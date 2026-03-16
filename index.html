@@ -1502,6 +1502,28 @@
   .pred-card { cursor:pointer; }
 
   /* ── $A-COIN SYSTEM ── */
+  /* Golden $A-Coin icon — usada en toda la app */
+  .acico {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.55em;
+    height: 1.55em;
+    background: radial-gradient(circle at 35% 30%, #fff5a0 0%, #ffd600 28%, #ffb300 58%, #cc5500 100%);
+    border-radius: 50%;
+    font-weight: 900;
+    font-style: normal;
+    color: #2d0f00;
+    vertical-align: middle;
+    box-shadow: 0 0 9px rgba(255,210,0,0.55), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.45);
+    border: 1px solid rgba(255,160,0,0.8);
+    flex-shrink: 0;
+    font-size: 0.72em;
+    line-height: 1;
+    text-shadow: none;
+    letter-spacing: -0.03em;
+  }
+
   .acoin-widget {
     display: flex; align-items: center; gap: 6px;
     background: linear-gradient(135deg, rgba(255,214,0,0.15), rgba(255,180,0,0.08));
@@ -2013,8 +2035,8 @@
 
   <!-- $A-Coin widget -->
   <button class="acoin-widget" onclick="openAcoinPanel()" title="Tu saldo $A-Coin">
-    <span class="acoin-widget-icon">🪙</span>
-    <span class="acoin-widget-bal">$<span id="acoinNavBal">0</span></span>
+    <span class="acoin-widget-icon"><span class="acico">$</span></span>
+    <span class="acoin-widget-bal"><span id="acoinNavBal">0</span></span>
   </button>
 
   <!-- Auth button (logged out) -->
@@ -2544,6 +2566,8 @@ const AC_PICK = 'acoin_picks';
 const AC_HIST = 'acoin_history';
 const AC_DAY  = 'acoin_last_daily';
 const AC_GOAL = 100000;
+// Ícono moneda dorada — usar en template literals con ${AC_ICON}
+const AC_ICON = '<span class="acico">$</span>';
 
 // ═══════════════════════════════════════════════
 //  SUPABASE CLIENT
@@ -4653,16 +4677,24 @@ function renderOdds() {
       }
     }
     const hasScore = !!scoreEntry;
+    // Si el partido terminó según scoresData → no mostrar como live
+    const isFinal  = scoreEntry?.flag === 'final';
+    const showLive = row.live && !isFinal;
+
+    // Ocultar completamente si terminó y no hay score (partido ya pasado sin datos)
+    if (isFinal && !hasScore) return '';
 
     return `
-      <div style="background:var(--tarjeta);border:1px solid ${row.live ? 'rgba(229,57,53,0.35)' : 'var(--borde)'};border-radius:12px;padding:12px 0 0">
+      <div style="background:var(--tarjeta);border:1px solid ${showLive ? 'rgba(229,57,53,0.35)' : isFinal ? 'rgba(255,255,255,0.08)' : 'var(--borde)'};border-radius:12px;padding:12px 0 0">
         <!-- Encabezado del partido -->
         <div style="padding:0 12px 6px">
-          <!-- Badge horario/live centrado -->
+          <!-- Badge horario/live/final centrado -->
           <div style="text-align:center;margin-bottom:6px">
-            ${row.live
+            ${showLive
               ? `<span class="live-badge"><span class="live-dot"></span>En Vivo</span>`
-              : `<span style="font-size:0.65rem;color:var(--texto-sec)">${row.time||''}</span>`
+              : isFinal
+                ? `<span style="font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:5px;padding:2px 7px;letter-spacing:.4px">FINAL</span>`
+                : `<span style="font-size:0.65rem;color:var(--texto-sec)">${row.time||''}</span>`
             }
           </div>
           <!-- Equipos: local — score/vs — visitante -->
@@ -4692,7 +4724,7 @@ function renderOdds() {
         ${bookRows}
         ${bestRow}
       </div>`;
-  }).join('');
+  }).filter(Boolean).join('');
 }
 
 // ═══════════════════════════════════════════════
@@ -5235,7 +5267,10 @@ function processOddsIntoComparador(data) {
     if (pa !== pb) return pb - pa;
     return new Date(a.commence_time) - new Date(b.commence_time);
   });
-  const top8 = filtered.slice(0, 8);
+  // Excluir partidos que casi seguro ya terminaron (iniciados hace más de 3h)
+  const top8 = filtered
+    .filter(g => new Date(g.commence_time).getTime() > nowTs - 3 * 3600000)
+    .slice(0, 8);
 
   const fixedKeys = FIXED_BOOKS.map(b => b.key);
   oddsData = top8.map(game => {
@@ -5266,7 +5301,8 @@ function processOddsIntoComparador(data) {
       });
     }
     const commenceTs = new Date(game.commence_time).getTime();
-    const isLive = commenceTs <= Date.now();
+    // "live" solo si empezó Y no hace más de 3h (no terminó)
+    const isLive = commenceTs <= Date.now() && commenceTs > Date.now() - 3 * 3600000;
     return {
       match: `${shortName(game.home_team)} vs ${shortName(game.away_team)}`,
       homeRaw: game.home_team,
@@ -5899,7 +5935,7 @@ function acUpdateUI() {
   const el = document.getElementById('acoinNavBal');
   if (el) el.textContent = fmt;
   const pb = document.getElementById('acoinPanelBal');
-  if (pb) pb.textContent = fmt + ' $A-Coin';
+  if (pb) pb.textContent = fmt;
   const pct = Math.min(100, Math.round(bal / AC_GOAL * 100));
   const pctEl = document.getElementById('acoinPanelPct');
   if (pctEl) pctEl.textContent = pct + '%';
@@ -5937,9 +5973,9 @@ function closeAcoinPanel() { document.getElementById('acoinPanel').classList.rem
 let _toastTimer = null;
 function acToast(icon, title, sub) {
   const t = document.getElementById('acoinToast');
-  document.getElementById('acoinToastIcon').textContent  = icon;
-  document.getElementById('acoinToastTitle').textContent = title;
-  document.getElementById('acoinToastSub').textContent   = sub;
+  document.getElementById('acoinToastIcon').innerHTML  = icon;
+  document.getElementById('acoinToastTitle').innerHTML = title;
+  document.getElementById('acoinToastSub').innerHTML   = sub;
   t.classList.add('show');
   clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => t.classList.remove('show'), 3800);
@@ -5952,7 +5988,7 @@ function acCheckDaily() {
   if (acGet() >= 500) return;
   acAdd(10000, '🌅 Bonus diario');
   localStorage.setItem(AC_DAY, today);
-  setTimeout(() => acToast('🌅', '+10.000 $A-Coin', 'Bonus diario recibido'), 1200);
+  setTimeout(() => acToast('🌅', `+10.000 ${AC_ICON} $A-Coin`, 'Bonus diario recibido'), 1200);
 }
 
 /* ── Bet state ── */
@@ -6015,7 +6051,7 @@ function acRefreshConfirm(matchId) {
   if (!amount || !odds) return;
   const ret = Math.round(amount * odds);
   confirm.disabled  = false;
-  confirm.innerHTML = `🎲 Apostar <strong>${acFmt(amount)}</strong> 🪙 → ganá <strong>${acFmt(ret)}</strong> 🪙`;
+  confirm.innerHTML = `🎲 Apostar <strong>${acFmt(amount)}</strong> ${AC_ICON} → ganá <strong>${acFmt(ret)}</strong> ${AC_ICON}`;
 }
 
 function acConfirmBet(matchId, home, away) {
@@ -6030,7 +6066,7 @@ function acConfirmBet(matchId, home, away) {
   if (picks.find(p => p.id === matchId)) return;
   const bal = acGet();
   if (bal < state.amount) {
-    acToast('❌', 'Saldo insuficiente', `Necesitás ${acFmt(state.amount)} 🪙`);
+    acToast('❌', 'Saldo insuficiente', `Necesitás ${acFmt(state.amount)} ${AC_ICON}`);
     return;
   }
   // Deduct immediately
@@ -6051,10 +6087,10 @@ function acConfirmBet(matchId, home, away) {
   const step2 = document.getElementById('acbet-s2-' + matchId);
   if (step2) step2.innerHTML = `
     <div style="text-align:center;padding:6px 4px;font-size:0.72rem;color:rgba(255,214,0,0.65)">
-      ⏳ ${acFmt(state.amount)} 🪙 apostados en <strong style="color:#ffd600">${labels[state.choice]}</strong>
-      · Si acertás ganás <strong style="color:#ffd600">${acFmt(ret)} 🪙</strong>
+      ⏳ ${acFmt(state.amount)} ${AC_ICON} apostados en <strong style="color:#ffd600">${labels[state.choice]}</strong>
+      · Si acertás ganás <strong style="color:#ffd600">${acFmt(ret)} ${AC_ICON}</strong>
     </div>`;
-  acToast('🎲', `${acFmt(state.amount)} 🪙 apostados`, `Potencial retorno: ${acFmt(ret)} 🪙`);
+  acToast('🎲', `${acFmt(state.amount)} ${AC_ICON} apostados`, `Potencial retorno: ${acFmt(ret)} ${AC_ICON}`);
 }
 
 /* ── Evaluate picks vs final scores ── */
@@ -6080,11 +6116,11 @@ function acEvaluatePicks() {
     if (correct) {
       const returnAmt = Math.round(betAmt * odds);
       acAdd(returnAmt, `✅ ${matchLabel}`);
-      acToast('✅', `+${acFmt(returnAmt)} 🪙`, `¡Acertaste! ${matchLabel}`);
+      acToast('✅', `+${acFmt(returnAmt)} ${AC_ICON}`, `¡Acertaste! ${matchLabel}`);
       p.coinsChange = returnAmt;
     } else {
       // coins already deducted when bet was placed — no extra penalty
-      acToast('❌', `Fallaste en ${matchLabel}`, `Perdiste ${acFmt(betAmt)} 🪙 apostados`);
+      acToast('❌', `Fallaste en ${matchLabel}`, `Perdiste ${acFmt(betAmt)} ${AC_ICON} apostados`);
       p.coinsChange = -betAmt;
     }
     p.evaluated = true; p.result = actual; p.correct = correct;
@@ -6111,7 +6147,7 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
     if (!existing.evaluated) {
       // Locked — pending result
       return `<div class="acoin-pick-section">
-        <div class="acoin-pick-label">🪙 Apostaste ${acFmt(betAmt)} en <span style="color:#ffd600">${labels[existing.pick]}</span></div>
+        <div class="acoin-pick-label">${AC_ICON} Apostaste ${acFmt(betAmt)} en <span style="color:#ffd600">${labels[existing.pick]}</span></div>
         <div class="acoin-pick-btns">
           ${['home','draw','away'].map(ch => `
             <button class="acoin-pick-btn ${ch===existing.pick?'selected':''}" disabled
@@ -6126,8 +6162,8 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
     // Evaluated
     const chg  = Math.abs(existing.coinsChange || (existing.correct ? ret : betAmt));
     const resultLabel = existing.correct
-      ? `✅ +${acFmt(chg)} 🪙 ganados`
-      : `❌ Perdiste ${acFmt(betAmt)} 🪙 apostados`;
+      ? `✅ +${acFmt(chg)} ${AC_ICON} ganados`
+      : `❌ Perdiste ${acFmt(betAmt)} ${AC_ICON} apostados`;
     return `<div class="acoin-pick-section">
       <div class="acoin-pick-label">${resultLabel}</div>
       <div class="acoin-pick-btns">
@@ -6147,7 +6183,7 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
   // No pick yet — interactive bet UI
   const chips = [500, 1000, 2000, 5000];
   return `<div class="acoin-pick-section">
-    <div class="acoin-pick-label">🪙 Apostá tus $A-Coins</div>
+    <div class="acoin-pick-label">${AC_ICON} Apostá tus $A-Coins</div>
     <div class="acoin-pick-btns">
       ${['home','draw','away'].map(ch => {
         const o = oddsMap[ch];
@@ -6155,7 +6191,7 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
         return `<button class="acoin-pick-btn" data-pick-match="${matchId}" data-pick-choice="${ch}"
           onclick="acSelectOutcome('${safeId}','${ch}',${o})">
           <span class="apb-label">${labels[ch]}</span>
-          <span class="apb-coins">x${o} 🪙</span>
+          <span class="apb-coins">x${o} ${AC_ICON}</span>
         </button>`;
       }).join('')}
     </div>
@@ -6628,10 +6664,23 @@ function admSaveConfig() {
 <div class="acoin-panel" id="acoinPanel" onclick="if(event.target===this)closeAcoinPanel()">
   <div class="acoin-panel-box">
     <button class="acoin-panel-close" onclick="closeAcoinPanel()">✕</button>
-    <div style="text-align:center;margin-bottom:20px">
-      <div style="font-size:2.4rem;margin-bottom:6px">🪙</div>
-      <div style="font-size:1.6rem;font-weight:900;color:#ffd600" id="acoinPanelBal">0 $A-Coin</div>
-      <div style="font-size:0.78rem;color:var(--texto-sec);margin-top:3px">Tu saldo actual</div>
+    <div style="text-align:center;margin-bottom:22px">
+      <!-- Moneda grande -->
+      <div style="display:flex;align-items:center;justify-content:center;margin-bottom:10px">
+        <span style="
+          display:inline-flex;align-items:center;justify-content:center;
+          width:68px;height:68px;
+          background:radial-gradient(circle at 35% 28%, #fff9b0 0%, #ffd600 28%, #ffb300 58%, #bb4400 100%);
+          border-radius:50%;
+          font-size:2rem;font-weight:900;color:#2d0f00;
+          box-shadow:0 0 28px rgba(255,210,0,0.65),0 4px 14px rgba(0,0,0,0.55),inset 0 2px 0 rgba(255,255,255,0.5);
+          border:2px solid rgba(255,170,0,0.9);
+          text-shadow:none;letter-spacing:-0.04em;line-height:1
+        ">$</span>
+      </div>
+      <!-- Balance -->
+      <div style="font-size:2rem;font-weight:900;color:#ffd600;line-height:1;letter-spacing:-0.5px" id="acoinPanelBal">0</div>
+      <div style="font-size:0.72rem;font-weight:700;color:rgba(255,214,0,0.55);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px">$A-Coin · Tu saldo</div>
     </div>
     <!-- Progreso hacia 100.000 -->
     <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,214,0,0.2);border-radius:14px;padding:14px 16px;margin-bottom:16px">
@@ -7305,7 +7354,7 @@ function aiGetMatchContext() {
 
 <!-- $A-COIN TOAST -->
 <div class="acoin-toast" id="acoinToast">
-  <span class="acoin-toast-icon" id="acoinToastIcon">🪙</span>
+  <span class="acoin-toast-icon" id="acoinToastIcon"><span class="acico">$</span></span>
   <div class="acoin-toast-text">
     <div class="at-title" id="acoinToastTitle">+1.000 $A-Coin</div>
     <div class="at-sub"   id="acoinToastSub">¡Acertaste!</div>
