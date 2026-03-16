@@ -3737,15 +3737,6 @@ function buildPredsFromOdds() {
     else if (maxProb >= 57) bvr = 3;
     else                    bvr = 2;
     const bvrText = bvr === 6 ? 'Máxima' : bvr === 5 ? 'Alta' : bvr >= 3 ? 'Media' : 'Baja';
-    const bvrGemsHtml = Array.from({length:6}, (_,i) =>
-      `<div class="bvr-gem ${i < bvr ? 'active-'+bvr : ''}"></div>`
-    ).join('');
-    const bvrHtml = `
-      <div class="bvr-wrap">
-        <span class="bvr-label">Confianza IA</span>
-        <div class="bvr-gems">${bvrGemsHtml}</div>
-        <span class="bvr-text r${bvr}">${bvr}/6 · ${bvrText}</span>
-      </div>`;
 
     // Cuotas formateadas
     const oddsPills = [];
@@ -3778,6 +3769,8 @@ function buildPredsFromOdds() {
       time:        matchTime(g.commence_time),
       commenceTs:  new Date(g.commence_time).getTime(),
       insight,
+      bvr,
+      bvrText,
       formH:   null, // No disponible en la API de odds
       formA:   null,
       _hO: hO, _dO: dO, _aO: aO,
@@ -3835,6 +3828,18 @@ function renderPreds() {
     </div>`;
 
   document.getElementById('predGrid').innerHTML = source.map((p, idx) => {
+    // BVR: usar valor guardado en p, o derivar de p.conf para datos estáticos
+    const _bvr     = p.bvr     || (p.conf==='high' ? 5 : p.conf==='med' ? 3 : 2);
+    const _bvrText = p.bvrText || (p.conf==='high' ? 'Alta' : p.conf==='med' ? 'Media' : 'Baja');
+    const _bvrGemsHtml = Array.from({length:6}, (_,i) =>
+      `<div class="bvr-gem ${i < _bvr ? 'active-'+_bvr : ''}"></div>`
+    ).join('');
+    const bvrHtml = `<div class="bvr-wrap">
+      <span class="bvr-label">Confianza IA</span>
+      <div class="bvr-gems">${_bvrGemsHtml}</div>
+      <span class="bvr-text r${_bvr}">${_bvr}/6 · ${_bvrText}</span>
+    </div>`;
+
     const oddsHtml = affCtaHtml;
 
     // Detectar si el partido está en vivo en scoresData
