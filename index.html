@@ -506,6 +506,52 @@
     margin-bottom: 14px;
   }
 
+  /* ── BET VALUE RATING ── */
+  .bvr-wrap {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 12px;
+    padding: 7px 11px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .bvr-label {
+    font-size: 0.63rem;
+    font-weight: 700;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.45);
+    white-space: nowrap;
+  }
+  .bvr-gems {
+    display: flex;
+    gap: 4px;
+    flex: 1;
+  }
+  .bvr-gem {
+    width: 18px;
+    height: 14px;
+    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+    background: rgba(255,255,255,0.1);
+    transition: all 0.2s;
+  }
+  .bvr-gem.active-2 { background: #ef5350; box-shadow: 0 0 5px rgba(239,83,80,0.5); }
+  .bvr-gem.active-3, .bvr-gem.active-4 { background: #ff9800; box-shadow: 0 0 5px rgba(255,152,0,0.5); }
+  .bvr-gem.active-5 { background: #66bb6a; box-shadow: 0 0 6px rgba(102,187,106,0.6); }
+  .bvr-gem.active-6 { background: linear-gradient(135deg,#ffd600,#ff9800); box-shadow: 0 0 8px rgba(255,214,0,0.7); }
+  .bvr-text {
+    font-size: 0.65rem;
+    font-weight: 800;
+    white-space: nowrap;
+    letter-spacing: 0.3px;
+  }
+  .bvr-text.r2 { color: #ef5350; }
+  .bvr-text.r3, .bvr-text.r4 { color: #ff9800; }
+  .bvr-text.r5 { color: #66bb6a; }
+  .bvr-text.r6 { color: #ffd600; text-shadow: 0 0 8px rgba(255,214,0,0.5); }
+
   .confidence-badge {
     font-size: 0.75rem;
     font-weight: 700;
@@ -3683,6 +3729,24 @@ function buildPredsFromOdds() {
     else if (maxProb >= 52) { conf = 'med';  confLabel = `Media (${maxProb}%)`; }
     else                    { conf = 'low';  confLabel = `Baja (${maxProb}%)`; }
 
+    // Bet Value Rating: 2–6
+    let bvr;
+    if      (maxProb >= 80) bvr = 6;
+    else if (maxProb >= 70) bvr = 5;
+    else if (maxProb >= 62) bvr = 4;
+    else if (maxProb >= 57) bvr = 3;
+    else                    bvr = 2;
+    const bvrText = bvr === 6 ? 'Máxima' : bvr === 5 ? 'Alta' : bvr >= 3 ? 'Media' : 'Baja';
+    const bvrGemsHtml = Array.from({length:6}, (_,i) =>
+      `<div class="bvr-gem ${i < bvr ? 'active-'+bvr : ''}"></div>`
+    ).join('');
+    const bvrHtml = `
+      <div class="bvr-wrap">
+        <span class="bvr-label">Confianza IA</span>
+        <div class="bvr-gems">${bvrGemsHtml}</div>
+        <span class="bvr-text r${bvr}">${bvr}/6 · ${bvrText}</span>
+      </div>`;
+
     // Cuotas formateadas
     const oddsPills = [];
     if (hO) oddsPills.push(`L:${hO.toFixed(2)}`);
@@ -3831,6 +3895,7 @@ function renderPreds() {
           </div>
         </div>
       </div>
+      ${bvrHtml}
       <div class="pred-match">
         <div class="pred-team">
           <div class="pred-emoji">${logoHtml(p.home, 52)}</div>
