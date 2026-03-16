@@ -3661,8 +3661,8 @@ function buildPredsFromOdds() {
     candidates = window._rawOddsGames
       .filter(g => {
         const t = new Date(g.commence_time).getTime();
-        // Incluir partidos que empezaron hace hasta 3h (podrían estar en vivo)
-        return t >= (now - 3 * 3600000) && t <= windowEnd;
+        // Solo partidos que AÚN NO empezaron (pronósticos pre-partido únicamente)
+        return t > now && t <= windowEnd;
       })
       .filter(hasH2HData)
       .sort((a, b) => {
@@ -3672,7 +3672,7 @@ function buildPredsFromOdds() {
         return new Date(a.commence_time) - new Date(b.commence_time);
       })
       .slice(0, 6);
-    if (candidates.length >= 3) break; // suficientes partidos
+    if (candidates.length >= 2) break; // suficientes partidos pre-partido
   }
 
   console.log(`[Preds] ${candidates.length} partidos reales encontrados en _rawOddsGames (${window._rawOddsGames.length} totales)`);
@@ -5185,6 +5185,109 @@ function cacheGet(key, ttl) {
 }
 
 let _oddsLoading = false;
+function processOddsIntoComparador(data) {
+  // Collect all bookmakers present in the response
+  const bookMap = {};
+  data.forEach(game => {
+    game.bookmakers?.forEach(b => { bookMap[b.key] = b.title; });
+  });
+  const books = Object.keys(bookMap).slice(0, 5);
+  if (books.length === 0) return;
+
+  // Update globals so renderOdds uses the real book names
+  allBooks = books;
+  featuredBooks = books.slice(0, 2);
+  bookLabels = bookMap;
+
+  // Filtrar: solo partidos de hoy (o próximas 24h si no hay de hoy)
+  const nowTs = Date.now();
+  const todayStart = new Date().setHours(0,0,0,0);
+  const todayEnd   = todayStart + 86400000;
+  let filtered = data.filter(g => {
+    const t = new Date(g.commence_time).getTime();
+    return t >= todayStart && t < todayEnd;
+  });
+  if (filtered.length === 0) {
+    filtered = data.filter(g => new Date(g.commence_time).getTime() >= nowTs)
+                   .sort((a,b) => new Date(a.commence_time) - new Date(b.commence_time))
+                   .slice(0, 8);
+  }
+  const PRIO = {
+    soccer_argentina_primera_division: 10,
+    soccer_argentina_primera_nacional: 9,
+    soccer_south_america_copa_libertadores: 8,
+    soccer_south_america_copa_sudamericana: 7,
+    soccer_uefa_champs_league: 7,
+    soccer_spain_la_liga: 6,
+    soccer_epl: 6,
+    soccer_brazil_campeonato: 5,
+    soccer_italy_serie_a: 5,
+    soccer_germany_bundesliga: 5,
+    soccer_france_ligue_one: 4,
+    soccer_uefa_europa_league: 4,
+    soccer_uefa_europa_conference_league: 3,
+    soccer_mexico_ligamx: 3,
+    soccer_usa_mls: 2,
+  };
+  filtered.sort((a,b) => {
+    const pa = PRIO[a.sport_key] || 1;
+    const pb = PRIO[b.sport_key] || 1;
+    if (pa !== pb) return pb - pa;
+    return new Date(a.commence_time) - new Date(b.commence_time);
+  });
+  const top8 = filtered.slice(0, 8);
+
+  const fixedKeys = FIXED_BOOKS.map(b => b.key);
+  oddsData = top8.map(game => {
+    const book = {};
+    fixedKeys.forEach(bKey => {
+      const bm = game.bookmakers?.find(b => b.key === bKey);
+      const market = bm?.markets?.find(m => m.key === 'h2h');
+      if (market) {
+        const home = market.outcomes.find(o => o.name === game.home_team)?.price ?? null;
+        const draw = market.outcomes.find(o => o.name === 'Draw')?.price ?? null;
+        const away = market.outcomes.find(o => o.name === game.away_team)?.price ?? null;
+        book[bKey] = [home, draw, away];
+      }
+    });
+    const hasAnyFixed = fixedKeys.some(k => book[k]);
+    if (!hasAnyFixed) {
+      const apiBooks = (game.bookmakers || [])
+        .filter(b => b.markets?.some(m => m.key === 'h2h'))
+        .slice(0, 5);
+      apiBooks.forEach((bm, idx) => {
+        const targetKey = fixedKeys[idx];
+        if (!targetKey) return;
+        const market = bm.markets.find(m => m.key === 'h2h');
+        const home = market.outcomes.find(o => o.name === game.home_team)?.price ?? null;
+        const draw = market.outcomes.find(o => o.name === 'Draw')?.price ?? null;
+        const away = market.outcomes.find(o => o.name === game.away_team)?.price ?? null;
+        book[targetKey] = [home, draw, away];
+      });
+    }
+    const commenceTs = new Date(game.commence_time).getTime();
+    const isLive = commenceTs <= Date.now();
+    return {
+      match: `${shortName(game.home_team)} vs ${shortName(game.away_team)}`,
+      homeRaw: game.home_team,
+      awayRaw: game.away_team,
+      league: leagueLabel(game.sport_title),
+      time: matchTime(game.commence_time),
+      commenceTs,
+      tipo: 'Ganador',
+      live: isLive,
+      book
+    };
+  });
+
+  const newOddsHash = JSON.stringify(oddsData.map(o => o.match));
+  if (!window._lastOddsHash || window._lastOddsHash !== newOddsHash) {
+    window._lastOddsHash = newOddsHash;
+    renderOdds();
+    console.log(`[Comparador] ${oddsData.length} cuotas cargadas`);
+  }
+}
+
 async function loadRealOdds(retryCount = 0) {
   if (retryCount === 0 && _oddsLoading) return; // evitar llamadas concurrentes
   // Use cache if fresh (skip API call)
@@ -5194,6 +5297,7 @@ async function loadRealOdds(retryCount = 0) {
       window._rawOddsGames = cached;
       renderScores(currentScoreFilter);
       renderPreds();
+      processOddsIntoComparador(cached); // poblar comparador desde caché
       console.log('[cache] odds desde caché localStorage');
       return;
     }
@@ -5225,113 +5329,7 @@ async function loadRealOdds(retryCount = 0) {
     // Actualizar predicciones con datos reales de la API
     renderPreds();
 
-    // Collect all bookmakers present in the response
-    const bookMap = {};
-    data.forEach(game => {
-      game.bookmakers?.forEach(b => { bookMap[b.key] = b.title; });
-    });
-    const books = Object.keys(bookMap).slice(0, 5);
-    if (books.length === 0) return;
-
-    // Update globals so renderOdds uses the real book names
-    allBooks = books;
-    featuredBooks = books.slice(0, 2);
-    bookLabels = bookMap;
-
-    // Filtrar: solo partidos de hoy (o próximas 24h si no hay de hoy)
-    const nowTs = Date.now();
-    const todayStart = new Date().setHours(0,0,0,0);
-    const todayEnd   = todayStart + 86400000;
-    let filtered = data.filter(g => {
-      const t = new Date(g.commence_time).getTime();
-      return t >= todayStart && t < todayEnd;
-    });
-    if (filtered.length === 0) {
-      // No hay de hoy → próximos 8 más cercanos
-      filtered = data.filter(g => new Date(g.commence_time).getTime() >= nowTs)
-                     .sort((a,b) => new Date(a.commence_time) - new Date(b.commence_time))
-                     .slice(0, 8);
-    }
-    // Priorizar: Argentina > Libertadores/Sud > Champions > España > Inglaterra > Italia > resto
-    const PRIO = {
-      soccer_argentina_primera_division: 10,
-      soccer_argentina_primera_nacional: 9,
-      soccer_south_america_copa_libertadores: 8,
-      soccer_south_america_copa_sudamericana: 7,
-      soccer_uefa_champs_league: 7,
-      soccer_spain_la_liga: 6,
-      soccer_epl: 6,
-      soccer_brazil_campeonato: 5,
-      soccer_italy_serie_a: 5,
-      soccer_germany_bundesliga: 5,
-      soccer_france_ligue_one: 4,
-      soccer_uefa_europa_league: 4,
-      soccer_uefa_europa_conference_league: 3,
-      soccer_mexico_ligamx: 3,
-      soccer_usa_mls: 2,
-    };
-    filtered.sort((a,b) => {
-      const pa = PRIO[a.sport_key] || 1;
-      const pb = PRIO[b.sport_key] || 1;
-      if (pa !== pb) return pb - pa;
-      return new Date(a.commence_time) - new Date(b.commence_time);
-    });
-    const top8 = filtered.slice(0, 8);
-
-    // Transform API response → internal format
-    // Siempre usar las claves de FIXED_BOOKS para que renderOdds encuentre los valores
-    const fixedKeys = FIXED_BOOKS.map(b => b.key);
-    oddsData = top8.map(game => {
-      const book = {};
-      // Primero intentar con las casas fijas afiliadas
-      fixedKeys.forEach(bKey => {
-        const bm = game.bookmakers?.find(b => b.key === bKey);
-        const market = bm?.markets?.find(m => m.key === 'h2h');
-        if (market) {
-          const home = market.outcomes.find(o => o.name === game.home_team)?.price ?? null;
-          const draw = market.outcomes.find(o => o.name === 'Draw')?.price ?? null;
-          const away = market.outcomes.find(o => o.name === game.away_team)?.price ?? null;
-          book[bKey] = [home, draw, away];
-        }
-      });
-      // Si ninguna casa fija tiene datos, tomar las primeras 5 de la API y mapearlas a FIXED_BOOKS
-      const hasAnyFixed = fixedKeys.some(k => book[k]);
-      if (!hasAnyFixed) {
-        const apiBooks = (game.bookmakers || [])
-          .filter(b => b.markets?.some(m => m.key === 'h2h'))
-          .slice(0, 5);
-        apiBooks.forEach((bm, idx) => {
-          const targetKey = fixedKeys[idx];
-          if (!targetKey) return;
-          const market = bm.markets.find(m => m.key === 'h2h');
-          const home = market.outcomes.find(o => o.name === game.home_team)?.price ?? null;
-          const draw = market.outcomes.find(o => o.name === 'Draw')?.price ?? null;
-          const away = market.outcomes.find(o => o.name === game.away_team)?.price ?? null;
-          book[targetKey] = [home, draw, away];
-        });
-      }
-      const commenceTs = new Date(game.commence_time).getTime();
-      const isLive = commenceTs <= Date.now();
-      return {
-        match: `${shortName(game.home_team)} vs ${shortName(game.away_team)}`,
-        homeRaw: game.home_team,
-        awayRaw: game.away_team,
-        league: leagueLabel(game.sport_title),
-        time: matchTime(game.commence_time),
-        commenceTs,
-        tipo: 'Ganador',
-        live: isLive,
-        book
-      };
-    });
-
-    // Solo re-renderizar si los partidos cambiaron
-    const newOddsHash = JSON.stringify(oddsData.map(o => o.match));
-    if (!window._lastOddsHash || window._lastOddsHash !== newOddsHash) {
-      window._lastOddsHash = newOddsHash;
-      renderOdds();
-      console.log(`[Worker] ${oddsData.length} cuotas actualizadas`);
-    }
+    processOddsIntoComparador(data);
     _oddsLoading = false;
   } catch (e) {
     if (retryCount < 3) {
