@@ -1694,14 +1694,19 @@
   .lang-picker { position: relative; flex-shrink: 0; }
   #langBtn {
     width: 36px; height: 36px; border-radius: 50%;
-    border: 1.5px solid rgba(0,200,83,0.25);
-    background: rgba(0,200,83,0.07);
-    font-size: 1.25rem; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.2s, transform 0.15s;
-    line-height: 1;
+    border: 2px solid rgba(0,200,83,0.5);
+    background: #222 center/cover no-repeat;
+    cursor: pointer; padding: 0; overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    box-shadow: 0 0 0 0 rgba(0,200,83,0);
+    flex-shrink: 0;
+    font-size: 0; /* ocultar cualquier texto/emoji residual */
   }
-  #langBtn:hover { background: rgba(0,200,83,0.18); transform: scale(1.08); }
+  #langBtn:hover {
+    border-color: rgba(0,200,83,0.9);
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(0,200,83,0.3);
+  }
   .lang-dropdown {
     display: none; position: absolute;
     top: calc(100% + 8px); right: 0;
@@ -2075,7 +2080,7 @@
 
   <!-- Language picker — always last -->
   <div class="lang-picker" id="langPicker">
-    <button id="langBtn" onclick="toggleLangMenu(event)" aria-label="Idioma">🇪🇸</button>
+    <button id="langBtn" onclick="toggleLangMenu(event)" aria-label="Idioma" style="background-image:url('https://flagcdn.com/w40/es.png')"></button>
     <div class="lang-dropdown" id="langDropdown">
       <button onclick="setLang('es')" id="langOpt_es">🇪🇸 Español</button>
       <button onclick="setLang('en')" id="langOpt_en">🇺🇸 English</button>
@@ -2775,6 +2780,8 @@ const teamLogos = {
   'Empoli FC':              'https://media.api-sports.io/football/teams/511.png',
   // ── FRANCIA ──
   'Paris Saint-Germain':    'https://media.api-sports.io/football/teams/85.png',
+  'Paris Saint Germain':    'https://media.api-sports.io/football/teams/85.png',
+  'Paris SG':               'https://media.api-sports.io/football/teams/85.png',
   'PSG':                    'https://media.api-sports.io/football/teams/85.png',
   'Olympique Lyonnais':     'https://media.api-sports.io/football/teams/80.png',
   'Lyon':                   'https://media.api-sports.io/football/teams/80.png',
@@ -2994,6 +3001,8 @@ const teamLogos = {
   'Argentinos Juniors':     'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1b/Escudo_de_la_Asociaci%C3%B3n_Atl%C3%A9tica_Argentinos_Juniors.svg/330px-Escudo_de_la_Asociaci%C3%B3n_Atl%C3%A9tica_Argentinos_Juniors.svg.png',
   'Newell\'s Old Boys':     'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Escudo_del_Club_Atl%C3%A9tico_Newell%27s_Old_Boys_de_Rosario.svg/330px-Escudo_del_Club_Atl%C3%A9tico_Newell%27s_Old_Boys_de_Rosario.svg.png',
   "Newell's Old Boys":      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Escudo_del_Club_Atl%C3%A9tico_Newell%27s_Old_Boys_de_Rosario.svg/330px-Escudo_del_Club_Atl%C3%A9tico_Newell%27s_Old_Boys_de_Rosario.svg.png',
+  'Newells Old Boys':       'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Escudo_del_Club_Atl%C3%A9tico_Newell%27s_Old_Boys_de_Rosario.svg/330px-Escudo_del_Club_Atl%C3%A9tico_Newell%27s_Old_Boys_de_Rosario.svg.png',
+  'Newell Old Boys':        'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Escudo_del_Club_Atl%C3%A9tico_Newell%27s_Old_Boys_de_Rosario.svg/330px-Escudo_del_Club_Atl%C3%A9tico_Newell%27s_Old_Boys_de_Rosario.svg.png',
   'Rosario Central':        'https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/Rosario_Central_logo.svg/330px-Rosario_Central_logo.svg.png',
   'Colón':                  'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Escudo_Colon_Con_Estrella.png/330px-Escudo_Colon_Con_Estrella.png',
   'Colon':                  'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Escudo_Colon_Con_Estrella.png/330px-Escudo_Colon_Con_Estrella.png',
@@ -5158,10 +5167,10 @@ function setLang(lang) {
     const key = el.getAttribute('data-i18n');
     el.textContent = T(key);
   });
-  // Update lang button flag
-  const flags = { es:'🇪🇸', en:'🇺🇸', pt:'🇧🇷' };
+  // Update lang button with flag image
+  const flagImgs = { es:'https://flagcdn.com/w40/es.png', en:'https://flagcdn.com/w40/us.png', pt:'https://flagcdn.com/w40/br.png' };
   const btn = document.getElementById('langBtn');
-  if (btn) btn.textContent = flags[lang] || '🌐';
+  if (btn) btn.style.backgroundImage = `url('${flagImgs[lang] || flagImgs.es}')`;
   // Highlight active option
   ['es','en','pt'].forEach(l => {
     const opt = document.getElementById('langOpt_' + l);
