@@ -2897,8 +2897,17 @@ const teamLogos = {
   'Belgrano de Cordoba':    'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Escudo_Oficial_del_Club_Atl%C3%A9tico_Belgrano.png/330px-Escudo_Oficial_del_Club_Atl%C3%A9tico_Belgrano.png',
   'Belgrano de Córdoba':    'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Escudo_Oficial_del_Club_Atl%C3%A9tico_Belgrano.png/330px-Escudo_Oficial_del_Club_Atl%C3%A9tico_Belgrano.png',
   'CA Belgrano':            'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Escudo_Oficial_del_Club_Atl%C3%A9tico_Belgrano.png/330px-Escudo_Oficial_del_Club_Atl%C3%A9tico_Belgrano.png',
-  'Huracán':                'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Emblema_oficial_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg/330px-Emblema_oficial_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg.png',
-  'Huracan':                'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Emblema_oficial_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg/330px-Emblema_oficial_del_Club_Atl%C3%A9tico_Hurac%C3%A1n.svg.png',
+  'Huracán':                'https://r2.thesportsdb.com/images/media/team/badge/3cafun1580842587.png',
+  'Huracan':                'https://r2.thesportsdb.com/images/media/team/badge/3cafun1580842587.png',
+  'Atlético Huracán':       'https://r2.thesportsdb.com/images/media/team/badge/3cafun1580842587.png',
+  'Atletico Huracan':       'https://r2.thesportsdb.com/images/media/team/badge/3cafun1580842587.png',
+  'CA Huracán':             'https://r2.thesportsdb.com/images/media/team/badge/3cafun1580842587.png',
+  'Aldosivi':               'https://r2.thesportsdb.com/images/media/team/badge/nqrjqb1517767667.png',
+  'Aldosivi Mar del Plata': 'https://r2.thesportsdb.com/images/media/team/badge/nqrjqb1517767667.png',
+  'Estudiantes de Río Cuarto': 'https://r2.thesportsdb.com/images/media/team/badge/b6szbk1578822113.png',
+  'Estudiantes Rio Cuarto': 'https://r2.thesportsdb.com/images/media/team/badge/b6szbk1578822113.png',
+  'Instituto de Córdoba':   'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Instituto_acc_cordoba_logo.svg/330px-Instituto_acc_cordoba_logo.svg.png',
+  'Instituto de Cordoba':   'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Instituto_acc_cordoba_logo.svg/330px-Instituto_acc_cordoba_logo.svg.png',
   'Defensa y Justicia':     'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Escudo_del_Club_Social_y_Deportivo_Defensa_y_Justicia.svg/330px-Escudo_del_Club_Social_y_Deportivo_Defensa_y_Justicia.svg.png',
   'Banfield':               'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/CA_Banfield_%282014%29.svg/330px-CA_Banfield_%282014%29.svg.png',
   'Tigre':                  'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Escudo_del_Club_Atl%C3%A9tico_Tigre_-_2019.svg/330px-Escudo_del_Club_Atl%C3%A9tico_Tigre_-_2019.svg.png',
@@ -5025,9 +5034,9 @@ function T(key) {
 function detectLang() {
   const saved = localStorage.getItem('aa_lang');
   if (saved && LANGS[saved]) return saved;
+  // Por defecto siempre español, salvo que el usuario lo cambie manualmente
   const bl = (navigator.language || 'es').toLowerCase();
   if (bl.startsWith('pt')) return 'pt';
-  if (bl.startsWith('en')) return 'en';
   return 'es';
 }
 
