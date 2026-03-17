@@ -3914,10 +3914,9 @@ function buildPredsFromOdds() {
   const upcoming = window._rawOddsGames.filter(g => new Date(g.commence_time).getTime() > (Date.now() - GAME_LOOKBACK)).length;
   console.log(`[Preds] ${candidates.length} candidatos | total:${totalRaw} withH2H:${withH2H} upcoming(±2h):${upcoming}`);
 
-  // Fallback: si no hay partidos en la ventana de 7 días (ej: parón internacional),
-  // mostrar los próximos partidos disponibles sin límite de tiempo
+  // Fallback nivel 1: sin límite de ventana pero solo partidos futuros (±2h)
   if (!candidates.length) {
-    console.warn('[Preds] Sin candidatos en ventana 7d — usando fallback sin límite de tiempo (posible parón)');
+    console.warn('[Preds] Fallback L1: sin ventana de tiempo (posible parón internacional)');
     candidates = window._rawOddsGames
       .filter(g => new Date(g.commence_time).getTime() > Date.now() - GAME_LOOKBACK)
       .filter(hasH2HData)
@@ -3928,10 +3927,18 @@ function buildPredsFromOdds() {
         return new Date(a.commence_time) - new Date(b.commence_time);
       })
       .slice(0, 6);
-    if (!candidates.length) {
-      console.warn('[Preds] Ningún partido con h2h disponible en _rawOddsGames');
-      return null;
-    }
+  }
+  // Fallback nivel 2: CUALQUIER partido con h2h, sin ningún filtro de tiempo
+  if (!candidates.length) {
+    console.warn('[Preds] Fallback L2: sin filtro de tiempo — mostrando cualquier partido con h2h');
+    candidates = window._rawOddsGames
+      .filter(hasH2HData)
+      .sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time))
+      .slice(0, 6);
+  }
+  if (!candidates.length) {
+    console.warn('[Preds] Sin ningún partido con h2h en los 172 juegos — revisar bookmakers');
+    return null;
   }
 
   return candidates.map(g => {
@@ -7179,7 +7186,17 @@ async function admDiagWorker() {
   log(`\n💾 Stale cache: ${stale ? JSON.parse(stale).length + ' partidos guardados' : 'vacía (nunca hubo conexión exitosa)'}`);
   const fresh = localStorage.getItem('cache_odds_v2');
   log(`💾 Fresh cache: ${fresh ? 'activa' : 'expirada/vacía'}`);
-  log(`\n🔍 _rawOddsGames en memoria: ${(window._rawOddsGames||[]).length} partidos`);
+  const raw = window._rawOddsGames || [];
+  log(`\n🔍 _rawOddsGames en memoria: ${raw.length} partidos`);
+  if (raw.length) {
+    const now2 = Date.now();
+    const withH2H2 = raw.filter(g => g.bookmakers?.some(b => b.markets?.some(m => m.key==='h2h'))).length;
+    const future2h = raw.filter(g => new Date(g.commence_time).getTime() > now2 - 7200000).length;
+    const future7d = raw.filter(g => { const t=new Date(g.commence_time).getTime(); return t>(now2-7200000)&&t<=(now2+168*3600000); }).length;
+    const sample = raw.slice(0,3).map(g=>`${g.home_team} vs ${g.away_team} @ ${g.commence_time}`).join('\n   ');
+    log(`   con h2h: ${withH2H2} | futuros±2h: ${future2h} | dentro de 7d: ${future7d}`);
+    log(`   Muestra:\n   ${sample}`);
+  }
   log(`\nListo. Revisá los ❌ arriba para saber qué arreglar.`);
 }
 
