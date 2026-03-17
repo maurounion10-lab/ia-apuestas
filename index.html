@@ -5321,6 +5321,7 @@ function savePredictions(preds) {
 
     hist.unshift({
       id, date: today, sport: p._sportKey?.includes('basketball') ? 'basket' : p._sportKey?.includes('tennis') ? 'tenis' : (p.sport || 'futbol'),
+      _sportKey: p._sportKey || null,   // guarda el API key real para resolver scores después
       home: p.home, away: p.away,
       rec: p.rec, odds: impliedOdds, stake,
       result: 'pending', pl: 0,
@@ -5402,42 +5403,89 @@ function resolveCompletedGames(scores, skipRender) {
   }
 }
 
+// Mapeo sport simple → API sport keys a consultar
+const SPORT_KEY_MAP = {
+  basket:  ['basketball_nba', 'basketball_euroleague', 'basketball_ncaab'],
+  futbol:  [
+    'soccer_argentina_primera_division', 'soccer_brazil_campeonato',
+    'soccer_conmebol_copa_libertadores', 'soccer_conmebol_copa_sudamericana',
+    'soccer_england_premier_league', 'soccer_spain_la_liga',
+    'soccer_germany_bundesliga', 'soccer_italy_serie_a',
+    'soccer_uefa_champs_league', 'soccer_uefa_europa_league',
+    'soccer_france_ligue_one', 'soccer_netherlands_eredivisie'
+  ],
+  tenis:   ['tennis_atp_french_open', 'tennis_wta']
+};
+
 // Carga scores históricos (últimos 3 días) para resolver predicciones pendientes
 async function loadHistoricalScores() {
   const hist = loadHistorial();
   const now = Date.now();
   const sevenDaysMs = 7 * 24 * 3600 * 1000;
-  // Resolver tanto 'pending' como 'void' recientes (< 7 días) — los void pueden haber sido
-  // seteados por un bug anterior, así que intentamos re-resolverlos con los scores del servidor
+  // Resolver tanto 'pending' como 'void' recientes (< 7 días)
   const needsResolve = hist.filter(h => {
-    if (h.result === 'win' || h.result === 'loss') return false; // ya resueltos, skip
-    // Estimar cuándo fue el partido
+    if (h.result === 'win' || h.result === 'loss') return false;
     const ts = h.commenceTs || (h.id && (() => { const m = h.id.match(/(\d{4}-\d{2}-\d{2})T/); return m ? new Date(m[1]).getTime() : null; })());
-    if (ts && (now - ts) > sevenDaysMs) return false; // demasiado viejo
-    return true; // pending o void reciente
+    if (ts && (now - ts) > sevenDaysMs) return false;
+    return true;
   });
   if (!needsResolve.length) return;
+
+  // Collect unique API sport keys needed
+  const needed = new Set();
+  needsResolve.forEach(h => {
+    if (h._sportKey) {
+      needed.add(h._sportKey);
+    } else {
+      // Inferir desde campo sport simplificado
+      const keys = SPORT_KEY_MAP[h.sport] || SPORT_KEY_MAP.futbol;
+      keys.forEach(k => needed.add(k));
+    }
+  });
+
+  const parseScores = (data) => (data || [])
+    .filter(g => g.completed && g.scores)
+    .map(g => {
+      const homeScore = g.scores?.find(s => s.name === g.home_team);
+      const awayScore = g.scores?.find(s => s.name === g.away_team);
+      return {
+        home:   shortName(g.home_team),
+        away:   shortName(g.away_team),
+        scoreH: parseInt(homeScore?.score) || 0,
+        scoreA: parseInt(awayScore?.score) || 0,
+        flag:   'final',
+      };
+    });
+
   try {
-    const res = await fetch(`${WORKER_URL}/scores?daysFrom=3`);
-    if (!res.ok) return;
-    const json = await res.json();
-    const data = json.data ?? (Array.isArray(json) ? json : []);
-    const historicalScores = data
-      .filter(g => g.completed && g.scores)
-      .map(g => {
-        const homeScore = g.scores?.find(s => s.name === g.home_team);
-        const awayScore = g.scores?.find(s => s.name === g.away_team);
-        return {
-          home:   shortName(g.home_team),
-          away:   shortName(g.away_team),
-          scoreH: parseInt(homeScore?.score) || 0,
-          scoreA: parseInt(awayScore?.score) || 0,
-          flag:   'final',
-        };
-      });
-    if (historicalScores.length) {
-      console.log('[historicalScores] encontrados:', historicalScores.length, 'partidos finalizados');
-      resolveAllGames(historicalScores);
+    // Fetch all needed sport keys in parallel
+    const results = await Promise.allSettled(
+      [...needed].map(sportKey =>
+        fetch(`${WORKER_URL}/scores?sport=${encodeURIComponent(sportKey)}&daysFrom=3`)
+          .then(r => r.ok ? r.json() : null)
+          .catch(() => null)
+      )
+    );
+
+    const allScores = [];
+    results.forEach(r => {
+      if (r.status === 'fulfilled' && r.value) {
+        const data = r.value.data ?? (Array.isArray(r.value) ? r.value : []);
+        allScores.push(...parseScores(data));
+      }
+    });
+
+    if (allScores.length) {
+      console.log('[historicalScores] encontrados:', allScores.length, 'partidos finalizados en', needed.size, 'ligas');
+      resolveAllGames(allScores);
+    } else {
+      // Fallback: llamada genérica sin sport (comportamiento anterior)
+      const res = await fetch(`${WORKER_URL}/scores?daysFrom=3`);
+      if (!res.ok) return;
+      const json = await res.json();
+      const data = json.data ?? (Array.isArray(json) ? json : []);
+      const scores = parseScores(data);
+      if (scores.length) resolveAllGames(scores);
     }
   } catch(e) { console.warn('[historicalScores]', e); }
 }
