@@ -4925,11 +4925,11 @@ function renderPreds() {
     const isFinishedWin = isStarted && histResult === 'win';
     const isFinishedLoss= isStarted && histResult === 'loss';
     const isHighConfWin = isFinishedWin && p.conf === 'high';
-    // Clase CSS de la tarjeta
-    const cardClass = isHighConfWin ? 'pred-golden-win'
-                    : isFinishedWin  ? 'pred-card-win'
-                    : isFinishedLoss ? 'pred-card-loss'
-                    : isStarted      ? 'pred-card-finished' : '';
+    // Clase CSS de la tarjeta (pendientes sin opacidad — solo los terminados se atenúan)
+    const cardClass = isHighConfWin          ? 'pred-golden-win'
+                    : isFinishedWin          ? 'pred-card-win'
+                    : isFinishedLoss         ? 'pred-card-loss'
+                    : (isStarted && !isPending) ? 'pred-card-finished' : '';
     // Score final — si no está en historial intentar desde scoresData
     const finalScore = histScore
       || (isStarted && liveEntry?.flag === 'final' ? `${liveEntry.scoreH}-${liveEntry.scoreA}` : null);
