@@ -498,6 +498,27 @@
     transform: translateY(-3px);
     box-shadow: 0 12px 32px rgba(0,0,0,0.4);
   }
+  /* ── Skeleton de carga ── */
+  @keyframes shimmer {
+    0%   { background-position: -400px 0; }
+    100% { background-position:  400px 0; }
+  }
+  .skel {
+    background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%);
+    background-size: 800px 100%;
+    animation: shimmer 1.4s infinite linear;
+    border-radius: 6px;
+  }
+  .pred-card-skeleton {
+    background: var(--gris-card);
+    border: 1px solid var(--borde);
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 340px;
+  }
 
   .pred-header {
     display: flex;
@@ -4175,9 +4196,40 @@ function renderPreds() {
     console.error('[renderPreds] buildPredsFromOdds crash:', e.stack || e.message);
     window._lastPredsError = e.stack || e.message;
   }
-  const source = realPreds || predsData;
   const isLive = !!realPreds;
   try { if (realPreds) savePredictions(realPreds); } catch(e) { console.error('[renderPreds] savePredictions crash:', e); }
+
+  // Sin datos reales: mostrar skeleton de carga (nunca datos falsos)
+  if (!realPreds) {
+    const isLoading = _oddsLoading || !window._rawOddsGames;
+    document.getElementById('predGrid').innerHTML = [1,2,3].map(() => `
+      <div class="pred-card-skeleton">
+        <div class="skel" style="height:12px;width:55%"></div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="skel" style="height:22px;width:38%"></div>
+          <div class="skel" style="height:22px;width:28%"></div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:24px;padding:10px 0">
+          <div class="skel" style="height:52px;width:52px;border-radius:50%"></div>
+          <div class="skel" style="height:52px;width:52px;border-radius:50%"></div>
+        </div>
+        <div class="skel" style="height:58px;width:100%;border-radius:10px"></div>
+        <div style="display:flex;gap:6px">
+          <div class="skel" style="height:14px;flex:1"></div>
+          <div class="skel" style="height:14px;flex:1"></div>
+          <div class="skel" style="height:14px;flex:1"></div>
+        </div>
+        <div style="display:flex;gap:6px">
+          <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
+          <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
+          <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
+        </div>
+        ${isLoading ? `<div style="text-align:center;font-size:0.68rem;color:var(--texto-sec);opacity:0.6">Cargando pronósticos...</div>` : `<div style="text-align:center;font-size:0.68rem;color:var(--texto-sec);opacity:0.6">Sin partidos disponibles</div>`}
+      </div>`).join('');
+    window._aiPreds = [];
+    return;
+  }
+  const source = realPreds;
 
   // ── Banner de estado ──
   const statusBar = document.getElementById('predsStatusBar');
@@ -5958,8 +6010,21 @@ async function loadRealOdds(retryCount = 0) {
     }
     window._rawOddsGames = data;
     cacheSet('cache_odds_v2', data);
-    // Guardar copia de respaldo sin expiración (para cuando el Worker no responda)
-    try { localStorage.setItem('cache_odds_stale', JSON.stringify(data)); } catch(e) {}
+    // Guardar copia de respaldo liviana (solo campos esenciales) para que quepa en localStorage
+    try {
+      const slim = data.map(g => ({
+        id: g.id, sport_key: g.sport_key, commence_time: g.commence_time,
+        home_team: g.home_team, away_team: g.away_team,
+        bookmakers: (g.bookmakers||[]).slice(0,3).map(b => ({
+          key: b.key, title: b.title,
+          markets: (b.markets||[]).filter(m => m.key==='h2h').map(m => ({
+            key: m.key,
+            outcomes: m.outcomes
+          }))
+        })).filter(b => b.markets.length > 0)
+      }));
+      localStorage.setItem('cache_odds_stale', JSON.stringify(slim));
+    } catch(e) { console.warn('[stale cache] no se pudo guardar:', e.message); }
     console.log(`[Worker/odds] ${data.length} partidos (main:${dataMain.length} + europe:${dataEurope.length}). Ligas:`, [...new Set(data.map(g => g.sport_key))].join(', '));
     if (currentScoreFilter === 'basket') renderScores('basket');
     renderPreds();
