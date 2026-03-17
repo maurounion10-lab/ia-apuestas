@@ -6883,17 +6883,26 @@ function admSaveConfig() {
 }
 #aiChatBox.open.active {
   width: min(680px, calc(100vw - 48px));
-  max-height: 85vh;
+  /* Altura: 75vh pero nunca más de (pantalla - navbar - botón flotante) */
+  max-height: min(75vh, calc(100vh - 160px));
   right: max(24px, calc(50vw - 340px)); /* centra en pantallas anchas */
   transition: transform 0.22s cubic-bezier(.4,0,.2,1), opacity 0.22s,
               width 0.35s cubic-bezier(.4,0,.2,1),
               max-height 0.4s cubic-bezier(.4,0,.2,1),
               right 0.35s cubic-bezier(.4,0,.2,1);
 }
+/* Notebook / tablet (481–1100px) */
+@media (min-width: 481px) and (max-width: 1100px) {
+  #aiChatBox.open.active {
+    width: min(480px, calc(100vw - 48px));
+    max-height: min(70vh, calc(100vh - 160px));
+    right: 24px;
+  }
+}
 @media (max-width: 480px) {
   #aiChatBox.open.active {
     width: calc(100vw - 16px);
-    max-height: 85vh;
+    max-height: min(75vh, calc(100vh - 140px));
     right: 8px;
     bottom: 82px;
   }
