@@ -2146,6 +2146,17 @@
       Pronósticos de la IA
     </div>
     <div class="pred-grid" id="predGrid"></div>
+    <!-- Botón para ver pronósticos de baja confianza -->
+    <div id="predMoreWrap" style="display:none;text-align:center;margin-top:8px">
+      <button onclick="toggleLowPreds(this)" style="
+        background:rgba(255,255,255,0.05);border:1px solid var(--borde);
+        color:var(--texto-sec);font-size:0.78rem;border-radius:20px;
+        padding:8px 20px;cursor:pointer;transition:all .2s"
+        onmouseover="this.style.borderColor='rgba(0,200,83,0.4)';this.style.color='var(--verde)'"
+        onmouseout="this.style.borderColor='var(--borde)';this.style.color='var(--texto-sec)'">
+        <span id="predMoreLabel">▼ Ver todos los pronósticos</span>
+      </button>
+    </div>
   </section>
 
   <div class="section-divider"></div>
@@ -4015,7 +4026,11 @@ function renderPreds() {
       </div>
     </div>`;
 
-  document.getElementById('predGrid').innerHTML = source.map((p, idx) => {
+  // Ordenar por confianza: high → med → low
+  const confOrder = { high: 0, med: 1, low: 2 };
+  const sorted = [...source].sort((a,b) => (confOrder[a.conf]||2) - (confOrder[b.conf]||2));
+
+  document.getElementById('predGrid').innerHTML = sorted.map((p, idx) => {
     // BVR: usar valor guardado en p, o derivar de p.conf para datos estáticos
     const _bvr     = p.bvr     || (p.conf==='high' ? 5 : p.conf==='med' ? 3 : 2);
     const _bvrText = p.bvrText || (p.conf==='high' ? 'Alta' : p.conf==='med' ? 'Media' : 'Baja');
@@ -4075,7 +4090,7 @@ function renderPreds() {
       </div>` : '';
 
     return `
-    <div class="pred-card" style="${isGameLive ? 'border-color:rgba(229,57,53,0.4)' : p.conf==='high' ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)' : ''}">
+    <div class="pred-card${p.conf==='low'?' pred-low-card':''}" style="${isGameLive ? 'border-color:rgba(229,57,53,0.4)' : p.conf==='high' ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)' : ''}">
       <div class="pred-header">
         <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${p.conf==='high' ? '<span style="font-size:1rem;filter:drop-shadow(0 1px 4px rgba(255,214,0,0.8))">👑</span>' : ''}${p.league}${isGameLive ? '' : ' · ' + p.time}</span>
         <div style="display:flex;align-items:center;gap:6px">
@@ -4093,7 +4108,6 @@ function renderPreds() {
           </div>
         </div>
       </div>
-      ${bvrHtml}
       <div class="pred-match">
         <div class="pred-team">
           <div class="pred-emoji">${logoHtml(p.home, 52)}</div>
@@ -4119,6 +4133,7 @@ function renderPreds() {
         <div class="pred-rec-label">🤖 Recomendación IA</div>
         <div class="pred-rec-value">✅ ${p.rec}</div>
       </div>
+      ${bvrHtml}
       <div class="pred-bars">
         <div class="pred-bar-item">
           <span class="pred-bar-label">Local</span>
@@ -4175,6 +4190,27 @@ function renderPreds() {
       ${oddsHtml}
     </div>
   `}).join('');
+
+  // Ocultar cards de baja confianza por defecto
+  const lowCards = document.querySelectorAll('.pred-low-card');
+  const moreWrap = document.getElementById('predMoreWrap');
+  if (lowCards.length) {
+    lowCards.forEach(c => c.style.display = 'none');
+    if (moreWrap) moreWrap.style.display = 'block';
+    document.getElementById('predMoreLabel').textContent = `▼ Ver ${lowCards.length} pronóstico${lowCards.length>1?'s':'s'} de menor confianza`;
+  } else {
+    if (moreWrap) moreWrap.style.display = 'none';
+  }
+}
+
+function toggleLowPreds(btn) {
+  const lowCards = document.querySelectorAll('.pred-low-card');
+  const lbl = document.getElementById('predMoreLabel');
+  const isHidden = lowCards[0]?.style.display === 'none';
+  lowCards.forEach(c => c.style.display = isHidden ? '' : 'none');
+  lbl.textContent = isHidden
+    ? `▲ Ocultar pronósticos de menor confianza`
+    : `▼ Ver ${lowCards.length} pronóstico${lowCards.length>1?'s':''} de menor confianza`;
 }
 
 // ═══════════════════════════════════════════════
