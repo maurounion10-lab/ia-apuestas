@@ -3154,6 +3154,9 @@ const teamLogos = {
   'Gimnasia y Esgrima':     'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Gimnasia_y_Esgrima_La_Plata_logo.png/250px-Gimnasia_y_Esgrima_La_Plata_logo.png',
   'Gimnasia y Esgrima La Plata': 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Gimnasia_y_Esgrima_La_Plata_logo.png/250px-Gimnasia_y_Esgrima_La_Plata_logo.png',
   'Gimnasia LP':            'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Gimnasia_y_Esgrima_La_Plata_logo.png/250px-Gimnasia_y_Esgrima_La_Plata_logo.png',
+  'Gimnasia Mendoza':       'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Escudo_Club_Gimnasia_y_Esgrima_Mendoza.svg/200px-Escudo_Club_Gimnasia_y_Esgrima_Mendoza.svg.png',
+  'Gimnasia y Esgrima Mendoza': 'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Escudo_Club_Gimnasia_y_Esgrima_Mendoza.svg/200px-Escudo_Club_Gimnasia_y_Esgrima_Mendoza.svg.png',
+  'Gimnasia (Mendoza)':     'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Escudo_Club_Gimnasia_y_Esgrima_Mendoza.svg/200px-Escudo_Club_Gimnasia_y_Esgrima_Mendoza.svg.png',
   'Independiente Rivadavia':'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Escudo_del_Club_Independiente_Rivadavia.svg/250px-Escudo_del_Club_Independiente_Rivadavia.svg.png',
   'Ind. Rivadavia':         'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Escudo_del_Club_Independiente_Rivadavia.svg/250px-Escudo_del_Club_Independiente_Rivadavia.svg.png',
   'Central Córdoba':        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Central_Cordoba_SdE_crest_%282025%29.svg/330px-Central_Cordoba_SdE_crest_%282025%29.svg.png',
@@ -5586,25 +5589,29 @@ async function loadRealOdds(retryCount = 0) {
   }
   if (retryCount === 0) _oddsLoading = true;
   try {
-    const timeoutP = new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 12000));
-    const res = await Promise.race([fetch(`${WORKER_URL}/odds?category=main`), timeoutP]);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    const data = json.data ?? (Array.isArray(json) ? json : []);
-    if (json.meta) {
-      const failed = json.meta.filter(m => !m.ok || m.count === 0);
-      if (failed.length) console.warn('[Worker/odds] Deportes sin datos:', failed.map(m => `${m.sport}(${m.status})`).join(', '));
-    }
+    const _timeout = ms => new Promise((_, r) => setTimeout(() => r(new Error('timeout')), ms));
+    const _fetchCat = async cat => {
+      try {
+        const r = await Promise.race([fetch(`${WORKER_URL}/odds?category=${cat}`), _timeout(12000)]);
+        if (!r.ok) return [];
+        const j = await r.json();
+        return j.data ?? (Array.isArray(j) ? j : []);
+      } catch(e) { console.warn(`[odds][${cat}]`, e.message); return []; }
+    };
+    // Fetch LATAM+basket y Champions+ligas EU en paralelo
+    const [dataMain, dataEurope] = await Promise.all([_fetchCat('main'), _fetchCat('europe')]);
+    // Fusionar sin duplicados
+    const seen = new Set();
+    const data = [...dataMain, ...dataEurope].filter(g => { if(seen.has(g.id)) return false; seen.add(g.id); return true; });
+
     if (data.length === 0) {
       if (retryCount < 3) setTimeout(() => loadRealOdds(retryCount + 1), 2500);
       return;
     }
     window._rawOddsGames = data;
     cacheSet('cache_odds', data);
-    console.log(`[Worker/odds] ${data.length} partidos recibidos. Deportes: `, [...new Set(data.map(g => g.sport_key))].join(', '));
-    if (currentScoreFilter === 'basket') {
-      renderScores('basket');
-    }
+    console.log(`[Worker/odds] ${data.length} partidos (main:${dataMain.length} + europe:${dataEurope.length}). Ligas:`, [...new Set(data.map(g => g.sport_key))].join(', '));
+    if (currentScoreFilter === 'basket') renderScores('basket');
     renderPreds();
     processOddsIntoComparador(data);
     _oddsLoading = false;
