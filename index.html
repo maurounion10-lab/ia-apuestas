@@ -1076,6 +1076,55 @@
     object-position: 50% 20%;
   }
   .chat-bubble:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(0,200,83,0.5); }
+
+  /* ── Speech bubble flotante ── */
+  #chatSpeechBubble {
+    position: relative;
+    background: #0a1a0a;
+    border: 1.5px solid #00c853;
+    border-radius: 14px;
+    padding: 9px 13px;
+    font-size: 0.68rem;
+    font-weight: 900;
+    color: #00e676;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    max-width: 148px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 3px 14px rgba(0,200,83,0.4);
+    animation: floatSpeech 2.8s ease-in-out infinite;
+    line-height: 1.35;
+    user-select: none;
+    flex-shrink: 0;
+    align-self: flex-end;
+    margin-bottom: 4px;
+  }
+  #chatSpeechBubble::before {
+    content: '';
+    position: absolute;
+    bottom: 10px;
+    right: -11px;
+    border-width: 7px 0 7px 11px;
+    border-style: solid;
+    border-color: transparent transparent transparent #00c853;
+  }
+  #chatSpeechBubble::after {
+    content: '';
+    position: absolute;
+    bottom: 11px;
+    right: -9px;
+    border-width: 6px 0 6px 9px;
+    border-style: solid;
+    border-color: transparent transparent transparent #0a1a0a;
+  }
+  @keyframes floatSpeech {
+    0%,100% { transform: translateY(0px); }
+    50%      { transform: translateY(-5px); }
+  }
+  #chatSpeechBubble:hover { opacity: 0.85; animation: none; }
+  #chatBubbleRow { display: flex; align-items: flex-end; gap: 10px; }
+
   .chat-notify {
     position: absolute;
     top: -3px; right: -3px;
@@ -1374,6 +1423,10 @@
   .result-loss { background:rgba(255,61,61,0.12); color:var(--rojo); padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700; border:1px solid rgba(255,61,61,0.3); }
   .result-void { background:rgba(255,255,255,0.05); color:#888; padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700; border:1px solid #333; }
   .result-pending { background:rgba(255,145,0,0.1); color:var(--naranja); padding:3px 8px; border-radius:6px; font-size:0.7rem; font-weight:700; border:1px solid rgba(255,145,0,0.3); }
+  .result-editable { cursor:pointer; transition:opacity 0.15s; }
+  .result-editable:hover { opacity:0.7; }
+  .result-picker-btn { border:none; border-radius:5px; padding:3px 9px; font-size:0.65rem; font-weight:800; cursor:pointer; transition:transform 0.1s; }
+  .result-picker-btn:hover { transform:scale(1.08); }
 
   /* ── ODDS COMPARISON ── */
   .odds-table-wrap { overflow-x:auto; border-radius:14px; border:1px solid var(--borde); }
@@ -2691,10 +2744,15 @@
       <button class="chat-send" onclick="sendChat()">➤</button>
     </div>
   </div>
-  <button class="chat-bubble" onclick="toggleChat()" id="chatBubble">
-    <img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="Bot">
-    <div class="chat-notify" id="chatNotify">1</div>
-  </button>
+  <div id="chatBubbleRow">
+    <div id="chatSpeechBubble" onclick="document.getElementById('chatSpeechBubble').style.display='none'">
+      🔥 ¡Tengo el mejor pronóstico para hoy!
+    </div>
+    <button class="chat-bubble" onclick="toggleChat()" id="chatBubble">
+      <img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="Bot">
+      <div class="chat-notify" id="chatNotify">1</div>
+    </button>
+  </div>
 </div>
 
 <script>
@@ -4411,7 +4469,11 @@ function toggleChat() {
   const notify = document.getElementById('chatNotify');
   win.classList.toggle('visible', chatOpen);
   win.classList.toggle('hidden', !chatOpen);
-  if (chatOpen) { notify.style.display = 'none'; }
+  if (chatOpen) {
+    notify.style.display = 'none';
+    const sb = document.getElementById('chatSpeechBubble');
+    if (sb) sb.style.display = 'none';
+  }
 }
 
 function addMessage(text, type) {
@@ -4714,7 +4776,6 @@ function renderHistorial(filter) {
 
   const rMap = { win:'<span class="result-win">✅ WIN</span>', loss:'<span class="result-loss">❌ LOSS</span>', void:'<span class="result-void">⚪ VOID</span>', pending:'<span class="result-pending">🟡 PEND</span>' };
 
-
   const todayStr = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
   document.getElementById('histTableBody').innerHTML = data.length
     ? data.map(h => {
@@ -4731,9 +4792,38 @@ function renderHistorial(filter) {
         const marcador = h.finalScore
           ? `<span style="font-weight:700;color:#e0e0e0;letter-spacing:0.5px">${h.finalScore}</span>`
           : `<span style="color:#444">—</span>`;
-        return `<tr class="${rowClass}" style="${rowStyle}"><td>${rowIcon} <strong>${h.home}</strong> vs ${h.away}</td><td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${rMap[h.result]||rMap.void}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
+        const mKey = encodeURIComponent(h.home + '|||' + h.away);
+        const resultCell = (h.result === 'void' || h.result === 'pending')
+          ? `<span class="result-${h.result} result-editable" title="Click para corregir resultado" onclick="showResultPicker(this,'${mKey}')">${h.result==='void'?'⚪ VOID':'🟡 PEND'} <span style="font-size:0.55rem;opacity:0.5">✏</span></span>`
+          : (rMap[h.result] || rMap.void);
+        return `<tr class="${rowClass}" style="${rowStyle}"><td>${rowIcon} <strong>${h.home}</strong> vs ${h.away}</td><td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
       }).join('')
     : `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--texto-sec)">📋 El historial se llenará automáticamente con las pronósticos de cada día.</td></tr>`;
+}
+
+/* ── Corrección manual de resultado desde la tabla ── */
+function showResultPicker(el, mKey) {
+  const btns = `
+    <span style="display:inline-flex;gap:4px;align-items:center">
+      <button class="result-picker-btn" style="background:#1b3d20;color:#00e676;border:1px solid #00c853"
+        onclick="applyHistResult('${mKey}','win')">✅ WIN</button>
+      <button class="result-picker-btn" style="background:#3d1a1a;color:#ef5350;border:1px solid #c62828"
+        onclick="applyHistResult('${mKey}','loss')">❌ LOSS</button>
+      <button class="result-picker-btn" style="background:#1a1a1a;color:#888;border:1px solid #444"
+        onclick="renderHistorial(histFilter)">✕</button>
+    </span>`;
+  el.outerHTML = btns;
+}
+function applyHistResult(mKey, val) {
+  const [home, away] = decodeURIComponent(mKey).split('|||');
+  const hist = loadHistorial();
+  const entry = hist.find(e => e.home === home && e.away === away);
+  if (!entry) { renderHistorial(histFilter); return; }
+  entry.result = val;
+  const odds = parseFloat(entry.odds) || 1;
+  entry.pl = val === 'win' ? parseFloat(((odds - 1) * entry.stake).toFixed(2)) : val === 'loss' ? -entry.stake : 0;
+  saveHistorial(hist);
+  renderHistorial(histFilter);
 }
 
 function clearHistorial() {
