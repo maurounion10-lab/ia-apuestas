@@ -2169,7 +2169,7 @@
     </div>
     <div class="hist-table-wrap">
       <table class="hist-table">
-        <thead><tr><th>Partido</th><th>Recomendación</th><th>Cuota</th><th>Stake</th><th>Resultado</th><th>P/L</th></tr></thead>
+        <thead><tr><th>Partido</th><th>Recomendación</th><th>Cuota</th><th>Stake</th><th>Resultado</th><th>Marcador Final</th><th>P/L</th></tr></thead>
         <tbody id="histTableBody"></tbody>
       </table>
     </div>
@@ -4480,6 +4480,7 @@ function resolveCompletedGames(scores, skipRender) {
       // Mercados complejos (+2.5 goles, etc.) → void (no podemos verificar automáticamente)
 
       p.result = result;
+      p.finalScore = `${s.scoreH}-${s.scoreA}`;
       p.pl = result === 'win' ? parseFloat(((p.odds - 1) * p.stake).toFixed(2))
            : result === 'loss' ? -p.stake : 0;
       changed = true;
@@ -4562,9 +4563,12 @@ function renderHistorial(filter) {
         const rowIcon = isHigh ? '<span style="font-size:0.85rem;filter:drop-shadow(0 1px 3px rgba(255,214,0,0.8))">👑</span>' : icon;
         const rowClass = isToday ? 'hist-row-today' : '';
         const rowStyle = (!isToday && isHigh) ? 'background:rgba(255,214,0,0.03)' : '';
-        return `<tr class="${rowClass}" style="${rowStyle}"><td>${rowIcon} <strong>${h.home}</strong> vs ${h.away}</td><td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${rMap[h.result]||rMap.void}</td><td>${plHtml}</td></tr>`;
+        const marcador = h.finalScore
+          ? `<span style="font-weight:700;color:#e0e0e0;letter-spacing:0.5px">${h.finalScore}</span>`
+          : `<span style="color:#444">—</span>`;
+        return `<tr class="${rowClass}" style="${rowStyle}"><td>${rowIcon} <strong>${h.home}</strong> vs ${h.away}</td><td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${rMap[h.result]||rMap.void}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
       }).join('')
-    : `<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--texto-sec)">📋 El historial se llenará automáticamente con las pronósticos de cada día.</td></tr>`;
+    : `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--texto-sec)">📋 El historial se llenará automáticamente con las pronósticos de cada día.</td></tr>`;
 }
 
 function clearHistorial() {
