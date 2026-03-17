@@ -4327,16 +4327,19 @@ function buildPredsFromOdds() {
     const bttsOddsEst = bttsEst ? parseFloat((100 / bttsEst).toFixed(2)) : null;
 
     // ── Selección de la MEJOR apuesta ──
+    const MIN_ODDS = 1.40; // cuota mínima aceptable
     const candidates2 = [
       { rec: 'Local Gana',     prob: probH, odds: hO ?? hOP },
       { rec: 'Visitante Gana', prob: probA, odds: aO ?? aOP },
       ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dO ?? dOP }] : []),
-      // Totales: solo si hay cuota real (Worker actualizado) y mínimo de incertidumbre
-      ...(['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= 1.20)
+      // Totales: cuota mínima 1.40
+      ...(['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
-      // Ambos Marcan estimado (solo si hay señal fuerte de goles)
+      // Ambos Marcan estimado
       ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
-    ].filter(c => c.prob > 0);
+    ]
+    .filter(c => c.prob > 0)
+    .filter(c => !c.odds || parseFloat(c.odds) >= MIN_ODDS); // excluir cuotas bajas
 
     // Ordenar por probabilidad desc; en empate, dar prioridad a totales (cuota real externa)
     candidates2.sort((a, b) => {
@@ -4346,7 +4349,8 @@ function buildPredsFromOdds() {
       return 0;
     });
 
-    const best     = candidates2[0] || { rec: 'Local Gana', prob: probH, odds: hO ?? hOP };
+    if (!candidates2.length) return null; // todas las cuotas < MIN_ODDS → saltar partido
+    const best     = candidates2[0];
     const rec      = best.rec;
     const maxProb  = best.prob || probH;
     const bestOdds = best.odds;
