@@ -4293,11 +4293,7 @@ function buildPredsFromOdds() {
     return new Date(a.commence_time) - new Date(b.commence_time);
   };
 
-  // Intentar ventanas progresivamente más amplias hasta encontrar partidos
-  // Incluir partidos que empezaron hasta 2h atrás (pueden estar en juego o acaban de terminar)
-  // 6h hacia atrás: atrapa partidos de hoy que empezaron al mediodía/tarde
-  const GAME_LOOKBACK = 6 * 3600000;
-  // Ventana principal 24h — suficiente para hoy + mañana
+  // Solo partidos que AÚN NO comenzaron — nunca recomendar partidos en vivo o ya iniciados
   const WINDOWS = [24, 48, 72, 120, 168];
   let candidates = [];
   for (const hours of WINDOWS) {
@@ -4305,7 +4301,7 @@ function buildPredsFromOdds() {
     candidates = window._rawOddsGames
       .filter(g => {
         const t = new Date(g.commence_time).getTime();
-        return t > (now - GAME_LOOKBACK) && t <= windowEnd;
+        return t > now && t <= windowEnd;  // estrictamente futuro
       })
       .filter(hasH2HData)
       .sort(sortByPrioThenTime)
@@ -4315,14 +4311,14 @@ function buildPredsFromOdds() {
 
   const totalRaw = window._rawOddsGames.length;
   const withH2H = window._rawOddsGames.filter(hasH2HData).length;
-  const upcoming = window._rawOddsGames.filter(g => new Date(g.commence_time).getTime() > (Date.now() - GAME_LOOKBACK)).length;
-  console.log(`[Preds] ${candidates.length} candidatos | total:${totalRaw} withH2H:${withH2H} upcoming(±2h):${upcoming}`);
+  const upcoming = window._rawOddsGames.filter(g => new Date(g.commence_time).getTime() > now).length;
+  console.log(`[Preds] ${candidates.length} candidatos pre-partido | total:${totalRaw} withH2H:${withH2H} futuros:${upcoming}`);
 
-  // Fallback nivel 1: sin límite de ventana pero solo partidos futuros (±2h)
+  // Fallback nivel 1: sin límite de ventana pero solo partidos futuros
   if (!candidates.length) {
     console.warn('[Preds] Fallback L1: sin ventana de tiempo (posible parón internacional)');
     candidates = window._rawOddsGames
-      .filter(g => new Date(g.commence_time).getTime() > Date.now() - GAME_LOOKBACK)
+      .filter(g => new Date(g.commence_time).getTime() > now)
       .filter(hasH2HData)
       .sort(sortByPrioThenTime)
       .slice(0, 18);
@@ -4628,6 +4624,12 @@ function renderPreds() {
     }
   }
 
+  // Eliminar picks que ya empezaron (partido en vivo o pasado) — solo pre-partido
+  if (realPreds) {
+    const nowMs = Date.now();
+    realPreds = realPreds.filter(p => !p.commenceTs || p.commenceTs > nowMs);
+  }
+
   // Array vacío también cuenta como sin datos
   if (realPreds && realPreds.length === 0) realPreds = null;
   const isLive = !!realPreds;
@@ -4827,7 +4829,7 @@ function renderPreds() {
       ${formRow}
       <div class="pred-recommendation">
         <div class="pred-rec-left">
-          <div class="pred-rec-label">🤖 Recomendación IA</div>
+          <div class="pred-rec-label">🤖 Recomendación IA Pre-Partido</div>
           <div class="pred-rec-value">✅ ${p.rec}</div>
         </div>
         <div class="pred-rec-right">
