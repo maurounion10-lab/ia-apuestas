@@ -538,8 +538,8 @@
     transition: all 0.2s;
   }
   /* BVR 1-2 = Baja (rojo) | 3-4 = Media (naranja) | 5-6 = Alta (verde/dorado) */
-  .bvr-gem.active-1, .bvr-gem.active-2 { background: #ef5350; box-shadow: 0 0 5px rgba(239,83,80,0.5); }
-  .bvr-gem.active-3, .bvr-gem.active-4 { background: #ff9800; box-shadow: 0 0 5px rgba(255,152,0,0.5); }
+  .bvr-gem.active-1, .bvr-gem.active-2 { background: #d32f2f; box-shadow: 0 0 6px rgba(211,47,47,0.7); }
+  .bvr-gem.active-3, .bvr-gem.active-4 { background: #e64a19; box-shadow: 0 0 5px rgba(230,74,25,0.6); }
   .bvr-gem.active-5 { background: #66bb6a; box-shadow: 0 0 6px rgba(102,187,106,0.6); }
   .bvr-gem.active-6 { background: linear-gradient(135deg,#ffd600,#ff9800); box-shadow: 0 0 8px rgba(255,214,0,0.7); }
   .bvr-text {
@@ -548,8 +548,8 @@
     white-space: nowrap;
     letter-spacing: 0.3px;
   }
-  .bvr-text.r1, .bvr-text.r2 { color: #ef5350; }
-  .bvr-text.r3, .bvr-text.r4 { color: #ff9800; }
+  .bvr-text.r1, .bvr-text.r2 { color: #d32f2f; }
+  .bvr-text.r3, .bvr-text.r4 { color: #e64a19; }
   .bvr-text.r5 { color: #66bb6a; }
   .bvr-text.r6 { color: #ffd600; text-shadow: 0 0 8px rgba(255,214,0,0.5); }
 
@@ -600,20 +600,69 @@
     background: rgba(0,200,83,0.08);
     border: 1px solid rgba(0,200,83,0.2);
     border-radius: 10px;
-    padding: 12px 14px;
+    padding: 11px 14px;
     margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  .pred-rec-left {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
   }
   .pred-rec-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--texto-sec);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 4px;
   }
   .pred-rec-value {
     font-size: 1rem;
     font-weight: 700;
     color: var(--verde);
+    white-space: nowrap;
+  }
+  .pred-rec-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  .pred-rec-odds {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #fff;
+    line-height: 1;
+    letter-spacing: -0.5px;
+  }
+  .pred-rec-book {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    text-decoration: none;
+    transition: transform .15s;
+  }
+  .pred-rec-book:hover { transform: scale(1.08); }
+  .pred-rec-book img {
+    width: 34px; height: 34px;
+    border-radius: 8px;
+    object-fit: contain;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    padding: 2px;
+  }
+  .pred-rec-bonus {
+    font-size: 0.62rem;
+    color: #ffd600;
+    font-weight: 700;
+    letter-spacing: .3px;
+    display: flex;
+    align-items: center;
+    gap: 2px;
   }
 
   .pred-bars {
@@ -4274,8 +4323,17 @@ function renderPreds() {
       </div>
       ${formRow}
       <div class="pred-recommendation">
-        <div class="pred-rec-label">🤖 Recomendación IA</div>
-        <div class="pred-rec-value">✅ ${p.rec}</div>
+        <div class="pred-rec-left">
+          <div class="pred-rec-label">🤖 Recomendación IA</div>
+          <div class="pred-rec-value">✅ ${p.rec}</div>
+        </div>
+        <div class="pred-rec-right">
+          ${p._bestOdds ? `<div class="pred-rec-odds">${parseFloat(p._bestOdds).toFixed(2)}</div>` : ''}
+          ${p._bookKey ? `<a class="pred-rec-book" href="${getBookLink(p._bookKey)}" target="_blank" rel="noopener" title="Apostar en ${p._bookLabel||p._bookKey}">
+            <img src="${getBookLogo(p._bookKey)}" alt="${p._bookLabel||p._bookKey}" onerror="this.style.display='none'">
+            <span class="pred-rec-bonus">🎁 Bono</span>
+          </a>` : ''}
+        </div>
       </div>
       <div class="pred-bars">
         <div class="pred-bar-item">
