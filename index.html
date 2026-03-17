@@ -7221,7 +7221,15 @@ function aiAddMsg(role, text, withTime = true) {
     div.appendChild(t);
   }
   wrap.appendChild(div);
-  wrap.scrollTop = wrap.scrollHeight;
+  if (role === 'bot') {
+    // Scroll al inicio del mensaje del bot para leer desde arriba
+    requestAnimationFrame(() => {
+      wrap.scrollTop = div.offsetTop - 8;
+    });
+  } else {
+    // Mensajes del usuario: scroll al fondo para ver el indicador de escritura
+    wrap.scrollTop = wrap.scrollHeight;
+  }
   return div;
 }
 
