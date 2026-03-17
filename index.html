@@ -4184,28 +4184,28 @@ function buildPredsFromOdds() {
   // Prioridad por liga específica — liga más prestigiosa = número más alto
   const LEAGUE_PRIO = {
     // ── Fútbol ──
-    soccer_argentina_primera_division:    100,
-    soccer_argentina_primera_nacional:     85,
-    soccer_uefa_champs_league:             95,
-    soccer_uefa_europa_league:             80,
-    soccer_uefa_europa_conference_league:  70,
-    soccer_spain_la_liga:                  88,
-    soccer_england_premier_league:         87,
-    soccer_germany_bundesliga:             82,
-    soccer_italy_serie_a:                  81,
-    soccer_france_ligue_one:               78,
-    soccer_brazil_campeonato:              60,
-    soccer_usa_mls:                        55,
-    soccer_mexico_ligamx:                  58,
-    soccer_conmebol_copa_libertadores:     90,
-    soccer_conmebol_copa_sudamericana:     75,
-    // ── Basketball — siempre debajo de fútbol top ──
-    basketball_nba:                        55,
-    basketball_euroleague:                 45,
+    soccer_uefa_champs_league:             100,
+    soccer_conmebol_copa_libertadores:      99,
+    soccer_argentina_primera_division:      98,
+    soccer_england_premier_league:          97,
+    soccer_brazil_campeonato:               96,
+    soccer_conmebol_copa_sudamericana:      90,
+    soccer_spain_la_liga:                   88,
+    soccer_germany_bundesliga:              82,
+    soccer_italy_serie_a:                   81,
+    soccer_france_ligue_one:                78,
+    soccer_uefa_europa_league:              76,
+    soccer_uefa_europa_conference_league:   70,
+    soccer_argentina_primera_nacional:      65,
+    soccer_mexico_ligamx:                   62,
+    soccer_usa_mls:                         55,
+    // ── Basketball ──
+    basketball_nba:                         95,
+    basketball_euroleague:                  45,
     // ── Tennis ──
-    tennis_atp_french_open:                85,
-    tennis_wta_french_open:                85,
-    tennis_atp_wimbledon:                  85,
+    tennis_atp_french_open:                 85,
+    tennis_wta_french_open:                 85,
+    tennis_atp_wimbledon:                   85,
   };
 
   const getGamePrio = k => {
