@@ -1160,6 +1160,10 @@
     0%, 100% { opacity: 1; transform: scale(1); }
     50% { opacity: 0.7; transform: scale(1.2); }
   }
+  @keyframes badge-pulse {
+    0%, 100% { transform: scale(1);   box-shadow: 0 0 10px rgba(229,57,53,0.7); }
+    50%       { transform: scale(1.2); box-shadow: 0 0 18px rgba(229,57,53,1);   }
+  }
   @keyframes live-ping {
     0%   { transform: scale(1);   opacity: 1; }
     70%  { transform: scale(2.2); opacity: 0; }
@@ -2112,7 +2116,7 @@
   <div class="hero-text">
     <div class="hero-tag">⚡ IA Actualizada en Tiempo Real</div>
     <h1><span style="color:#fff;font-weight:900">Apuestas</span><span style="color:var(--verde);font-weight:900">Automáticas</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apostar</span></h1>
-    <p>Pronósticos potenciados por IA, análisis estadístico avanzado y calculadora de valor esperado. Apuesta con información, no con suerte.</p>
+    <p>Soy la primer IA para apuestas deportivas a la que puedes PREGUNTARLE. ¡Hablame! 🤙</p>
     <div class="hero-stats">
       <div class="hero-stat"><span class="num">72%</span><span class="lbl">Precisión IA</span></div>
       <div class="hero-stat"><span class="num">1,240+</span><span class="lbl">Partidos analizados</span></div>
@@ -2120,8 +2124,23 @@
       <div class="hero-stat"><span class="num">Live</span><span class="lbl">Scores en vivo</span></div>
     </div>
   </div>
-  <div class="hero-mascot">
-    <img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="ApuestasAutomáticas Bot">
+  <div style="position:relative;flex-shrink:0">
+    <div class="hero-mascot">
+      <img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="ApuestasAutomáticas Bot">
+    </div>
+    <!-- Badge de notificación -->
+    <div onclick="navTo('chat')" style="
+      position:absolute;bottom:8px;right:8px;
+      width:22px;height:22px;border-radius:50%;
+      background:#e53935;
+      color:#fff;font-size:0.72rem;font-weight:900;
+      display:flex;align-items:center;justify-content:center;
+      border:2px solid #0a1a0a;
+      box-shadow:0 0 10px rgba(229,57,53,0.7),0 2px 6px rgba(0,0,0,0.5);
+      cursor:pointer;
+      animation:badge-pulse 1.8s ease-in-out infinite;
+      z-index:10;line-height:1
+    ">1</div>
   </div>
 </div>
 
