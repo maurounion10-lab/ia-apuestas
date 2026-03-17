@@ -4491,14 +4491,61 @@ function renderPreds() {
     }).join('');
   }
 
+  // ── Caché diaria de picks ──
+  // Una vez generados los picks del día, no cambian hasta las 6am del día siguiente
+  const DAILY_PREDS_KEY = 'gambeta_daily_preds_v1';
+  const DAILY_PREDS_RESET_HOUR = 6; // 6am
+
+  function getDailyPredsCacheDate() {
+    const now = new Date();
+    // Si es antes de las 6am, el "día de picks" sigue siendo el anterior
+    if (now.getHours() < DAILY_PREDS_RESET_HOUR) {
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      return yesterday.toISOString().slice(0, 10);
+    }
+    return now.toISOString().slice(0, 10);
+  }
+
+  function loadDailyPredsCache() {
+    try {
+      const raw = localStorage.getItem(DAILY_PREDS_KEY);
+      if (!raw) return null;
+      const { date, preds } = JSON.parse(raw);
+      if (date !== getDailyPredsCacheDate()) return null; // caducó
+      if (!preds || !preds.length) return null;
+      return preds;
+    } catch(_) { return null; }
+  }
+
+  function saveDailyPredsCache(preds) {
+    try {
+      localStorage.setItem(DAILY_PREDS_KEY, JSON.stringify({
+        date: getDailyPredsCacheDate(),
+        preds
+      }));
+    } catch(_) {}
+  }
+
   // Usar datos reales si están disponibles, sino los estáticos
   let realPreds = null;
-  try {
-    realPreds = buildPredsFromOdds();
-  } catch(e) {
-    console.error('[renderPreds] buildPredsFromOdds crash:', e.stack || e.message);
-    window._lastPredsError = e.stack || e.message;
+
+  // 1. Intentar cargar desde caché diaria
+  realPreds = loadDailyPredsCache();
+
+  // 2. Si no hay caché, generar desde la API y guardar
+  if (!realPreds) {
+    try {
+      realPreds = buildPredsFromOdds();
+      if (realPreds && realPreds.length) {
+        saveDailyPredsCache(realPreds);
+      }
+    } catch(e) {
+      console.error('[renderPreds] buildPredsFromOdds crash:', e.stack || e.message);
+      window._lastPredsError = e.stack || e.message;
+    }
   }
+
   // Array vacío también cuenta como sin datos
   if (realPreds && realPreds.length === 0) realPreds = null;
   const isLive = !!realPreds;
@@ -7823,7 +7870,13 @@ async function admDiagWorker() {
 
 function admRefreshOdds()   { loadRealOdds();   document.getElementById('admDatosMsg').textContent='🔄 Recargando cuotas...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Cuotas recargadas'; },3000); }
 function admRefreshScores() { loadRealScores(); document.getElementById('admDatosMsg').textContent='🔄 Recargando marcadores...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Marcadores recargados'; },3000); }
-function admRefreshPreds()  { renderPreds();    document.getElementById('admDatosMsg').textContent='✓ Pronósticos regenerados'; setTimeout(()=>document.getElementById('admDatosMsg').textContent='',2500); }
+function admRefreshPreds()  {
+  // Borrar caché diaria para forzar regeneración desde la API
+  try { localStorage.removeItem('gambeta_daily_preds_v1'); } catch(_) {}
+  renderPreds();
+  document.getElementById('admDatosMsg').textContent='✓ Pronósticos regenerados (caché limpiada)';
+  setTimeout(()=>document.getElementById('admDatosMsg').textContent='',3000);
+}
 function admResolveNow()    { loadHistoricalScores().then(()=>{ resolveCompletedGames(scoresData); renderHistorial(histFilter); admRenderHistTable(); document.getElementById('admDatosMsg').textContent='✓ Pendientes resueltos'; setTimeout(()=>document.getElementById('admDatosMsg').textContent='',2500); }); }
 
 // ── Bankroll ──
