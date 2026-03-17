@@ -3840,6 +3840,21 @@ function buildPredsFromOdds() {
   const now       = Date.now();
 
   const SPORT_PRIO = { soccer:4, basketball:3, tennis:2, rugby:1, mma:1 };
+  // Prioridad por liga: competiciones grandes primero
+  const LEAGUE_PRIO = {
+    soccer_uefa_champs_league:      10,
+    soccer_conmebol_libertadores:   9,
+    soccer_conmebol_sudamericana:   8,
+    soccer_england_premier_league:  7,
+    soccer_spain_la_liga:           7,
+    soccer_germany_bundesliga:      7,
+    soccer_italy_serie_a:           7,
+    soccer_france_ligue_one:        6,
+    soccer_brazil_campeonato:       5,
+    soccer_argentina_primera_division: 5,
+    soccer_argentina_primera_b:     3,
+  };
+
   const getSportCat = k => {
     if (!k) return 'other';
     if (k.includes('soccer'))                          return 'soccer';
@@ -3860,18 +3875,18 @@ function buildPredsFromOdds() {
     candidates = window._rawOddsGames
       .filter(g => {
         const t = new Date(g.commence_time).getTime();
-        // Solo partidos que AÚN NO empezaron (pronósticos pre-partido únicamente)
         return t > now && t <= windowEnd;
       })
       .filter(hasH2HData)
       .sort((a, b) => {
-        const pa = SPORT_PRIO[getSportCat(a.sport_key)] || 0;
-        const pb = SPORT_PRIO[getSportCat(b.sport_key)] || 0;
-        if (pa !== pb) return pb - pa;
+        // Primero prioridad de liga, luego deporte general, luego hora
+        const la = LEAGUE_PRIO[a.sport_key] || (SPORT_PRIO[getSportCat(a.sport_key)] || 0);
+        const lb = LEAGUE_PRIO[b.sport_key] || (SPORT_PRIO[getSportCat(b.sport_key)] || 0);
+        if (la !== lb) return lb - la;
         return new Date(a.commence_time) - new Date(b.commence_time);
       })
-      .slice(0, 6);
-    if (candidates.length >= 2) break; // suficientes partidos pre-partido
+      .slice(0, 12);   // hasta 12 pronósticos
+    if (candidates.length >= 2) break;
   }
 
   console.log(`[Preds] ${candidates.length} partidos reales encontrados en _rawOddsGames (${window._rawOddsGames.length} totales)`);
@@ -5677,31 +5692,42 @@ async function loadRealOdds(retryCount = 0) {
   }
   if (retryCount === 0) _oddsLoading = true;
   try {
-    const timeoutP = new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 12000));
-    const res = await Promise.race([fetch(`${WORKER_URL}/odds?category=main`), timeoutP]);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    // Nuevo formato: { data: [...], meta: [...] }
-    const data = json.data ?? (Array.isArray(json) ? json : []);
-    if (json.meta) {
-      const failed = json.meta.filter(m => !m.ok || m.count === 0);
-      if (failed.length) console.warn('[Worker/odds] Deportes sin datos:', failed.map(m => `${m.sport}(${m.status})`).join(', '));
-    }
+    const timeout = ms => new Promise((_, r) => setTimeout(() => r(new Error('timeout')), ms));
+
+    // Fetch main (LATAM + basket + tenis) y europe (Champions, Libertadores, ligas EU) en paralelo
+    const fetchCat = async cat => {
+      try {
+        const res = await Promise.race([fetch(`${WORKER_URL}/odds?category=${cat}`), timeout(12000)]);
+        if (!res.ok) return [];
+        const json = await res.json();
+        const d = json.data ?? (Array.isArray(json) ? json : []);
+        if (json.meta) {
+          const failed = json.meta.filter(m => !m.ok || m.count === 0);
+          if (failed.length) console.warn(`[Worker/odds][${cat}] sin datos:`, failed.map(m=>m.sport).join(', '));
+        }
+        return d;
+      } catch(e) { console.warn(`[Worker/odds][${cat}] error:`, e.message); return []; }
+    };
+
+    const [dataMain, dataEurope] = await Promise.all([fetchCat('main'), fetchCat('europe')]);
+
+    // Fusionar deduplicando por id
+    const seen = new Set();
+    const data = [...dataMain, ...dataEurope].filter(g => {
+      if (seen.has(g.id)) return false;
+      seen.add(g.id); return true;
+    });
+
     if (data.length === 0) {
       if (retryCount < 3) setTimeout(() => loadRealOdds(retryCount + 1), 2500);
       return;
     }
     // Guardar raw odds para usarlos como fallback en tabs sin scores (ej: NBA sin live)
     window._rawOddsGames = data;
-    cacheSet('cache_odds', data); // guardar en caché local
-    console.log(`[Worker/odds] ${data.length} partidos recibidos. Deportes: `, [...new Set(data.map(g => g.sport_key))].join(', '));
-    // Si el tab activo es basket, re-renderizar para mostrar datos del fallback
-    if (currentScoreFilter === 'basket') {
-      renderScores('basket');
-    }
-    // Actualizar predicciones con datos reales de la API
+    cacheSet('cache_odds', data);
+    console.log(`[Worker/odds] ${data.length} partidos (main:${dataMain.length} + europe:${dataEurope.length}). Ligas:`, [...new Set(data.map(g => g.sport_key))].join(', '));
+    if (currentScoreFilter === 'basket') renderScores('basket');
     renderPreds();
-
     processOddsIntoComparador(data);
     _oddsLoading = false;
   } catch (e) {
