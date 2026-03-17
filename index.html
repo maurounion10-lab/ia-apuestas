@@ -4168,7 +4168,7 @@ function buildPredsFromOdds() {
     if (dO) oddsPills.push(`E:${dO.toFixed(2)}`);
     if (aO) oddsPills.push(`V:${aO.toFixed(2)}`);
     if (overOdds['2.5']) oddsPills.push(`+2.5:${parseFloat(overOdds['2.5']).toFixed(2)}`);
-    if (bttsYesOdds)     oddsPills.push(`AM:${bttsYesOdds.toFixed(2)}`);
+    if (bttsOddsEst)     oddsPills.push(`AM:${bttsOddsEst.toFixed(2)}`);
 
     // Insight generado por probabilidades
     const hN = shortName(g.home_team), aN = shortName(g.away_team);
