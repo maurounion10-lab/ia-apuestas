@@ -537,7 +537,8 @@
     background: rgba(255,255,255,0.1);
     transition: all 0.2s;
   }
-  .bvr-gem.active-2 { background: #ef5350; box-shadow: 0 0 5px rgba(239,83,80,0.5); }
+  /* BVR 1-2 = Baja (rojo) | 3-4 = Media (naranja) | 5-6 = Alta (verde/dorado) */
+  .bvr-gem.active-1, .bvr-gem.active-2 { background: #ef5350; box-shadow: 0 0 5px rgba(239,83,80,0.5); }
   .bvr-gem.active-3, .bvr-gem.active-4 { background: #ff9800; box-shadow: 0 0 5px rgba(255,152,0,0.5); }
   .bvr-gem.active-5 { background: #66bb6a; box-shadow: 0 0 6px rgba(102,187,106,0.6); }
   .bvr-gem.active-6 { background: linear-gradient(135deg,#ffd600,#ff9800); box-shadow: 0 0 8px rgba(255,214,0,0.7); }
@@ -547,7 +548,7 @@
     white-space: nowrap;
     letter-spacing: 0.3px;
   }
-  .bvr-text.r2 { color: #ef5350; }
+  .bvr-text.r1, .bvr-text.r2 { color: #ef5350; }
   .bvr-text.r3, .bvr-text.r4 { color: #ff9800; }
   .bvr-text.r5 { color: #66bb6a; }
   .bvr-text.r6 { color: #ffd600; text-shadow: 0 0 8px rgba(255,214,0,0.5); }
@@ -4008,14 +4009,16 @@ function buildPredsFromOdds() {
     else if (maxProb >= 52) { conf = 'med';  confLabel = `Media (${maxProb}%)`; }
     else                    { conf = 'low';  confLabel = `Baja (${maxProb}%)`; }
 
-    // Bet Value Rating: 2–6
+    // Bet Value Rating 1–6, alineado con confianza:
+    // Alta  (≥62%) → 5-6  |  Media (52-61%) → 3-4  |  Baja (<52%) → 1-2
     let bvr;
-    if      (maxProb >= 80) bvr = 6;
-    else if (maxProb >= 70) bvr = 5;
-    else if (maxProb >= 62) bvr = 4;
-    else if (maxProb >= 57) bvr = 3;
-    else                    bvr = 2;
-    const bvrText = bvr === 6 ? 'Máxima' : bvr === 5 ? 'Alta' : bvr >= 3 ? 'Media' : 'Baja';
+    if      (conf === 'high' && maxProb >= 75) bvr = 6;
+    else if (conf === 'high')                  bvr = 5;
+    else if (conf === 'med'  && maxProb >= 58) bvr = 4;
+    else if (conf === 'med')                   bvr = 3;
+    else if (maxProb >= 43)                    bvr = 2;
+    else                                       bvr = 1;
+    const bvrText = bvr === 6 ? 'Máxima' : bvr === 5 ? 'Alta' : bvr === 4 ? 'Media-Alta' : bvr === 3 ? 'Media' : 'Baja';
 
     // Cuotas formateadas
     const fmtO = v => v != null ? ` (cuota ${parseFloat(v).toFixed(2)})` : '';
@@ -4119,7 +4122,7 @@ function renderPreds() {
 
   document.getElementById('predGrid').innerHTML = source.map((p, idx) => {
     // BVR: usar valor guardado en p, o derivar de p.conf para datos estáticos
-    const _bvr     = p.bvr     || (p.conf==='high' ? 5 : p.conf==='med' ? 3 : 2);
+    const _bvr     = p.bvr     || (p.conf==='high' ? 5 : p.conf==='med' ? 3 : 1);
     const _bvrText = p.bvrText || (p.conf==='high' ? 'Alta' : p.conf==='med' ? 'Media' : 'Baja');
     const _bvrGemsHtml = Array.from({length:6}, (_,i) =>
       `<div class="bvr-gem ${i < _bvr ? 'active-'+_bvr : ''}"></div>`
