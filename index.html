@@ -2320,6 +2320,24 @@
     </div>
     <div id="predsStatusBar" style="display:none;margin:0 0 12px;padding:8px 12px;border-radius:10px;font-size:0.72rem;display:flex;align-items:center;gap:8px;justify-content:space-between"></div>
     <div class="pred-grid" id="predGrid"></div>
+    <div id="predVerMas" style="display:none;justify-content:center;margin-top:18px">
+      <button onclick="filterPredSport('soccer', document.querySelector('#predSportTabs .sport-tab:nth-child(2)'))" style="
+        background:transparent;
+        border:1.5px solid rgba(0,200,83,0.4);
+        color:rgba(165,214,167,0.9);
+        padding:10px 28px;
+        border-radius:24px;
+        font-size:0.85rem;
+        font-weight:600;
+        cursor:pointer;
+        font-family:inherit;
+        transition:all .2s;
+      "
+      onmouseover="this.style.background='rgba(0,200,83,0.1)';this.style.borderColor='rgba(0,200,83,0.7)'"
+      onmouseout="this.style.background='transparent';this.style.borderColor='rgba(0,200,83,0.4)'">
+        ⚽ Ver todos los partidos del día →
+      </button>
+    </div>
   </section>
 
   <div class="section-divider"></div>
@@ -4277,7 +4295,7 @@ function buildPredsFromOdds() {
       })
       .filter(hasH2HData)
       .sort(sortByPrioThenTime)
-      .slice(0, 18);
+      .slice(0, 30);
     if (candidates.length >= 2) break;
   }
 
@@ -4555,12 +4573,15 @@ function renderPreds() {
   if (realPreds) {
     const sf = window._predSportFilter || 'all';
     if (sf === 'soccer') {
+      // Fútbol: mostrar TODOS los partidos del día sin límite
       realPreds = realPreds.filter(p => (p._sportKey || '').includes('soccer'));
     } else if (sf === 'basketball') {
       realPreds = realPreds.filter(p => (p._sportKey || '').includes('basketball'));
+      realPreds = realPreds.slice(0, 6);
+    } else {
+      // Todos: limitar a 6 (top picks)
+      realPreds = realPreds.slice(0, 6);
     }
-    // Limitar a 6 por tab (los de mayor prioridad ya están ordenados)
-    realPreds = realPreds.slice(0, 6);
     if (realPreds.length === 0) realPreds = null;
   }
 
@@ -4809,6 +4830,17 @@ function renderPreds() {
       ${oddsHtml}
     </div>
   `}).join('');
+
+  // ── Botón "Ver más" — solo en tab Todos ──
+  const verMasContainer = document.getElementById('predVerMas');
+  if (verMasContainer) {
+    const sf = window._predSportFilter || 'all';
+    if (sf === 'all' && isLive) {
+      verMasContainer.style.display = 'flex';
+    } else {
+      verMasContainer.style.display = 'none';
+    }
+  }
 }
 
 // ═══════════════════════════════════════════════
