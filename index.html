@@ -2193,6 +2193,7 @@
       <div class="icon">🔮</div>
       Pronósticos de la IA
     </div>
+    <div id="predsStatusBar" style="display:none;margin:0 0 12px;padding:8px 12px;border-radius:10px;font-size:0.72rem;display:flex;align-items:center;gap:8px;justify-content:space-between"></div>
     <div class="pred-grid" id="predGrid"></div>
   </section>
 
@@ -3887,6 +3888,8 @@ function buildPredsFromOdds() {
   const hasH2HData = g => g.bookmakers?.some(b => b.markets?.some(m => m.key === 'h2h'));
 
   // Intentar ventanas progresivamente más amplias hasta encontrar partidos
+  // Incluir partidos que empezaron hasta 2h atrás (pueden estar en juego o acaban de terminar)
+  const GAME_LOOKBACK = 2 * 3600000; // 2 horas hacia atrás
   const WINDOWS = [24, 48, 72, 120, 168]; // 1d, 2d, 3d, 5d, 7d
   let candidates = [];
   for (const hours of WINDOWS) {
@@ -3894,7 +3897,7 @@ function buildPredsFromOdds() {
     candidates = window._rawOddsGames
       .filter(g => {
         const t = new Date(g.commence_time).getTime();
-        return t > now && t <= windowEnd;
+        return t > (now - GAME_LOOKBACK) && t <= windowEnd;
       })
       .filter(hasH2HData)
       .sort((a, b) => {
@@ -3907,8 +3910,15 @@ function buildPredsFromOdds() {
     if (candidates.length >= 2) break;
   }
 
-  console.log(`[Preds] ${candidates.length} partidos reales encontrados en _rawOddsGames (${window._rawOddsGames.length} totales)`);
-  if (!candidates.length) return null;
+  const totalRaw = window._rawOddsGames.length;
+  const withH2H = window._rawOddsGames.filter(hasH2HData).length;
+  const upcoming = window._rawOddsGames.filter(g => new Date(g.commence_time).getTime() > (Date.now() - GAME_LOOKBACK)).length;
+  console.log(`[Preds] ${candidates.length} candidatos | total:${totalRaw} withH2H:${withH2H} upcoming(±2h):${upcoming}`);
+  if (!candidates.length) {
+    console.warn('[Preds] Sin candidatos — check: partidos pasados? sin h2h? ventana muy estrecha?',
+      window._rawOddsGames.slice(0,3).map(g => ({ t: g.commence_time, sport: g.sport_key, home: g.home_team })));
+    return null;
+  }
 
   return candidates.map(g => {
     // Solo usar las casas afiliadas, en orden de prioridad
@@ -4087,6 +4097,33 @@ function renderPreds() {
   const source = realPreds || predsData;
   const isLive = !!realPreds;
   if (realPreds) savePredictions(realPreds);
+
+  // ── Banner de estado ──
+  const statusBar = document.getElementById('predsStatusBar');
+  if (statusBar) {
+    if (isLive) {
+      statusBar.style.display = 'flex';
+      statusBar.style.background = 'rgba(0,200,83,0.08)';
+      statusBar.style.border = '1px solid rgba(0,200,83,0.25)';
+      statusBar.style.color = '#00c853';
+      statusBar.innerHTML = `<span>📡 Datos en vivo · ${source.length} pronósticos</span>`;
+    } else {
+      statusBar.style.display = 'flex';
+      statusBar.style.background = 'rgba(255,152,0,0.08)';
+      statusBar.style.border = '1px solid rgba(255,152,0,0.3)';
+      statusBar.style.color = '#ff9800';
+      const rawCount = (window._rawOddsGames||[]).length;
+      const reason = !window._rawOddsGames ? 'Sin conexión con el Worker' : rawCount === 0 ? 'Worker retornó 0 partidos' : 'Sin partidos próximos en la API';
+      statusBar.innerHTML = `
+        <span>⚠️ Demo · ${reason}</span>
+        <button onclick="forceRefreshOdds()" style="
+          background:rgba(255,152,0,0.2);border:1px solid rgba(255,152,0,0.5);
+          color:#ff9800;border-radius:6px;padding:3px 10px;font-size:0.7rem;
+          cursor:pointer;font-weight:700;letter-spacing:.5px
+        ">🔄 Actualizar</button>`;
+    }
+  }
+
   // Exponer predicciones al chat IA
   window._aiPreds = source;
 
@@ -5777,6 +5814,21 @@ function processOddsIntoComparador(data) {
     renderOdds();
     console.log(`[Comparador] ${oddsData.length} cuotas cargadas`);
   }
+}
+
+function forceRefreshOdds() {
+  // Limpiar caché y recargar desde el Worker
+  localStorage.removeItem('cache_odds_v2');
+  window._rawOddsGames = null;
+  _oddsLoading = false;
+  const statusBar = document.getElementById('predsStatusBar');
+  if (statusBar) {
+    statusBar.style.background = 'rgba(33,150,243,0.08)';
+    statusBar.style.border = '1px solid rgba(33,150,243,0.3)';
+    statusBar.style.color = '#42a5f5';
+    statusBar.innerHTML = `<span>🔄 Conectando con el Worker...</span>`;
+  }
+  loadRealOdds();
 }
 
 async function loadRealOdds(retryCount = 0) {
