@@ -2300,7 +2300,6 @@
       <button class="sport-tab active" onclick="filterHist('all',this)">🌍 Todos</button>
       <button class="sport-tab" onclick="filterHist('futbol',this)">⚽ Fútbol</button>
       <button class="sport-tab" onclick="filterHist('basket',this)">🏀 Básquet</button>
-      <button class="sport-tab" onclick="filterHist('tenis',this)">🎾 Tenis</button>
       <div style="width:1px;background:var(--borde);margin:0 4px;align-self:stretch"></div>
       <button class="sport-tab" id="histDateBtnHoy"    onclick="filterHistDate('today',this)" style="font-size:0.72rem">Hoy</button>
       <button class="sport-tab" id="histDateBtnWeek"   onclick="filterHistDate('week',this)"  style="font-size:0.72rem">7 días</button>
@@ -5146,7 +5145,7 @@ function savePredictions(preds) {
     const stake = p.conf === 'high' ? 100 : p.conf === 'med' ? 50 : 25;
 
     hist.unshift({
-      id, date: today, sport: p.sport || 'futbol',
+      id, date: today, sport: p._sportKey?.includes('basketball') ? 'basket' : p._sportKey?.includes('tennis') ? 'tenis' : (p.sport || 'futbol'),
       home: p.home, away: p.away,
       rec: p.rec, odds: impliedOdds, stake,
       result: 'pending', pl: 0,
@@ -7440,6 +7439,27 @@ document.addEventListener('DOMContentLoaded', () => {
   acCheckDaily();
   // Live stats in hero (async, non-blocking)
   loadLiveStats();
+  // Patch historial entries que quedaron con sport='futbol' siendo basket
+  (function patchHistorialSport() {
+    const NBA_TEAMS = new Set([
+      'Lakers','Celtics','Warriors','Bulls','Heat','Knicks','Nets','Suns','Bucks','Nuggets',
+      'Clippers','Mavericks','Raptors','76ers','Sixers','Thunder','Spurs','Grizzlies','Pelicans',
+      'Hawks','Hornets','Pacers','Pistons','Wizards','Cavaliers','Timberwolves','Jazz','Kings',
+      'Trail Blazers','Magic','Rockets','Blazers','Wolves'
+    ]);
+    try {
+      const hist = JSON.parse(localStorage.getItem('apuestas_historial_v1') || '[]');
+      let changed = false;
+      hist.forEach(h => {
+        if (h.sport === 'futbol' || !h.sport) {
+          const teams = [(h.home||''), (h.away||'')];
+          const isBasket = teams.some(t => NBA_TEAMS.has(t));
+          if (isBasket) { h.sport = 'basket'; changed = true; }
+        }
+      });
+      if (changed) localStorage.setItem('apuestas_historial_v1', JSON.stringify(hist));
+    } catch(_) {}
+  })();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
