@@ -5797,7 +5797,8 @@ function renderHistorial(filter) {
           ? `<span style="font-weight:700;color:#e0e0e0;letter-spacing:0.5px">${h.finalScore}</span>`
           : `<span style="color:#444">—</span>`;
         const mKey = encodeURIComponent(h.home + '|||' + h.away);
-        const resultCell = (h.result === 'void' || h.result === 'pending')
+        const _admOk = (() => { try { const s = JSON.parse(sessionStorage.getItem(ADMIN_SESSION)||'null'); return !!(s && s.exp > Date.now()); } catch { return false; } })();
+        const resultCell = (_admOk && (h.result === 'void' || h.result === 'pending'))
           ? `<span class="result-${h.result} result-editable" title="Click para corregir resultado" onclick="showResultPicker(this,'${mKey}')">${h.result==='void'?'⚪ VOID':'🟡 PEND'} <span style="font-size:0.55rem;opacity:0.5">✏</span></span>`
           : (rMap[h.result] || rMap.void);
         return `<tr class="${rowClass}" style="${rowStyle}"><td>${rowIcon} <strong>${h.home}</strong> vs ${h.away}</td><td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
