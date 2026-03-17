@@ -3942,6 +3942,7 @@ function buildPredsFromOdds() {
   }
 
   return candidates.map(g => {
+    try {
     // Solo usar las casas afiliadas, en orden de prioridad
     const AFFILIATE_KEYS = ['megapari','melbet','betwinner','dbbet','sapphire'];
     const hasH2H = b => b.markets?.some(m => m.key === 'h2h');
@@ -4101,7 +4102,11 @@ function buildPredsFromOdds() {
       _bookKey:   isAffiliate ? bmUsed?.key   : null,
       _bookLabel: isAffiliate ? bmUsed?.title : null,
     };
-  });
+    } catch(e) {
+      console.error('[buildPredsFromOdds] Error en partido:', g?.home_team, 'vs', g?.away_team, e.message);
+      return null;
+    }
+  }).filter(Boolean);
 }
 
 function renderPreds() {
@@ -4114,10 +4119,16 @@ function renderPreds() {
   }
 
   // Usar datos reales si están disponibles, sino los estáticos
-  const realPreds = buildPredsFromOdds();
+  let realPreds = null;
+  try {
+    realPreds = buildPredsFromOdds();
+  } catch(e) {
+    console.error('[renderPreds] buildPredsFromOdds crash:', e.stack || e.message);
+    window._lastPredsError = e.stack || e.message;
+  }
   const source = realPreds || predsData;
   const isLive = !!realPreds;
-  if (realPreds) savePredictions(realPreds);
+  try { if (realPreds) savePredictions(realPreds); } catch(e) { console.error('[renderPreds] savePredictions crash:', e); }
 
   // ── Banner de estado ──
   const statusBar = document.getElementById('predsStatusBar');
@@ -7197,6 +7208,8 @@ async function admDiagWorker() {
     log(`   con h2h: ${withH2H2} | futuros±2h: ${future2h} | dentro de 7d: ${future7d}`);
     log(`   Muestra:\n   ${sample}`);
   }
+  if (window._lastPredsError) log(`\n❌ Error en buildPredsFromOdds:\n   ${window._lastPredsError}`);
+  else log(`\n✅ Sin errores JS en buildPredsFromOdds`);
   log(`\nListo. Revisá los ❌ arriba para saber qué arreglar.`);
 }
 
