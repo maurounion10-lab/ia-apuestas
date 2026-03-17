@@ -4155,18 +4155,56 @@ function buildPredsFromOdds() {
 
   const now       = Date.now();
 
-  const SPORT_PRIO = { soccer:4, basketball:3, tennis:2, rugby:1, mma:1 };
-  const getSportCat = k => {
-    if (!k) return 'other';
-    if (k.includes('soccer'))                          return 'soccer';
-    if (k.includes('basketball'))                      return 'basketball';
-    if (k.includes('tennis'))                         return 'tennis';
-    if (k.includes('rugby'))                          return 'rugby';
-    if (k.includes('mma') || k.includes('boxing'))    return 'mma';
-    return 'other';
+  // Prioridad por deporte (categoría general)
+  const SPORT_CAT_PRIO = { soccer:40, basketball:30, tennis:20, rugby:10, mma:10 };
+
+  // Prioridad por liga específica — liga más prestigiosa = número más alto
+  const LEAGUE_PRIO = {
+    // ── Fútbol ──
+    soccer_argentina_primera_division:    100,
+    soccer_argentina_primera_nacional:     85,
+    soccer_uefa_champs_league:             95,
+    soccer_uefa_europa_league:             80,
+    soccer_uefa_europa_conference_league:  70,
+    soccer_spain_la_liga:                  88,
+    soccer_england_premier_league:         87,
+    soccer_germany_bundesliga:             82,
+    soccer_italy_serie_a:                  81,
+    soccer_france_ligue_one:               78,
+    soccer_brazil_campeonato:              60,
+    soccer_usa_mls:                        55,
+    soccer_mexico_ligamx:                  58,
+    soccer_conmebol_copa_libertadores:     90,
+    soccer_conmebol_copa_sudamericana:     75,
+    // ── Basketball ──
+    basketball_nba:                        90,
+    basketball_euroleague:                 70,
+    // ── Tennis ──
+    tennis_atp_french_open:                85,
+    tennis_wta_french_open:                85,
+    tennis_atp_wimbledon:                  85,
+  };
+
+  const getGamePrio = k => {
+    if (!k) return 0;
+    // Prioridad exacta si existe, sino prio de categoría
+    if (LEAGUE_PRIO[k]) return LEAGUE_PRIO[k];
+    if (k.includes('soccer'))     return SPORT_CAT_PRIO.soccer;
+    if (k.includes('basketball')) return SPORT_CAT_PRIO.basketball;
+    if (k.includes('tennis'))     return SPORT_CAT_PRIO.tennis;
+    if (k.includes('rugby'))      return SPORT_CAT_PRIO.rugby;
+    return 5;
   };
 
   const hasH2HData = g => g.bookmakers?.some(b => b.markets?.some(m => m.key === 'h2h'));
+
+  // Comparador: primero por prioridad de liga (desc), luego por horario (asc)
+  const sortByPrioThenTime = (a, b) => {
+    const pa = getGamePrio(a.sport_key);
+    const pb = getGamePrio(b.sport_key);
+    if (pa !== pb) return pb - pa;
+    return new Date(a.commence_time) - new Date(b.commence_time);
+  };
 
   // Intentar ventanas progresivamente más amplias hasta encontrar partidos
   // Incluir partidos que empezaron hasta 2h atrás (pueden estar en juego o acaban de terminar)
@@ -4181,12 +4219,7 @@ function buildPredsFromOdds() {
         return t > (now - GAME_LOOKBACK) && t <= windowEnd;
       })
       .filter(hasH2HData)
-      .sort((a, b) => {
-        const pa = SPORT_PRIO[getSportCat(a.sport_key)] || 0;
-        const pb = SPORT_PRIO[getSportCat(b.sport_key)] || 0;
-        if (pa !== pb) return pb - pa;
-        return new Date(a.commence_time) - new Date(b.commence_time);
-      })
+      .sort(sortByPrioThenTime)
       .slice(0, 6);
     if (candidates.length >= 2) break;
   }
@@ -4202,12 +4235,7 @@ function buildPredsFromOdds() {
     candidates = window._rawOddsGames
       .filter(g => new Date(g.commence_time).getTime() > Date.now() - GAME_LOOKBACK)
       .filter(hasH2HData)
-      .sort((a, b) => {
-        const pa = SPORT_PRIO[getSportCat(a.sport_key)] || 0;
-        const pb = SPORT_PRIO[getSportCat(b.sport_key)] || 0;
-        if (pa !== pb) return pb - pa;
-        return new Date(a.commence_time) - new Date(b.commence_time);
-      })
+      .sort(sortByPrioThenTime)
       .slice(0, 6);
   }
   // Fallback nivel 2: CUALQUIER partido con h2h, sin ningún filtro de tiempo
@@ -4215,7 +4243,7 @@ function buildPredsFromOdds() {
     console.warn('[Preds] Fallback L2: sin filtro de tiempo — mostrando cualquier partido con h2h');
     candidates = window._rawOddsGames
       .filter(hasH2HData)
-      .sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time))
+      .sort(sortByPrioThenTime)
       .slice(0, 6);
   }
   if (!candidates.length) {
