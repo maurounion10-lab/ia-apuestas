@@ -5024,7 +5024,7 @@ function addBet() {
 // ═══════════════════════════════════════════════
 const matchAnalysisData = {
   'Real Madrid-Man City': {
-    league:'🏆 Champions League', time:'Hoy 21:00', weather:'🌤 Madrid · 16°C',
+    league:'Champions League', time:'Hoy 21:00', weather:'🌤 Madrid · 16°C',
     homeForm:['G','G','E','G','G'], awayForm:['G','P','G','G','E'],
     stats:[{name:'Posesión %',home:56,away:44},{name:'Goles/partido',home:2.8,away:2.4,max:5},{name:'Tiros/partido',home:6.2,away:5.8,max:10},{name:'Duelos ganados %',home:54,away:46}],
     h2h:[{date:'05/11/24',home:'Real Madrid',away:'Man City',score:'3-3',res:'E'},{date:'09/04/24',home:'Man City',away:'Real Madrid',score:'1-1',res:'E'},{date:'17/04/24',home:'Real Madrid',away:'Man City',score:'4-3',res:'G'},{date:'26/04/23',home:'Man City',away:'Real Madrid',score:'4-0',res:'P'}],
@@ -5220,10 +5220,10 @@ function leagueLabel(sportTitle) {
     'Argentine Primera División': '🇦🇷 Liga Prof.',
     'Primera División - Argentina': '🇦🇷 Liga Prof.',
     'Primera Nacional - Argentina': '🇦🇷 Primera Nac.',
-    'Copa Libertadores': '🏆 Libertadores',
-    'Copa Sudamericana': '🏆 Sudamericana',
-    'UEFA Champions League': '🏆 Champions',
-    'Champions League': '🏆 Champions',
+    'Copa Libertadores': 'Libertadores',
+    'Copa Sudamericana': 'Sudamericana',
+    'UEFA Champions League': 'Champions',
+    'Champions League': 'Champions',
     'UEFA Europa League': '🟠 Europa League',
     'Europa League': '🟠 Europa League',
     'UEFA Europa Conference League': '🟢 Conference',
@@ -7358,6 +7358,9 @@ function aiGreet() {
 
 function aiParseMarkdown(text) {
   return text
+    // bloques ```...``` (multilinea) — ANTES del inline para no conflictuar
+    .replace(/```[\w]*\n?([\s\S]*?)```/g, (_, code) =>
+      `<pre style="background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2);border-radius:8px;padding:10px 14px;margin:8px 0;font-family:monospace;font-size:0.82rem;line-height:1.5;white-space:pre-wrap;overflow-x:auto;color:#e0ffe8">${code.trim()}</pre>`)
     // ### h3
     .replace(/^###\s+(.+)$/gm, '<div style="font-size:0.82rem;font-weight:700;color:#00c853;margin:6px 0 2px">$1</div>')
     // ## h2
@@ -7368,7 +7371,7 @@ function aiParseMarkdown(text) {
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     // *cursiva*
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    // `código`
+    // `código inline`
     .replace(/`(.*?)`/g, '<code style="background:rgba(0,200,83,0.15);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:0.85em">$1</code>')
     // listas con - o •
     .replace(/^[\-•]\s+(.+)$/gm, '<li>$1</li>')
