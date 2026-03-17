@@ -2085,8 +2085,25 @@
     box-shadow: 0 0 16px rgba(0,200,83,0.4);
   }
   @media (max-width: 820px) {
-    .nav-auth-entrar { padding: 6px 10px; font-size: 0.74rem; }
-    .nav-auth-register { padding: 6px 11px; font-size: 0.74rem; }
+    /* Botón único en mobile: ocultar "Entrar" y dejar solo el verde */
+    .nav-auth-entrar { display: none; }
+    .nav-auth-register {
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      border-radius: 10px; /* fully rounded now that Entrar is hidden */
+      white-space: nowrap;
+    }
+    .nav-auth-btn { border-radius: 10px; overflow: visible; }
+  }
+  @media (max-width: 520px) {
+    /* Muy chico: acortar texto del botón y ocultar lang picker */
+    .nav-auth-register { padding: 7px 11px; font-size: 0.75rem; }
+    .lang-picker { display: none; }
+    /* Reducir gap del nav */
+    nav { gap: 8px; padding: 0 14px; }
+    /* $A-Coin más compacto */
+    .acoin-widget { padding: 5px 8px; gap: 4px; }
+    .acoin-widget-bal { font-size: 0.8rem; }
   }
 
   /* ── NAV USER MENU ── */
@@ -2232,9 +2249,8 @@
   <a onclick="navTo('bot-alerta');closeMobileNav()">🤖 Bot Alerta</a>
   <a onclick="navTo('telegram');closeMobileNav()">🎁 Promos</a>
   <a id="drawerPanelLink" onclick="navTo('mipanel');closeMobileNav()" style="display:none;color:var(--verde)">👤 Mi Panel</a>
-  <div id="drawerAuthRow" style="margin-top:8px;padding-top:12px;border-top:1px solid rgba(0,200,83,0.15);display:flex;gap:8px">
-    <button onclick="openAuth();closeMobileNav()" style="flex:1;padding:10px 8px;background:transparent;border:1.5px solid rgba(0,200,83,0.4);border-radius:10px;color:rgba(165,214,167,0.9);font-size:0.85rem;font-weight:600;cursor:pointer;font-family:inherit;text-align:center">Entrar</button>
-    <button onclick="openAuth();closeMobileNav()" style="flex:2;padding:10px 8px;background:linear-gradient(135deg,var(--verde),var(--verde-oscuro));border:none;border-radius:10px;color:#fff;font-size:0.85rem;font-weight:700;cursor:pointer;font-family:inherit;text-align:center">✦ Registro Gratuito</button>
+  <div id="drawerAuthRow" style="margin-top:8px;padding-top:12px;border-top:1px solid rgba(0,200,83,0.15)">
+    <button onclick="openAuth();closeMobileNav()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--verde),var(--verde-oscuro));border:none;border-radius:12px;color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;letter-spacing:0.3px">✦ Entrar / Registro Gratis</button>
   </div>
 </nav>
 
@@ -2264,6 +2280,11 @@
     <div class="section-title">
       <div class="icon">🔮</div>
       Pronósticos de la IA
+    </div>
+    <div style="display:flex;gap:8px;margin:0 0 12px;flex-wrap:wrap" id="predSportTabs">
+      <button class="sport-tab active" onclick="filterPredSport('all',this)">🌍 Todos</button>
+      <button class="sport-tab" onclick="filterPredSport('soccer',this)">⚽ Fútbol</button>
+      <button class="sport-tab" onclick="filterPredSport('basketball',this)">🏀 Basket</button>
     </div>
     <div id="predsStatusBar" style="display:none;margin:0 0 12px;padding:8px 12px;border-radius:10px;font-size:0.72rem;display:flex;align-items:center;gap:8px;justify-content:space-between"></div>
     <div class="pred-grid" id="predGrid"></div>
@@ -4225,7 +4246,7 @@ function buildPredsFromOdds() {
       })
       .filter(hasH2HData)
       .sort(sortByPrioThenTime)
-      .slice(0, 6);
+      .slice(0, 18);
     if (candidates.length >= 2) break;
   }
 
@@ -4241,7 +4262,7 @@ function buildPredsFromOdds() {
       .filter(g => new Date(g.commence_time).getTime() > Date.now() - GAME_LOOKBACK)
       .filter(hasH2HData)
       .sort(sortByPrioThenTime)
-      .slice(0, 6);
+      .slice(0, 18);
   }
   // Fallback nivel 2: CUALQUIER partido con h2h, sin ningún filtro de tiempo
   if (!candidates.length) {
@@ -4249,7 +4270,7 @@ function buildPredsFromOdds() {
     candidates = window._rawOddsGames
       .filter(hasH2HData)
       .sort(sortByPrioThenTime)
-      .slice(0, 6);
+      .slice(0, 18);
   }
   if (!candidates.length) {
     console.warn('[Preds] Sin ningún partido con h2h en los 172 juegos — revisar bookmakers');
@@ -4420,6 +4441,7 @@ function buildPredsFromOdds() {
       _bestOdds: bestOdds,
       _bookKey:   isAffiliate ? bmUsed?.key   : null,
       _bookLabel: isAffiliate ? bmUsed?.title : null,
+      _sportKey:  g.sport_key || '',
     };
     } catch(e) {
       console.error('[buildPredsFromOdds] Error en partido:', g?.home_team, 'vs', g?.away_team, e.message);
@@ -4450,6 +4472,19 @@ function renderPreds() {
   if (realPreds && realPreds.length === 0) realPreds = null;
   const isLive = !!realPreds;
   try { if (realPreds) savePredictions(realPreds); } catch(e) { console.error('[renderPreds] savePredictions crash:', e); }
+
+  // Filtrar por deporte según tab activo
+  if (realPreds) {
+    const sf = window._predSportFilter || 'all';
+    if (sf === 'soccer') {
+      realPreds = realPreds.filter(p => (p._sportKey || '').includes('soccer'));
+    } else if (sf === 'basketball') {
+      realPreds = realPreds.filter(p => (p._sportKey || '').includes('basketball'));
+    }
+    // Limitar a 6 por tab (los de mayor prioridad ya están ordenados)
+    realPreds = realPreds.slice(0, 6);
+    if (realPreds.length === 0) realPreds = null;
+  }
 
   // Sin datos reales: mostrar skeleton de carga (nunca datos falsos)
   if (!realPreds) {
@@ -4491,7 +4526,8 @@ function renderPreds() {
       statusBar.style.background = 'rgba(0,200,83,0.08)';
       statusBar.style.border = '1px solid rgba(0,200,83,0.25)';
       statusBar.style.color = '#00c853';
-      statusBar.innerHTML = `<span>📡 Datos en vivo · ${source.length} pronósticos</span>`;
+      const sfLabel = (window._predSportFilter==='soccer') ? ' · ⚽ Fútbol' : (window._predSportFilter==='basketball') ? ' · 🏀 Basket' : '';
+      statusBar.innerHTML = `<span>📡 Datos en vivo · ${source.length} pronósticos${sfLabel}</span>`;
     } else {
       // No mostrar banner de error a los visitantes
       statusBar.style.display = 'none';
@@ -5366,6 +5402,15 @@ function clearHistorial() {
   if (!confirm('¿Limpiar todo el historial? Esta acción no se puede deshacer.')) return;
   saveHistorial([]);
   renderHistorial(histFilter);
+}
+
+// ── Filtro de deporte en pronósticos ──
+window._predSportFilter = 'all';
+function filterPredSport(sport, btn) {
+  window._predSportFilter = sport;
+  document.querySelectorAll('#predSportTabs .sport-tab').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  renderPreds();
 }
 
 function filterHist(f,btn) {
