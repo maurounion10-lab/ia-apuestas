@@ -4694,8 +4694,19 @@ function resolveCompletedGames(scores, skipRender) {
 
 // Carga scores históricos (últimos 3 días) para resolver predicciones pendientes
 async function loadHistoricalScores() {
-  const pending = loadHistorial().filter(h => h.result === 'pending');
-  if (!pending.length) return;
+  const hist = loadHistorial();
+  const now = Date.now();
+  const sevenDaysMs = 7 * 24 * 3600 * 1000;
+  // Resolver tanto 'pending' como 'void' recientes (< 7 días) — los void pueden haber sido
+  // seteados por un bug anterior, así que intentamos re-resolverlos con los scores del servidor
+  const needsResolve = hist.filter(h => {
+    if (h.result === 'win' || h.result === 'loss') return false; // ya resueltos, skip
+    // Estimar cuándo fue el partido
+    const ts = h.commenceTs || (h.id && (() => { const m = h.id.match(/(\d{4}-\d{2}-\d{2})T/); return m ? new Date(m[1]).getTime() : null; })());
+    if (ts && (now - ts) > sevenDaysMs) return false; // demasiado viejo
+    return true; // pending o void reciente
+  });
+  if (!needsResolve.length) return;
   try {
     const res = await fetch(`${WORKER_URL}/scores?daysFrom=3`);
     if (!res.ok) return;
@@ -4716,9 +4727,38 @@ async function loadHistoricalScores() {
       });
     if (historicalScores.length) {
       console.log('[historicalScores] encontrados:', historicalScores.length, 'partidos finalizados');
-      resolveCompletedGames(historicalScores);
+      resolveAllGames(historicalScores);
     }
   } catch(e) { console.warn('[historicalScores]', e); }
+}
+
+// Como resolveCompletedGames pero también re-resuelve entradas void recientes
+function resolveAllGames(scores) {
+  const hist = loadHistorial();
+  const now = Date.now();
+  const sevenDaysMs = 7 * 24 * 3600 * 1000;
+  let changed = false;
+  scores.filter(s => s.flag === 'final').forEach(s => {
+    hist.forEach(p => {
+      if (p.result === 'win' || p.result === 'loss') return; // ya definitivo, no tocar
+      if (!teamsMatch(s.home, p.home) || !teamsMatch(s.away, p.away)) return;
+      const homeWin = s.scoreH > s.scoreA;
+      const awayWin = s.scoreA > s.scoreH;
+      const draw    = s.scoreH === s.scoreA;
+      let result = 'void';
+      if      (p.rec === 'Local Gana')     result = homeWin ? 'win' : 'loss';
+      else if (p.rec === 'Visitante Gana') result = awayWin ? 'win' : 'loss';
+      else if (p.rec === 'Empate')         result = draw    ? 'win' : 'loss';
+      if (result !== 'void' || p.result === 'pending') {
+        p.result = result;
+        p.finalScore = `${s.scoreH}-${s.scoreA}`;
+        p.pl = result === 'win' ? parseFloat(((p.odds - 1) * p.stake).toFixed(2))
+             : result === 'loss' ? -p.stake : 0;
+        changed = true;
+      }
+    });
+  });
+  if (changed) { saveHistorial(hist); renderHistorial(histFilter); }
 }
 
 function calcRacha(data) {
