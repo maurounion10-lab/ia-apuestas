@@ -3730,6 +3730,8 @@ const teamLogos = {
   'BSC Young Boys':         'https://media.api-sports.io/football/teams/3.png',
   'Ferencvaros':            'https://media.api-sports.io/football/teams/2647.png',
   'Ferencváros':            'https://media.api-sports.io/football/teams/2647.png',
+  'Ferencváros TC':         'https://media.api-sports.io/football/teams/2647.png',
+  'Ferencvaros TC':         'https://media.api-sports.io/football/teams/2647.png',
   'Dinamo Zagreb':          'https://media.api-sports.io/football/teams/2652.png',
   'GNK Dinamo Zagreb':      'https://media.api-sports.io/football/teams/2652.png',
   'Midtjylland':            'https://media.api-sports.io/football/teams/398.png',
@@ -3882,7 +3884,19 @@ const playerPhotoCache = {};
 
 // Genera HTML de logo: imagen oficial si existe, avatar foto para tenistas
 function logoHtml(name, size=48) {
-  const url = teamLogos[name];
+  // Buscar logo con fallbacks de nombre: exacto → sin sufijo → sin prefijo
+  function findLogoUrl(n) {
+    if (!n) return null;
+    if (teamLogos[n]) return teamLogos[n];
+    // Intentar sin sufijos comunes: FC, SC, TC, CF, AC, AS, CD, SD, RCD, FK, SK, BK, IF, IFK
+    const stripped = n.replace(/\b(FC|SC|TC|CF|AC|AS|CD|SD|RCD|FK|SK|BK|IF|IFK|RC|UD|CA|CE|SV|VfB|VfL|TSG|RB|BSC|GNK|NK)\b\.?/gi, '').trim();
+    if (stripped !== n && teamLogos[stripped]) return teamLogos[stripped];
+    // Intentar sin prefijos comunes
+    const noPre = n.replace(/^(FC|SC|AC|AS|CD|SD|RCD|FK|SK|NK|GNK|RB)\s+/i, '').trim();
+    if (noPre !== n && teamLogos[noPre]) return teamLogos[noPre];
+    return null;
+  }
+  const url = findLogoUrl(name);
   const fallbackEmoji = '⚽';
   if (url) {
     return `<img src="${url}" alt="${name}" width="${size}" height="${size}"
