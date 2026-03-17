@@ -3,12 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0a0f0a">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="ApuestasIA">
-<link rel="manifest" href="data:application/json,{%22name%22:%22ApuestasAutom%C3%A1ticas%22,%22short_name%22:%22ApuestasIA%22,%22description%22:%22IA%20para%20apuestas%20deportivas%22,%22start_url%22:%22/%22,%22display%22:%22standalone%22,%22background_color%22:%22%230a0f0a%22,%22theme_color%22:%22%2300c853%22,%22orientation%22:%22portrait%22,%22icons%22:[{%22src%22:%22data:image/svg+xml,<svg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20100%20100'><rect%20width='100'%20height='100'%20rx='22'%20fill='%230a0f0a'/><rect%20width='100'%20height='100'%20rx='22'%20fill='%2300c853'%20opacity='.9'/><path%20d='M58,10%20L34,55%20L50,55%20L42,90%20L66,45%20L50,45%20Z'%20fill='%23ffd600'/></svg>%22,%22sizes%22:%22192x192%22,%22type%22:%22image/svg+xml%22}]}">
 <title>ApuestasAutomáticas – IA · Apuestas Inteligentes</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23112a14'/><defs><linearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2300c853'/><stop offset='100%25' stop-color='%23007c32'/></linearGradient><linearGradient id='bl' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23ffd600'/><stop offset='100%25' stop-color='%23ff9100'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23bg)'/><path d='M58,10 L34,55 L50,55 L42,90 L66,45 L50,45 Z' fill='url(%23bl)'/><circle cx='75' cy='20' r='6' fill='%2300e676' opacity='0.9'/><circle cx='25' cy='75' r='4' fill='%2300e676' opacity='0.6'/></svg>">
 <style>
@@ -2146,17 +2140,6 @@
       Pronósticos de la IA
     </div>
     <div class="pred-grid" id="predGrid"></div>
-    <!-- Botón para ver pronósticos de baja confianza -->
-    <div id="predMoreWrap" style="display:none;text-align:center;margin-top:8px">
-      <button onclick="toggleLowPreds(this)" style="
-        background:rgba(255,255,255,0.05);border:1px solid var(--borde);
-        color:var(--texto-sec);font-size:0.78rem;border-radius:20px;
-        padding:8px 20px;cursor:pointer;transition:all .2s"
-        onmouseover="this.style.borderColor='rgba(0,200,83,0.4)';this.style.color='var(--verde)'"
-        onmouseout="this.style.borderColor='var(--borde)';this.style.color='var(--texto-sec)'">
-        <span id="predMoreLabel">▼ Ver todos los pronósticos</span>
-      </button>
-    </div>
   </section>
 
   <div class="section-divider"></div>
@@ -2165,26 +2148,15 @@
   <section id="historial">
     <div class="section-title"><div class="icon">📋</div>Resultados de Pronósticos</div>
     <div class="hist-summary" id="histSummary"></div>
-
-    <!-- Gráfico de evolución de bankroll -->
-    <div id="histChartWrap" style="margin:12px 0 18px;background:var(--gris-card);border:1px solid var(--borde);border-radius:14px;padding:14px 16px;display:none">
-      <div style="font-size:0.72rem;font-weight:700;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px">📈 Evolución del Bankroll</div>
-      <canvas id="histChart" height="70" style="width:100%;display:block"></canvas>
-    </div>
-
-    <!-- Filtros deporte + fecha -->
-    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center;justify-content:space-between">
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="histSportTabs">
-        <button class="sport-tab active" onclick="filterHist('all',this)">🌍 Todos</button>
-        <button class="sport-tab" onclick="filterHist('futbol',this)">⚽ Fútbol</button>
-        <button class="sport-tab" onclick="filterHist('basket',this)">🏀 Básquet</button>
-        <button class="sport-tab" onclick="filterHist('tenis',this)">🎾 Tenis</button>
-      </div>
-      <div style="display:flex;gap:6px;flex-wrap:wrap" id="histDateTabs">
-        <button class="sport-tab" onclick="filterHistDate('today',this)" style="font-size:0.72rem">Hoy</button>
-        <button class="sport-tab" onclick="filterHistDate('week',this)" style="font-size:0.72rem">7 días</button>
-        <button class="sport-tab active" onclick="filterHistDate('all',this)" style="font-size:0.72rem">Todo</button>
-      </div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
+      <button class="sport-tab active" onclick="filterHist('all',this)">🌍 Todos</button>
+      <button class="sport-tab" onclick="filterHist('futbol',this)">⚽ Fútbol</button>
+      <button class="sport-tab" onclick="filterHist('basket',this)">🏀 Básquet</button>
+      <button class="sport-tab" onclick="filterHist('tenis',this)">🎾 Tenis</button>
+      <div style="width:1px;background:var(--borde);margin:0 4px;align-self:stretch"></div>
+      <button class="sport-tab" id="histDateBtnHoy"    onclick="filterHistDate('today',this)" style="font-size:0.72rem">Hoy</button>
+      <button class="sport-tab" id="histDateBtnWeek"   onclick="filterHistDate('week',this)"  style="font-size:0.72rem">7 días</button>
+      <button class="sport-tab active" id="histDateBtnAll" onclick="filterHistDate('all',this)"   style="font-size:0.72rem">Todo</button>
     </div>
 
     <div class="hist-table-wrap">
@@ -4025,26 +3997,17 @@ function renderPreds() {
       </div>
     </div>`;
 
-  // Ordenar por confianza: high → med → low
-  const confOrder = { high: 0, med: 1, low: 2 };
-  const sorted = [...source].sort((a,b) => (confOrder[a.conf]||2) - (confOrder[b.conf]||2));
-
-  document.getElementById('predGrid').innerHTML = sorted.map((p, idx) => {
+  document.getElementById('predGrid').innerHTML = source.map((p, idx) => {
     // BVR: usar valor guardado en p, o derivar de p.conf para datos estáticos
     const _bvr     = p.bvr     || (p.conf==='high' ? 5 : p.conf==='med' ? 3 : 2);
     const _bvrText = p.bvrText || (p.conf==='high' ? 'Alta' : p.conf==='med' ? 'Media' : 'Baja');
-    const _bvrPct  = Math.round(_bvr / 6 * 100);
-    const _bvrColor = _bvr >= 5 ? '#00c853' : _bvr >= 3 ? '#ffd600' : '#ff7043';
     const _bvrGemsHtml = Array.from({length:6}, (_,i) =>
       `<div class="bvr-gem ${i < _bvr ? 'active-'+_bvr : ''}"></div>`
     ).join('');
     const bvrHtml = `<div class="bvr-wrap">
       <span class="bvr-label">Confianza IA</span>
       <div class="bvr-gems">${_bvrGemsHtml}</div>
-      <span class="bvr-text r${_bvr}">${_bvrPct}% · ${_bvrText}</span>
-    </div>
-    <div style="margin-top:6px;height:4px;background:rgba(255,255,255,0.08);border-radius:4px;overflow:hidden">
-      <div style="height:100%;width:${_bvrPct}%;background:${_bvrColor};border-radius:4px;transition:width .6s ease;box-shadow:0 0 6px ${_bvrColor}55"></div>
+      <span class="bvr-text r${_bvr}">${_bvr}/6 · ${_bvrText}</span>
     </div>`;
 
     const oddsHtml = affCtaHtml;
@@ -4089,7 +4052,7 @@ function renderPreds() {
       </div>` : '';
 
     return `
-    <div class="pred-card${p.conf==='low'?' pred-low-card':''}" style="${isGameLive ? 'border-color:rgba(229,57,53,0.4)' : p.conf==='high' ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)' : ''}">
+    <div class="pred-card" style="${isGameLive ? 'border-color:rgba(229,57,53,0.4)' : p.conf==='high' ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)' : ''}">
       <div class="pred-header">
         <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${p.conf==='high' ? '<span style="font-size:1rem;filter:drop-shadow(0 1px 4px rgba(255,214,0,0.8))">👑</span>' : ''}${p.league}${isGameLive ? '' : ' · ' + p.time}</span>
         <div style="display:flex;align-items:center;gap:6px">
@@ -4107,6 +4070,7 @@ function renderPreds() {
           </div>
         </div>
       </div>
+      ${bvrHtml}
       <div class="pred-match">
         <div class="pred-team">
           <div class="pred-emoji">${logoHtml(p.home, 52)}</div>
@@ -4132,7 +4096,6 @@ function renderPreds() {
         <div class="pred-rec-label">🤖 Recomendación IA</div>
         <div class="pred-rec-value">✅ ${p.rec}</div>
       </div>
-      ${bvrHtml}
       <div class="pred-bars">
         <div class="pred-bar-item">
           <span class="pred-bar-label">Local</span>
@@ -4189,27 +4152,6 @@ function renderPreds() {
       ${oddsHtml}
     </div>
   `}).join('');
-
-  // Ocultar cards de baja confianza por defecto
-  const lowCards = document.querySelectorAll('.pred-low-card');
-  const moreWrap = document.getElementById('predMoreWrap');
-  if (lowCards.length) {
-    lowCards.forEach(c => c.style.display = 'none');
-    if (moreWrap) moreWrap.style.display = 'block';
-    document.getElementById('predMoreLabel').textContent = `▼ Ver ${lowCards.length} pronóstico${lowCards.length>1?'s':'s'} de menor confianza`;
-  } else {
-    if (moreWrap) moreWrap.style.display = 'none';
-  }
-}
-
-function toggleLowPreds(btn) {
-  const lowCards = document.querySelectorAll('.pred-low-card');
-  const lbl = document.getElementById('predMoreLabel');
-  const isHidden = lowCards[0]?.style.display === 'none';
-  lowCards.forEach(c => c.style.display = isHidden ? '' : 'none');
-  lbl.textContent = isHidden
-    ? `▲ Ocultar pronósticos de menor confianza`
-    : `▼ Ver ${lowCards.length} pronóstico${lowCards.length>1?'s':''} de menor confianza`;
 }
 
 // ═══════════════════════════════════════════════
@@ -4550,6 +4492,8 @@ const HIST_KEY   = 'apuestas_historial_v1';
 const HIST_STAKE = 100; // stake fijo por predicción
 let histFilter = 'all';
 let histDateFilter = 'all';
+// Fecha de lanzamiento del sitio — fija para todos los usuarios
+const PAGE_LAUNCH_DATE = new Date('2025-03-01');
 
 function loadHistorial()   { try { return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch { return []; } }
 function saveHistorial(arr){ try { localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(-200))); } catch {} }
@@ -4721,24 +4665,33 @@ function calcRacha(data) {
 }
 
 function renderHistorial(filter) {
-  migrateHistStakes();
+  migrateHistStakes();          // corrige stakes/P&L de entradas antiguas
+  // Resolver con scores en memoria (sincrónico, sin loop)
   resolveCompletedGames(scoresData || [], true);
+  // Buscar scores históricos del servidor para pendientes sin resolver
   loadHistoricalScores();
   const all  = loadHistorial();
-  // Filtro por deporte
   let data = filter==='all' ? all : all.filter(h=>h.sport===filter);
-  // Filtro por fecha
+
+  // Filtro por fecha — referencia fija (PAGE_LAUNCH_DATE), igual para todos
   if (histDateFilter !== 'all') {
-    const now = Date.now();
-    const cutMs = histDateFilter === 'today' ? 86400000 : 7 * 86400000;
-    const cutDate = new Date(now - cutMs);
+    const now = new Date();
+    const todayStr = now.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'});
+    const sevenDaysAgo = new Date(now); sevenDaysAgo.setDate(now.getDate() - 7);
+
     data = data.filter(h => {
-      if (!h.date) return true;
-      // h.date es "DD/MM" — convertir a Date usando el año actual
+      if (!h.date) return histDateFilter === 'all';
+      // h.date formato "DD/MM" — convertir a Date del año actual
       const parts = h.date.split('/');
       if (parts.length < 2) return true;
-      const d = new Date(new Date().getFullYear(), parseInt(parts[1])-1, parseInt(parts[0]));
-      return d >= cutDate;
+      const yr = now.getFullYear();
+      const hDate = new Date(yr, parseInt(parts[1]) - 1, parseInt(parts[0]));
+      // Si la fecha calculada es futura (ej: dic en enero), restar un año
+      if (hDate > now) hDate.setFullYear(yr - 1);
+
+      if (histDateFilter === 'today') return h.date === todayStr;
+      if (histDateFilter === 'week')  return hDate >= sevenDaysAgo;
+      return true;
     });
   }
   const completed = data.filter(h=>h.result!=='pending'&&h.result!=='void');
@@ -4758,8 +4711,6 @@ function renderHistorial(filter) {
 
   const rMap = { win:'<span class="result-win">✅ WIN</span>', loss:'<span class="result-loss">❌ LOSS</span>', void:'<span class="result-void">⚪ VOID</span>', pending:'<span class="result-pending">🟡 PEND</span>' };
 
-  // Renderizar gráfico de bankroll
-  requestAnimationFrame(() => renderHistChart(data));
 
   const todayStr = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
   document.getElementById('histTableBody').innerHTML = data.length
@@ -4789,60 +4740,19 @@ function clearHistorial() {
 }
 
 function filterHist(f,btn) {
-  document.querySelectorAll('#histSportTabs .sport-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('#historial .sport-tab').forEach(b=>b.classList.remove('active'));
+  // Restaurar el activo del filtro de fecha
+  const dateActive = histDateFilter==='today' ? 'histDateBtnHoy' : histDateFilter==='week' ? 'histDateBtnWeek' : 'histDateBtnAll';
+  document.getElementById(dateActive)?.classList.add('active');
   btn.classList.add('active'); histFilter=f; renderHistorial(f);
 }
 
-function filterHistDate(f,btn) {
-  document.querySelectorAll('#histDateTabs .sport-tab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active'); histDateFilter=f; renderHistorial(histFilter);
-}
-
-function renderHistChart(data) {
-  const wrap = document.getElementById('histChartWrap');
-  const canvas = document.getElementById('histChart');
-  if (!canvas) return;
-  const completed = data.filter(h => h.result==='win'||h.result==='loss');
-  if (completed.length < 2) { wrap.style.display='none'; return; }
-  wrap.style.display='block';
-  const W = canvas.offsetWidth || 600;
-  canvas.width  = W * window.devicePixelRatio;
-  canvas.height = 70 * window.devicePixelRatio;
-  const ctx = canvas.getContext('2d');
-  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
-  // Construir curva P/L acumulado
-  let cum = 0;
-  const points = completed.slice().reverse().map(h => { cum += h.pl||0; return cum; });
-  const minV = Math.min(0, ...points);
-  const maxV = Math.max(0, ...points);
-  const range = maxV - minV || 1;
-  const padX = 4, padY = 8, h = 70, w = W;
-  const px = i => padX + (i / (points.length-1)) * (w - padX*2);
-  const py = v => padY + (1 - (v - minV) / range) * (h - padY*2);
-  // Fondo degradado bajo la curva
-  const isPos = points[points.length-1] >= 0;
-  const grad = ctx.createLinearGradient(0, 0, 0, h);
-  grad.addColorStop(0, isPos ? 'rgba(0,200,83,0.3)' : 'rgba(229,57,53,0.3)');
-  grad.addColorStop(1, 'rgba(0,0,0,0)');
-  ctx.beginPath();
-  ctx.moveTo(px(0), py(points[0]));
-  for (let i=1;i<points.length;i++) ctx.lineTo(px(i), py(points[i]));
-  ctx.lineTo(px(points.length-1), h); ctx.lineTo(px(0), h); ctx.closePath();
-  ctx.fillStyle = grad; ctx.fill();
-  // Línea
-  ctx.beginPath();
-  ctx.moveTo(px(0), py(points[0]));
-  for (let i=1;i<points.length;i++) ctx.lineTo(px(i), py(points[i]));
-  ctx.strokeStyle = isPos ? '#00c853' : '#e53935';
-  ctx.lineWidth = 2; ctx.lineJoin = 'round'; ctx.stroke();
-  // Línea de 0
-  const zeroY = py(0);
-  ctx.beginPath(); ctx.moveTo(padX, zeroY); ctx.lineTo(w-padX, zeroY);
-  ctx.strokeStyle = 'rgba(255,255,255,0.1)'; ctx.lineWidth = 1; ctx.stroke();
-  // Punto final
-  const lx = px(points.length-1), ly = py(points[points.length-1]);
-  ctx.beginPath(); ctx.arc(lx, ly, 4, 0, Math.PI*2);
-  ctx.fillStyle = isPos ? '#00c853' : '#e53935'; ctx.fill();
+function filterHistDate(f, btn) {
+  // Solo desactivar los botones de fecha (los 3 últimos), no los de deporte
+  ['histDateBtnHoy','histDateBtnWeek','histDateBtnAll'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  btn.classList.add('active');
+  histDateFilter = f;
+  renderHistorial(histFilter);
 }
 
 // ═══════════════════════════════════════════════
@@ -7474,30 +7384,10 @@ function aiToggleChat() {
 function aiGreet() {
   aiGreeted = true;
   const lang = (typeof currentLang !== 'undefined' ? currentLang : 'es');
-
-  // Resumen del día
-  let dailySummary = '';
-  try {
-    const preds = window._aiPreds || [];
-    const hist  = typeof loadHistorial === 'function' ? loadHistorial() : [];
-    const todayStr = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
-    const todayResults = hist.filter(h => h.date === todayStr);
-    const todayWins  = todayResults.filter(h=>h.result==='win').length;
-    const todayTotal = todayResults.filter(h=>h.result==='win'||h.result==='loss').length;
-    const totalPreds = preds.length;
-    const highConf   = preds.filter(p=>p.conf==='high').length;
-
-    const parts = [];
-    if (totalPreds > 0) parts.push(`Hoy tengo <strong>${totalPreds} pronóstico${totalPreds>1?'s':''}</strong>${highConf ? `, ${highConf} de alta confianza 👑` : ''}.`);
-    if (todayTotal > 0) parts.push(`Resultados del día: <strong>${todayWins}/${todayTotal}</strong> ✅`);
-
-    if (parts.length) dailySummary = '\n\n' + parts.join(' ');
-  } catch(e) {}
-
   const greetings = {
-    es: `👋 ¡Hola! Soy la <strong>Primera IA para Apuestas Deportivas</strong>.${dailySummary}\n\nPuedo darte pronósticos, análisis y consejos. ¿En qué te ayudo?`,
-    en: `👋 Hi! I'm the <strong>First AI for Sports Betting</strong>.${dailySummary}\n\nI can give you predictions, analysis and tips. How can I help?`,
-    pt: `👋 Olá! Sou a <strong>Primeira IA para Apostas Esportivas</strong>.${dailySummary}\n\nComo posso ajudar você?`,
+    es: `👋 ¡Hola! Soy la <strong>Primera IA para Apuestas Deportivas</strong>. Puedo darte pronósticos, análisis estadísticos y consejos para apostar con valor.\n¿En qué te puedo ayudar?`,
+    en: `👋 Hi! I'm the <strong>First AI for Sports Betting</strong>. I can give you predictions, statistical analysis and value betting tips.\nHow can I help you?`,
+    pt: `👋 Olá! Sou a <strong>Primeira IA para Apostas Esportivas</strong>. Posso fornecer prognósticos, análises estatísticas e dicas para apostar com valor.\nComo posso ajudar você?`,
   };
   aiAddMsg('bot', greetings[lang] || greetings['es']);
 }
@@ -7842,43 +7732,6 @@ function aiGetMatchContext() {
   </div>
 </div>
 
-<!-- PWA install prompt -->
-<div id="pwaInstallBanner" style="display:none;position:fixed;bottom:90px;left:50%;transform:translateX(-50%);z-index:9999;
-  background:linear-gradient(135deg,#112a14,#1a3a1a);border:1px solid rgba(0,200,83,0.4);
-  border-radius:14px;padding:12px 18px;display:none;align-items:center;gap:12px;
-  box-shadow:0 8px 32px rgba(0,0,0,0.6);max-width:340px;width:calc(100vw - 48px)">
-  <div style="font-size:1.8rem">📲</div>
-  <div style="flex:1">
-    <div style="font-size:0.82rem;font-weight:700;color:#fff">Instalá la app</div>
-    <div style="font-size:0.7rem;color:rgba(255,255,255,0.6)">Acceso rápido desde tu pantalla de inicio</div>
-  </div>
-  <button id="pwaDismiss" onclick="document.getElementById('pwaInstallBanner').style.display='none';localStorage.setItem('pwa_dismissed','1')"
-    style="background:none;border:none;color:rgba(255,255,255,0.4);font-size:1.1rem;cursor:pointer;padding:4px">✕</button>
-  <button id="pwaInstallBtn" style="background:var(--verde);border:none;color:#000;font-weight:700;font-size:0.75rem;
-    border-radius:8px;padding:7px 12px;cursor:pointer;white-space:nowrap">Instalar</button>
-</div>
-
-<script>
-// PWA install prompt
-let _deferredInstall = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  _deferredInstall = e;
-  if (!localStorage.getItem('pwa_dismissed')) {
-    setTimeout(() => {
-      const b = document.getElementById('pwaInstallBanner');
-      if (b) b.style.display = 'flex';
-    }, 4000);
-  }
-});
-document.getElementById('pwaInstallBtn')?.addEventListener('click', async () => {
-  if (!_deferredInstall) return;
-  _deferredInstall.prompt();
-  const { outcome } = await _deferredInstall.userChoice;
-  _deferredInstall = null;
-  document.getElementById('pwaInstallBanner').style.display = 'none';
-});
-</script>
 
 </body>
 </html>
