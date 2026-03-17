@@ -3,21 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>gambeta.ai – Pronósticos Inteligentes con IA</title>
+<title>gambeta.ai – La IA que apuesta con vos · Picks gratis</title>
 
 <!-- SEO -->
-<meta name="description" content="La primera IA interactiva para apuestas deportivas. Pronósticos en tiempo real de Champions, Libertadores, Premier, NBA y más. Gratis.">
+<meta name="description" content="Pronósticos deportivos con IA en tiempo real. Champions, Libertadores, Premier, NBA y más. Registrate gratis y armá tu combinada.">
 <meta name="keywords" content="pronósticos deportivos, apuestas con IA, picks fútbol, Champions League, NBA, Libertadores, inteligencia artificial apuestas">
 <meta name="author" content="gambeta.ai">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://gambeta.ai">
+<link rel="canonical" href="https://ia-apuestas.pages.dev">
 
 <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://gambeta.ai">
-<meta property="og:title" content="gambeta.ai – La IA que apuesta con vos">
-<meta property="og:description" content="Pronósticos en tiempo real con Inteligencia Artificial. Champions, Libertadores, Premier, NBA y más. Interactuá con la IA, armá tu combinada y llevá el control de tu bankroll.">
-<meta property="og:image" content="https://gambeta.ai/og-image.png">
+<meta property="og:url" content="https://ia-apuestas.pages.dev">
+<meta property="og:title" content="gambeta.ai – La IA que apuesta con vos · Picks gratis">
+<meta property="og:description" content="Pronósticos deportivos con IA en tiempo real. Champions, Libertadores, Premier, NBA y más. Registrate gratis y armá tu combinada.">
+<meta property="og:image" content="https://ia-apuestas.pages.dev/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:locale" content="es_AR">
@@ -26,9 +26,9 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@gambetaia">
-<meta name="twitter:title" content="gambeta.ai – La IA que apuesta con vos">
-<meta name="twitter:description" content="Pronósticos en tiempo real con IA. Champions, Libertadores, Premier, NBA y más. Gratis.">
-<meta name="twitter:image" content="https://gambeta.ai/og-image.png">
+<meta name="twitter:title" content="gambeta.ai – La IA que apuesta con vos · Picks gratis">
+<meta name="twitter:description" content="Pronósticos deportivos con IA en tiempo real. Champions, Libertadores, Premier, NBA y más. Registrate gratis y armá tu combinada.">
+<meta name="twitter:image" content="https://ia-apuestas.pages.dev/og-image.png">
 
 <!-- PWA / Mobile -->
 <meta name="theme-color" content="#00c853">
@@ -4381,11 +4381,27 @@ function buildPredsFromOdds() {
       return null;
     };
     const totalsMkt = findMkt('totals');
-    // Over X.5 odds — extraer de los outcomes del mercado totals
+    const isBasketball = (g.sport_key || '').includes('basketball');
+
+    // Over odds — fútbol: busca líneas 1.5/2.5/3.5 · basket: detecta la línea automáticamente
     const overOdds = {};
+    let basketTotalsLine = null;
+    let basketOverOdds = null;
+    let basketUnderOdds = null;
     (totalsMkt?.outcomes || []).forEach(o => {
       const pt = String(o.point);
-      if (o.name === 'Over') overOdds[pt] = o.price;
+      if (!isBasketball) {
+        if (o.name === 'Over') overOdds[pt] = o.price;
+      } else {
+        // Basket: tomar la primera línea Over/Under disponible
+        if (o.name === 'Over' && !basketOverOdds) {
+          basketOverOdds   = o.price;
+          basketTotalsLine = pt;
+        }
+        if (o.name === 'Under' && !basketUnderOdds) {
+          basketUnderOdds = o.price;
+        }
+      }
     });
 
     // ── Probabilidades 1X2 ──
@@ -4397,18 +4413,26 @@ function buildPredsFromOdds() {
     const probD = dOP ? Math.round(rawD / tot * 100) : 0;
     const probA = Math.round(rawA / tot * 100);
 
-    // Probabilidades de totales (implícita cruda del over)
+    // Probabilidades de totales fútbol (implícita cruda del over)
     const probOver = {};
     ['1.5','2.5','3.5'].forEach(pt => {
       if (overOdds[pt]) probOver[pt] = Math.round(100 / overOdds[pt]);
     });
 
-    // Ambos Marcan estimado: si ningún equipo es muy dominante y over2.5 es probable
-    // Fórmula: si Over2.5 existe y probOver[2.5] >= 55, BTTS prob ≈ probOver[2.5] + 5
-    const bttsEst = (probOver['2.5'] && probOver['2.5'] >= 55)
-      ? Math.min(probOver['2.5'] + 5, 80)
-      : null;
-    const bttsOddsEst = bttsEst ? parseFloat((100 / bttsEst).toFixed(2)) : null;
+    // ── Ambos Marcan (fútbol) ──
+    // Primero buscar mercado btts real en la API; si no, estimarlo desde Over2.5
+    const bttsMkt = findMkt('btts') || findMkt('both_teams_to_score');
+    let bttsOddsReal = null;
+    if (bttsMkt) {
+      const yes = (bttsMkt.outcomes || []).find(o => /yes|si|sí/i.test(o.name));
+      if (yes) bttsOddsReal = yes.price;
+    }
+    const bttsEst = bttsOddsReal
+      ? Math.round(100 / bttsOddsReal)
+      : (probOver['2.5'] && probOver['2.5'] >= 50)
+        ? Math.min(probOver['2.5'] + 5, 80)
+        : null;
+    const bttsOddsEst = bttsOddsReal || (bttsEst ? parseFloat((100 / bttsEst).toFixed(2)) : null);
 
     // ── Selección de la MEJOR apuesta ──
     const MIN_ODDS = 1.40; // cuota mínima aceptable
@@ -4416,11 +4440,28 @@ function buildPredsFromOdds() {
       { rec: 'Local Gana',     prob: probH, odds: hO ?? hOP },
       { rec: 'Visitante Gana', prob: probA, odds: aO ?? aOP },
       ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dO ?? dOP }] : []),
-      // Totales: cuota mínima 1.40
-      ...(['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
-          .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
-      // Ambos Marcan estimado
-      ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
+      // Totales fútbol: Over 1.5 / 2.5 / 3.5
+      ...(!isBasketball ? ['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
+          .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) })) : []),
+      // Ambos Marcan (solo fútbol)
+      ...(!isBasketball && bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
+      // Over/Under basket: línea automática (ej: Más de 215.5)
+      ...(isBasketball && basketTotalsLine && basketOverOdds >= MIN_ODDS ? [{
+        rec: `Más de ${basketTotalsLine}`,
+        prob: Math.round(100 / basketOverOdds),
+        odds: basketOverOdds,
+        isTotals: true,
+        line: parseFloat(basketTotalsLine),
+        isBasketTotals: true,
+      }] : []),
+      ...(isBasketball && basketTotalsLine && basketUnderOdds >= MIN_ODDS ? [{
+        rec: `Menos de ${basketTotalsLine}`,
+        prob: Math.round(100 / basketUnderOdds),
+        odds: basketUnderOdds,
+        isTotals: true,
+        line: parseFloat(basketTotalsLine),
+        isBasketTotals: true,
+      }] : []),
     ]
     .filter(c => c.prob > 0)
     .filter(c => !c.odds || parseFloat(c.odds) >= MIN_ODDS); // excluir cuotas bajas
@@ -4461,8 +4502,10 @@ function buildPredsFromOdds() {
     if (hO) oddsPills.push(`L:${hO.toFixed(2)}`);
     if (dO) oddsPills.push(`E:${dO.toFixed(2)}`);
     if (aO) oddsPills.push(`V:${aO.toFixed(2)}`);
-    if (overOdds['2.5']) oddsPills.push(`+2.5:${parseFloat(overOdds['2.5']).toFixed(2)}`);
-    if (bttsOddsEst)     oddsPills.push(`AM:${bttsOddsEst.toFixed(2)}`);
+    if (overOdds['2.5'])    oddsPills.push(`+2.5:${parseFloat(overOdds['2.5']).toFixed(2)}`);
+    if (bttsOddsEst)        oddsPills.push(`AM:${bttsOddsEst.toFixed(2)}`);
+    if (basketOverOdds)     oddsPills.push(`O${basketTotalsLine}:${parseFloat(basketOverOdds).toFixed(2)}`);
+    if (basketUnderOdds)    oddsPills.push(`U${basketTotalsLine}:${parseFloat(basketUnderOdds).toFixed(2)}`);
 
     // Insight generado por probabilidades
     const hN = shortName(g.home_team), aN = shortName(g.away_team);
@@ -4476,10 +4519,17 @@ function buildPredsFromOdds() {
     else if (rec === 'Ambos Marcan')
       insight = `Estimación: ${bttsEst}% de probabilidad de que ambos equipos conviertan${fmtO(bttsOddsEst)}. El mercado de goles refleja un partido abierto — ${hN} (${probH}%) vs ${aN} (${probA}%). Buena apuesta de goles de doble vía.`;
     else {
-      // Más de X.5
       const line = best.line;
-      const pOver = probOver[String(line)];
-      insight = `El mercado asigna ${pOver}% de probabilidad a que el partido supere los ${line} goles${fmtO(overOdds[String(line)])}. Partido con perfil ofensivo — ${hN} (${probH}% favorito) vs ${aN} (${probA}%). Apuesta de totales con valor.`;
+      if (best.isBasketTotals) {
+        // Over/Under basket
+        const isOver = rec.startsWith('Más');
+        const pct    = Math.round(100 / (isOver ? basketOverOdds : basketUnderOdds));
+        insight = `Línea de puntos totales en ${line}. El mercado da ${pct}% de probabilidad al ${isOver ? 'Over' : 'Under'}${fmtO(isOver ? basketOverOdds : basketUnderOdds)}. ${hN} (${probH}% de ganar) vs ${aN} (${probA}%). Apuesta de totales NBA con valor estadístico.`;
+      } else {
+        // Más de X.5 fútbol
+        const pOver = probOver[String(line)];
+        insight = `El mercado asigna ${pOver}% de probabilidad a que el partido supere los ${line} goles${fmtO(overOdds[String(line)])}. Partido con perfil ofensivo — ${hN} (${probH}% favorito) vs ${aN} (${probA}%). Apuesta de totales con valor.`;
+      }
     }
 
     return {
@@ -5311,6 +5361,16 @@ function resolveCompletedGames(scores, skipRender) {
       else if (p.rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
       else if (p.rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
       else if (p.rec === 'Más de 3.5')     result = totalGoals >= 4 ? 'win' : 'loss';
+      else if (/^Más de (\d+\.?\d*)$/.test(p.rec)) {
+        // Over basket (ej: "Más de 215.5")
+        const line = parseFloat(p.rec.replace('Más de ',''));
+        result = totalGoals > line ? 'win' : 'loss';
+      }
+      else if (/^Menos de (\d+\.?\d*)$/.test(p.rec)) {
+        // Under basket (ej: "Menos de 215.5")
+        const line = parseFloat(p.rec.replace('Menos de ',''));
+        result = totalGoals < line ? 'win' : 'loss';
+      }
 
       p.result = result;
       p.finalScore = `${s.scoreH}-${s.scoreA}`;
