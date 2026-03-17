@@ -3938,6 +3938,45 @@ function filterScores(sport, btn) {
 // ═══════════════════════════════════════════════
 
 // Construye predicciones reales a partir de los datos de la API de odds
+function shortName(name) {
+  if (!name) return '';
+  // Abreviar nombres largos de equipos
+  const abbrevs = {
+    'Paris Saint Germain': 'PSG', 'Paris Saint-Germain': 'PSG',
+    'Manchester City': 'Man City', 'Manchester United': 'Man Utd',
+    'Atletico Madrid': 'Atlético', 'Atlético de Madrid': 'Atlético',
+    'Borussia Dortmund': 'Dortmund', 'Internazionale': 'Inter',
+    'Bayer Leverkusen': 'Leverkusen', 'RB Leipzig': 'Leipzig',
+    'Newells Old Boys': 'Newell\'s', 'Deportivo Riestra': 'Riestra',
+    'Central Córdoba': 'C. Córdoba', 'Gimnasia Mendoza': 'G. Mendoza',
+  };
+  return abbrevs[name] || (name.length > 18 ? name.slice(0,16) + '…' : name);
+}
+
+function leagueLabel(sportTitle) {
+  if (!sportTitle) return 'Liga';
+  const map = {
+    'Primera División - Argentina': 'Liga Prof.',
+    'UEFA Champions League': 'Champions',
+    'UEFA Europa League': 'Europa League',
+    'UEFA Conference League': 'Conference',
+    'English Premier League': 'Premier League',
+    'La Liga - Spain': 'La Liga',
+    'La Liga': 'La Liga',
+    'Bundesliga - Germany': 'Bundesliga',
+    'Bundesliga': 'Bundesliga',
+    'Serie A - Italy': 'Serie A',
+    'Serie A': 'Serie A',
+    'Ligue 1 - France': 'Ligue 1',
+    'Ligue 1': 'Ligue 1',
+    'NBA': 'NBA',
+    'CONMEBOL Libertadores': 'Libertadores',
+    'CONMEBOL Sudamericana': 'Sudamericana',
+    'Campeonato Brasileiro Série A': 'Brasileirao',
+  };
+  return map[sportTitle] || sportTitle.split(' - ')[0];
+}
+
 function buildPredsFromOdds() {
   if (!window._rawOddsGames || !window._rawOddsGames.length) return null;
 
@@ -4174,6 +4213,7 @@ function buildPredsFromOdds() {
     };
     } catch(e) {
       console.error('[buildPredsFromOdds] Error en partido:', g?.home_team, 'vs', g?.away_team, e.message);
+      window._lastPredsError = (window._lastPredsError || '') + `\n${g?.home_team} vs ${g?.away_team}: ${e.message}`;
       return null;
     }
   }).filter(Boolean);
@@ -4196,6 +4236,8 @@ function renderPreds() {
     console.error('[renderPreds] buildPredsFromOdds crash:', e.stack || e.message);
     window._lastPredsError = e.stack || e.message;
   }
+  // Array vacío también cuenta como sin datos
+  if (realPreds && realPreds.length === 0) realPreds = null;
   const isLive = !!realPreds;
   try { if (realPreds) savePredictions(realPreds); } catch(e) { console.error('[renderPreds] savePredictions crash:', e); }
 
