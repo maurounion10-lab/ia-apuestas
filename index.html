@@ -4179,9 +4179,9 @@ function buildPredsFromOdds() {
     soccer_mexico_ligamx:                  58,
     soccer_conmebol_copa_libertadores:     90,
     soccer_conmebol_copa_sudamericana:     75,
-    // ── Basketball ──
-    basketball_nba:                        90,
-    basketball_euroleague:                 70,
+    // ── Basketball — siempre debajo de fútbol top ──
+    basketball_nba:                        55,
+    basketball_euroleague:                 45,
     // ── Tennis ──
     tennis_atp_french_open:                85,
     tennis_wta_french_open:                85,
@@ -4211,10 +4211,10 @@ function buildPredsFromOdds() {
 
   // Intentar ventanas progresivamente más amplias hasta encontrar partidos
   // Incluir partidos que empezaron hasta 2h atrás (pueden estar en juego o acaban de terminar)
-  // 3.5h hacia atrás: cubre partidos live (90min + extratime + buffer)
-  const GAME_LOOKBACK = 3.5 * 3600000;
-  // Arrancar con 48h para tener pool amplio y poder ordenar por prioridad de liga
-  const WINDOWS = [48, 72, 120, 168];
+  // 6h hacia atrás: atrapa partidos de hoy que empezaron al mediodía/tarde
+  const GAME_LOOKBACK = 6 * 3600000;
+  // Ventana principal 24h — suficiente para hoy + mañana
+  const WINDOWS = [24, 48, 72, 120, 168];
   let candidates = [];
   for (const hours of WINDOWS) {
     const windowEnd = now + hours * 3600000;
@@ -6197,7 +6197,7 @@ function processOddsIntoComparador(data) {
 
 function forceRefreshOdds() {
   // Limpiar caché (fresca y stale) y recargar desde el Worker
-  localStorage.removeItem('cache_odds_v3');
+  localStorage.removeItem('cache_odds_v4');
   localStorage.removeItem('cache_odds_stale');
   window._rawOddsGames = null;
   _oddsLoading = false;
@@ -6215,7 +6215,7 @@ async function loadRealOdds(retryCount = 0) {
   if (retryCount === 0 && _oddsLoading) return; // evitar llamadas concurrentes
   // Use cache if fresh (skip API call)
   if (retryCount === 0) {
-    const cached = cacheGet('cache_odds_v3', CACHE_ODDS_TTL);
+    const cached = cacheGet('cache_odds_v4', CACHE_ODDS_TTL);
     if (cached) {
       window._rawOddsGames = cached;
       renderScores(currentScoreFilter);
@@ -6257,7 +6257,7 @@ async function loadRealOdds(retryCount = 0) {
       return;
     }
     window._rawOddsGames = data;
-    cacheSet('cache_odds_v3', data);
+    cacheSet('cache_odds_v4', data);
     // Guardar copia de respaldo liviana (solo campos esenciales) para que quepa en localStorage
     try {
       const slim = data.map(g => ({
@@ -6513,7 +6513,7 @@ setInterval(() => { delete realStatsCache[currentStatFilter]; loadRealStats(curr
 // Al volver a la pestaña, refrescar solo si la caché de odds expiró
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    if (!cacheGet('cache_odds_v3', CACHE_ODDS_TTL)) loadRealOdds();
+    if (!cacheGet('cache_odds_v4', CACHE_ODDS_TTL)) loadRealOdds();
     // Scores: solo si caché expiró (pre-partido / finalizados, los live son de Sofascore)
     if (!cacheGet('cache_scores', CACHE_SCORES_TTL)) loadRealScores();
   }
@@ -7702,7 +7702,7 @@ async function admDiagWorker() {
   await testUrl('/available', `${WORKER_URL}/available`);
   const stale = localStorage.getItem('cache_odds_stale');
   log(`\n💾 Stale cache: ${stale ? JSON.parse(stale).length + ' partidos guardados' : 'vacía (nunca hubo conexión exitosa)'}`);
-  const fresh = localStorage.getItem('cache_odds_v3');
+  const fresh = localStorage.getItem('cache_odds_v4');
   log(`💾 Fresh cache: ${fresh ? 'activa' : 'expirada/vacía'}`);
   const raw = window._rawOddsGames || [];
   log(`\n🔍 _rawOddsGames en memoria: ${raw.length} partidos`);
