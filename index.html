@@ -246,7 +246,7 @@
 
   .hero-stats {
     display: flex;
-    gap: 32px;
+    gap: 48px;
     justify-content: center;
     flex-wrap: wrap;
   }
@@ -2175,7 +2175,6 @@
       <div class="hero-stat"><span class="num">72%</span><span class="lbl">Precisión IA</span></div>
       <div class="hero-stat"><span class="num">1,240+</span><span class="lbl">Partidos analizados</span></div>
       <div class="hero-stat"><span class="num">38</span><span class="lbl">Ligas cubiertas</span></div>
-      <div class="hero-stat"><span class="num">Live</span><span class="lbl">Scores en vivo</span></div>
     </div>
   </div>
   <div style="flex-shrink:0">
@@ -4108,19 +4107,8 @@ function renderPreds() {
       statusBar.style.color = '#00c853';
       statusBar.innerHTML = `<span>📡 Datos en vivo · ${source.length} pronósticos</span>`;
     } else {
-      statusBar.style.display = 'flex';
-      statusBar.style.background = 'rgba(255,152,0,0.08)';
-      statusBar.style.border = '1px solid rgba(255,152,0,0.3)';
-      statusBar.style.color = '#ff9800';
-      const rawCount = (window._rawOddsGames||[]).length;
-      const reason = !window._rawOddsGames ? 'Sin conexión con el Worker' : rawCount === 0 ? 'Worker retornó 0 partidos' : 'Sin partidos próximos en la API';
-      statusBar.innerHTML = `
-        <span>⚠️ Demo · ${reason}</span>
-        <button onclick="forceRefreshOdds()" style="
-          background:rgba(255,152,0,0.2);border:1px solid rgba(255,152,0,0.5);
-          color:#ff9800;border-radius:6px;padding:3px 10px;font-size:0.7rem;
-          cursor:pointer;font-weight:700;letter-spacing:.5px
-        ">🔄 Actualizar</button>`;
+      // No mostrar banner de error a los visitantes
+      statusBar.style.display = 'none';
     }
   }
 
@@ -5817,8 +5805,9 @@ function processOddsIntoComparador(data) {
 }
 
 function forceRefreshOdds() {
-  // Limpiar caché y recargar desde el Worker
+  // Limpiar caché (fresca y stale) y recargar desde el Worker
   localStorage.removeItem('cache_odds_v2');
+  localStorage.removeItem('cache_odds_stale');
   window._rawOddsGames = null;
   _oddsLoading = false;
   const statusBar = document.getElementById('predsStatusBar');
@@ -5840,10 +5829,19 @@ async function loadRealOdds(retryCount = 0) {
       window._rawOddsGames = cached;
       renderScores(currentScoreFilter);
       renderPreds();
-      processOddsIntoComparador(cached); // poblar comparador desde caché
+      processOddsIntoComparador(cached);
       console.log('[cache] odds desde caché localStorage');
       return;
     }
+    // Si la caché fresca expiró, usar la de respaldo mientras se recarga
+    try {
+      const stale = JSON.parse(localStorage.getItem('cache_odds_stale') || 'null');
+      if (stale && stale.length) {
+        window._rawOddsGames = stale;
+        renderPreds();
+        console.log('[cache] usando stale fallback mientras se recarga');
+      }
+    } catch(e) {}
   }
   if (retryCount === 0) _oddsLoading = true;
   try {
@@ -5864,10 +5862,13 @@ async function loadRealOdds(retryCount = 0) {
 
     if (data.length === 0) {
       if (retryCount < 3) setTimeout(() => loadRealOdds(retryCount + 1), 2500);
+      else _oddsLoading = false;
       return;
     }
     window._rawOddsGames = data;
     cacheSet('cache_odds_v2', data);
+    // Guardar copia de respaldo sin expiración (para cuando el Worker no responda)
+    try { localStorage.setItem('cache_odds_stale', JSON.stringify(data)); } catch(e) {}
     console.log(`[Worker/odds] ${data.length} partidos (main:${dataMain.length} + europe:${dataEurope.length}). Ligas:`, [...new Set(data.map(g => g.sport_key))].join(', '));
     if (currentScoreFilter === 'basket') renderScores('basket');
     renderPreds();
