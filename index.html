@@ -2124,23 +2124,10 @@
       <div class="hero-stat"><span class="num">Live</span><span class="lbl">Scores en vivo</span></div>
     </div>
   </div>
-  <div style="position:relative;flex-shrink:0">
+  <div style="flex-shrink:0">
     <div class="hero-mascot">
       <img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="ApuestasAutomáticas Bot">
     </div>
-    <!-- Badge de notificación -->
-    <div onclick="navTo('chat')" style="
-      position:absolute;bottom:8px;right:8px;
-      width:22px;height:22px;border-radius:50%;
-      background:#e53935;
-      color:#fff;font-size:0.72rem;font-weight:900;
-      display:flex;align-items:center;justify-content:center;
-      border:2px solid #0a1a0a;
-      box-shadow:0 0 10px rgba(229,57,53,0.7),0 2px 6px rgba(0,0,0,0.5);
-      cursor:pointer;
-      animation:badge-pulse 1.8s ease-in-out infinite;
-      z-index:10;line-height:1
-    ">1</div>
   </div>
 </div>
 
@@ -6846,12 +6833,15 @@ function admSaveConfig() {
 #aiChatBtn svg { position: relative; z-index: 1; }
 #aiChatBadge {
   position: absolute;
-  top: 3px; right: 3px;
-  width: 13px; height: 13px;
-  background: #fff;
+  top: 0px; right: 0px;
+  width: 20px; height: 20px;
+  font-size: 0.68rem; font-weight: 900; color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  background: #e53935;
   border-radius: 50%;
-  border: 2px solid #00952e;
-  animation: aiBlink 2s infinite;
+  border: 2px solid #0a1a0a;
+  box-shadow: 0 0 10px rgba(229,57,53,0.8);
+  animation: badge-pulse 1.8s ease-in-out infinite;
   z-index: 2;
 }
 @keyframes aiBlink { 0%,100%{opacity:1} 50%{opacity:0.4} }
@@ -7105,7 +7095,7 @@ function admSaveConfig() {
 <!-- Botón flotante -->
 <button id="aiChatBtn" onclick="aiToggleChat()">
   <img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="IA" style="width:54px;height:54px;border-radius:50%;object-fit:cover;object-position:center top;position:relative;z-index:1">
-  <span id="aiChatBadge"></span>
+  <span id="aiChatBadge">1</span>
 </button>
 
 <!-- Chat popup -->
@@ -7168,6 +7158,9 @@ function aiToggleChat() {
   const box = document.getElementById('aiChatBox');
   box.classList.toggle('open', aiOpen);
   if (aiOpen) {
+    // Ocultar badge al abrir
+    const badge = document.getElementById('aiChatBadge');
+    if (badge) badge.style.display = 'none';
     if (!aiGreeted) aiGreet();
     setTimeout(() => document.getElementById('aiInput').focus(), 250);
   }
