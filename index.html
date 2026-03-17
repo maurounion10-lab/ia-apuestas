@@ -6873,6 +6873,10 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
         <div>🟡 Marcadores: <span id="admScoresCount">—</span> partidos</div>
         <div>🟡 Pronósticos activos: <span id="admPredsCount">—</span></div>
       </div>
+
+      <!-- Diagnóstico del Worker -->
+      <button onclick="admDiagWorker()" style="background:rgba(156,39,176,0.15);border:1px solid rgba(156,39,176,0.4);color:#ce93d8;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600;width:100%">🔍 Diagnosticar conexión con el Worker</button>
+      <div id="admWorkerDiag" style="display:none;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;font-size:0.72rem;font-family:monospace;color:#e0e0e0;line-height:1.7;white-space:pre-wrap;word-break:break-all;max-height:260px;overflow-y:auto"></div>
       <div id="admDatosMsg" style="font-size:0.78rem;color:var(--verde);min-height:18px"></div>
     </div>
 
@@ -7121,6 +7125,49 @@ function admRefreshStatus() {
   const preds = typeof buildPredsFromOdds === 'function' ? (buildPredsFromOdds()||[]) : [];
   document.getElementById('admPredsCount').textContent  = preds.length + ' pronósticos';
 }
+async function admDiagWorker() {
+  const box = document.getElementById('admWorkerDiag');
+  box.style.display = 'block';
+  box.textContent = '🔄 Testeando Worker...\n';
+  const t0 = Date.now();
+  const log = s => { box.textContent += s + '\n'; box.scrollTop = box.scrollHeight; };
+  const testUrl = async (label, url) => {
+    try {
+      const r = await Promise.race([
+        fetch(url),
+        new Promise((_, rej) => setTimeout(() => rej(new Error('TIMEOUT 10s')), 10000))
+      ]);
+      const ms = Date.now() - t0;
+      if (!r.ok) {
+        log(`❌ ${label} → HTTP ${r.status} (${ms}ms)`);
+        try { const txt = await r.text(); log(`   Body: ${txt.slice(0,200)}`); } catch(e) {}
+        return null;
+      }
+      const j = await r.json();
+      const count = j.data ? j.data.length : (Array.isArray(j) ? j.length : '?');
+      log(`✅ ${label} → ${count} partidos (${ms}ms)`);
+      if (j.meta) {
+        const failed = j.meta.filter(m => !m.ok);
+        if (failed.length) log(`   ⚠️ Sports fallidos: ${failed.map(m=>m.sport+' HTTP'+m.status).join(', ')}`);
+      }
+      return j;
+    } catch(e) {
+      log(`❌ ${label} → ${e.message}`);
+      return null;
+    }
+  };
+  log(`Worker URL: ${WORKER_URL}\n`);
+  await testUrl('/odds?category=main', `${WORKER_URL}/odds?category=main`);
+  await testUrl('/odds?category=europe', `${WORKER_URL}/odds?category=europe`);
+  await testUrl('/available', `${WORKER_URL}/available`);
+  const stale = localStorage.getItem('cache_odds_stale');
+  log(`\n💾 Stale cache: ${stale ? JSON.parse(stale).length + ' partidos guardados' : 'vacía (nunca hubo conexión exitosa)'}`);
+  const fresh = localStorage.getItem('cache_odds_v2');
+  log(`💾 Fresh cache: ${fresh ? 'activa' : 'expirada/vacía'}`);
+  log(`\n🔍 _rawOddsGames en memoria: ${(window._rawOddsGames||[]).length} partidos`);
+  log(`\nListo. Revisá los ❌ arriba para saber qué arreglar.`);
+}
+
 function admRefreshOdds()   { loadRealOdds();   document.getElementById('admDatosMsg').textContent='🔄 Recargando cuotas...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Cuotas recargadas'; },3000); }
 function admRefreshScores() { loadRealScores(); document.getElementById('admDatosMsg').textContent='🔄 Recargando marcadores...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Marcadores recargados'; },3000); }
 function admRefreshPreds()  { renderPreds();    document.getElementById('admDatosMsg').textContent='✓ Pronósticos regenerados'; setTimeout(()=>document.getElementById('admDatosMsg').textContent='',2500); }
