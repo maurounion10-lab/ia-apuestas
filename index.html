@@ -2854,18 +2854,37 @@ function acScheduleSync() {
 
 async function acSyncToDB() {
   if (!authUser?.email) return;
+  // historial de pronósticos (slim: solo campos necesarios para stats)
+  let predsSlim = [];
+  try {
+    const hist = JSON.parse(localStorage.getItem('apuestas_historial_v1') || '[]');
+    predsSlim = hist.slice(0, 150).map(h => ({
+      id: h.id, result: h.result, rec: h.rec, sport: h.sport
+    }));
+  } catch(_) {}
+
   const payload = {
-    email:      authUser.email,
-    balance:    acGet(),
-    picks:      acGetPicks(),
-    history:    JSON.parse(localStorage.getItem(AC_HIST) || '[]'),
-    last_daily: localStorage.getItem(AC_DAY) || null,
-    updated_at: new Date().toISOString()
+    email:       authUser.email,
+    balance:     acGet(),
+    picks:       acGetPicks(),
+    history:     JSON.parse(localStorage.getItem(AC_HIST) || '[]'),
+    last_daily:  localStorage.getItem(AC_DAY) || null,
+    predictions: predsSlim,   // ← historial de pronósticos para stats globales
+    updated_at:  new Date().toISOString()
   };
   const { error } = await sbClient
     .from('acoin_users')
     .upsert(payload, { onConflict: 'email' });
-  if (error) console.warn('[Supabase sync error]', error.message);
+  if (error) {
+    // Si falla por columna inexistente, reintentar sin predictions
+    if (error.message && error.message.includes('predictions')) {
+      const { error: e2 } = await sbClient.from('acoin_users')
+        .upsert({ ...payload, predictions: undefined }, { onConflict: 'email' });
+      if (e2) console.warn('[Supabase sync error]', e2.message);
+    } else {
+      console.warn('[Supabase sync error]', error.message);
+    }
+  }
 }
 
 async function acLoadFromDB(email) {
@@ -2926,61 +2945,70 @@ function heroStatsApply(precision, totalPicks, animate) {
   }
 }
 
+function computeStatsFromHistorial(rows) {
+  // rows = array de arrays de predicciones (cada usuario aporta el suyo)
+  // también acepta un único array plano (historial local)
+  const flat = rows.length && Array.isArray(rows[0]) ? rows.flat() : rows;
+  const total   = flat.length;
+  const wins    = flat.filter(h => h && h.result === 'win').length;
+  const losses  = flat.filter(h => h && h.result === 'loss').length;
+  const resolved = wins + losses;
+  const precision = resolved >= 5
+    ? Math.round((wins / resolved) * 100)
+    : null; // sin suficientes datos aún
+  return { total, wins, losses, resolved, precision };
+}
+
 async function loadLiveStats() {
-  // 1. Try cache
+  // ── PASO 1: mostrar stats locales instantáneamente ──
+  // (siempre disponibles, sin esperar red)
+  // loadHistorial() está definida más adelante en el código,
+  // la llamamos con un try/catch por si aún no está disponible
+  let localStats = null;
   try {
-    const raw = localStorage.getItem(STATS_CACHE_KEY);
-    if (raw) {
-      const cached = JSON.parse(raw);
-      if (Date.now() - cached.ts < STATS_CACHE_TTL) {
-        heroStatsApply(cached.precision, cached.totalPicks, true);
-        return;
-      }
+    const localHist = (typeof loadHistorial === 'function') ? loadHistorial() : [];
+    if (localHist.length > 0) {
+      localStats = computeStatsFromHistorial(localHist);
+      const prec = localStats.precision ?? 71;
+      heroStatsApply(prec, localStats.total, true);
     }
   } catch(_) {}
 
-  // 2. Query Supabase — only need picks column
+  // ── PASO 2: intentar stats globales desde Supabase ──
+  // Requiere columna "predictions" JSONB en la tabla acoin_users.
+  // Si no existe, falla silenciosamente y se queda con los stats locales.
   try {
     const { data, error } = await sbClient
       .from('acoin_users')
-      .select('picks')
-      .not('picks', 'is', null);
+      .select('predictions')
+      .not('predictions', 'is', null);
 
-    if (error) throw error;
+    if (error) throw error; // columna no existe → catch
 
-    let totalAll = 0, totalEval = 0, totalCorrect = 0;
-    (data || []).forEach(row => {
-      const picks = Array.isArray(row.picks) ? row.picks : [];
-      picks.forEach(p => {
-        if (!p) return;
-        totalAll++; // todos los picks hechos
-        if (p.evaluated) {
-          totalEval++;
-          if (p.correct) totalCorrect++;
-        }
-      });
-    });
+    const allRows = (data || [])
+      .map(row => Array.isArray(row.predictions) ? row.predictions : [])
+      .filter(arr => arr.length > 0);
 
-    // Precisión: solo de los picks ya evaluados (con resultado real)
-    // Min 10 evaluados antes de mostrar el % real; si no, placeholder
-    const precision  = totalEval >= 10
-      ? Math.round((totalCorrect / totalEval) * 100)
-      : 71; // placeholder hasta tener masa crítica
-    const totalPicks = totalAll; // todos los picks realizados (evaluados o no)
+    if (!allRows.length) throw new Error('sin datos globales');
 
-    // 3. Save cache
+    const gs = computeStatsFromHistorial(allRows);
+    const precision = gs.precision ?? (localStats?.precision ?? 71);
+    const total     = gs.total;
+
     localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({
-      precision, totalPicks, ts: Date.now()
+      precision, totalPicks: total, ts: Date.now(), source: 'global'
     }));
 
-    heroStatsApply(precision, totalPicks, true);
+    heroStatsApply(precision, total, true);
   } catch(e) {
-    console.warn('[loadLiveStats]', e.message || e);
-    // Fallback silently — keep "–" or show sensible defaults
-    const elP = document.getElementById('heroStatPrecision');
-    const elN = document.getElementById('heroStatPicks');
-    if (elP) animateCounter(elP, 50, 71, '%', 1200);
-    if (elN) animateCounter(elN, 0, 0, '', 800);
+    // Sin columna "predictions" en Supabase → stats locales ya aplicadas arriba.
+    // Si tampoco había stats locales, mostrar placeholder animado.
+    if (!localStats || localStats.total === 0) {
+      const elP = document.getElementById('heroStatPrecision');
+      const elN = document.getElementById('heroStatPicks');
+      if (elP) elP.textContent = '–';
+      if (elN) elN.textContent = '–';
+    }
   }
 }
 
