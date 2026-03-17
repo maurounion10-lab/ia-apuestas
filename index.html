@@ -3939,7 +3939,34 @@ function buildPredsFromOdds() {
     const aOP = awayOut?.price || null;
     const dOP = drawOut?.price || null;
 
-    // Probabilidades implícitas normalizadas (siempre con precios reales)
+    // ── Mercados de totales y BTTS ──
+    // Buscar en todos los bookmakers disponibles (no solo afiliado)
+    const findMkt = key => {
+      for (const bk of (g.bookmakers || [])) {
+        const m = bk.markets?.find(m => m.key === key);
+        if (m) return m;
+      }
+      return null;
+    };
+    const totalsMkt = findMkt('totals');
+    const bttsMkt   = findMkt('btts');
+
+    // Over X.5 odds (usar primer bookmaker que tenga el punto)
+    const overOdds  = {};  // { '1.5': 1.22, '2.5': 1.75, '3.5': 2.40 }
+    const underOdds = {};
+    (totalsMkt?.outcomes || []).forEach(o => {
+      const pt = String(o.point);
+      if (o.name === 'Over')  overOdds[pt]  = o.price;
+      if (o.name === 'Under') underOdds[pt] = o.price;
+    });
+
+    // BTTS (Both Teams to Score)
+    let bttsYesOdds = null;
+    (bttsMkt?.outcomes || []).forEach(o => {
+      if (o.name === 'Yes') bttsYesOdds = o.price;
+    });
+
+    // ── Probabilidades ──
     const rawH = hOP ? 1/hOP : 0;
     const rawD = dOP ? 1/dOP : 0;
     const rawA = aOP ? 1/aOP : 0;
@@ -3948,12 +3975,38 @@ function buildPredsFromOdds() {
     const probD = dOP ? Math.round(rawD / tot * 100) : 0;
     const probA = Math.round(rawA / tot * 100);
 
-    // Recomendación y confianza
-    const maxProb = Math.max(probH, probD || 0, probA);
-    let rec;
-    if (maxProb === probH)       rec = 'Local Gana';
-    else if (dO && maxProb === probD) rec = 'Empate';
-    else                         rec = 'Visitante Gana';
+    // Probabilidades de totales (implícita cruda, sin normalizar — son mercados 50/50 con margen)
+    const probOver = {};
+    ['1.5','2.5','3.5'].forEach(pt => {
+      if (overOdds[pt]) probOver[pt] = Math.round(100 / overOdds[pt]);
+    });
+    const probBtts = bttsYesOdds ? Math.round(100 / bttsYesOdds) : null;
+
+    // ── Selección de la MEJOR apuesta ──
+    // Construir lista de candidatos con su probabilidad y cuota
+    const candidates2 = [
+      { rec: 'Local Gana',     prob: probH,           odds: hO ?? hOP },
+      { rec: 'Visitante Gana', prob: probA,           odds: aO ?? aOP },
+      ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dO ?? dOP }] : []),
+      // Totales: solo si la cuota es ≥ 1.20 (hay verdadera incertidumbre)
+      ...(['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= 1.20)
+          .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
+      // BTTS: solo si la cuota refleja cierta incertidumbre (≥ 1.30)
+      ...(bttsYesOdds && bttsYesOdds >= 1.30 ? [{ rec: 'Ambos Marcan', prob: probBtts, odds: bttsYesOdds, isBtts: true }] : []),
+    ].filter(c => c.prob > 0);
+
+    // Ordenar por probabilidad desc; en empate, dar prioridad a totales/btts (más cuota real)
+    candidates2.sort((a, b) => {
+      if (b.prob !== a.prob) return b.prob - a.prob;
+      if (a.isTotals || a.isBtts) return -1;
+      if (b.isTotals || b.isBtts) return 1;
+      return 0;
+    });
+
+    const best     = candidates2[0] || { rec: 'Local Gana', prob: probH, odds: hO ?? hOP };
+    const rec      = best.rec;
+    const maxProb  = best.prob || probH;
+    const bestOdds = best.odds;
 
     let conf, confLabel;
     if (maxProb >= 62)      { conf = 'high'; confLabel = `Alta (${maxProb}%)`; }
@@ -3970,21 +4023,31 @@ function buildPredsFromOdds() {
     const bvrText = bvr === 6 ? 'Máxima' : bvr === 5 ? 'Alta' : bvr >= 3 ? 'Media' : 'Baja';
 
     // Cuotas formateadas
+    const fmtO = v => v != null ? ` (cuota ${parseFloat(v).toFixed(2)})` : '';
     const oddsPills = [];
     if (hO) oddsPills.push(`L:${hO.toFixed(2)}`);
     if (dO) oddsPills.push(`E:${dO.toFixed(2)}`);
     if (aO) oddsPills.push(`V:${aO.toFixed(2)}`);
+    if (overOdds['2.5']) oddsPills.push(`+2.5:${parseFloat(overOdds['2.5']).toFixed(2)}`);
+    if (bttsYesOdds)     oddsPills.push(`AM:${bttsYesOdds.toFixed(2)}`);
 
     // Insight generado por probabilidades
     const hN = shortName(g.home_team), aN = shortName(g.away_team);
-    const fmtO = v => v != null ? ` (cuota ${v.toFixed(2)})` : '';
     let insight;
     if (rec === 'Local Gana')
       insight = `${hN} parte como favorito con ${probH}% de probabilidad implícita según el mercado${fmtO(hO)}. ${aN} tiene ${probA}% de chances como visitante. Las cuotas reflejan ventaja clara del local — apuesta con valor en línea de 1X.`;
     else if (rec === 'Visitante Gana')
       insight = `${aN} es favorito visitante con ${probA}% de probabilidad implícita${fmtO(aO)}. El mercado descuenta a ${hN} que solo tiene ${probH}% de chances. Valor en apostar al visitante directo.`;
-    else
-      insight = `Partido muy equilibrado — el mercado da ${probH}% local, ${probD}% empate, ${probA}% visitante. El empate ofrece la cuota más atractiva${fmtO(dO)}. Partido difícil de predecir; stake bajo recomendado.`;
+    else if (rec === 'Empate')
+      insight = `Partido muy equilibrado — el mercado da ${probH}% local, ${probD}% empate, ${probA}% visitante. El empate ofrece la cuota más atractiva${fmtO(dO ?? dOP)}. Partido difícil de predecir; stake bajo recomendado.`;
+    else if (rec === 'Ambos Marcan')
+      insight = `El mercado asigna ${probBtts}% de probabilidad a que ambos equipos conviertan${fmtO(bttsYesOdds)}. Tanto ${hN} como ${aN} muestran tendencia anotadora. Apuesta de goles con cuota atractiva.`;
+    else {
+      // Más de X.5
+      const line = best.line;
+      const pOver = probOver[String(line)];
+      insight = `El mercado asigna ${pOver}% de probabilidad a que el partido supere los ${line} goles${fmtO(overOdds[String(line)])}. Partido con perfil ofensivo — ${hN} (${probH}% favorito) vs ${aN} (${probA}%). Apuesta de totales con valor.`;
+    }
 
     return {
       league:  leagueLabel(g.sport_title),
@@ -4002,9 +4065,10 @@ function buildPredsFromOdds() {
       insight,
       bvr,
       bvrText,
-      formH:   null, // No disponible en la API de odds
+      formH:   null,
       formA:   null,
       _hO: hO, _dO: dO, _aO: aO,
+      _bestOdds: bestOdds,
       _bookKey:   isAffiliate ? bmUsed?.key   : null,
       _bookLabel: isAffiliate ? bmUsed?.title : null,
     };
@@ -4617,10 +4681,12 @@ function savePredictions(preds) {
     const id = `${matchKey}_${todayKey}`;
 
     // Calcular cuota implícita del resultado recomendado
+    // Para totales/btts usar la cuota real si está disponible
     let impliedOdds = 2.0;
-    if (p.rec === 'Local Gana'     && p.probH > 0) impliedOdds = parseFloat((100/p.probH).toFixed(2));
+    if      (p.rec === 'Local Gana'     && p.probH > 0) impliedOdds = parseFloat((100/p.probH).toFixed(2));
     else if (p.rec === 'Visitante Gana' && p.probA > 0) impliedOdds = parseFloat((100/p.probA).toFixed(2));
-    else if (p.rec === 'Empate'    && p.probD > 0) impliedOdds = parseFloat((100/p.probD).toFixed(2));
+    else if (p.rec === 'Empate'         && p.probD > 0) impliedOdds = parseFloat((100/p.probD).toFixed(2));
+    else if (p._bestOdds)                               impliedOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
 
     // Stake según confianza: Alta=$100, Media=$50, Baja=$25
     const stake = p.conf === 'high' ? 100 : p.conf === 'med' ? 50 : 25;
@@ -4656,11 +4722,17 @@ function resolveCompletedGames(scores, skipRender) {
       const awayWin = s.scoreA > s.scoreH;
       const draw    = s.scoreH === s.scoreA;
 
+      const totalGoals = s.scoreH + s.scoreA;
+      const bttsMet    = s.scoreH > 0 && s.scoreA > 0;
+
       let result = 'void';
-      if      (p.rec === 'Local Gana')     result = homeWin ? 'win' : 'loss';
-      else if (p.rec === 'Visitante Gana') result = awayWin ? 'win' : 'loss';
-      else if (p.rec === 'Empate')         result = draw    ? 'win' : 'loss';
-      // Mercados complejos (+2.5 goles, etc.) → void (no podemos verificar automáticamente)
+      if      (p.rec === 'Local Gana')     result = homeWin    ? 'win' : 'loss';
+      else if (p.rec === 'Visitante Gana') result = awayWin    ? 'win' : 'loss';
+      else if (p.rec === 'Empate')         result = draw       ? 'win' : 'loss';
+      else if (p.rec === 'Ambos Marcan')   result = bttsMet    ? 'win' : 'loss';
+      else if (p.rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
+      else if (p.rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
+      else if (p.rec === 'Más de 3.5')     result = totalGoals >= 4 ? 'win' : 'loss';
 
       p.result = result;
       p.finalScore = `${s.scoreH}-${s.scoreA}`;
@@ -4742,13 +4814,19 @@ function resolveAllGames(scores) {
     hist.forEach(p => {
       if (p.result === 'win' || p.result === 'loss') return; // ya definitivo, no tocar
       if (!teamsMatch(s.home, p.home) || !teamsMatch(s.away, p.away)) return;
-      const homeWin = s.scoreH > s.scoreA;
-      const awayWin = s.scoreA > s.scoreH;
-      const draw    = s.scoreH === s.scoreA;
+      const homeWin    = s.scoreH > s.scoreA;
+      const awayWin    = s.scoreA > s.scoreH;
+      const draw       = s.scoreH === s.scoreA;
+      const totalGoals = s.scoreH + s.scoreA;
+      const bttsMet    = s.scoreH > 0 && s.scoreA > 0;
       let result = 'void';
-      if      (p.rec === 'Local Gana')     result = homeWin ? 'win' : 'loss';
-      else if (p.rec === 'Visitante Gana') result = awayWin ? 'win' : 'loss';
-      else if (p.rec === 'Empate')         result = draw    ? 'win' : 'loss';
+      if      (p.rec === 'Local Gana')     result = homeWin       ? 'win' : 'loss';
+      else if (p.rec === 'Visitante Gana') result = awayWin       ? 'win' : 'loss';
+      else if (p.rec === 'Empate')         result = draw          ? 'win' : 'loss';
+      else if (p.rec === 'Ambos Marcan')   result = bttsMet       ? 'win' : 'loss';
+      else if (p.rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
+      else if (p.rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
+      else if (p.rec === 'Más de 3.5')     result = totalGoals >= 4 ? 'win' : 'loss';
       if (result !== 'void' || p.result === 'pending') {
         p.result = result;
         p.finalScore = `${s.scoreH}-${s.scoreA}`;
