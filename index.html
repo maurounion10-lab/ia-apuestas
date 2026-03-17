@@ -3491,7 +3491,7 @@ const teamLogos = {
   'Red Bull Salzburg':      'https://media.api-sports.io/football/teams/322.png',
   'FC Salzburg':            'https://media.api-sports.io/football/teams/322.png',
   'Shakhtar Donetsk':       'https://media.api-sports.io/football/teams/238.png',
-  'Galatasaray':            'https://media.api-sports.io/football/teams/356.png',
+  'Galatasaray':            'https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Galatasaray_logo.svg/200px-Galatasaray_logo.svg.png',
   'Fenerbahce':             'https://media.api-sports.io/football/teams/357.png',
   'Besiktas':               'https://media.api-sports.io/football/teams/358.png',
   'Olympiakos':             'https://media.api-sports.io/football/teams/415.png',
@@ -3792,7 +3792,7 @@ const teamLogos = {
   'Club Brugge':            'https://media.api-sports.io/football/teams/556.png',
   'Anderlecht':             'https://media.api-sports.io/football/teams/550.png',
   'RSC Anderlecht':         'https://media.api-sports.io/football/teams/550.png',
-  'Galatasaray':            'https://media.api-sports.io/football/teams/2672.png',
+  'Galatasaray':            'https://upload.wikimedia.org/wikipedia/en/thumb/f/f1/Galatasaray_logo.svg/200px-Galatasaray_logo.svg.png',
   'Fenerbahçe':             'https://media.api-sports.io/football/teams/2673.png',
   'Fenerbahce':             'https://media.api-sports.io/football/teams/2673.png',
   'Beşiktaş':               'https://media.api-sports.io/football/teams/2674.png',
@@ -4703,12 +4703,16 @@ function renderPreds() {
 
   // 1. Intentar cargar desde caché diaria
   realPreds = loadDailyPredsCache();
+
+  // Guardar partidos ya iniciados ANTES de cualquier invalidación para no perderlos
+  const _nowMs = Date.now();
+  const _preserveStarted = (realPreds || []).filter(p => p.commenceTs && p.commenceTs <= _nowMs);
+
   // Invalidar caché si hay picks de basket sin Over/Under (versión anterior sin esta lógica)
   if (realPreds) {
     const basketPreds = realPreds.filter(p => (p._sportKey || '').includes('basketball'));
     const hasOU = basketPreds.some(p => p.rec && (p.rec.startsWith('Más de') || p.rec.startsWith('Menos de')));
     if (basketPreds.length > 0 && !hasOU) {
-      // Caché vieja — regenerar
       localStorage.removeItem('gambeta_daily_preds_v1');
       realPreds = null;
     }
@@ -4718,6 +4722,16 @@ function renderPreds() {
   if (!realPreds) {
     try {
       realPreds = buildPredsFromOdds();
+      // Rescatar los picks que ya empezaron del caché anterior — no se pierden al regenerar
+      if (_preserveStarted.length) {
+        const base = realPreds || [];
+        _preserveStarted.forEach(op => {
+          if (!base.find(p => teamsMatch(p.home, op.home) && teamsMatch(p.away, op.away))) {
+            base.push(op);
+          }
+        });
+        realPreds = base;
+      }
       if (realPreds && realPreds.length) {
         saveDailyPredsCache(realPreds);
       }
@@ -4731,6 +4745,28 @@ function renderPreds() {
   if (realPreds) {
     const nowMs = Date.now();
     const hist  = loadHistorial();
+    const todayStr = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
+
+    // Incorporar picks de HOY del historial que no estén ya en la caché
+    // (caso: caché fue regenerada y se perdieron picks que ya empezaron)
+    hist
+      .filter(h => h.date === todayStr && !realPreds.find(p => teamsMatch(p.home, h.home) && teamsMatch(p.away, h.away)))
+      .forEach(h => {
+        realPreds.push({
+          league:     h.sport === 'basket' ? 'NBA' : 'Fútbol',
+          home:       h.home,
+          away:       h.away,
+          rec:        h.rec,
+          conf:       h.stake >= 100 ? 'high' : h.stake >= 50 ? 'med' : 'low',
+          confLabel:  h.stake >= 100 ? 'Alta' : h.stake >= 50 ? 'Media' : 'Baja',
+          probH: 0, probD: 0, probA: 0,
+          odds: [], time: '', bvr: 0, bvrText: '',
+          commenceTs: h.commenceTs || (_nowMs - 1), // garantiza que se marque como started
+          _sportKey:  h._sportKey || (h.sport === 'basket' ? 'basketball_nba' : 'soccer_argentina_primera_division'),
+          _fromHist:  true, // viene del historial, no de la API
+        });
+      });
+
     realPreds = realPreds.map(p => {
       const started = p.commenceTs && p.commenceTs <= nowMs;
       if (!started) return p; // partido futuro — sin cambios
@@ -5000,6 +5036,7 @@ function renderPreds() {
           </a>` : ''}
         </div>
       </div>
+      ${!p._fromHist ? `
       <div class="pred-bars">
         <div class="pred-bar-item">
           <span class="pred-bar-label">Local</span>
@@ -5034,7 +5071,7 @@ function renderPreds() {
             <div style="font-size:1rem;font-weight:800;color:var(--rojo)">${p.probA > 0 ? (100/p.probA).toFixed(2) : '—'}</div>
           </div>
         </div>
-      </div>
+      </div>` : ''}
       <!-- Botón expandir análisis -->
       <button class="pred-expand-btn" onclick="togglePredExpand(${idx})">
         <span>🔍 Ver análisis de la IA</span>
