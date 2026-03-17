@@ -3913,10 +3913,25 @@ function buildPredsFromOdds() {
   const withH2H = window._rawOddsGames.filter(hasH2HData).length;
   const upcoming = window._rawOddsGames.filter(g => new Date(g.commence_time).getTime() > (Date.now() - GAME_LOOKBACK)).length;
   console.log(`[Preds] ${candidates.length} candidatos | total:${totalRaw} withH2H:${withH2H} upcoming(±2h):${upcoming}`);
+
+  // Fallback: si no hay partidos en la ventana de 7 días (ej: parón internacional),
+  // mostrar los próximos partidos disponibles sin límite de tiempo
   if (!candidates.length) {
-    console.warn('[Preds] Sin candidatos — check: partidos pasados? sin h2h? ventana muy estrecha?',
-      window._rawOddsGames.slice(0,3).map(g => ({ t: g.commence_time, sport: g.sport_key, home: g.home_team })));
-    return null;
+    console.warn('[Preds] Sin candidatos en ventana 7d — usando fallback sin límite de tiempo (posible parón)');
+    candidates = window._rawOddsGames
+      .filter(g => new Date(g.commence_time).getTime() > Date.now() - GAME_LOOKBACK)
+      .filter(hasH2HData)
+      .sort((a, b) => {
+        const pa = SPORT_PRIO[getSportCat(a.sport_key)] || 0;
+        const pb = SPORT_PRIO[getSportCat(b.sport_key)] || 0;
+        if (pa !== pb) return pb - pa;
+        return new Date(a.commence_time) - new Date(b.commence_time);
+      })
+      .slice(0, 6);
+    if (!candidates.length) {
+      console.warn('[Preds] Ningún partido con h2h disponible en _rawOddsGames');
+      return null;
+    }
   }
 
   return candidates.map(g => {
