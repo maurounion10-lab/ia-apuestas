@@ -4919,22 +4919,22 @@ function renderPreds() {
     const isGameLive = !!liveEntry && liveEntry.flag === 'live';
 
     // Estado del partido para la tarjeta
-    const isStarted     = !!p._started;
-    const histResult    = p._histResult || 'pending'; // 'win'|'loss'|'void'|'pending'
-    const histScore     = p._histScore  || null;
-    const isFinishedWin = isStarted && histResult === 'win';
-    const isFinishedLoss= isStarted && histResult === 'loss';
-    const isHighConfWin = isFinishedWin && p.conf === 'high';
-    // Clase CSS de la tarjeta (pendientes sin opacidad — solo los terminados se atenúan)
-    const cardClass = isHighConfWin          ? 'pred-golden-win'
-                    : isFinishedWin          ? 'pred-card-win'
-                    : isFinishedLoss         ? 'pred-card-loss'
-                    : (isStarted && !isPending) ? 'pred-card-finished' : '';
+    const isStarted      = !!p._started;
+    const histResult     = p._histResult || 'pending'; // 'win'|'loss'|'void'|'pending'
+    const histScore      = p._histScore  || null;
+    const isFinishedWin  = isStarted && histResult === 'win';
+    const isFinishedLoss = isStarted && histResult === 'loss';
+    const isHighConfWin  = isFinishedWin && p.conf === 'high';
+    const isPending      = isStarted && histResult === 'pending'; // ← antes de cardClass
     // Score final — si no está en historial intentar desde scoresData
     const finalScore = histScore
       || (isStarted && liveEntry?.flag === 'final' ? `${liveEntry.scoreH}-${liveEntry.scoreA}` : null);
+    // Clase CSS de la tarjeta (pendientes sin opacidad — solo los terminados se atenúan)
+    const cardClass = isHighConfWin             ? 'pred-golden-win'
+                    : isFinishedWin             ? 'pred-card-win'
+                    : isFinishedLoss            ? 'pred-card-loss'
+                    : (isStarted && !isPending) ? 'pred-card-finished' : '';
     // Badge de resultado
-    const isPending = isStarted && histResult === 'pending';
     const resultBadgeHtml = isStarted
       ? (histResult === 'win'
           ? `<span class="badge-result-win">✅ GANADO${finalScore ? ' · '+finalScore : ''}</span>`
