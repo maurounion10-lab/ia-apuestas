@@ -5553,14 +5553,15 @@ function matchTime(commence_time) {
 }
 
 // ── API cache helpers (reduce credit usage) ──
+const CACHE_VERSION    = 'v3';  // incrementar para invalidar caché vieja
 const CACHE_ODDS_TTL   = 60 * 60 * 1000;  // 60 min
 const CACHE_SCORES_TTL = 30 * 60 * 1000;  // 30 min
 function cacheSet(key, data) {
-  try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
+  try { localStorage.setItem(`${key}_${CACHE_VERSION}`, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
 }
 function cacheGet(key, ttl) {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = localStorage.getItem(`${key}_${CACHE_VERSION}`);
     if (!raw) return null;
     const { ts, data } = JSON.parse(raw);
     if (Date.now() - ts > ttl) return null;
