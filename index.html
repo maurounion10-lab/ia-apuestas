@@ -4934,12 +4934,13 @@ function renderPreds() {
     const finalScore = histScore
       || (isStarted && liveEntry?.flag === 'final' ? `${liveEntry.scoreH}-${liveEntry.scoreA}` : null);
     // Badge de resultado
+    const isPending = isStarted && histResult === 'pending';
     const resultBadgeHtml = isStarted
       ? (histResult === 'win'
           ? `<span class="badge-result-win">✅ GANADO${finalScore ? ' · '+finalScore : ''}</span>`
           : histResult === 'loss'
           ? `<span class="badge-result-loss">❌ PERDIDO${finalScore ? ' · '+finalScore : ''}</span>`
-          : `<span class="badge-terminado">⏱ TERMINADO${finalScore ? ' · '+finalScore : ''}</span>`)
+          : `<span class="badge-result-pending">⏳ Pendiente</span>`)
       : '';
 
     // H2H mini (solo para datos estáticos con matchAnalysisData)
@@ -4980,7 +4981,6 @@ function renderPreds() {
         <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${(!isStarted && p.conf==='high') ? '<span style="font-size:1rem;filter:drop-shadow(0 1px 4px rgba(255,214,0,0.8))">👑</span>' : ''}${p.league}${(isGameLive || isStarted) ? '' : ' · ' + p.time}</span>
         <div style="display:flex;align-items:center;gap:6px">
           ${resultBadgeHtml}
-          ${isGameLive ? `<span class="live-badge"><span class="live-dot"></span>En Vivo</span>` : ''}
           ${!isStarted ? `<div style="display:flex;align-items:center;gap:6px">
             <span class="confidence-badge ${p.conf==='high'?'conf-high':p.conf==='med'?'conf-med':'conf-low'}">${p.confLabel}</span>
             <span style="font-size:0.72rem;font-weight:800;
@@ -5000,7 +5000,7 @@ function renderPreds() {
           <div class="pred-emoji">${logoHtml(p.home, 52)}</div>
           <div class="pred-tname">${p.home}</div>
         </div>
-        ${isGameLive
+        ${(!isPending && isGameLive)
           ? `<div style="text-align:center">
                <div style="font-size:1.4rem;font-weight:900;color:#ef5350;
                  background:rgba(229,57,53,0.12);border:1px solid rgba(229,57,53,0.35);
@@ -5008,7 +5008,7 @@ function renderPreds() {
                  ${liveEntry.scoreH} - ${liveEntry.scoreA}
                </div>
              </div>`
-          : isStarted && finalScore
+          : (!isPending && isStarted && finalScore)
           ? `<div style="text-align:center">
                <div class="pred-final-score ${isFinishedWin ? 'score-win' : isFinishedLoss ? 'score-loss' : 'score-void'}">
                  ${finalScore}
@@ -5072,7 +5072,8 @@ function renderPreds() {
           </div>
         </div>
       </div>` : ''}
-      <!-- Botón expandir análisis -->
+      <!-- Botón expandir análisis — solo en picks pre-partido con insight disponible -->
+      ${!isStarted && p.insight ? `
       <button class="pred-expand-btn" onclick="togglePredExpand(${idx})">
         <span>🔍 Ver análisis de la IA</span>
         <span class="pred-expand-arrow" id="pred-arrow-${idx}">▼</span>
@@ -5081,16 +5082,16 @@ function renderPreds() {
         <div class="pred-insight-text">💡 ${p.insight}</div>
         ${h2hHtml ? `<div style="margin-top:4px">${h2hHtml}</div>` : ''}
         ${md ? `<button class="pred-full-btn" onclick="openMatchAnalysis('${p.home}','${p.away}')">Ver análisis estadístico completo →</button>` : ''}
-      </div>
-      <!-- $A-Coin picks -->
-      ${acPickHTML(
+      </div>` : ''}
+      <!-- $A-Coin picks — solo pre-partido -->
+      ${!isStarted ? acPickHTML(
         p.home, p.away, p.homeRaw || p.home, p.awayRaw || p.away,
         p.probH > 0 ? parseFloat((100/p.probH).toFixed(2)) : null,
         p.probD > 0 ? parseFloat((100/p.probD).toFixed(2)) : null,
         p.probA > 0 ? parseFloat((100/p.probA).toFixed(2)) : null
-      )}
-      <!-- CTA casas afiliadas -->
-      ${oddsHtml}
+      ) : ''}
+      <!-- CTA casas afiliadas — solo pre-partido -->
+      ${!isStarted ? oddsHtml : ''}
     </div>
   `}).join('');
 
