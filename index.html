@@ -8423,10 +8423,10 @@ function admSaveConfig() {
 
   <!-- Quick chips -->
   <div id="aiQuickChips">
-    <button class="ai-chip" onclick="aiSendChip('⚽ Mejor apuesta hoy')">⚽ Mejor apuesta hoy</button>
-    <button class="ai-chip" onclick="aiSendChip('📊 ¿Cómo calculo el valor esperado?')">📊 Valor esperado</button>
-    <button class="ai-chip" onclick="aiSendChip('💰 Consejos de bankroll')">💰 Bankroll</button>
-    <button class="ai-chip" onclick="aiSendChip('🏀 ¿Qué deporte tiene mejor margen?')">🏀 Mejor margen</button>
+    <button class="ai-chip" onclick="aiSendChip('mejor-apuesta')">⚽ Mejor apuesta hoy</button>
+    <button class="ai-chip" onclick="aiSendChip('equipos-racha')">🔥 Equipos en Racha</button>
+    <button class="ai-chip" onclick="aiSendChip('gestion-banca')">💰 Gestión de Banca</button>
+    <button class="ai-chip" onclick="aiSendChip('promo-hoy')">🎁 Promo para hoy</button>
   </div>
 
   <!-- Preview imagen seleccionada -->
@@ -8700,8 +8700,55 @@ function aiClearImage() {
   document.getElementById('aiInput').placeholder = 'Preguntá a la IA...';
 }
 
-function aiSendChip(text) {
-  document.getElementById('aiInput').value = text;
+function aiSendChip(chipId) {
+  let displayText, sendText;
+
+  if (chipId === 'mejor-apuesta') {
+    displayText = '⚽ Mejor apuesta hoy';
+    // Build rich message using live predictions context
+    const preds = window._aiPreds || [];
+    if (preds.length >= 2) {
+      const p1 = preds[0], p2 = preds[1];
+      const fmt = p => `${p.home} vs ${p.away} — pick: ${p.rec}, confianza ${p.conf}%`;
+      sendText = `⚽ Mejor apuesta hoy\n\nTengo estos picks disponibles:\n1ª opción: ${fmt(p1)}\n2ª opción: ${fmt(p2)}\n\n¿Cuál es la mejor apuesta para apostar hoy y cuál sería la segunda mejor como alternativa? Dame un análisis breve de cada una.`;
+    } else if (preds.length === 1) {
+      const p1 = preds[0];
+      sendText = `⚽ Mejor apuesta hoy\n\nTengo este pick disponible: ${p1.home} vs ${p1.away} — pick: ${p1.rec}, confianza ${p1.conf}%.\n\n¿Es una buena apuesta? Dame tu análisis.`;
+    } else {
+      sendText = '⚽ ¿Cuál es la mejor apuesta del día según los pronósticos actuales? Dime la de mayor confianza y luego la segunda mejor como alternativa.';
+    }
+
+  } else if (chipId === 'equipos-racha') {
+    displayText = '🔥 Equipos en Racha';
+    sendText = '🔥 ¿Cuáles son los equipos en racha ganadora esta semana en Champions League, Copa Libertadores, Premier League y NBA? Dame los 3 o 4 más destacados con su racha actual.';
+
+  } else if (chipId === 'gestion-banca') {
+    displayText = '💰 Gestión de Banca';
+    sendText = '💰 Dame consejos prácticos de gestión de banca (bankroll management) para apostar en deportes: criterio Kelly, qué porcentaje del bankroll apostar por pick, cómo manejar rachas negativas y cuándo parar. Sé concreto y directo.';
+
+  } else if (chipId === 'promo-hoy') {
+    displayText = '🎁 Promo para hoy';
+    const day = new Date().getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
+    const promoMap = {
+      0: 'Es Domingo. Para aprovechar el bono de los Lunes de Melbet, ¿qué tengo que hacer HOY (domingo) para activarlo? ¿Cómo funciona exactamente el bono semanal del Lunes de Melbet y cuánto duplica?',
+      1: 'Es Lunes. Habla sobre el bono de recarga de los Lunes de Melbet: ¿cuánto duplica el depósito, cuál es el monto máximo de bono y cómo se libera? ¿Vale la pena aprovecharlo hoy?',
+      2: 'Es Martes. Cuéntame sobre las casas de apuestas nuevas en LATAM: DBbet y Sapphirebet. ¿Qué bonos de bienvenida ofrecen? ¿Cuánto duplican el primer depósito y hasta qué límite?',
+      3: 'Es Miércoles. Quiero aprovechar el bono del Jueves de BetWinner. ¿Qué tengo que hacer HOY (miércoles) para activarlo? ¿Cómo funciona esa promoción semanal?',
+      4: 'Es Jueves. Habla sobre la promo del Jueves de BetWinner: ¿cómo funciona, cuánto da de bono y cuáles son los términos y condiciones principales?',
+      5: 'Es Viernes. Si deposito hoy en Megapari, ¿qué bono especial de Sábado puedo activar? ¿Cuánto duplica el depósito y vale la pena hacerlo hoy?',
+      6: 'Es Sábado. Habla sobre la promo de Sábado de Megapari: ¿cómo funciona, cuánto duplica el depósito, cuál es el límite máximo y cuáles son los términos?'
+    };
+    sendText = '🎁 Promo para hoy: ' + (promoMap[day] || '¿Qué casas de apuestas tienen las mejores promociones activas hoy?');
+
+  } else {
+    // fallback: send as-is
+    displayText = chipId;
+    sendText = chipId;
+  }
+
+  // Store override so aiSend() shows short label but sends full context
+  window._aiChipOverride = (sendText !== displayText) ? sendText : null;
+  document.getElementById('aiInput').value = displayText;
   aiSend();
 }
 
@@ -8718,9 +8765,13 @@ function aiEnrichWithChannels(msg) {
 async function aiSend() {
   if (aiWorking) return;
   const input   = document.getElementById('aiInput');
-  const msg     = input.value.trim();
+  const displayLabel = input.value.trim();
   const hasImg  = !!aiImageB64;
-  if (!msg && !hasImg) return;
+  if (!displayLabel && !hasImg) return;
+
+  // Consume chip override (long context msg) or fall back to display label
+  const apiMsg = window._aiChipOverride || displayLabel;
+  window._aiChipOverride = null;
 
   // Capturar y limpiar imagen antes de resetear
   const sendB64  = aiImageB64;
@@ -8735,18 +8786,18 @@ async function aiSend() {
   // Agrandar ventana al primer mensaje
   document.getElementById('aiChatBox').classList.add('active');
 
-  // Mostrar mensaje del usuario (con miniatura si hay imagen)
+  // Mostrar mensaje del usuario — siempre la etiqueta corta (displayLabel)
   const displayMsg = hasImg
-    ? `${msg ? msg + '<br>' : ''}<img src="data:${sendMime};base64,${sendB64}" style="max-height:120px;border-radius:8px;margin-top:4px;display:block">`
-    : msg;
+    ? `${displayLabel ? displayLabel + '<br>' : ''}<img src="data:${sendMime};base64,${sendB64}" style="max-height:120px;border-radius:8px;margin-top:4px;display:block">`
+    : displayLabel;
   aiAddMsg('user', displayMsg);
-  aiHistory.push({ role: 'user', content: msg || '(imagen adjunta)' });
+  aiHistory.push({ role: 'user', content: apiMsg || '(imagen adjunta)' });
 
   // Contexto del partido activo (si lo hay)
   const ctx = aiGetMatchContext();
 
   // Typing indicator (imágenes no buscan web)
-  const willSearch = !hasImg && aiNeedsWeb(msg);
+  const willSearch = !hasImg && aiNeedsWeb(apiMsg);
   aiShowTyping(willSearch);
 
   try {
@@ -8754,7 +8805,7 @@ async function aiSend() {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        message: aiEnrichWithChannels(msg) || 'Analiza esta imagen de cuotas y dame tu recomendación.',
+        message: aiEnrichWithChannels(apiMsg) || 'Analiza esta imagen de cuotas y dame tu recomendación.',
         context: ctx,
         channels: LATAM_CHANNELS,
         history: aiHistory.slice(-8),
