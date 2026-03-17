@@ -3045,7 +3045,7 @@ const teamLogos = {
   // ── ARGENTINA Primera Nacional ──
   'Quilmes':                'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Quilmes_AC_crest.svg/200px-Quilmes_AC_crest.svg.png',
   'Almirante Brown':        'https://upload.wikimedia.org/wikipedia/commons/thumb/9/93/Almirante_Brown_escudo.svg/200px-Almirante_Brown_escudo.svg.png',
-  'Deportivo Riestra':      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Deportivo_Riestra_crest.png/200px-Deportivo_Riestra_crest.png',
+  'Deportivo Riestra':      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ab/Escudo_del_Club_Deportivo_Riestra.svg/200px-Escudo_del_Club_Deportivo_Riestra.svg.png',
   'Brown de Adrogué':       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/BrownAdro.svg/200px-BrownAdro.svg.png',
   'Ferro Carril Oeste':     'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/FerroCarrilOeste.svg/200px-FerroCarrilOeste.svg.png',
   'Güemes':                 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/34/Escudo_de_Guemes.png/200px-Escudo_de_Guemes.png',
@@ -4598,24 +4598,14 @@ function resolveCompletedGames(scores, skipRender) {
     });
   });
 
-  // Fallback directo por fecha: cualquier pronóstico PEND de un día anterior → VOID
-  // El campo date siempre existe en formato "DD/MM"
-  const todayDDMM = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
+  // Fallback solo para pronósticos muy viejos (>7 días) que nunca pudieron resolverse
   hist.filter(h => h.result === 'pending').forEach(p => {
-    // Si la fecha guardada es distinta a hoy, el partido ya pasó → void
-    if (p.date && p.date !== todayDDMM) {
-      p.result = 'void';
-      p.pl = 0;
-      changed = true;
-      return;
-    }
-    // Fallback secundario: commenceTs o fecha del id si el date falta
     let cutoff = null;
     if (p.commenceTs) {
-      cutoff = p.commenceTs + 28 * 3600000;
+      cutoff = p.commenceTs + 7 * 86400000; // 7 días después del partido
     } else if (p.id) {
       const m = p.id.match(/(\d{4}-\d{2}-\d{2})$/);
-      if (m) cutoff = new Date(m[1]).getTime() + 48 * 3600000;
+      if (m) cutoff = new Date(m[1]).getTime() + 7 * 86400000;
     }
     if (cutoff && now > cutoff) {
       p.result = 'void';
@@ -4630,6 +4620,35 @@ function resolveCompletedGames(scores, skipRender) {
   }
 }
 
+// Carga scores históricos (últimos 3 días) para resolver predicciones pendientes
+async function loadHistoricalScores() {
+  const pending = loadHistorial().filter(h => h.result === 'pending');
+  if (!pending.length) return;
+  try {
+    const res = await fetch(`${WORKER_URL}/scores?daysFrom=3`);
+    if (!res.ok) return;
+    const json = await res.json();
+    const data = json.data ?? (Array.isArray(json) ? json : []);
+    const historicalScores = data
+      .filter(g => g.completed && g.scores)
+      .map(g => {
+        const homeScore = g.scores?.find(s => s.name === g.home_team);
+        const awayScore = g.scores?.find(s => s.name === g.away_team);
+        return {
+          home:   shortName(g.home_team),
+          away:   shortName(g.away_team),
+          scoreH: parseInt(homeScore?.score) || 0,
+          scoreA: parseInt(awayScore?.score) || 0,
+          flag:   'final',
+        };
+      });
+    if (historicalScores.length) {
+      console.log('[historicalScores] encontrados:', historicalScores.length, 'partidos finalizados');
+      resolveCompletedGames(historicalScores);
+    }
+  } catch(e) { console.warn('[historicalScores]', e); }
+}
+
 function calcRacha(data) {
   const completed = data.filter(h => h.result==='win'||h.result==='loss');
   if (!completed.length) return {val:0,str:'—'};
@@ -4640,8 +4659,10 @@ function calcRacha(data) {
 
 function renderHistorial(filter) {
   migrateHistStakes();          // corrige stakes/P&L de entradas antiguas
-  // Resolver pronósticos viejos por fecha (skipRender=true para evitar loop)
+  // Resolver con scores en memoria (sincrónico, sin loop)
   resolveCompletedGames(scoresData || [], true);
+  // Buscar scores históricos del servidor para pendientes sin resolver
+  loadHistoricalScores();
   const all  = loadHistorial();
   const data = filter==='all' ? all : all.filter(h=>h.sport===filter);
   const completed = data.filter(h=>h.result!=='pending'&&h.result!=='void');
@@ -6801,7 +6822,7 @@ function admRefreshStatus() {
 function admRefreshOdds()   { loadRealOdds();   document.getElementById('admDatosMsg').textContent='🔄 Recargando cuotas...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Cuotas recargadas'; },3000); }
 function admRefreshScores() { loadRealScores(); document.getElementById('admDatosMsg').textContent='🔄 Recargando marcadores...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Marcadores recargados'; },3000); }
 function admRefreshPreds()  { renderPreds();    document.getElementById('admDatosMsg').textContent='✓ Pronósticos regenerados'; setTimeout(()=>document.getElementById('admDatosMsg').textContent='',2500); }
-function admResolveNow()    { resolveCompletedGames(scoresData); renderHistorial(histFilter); admRenderHistTable(); document.getElementById('admDatosMsg').textContent='✓ Pendientes resueltos'; setTimeout(()=>document.getElementById('admDatosMsg').textContent='',2500); }
+function admResolveNow()    { loadHistoricalScores().then(()=>{ resolveCompletedGames(scoresData); renderHistorial(histFilter); admRenderHistTable(); document.getElementById('admDatosMsg').textContent='✓ Pendientes resueltos'; setTimeout(()=>document.getElementById('admDatosMsg').textContent='',2500); }); }
 
 // ── Bankroll ──
 function admSetBankroll() {
