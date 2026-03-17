@@ -2242,9 +2242,9 @@
     <h1><span style="color:#fff;font-weight:900">Apuestas</span><span style="color:var(--verde);font-weight:900">Automáticas</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apostar</span></h1>
     <p>Soy la primer IA para apuestas deportivas a la que puedes PREGUNTARLE, hablar e interactuar, armemos una buena combinada. ¡Ya te mandé abajo! 🤙</p>
     <div class="hero-stats">
-      <div class="hero-stat"><span class="num">72%</span><span class="lbl">Precisión IA</span></div>
-      <div class="hero-stat"><span class="num">1,240+</span><span class="lbl">Partidos analizados</span></div>
-      <div class="hero-stat"><span class="num">38</span><span class="lbl">Ligas cubiertas</span></div>
+      <div class="hero-stat"><span class="num" id="heroStatPrecision">–</span><span class="lbl">Precisión IA</span></div>
+      <div class="hero-stat"><span class="num" id="heroStatPicks">–</span><span class="lbl">Picks realizados</span></div>
+      <div class="hero-stat"><span class="num" id="heroStatLeagues">38</span><span class="lbl">Ligas cubiertas</span></div>
     </div>
   </div>
   <div style="flex-shrink:0">
@@ -2300,13 +2300,13 @@
     <div class="bk-lock-overlay" id="bkLockOverlay">
       <div class="bk-lock-icon">🔒</div>
       <div class="bk-lock-title">Tu Bankroll Personal</div>
-      <div class="bk-lock-sub">Registrate gratis y llevá un control profesional de tus apuestas con análisis IA en tiempo real.</div>
+      <div class="bk-lock-sub">Registrate gratis así la IA lleva un control de cómo te fue con los pronósticos de nuestra App desde tu registro!</div>
       <div class="bk-lock-perks">
         <div class="bk-lock-perk"><span>📊</span> Seguimiento de ganancias y pérdidas</div>
         <div class="bk-lock-perk"><span>🤖</span> Consejos IA personalizados según tu historial</div>
         <div class="bk-lock-perk"><span>📈</span> Gráfico de evolución de tu bankroll</div>
         <div class="bk-lock-perk"><span>⚖️</span> Calculadora de valor esperado automática</div>
-        <div class="bk-lock-perk"><span>⭐</span> 7 días de plan PRO completamente gratis</div>
+        <div class="bk-lock-perk"><span>⭐</span> Estas cuentas (por ahora) son GRATIS</div>
       </div>
       <button class="bk-lock-btn" onclick="openAuth()">Crear cuenta gratuita →</button>
       <button class="bk-lock-secondary" onclick="openAuth()">Ya tengo cuenta · Iniciar sesión</button>
@@ -2890,6 +2890,101 @@ async function acLoadFromDB(email) {
 }
 
 // ═══════════════════════════════════════════════
+//  LIVE STATS (Hero section — Supabase aggregate)
+// ═══════════════════════════════════════════════
+const STATS_CACHE_KEY = 'ia_live_stats_v1';
+const STATS_CACHE_TTL = 30 * 60 * 1000; // 30 min
+
+function animateCounter(el, from, to, suffix, duration) {
+  if (!el) return;
+  const start = performance.now();
+  const diff  = to - from;
+  function step(now) {
+    const elapsed = now - start;
+    const progress = Math.min(elapsed / duration, 1);
+    // ease-out cubic
+    const eased = 1 - Math.pow(1 - progress, 3);
+    const current = Math.round(from + diff * eased);
+    el.textContent = current.toLocaleString('es-AR') + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+function heroStatsApply(precision, totalPicks, animate) {
+  const elP = document.getElementById('heroStatPrecision');
+  const elN = document.getElementById('heroStatPicks');
+  if (!elP || !elN) return;
+  if (animate) {
+    animateCounter(elP, 50, precision, '%', 1400);
+    animateCounter(elN, 0, totalPicks, totalPicks >= 1000 ? '' : '', 1600);
+  } else {
+    elP.textContent = precision + '%';
+    elN.textContent = totalPicks >= 1000
+      ? (totalPicks / 1000).toFixed(1).replace('.0','') + 'K+'
+      : totalPicks + '+';
+  }
+}
+
+async function loadLiveStats() {
+  // 1. Try cache
+  try {
+    const raw = localStorage.getItem(STATS_CACHE_KEY);
+    if (raw) {
+      const cached = JSON.parse(raw);
+      if (Date.now() - cached.ts < STATS_CACHE_TTL) {
+        heroStatsApply(cached.precision, cached.totalPicks, true);
+        return;
+      }
+    }
+  } catch(_) {}
+
+  // 2. Query Supabase — only need picks column
+  try {
+    const { data, error } = await sbClient
+      .from('acoin_users')
+      .select('picks')
+      .not('picks', 'is', null);
+
+    if (error) throw error;
+
+    let totalAll = 0, totalEval = 0, totalCorrect = 0;
+    (data || []).forEach(row => {
+      const picks = Array.isArray(row.picks) ? row.picks : [];
+      picks.forEach(p => {
+        if (!p) return;
+        totalAll++; // todos los picks hechos
+        if (p.evaluated) {
+          totalEval++;
+          if (p.correct) totalCorrect++;
+        }
+      });
+    });
+
+    // Precisión: solo de los picks ya evaluados (con resultado real)
+    // Min 10 evaluados antes de mostrar el % real; si no, placeholder
+    const precision  = totalEval >= 10
+      ? Math.round((totalCorrect / totalEval) * 100)
+      : 71; // placeholder hasta tener masa crítica
+    const totalPicks = totalAll; // todos los picks realizados (evaluados o no)
+
+    // 3. Save cache
+    localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({
+      precision, totalPicks, ts: Date.now()
+    }));
+
+    heroStatsApply(precision, totalPicks, true);
+  } catch(e) {
+    console.warn('[loadLiveStats]', e.message || e);
+    // Fallback silently — keep "–" or show sensible defaults
+    const elP = document.getElementById('heroStatPrecision');
+    const elN = document.getElementById('heroStatPicks');
+    if (elP) animateCounter(elP, 50, 71, '%', 1200);
+    if (elN) animateCounter(elN, 0, 0, '', 800);
+  }
+}
+
+// ═══════════════════════════════════════════════
 //  DATA
 // ═══════════════════════════════════════════════
 
@@ -3318,6 +3413,56 @@ const teamLogos = {
   'Atletico Mineiro':           'https://r2.thesportsdb.com/images/media/team/badge/x5lixs1743742872.png',
   'Atlético Mineiro':           'https://r2.thesportsdb.com/images/media/team/badge/x5lixs1743742872.png',
   'Atlético-MG':            'https://media.api-sports.io/football/teams/1062.png',
+  // ── BRASIL (completo Série A) ──
+  'Cruzeiro':               'https://media.api-sports.io/football/teams/120.png',
+  'Cruzeiro EC':            'https://media.api-sports.io/football/teams/120.png',
+  'Vasco da Gama':          'https://media.api-sports.io/football/teams/131.png',
+  'CR Vasco da Gama':       'https://media.api-sports.io/football/teams/131.png',
+  'Vasco':                  'https://media.api-sports.io/football/teams/131.png',
+  'Fortaleza':              'https://media.api-sports.io/football/teams/2283.png',
+  'Fortaleza EC':           'https://media.api-sports.io/football/teams/2283.png',
+  'Bahia':                  'https://media.api-sports.io/football/teams/135.png',
+  'EC Bahia':               'https://media.api-sports.io/football/teams/135.png',
+  'Red Bull Bragantino':    'https://media.api-sports.io/football/teams/1672.png',
+  'RB Bragantino':          'https://media.api-sports.io/football/teams/1672.png',
+  'Bragantino':             'https://media.api-sports.io/football/teams/1672.png',
+  'Sport Recife':           'https://media.api-sports.io/football/teams/127.png',
+  'Sport Club do Recife':   'https://media.api-sports.io/football/teams/127.png',
+  'Ceará':                  'https://media.api-sports.io/football/teams/136.png',
+  'Ceara':                  'https://media.api-sports.io/football/teams/136.png',
+  'Ceará SC':               'https://media.api-sports.io/football/teams/136.png',
+  'Goiás':                  'https://media.api-sports.io/football/teams/133.png',
+  'Goias':                  'https://media.api-sports.io/football/teams/133.png',
+  'Goiás EC':               'https://media.api-sports.io/football/teams/133.png',
+  'Vitória':                'https://media.api-sports.io/football/teams/129.png',
+  'Vitoria':                'https://media.api-sports.io/football/teams/129.png',
+  'EC Vitória':             'https://media.api-sports.io/football/teams/129.png',
+  'Cuiabá':                 'https://media.api-sports.io/football/teams/1546.png',
+  'Cuiaba':                 'https://media.api-sports.io/football/teams/1546.png',
+  'Cuiabá EC':              'https://media.api-sports.io/football/teams/1546.png',
+  'América Mineiro':        'https://media.api-sports.io/football/teams/130.png',
+  'America Mineiro':        'https://media.api-sports.io/football/teams/130.png',
+  'América-MG':             'https://media.api-sports.io/football/teams/130.png',
+  'Juventude':              'https://media.api-sports.io/football/teams/132.png',
+  'EC Juventude':           'https://media.api-sports.io/football/teams/132.png',
+  'Coritiba':               'https://media.api-sports.io/football/teams/128.png',
+  'Coritiba FC':            'https://media.api-sports.io/football/teams/128.png',
+  'Coritiba FBC':           'https://media.api-sports.io/football/teams/128.png',
+  'Mirassol':               'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Mirassol_Futebol_Clube_logo.png/200px-Mirassol_Futebol_Clube_logo.png',
+  'Mirassol FC':            'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Mirassol_Futebol_Clube_logo.png/200px-Mirassol_Futebol_Clube_logo.png',
+  'Sport Club Corinthians Paulista': 'https://r2.thesportsdb.com/images/media/team/badge/vvuvps1473538042.png',
+  'Athletico-PR':           'https://r2.thesportsdb.com/images/media/team/badge/irzu1u1554237406.png',
+  'CAP':                    'https://r2.thesportsdb.com/images/media/team/badge/irzu1u1554237406.png',
+  'Operário':               'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Operario_FC_logo.png/200px-Operario_FC_logo.png',
+  'Operario':               'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Operario_FC_logo.png/200px-Operario_FC_logo.png',
+  'Novorizontino':          'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Gremio_Novorizontino_logo.png/200px-Gremio_Novorizontino_logo.png',
+  'Grêmio Novorizontino':   'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Gremio_Novorizontino_logo.png/200px-Gremio_Novorizontino_logo.png',
+  'Avaí':                   'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Ava%C3%AD_FC.svg/200px-Ava%C3%AD_FC.svg.png',
+  'Avai':                   'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Ava%C3%AD_FC.svg/200px-Ava%C3%AD_FC.svg.png',
+  'Avaí FC':                'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Ava%C3%AD_FC.svg/200px-Ava%C3%AD_FC.svg.png',
+  'Chapecoense':            'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Chapecoense_logo.svg/200px-Chapecoense_logo.svg.png',
+  'Ponte Preta':            'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg/200px-Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg.png',
+  'AA Ponte Preta':         'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg/200px-Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg.png',
   // ── 🏀 NBA ──
   'Lakers':                 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
   'LA Lakers':              'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
@@ -6996,7 +7141,7 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
           ✅ Historial completo de apuestas<br>
           ✅ Alertas de valor por email<br>
           ✅ Calculadora avanzada activa<br>
-          <span class="perk-gold">⭐ 7 días de plan PRO completamente gratis</span>
+          <span class="perk-gold">⭐ Estas cuentas (por ahora) son GRATIS</span>
         </div>
         <button class="auth-btn-main" style="margin-top:18px" onclick="closeAuth()">Empezar a ganar →</button>
       </div>
@@ -7043,6 +7188,7 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
       <button class="adm-tab active" onclick="admTab('historial',this)" style="flex:1;padding:12px;background:transparent;border:none;color:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid var(--verde)">📋 Historial</button>
       <button class="adm-tab" onclick="admTab('datos',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">🔄 Datos</button>
       <button class="adm-tab" onclick="admTab('bankroll',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">💰 Bankroll</button>
+      <button class="adm-tab" onclick="admTab('usuarios',this);admLoadUsers();" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">👥 Usuarios</button>
       <button class="adm-tab" onclick="admTab('config',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">🛠 Config</button>
     </div>
 
@@ -7120,6 +7266,45 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
       </div>
       <div id="admConfigMsg" style="font-size:0.78rem;color:var(--verde);min-height:18px"></div>
     </div>
+
+    <!-- TAB: USUARIOS -->
+    <div id="adm-usuarios" class="adm-pane" style="padding:20px;display:none;flex-direction:column;gap:14px">
+
+      <!-- Header stats -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div style="background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div id="admUserTotal" style="font-size:1.6rem;font-weight:800;color:var(--verde)">–</div>
+          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px">Total registrados</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center">
+          <div id="admUserHoy" style="font-size:1.6rem;font-weight:800;color:#fff">–</div>
+          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px">Nuevos hoy</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center">
+          <div id="admUserSemana" style="font-size:1.6rem;font-weight:800;color:#fff">–</div>
+          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px">Esta semana</div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="admLoadUsers()" style="background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-weight:700;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">🔄 Actualizar</button>
+        <button onclick="localStorage.removeItem('ia_live_stats_v1');loadLiveStats();this.textContent='✅ Stats actualizadas';setTimeout(()=>this.textContent='📊 Refrescar stats hero',2000)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">📊 Refrescar stats hero</button>
+        <button onclick="admCopyEmails()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">📋 Copiar todos los emails</button>
+        <button onclick="admExportCSV()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">⬇️ Exportar CSV</button>
+      </div>
+
+      <!-- Search -->
+      <input id="admUserSearch" type="text" placeholder="🔍 Buscar por email..." oninput="admFilterUsers()"
+        style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:9px 14px;border-radius:10px;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box"/>
+
+      <!-- Status message -->
+      <div id="admUserStatus" style="font-size:0.78rem;color:var(--texto-sec);min-height:16px"></div>
+
+      <!-- User list -->
+      <div id="admUserList" style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto"></div>
+    </div>
+
   </div>
 </div>
 
@@ -7143,6 +7328,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // $A-Coin: init balance display + daily bonus
   acUpdateUI();
   acCheckDaily();
+  // Live stats in hero (async, non-blocking)
+  loadLiveStats();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -7226,6 +7413,100 @@ function admTab(name, btn) {
   document.getElementById('adm-' + name).style.display = 'flex';
   btn.style.color = '#fff';
   btn.style.borderBottom = '2px solid var(--verde)';
+}
+
+// ── USUARIOS (Supabase) ──
+let _admAllUsers = [];
+
+async function admLoadUsers() {
+  const statusEl = document.getElementById('admUserStatus');
+  const listEl   = document.getElementById('admUserList');
+  statusEl.textContent = '⏳ Cargando desde Supabase...';
+  listEl.innerHTML = '';
+
+  try {
+    const { data, error, count } = await sbClient
+      .from('acoin_users')
+      .select('email, balance, updated_at', { count: 'exact' })
+      .order('updated_at', { ascending: false });
+
+    if (error) throw error;
+
+    _admAllUsers = data || [];
+    const total = _admAllUsers.length;
+
+    // Stats
+    const hoy = new Date(); hoy.setHours(0,0,0,0);
+    const semanaAtras = new Date(hoy); semanaAtras.setDate(semanaAtras.getDate() - 7);
+    const nuevosHoy    = _admAllUsers.filter(u => u.updated_at && new Date(u.updated_at) >= hoy).length;
+    const nuevosSemana = _admAllUsers.filter(u => u.updated_at && new Date(u.updated_at) >= semanaAtras).length;
+
+    document.getElementById('admUserTotal').textContent   = total;
+    document.getElementById('admUserHoy').textContent     = nuevosHoy;
+    document.getElementById('admUserSemana').textContent  = nuevosSemana;
+
+    statusEl.textContent = total > 0 ? `✅ ${total} usuario${total !== 1 ? 's' : ''} registrado${total !== 1 ? 's' : ''}` : '📭 Sin usuarios todavía';
+    admRenderUserList(_admAllUsers);
+  } catch(e) {
+    statusEl.textContent = '❌ Error: ' + (e.message || e);
+    console.error('[admLoadUsers]', e);
+  }
+}
+
+function admRenderUserList(users) {
+  const listEl = document.getElementById('admUserList');
+  if (!users.length) {
+    listEl.innerHTML = '<div style="padding:20px;text-align:center;color:var(--texto-sec);font-size:0.82rem">Sin resultados</div>';
+    return;
+  }
+  listEl.innerHTML = users.map((u, i) => {
+    const fecha = u.updated_at ? new Date(u.updated_at).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '–';
+    const bal   = typeof u.balance === 'number' ? u.balance : (parseFloat(u.balance) || 0);
+    return `
+    <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px">
+      <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.25);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--verde);flex-shrink:0">${i+1}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:0.82rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.email}</div>
+        <div style="font-size:0.68rem;color:var(--texto-sec);margin-top:1px">${fecha}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-size:0.78rem;font-weight:700;color:${bal >= 0 ? 'var(--verde)' : 'var(--rojo)'}">$A ${bal.toFixed(0)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function admFilterUsers() {
+  const q = (document.getElementById('admUserSearch').value || '').toLowerCase();
+  const filtered = q ? _admAllUsers.filter(u => u.email && u.email.toLowerCase().includes(q)) : _admAllUsers;
+  admRenderUserList(filtered);
+}
+
+function admCopyEmails() {
+  if (!_admAllUsers.length) { alert('Primero cargá los usuarios.'); return; }
+  const txt = _admAllUsers.map(u => u.email).join('\n');
+  navigator.clipboard.writeText(txt).then(() => {
+    document.getElementById('admUserStatus').textContent = `✅ ${_admAllUsers.length} emails copiados al portapapeles`;
+    setTimeout(() => { if(document.getElementById('admUserStatus')) document.getElementById('admUserStatus').textContent = ''; }, 3000);
+  }).catch(() => {
+    prompt('Copiá manualmente:', txt);
+  });
+}
+
+function admExportCSV() {
+  if (!_admAllUsers.length) { alert('Primero cargá los usuarios.'); return; }
+  const header = 'Email,Balance $A,Última actividad';
+  const rows = _admAllUsers.map(u => {
+    const bal  = typeof u.balance === 'number' ? u.balance : (parseFloat(u.balance) || 0);
+    const fecha = u.updated_at ? new Date(u.updated_at).toLocaleString('es-AR') : '';
+    return `${u.email},${bal.toFixed(0)},"${fecha}"`;
+  });
+  const csv  = [header, ...rows].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url; a.download = `usuarios_ia-apuestas_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
 }
 
 // ── Historial ──
