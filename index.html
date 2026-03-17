@@ -4486,15 +4486,24 @@ function resolveCompletedGames(scores) {
     });
   });
 
-  // Fallback: voiding automático para pronósticos sin coincidencia de más de 28 horas
-  // Usa commenceTs (si existe) o extrae la fecha del id (formato: homeaway_YYYY-MM-DD)
+  // Fallback directo por fecha: cualquier pronóstico PEND de un día anterior → VOID
+  // El campo date siempre existe en formato "DD/MM"
+  const todayDDMM = new Date().toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
   hist.filter(h => h.result === 'pending').forEach(p => {
+    // Si la fecha guardada es distinta a hoy, el partido ya pasó → void
+    if (p.date && p.date !== todayDDMM) {
+      p.result = 'void';
+      p.pl = 0;
+      changed = true;
+      return;
+    }
+    // Fallback secundario: commenceTs o fecha del id si el date falta
     let cutoff = null;
     if (p.commenceTs) {
-      cutoff = p.commenceTs + 28 * 3600000; // 28h después del inicio del partido
+      cutoff = p.commenceTs + 28 * 3600000;
     } else if (p.id) {
       const m = p.id.match(/(\d{4}-\d{2}-\d{2})$/);
-      if (m) cutoff = new Date(m[1]).getTime() + 48 * 3600000; // 48h después de la fecha del pronóstico
+      if (m) cutoff = new Date(m[1]).getTime() + 48 * 3600000;
     }
     if (cutoff && now > cutoff) {
       p.result = 'void';
