@@ -530,6 +530,88 @@
     transform: translateY(-3px);
     box-shadow: 0 12px 32px rgba(0,0,0,0.4);
   }
+
+  /* ── Estados de resultado en pronóstico ── */
+  @keyframes golden-pulse {
+    0%   { box-shadow: 0 0 22px rgba(255,214,0,0.45), 0 4px 20px rgba(0,0,0,0.5); }
+    50%  { box-shadow: 0 0 55px rgba(255,214,0,0.85), 0 0 90px rgba(255,180,0,0.4), 0 4px 20px rgba(0,0,0,0.5); }
+    100% { box-shadow: 0 0 22px rgba(255,214,0,0.45), 0 4px 20px rgba(0,0,0,0.5); }
+  }
+  @keyframes golden-sweep {
+    0%   { background-position: -220% 0; }
+    100% { background-position: 220% 0; }
+  }
+  @keyframes confetti-pop {
+    0%   { transform: scale(1); }
+    15%  { transform: scale(1.04); }
+    30%  { transform: scale(0.98); }
+    50%  { transform: scale(1.02); }
+    100% { transform: scale(1); }
+  }
+  .pred-golden-win {
+    border-color: #ffd600 !important;
+    background: linear-gradient(180deg, rgba(255,214,0,0.13) 0%, var(--gris-card) 55%) !important;
+    animation: golden-pulse 2.5s ease-in-out infinite, confetti-pop 0.6s ease-out;
+  }
+  .pred-golden-win::after {
+    content: '';
+    position: absolute; inset: 0; border-radius: 16px; pointer-events: none;
+    background: linear-gradient(105deg, transparent 38%, rgba(255,252,180,0.22) 50%, transparent 62%);
+    background-size: 200% 100%;
+    animation: golden-sweep 2.8s linear infinite;
+  }
+  .pred-card-win {
+    border-color: rgba(0,200,83,0.45) !important;
+    background: linear-gradient(180deg, rgba(0,200,83,0.07) 0%, var(--gris-card) 60%) !important;
+  }
+  .pred-card-loss {
+    border-color: rgba(255,61,61,0.3) !important;
+    background: linear-gradient(180deg, rgba(255,61,61,0.05) 0%, var(--gris-card) 60%) !important;
+    opacity: 0.78;
+  }
+  .pred-card-finished {
+    opacity: 0.62;
+    filter: saturate(0.7);
+  }
+  /* Badges de resultado */
+  .badge-terminado {
+    font-size: 0.6rem; font-weight: 800; letter-spacing: .5px; text-transform: uppercase;
+    background: rgba(255,255,255,0.06); color: #777;
+    border: 1px solid #333; border-radius: 6px; padding: 2px 7px;
+  }
+  .badge-result-win {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.72rem; font-weight: 900;
+    background: rgba(0,200,83,0.18); color: #00e676;
+    border: 1px solid rgba(0,200,83,0.4); border-radius: 6px; padding: 3px 9px;
+  }
+  .badge-result-loss {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.72rem; font-weight: 900;
+    background: rgba(255,61,61,0.15); color: #ff5252;
+    border: 1px solid rgba(255,61,61,0.35); border-radius: 6px; padding: 3px 9px;
+  }
+  .badge-result-pending {
+    font-size: 0.65rem; font-weight: 700;
+    background: rgba(255,145,0,0.1); color: var(--naranja);
+    border: 1px solid rgba(255,145,0,0.3); border-radius: 6px; padding: 2px 7px;
+  }
+  /* Score final en tarjeta terminada */
+  .pred-final-score {
+    font-size: 1.3rem; font-weight: 900; letter-spacing: 3px;
+    padding: 3px 14px; border-radius: 8px; line-height: 1;
+  }
+  .pred-final-score.score-win  { color: #00e676; background: rgba(0,200,83,0.12); border: 1px solid rgba(0,200,83,0.35); }
+  .pred-final-score.score-loss { color: #ff5252; background: rgba(255,61,61,0.12); border: 1px solid rgba(255,61,61,0.35); }
+  .pred-final-score.score-void { color: #888;    background: rgba(255,255,255,0.05); border: 1px solid #333; }
+  /* Corona dorada grande para acierto de confianza alta */
+  .golden-crown-badge {
+    position: absolute; top: -2px; right: 14px;
+    font-size: 1.6rem; filter: drop-shadow(0 2px 8px rgba(255,214,0,0.9));
+    animation: golden-pulse 2s ease-in-out infinite;
+    line-height: 1;
+  }
+
   /* ── Skeleton de carga ── */
   @keyframes shimmer {
     0%   { background-position: -400px 0; }
@@ -4462,8 +4544,19 @@ function buildPredsFromOdds() {
     .filter(c => c.prob > 0)
     .filter(c => !c.odds || parseFloat(c.odds) >= MIN_ODDS); // excluir cuotas bajas
 
-    // Ordenar por probabilidad desc; en empate, dar prioridad a totales (cuota real externa)
+    // Ordenar picks: para basket el Over/Under va siempre primero (es la apuesta más relevante);
+    // para fútbol ordenar por probabilidad desc y en empate preferir totales reales.
     candidates2.sort((a, b) => {
+      if (isBasketball) {
+        // En basket: prioridad → Over/Under con línea real > moneyline
+        const aIsOU = a.isBasketTotals ? 1 : 0;
+        const bIsOU = b.isBasketTotals ? 1 : 0;
+        if (bIsOU !== aIsOU) return bIsOU - aIsOU; // Over/Under primero
+        // Entre dos O/U: el Over (prob más alta) gana
+        if (b.prob !== a.prob) return b.prob - a.prob;
+        return 0;
+      }
+      // Fútbol: por probabilidad; en empate, los totales con cuota real ganan
       if (b.prob !== a.prob) return b.prob - a.prob;
       if (a.isTotals) return -1;
       if (b.isTotals) return 1;
@@ -4610,6 +4703,16 @@ function renderPreds() {
 
   // 1. Intentar cargar desde caché diaria
   realPreds = loadDailyPredsCache();
+  // Invalidar caché si hay picks de basket sin Over/Under (versión anterior sin esta lógica)
+  if (realPreds) {
+    const basketPreds = realPreds.filter(p => (p._sportKey || '').includes('basketball'));
+    const hasOU = basketPreds.some(p => p.rec && (p.rec.startsWith('Más de') || p.rec.startsWith('Menos de')));
+    if (basketPreds.length > 0 && !hasOU) {
+      // Caché vieja — regenerar
+      localStorage.removeItem('gambeta_daily_preds_v1');
+      realPreds = null;
+    }
+  }
 
   // 2. Si no hay caché, generar desde la API y guardar
   if (!realPreds) {
@@ -4624,30 +4727,54 @@ function renderPreds() {
     }
   }
 
-  // Eliminar picks que ya empezaron (partido en vivo o pasado) — solo pre-partido
+  // Anotar picks con su resultado del historial (no filtrar, mostrar terminados con badge)
   if (realPreds) {
     const nowMs = Date.now();
-    realPreds = realPreds.filter(p => !p.commenceTs || p.commenceTs > nowMs);
+    const hist  = loadHistorial();
+    realPreds = realPreds.map(p => {
+      const started = p.commenceTs && p.commenceTs <= nowMs;
+      if (!started) return p; // partido futuro — sin cambios
+      // Buscar resultado en historial
+      const entry = hist.find(h =>
+        teamsMatch(h.home, p.home) && teamsMatch(h.away, p.away)
+      );
+      return {
+        ...p,
+        _started:    true,
+        _histResult: entry?.result  || 'pending',
+        _histScore:  entry?.finalScore || null,
+      };
+    });
   }
 
   // Array vacío también cuenta como sin datos
   if (realPreds && realPreds.length === 0) realPreds = null;
   const isLive = !!realPreds;
-  try { if (realPreds) savePredictions(realPreds); } catch(e) { console.error('[renderPreds] savePredictions crash:', e); }
+  // Guardar al historial solo los picks pre-partido (no los ya iniciados)
+  try {
+    if (realPreds) savePredictions(realPreds.filter(p => !p._started));
+  } catch(e) { console.error('[renderPreds] savePredictions crash:', e); }
 
   // Filtrar por deporte según tab activo
   if (realPreds) {
     const sf = window._predSportFilter || 'all';
+    // Separar upcoming y terminados
+    let upcoming  = realPreds.filter(p => !p._started);
+    let finished  = realPreds.filter(p =>  p._started);
+
     if (sf === 'soccer') {
-      // Fútbol: mostrar TODOS los partidos del día sin límite
-      realPreds = realPreds.filter(p => (p._sportKey || '').includes('soccer'));
+      upcoming = upcoming.filter(p => (p._sportKey || '').includes('soccer'));
+      finished = finished.filter(p => (p._sportKey || '').includes('soccer'));
     } else if (sf === 'basketball') {
-      realPreds = realPreds.filter(p => (p._sportKey || '').includes('basketball'));
-      realPreds = realPreds.slice(0, 6);
+      upcoming = upcoming.filter(p => (p._sportKey || '').includes('basketball'));
+      upcoming = upcoming.slice(0, 6);
+      finished = finished.filter(p => (p._sportKey || '').includes('basketball'));
     } else {
-      // Todos: limitar a 6 (top picks)
-      realPreds = realPreds.slice(0, 6);
+      // Todos: top 6 upcoming + todos los terminados del día
+      upcoming = upcoming.slice(0, 6);
     }
+    // Upcoming primero, terminados al final
+    realPreds = [...upcoming, ...finished];
     if (realPreds.length === 0) realPreds = null;
   }
 
@@ -4755,6 +4882,30 @@ function renderPreds() {
     );
     const isGameLive = !!liveEntry && liveEntry.flag === 'live';
 
+    // Estado del partido para la tarjeta
+    const isStarted     = !!p._started;
+    const histResult    = p._histResult || 'pending'; // 'win'|'loss'|'void'|'pending'
+    const histScore     = p._histScore  || null;
+    const isFinishedWin = isStarted && histResult === 'win';
+    const isFinishedLoss= isStarted && histResult === 'loss';
+    const isHighConfWin = isFinishedWin && p.conf === 'high';
+    // Clase CSS de la tarjeta
+    const cardClass = isHighConfWin ? 'pred-golden-win'
+                    : isFinishedWin  ? 'pred-card-win'
+                    : isFinishedLoss ? 'pred-card-loss'
+                    : isStarted      ? 'pred-card-finished' : '';
+    // Score final — si no está en historial intentar desde scoresData
+    const finalScore = histScore
+      || (isStarted && liveEntry?.flag === 'final' ? `${liveEntry.scoreH}-${liveEntry.scoreA}` : null);
+    // Badge de resultado
+    const resultBadgeHtml = isStarted
+      ? (histResult === 'win'
+          ? `<span class="badge-result-win">✅ GANADO${finalScore ? ' · '+finalScore : ''}</span>`
+          : histResult === 'loss'
+          ? `<span class="badge-result-loss">❌ PERDIDO${finalScore ? ' · '+finalScore : ''}</span>`
+          : `<span class="badge-terminado">⏱ TERMINADO${finalScore ? ' · '+finalScore : ''}</span>`)
+      : '';
+
     // H2H mini (solo para datos estáticos con matchAnalysisData)
     const mdKey = `${p.home}-${p.away}`;
     const md = !isLive && typeof matchAnalysisData !== 'undefined' ? matchAnalysisData[mdKey] : null;
@@ -4787,12 +4938,14 @@ function renderPreds() {
       </div>` : '';
 
     return `
-    <div class="pred-card" style="${isGameLive ? 'border-color:rgba(229,57,53,0.4)' : p.conf==='high' ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)' : ''}">
+    <div class="pred-card ${cardClass}" style="${isGameLive ? 'border-color:rgba(229,57,53,0.4)' : (!isStarted && p.conf==='high') ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)' : ''}">
+      ${isHighConfWin ? '<div class="golden-crown-badge">👑</div>' : ''}
       <div class="pred-header">
-        <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${p.conf==='high' ? '<span style="font-size:1rem;filter:drop-shadow(0 1px 4px rgba(255,214,0,0.8))">👑</span>' : ''}${p.league}${isGameLive ? '' : ' · ' + p.time}</span>
+        <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${(!isStarted && p.conf==='high') ? '<span style="font-size:1rem;filter:drop-shadow(0 1px 4px rgba(255,214,0,0.8))">👑</span>' : ''}${p.league}${(isGameLive || isStarted) ? '' : ' · ' + p.time}</span>
         <div style="display:flex;align-items:center;gap:6px">
+          ${resultBadgeHtml}
           ${isGameLive ? `<span class="live-badge"><span class="live-dot"></span>En Vivo</span>` : ''}
-          <div style="display:flex;align-items:center;gap:6px">
+          ${!isStarted ? `<div style="display:flex;align-items:center;gap:6px">
             <span class="confidence-badge ${p.conf==='high'?'conf-high':p.conf==='med'?'conf-med':'conf-low'}">${p.confLabel}</span>
             <span style="font-size:0.72rem;font-weight:800;
               color:${p.conf==='high'?'#ffd600':p.conf==='med'?'#ffd600':'#ff7043'};
@@ -4802,7 +4955,7 @@ function renderPreds() {
               border-radius:6px;padding:2px 7px;white-space:nowrap">
               💰 $${p.conf==='high'?'100':p.conf==='med'?'50':'25'}
             </span>
-          </div>
+          </div>` : ''}
         </div>
       </div>
       ${bvrHtml}
@@ -4818,6 +4971,13 @@ function renderPreds() {
                  border-radius:8px;padding:4px 14px;letter-spacing:3px;line-height:1">
                  ${liveEntry.scoreH} - ${liveEntry.scoreA}
                </div>
+             </div>`
+          : isStarted && finalScore
+          ? `<div style="text-align:center">
+               <div class="pred-final-score ${isFinishedWin ? 'score-win' : isFinishedLoss ? 'score-loss' : 'score-void'}">
+                 ${finalScore}
+               </div>
+               <div style="font-size:0.6rem;color:#666;margin-top:4px;letter-spacing:.5px">FINAL</div>
              </div>`
           : `<div class="pred-vs">VS</div>`
         }
