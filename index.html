@@ -3633,7 +3633,7 @@ function renderScores(filter) {
     </div>`;
     return;
   }
-  grid.innerHTML = data.filter(s => s.flag !== 'live').map(s => `
+  grid.innerHTML = data.filter(s => s.flag !== 'live' && !s.forResolutionOnly).map(s => `
     <div class="score-card ${s.flag}">
       <div class="score-header">
         <span class="league-name">${s.league}</span>
@@ -4405,8 +4405,14 @@ function teamsMatch(a, b) {
   const na = normTeam(a), nb = normTeam(b);
   if (!na || !nb) return false;
   if (na === nb) return true;
+  // Coincidencia por prefijo (primeros 5 chars) — cubre "Arsenal" vs "Arsenal FC"
   const short = (x,y) => x.length >= 4 && y.includes(x.slice(0,5));
-  return short(na,nb) || short(nb,na);
+  if (short(na,nb) || short(nb,na)) return true;
+  // Coincidencia por subcadena larga (>=5 chars): algún fragmento del nombre A aparece en B
+  const wa = na.match(/.{5,}/g) || [];
+  const wb = nb.match(/.{5,}/g) || [];
+  if (wa.some(w => nb.includes(w)) || wb.some(w => na.includes(w))) return true;
+  return false;
 }
 
 // Guarda predicciones nuevas (evita duplicados del mismo día)
@@ -4441,6 +4447,7 @@ function savePredictions(preds) {
       home: p.home, away: p.away,
       rec: p.rec, odds: impliedOdds, stake,
       result: 'pending', pl: 0,
+      commenceTs: p.commenceTs || null,
     });
     added++;
   });
@@ -4455,8 +4462,11 @@ function resolveCompletedGames(scores) {
   if (!pending.length) return;
 
   let changed = false;
+  const now = Date.now();
+
   scores.filter(s => s.flag === 'final').forEach(s => {
     pending.forEach(p => {
+      if (p.result !== 'pending') return; // ya fue resuelto en esta pasada
       if (!teamsMatch(s.home, p.home) || !teamsMatch(s.away, p.away)) return;
 
       const homeWin = s.scoreH > s.scoreA;
@@ -4474,6 +4484,23 @@ function resolveCompletedGames(scores) {
            : result === 'loss' ? -p.stake : 0;
       changed = true;
     });
+  });
+
+  // Fallback: voiding automático para pronósticos sin coincidencia de más de 28 horas
+  // Usa commenceTs (si existe) o extrae la fecha del id (formato: homeaway_YYYY-MM-DD)
+  hist.filter(h => h.result === 'pending').forEach(p => {
+    let cutoff = null;
+    if (p.commenceTs) {
+      cutoff = p.commenceTs + 28 * 3600000; // 28h después del inicio del partido
+    } else if (p.id) {
+      const m = p.id.match(/(\d{4}-\d{2}-\d{2})$/);
+      if (m) cutoff = new Date(m[1]).getTime() + 48 * 3600000; // 48h después de la fecha del pronóstico
+    }
+    if (cutoff && now > cutoff) {
+      p.result = 'void';
+      p.pl = 0;
+      changed = true;
+    }
   });
 
   if (changed) {
@@ -5481,6 +5508,7 @@ async function loadRealScores(retryCount = 0) {
     const todayLocal    = new Date().toLocaleDateString('en-CA');
     const tomorrowLocal = new Date(Date.now() + 86400000).toLocaleDateString('en-CA');
 
+    const threeDaysAgo = new Date(Date.now() - 3 * 86400000).toLocaleDateString('en-CA');
     const relevant = data.filter(g => {
       const isLive = !g.completed && g.scores != null;
       const gameDate   = new Date(g.commence_time);
@@ -5488,7 +5516,9 @@ async function loadRealScores(retryCount = 0) {
       const gameHour   = gameDate.getHours(); // hora local del visitante
       // Incluir madrugada del día siguiente (00:00–02:59) como parte de la jornada actual
       const isNightcap = gameLocal === tomorrowLocal && gameHour < 3;
-      return isLive || gameLocal === todayLocal || isNightcap;
+      // Incluir partidos finalizados de los últimos 3 días (para resolver pronósticos anteriores)
+      const isRecentCompleted = g.completed && gameLocal >= threeDaysAgo && gameLocal < todayLocal;
+      return isLive || gameLocal === todayLocal || isNightcap || isRecentCompleted;
     });
 
     // Ordenar: live → soon (≤2h) → upcoming → final
@@ -5531,6 +5561,9 @@ async function loadRealScores(retryCount = 0) {
       const isSoon     = !isLive && !isFinished && minsUntil >= 0 && minsUntil <= 120; // ≤ 2 horas
       const sport = getSport(game.sport_key);
       const flag  = isLive ? 'live' : isFinished ? 'final' : isSoon ? 'soon' : 'upcoming';
+      const gameLocal = new Date(game.commence_time).toLocaleDateString('en-CA');
+      // Partidos de días anteriores: solo para resolución de pronósticos, no mostrar en display
+      const forResolutionOnly = isFinished && gameLocal < todayLocal;
       return {
         sport,
         league: leagueLabel(game.sport_title),
@@ -5543,6 +5576,7 @@ async function loadRealScores(retryCount = 0) {
         status: flag,
         time: isLive ? T('time.live') : (isFinished ? T('time.final') : matchTime(game.commence_time)),
         flag,
+        forResolutionOnly,
       };
     });
 
