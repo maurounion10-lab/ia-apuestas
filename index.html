@@ -4456,7 +4456,7 @@ function savePredictions(preds) {
 }
 
 // Resuelve predicciones pendientes contra partidos finalizados
-function resolveCompletedGames(scores) {
+function resolveCompletedGames(scores, skipRender) {
   const hist = loadHistorial();
   const pending = hist.filter(h => h.result === 'pending');
   if (!pending.length) return;
@@ -4514,7 +4514,7 @@ function resolveCompletedGames(scores) {
 
   if (changed) {
     saveHistorial(hist);
-    renderHistorial(histFilter);
+    if (!skipRender) renderHistorial(histFilter);
   }
 }
 
@@ -4528,6 +4528,8 @@ function calcRacha(data) {
 
 function renderHistorial(filter) {
   migrateHistStakes();          // corrige stakes/P&L de entradas antiguas
+  // Resolver pronósticos viejos por fecha (skipRender=true para evitar loop)
+  resolveCompletedGames(scoresData || [], true);
   const all  = loadHistorial();
   const data = filter==='all' ? all : all.filter(h=>h.sport===filter);
   const completed = data.filter(h=>h.result!=='pending'&&h.result!=='void');
@@ -6876,16 +6878,20 @@ function admSaveConfig() {
   pointer-events: all;
 }
 #aiChatBox.open.active {
-  width: 459px;
-  max-height: 75vh;
+  width: min(680px, calc(100vw - 48px));
+  max-height: 85vh;
+  right: max(24px, calc(50vw - 340px)); /* centra en pantallas anchas */
   transition: transform 0.22s cubic-bezier(.4,0,.2,1), opacity 0.22s,
               width 0.35s cubic-bezier(.4,0,.2,1),
-              max-height 0.4s cubic-bezier(.4,0,.2,1);
+              max-height 0.4s cubic-bezier(.4,0,.2,1),
+              right 0.35s cubic-bezier(.4,0,.2,1);
 }
 @media (max-width: 480px) {
   #aiChatBox.open.active {
-    width: calc(100vw - 24px);
-    max-height: 75vh;
+    width: calc(100vw - 16px);
+    max-height: 85vh;
+    right: 8px;
+    bottom: 82px;
   }
 }
 
