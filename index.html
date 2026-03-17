@@ -3949,24 +3949,14 @@ function buildPredsFromOdds() {
       return null;
     };
     const totalsMkt = findMkt('totals');
-    const bttsMkt   = findMkt('btts');
-
-    // Over X.5 odds (usar primer bookmaker que tenga el punto)
-    const overOdds  = {};  // { '1.5': 1.22, '2.5': 1.75, '3.5': 2.40 }
-    const underOdds = {};
+    // Over X.5 odds — extraer de los outcomes del mercado totals
+    const overOdds = {};
     (totalsMkt?.outcomes || []).forEach(o => {
       const pt = String(o.point);
-      if (o.name === 'Over')  overOdds[pt]  = o.price;
-      if (o.name === 'Under') underOdds[pt] = o.price;
+      if (o.name === 'Over') overOdds[pt] = o.price;
     });
 
-    // BTTS (Both Teams to Score)
-    let bttsYesOdds = null;
-    (bttsMkt?.outcomes || []).forEach(o => {
-      if (o.name === 'Yes') bttsYesOdds = o.price;
-    });
-
-    // ── Probabilidades ──
+    // ── Probabilidades 1X2 ──
     const rawH = hOP ? 1/hOP : 0;
     const rawD = dOP ? 1/dOP : 0;
     const rawA = aOP ? 1/aOP : 0;
@@ -3975,31 +3965,36 @@ function buildPredsFromOdds() {
     const probD = dOP ? Math.round(rawD / tot * 100) : 0;
     const probA = Math.round(rawA / tot * 100);
 
-    // Probabilidades de totales (implícita cruda, sin normalizar — son mercados 50/50 con margen)
+    // Probabilidades de totales (implícita cruda del over)
     const probOver = {};
     ['1.5','2.5','3.5'].forEach(pt => {
       if (overOdds[pt]) probOver[pt] = Math.round(100 / overOdds[pt]);
     });
-    const probBtts = bttsYesOdds ? Math.round(100 / bttsYesOdds) : null;
+
+    // Ambos Marcan estimado: si ningún equipo es muy dominante y over2.5 es probable
+    // Fórmula: si Over2.5 existe y probOver[2.5] >= 55, BTTS prob ≈ probOver[2.5] + 5
+    const bttsEst = (probOver['2.5'] && probOver['2.5'] >= 55)
+      ? Math.min(probOver['2.5'] + 5, 80)
+      : null;
+    const bttsOddsEst = bttsEst ? parseFloat((100 / bttsEst).toFixed(2)) : null;
 
     // ── Selección de la MEJOR apuesta ──
-    // Construir lista de candidatos con su probabilidad y cuota
     const candidates2 = [
-      { rec: 'Local Gana',     prob: probH,           odds: hO ?? hOP },
-      { rec: 'Visitante Gana', prob: probA,           odds: aO ?? aOP },
+      { rec: 'Local Gana',     prob: probH, odds: hO ?? hOP },
+      { rec: 'Visitante Gana', prob: probA, odds: aO ?? aOP },
       ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dO ?? dOP }] : []),
-      // Totales: solo si la cuota es ≥ 1.20 (hay verdadera incertidumbre)
+      // Totales: solo si hay cuota real (Worker actualizado) y mínimo de incertidumbre
       ...(['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= 1.20)
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
-      // BTTS: solo si la cuota refleja cierta incertidumbre (≥ 1.30)
-      ...(bttsYesOdds && bttsYesOdds >= 1.30 ? [{ rec: 'Ambos Marcan', prob: probBtts, odds: bttsYesOdds, isBtts: true }] : []),
+      // Ambos Marcan estimado (solo si hay señal fuerte de goles)
+      ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
     ].filter(c => c.prob > 0);
 
-    // Ordenar por probabilidad desc; en empate, dar prioridad a totales/btts (más cuota real)
+    // Ordenar por probabilidad desc; en empate, dar prioridad a totales (cuota real externa)
     candidates2.sort((a, b) => {
       if (b.prob !== a.prob) return b.prob - a.prob;
-      if (a.isTotals || a.isBtts) return -1;
-      if (b.isTotals || b.isBtts) return 1;
+      if (a.isTotals) return -1;
+      if (b.isTotals) return 1;
       return 0;
     });
 
@@ -4041,7 +4036,7 @@ function buildPredsFromOdds() {
     else if (rec === 'Empate')
       insight = `Partido muy equilibrado — el mercado da ${probH}% local, ${probD}% empate, ${probA}% visitante. El empate ofrece la cuota más atractiva${fmtO(dO ?? dOP)}. Partido difícil de predecir; stake bajo recomendado.`;
     else if (rec === 'Ambos Marcan')
-      insight = `El mercado asigna ${probBtts}% de probabilidad a que ambos equipos conviertan${fmtO(bttsYesOdds)}. Tanto ${hN} como ${aN} muestran tendencia anotadora. Apuesta de goles con cuota atractiva.`;
+      insight = `Estimación: ${bttsEst}% de probabilidad de que ambos equipos conviertan${fmtO(bttsOddsEst)}. El mercado de goles refleja un partido abierto — ${hN} (${probH}%) vs ${aN} (${probA}%). Buena apuesta de goles de doble vía.`;
     else {
       // Más de X.5
       const line = best.line;
