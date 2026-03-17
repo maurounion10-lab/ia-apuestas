@@ -7222,19 +7222,13 @@ function aiAddMsg(role, text, withTime = true) {
   }
   wrap.appendChild(div);
   if (role === 'bot') {
-    // Scroll al mensaje del usuario que hizo la pregunta (el anterior al bot)
-    // así el visitante ve: su pregunta + la respuesta desde el principio
+    // Scroll a la pregunta del usuario → la ve primero, luego la respuesta
     requestAnimationFrame(() => {
-      const msgs = wrap.querySelectorAll('.ai-msg.user');
-      const lastUser = msgs.length ? msgs[msgs.length - 1] : null;
-      if (lastUser) {
-        wrap.scrollTop = lastUser.offsetTop - 8;
-      } else {
-        wrap.scrollTop = div.offsetTop - 8;
-      }
+      const userMsgs = wrap.querySelectorAll('.ai-msg.user');
+      const lastQ = userMsgs.length ? userMsgs[userMsgs.length - 1] : div;
+      wrap.scrollTop = lastQ.offsetTop - 8;
     });
   } else {
-    // Mensaje del usuario: scroll al fondo para ver el indicador de escritura
     wrap.scrollTop = wrap.scrollHeight;
   }
   return div;
