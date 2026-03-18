@@ -1693,6 +1693,65 @@
   .bk-lock-secondary:hover { color: var(--verde); }
 
   /* ── MI PANEL (logged-in users) ── */
+  /* ── ONBOARDING OVERLAY ── */
+  .ob-overlay {
+    display: none;
+    position: fixed; inset: 0; z-index: 100000;
+    background: rgba(0,0,0,0.97);
+    backdrop-filter: blur(18px);
+    align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .ob-box {
+    background: #0d1a0d;
+    border: 1px solid rgba(0,200,83,0.25);
+    border-radius: 24px;
+    padding: 34px 28px;
+    width: 100%; max-width: 420px;
+    box-shadow: 0 0 80px rgba(0,200,83,0.1);
+    text-align: center;
+  }
+  .ob-logo { font-size:2.2rem; margin-bottom:6px; }
+  .ob-title { font-size:1.25rem; font-weight:900; color:#fff; margin-bottom:8px; letter-spacing:-0.3px; }
+  .ob-sub { font-size:0.82rem; color:rgba(255,255,255,0.45); margin-bottom:22px; line-height:1.5; }
+  .ob-input {
+    width: 100%; box-sizing: border-box;
+    background: rgba(255,255,255,0.05);
+    border: 1.5px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    color: #fff; font-size: 1.05rem; font-weight: 600;
+    padding: 13px 16px; outline: none;
+    font-family: inherit; transition: border-color 0.2s;
+    text-align: center; letter-spacing: 0.5px;
+  }
+  .ob-input:focus { border-color: var(--verde); }
+  .ob-input::placeholder { color: rgba(255,255,255,0.25); font-weight:400; }
+  .ob-err { font-size:0.77rem; color:#ff6b6b; min-height:18px; margin:6px 0 10px; }
+  .ob-btn {
+    width: 100%; padding: 14px;
+    background: var(--verde); color: #000;
+    font-size: 0.95rem; font-weight: 800;
+    border: none; border-radius: 14px; cursor: pointer;
+    font-family: inherit; transition: opacity 0.2s, transform 0.1s;
+    margin-top: 6px;
+  }
+  .ob-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .ob-btn:disabled { opacity: 0.35; cursor: not-allowed; transform: none; }
+  /* Clubs grid */
+  .ob-clubs { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:6px 0 22px; }
+  .ob-club-card {
+    background: rgba(255,255,255,0.04);
+    border: 2px solid rgba(255,255,255,0.09);
+    border-radius: 16px; padding: 16px 10px 12px;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+  }
+  .ob-club-card:hover { border-color: rgba(255,255,255,0.25); background:rgba(255,255,255,0.07); }
+  .ob-club-card.selected { border-color: var(--verde); background:rgba(0,200,83,0.1); box-shadow:0 0 20px rgba(0,200,83,0.2); }
+  .ob-club-card img { width:56px; height:56px; object-fit:contain; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
+  .ob-club-name { font-size:0.72rem; font-weight:700; color:rgba(255,255,255,0.7); text-align:center; line-height:1.3; }
+  .ob-club-card.selected .ob-club-name { color:#fff; }
+
   .mipanel-tabs { display:flex; gap:6px; margin-bottom:20px; flex-wrap:wrap; }
   .mipanel-tab { padding:8px 18px; border-radius:20px; border:1px solid var(--borde); background:transparent; color:var(--texto-sec); font-size:0.84rem; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.2s; }
   .mipanel-tab.active { background:rgba(0,200,83,0.15); border-color:var(--verde); color:var(--verde); }
@@ -2362,9 +2421,13 @@
     </button>
     <div class="user-dropdown" id="userDropdown">
       <div class="user-dd-header">
-        <div class="user-dd-name" id="ddName">—</div>
-        <div class="user-dd-email" id="ddEmail">—</div>
-        <div class="user-dd-plan">⭐ PRO · 7 días gratis</div>
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
+          <div id="ddAvatarBadge" style="display:none;width:30px;height:30px;flex-shrink:0"></div>
+          <div>
+            <div class="user-dd-name" id="ddName">—</div>
+            <div class="user-dd-email" id="ddEmail">—</div>
+          </div>
+        </div>
       </div>
       <button class="user-dd-item" onclick="navTo('predictions');closeUserMenu()">🔮 Mis pronósticos</button>
       <button class="user-dd-item" onclick="navTo('historial');closeUserMenu()">📋 Mi historial</button>
@@ -3107,6 +3170,8 @@ async function acSyncToDB() {
     history:     JSON.parse(localStorage.getItem(AC_HIST) || '[]'),
     last_daily:  localStorage.getItem(AC_DAY) || null,
     predictions: predsSlim,   // ← historial de pronósticos para stats globales
+    nickname:    localStorage.getItem(GB_NICK) || null,
+    avatar:      localStorage.getItem(GB_AVA)  || null,
     updated_at:  new Date().toISOString()
   };
   const { error } = await sbClient
@@ -3166,6 +3231,10 @@ async function acLoadFromDB(email) {
     localStorage.setItem(AC_HIST, JSON.stringify(mergedHist));
     localStorage.setItem(AC_PICK, JSON.stringify(mergedPick));
     if (mergedDay) localStorage.setItem(AC_DAY, mergedDay);
+
+    // Nickname / avatar: DB wins only if local is empty (so we don't lose onboarding done offline)
+    if (data.nickname && !localStorage.getItem(GB_NICK)) localStorage.setItem(GB_NICK, data.nickname);
+    if (data.avatar   && !localStorage.getItem(GB_AVA))  localStorage.setItem(GB_AVA,  data.avatar);
 
     // If local state was richer than DB, push the merged data back up
     if (mergedBal > dbBal || mergedHist.length > dbHist.length || mergedPick.length > dbPick.length) {
@@ -7461,6 +7530,7 @@ function updateNavAuth() {
   setTimeout(drawBankrollChart, 80);
   renderBetsList();
   renderMyPanel();
+  applyUserProfile(); // apodo + escudo si ya completó el onboarding
 }
 
 function toggleUserMenu() {
@@ -7501,6 +7571,7 @@ sbClient.auth.onAuthStateChange(async (event, session) => {
     await acLoadFromDB(u.email);
     await sbLoadHistorial();
     closeAuth();
+    checkOnboarding();
   } else if (event === 'SIGNED_OUT') {
     // Solo limpiar UI si había sesión previa
     if (authUser) {
@@ -8180,6 +8251,34 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
   </div>
 </div>
 
+<!-- ONBOARDING — primera vez que el usuario inicia sesión -->
+<div class="ob-overlay" id="onboardingOverlay">
+  <div class="ob-box">
+
+    <!-- Paso 1: Apodo -->
+    <div id="obStep1">
+      <div class="ob-logo">🎰</div>
+      <div class="ob-title">¿Cómo querés que te llamemos?</div>
+      <div class="ob-sub">Elegí un apodo para aparecer<br>en la comunidad gambeta.ai</div>
+      <input class="ob-input" id="obNickInput" type="text" maxlength="20" placeholder="Tu apodo..."
+        onkeydown="if(event.key==='Enter')obNext()"
+        oninput="document.getElementById('obNickErr').textContent=''">
+      <div class="ob-err" id="obNickErr"></div>
+      <button class="ob-btn" onclick="obNext()">Continuar →</button>
+    </div>
+
+    <!-- Paso 2: Escudo -->
+    <div id="obStep2" style="display:none">
+      <div class="ob-logo">🛡️</div>
+      <div class="ob-title">Elegí tu escudo</div>
+      <div class="ob-sub">Será tu avatar en gambeta.ai</div>
+      <div class="ob-clubs" id="obClubsGrid"></div>
+      <button class="ob-btn" id="obFinishBtn" onclick="obFinish()" disabled>Elegir este escudo ⚽</button>
+    </div>
+
+  </div>
+</div>
+
 <!-- PANEL ADMIN — acceso: triple clic en logo o Ctrl+Shift+A -->
 <!-- ═══════════════════════════════════════════════ -->
 <div id="adminPanel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9000;backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px">
@@ -8456,6 +8555,176 @@ function openAdmin() {
 }
 function closeAdmin() {
   document.getElementById('adminPanel').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════
+//  ONBOARDING — Primera vez en la cuenta
+// ══════════════════════════════════════════════
+const GB_NICK = 'gambeta_nickname';
+const GB_AVA  = 'gambeta_avatar';
+
+// ── Pool generado dinámicamente desde teamLogos ──────────────
+// Se construye en tiempo de ejecución: deduplica por URL (1 entrada por logo único)
+// y asigna un color de acento consistente por nombre de equipo.
+const _OB_COLOR_PALETTE = [
+  '#e10600','#003f8f','#c8aa6e','#00529b','#dc052d','#6cabdd',
+  '#f7941d','#a50044','#00944a','#ffd600','#9c27b0','#00acc1',
+  '#ff7043','#43a047','#1565c0','#6d4c41','#546e7a','#e91e63'
+];
+function _obColorFromName(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = Math.imul(31, h) + name.charCodeAt(i) | 0;
+  return _OB_COLOR_PALETTE[Math.abs(h) % _OB_COLOR_PALETTE.length];
+}
+function _buildObPool() {
+  const seen = new Set();
+  const pool = [];
+  for (const [name, url] of Object.entries(teamLogos)) {
+    if (seen.has(url)) continue; // mismo logo bajo nombre alternativo → skip
+    seen.add(url);
+    pool.push({
+      id:    name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+      name,
+      logo:  url,
+      color: _obColorFromName(name)
+    });
+  }
+  return pool;
+}
+
+let _obSelectedClub  = null;
+let _obCurrentClubs  = [];   // los 3 clubs sorteados para esta sesión
+
+// Sorteo ponderado: los menos elegidos tienen más peso
+function _obWeightedSample(items, n) {
+  const result = [], pool = [...items];
+  for (let i = 0; i < n && pool.length; i++) {
+    const total = pool.reduce((s, c) => s + c._w, 0);
+    let r = Math.random() * total;
+    let idx = 0;
+    for (; idx < pool.length - 1; idx++) { r -= pool[idx]._w; if (r <= 0) break; }
+    result.push(pool[idx]);
+    pool.splice(idx, 1);
+  }
+  return result;
+}
+
+// Consulta Supabase, cuenta cuántos usuarios usan cada club y sortea 3 con peso inverso
+async function _obPickClubs() {
+  const pool = _buildObPool(); // todos los equipos cargados en la página
+
+  // Contar uso de cada logo en la DB (comparamos por URL, que es la clave única real)
+  const countsByUrl = {};
+  try {
+    const { data } = await sbClient
+      .from('acoin_users')
+      .select('avatar')
+      .not('avatar', 'is', null);
+    (data || []).forEach(row => {
+      try {
+        const a = JSON.parse(row.avatar);
+        if (a?.logo) countsByUrl[a.logo] = (countsByUrl[a.logo] || 0) + 1;
+      } catch(_) {}
+    });
+  } catch(_) { /* sin conexión → todos pesan igual */ }
+
+  const maxCount = Math.max(...Object.values(countsByUrl), 1);
+  const weighted = pool.map(c => ({
+    ...c,
+    _w: maxCount - (countsByUrl[c.logo] || 0) + 1  // +1 para que nadie tenga peso 0
+  }));
+  return _obWeightedSample(weighted, 3);
+}
+
+async function checkOnboarding() {
+  if (!authUser) return;
+  if (localStorage.getItem(GB_NICK)) return;
+  // Bloquear página
+  const overlay = document.getElementById('onboardingOverlay');
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+  setTimeout(() => { const inp = document.getElementById('obNickInput'); if (inp) inp.focus(); }, 250);
+  // Pre-cargar los 3 clubs en paralelo (step 2 los usará cuando llegue)
+  _obCurrentClubs = await _obPickClubs();
+}
+
+async function obNext() {
+  const inp  = document.getElementById('obNickInput');
+  const nick = (inp.value || '').trim();
+  const err  = document.getElementById('obNickErr');
+  if (nick.length < 2) { err.textContent = '⚠ Mínimo 2 caracteres'; inp.focus(); return; }
+  if (nick.length > 20) { err.textContent = '⚠ Máximo 20 caracteres'; inp.focus(); return; }
+  localStorage.setItem(GB_NICK, nick);
+  // Si por alguna razón los clubs aún no cargaron (red lenta), esperamos
+  if (!_obCurrentClubs.length) _obCurrentClubs = await _obPickClubs();
+  document.getElementById('obStep1').style.display = 'none';
+  document.getElementById('obStep2').style.display = 'block';
+  _obSelectedClub = null;
+  renderObClubs();
+}
+
+function renderObClubs() {
+  const grid = document.getElementById('obClubsGrid');
+  const fallback = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>`;
+  grid.innerHTML = _obCurrentClubs.map(c => `
+    <div class="ob-club-card" onclick="obSelectClub('${c.id}')" id="obClub_${c.id}">
+      <img src="${c.logo}" alt="${c.name}"
+           onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='${fallback}';this.style.opacity='0.5';}">
+      <div class="ob-club-name">${c.name}</div>
+    </div>
+  `).join('');
+}
+
+function obSelectClub(id) {
+  _obSelectedClub = id;
+  document.querySelectorAll('.ob-club-card').forEach(el => el.classList.remove('selected'));
+  const card = document.getElementById('obClub_' + id);
+  if (card) card.classList.add('selected');
+  const btn = document.getElementById('obFinishBtn');
+  if (btn) btn.disabled = false;
+}
+
+function obFinish() {
+  if (!_obSelectedClub) return;
+  const club = _obCurrentClubs.find(c => c.id === _obSelectedClub);
+  if (!club) return;
+  localStorage.setItem(GB_AVA, JSON.stringify({ id: club.id, logo: club.logo, name: club.name, color: club.color }));
+  document.getElementById('onboardingOverlay').style.display = 'none';
+  document.body.style.overflow = '';
+  applyUserProfile();
+  acScheduleSync();
+}
+
+function applyUserProfile() {
+  const nick   = localStorage.getItem(GB_NICK);
+  const avaRaw = localStorage.getItem(GB_AVA);
+  const ava    = avaRaw ? (() => { try { return JSON.parse(avaRaw); } catch(_) { return null; } })() : null;
+  if (nick) {
+    const navName = document.getElementById('navUserName');
+    if (navName) navName.textContent = nick;
+    const ddName = document.getElementById('ddName');
+    if (ddName) ddName.textContent = nick;
+    const miEl = document.getElementById('mipanelUser');
+    if (miEl) miEl.textContent = '— ' + nick;
+  }
+  if (ava) {
+    const avatarEl = document.getElementById('navUserAvatar');
+    if (avatarEl) {
+      avatarEl.innerHTML = `<img src="${ava.logo}" alt="${ava.name}"
+        style="width:100%;height:100%;object-fit:contain;border-radius:50%;padding:2px"
+        onerror="this.parentElement.textContent='${(nick||'?')[0].toUpperCase()}'">`;
+      avatarEl.style.background = 'rgba(0,0,0,0.5)';
+      avatarEl.style.border = `2px solid ${ava.color}66`;
+    }
+    // Badge en el dropdown
+    const badge = document.getElementById('ddAvatarBadge');
+    if (badge) {
+      badge.style.display = 'block';
+      badge.innerHTML = `<img src="${ava.logo}" alt="${ava.name}"
+        style="width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.6))"
+        onerror="this.style.display='none'">`;
+    }
+  }
 }
 
 function admTab(name, btn) {
