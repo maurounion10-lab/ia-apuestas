@@ -2437,6 +2437,7 @@
         <tbody id="histTableBody"></tbody>
       </table>
     </div>
+    <div id="histPagNav" style="display:none;align-items:center;justify-content:center;gap:10px;margin-top:14px;flex-wrap:wrap"></div>
   </section>
 
   <!-- BANKROLL MANAGER -->
@@ -5468,6 +5469,8 @@ function closeMobileNav() {
 const HIST_KEY   = 'apuestas_historial_v1';
 const HIST_STAKE = 100; // stake fijo por predicción
 let histFilter = 'all';
+const HIST_PAGE_SIZE = 10;
+let histPage = 0;
 let histDateFilter = 'all';
 // Fecha de lanzamiento del sitio — fija para todos los usuarios
 const PAGE_LAUNCH_DATE = new Date('2025-03-01');
@@ -5809,8 +5812,15 @@ function renderHistorial(filter) {
   const rMap = { win:'<span class="result-win">✅ WIN</span>', loss:'<span class="result-loss">❌ LOSS</span>', void:'<span class="result-void">⚪ VOID</span>', pending:'<span class="result-pending">🟡 PEND</span>' };
 
   const todayStr = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
+
+  // Paginación
+  const totalPages = Math.max(1, Math.ceil(data.length / HIST_PAGE_SIZE));
+  if (histPage >= totalPages) histPage = totalPages - 1;
+  if (histPage < 0) histPage = 0;
+  const pageData = data.slice(histPage * HIST_PAGE_SIZE, (histPage + 1) * HIST_PAGE_SIZE);
+
   document.getElementById('histTableBody').innerHTML = data.length
-    ? data.map(h => {
+    ? pageData.map(h => {
         const plHtml = h.result==='pending'||h.result==='void'
           ? '<span style="color:#555">—</span>'
           : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
@@ -5827,13 +5837,50 @@ function renderHistorial(filter) {
         const mKey = encodeURIComponent(h.home + '|||' + h.away);
         const mScore = encodeURIComponent(h.finalScore || '');
         const _admOk = (() => { try { const s = JSON.parse(sessionStorage.getItem(ADMIN_SESSION)||'null'); return !!(s && s.exp > Date.now()); } catch { return false; } })();
-        // Admin: TODAS las entradas muestran ✏ para editar resultado + marcador
         const resultCell = _admOk
           ? `<span style="display:inline-flex;align-items:center;gap:3px">${rMap[h.result]||rMap.void}<span class="result-editable" style="cursor:pointer;font-size:0.6rem;opacity:0.45;margin-left:2px" title="Editar resultado y marcador" onclick="showResultPicker(this,'${mKey}','${h.result}','${mScore}')">✏</span></span>`
           : (rMap[h.result] || rMap.void);
         return `<tr class="${rowClass}" style="${rowStyle}"><td>${rowIcon} <strong>${h.home}</strong> vs ${h.away}</td><td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
       }).join('')
-    : `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--texto-sec)">📋 El historial se llenará automáticamente con las pronósticos de cada día.</td></tr>`;
+    : `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--texto-sec)">📋 El historial se llenará automáticamente con los pronósticos de cada día.</td></tr>`;
+
+  // Barra de navegación de páginas
+  const navEl = document.getElementById('histPagNav');
+  if (totalPages <= 1) {
+    navEl.style.display = 'none';
+  } else {
+    navEl.style.display = 'flex';
+    const btnStyle = (active) => `cursor:pointer;padding:6px 13px;border-radius:8px;font-size:0.78rem;font-weight:700;border:1px solid ${active?'var(--verde)':'rgba(0,200,83,0.25)'};background:${active?'rgba(0,200,83,0.18)':'transparent'};color:${active?'var(--verde)':'var(--texto-sec)'};transition:background .15s`;
+    const disabledStyle = `cursor:default;padding:6px 13px;border-radius:8px;font-size:0.78rem;font-weight:700;border:1px solid rgba(255,255,255,0.08);background:transparent;color:rgba(255,255,255,0.2)`;
+    let html = '';
+    // Botón anterior
+    html += histPage > 0
+      ? `<button style="${btnStyle(false)}" onclick="histNavTo(${histPage-1})">‹ Anterior</button>`
+      : `<button style="${disabledStyle}" disabled>‹ Anterior</button>`;
+    // Números de página (máx 5 visibles)
+    const halfWin = 2;
+    let start = Math.max(0, histPage - halfWin);
+    let end   = Math.min(totalPages - 1, histPage + halfWin);
+    if (end - start < 4) { start = Math.max(0, end - 4); }
+    if (start > 0) html += `<span style="color:var(--texto-sec);font-size:0.75rem;padding:0 2px">…</span>`;
+    for (let i = start; i <= end; i++) {
+      html += `<button style="${btnStyle(i===histPage)}" onclick="histNavTo(${i})">${i+1}</button>`;
+    }
+    if (end < totalPages - 1) html += `<span style="color:var(--texto-sec);font-size:0.75rem;padding:0 2px">…</span>`;
+    // Botón siguiente
+    html += histPage < totalPages - 1
+      ? `<button style="${btnStyle(false)}" onclick="histNavTo(${histPage+1})">Siguiente ›</button>`
+      : `<button style="${disabledStyle}" disabled>Siguiente ›</button>`;
+    // Info de página
+    html += `<span style="font-size:0.72rem;color:var(--texto-sec);margin-left:4px">${histPage*HIST_PAGE_SIZE+1}–${Math.min((histPage+1)*HIST_PAGE_SIZE,data.length)} de ${data.length}</span>`;
+    navEl.innerHTML = html;
+  }
+}
+
+function histNavTo(page) {
+  histPage = page;
+  renderHistorial(histFilter);
+  document.getElementById('historial')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 /* ── Corrección manual de resultado + marcador desde la tabla (solo admin) ── */
@@ -5894,14 +5941,13 @@ function filterHist(f,btn) {
   // Restaurar el activo del filtro de fecha
   const dateActive = histDateFilter==='today' ? 'histDateBtnHoy' : histDateFilter==='week' ? 'histDateBtnWeek' : 'histDateBtnAll';
   document.getElementById(dateActive)?.classList.add('active');
-  btn.classList.add('active'); histFilter=f; renderHistorial(f);
+  btn.classList.add('active'); histFilter=f; histPage=0; renderHistorial(f);
 }
 
 function filterHistDate(f, btn) {
-  // Solo desactivar los botones de fecha (los 3 últimos), no los de deporte
   ['histDateBtnHoy','histDateBtnWeek','histDateBtnAll'].forEach(id => document.getElementById(id)?.classList.remove('active'));
   btn.classList.add('active');
-  histDateFilter = f;
+  histDateFilter = f; histPage=0;
   renderHistorial(histFilter);
 }
 
