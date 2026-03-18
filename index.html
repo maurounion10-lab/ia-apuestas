@@ -2430,15 +2430,6 @@
   <section id="historial">
     <div class="section-title"><div class="icon">📋</div>Resultados de Pronósticos</div>
     <div class="hist-summary" id="histSummary"></div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;align-items:center">
-      <button class="sport-tab active" onclick="filterHist('all',this)">🌍 Todos</button>
-      <button class="sport-tab" onclick="filterHist('futbol',this)">⚽ Fútbol</button>
-      <button class="sport-tab" onclick="filterHist('basket',this)">🏀 Básquet</button>
-      <div style="width:1px;background:var(--borde);margin:0 4px;align-self:stretch"></div>
-      <button class="sport-tab" id="histDateBtnHoy"    onclick="filterHistDate('today',this)" style="font-size:0.72rem">Hoy</button>
-      <button class="sport-tab" id="histDateBtnWeek"   onclick="filterHistDate('week',this)"  style="font-size:0.72rem">7 días</button>
-      <button class="sport-tab active" id="histDateBtnAll" onclick="filterHistDate('all',this)"   style="font-size:0.72rem">Todo</button>
-    </div>
 
     <div class="hist-table-wrap">
       <table class="hist-table">
