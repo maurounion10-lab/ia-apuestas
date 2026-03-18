@@ -4732,6 +4732,7 @@ let currentScoreFilter = 'all';
 
 function renderScores(filter) {
   const grid = document.getElementById('scoresGrid');
+  if (!grid) return;
   // Rugby, UFC y Tenis siempre muestran el banner de Telegram (nunca partidos)
   const BANNER_ONLY = new Set(['rugby', 'ufc', 'tenis']);
   // Rugby y UFC tampoco aparecen en "Todos"
