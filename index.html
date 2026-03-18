@@ -5476,7 +5476,54 @@ let histDateFilter = 'all';
 const PAGE_LAUNCH_DATE = new Date('2025-03-01');
 
 function loadHistorial()   { try { return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch { return []; } }
-function saveHistorial(arr){ try { localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(-200))); } catch {} }
+function saveHistorial(arr) {
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(-200))); } catch {}
+  // Sync a Supabase en background (debounced 1.5s)
+  if (authUser?.email) {
+    clearTimeout(_histSyncTimer);
+    _histSyncTimer = setTimeout(() => sbSaveHistorial(arr), 1500);
+  }
+}
+
+// ── Sync historial ↔ Supabase ──
+let _histSyncTimer = null;
+
+async function sbSaveHistorial(arr) {
+  if (!authUser?.email) return;
+  try {
+    const { error } = await sbClient
+      .from('acoin_users')
+      .upsert({ email: authUser.email, historial_full: arr.slice(-200), updated_at: new Date().toISOString() },
+               { onConflict: 'email' });
+    if (error) console.warn('[histSave]', error.message);
+  } catch(e) { console.warn('[histSave]', e.message); }
+}
+
+async function sbLoadHistorial() {
+  if (!authUser?.email) return;
+  try {
+    const { data, error } = await sbClient
+      .from('acoin_users')
+      .select('historial_full')
+      .eq('email', authUser.email)
+      .maybeSingle();
+    if (error) { console.warn('[histLoad]', error.message); return; }
+    const dbHist = data?.historial_full;
+    if (!Array.isArray(dbHist) || dbHist.length === 0) {
+      // Usuario nuevo: subir historial local si tiene datos
+      const local = loadHistorial();
+      if (local.length > 0) await sbSaveHistorial(local);
+      return;
+    }
+    // Merge: DB es la fuente de verdad; agregar picks locales que no estén en DB
+    const localHist = loadHistorial();
+    const dbKeys   = new Set(dbHist.map(h => h.home + '|||' + h.away));
+    const localOnly = localHist.filter(h => !dbKeys.has(h.home + '|||' + h.away));
+    const merged   = [...dbHist, ...localOnly].slice(-200);
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
+    renderHistorial(histFilter);
+  } catch(e) { console.warn('[histLoad]', e.message); }
+}
 
 // Migración: recalcula stake y P/L de entradas antiguas según odds almacenadas
 function migrateHistStakes() {
@@ -7098,6 +7145,7 @@ document.addEventListener('visibilitychange', () => {
 // ═══════════════════════════════════════════════
 let authUser = null;
 let pendingSocial = null;
+let authIsLogin = false; // false = registrar, true = iniciar sesión
 
 const socialMeta = {
   google:   { label:'Google',   icon:`<svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>` },
@@ -7106,6 +7154,18 @@ const socialMeta = {
   apple:    { label:'Apple',    icon:`<svg width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#111"/><path fill="#fff" d="M17.04 17.33c-.36.82-.79 1.58-1.4 2.16-.82.8-1.7.75-2.55.34-.9-.43-1.72-.44-2.66 0-.97.45-1.84.47-2.65-.37C5.13 16.9 4.3 13.6 5.4 10.72c.72-1.88 2.1-2.97 3.52-2.99 1 .02 1.83.58 2.52.58.69 0 1.98-.72 3.33-.61.57.02 2.15.2 3.17 1.57-.08.05-1.9 1.09-1.88 3.25.02 2.58 2.28 3.44 2.3 3.45-.02.08-.37 1.21-1.32 2.36zM13.87 3.5c-.02 1.85-1.39 3.23-3.15 3.11C10.5 4.84 11.94 3.39 13.87 3.5z"/></svg>` },
   email:    { label:'Email',    icon:`📧` }
 };
+
+// ── Traducciones de errores de Supabase ──
+function sbTranslateError(msg) {
+  if (!msg) return 'Error desconocido.';
+  if (msg.includes('Invalid login credentials'))   return 'Email o contraseña incorrectos.';
+  if (msg.includes('Email not confirmed'))          return 'Confirmá tu email antes de iniciar sesión.';
+  if (msg.includes('User already registered'))      return 'Este email ya está registrado. Usá "Iniciá sesión".';
+  if (msg.includes('Password should be at least'))  return 'La contraseña debe tener al menos 6 caracteres.';
+  if (msg.includes('rate limit'))                   return 'Demasiados intentos. Esperá unos minutos.';
+  if (msg.includes('network'))                      return 'Sin conexión. Revisá tu internet.';
+  return msg;
+}
 
 function openAuth() {
   document.getElementById('authOverlay').classList.add('open');
@@ -7124,20 +7184,42 @@ function showAuthStep(n) {
   document.getElementById('authStep' + n).classList.add('active');
 }
 
-function selectSocial(provider) {
-  pendingSocial = provider;
-  const meta = socialMeta[provider];
-  // Pre-fill email if typed in direct field
-  const direct = document.getElementById('directEmail').value.trim();
-  if (provider === 'email' && direct) {
-    document.getElementById('leadEmail').value = direct;
-  } else {
-    document.getElementById('leadEmail').value = '';
+function toggleAuthMode() {
+  authIsLogin = !authIsLogin;
+  document.getElementById('authStep2Title').textContent   = authIsLogin ? 'Iniciá sesión' : 'Crear cuenta';
+  document.getElementById('authStep2Sub').textContent     = authIsLogin ? 'Ingresá tu email y contraseña.' : 'Ingresá tu email y elegí una contraseña.';
+  document.getElementById('authSubmitBtn').textContent    = authIsLogin ? 'Iniciar sesión →' : '✓ Crear mi cuenta gratis';
+  document.getElementById('authModeText').textContent     = authIsLogin ? '¿No tenés cuenta?' : '¿Ya tenés cuenta?';
+  document.getElementById('authModeLink').textContent     = authIsLogin ? 'Registrate gratis' : 'Iniciá sesión';
+  document.getElementById('marketingRow').style.display  = authIsLogin ? 'none' : '';
+  document.getElementById('emailError').textContent = '';
+}
+
+async function selectSocial(provider) {
+  // Google: OAuth real → redirect a Supabase
+  if (provider === 'google') {
+    await sbClient.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: window.location.href.split('?')[0] }
+    });
+    return;
   }
-  // Social chip
-  const iconHtml = typeof meta.icon === 'string' && meta.icon.startsWith('<')
-    ? meta.icon : `<span style="font-size:1.1rem">${meta.icon}</span>`;
-  document.getElementById('socialChip').innerHTML = `${iconHtml} Conectando con ${meta.label}`;
+  // Email: ir al step 2 con email + contraseña
+  pendingSocial = provider;
+  authIsLogin = false;
+  const direct = document.getElementById('directEmail').value.trim();
+  document.getElementById('leadEmail').value    = (provider === 'email' && direct) ? direct : '';
+  document.getElementById('leadPassword').value = '';
+  // Resetear a modo registro
+  document.getElementById('authStep2Title').textContent  = 'Crear cuenta';
+  document.getElementById('authStep2Sub').textContent    = 'Ingresá tu email y elegí una contraseña.';
+  document.getElementById('authSubmitBtn').textContent   = '✓ Crear mi cuenta gratis';
+  document.getElementById('authModeText').textContent    = '¿Ya tenés cuenta?';
+  document.getElementById('authModeLink').textContent    = 'Iniciá sesión';
+  document.getElementById('marketingRow').style.display  = '';
+  const meta = socialMeta[provider];
+  const iconHtml = typeof meta.icon === 'string' && meta.icon.startsWith('<') ? meta.icon : `<span style="font-size:1.1rem">${meta.icon}</span>`;
+  document.getElementById('socialChip').innerHTML = `${iconHtml} Registrándose con ${meta.label}`;
   document.getElementById('emailError').textContent = '';
   showAuthStep(2);
   setTimeout(() => document.getElementById('leadEmail').focus(), 100);
@@ -7145,30 +7227,47 @@ function selectSocial(provider) {
 
 function authGoBack() {
   pendingSocial = null;
+  authIsLogin = false;
   showAuthStep(1);
 }
 
-function completeAuth() {
-  const email = document.getElementById('leadEmail').value.trim();
-  const errEl = document.getElementById('emailError');
+async function completeAuth() {
+  const email    = document.getElementById('leadEmail').value.trim();
+  const password = document.getElementById('leadPassword').value;
+  const errEl    = document.getElementById('emailError');
+
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     errEl.textContent = '⚠ Ingresá un email válido para continuar.';
-    document.getElementById('leadEmail').focus();
-    return;
+    document.getElementById('leadEmail').focus(); return;
+  }
+  if (password.length < 6) {
+    errEl.textContent = '⚠ La contraseña debe tener al menos 6 caracteres.';
+    document.getElementById('leadPassword').focus(); return;
   }
   errEl.textContent = '';
-  // Build user object
-  const provider = pendingSocial || 'email';
-  const namePart = email.split('@')[0].replace(/[._-]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-  authUser = { name: namePart, email, provider, joined: new Date().toLocaleDateString('es') };
-  // Welcome message
-  document.getElementById('welcomeMsg').textContent = `Hola ${authUser.name.split(' ')[0]}, tu cuenta está lista 🎉`;
-  showAuthStep(3);
-  // Update nav after brief delay
-  setTimeout(updateNavAuth, 600);
-  // Load $A-Coin data from Supabase (creates record if new user)
-  acLoadFromDB(email);
-  console.log('[Lead capturado]', authUser);
+
+  const btn = document.getElementById('authSubmitBtn');
+  const origText = btn.textContent;
+  btn.textContent = '⏳ Procesando...'; btn.disabled = true;
+
+  try {
+    const result = authIsLogin
+      ? await sbClient.auth.signInWithPassword({ email, password })
+      : await sbClient.auth.signUp({ email, password });
+
+    if (result.error) {
+      errEl.textContent = '⚠ ' + sbTranslateError(result.error.message);
+    } else if (!authIsLogin && !result.data?.session) {
+      // Supabase pidió confirmación por email
+      document.getElementById('welcomeMsg').textContent = `Revisá tu bandeja de entrada (${email}) y confirmá tu cuenta para activarla. ✉️`;
+      showAuthStep(3);
+    }
+    // Si hay sesión, onAuthStateChange lo maneja automáticamente
+  } catch(e) {
+    errEl.textContent = '⚠ Error de conexión. Intentá de nuevo.';
+  } finally {
+    btn.textContent = origText; btn.disabled = false;
+  }
 }
 
 function updateNavAuth() {
@@ -7202,12 +7301,12 @@ function closeUserMenu() {
   document.getElementById('userDropdown').classList.remove('open');
 }
 function logoutUser() {
+  sbClient.auth.signOut(); // cierra sesión en Supabase
   authUser = null;
   pendingSocial = null;
   document.getElementById('navUserWrap').classList.remove('visible');
   document.getElementById('navAuthBtn').style.display = '';
   closeUserMenu();
-  // Hide Mi Panel, re-lock bankroll
   document.getElementById('mipanel').style.display = 'none';
   const lockOverlay = document.getElementById('bkLockOverlay');
   if (lockOverlay) lockOverlay.style.display = '';
@@ -7216,6 +7315,41 @@ function logoutUser() {
   const drawerAuthRow = document.getElementById('drawerAuthRow');
   if (drawerAuthRow) drawerAuthRow.style.display = '';
 }
+
+// ── Escucha cambios de sesión Supabase (login/logout/refresh de token) ──
+sbClient.auth.onAuthStateChange(async (event, session) => {
+  if ((event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED') && session?.user) {
+    const u = session.user;
+    const rawName = u.user_metadata?.full_name || u.user_metadata?.name || u.email.split('@')[0];
+    const name = rawName.replace(/[._-]/g,' ').replace(/\b\w/g, c => c.toUpperCase());
+    authUser = {
+      name,
+      email:    u.email,
+      provider: u.app_metadata?.provider || 'email',
+      joined:   new Date(u.created_at).toLocaleDateString('es')
+    };
+    updateNavAuth();
+    await acLoadFromDB(u.email);
+    await sbLoadHistorial();
+    closeAuth();
+  } else if (event === 'SIGNED_OUT') {
+    // Solo limpiar UI si había sesión previa
+    if (authUser) {
+      authUser = null;
+      pendingSocial = null;
+      document.getElementById('navUserWrap').classList.remove('visible');
+      document.getElementById('navAuthBtn').style.display = '';
+      closeUserMenu();
+      document.getElementById('mipanel').style.display = 'none';
+      const lo = document.getElementById('bkLockOverlay');
+      if (lo) lo.style.display = '';
+      const dl = document.getElementById('drawerPanelLink');
+      if (dl) dl.style.display = 'none';
+      const da = document.getElementById('drawerAuthRow');
+      if (da) da.style.display = '';
+    }
+  }
+});
 // Close dropdown on outside click
 document.addEventListener('click', e => {
   const wrap = document.getElementById('navUserWrap');
@@ -7747,19 +7881,24 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
       <div class="auth-legal">Al registrarte aceptás los <a href="#">Términos y Condiciones</a> y la <a href="#">Política de Privacidad</a>.</div>
     </div>
 
-    <!-- STEP 2: Email capture -->
+    <!-- STEP 2: Email + Password -->
     <div class="auth-step" id="authStep2">
       <button class="auth-back" onclick="authGoBack()">← Volver</button>
       <div id="socialChip" class="auth-social-chip"></div>
-      <div class="auth-title" style="text-align:left">Confirmá tu email</div>
-      <div class="auth-subtitle" style="text-align:left;margin-bottom:16px">Para activar tu cuenta y recibir pronósticos exclusivos de la IA necesitamos tu email.</div>
-      <input class="auth-input" type="email" id="leadEmail" placeholder="tu@email.com" onkeydown="if(event.key==='Enter')completeAuth()">
+      <div class="auth-title" style="text-align:left" id="authStep2Title">Crear cuenta</div>
+      <div class="auth-subtitle" style="text-align:left;margin-bottom:16px" id="authStep2Sub">Ingresá tu email y elegí una contraseña.</div>
+      <input class="auth-input" type="email" id="leadEmail" placeholder="tu@email.com" onkeydown="if(event.key==='Enter')document.getElementById('leadPassword').focus()">
+      <input class="auth-input" type="password" id="leadPassword" placeholder="Contraseña (mín. 6 caracteres)" style="margin-top:8px" onkeydown="if(event.key==='Enter')completeAuth()">
       <div id="emailError" style="color:var(--rojo);font-size:0.75rem;min-height:20px;padding:4px 2px"></div>
-      <div class="auth-check-row">
+      <div class="auth-check-row" id="marketingRow">
         <input type="checkbox" id="marketingCheck" checked>
-        <label for="marketingCheck">Quiero recibir pronósticos diarios, alertas de valor y análisis IA. Podés darte de baja cuando quieras.</label>
+        <label for="marketingCheck">Quiero recibir pronósticos diarios y alertas de valor. Podés darte de baja cuando quieras.</label>
       </div>
-      <button class="auth-btn-main" onclick="completeAuth()">✓ Crear mi cuenta gratis</button>
+      <button class="auth-btn-main" id="authSubmitBtn" onclick="completeAuth()">✓ Crear mi cuenta gratis</button>
+      <div style="text-align:center;margin-top:14px;font-size:0.78rem;color:var(--texto-sec)">
+        <span id="authModeText">¿Ya tenés cuenta?</span>
+        <a onclick="toggleAuthMode()" style="color:var(--verde);cursor:pointer;margin-left:5px;font-weight:700;text-decoration:underline" id="authModeLink">Iniciá sesión</a>
+      </div>
     </div>
 
     <!-- STEP 3: Bienvenida -->
