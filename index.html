@@ -8835,7 +8835,9 @@ function aiAddMsg(role, text, withTime = true) {
   const wrap = document.getElementById('aiMessages');
   const div  = document.createElement('div');
   div.className = `ai-msg ${role}`;
-  div.innerHTML = aiParseMarkdown(text);
+  // Para respuestas del bot, agregar CTA de promo diaria al final
+  const ctaHtml = (role === 'bot' && withTime) ? getDailyPromoCta() : '';
+  div.innerHTML = aiParseMarkdown(text) + ctaHtml;
   if (withTime) {
     const t = document.createElement('div');
     t.className = 'ai-msg-time';
@@ -8854,6 +8856,28 @@ function aiAddMsg(role, text, withTime = true) {
     wrap.scrollTop = wrap.scrollHeight;
   }
   return div;
+}
+
+// CTA diario: qué casa bonifica hoy y link de registro
+function getDailyPromoCta() {
+  const day = new Date().getDay(); // 0=Dom…6=Sáb
+  const promos = {
+    0: { texto: '🎁 Mañana <strong>Melbet duplica tu depósito</strong> — aprovechalo antes de las 23:59.',  casa: 'Melbet',      link: 'https://melbet.com/es/registration' },
+    1: { texto: '🎁 Hoy <strong>Melbet duplica tu depósito</strong> — el bono se activa solo los lunes.',   casa: 'Melbet',      link: 'https://melbet.com/es/registration' },
+    2: { texto: '🎁 Hoy <strong>DBbet y Sapphirebet duplican tu primer depósito</strong> — bonos de bienvenida activos.', casa: 'DBbet',  link: 'https://dbbet.com/registration' },
+    3: { texto: '🎁 Mañana <strong>BetWinner duplica tu depósito</strong> — preparate hoy para el bono del jueves.', casa: 'BetWinner', link: 'https://betwinner.com/es/registration' },
+    4: { texto: '🎁 Hoy <strong>BetWinner duplica tu depósito</strong> — el bono del jueves está activo ahora.', casa: 'BetWinner',   link: 'https://betwinner.com/es/registration' },
+    5: { texto: '🎁 Mañana <strong>Megapari duplica tu depósito</strong> — depositá hoy para tenerlo listo.',  casa: 'Megapari',   link: 'https://megapari.com/es/registration' },
+    6: { texto: '🎁 Hoy <strong>Megapari duplica tu depósito</strong> — el bono de sábado está activo.',      casa: 'Megapari',   link: 'https://megapari.com/es/registration' },
+  };
+  const p = promos[day] || promos[1];
+  return `<div style="margin-top:12px;padding:10px 13px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.25);border-radius:10px;font-size:0.8rem;line-height:1.5;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+    <span style="color:#ccc">${p.texto}</span>
+    <a href="${p.link}" target="_blank" rel="noopener"
+       style="flex-shrink:0;background:var(--verde);color:#000;font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
+      Registrarse →
+    </a>
+  </div>`;
 }
 
 // Detecta si la respuesta del bot menciona cuotas/odds para mostrar ad Melbet
