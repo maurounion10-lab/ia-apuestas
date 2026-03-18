@@ -9337,6 +9337,11 @@ function admSaveConfig() {
 .ai-typing span:nth-child(2) { animation-delay: 0.2s; }
 .ai-typing span:nth-child(3) { animation-delay: 0.4s; }
 @keyframes aiDot { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+@keyframes aiBounce {
+  0%,100% { transform: translateY(0) scaleX(1) scaleY(1); animation-timing-function: cubic-bezier(.33,0,.66,0); }
+  45%     { transform: translateY(-14px) scaleX(0.95) scaleY(1.05); animation-timing-function: cubic-bezier(.33,1,.66,1); }
+  90%     { transform: translateY(0) scaleX(1.1) scaleY(0.9); animation-timing-function: cubic-bezier(.33,1,.66,1); }
+}
 
 /* Quick chips */
 #aiQuickChips {
@@ -9765,14 +9770,26 @@ function aiNeedsWeb(msg) {
   return true;
 }
 
-function aiShowTyping(searching = false) {
+function _aiDetectSport(msg) {
+  const t = (msg || '').toLowerCase();
+  if (/\b(nba|basket|básquet|basquet|baloncesto|canasta|lakers|celtics|warriors|bulls|heat|spurs|knicks|bucks|nets|suns|nuggets|clippers|thunder|pelicans|pistons|raptors|jazz|grizzlies|hawks|wizards|blazers|pacers|hornets|magic|kings|cavaliers|timberwolves|rockets|mavericks|spurs)\b/.test(t)) return '🏀';
+  if (/\b(tenis|tennis|atp|wta|wimbledon|roland.?garros|us.?open|australian.?open|djokovic|alcaraz|nadal|federer|sinner|swiatek|raqueta|set|game|match.?point)\b/.test(t)) return '🎾';
+  if (/\b(nfl|american.?football|superbowl|super.?bowl|touchdown|quarterback|patriots|cowboys|chiefs|eagles|49ers|packers|ravens|broncos|chargers|raiders|bears|giants|jets|dolphins|bills|colts|titans|jaguars|texans|lions|vikings|falcons|saints|bucs|buccaneers|panthers|cardinals|seahawks|rams)\b/.test(t)) return '🏈';
+  if (/\b(baseball|béisbol|beisbol|mlb|yankees|dodgers|red.?sox|cubs|mets|giants|cardinals|braves|astros|padres|phillies|mariners|rangers|orioles|tigers|twins|rays|guardians|royals|white.?sox|pirates|brewers|diamondbacks|rockies|athletics|nationals|marlins|reds|angels)\b/.test(t)) return '⚾';
+  if (/\b(rugby|six.?nations|all.?blacks|springboks|wallabies|premiership.?rugby|top.?14|rugby.?world.?cup|tries|scrum|lineout)\b/.test(t)) return '🏉';
+  // Default: fútbol
+  return '⚽';
+}
+
+function aiShowTyping(searching = false, msg = '') {
   const wrap = document.getElementById('aiMessages');
-  // Indicador "buscando en web"
+  // Indicador de búsqueda con pelota animada según el deporte
   if (searching) {
+    const ball = _aiDetectSport(msg);
     const s = document.createElement('div');
     s.id = 'aiSearching';
-    s.style.cssText = 'display:flex;align-items:center;gap:7px;font-size:0.75rem;color:rgba(165,214,167,0.7);padding:4px 2px;';
-    s.innerHTML = `<span style="animation:aiDot 1.2s infinite;display:inline-block">🔍</span> Buscando en internet...`;
+    s.style.cssText = 'display:flex;align-items:center;gap:8px;font-size:0.78rem;color:rgba(165,214,167,0.75);padding:5px 2px;';
+    s.innerHTML = `<span style="display:inline-block;animation:aiBounce 0.75s infinite;transform-origin:bottom center;font-size:1.05rem;line-height:1">${ball}</span><span style="letter-spacing:0.2px">Investigando mis fuentes...</span>`;
     wrap.appendChild(s);
     wrap.scrollTop = wrap.scrollHeight;
   }
@@ -9973,7 +9990,7 @@ async function aiSend() {
 
   // Typing indicator (imágenes no buscan web)
   const willSearch = !hasImg && aiNeedsWeb(apiMsg);
-  aiShowTyping(willSearch);
+  aiShowTyping(willSearch, apiMsg);
 
   try {
     const res = await fetch(AI_WORKER, {
