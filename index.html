@@ -149,6 +149,10 @@
     flex: 1;
     justify-content: center;
   }
+  /* Guest nav: slight visual distinction */
+  #navLinksGuest a {
+    font-size: 0.81rem;
+  }
   .nav-links a {
     color: rgba(165,214,167,0.65);
     text-decoration: none;
@@ -2453,14 +2457,22 @@
       <span class="logo-line1">gambeta<span>.ai</span></span>
     </div>
   </div>
-  <div class="nav-links">
-
-    <a onclick="navTo('predictions')">🔮 <span class="nav-text" data-i18n="nav.pred">Pronósticos</span></a>
-    <a onclick="navTo('historial')">📋 <span class="nav-text" data-i18n="nav.hist">Resultados</span></a>
-    <a onclick="navTo('bankroll')">💰 <span class="nav-text" data-i18n="nav.bankroll">Bankroll</span></a>
-    <a onclick="navTo('cuotas')">💹 <span class="nav-text" data-i18n="nav.cuotas">Cuotas</span></a>
-    <a onclick="navTo('calculator')">🧮 <span class="nav-text" data-i18n="nav.calc">Calculadora</span></a>
+  <!-- Nav visitante (sin login) -->
+  <div class="nav-links" id="navLinksGuest">
+    <a onclick="navTo('predictions')">🔮 <span class="nav-text">Pronósticos</span></a>
+    <a onclick="navTo('historial')">📋 <span class="nav-text">Resultados</span></a>
     <a onclick="navTo('ranking');loadRanking()" style="position:relative">🏆 <span class="nav-text">Ranking</span><span id="rankingNavDot" style="display:none;position:absolute;top:2px;right:-4px;width:7px;height:7px;border-radius:50%;background:#ffd600;box-shadow:0 0 6px #ffd600"></span></a>
+    <a onclick="navTo('bot-alerta')">🤖 <span class="nav-text">Bot Alerta</span></a>
+    <a onclick="navTo('telegram')">🎁 <span class="nav-text">Promos</span></a>
+  </div>
+
+  <!-- Nav usuario registrado -->
+  <div class="nav-links" id="navLinksUser" style="display:none">
+    <a onclick="navTo('predictions')">🔮 <span class="nav-text">Pronósticos</span></a>
+    <a onclick="navTo('historial')">📋 <span class="nav-text">Resultados</span></a>
+    <a onclick="navTo('bankroll')">💰 <span class="nav-text">Bankroll</span></a>
+    <a onclick="navTo('calculator')">🧮 <span class="nav-text">Calculadora</span></a>
+    <a onclick="navTo('ranking');loadRanking()" style="position:relative">🏆 <span class="nav-text">Ranking</span></a>
     <a onclick="navTo('bot-alerta')">🤖 <span class="nav-text">Bot Alerta</span></a>
     <a onclick="navTo('telegram')">🎁 <span class="nav-text">Promos</span></a>
   </div>
@@ -2523,18 +2535,27 @@
 <!-- Overlay y drawer mobile -->
 <div class="nav-drawer-overlay" id="navOverlay" onclick="closeMobileNav()"></div>
 <nav class="nav-drawer" id="navDrawer">
-
-  <a onclick="navTo('predictions');closeMobileNav()">🔮 Pronósticos IA</a>
-  <a onclick="navTo('historial');closeMobileNav()">📋 Resultados</a>
-  <a onclick="navTo('bankroll');closeMobileNav()">💰 Bankroll Manager</a>
-  <a onclick="navTo('cuotas');closeMobileNav()">💹 Comparador de Cuotas</a>
-  <a onclick="navTo('calculator');closeMobileNav()">🧮 Calculadora</a>
-  <a onclick="navTo('ranking');loadRanking();closeMobileNav()">🏆 Ranking G$</a>
-  <a onclick="navTo('bot-alerta');closeMobileNav()">🤖 Bot Alerta</a>
-  <a onclick="navTo('telegram');closeMobileNav()">🎁 Promos</a>
-  <a id="drawerPanelLink" onclick="navTo('mipanel');closeMobileNav()" style="display:none;color:var(--verde)">👤 Mi Panel</a>
-  <div id="drawerAuthRow" style="margin-top:8px;padding-top:12px;border-top:1px solid rgba(0,200,83,0.15)">
-    <button onclick="openAuth();closeMobileNav()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--verde),var(--verde-oscuro));border:none;border-radius:12px;color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;letter-spacing:0.3px">✦ Entrar / Registro Gratis</button>
+  <!-- Links visitante -->
+  <div id="drawerLinksGuest">
+    <a onclick="navTo('predictions');closeMobileNav()">🔮 Pronósticos IA</a>
+    <a onclick="navTo('historial');closeMobileNav()">📋 Resultados</a>
+    <a onclick="navTo('ranking');loadRanking();closeMobileNav()">🏆 Ranking G$</a>
+    <a onclick="navTo('bot-alerta');closeMobileNav()">🤖 Bot Alerta</a>
+    <a onclick="navTo('telegram');closeMobileNav()">🎁 Promos</a>
+    <div id="drawerAuthRow" style="margin-top:8px;padding-top:12px;border-top:1px solid rgba(0,200,83,0.15)">
+      <button onclick="openAuth();closeMobileNav()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--verde),var(--verde-oscuro));border:none;border-radius:12px;color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;letter-spacing:0.3px">✦ Entrar / Registro Gratis</button>
+    </div>
+  </div>
+  <!-- Links usuario registrado -->
+  <div id="drawerLinksUser" style="display:none">
+    <a onclick="navTo('predictions');closeMobileNav()">🔮 Pronósticos IA</a>
+    <a onclick="navTo('historial');closeMobileNav()">📋 Resultados</a>
+    <a onclick="navTo('bankroll');closeMobileNav()">💰 Bankroll Manager</a>
+    <a onclick="navTo('calculator');closeMobileNav()">🧮 Calculadora</a>
+    <a onclick="navTo('ranking');loadRanking();closeMobileNav()">🏆 Ranking G$</a>
+    <a onclick="navTo('bot-alerta');closeMobileNav()">🤖 Bot Alerta</a>
+    <a onclick="navTo('telegram');closeMobileNav()">🎁 Promos</a>
+    <a id="drawerPanelLink" onclick="navTo('mipanel');closeMobileNav()" style="display:none;color:var(--verde)">👤 Mi Panel</a>
   </div>
 </nav>
 
@@ -3103,13 +3124,6 @@
   </section>
   <!-- COMPARADOR DE CUOTAS (al fondo) -->
   <div class="section-divider"></div>
-  <section id="cuotas">
-    <div class="section-title">
-      <div class="icon">💹</div>Comparador de Cuotas
-      <span style="font-size:0.75rem;color:var(--texto-sec);font-weight:400;margin-left:8px">Mejor cuota resaltada en verde</span>
-    </div>
-    <div id="oddsCardsGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px"></div>
-  </section>
 
   <!-- CALCULATOR -->
   <div class="section-divider"></div>
@@ -6657,11 +6671,6 @@ function filterHistDate(f, btn) {
 // ═══════════════════════════════════════════════
 //  ODDS COMPARISON
 // ═══════════════════════════════════════════════
-let oddsData = [];
-
-let featuredBooks = ['megapari','melbet'];
-let allBooks = ['megapari','melbet','betwinner','dbbet','sapphire'];
-let bookLabels = { megapari:'Megapari', melbet:'Melbet', betwinner:'BetWinner', dbbet:'DBBet', sapphire:'SapphireBet' };
 
 // Links de afiliado por casa de apuestas
 const BOOK_AFFILIATE = {
@@ -6718,159 +6727,6 @@ const FIXED_BOOKS = [
 
 function buildOddsHeader() {} // no-op: replaced by card layout
 
-function renderOdds() {
-  const grid = document.getElementById('oddsCardsGrid');
-  if (!grid) return;
-  if (oddsData.length === 0) {
-    grid.innerHTML = `<div style="text-align:center;padding:40px;color:var(--texto-sec);grid-column:1/-1">⏳ Cargando cuotas en tiempo real...</div>`;
-    return;
-  }
-
-  const lbls = ['Local','Empate','Visit.'];
-  const isFeat = b => featuredBooks.includes(b);
-
-  grid.innerHTML = oddsData.map(row => {
-    const bests = [0,1,2].map(i =>
-      Math.max(...FIXED_BOOKS.map(b => row.book[b.key]?.[i] ?? -Infinity))
-    );
-
-    const [teamA, teamB] = row.match.split(' vs ').map(t => t.trim());
-    const logoA = logoHtml(teamA, 26);
-    const logoB = teamB ? logoHtml(teamB, 26) : '';
-
-    // Fila de encabezado G/E/P
-    const headerRow = `
-      <div style="display:grid;grid-template-columns:1fr repeat(3,56px);gap:0;
-        background:rgba(255,255,255,0.04);border-radius:8px 8px 0 0;
-        padding:6px 10px;margin-top:10px">
-        <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.6px">Casa</div>
-        ${lbls.map(l=>`<div style="font-size:0.62rem;color:var(--texto-sec);text-align:center;text-transform:uppercase;letter-spacing:.6px">${l}</div>`).join('')}
-      </div>`;
-
-    // Filas de cada casa
-    const bookRows = FIXED_BOOKS.map(b => {
-      const vals = row.book[b.key];
-      const link = getBookLink(b.key);
-      const logo = getBookLogo(b.key);
-      const feat = b.feat;
-
-      const valCells = [0,1,2].map(i => {
-        const v = vals?.[i];
-        if (!v) return `<div style="text-align:center;color:rgba(255,255,255,0.2);font-size:0.78rem">—</div>`;
-        const isBest = v === bests[i];
-        const color  = isBest ? (feat ? 'var(--amarillo)' : 'var(--verde)') : 'var(--texto)';
-        const weight = isBest ? '700' : '400';
-        const star   = isBest && feat ? '<span style="font-size:0.55rem;vertical-align:super;margin-left:1px">★</span>' : '';
-        return `<div style="text-align:center;font-size:0.82rem;color:${color};font-weight:${weight}">${v.toFixed(2)}${star}</div>`;
-      }).join('');
-
-      const inner = `
-        <div style="display:grid;grid-template-columns:1fr repeat(3,56px);gap:0;
-          padding:7px 10px;border-top:1px solid rgba(255,255,255,0.04);
-          ${feat ? 'background:rgba(255,214,0,0.04)' : ''}">
-          <div style="display:flex;align-items:center;gap:6px">
-            <img src="${logo}" style="width:18px;height:18px;border-radius:3px;object-fit:contain"
-              onerror="this.style.display='none'">
-            <span style="font-size:0.75rem;color:${feat?'var(--amarillo)':'var(--texto-sec)'};white-space:nowrap">
-              ${feat?'★ ':''}${b.label}
-            </span>
-          </div>
-          ${valCells}
-        </div>`;
-      return link
-        ? `<a href="${link}" target="_blank" rel="noopener" style="text-decoration:none;display:block">${inner}</a>`
-        : inner;
-    }).join('');
-
-    // Fila "Mejor cuota"
-    const bestRow = `
-      <div style="display:grid;grid-template-columns:1fr repeat(3,56px);gap:0;
-        padding:7px 10px;border-top:1px solid rgba(0,200,83,0.2);
-        background:rgba(0,200,83,0.06);border-radius:0 0 8px 8px">
-        <div style="font-size:0.72rem;color:var(--verde);font-weight:600">🏆 Mejor</div>
-        ${[0,1,2].map(i => {
-          if (bests[i] === -Infinity) return `<div style="text-align:center;color:rgba(255,255,255,0.2)">—</div>`;
-          const winner = FIXED_BOOKS.find(b => row.book[b.key]?.[i] === bests[i]);
-          const link   = winner ? getBookLink(winner.key) : null;
-          const feat   = winner?.feat;
-          const val    = `<div style="text-align:center;font-size:0.84rem;font-weight:700;color:${feat?'var(--amarillo)':'var(--verde)'}">${bests[i].toFixed(2)}</div>`;
-          return link ? `<a href="${link}" target="_blank" rel="noopener" style="text-decoration:none">${val}</a>` : val;
-        }).join('')}
-      </div>`;
-
-    // Buscar marcador en vivo en scoresData — 3 métodos en cascada
-    let scoreEntry = null;
-    if (row.live) {
-      // 1) Match exacto por nombre (ambos equipos)
-      scoreEntry = scoresData.find(s =>
-        teamsMatch(s.home, teamA) && teamsMatch(s.away, teamB)
-      );
-      // 2) Match por nombre crudo (antes de shortName)
-      if (!scoreEntry && row.homeRaw) {
-        scoreEntry = scoresData.find(s =>
-          teamsMatch(s.homeRaw || s.home, row.homeRaw) &&
-          teamsMatch(s.awayRaw || s.away, row.awayRaw)
-        );
-      }
-      // 3) Match por commence_time ±10 min (misma hora = mismo partido)
-      if (!scoreEntry && row.commenceTs) {
-        scoreEntry = scoresData.find(s => {
-          // scoresData entries no tienen commenceTs guardado → usar cualquier que coincida en al menos 1 equipo y sea live/final
-          return (s.flag === 'live' || s.flag === 'final') &&
-            (teamsMatch(s.home, teamA) || teamsMatch(s.away, teamB));
-        });
-      }
-    }
-    const hasScore = !!scoreEntry;
-    // Si el partido terminó según scoresData → no mostrar como live
-    const isFinal  = scoreEntry?.flag === 'final';
-    const showLive = row.live && !isFinal;
-
-    // Ocultar completamente si terminó y no hay score (partido ya pasado sin datos)
-    if (isFinal && !hasScore) return '';
-
-    return `
-      <div style="background:var(--tarjeta);border:1px solid ${showLive ? 'rgba(229,57,53,0.35)' : isFinal ? 'rgba(255,255,255,0.08)' : 'var(--borde)'};border-radius:12px;padding:12px 0 0">
-        <!-- Encabezado del partido -->
-        <div style="padding:0 12px 6px">
-          <!-- Badge horario/live/final centrado -->
-          <div style="text-align:center;margin-bottom:6px">
-            ${showLive
-              ? `<span class="live-badge"><span class="live-dot"></span>En Vivo</span>`
-              : isFinal
-                ? `<span style="font-size:0.65rem;font-weight:700;color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:5px;padding:2px 7px;letter-spacing:.4px">FINAL</span>`
-                : `<span style="font-size:0.65rem;color:var(--texto-sec)">${row.time||''}</span>`
-            }
-          </div>
-          <!-- Equipos: local — score/vs — visitante -->
-          <div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:8px">
-            <!-- Local -->
-            <div style="display:flex;align-items:center;gap:7px;justify-content:flex-end">
-              <span style="font-size:0.78rem;font-weight:600;color:var(--texto);text-align:right;line-height:1.2">${shortName(teamA)}</span>
-              <div style="flex-shrink:0">${logoA}</div>
-            </div>
-            <!-- Centro: marcador o VS -->
-            ${hasScore
-              ? `<div style="font-size:1.05rem;font-weight:800;color:#ef5350;
-                   background:rgba(229,57,53,0.12);border:1px solid rgba(229,57,53,0.3);
-                   border-radius:7px;padding:2px 10px;letter-spacing:3px;white-space:nowrap;text-align:center">
-                   ${scoreEntry.scoreH} - ${scoreEntry.scoreA}
-                 </div>`
-              : `<div style="font-size:0.7rem;color:rgba(255,255,255,0.3);font-weight:600;text-align:center">VS</div>`
-            }
-            <!-- Visitante -->
-            <div style="display:flex;align-items:center;gap:7px;justify-content:flex-start">
-              <div style="flex-shrink:0">${logoB}</div>
-              <span style="font-size:0.78rem;font-weight:600;color:var(--texto);text-align:left;line-height:1.2">${shortName(teamB)}</span>
-            </div>
-          </div>
-        </div>
-        ${headerRow}
-        ${bookRows}
-        ${bestRow}
-      </div>`;
-  }).filter(Boolean).join('');
-}
 
 // ═══════════════════════════════════════════════
 //  BANKROLL MANAGER
@@ -7371,7 +7227,6 @@ function processOddsIntoComparador(data) {
   const books = Object.keys(bookMap).slice(0, 5);
   if (books.length === 0) return;
 
-  // Update globals so renderOdds uses the real book names
   allBooks = books;
   featuredBooks = books.slice(0, 2);
   bookLabels = bookMap;
@@ -7464,7 +7319,6 @@ function processOddsIntoComparador(data) {
   const newOddsHash = JSON.stringify(oddsData.map(o => o.match));
   if (!window._lastOddsHash || window._lastOddsHash !== newOddsHash) {
     window._lastOddsHash = newOddsHash;
-    renderOdds();
     console.log(`[Comparador] ${oddsData.length} cuotas cargadas`);
   }
 }
@@ -7482,85 +7336,8 @@ function forceRefreshOdds() {
     statusBar.style.color = '#42a5f5';
     statusBar.innerHTML = `<span>🔄 Conectando con el Worker...</span>`;
   }
-  loadRealOdds();
 }
 
-async function loadRealOdds(retryCount = 0) {
-  if (retryCount === 0 && _oddsLoading) return; // evitar llamadas concurrentes
-  // Use cache if fresh (skip API call)
-  if (retryCount === 0) {
-    const cached = cacheGet('cache_odds_v4', CACHE_ODDS_TTL);
-    if (cached) {
-      window._rawOddsGames = cached;
-      renderScores(currentScoreFilter);
-      renderPreds();
-      processOddsIntoComparador(cached);
-      console.log('[cache] odds desde caché localStorage');
-      return;
-    }
-    // Si la caché fresca expiró, usar la de respaldo mientras se recarga
-    try {
-      const stale = JSON.parse(localStorage.getItem('cache_odds_stale') || 'null');
-      if (stale && stale.length) {
-        window._rawOddsGames = stale;
-        renderPreds();
-        console.log('[cache] usando stale fallback mientras se recarga');
-      }
-    } catch(e) {}
-  }
-  if (retryCount === 0) _oddsLoading = true;
-  try {
-    const _timeout = ms => new Promise((_, r) => setTimeout(() => r(new Error('timeout')), ms));
-    const _fetchCat = async cat => {
-      try {
-        const r = await Promise.race([fetch(`${WORKER_URL}/odds?category=${cat}`), _timeout(12000)]);
-        if (!r.ok) return [];
-        const j = await r.json();
-        return j.data ?? (Array.isArray(j) ? j : []);
-      } catch(e) { console.warn(`[odds][${cat}]`, e.message); return []; }
-    };
-    // Fetch LATAM+basket y Champions+ligas EU en paralelo
-    const [dataMain, dataEurope] = await Promise.all([_fetchCat('main'), _fetchCat('europe')]);
-    // Fusionar sin duplicados
-    const seen = new Set();
-    const data = [...dataMain, ...dataEurope].filter(g => { if(seen.has(g.id)) return false; seen.add(g.id); return true; });
-
-    if (data.length === 0) {
-      if (retryCount < 3) setTimeout(() => loadRealOdds(retryCount + 1), 2500);
-      else _oddsLoading = false;
-      return;
-    }
-    window._rawOddsGames = data;
-    cacheSet('cache_odds_v4', data);
-    // Guardar copia de respaldo liviana (solo campos esenciales) para que quepa en localStorage
-    try {
-      const slim = data.map(g => ({
-        id: g.id, sport_key: g.sport_key, commence_time: g.commence_time,
-        home_team: g.home_team, away_team: g.away_team,
-        bookmakers: (g.bookmakers||[]).slice(0,3).map(b => ({
-          key: b.key, title: b.title,
-          markets: (b.markets||[]).filter(m => m.key==='h2h').map(m => ({
-            key: m.key,
-            outcomes: m.outcomes
-          }))
-        })).filter(b => b.markets.length > 0)
-      }));
-      localStorage.setItem('cache_odds_stale', JSON.stringify(slim));
-    } catch(e) { console.warn('[stale cache] no se pudo guardar:', e.message); }
-    console.log(`[Worker/odds] ${data.length} partidos (main:${dataMain.length} + europe:${dataEurope.length}). Ligas:`, [...new Set(data.map(g => g.sport_key))].join(', '));
-    if (currentScoreFilter === 'basket') renderScores('basket');
-    renderPreds();
-    processOddsIntoComparador(data);
-    _oddsLoading = false;
-  } catch (e) {
-    if (retryCount < 3) {
-      setTimeout(() => loadRealOdds(retryCount + 1), 2500 * (retryCount + 1));
-    } else {
-      console.warn('[Worker] odds: sin respuesta tras 4 intentos —', e.message);
-      _oddsLoading = false;
-    }
-  }
-}
 
 let _scoresLoading = false;
 async function loadRealScores(retryCount = 0) {
@@ -7716,7 +7493,7 @@ async function loadRealScores(retryCount = 0) {
       resolveCompletedGames(scoresData);
       acEvaluatePicks();   // $A-Coin: evaluar picks pendientes contra resultados
       loadPlayerPhotos();
-      renderOdds();   // refrescar marcadores en vivo en el comparador de cuotas
+      // (cuotas section removed)
       renderPreds();  // refrescar badges EN VIVO y marcadores en predicciones
       console.log(`[Worker] scores: ${mapped.length} eventos cargados`);
     }
@@ -7742,7 +7519,6 @@ renderPreds();
 renderStats('futbol');
 updateCalc();
 renderHistorial('all');
-renderOdds();
 renderBankrollSummary();
 renderBetsList();
 setTimeout(drawBankrollChart, 100);
@@ -7775,19 +7551,16 @@ fetch(`${WORKER_URL}/available`)
 setLang(detectLang());
 
 // Cargar datos reales desde el Worker
-loadRealOdds();
 loadRealScores();
 loadRealStats('futbol'); // Stats: carga fútbol al iniciar
 // Refrescar cuotas cada 60 min (pre-partido pueden cambiar)
 // Scores ya NO tienen polling — pre-partido y finalizados son estáticos,
 // los live se tercerizan a Sofascore.
-setInterval(loadRealOdds, 60 * 60 * 1000);
 setInterval(() => { delete realStatsCache[currentStatFilter]; loadRealStats(currentStatFilter); }, 60 * 60 * 1000);
 
 // Al volver a la pestaña, refrescar solo si la caché de odds expiró
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    if (!cacheGet('cache_odds_v4', CACHE_ODDS_TTL)) loadRealOdds();
     // Scores: solo si caché expiró (pre-partido / finalizados, los live son de Sofascore)
     if (!cacheGet('cache_scores', CACHE_SCORES_TTL)) loadRealScores();
   }
@@ -7958,6 +7731,16 @@ async function completeAuth() {
 
 function updateNavAuth() {
   document.getElementById('navAuthBtn').style.display = 'none';
+  // Switch nav: hide guest links, show user links
+  const guestLinks = document.getElementById('navLinksGuest');
+  const userLinks  = document.getElementById('navLinksUser');
+  if (guestLinks) guestLinks.style.display = 'none';
+  if (userLinks)  userLinks.style.display  = '';
+  // Mobile drawer
+  const dGuest = document.getElementById('drawerLinksGuest');
+  const dUser  = document.getElementById('drawerLinksUser');
+  if (dGuest) dGuest.style.display = 'none';
+  if (dUser)  dUser.style.display  = '';
   const wrap = document.getElementById('navUserWrap');
   wrap.classList.add('visible');
   const initials = authUser.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
@@ -7993,14 +7776,22 @@ function logoutUser() {
   pendingSocial = null;
   document.getElementById('navUserWrap').classList.remove('visible');
   document.getElementById('navAuthBtn').style.display = '';
+  // Switch nav back to guest
+  const guestLinks = document.getElementById('navLinksGuest');
+  const userLinks  = document.getElementById('navLinksUser');
+  if (guestLinks) guestLinks.style.display = '';
+  if (userLinks)  userLinks.style.display  = 'none';
+  // Mobile drawer
+  const dGuest = document.getElementById('drawerLinksGuest');
+  const dUser  = document.getElementById('drawerLinksUser');
+  if (dGuest) dGuest.style.display = '';
+  if (dUser)  dUser.style.display  = 'none';
   closeUserMenu();
   document.getElementById('mipanel').style.display = 'none';
   const lockOverlay = document.getElementById('bkLockOverlay');
   if (lockOverlay) lockOverlay.style.display = '';
   const drawerLink = document.getElementById('drawerPanelLink');
   if (drawerLink) drawerLink.style.display = 'none';
-  const drawerAuthRow = document.getElementById('drawerAuthRow');
-  if (drawerAuthRow) drawerAuthRow.style.display = '';
 }
 
 // ── Escucha cambios de sesión Supabase (login/logout/refresh de token) ──
@@ -9678,7 +9469,6 @@ async function admDiagWorker() {
   log(`\nListo. Revisá los ❌ arriba para saber qué arreglar.`);
 }
 
-function admRefreshOdds()   { loadRealOdds();   document.getElementById('admDatosMsg').textContent='🔄 Recargando cuotas...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Cuotas recargadas'; },3000); }
 function admRefreshScores() { loadRealScores(); document.getElementById('admDatosMsg').textContent='🔄 Recargando marcadores...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Marcadores recargados'; },3000); }
 function admRefreshPreds()  {
   // Borrar caché diaria para forzar regeneración desde la API
