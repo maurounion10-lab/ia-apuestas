@@ -7337,6 +7337,62 @@ function forceRefreshOdds() {
     statusBar.style.color = '#42a5f5';
     statusBar.innerHTML = `<span>🔄 Conectando con el Worker...</span>`;
   }
+  loadRealOdds();
+}
+
+// Carga cuotas desde el Worker y popula window._rawOddsGames (usado por las fichas)
+async function loadRealOdds() {
+  if (_oddsLoading) return;
+
+  // Usar caché si está fresca
+  const cached = cacheGet('cache_odds_v4', CACHE_ODDS_TTL);
+  if (cached && Array.isArray(cached) && cached.length > 0) {
+    window._rawOddsGames = cached;
+    processOddsIntoComparador(cached);
+    renderPreds();
+    return;
+  }
+
+  _oddsLoading = true;
+  renderPreds(); // muestra skeleton mientras carga
+
+  try {
+    // Traer todas las ligas en una sola llamada
+    const [resMain, resEur] = await Promise.all([
+      fetch(`${WORKER_URL}/odds?category=main`).then(r => r.ok ? r.json() : { data: [] }),
+      fetch(`${WORKER_URL}/odds?category=europe`).then(r => r.ok ? r.json() : { data: [] }),
+    ]);
+    const combined = [...(resMain.data || []), ...(resEur.data || [])];
+    if (combined.length > 0) {
+      window._rawOddsGames = combined;
+      cacheSet('cache_odds_v4', combined);
+      // Guardar también como stale (respaldo si falla luego)
+      try { localStorage.setItem('cache_odds_stale', JSON.stringify({ ts: Date.now(), data: combined })); } catch(e) {}
+      processOddsIntoComparador(combined);
+    } else {
+      // Intentar usar caché stale si la llamada devolvió vacío
+      try {
+        const staleRaw = localStorage.getItem('cache_odds_stale');
+        if (staleRaw) {
+          const { data: staleData } = JSON.parse(staleRaw);
+          if (staleData?.length) { window._rawOddsGames = staleData; processOddsIntoComparador(staleData); }
+        }
+      } catch(e) {}
+    }
+  } catch(e) {
+    console.warn('[Odds] Error cargando cuotas:', e);
+    // Usar caché stale como fallback
+    try {
+      const staleRaw = localStorage.getItem('cache_odds_stale');
+      if (staleRaw) {
+        const { data: staleData } = JSON.parse(staleRaw);
+        if (staleData?.length) { window._rawOddsGames = staleData; processOddsIntoComparador(staleData); }
+      }
+    } catch(e2) {}
+  } finally {
+    _oddsLoading = false;
+    renderPreds();
+  }
 }
 
 
@@ -7553,17 +7609,17 @@ setLang(detectLang());
 
 // Cargar datos reales desde el Worker
 loadRealScores();
+loadRealOdds();  // ← carga cuotas para las fichas de pronósticos
 loadRealStats('futbol'); // Stats: carga fútbol al iniciar
-// Refrescar cuotas cada 60 min (pre-partido pueden cambiar)
-// Scores ya NO tienen polling — pre-partido y finalizados son estáticos,
-// los live se tercerizan a Sofascore.
+// Refrescar cada 60 min
 setInterval(() => { delete realStatsCache[currentStatFilter]; loadRealStats(currentStatFilter); }, 60 * 60 * 1000);
+setInterval(() => loadRealOdds(), 60 * 60 * 1000); // refrescar cuotas/fichas cada hora
 
-// Al volver a la pestaña, refrescar solo si la caché de odds expiró
+// Al volver a la pestaña, refrescar solo si la caché expiró
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    // Scores: solo si caché expiró (pre-partido / finalizados, los live son de Sofascore)
     if (!cacheGet('cache_scores', CACHE_SCORES_TTL)) loadRealScores();
+    if (!cacheGet('cache_odds_v4',  CACHE_ODDS_TTL))  loadRealOdds();
   }
 });
 
@@ -10119,11 +10175,16 @@ function aiAddMsg(role, text, withTime = true) {
   }
   wrap.appendChild(div);
   if (role === 'bot') {
-    // Scroll a la pregunta del usuario → la ve primero, luego la respuesta
+    // Scroll para mostrar la pregunta del usuario + la respuesta juntas
     requestAnimationFrame(() => {
-      const userMsgs = wrap.querySelectorAll('.ai-msg.user');
-      const lastQ = userMsgs.length ? userMsgs[userMsgs.length - 1] : div;
-      wrap.scrollTop = lastQ.offsetTop - 8;
+      requestAnimationFrame(() => {
+        const userMsgs = wrap.querySelectorAll('.ai-msg.user');
+        const lastQ = userMsgs.length ? userMsgs[userMsgs.length - 1] : div;
+        // getBoundingClientRect es confiable sin importar el offsetParent
+        const wrapRect = wrap.getBoundingClientRect();
+        const msgRect  = lastQ.getBoundingClientRect();
+        wrap.scrollTop += (msgRect.top - wrapRect.top) - 8;
+      });
     });
   } else {
     wrap.scrollTop = wrap.scrollHeight;
