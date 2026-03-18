@@ -2040,19 +2040,33 @@
   .acoin-pick-btn.result-fail .apb-coins { color: #ff6b6b; }
   .acoin-pick-btn:disabled { cursor: default; opacity: 0.6; }
 
-  /* Floating toast notification */
+  /* Floating toast notification — entra por izquierda, pausa centro, sale por derecha */
   .acoin-toast {
-    position: fixed; bottom: 28px; right: 24px; z-index: 9999;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateX(-110vw);
+    z-index: 9999;
     background: linear-gradient(135deg, #1a2010, #111811);
     border: 1px solid rgba(255,214,0,0.5);
-    border-radius: 14px; padding: 12px 18px;
-    display: flex; align-items: center; gap: 10px;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.5), 0 0 16px rgba(255,214,0,0.15);
-    transform: translateY(80px); opacity: 0;
-    transition: all 0.35s cubic-bezier(0.34,1.56,0.64,1);
-    pointer-events: none; max-width: 280px;
+    border-radius: 14px; padding: 14px 22px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.6), 0 0 24px rgba(255,214,0,0.2);
+    opacity: 0;
+    pointer-events: none;
+    min-width: 240px; max-width: 320px;
+    white-space: nowrap;
   }
-  .acoin-toast.show { transform: translateY(0); opacity: 1; }
+  /* Animación: entra → pausa → sale */
+  @keyframes toastSlide {
+    0%   { transform: translate(-50%, -50%) translateX(-110vw); opacity: 0; }
+    12%  { transform: translate(-50%, -50%) translateX(0);      opacity: 1; }
+    80%  { transform: translate(-50%, -50%) translateX(0);      opacity: 1; }
+    100% { transform: translate(-50%, -50%) translateX(110vw);  opacity: 0; }
+  }
+  .acoin-toast.show {
+    animation: toastSlide 3.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
   .acoin-toast-icon { font-size: 1.5rem; flex-shrink: 0; }
   .acoin-toast-text .at-title { font-size: 0.85rem; font-weight: 800; color: #ffd600; }
   .acoin-toast-text .at-sub   { font-size: 0.74rem; color: var(--texto-sec); margin-top: 1px; }
@@ -8376,9 +8390,13 @@ function acToast(icon, title, sub) {
   document.getElementById('acoinToastIcon').innerHTML  = icon;
   document.getElementById('acoinToastTitle').innerHTML = title;
   document.getElementById('acoinToastSub').innerHTML   = sub;
+  // Reiniciar animación: quitar y re-agregar la clase
+  t.classList.remove('show');
+  void t.offsetWidth; // forzar reflow
   t.classList.add('show');
   clearTimeout(_toastTimer);
-  _toastTimer = setTimeout(() => t.classList.remove('show'), 3800);
+  // Limpiar clase cuando termina la animación (3.8s)
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 3900);
 }
 
 /* ── Daily bonus ── */
