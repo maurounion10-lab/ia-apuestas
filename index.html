@@ -3518,8 +3518,8 @@ const teamLogos = {
   'Vélez':                  'https://upload.wikimedia.org/wikipedia/commons/2/21/Escudo_del_Club_Atl%C3%A9tico_V%C3%A9lez_Sarsfield.svg',
   'Velez':                  'https://upload.wikimedia.org/wikipedia/commons/2/21/Escudo_del_Club_Atl%C3%A9tico_V%C3%A9lez_Sarsfield.svg',
   'Velez Sarsfield BA':     'https://upload.wikimedia.org/wikipedia/commons/2/21/Escudo_del_Club_Atl%C3%A9tico_V%C3%A9lez_Sarsfield.svg',
-  'Lanús':                  'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Escudo_del_Club_Lan%C3%BAs.png/330px-Escudo_del_Club_Lan%C3%BAs.png',
-  'Lanus':                  'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Escudo_del_Club_Lan%C3%BAs.png/330px-Escudo_del_Club_Lan%C3%BAs.png',
+  'Lanús':                  'https://media.api-sports.io/football/teams/439.png',
+  'Lanus':                  'https://media.api-sports.io/football/teams/439.png',
   'Talleres':               'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Escudo_Talleres_2015.svg/330px-Escudo_Talleres_2015.svg.png',
   'Talleres de Córdoba':    'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9b/Escudo_Talleres_2015.svg/330px-Escudo_Talleres_2015.svg.png',
   'Belgrano':               'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Escudo_Oficial_del_Club_Atl%C3%A9tico_Belgrano.png/330px-Escudo_Oficial_del_Club_Atl%C3%A9tico_Belgrano.png',
@@ -4385,6 +4385,23 @@ function buildPredsFromOdds() {
   // aunque ya haya 2+ candidatos en 24h (ej: Brasileirao hoy no debe tapar Champions mañana)
   const WINDOWS = [24, 48, 72, 120, 168];
   const TOP_PRIO_THRESHOLD = LEAGUE_PRIO.soccer_conmebol_copa_libertadores; // 99+
+
+  // Partidos de NBA que empiezan a las 3 AM ART (UTC-3) o más tarde:
+  // no publicarlos hasta las 11 AM ART del mismo día calendario
+  const ART_OFFSET_MS = -3 * 3600000; // UTC-3
+  const isNbaVisible = (g) => {
+    if (g.sport_key !== 'basketball_nba') return true;
+    const t = new Date(g.commence_time).getTime();
+    const gameArtMs   = t + ART_OFFSET_MS;                    // hora ART del partido
+    const gameArtDate = new Date(gameArtMs);
+    const gameHourArt = gameArtDate.getUTCHours();             // 0-23 en ART
+    if (gameHourArt < 3) return true;                         // arranca antes de las 3 AM → siempre visible
+    // Arranca a las 3 AM o más tarde → visible solo desde las 11 AM ART del mismo día
+    const dayStartArt = new Date(gameArtMs); dayStartArt.setUTCHours(0,0,0,0);
+    const showAfter = dayStartArt.getTime() - ART_OFFSET_MS + 11 * 3600000; // 11 AM ART en UTC
+    return now >= showAfter;
+  };
+
   let candidates = [];
   for (const hours of WINDOWS) {
     const windowEnd = now + hours * 3600000;
@@ -4393,6 +4410,7 @@ function buildPredsFromOdds() {
         const t = new Date(g.commence_time).getTime();
         return t > now && t <= windowEnd;  // estrictamente futuro
       })
+      .filter(isNbaVisible)   // NBA madrugada: no mostrar hasta las 11 AM ART
       .filter(hasH2HData)
       .sort(sortByPrioThenTime)
       .slice(0, 30);
@@ -5668,35 +5686,43 @@ async function loadHistoricalScores() {
       };
     });
 
+  // 1) Siempre resolver contra scoresData en memoria (gratis, sincrónico)
+  if (scoresData && scoresData.length) {
+    resolveCompletedGames(scoresData, true);
+  }
+
   try {
-    // Fetch all needed sport keys in parallel
-    const results = await Promise.allSettled(
-      [...needed].map(sportKey =>
+    // 2) Fetch por sport key Y siempre también el genérico con daysFrom=3
+    //    (por si el Worker no soporta el parámetro sport, el genérico cubre el historial)
+    const fetchTargets = [
+      ...[...needed].map(sportKey =>
         fetch(`${WORKER_URL}/scores?sport=${encodeURIComponent(sportKey)}&daysFrom=3`)
           .then(r => r.ok ? r.json() : null)
           .catch(() => null)
-      )
-    );
+      ),
+      // genérico siempre, en paralelo
+      fetch(`${WORKER_URL}/scores?daysFrom=3`)
+        .then(r => r.ok ? r.json() : null)
+        .catch(() => null),
+    ];
+
+    const results = await Promise.allSettled(fetchTargets);
 
     const allScores = [];
+    const seen = new Set();
     results.forEach(r => {
       if (r.status === 'fulfilled' && r.value) {
         const data = r.value.data ?? (Array.isArray(r.value) ? r.value : []);
-        allScores.push(...parseScores(data));
+        parseScores(data).forEach(s => {
+          const key = `${normTeam(s.home)}_${normTeam(s.away)}`;
+          if (!seen.has(key)) { seen.add(key); allScores.push(s); }
+        });
       }
     });
 
     if (allScores.length) {
       console.log('[historicalScores] encontrados:', allScores.length, 'partidos finalizados en', needed.size, 'ligas');
       resolveAllGames(allScores);
-    } else {
-      // Fallback: llamada genérica sin sport (comportamiento anterior)
-      const res = await fetch(`${WORKER_URL}/scores?daysFrom=3`);
-      if (!res.ok) return;
-      const json = await res.json();
-      const data = json.data ?? (Array.isArray(json) ? json : []);
-      const scores = parseScores(data);
-      if (scores.length) resolveAllGames(scores);
     }
   } catch(e) { console.warn('[historicalScores]', e); }
 }
