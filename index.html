@@ -1661,6 +1661,7 @@
   .match-cell span { font-size:0.66rem; color:var(--texto-sec); }
 
   /* ── BANKROLL MANAGER ── */
+  #bankroll { position: relative; }
   .bankroll-layout { display:grid; grid-template-columns:1fr 2fr; gap:24px; }
   @media (max-width:800px) { .bankroll-layout { grid-template-columns:1fr; } }
   .bankroll-form { display:flex; flex-direction:column; gap:14px; }
@@ -1677,13 +1678,16 @@
 
   /* ── BANKROLL LOCK (guests) ── */
   .bk-lock-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
     background: linear-gradient(160deg, #0a1a0a, #0d1f0d);
     border: 1px solid rgba(0,200,83,0.2);
     border-radius: 18px;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     text-align: center; padding: 44px 28px;
-    max-width: 480px; margin: 0 auto;
+    min-height: 480px;
   }
   .bk-lock-icon { font-size: 2.6rem; margin-bottom: 16px; }
   .bk-lock-title { font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 10px; }
