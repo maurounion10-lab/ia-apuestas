@@ -5834,36 +5834,51 @@ function renderHistorial(filter) {
           ? `<span style="font-weight:700;color:#e0e0e0;letter-spacing:0.5px">${h.finalScore}</span>`
           : `<span style="color:#444">—</span>`;
         const mKey = encodeURIComponent(h.home + '|||' + h.away);
+        const mScore = encodeURIComponent(h.finalScore || '');
         const _admOk = (() => { try { const s = JSON.parse(sessionStorage.getItem(ADMIN_SESSION)||'null'); return !!(s && s.exp > Date.now()); } catch { return false; } })();
-        const resultCell = (_admOk && (h.result === 'void' || h.result === 'pending'))
-          ? `<span class="result-${h.result} result-editable" title="Click para corregir resultado" onclick="showResultPicker(this,'${mKey}')">${h.result==='void'?'⚪ VOID':'🟡 PEND'} <span style="font-size:0.55rem;opacity:0.5">✏</span></span>`
+        // Admin: TODAS las entradas muestran ✏ para editar resultado + marcador
+        const resultCell = _admOk
+          ? `<span style="display:inline-flex;align-items:center;gap:3px">${rMap[h.result]||rMap.void}<span class="result-editable" style="cursor:pointer;font-size:0.6rem;opacity:0.45;margin-left:2px" title="Editar resultado y marcador" onclick="showResultPicker(this,'${mKey}','${h.result}','${mScore}')">✏</span></span>`
           : (rMap[h.result] || rMap.void);
         return `<tr class="${rowClass}" style="${rowStyle}"><td>${rowIcon} <strong>${h.home}</strong> vs ${h.away}</td><td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
       }).join('')
     : `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--texto-sec)">📋 El historial se llenará automáticamente con las pronósticos de cada día.</td></tr>`;
 }
 
-/* ── Corrección manual de resultado desde la tabla ── */
-function showResultPicker(el, mKey) {
-  const btns = `
-    <span style="display:inline-flex;gap:4px;align-items:center">
+/* ── Corrección manual de resultado + marcador desde la tabla (solo admin) ── */
+function showResultPicker(el, mKey, currentResult, encodedScore) {
+  const curScore = decodeURIComponent(encodedScore || '');
+  const pid = 'sp_' + Math.random().toString(36).slice(2,7);
+  // Reemplaza la celda entera (td) con el picker inline
+  const td = el.closest('td');
+  td.innerHTML = `
+    <span style="display:inline-flex;gap:4px;align-items:center;flex-wrap:wrap">
+      <input id="${pid}" type="text" value="${curScore}" placeholder="Ej: 2-1"
+        style="width:52px;background:#0d1a0d;border:1px solid rgba(0,200,83,0.4);color:#fff;padding:3px 6px;border-radius:6px;font-size:0.7rem;text-align:center;outline:none"/>
       <button class="result-picker-btn" style="background:#1b3d20;color:#00e676;border:1px solid #00c853"
-        onclick="applyHistResult('${mKey}','win')">✅ WIN</button>
+        onclick="applyHistResult('${mKey}','win','${pid}')">✅ WIN</button>
       <button class="result-picker-btn" style="background:#3d1a1a;color:#ef5350;border:1px solid #c62828"
-        onclick="applyHistResult('${mKey}','loss')">❌ LOSS</button>
-      <button class="result-picker-btn" style="background:#1a1a1a;color:#888;border:1px solid #444"
+        onclick="applyHistResult('${mKey}','loss','${pid}')">❌ LOSS</button>
+      <button class="result-picker-btn" style="background:#2a1a00;color:#ffa726;border:1px solid #e65100"
+        onclick="applyHistResult('${mKey}','void','${pid}')">⚪</button>
+      <button class="result-picker-btn" style="background:#1a1a1a;color:#888;border:1px solid #333"
         onclick="renderHistorial(histFilter)">✕</button>
     </span>`;
-  el.outerHTML = btns;
+  setTimeout(() => document.getElementById(pid)?.focus(), 50);
 }
-function applyHistResult(mKey, val) {
+
+function applyHistResult(mKey, val, scoreInputId) {
   const [home, away] = decodeURIComponent(mKey).split('|||');
   const hist = loadHistorial();
   const entry = hist.find(e => e.home === home && e.away === away);
   if (!entry) { renderHistorial(histFilter); return; }
+  // Leer marcador del input (si existe)
+  const scoreRaw = scoreInputId ? (document.getElementById(scoreInputId)?.value || '').trim() : '';
+  if (scoreRaw) entry.finalScore = scoreRaw;
   entry.result = val;
   const odds = parseFloat(entry.odds) || 1;
-  entry.pl = val === 'win' ? parseFloat(((odds - 1) * entry.stake).toFixed(2)) : val === 'loss' ? -entry.stake : 0;
+  entry.pl = val === 'win'  ? parseFloat(((odds - 1) * entry.stake).toFixed(2))
+           : val === 'loss' ? -entry.stake : 0;
   saveHistorial(hist);
   renderHistorial(histFilter);
 }
@@ -8862,21 +8877,31 @@ function aiAddMsg(role, text, withTime = true) {
 function getDailyPromoCta() {
   const day = new Date().getDay(); // 0=Dom…6=Sáb
   const promos = {
-    0: { texto: '🎁 Mañana <strong>Melbet duplica tu depósito</strong> — aprovechalo antes de las 23:59.',  casa: 'Melbet',      link: 'https://melbet.com/es/registration' },
-    1: { texto: '🎁 Hoy <strong>Melbet duplica tu depósito</strong> — el bono se activa solo los lunes.',   casa: 'Melbet',      link: 'https://melbet.com/es/registration' },
-    2: { texto: '🎁 Hoy <strong>DBbet y Sapphirebet duplican tu primer depósito</strong> — bonos de bienvenida activos.', casa: 'DBbet',  link: 'https://dbbet.com/registration' },
-    3: { texto: '🎁 Mañana <strong>BetWinner duplica tu depósito</strong> — preparate hoy para el bono del jueves.', casa: 'BetWinner', link: 'https://betwinner.com/es/registration' },
-    4: { texto: '🎁 Hoy <strong>BetWinner duplica tu depósito</strong> — el bono del jueves está activo ahora.', casa: 'BetWinner',   link: 'https://betwinner.com/es/registration' },
-    5: { texto: '🎁 Mañana <strong>Megapari duplica tu depósito</strong> — depositá hoy para tenerlo listo.',  casa: 'Megapari',   link: 'https://megapari.com/es/registration' },
-    6: { texto: '🎁 Hoy <strong>Megapari duplica tu depósito</strong> — el bono de sábado está activo.',      casa: 'Megapari',   link: 'https://megapari.com/es/registration' },
+    0: { texto: '🎁 Mañana <strong>Melbet duplica tu depósito</strong> — aprovechalo antes de las 23:59.',  casa: 'Melbet',      link: 'https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration' },
+    1: { texto: '🎁 Hoy <strong>Melbet duplica tu depósito</strong> — el bono se activa solo los lunes.',   casa: 'Melbet',      link: 'https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration' },
+    2: { texto: '🎁 Hoy <strong>DBbet y Sapphirebet duplican tu primer depósito</strong> — bonos de bienvenida activos.', casa: 'DBbet',  link: 'https://db-bet.co/4bCBGQp', link2: 'https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836&r=email', casa2: 'SapphireBet' },
+    3: { texto: '🎁 Mañana <strong>BetWinner duplica tu depósito</strong> — preparate hoy para el bono del jueves.', casa: 'BetWinner', link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
+    4: { texto: '🎁 Hoy <strong>BetWinner duplica tu depósito</strong> — el bono del jueves está activo ahora.', casa: 'BetWinner',   link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
+    5: { texto: '🎁 Mañana <strong>Megapari duplica tu depósito</strong> — depositá hoy para tenerlo listo.',  casa: 'Megapari',   link: 'https://proarg.megapari-003572.in/' },
+    6: { texto: '🎁 Hoy <strong>Megapari duplica tu depósito</strong> — el bono de sábado está activo.',      casa: 'Megapari',   link: 'https://proarg.megapari-003572.in/' },
   };
   const p = promos[day] || promos[1];
+  const btns = p.link2
+    ? `<a href="${p.link}" target="_blank" rel="noopener"
+         style="flex-shrink:0;background:var(--verde);color:#000;font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
+         ${p.casa} →
+       </a>
+       <a href="${p.link2}" target="_blank" rel="noopener"
+         style="flex-shrink:0;background:rgba(0,200,83,0.2);color:var(--verde);border:1px solid var(--verde);font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
+         ${p.casa2} →
+       </a>`
+    : `<a href="${p.link}" target="_blank" rel="noopener"
+         style="flex-shrink:0;background:var(--verde);color:#000;font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
+         Registrarse →
+       </a>`;
   return `<div style="margin-top:12px;padding:10px 13px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.25);border-radius:10px;font-size:0.8rem;line-height:1.5;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
     <span style="color:#ccc">${p.texto}</span>
-    <a href="${p.link}" target="_blank" rel="noopener"
-       style="flex-shrink:0;background:var(--verde);color:#000;font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
-      Registrarse →
-    </a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${btns}</div>
   </div>`;
 }
 
@@ -9041,15 +9066,15 @@ function aiSendChip(chipId) {
     const day = new Date().getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
     const promoBase = 'INSTRUCCIÓN: Eres el experto de gambeta.ai. Presentá directamente la siguiente información de promo al usuario, de forma entusiasta y clara. NO digas que no tenés datos ni hagas aclaraciones sobre tus limitaciones — simplemente presentá la info con confianza y agregá tips prácticos para aprovecharla.\n\n';
     const promoMap = {
-      0: promoBase + '📅 HOY ES DOMINGO — PREPARATE PARA EL LUNES DE MELBET\n\nMañana Melbet DUPLICA tu depósito al 100% — es decir, si depositás $50 recibís $100 para apostar. Para tenerlo listo: 1) Tener cuenta activa en Melbet, 2) Depositar mañana lunes antes de las 23:59, 3) Ir a "Mis Bonos" y activar el bono de recarga manualmente antes de apostar. Rollover: 5x el bono en cuotas de 1.40+. Tip: depositá exactamente lo que vayas a usar — el 100% extra es plata real para apostar con fondos dobles.',
-      1: promoBase + '📅 HOY ES LUNES — MELBET DUPLICA TU DEPÓSITO 🟡\n\nPromo activa HOY: Melbet te da el 100% de tu depósito como bono — depositás $50 y tenés $100 para apostar. Cómo activarlo: 1) Ingresá a Melbet, 2) Hacé tu depósito, 3) Antes de apostar andá a "Mis Bonos" y activá el bono de recarga del lunes. Rollover: 5x en cuotas mínimas de 1.40. Tip: usá los fondos dobles en una acumulada de 2-3 partidos con cuotas entre 1.50-1.80 — es la forma más rápida de liberar el bono y sacar ganancia real.',
-      2: promoBase + '📅 HOY ES MARTES — DOS CASAS NUEVAS DUPLICAN TU PRIMER DEPÓSITO 🆕\n\nDos bookmakers nuevos en LATAM están regalando el 100% del primer depósito:\n\n🔵 DBbet: depositás $X y apostás con $2X. Cuotas muy competitivas, retiros rápidos, acepta criptomonedas.\n\n💎 Sapphirebet: también duplica el 100% del primer depósito. Excelentes cuotas en fútbol sudamericano y NBA, soporte en español 24/7.\n\nTip: Si no tenés cuenta en ninguna, este martes es la oportunidad perfecta — son bonos de bienvenida de una sola vez. Abrí cuenta, depositá el mínimo, y ya tenés fondos dobles para arrancar.',
-      3: promoBase + '📅 HOY ES MIÉRCOLES — PREPARATE: MAÑANA BETWINNER DUPLICA TU DEPÓSITO ⚡\n\nMañana jueves BetWinner hace 100% match de tu depósito — lo que ponés, lo duplican. Para tenerlo listo: 1) Tener cuenta BetWinner activa y verificada, 2) Depositar mañana jueves, 3) Confirmar en "Promociones" que el bono esté activo antes de apostar. Rollover: 5x en cuotas 1.40+. Tip: BetWinner tiene de las mejores cuotas en Champions League y Copa Libertadores — con fondos dobles podés cubrir más mercados.',
-      4: promoBase + '📅 HOY ES JUEVES — BETWINNER DUPLICA TU DEPÓSITO HOY ⚡\n\nPromo activa HOY: BetWinner te da el 100% de tu depósito como bono — fondos dobles para apostar. Cómo activarla: 1) Ingresá a BetWinner, 2) Hacé tu depósito, 3) Verificar en sección "Bonos" que se acreditó el 100%. Rollover: 5x en cuotas de 1.40 o más. Tip: BetWinner tiene mercados de goles, corners y tarjetas con muy buenas cuotas — combiná 2-3 partidos de hoy para cumplir el rollover en el mismo día.',
-      5: promoBase + '📅 HOY ES VIERNES — PREPARATE: MAÑANA MEGAPARI DUPLICA TU DEPÓSITO 🎰\n\nMañana sábado Megapari hace 100% match — depositás y te duplican el monto al instante. Si querés tener todo listo: 1) Ingresá a Megapari hoy, 2) Podés depositar hoy viernes o mañana temprano, 3) El sábado andá a "Bonos activos" y activá el bono de recarga. Rollover: 6x en cuotas 1.40+. Tip: Megapari tiene cuotas excelentes en NBA y eSports — con fondos dobles podés diversificar y cubrir más partidos del fin de semana.',
-      6: promoBase + '📅 HOY ES SÁBADO — MEGAPARI DUPLICA TU DEPÓSITO HOY 🎰\n\nPromo activa HOY: Megapari hace el 100% de match sobre tu depósito — ponés $50 y apostás con $100. Cómo activarla: 1) Ingresá a tu cuenta Megapari, 2) Hacé tu depósito, 3) Andá a "Bonos activos" y seleccioná el bono de recarga de sábado. Rollover: 6x en cuotas de 1.40 o más. Tip: hoy con ligas europeas + americanas hay decenas de partidos — armá una acumulada de 3-4 partidos con cuotas bajas (1.40-1.60) y liberás el bono en el día.'
+      0: promoBase + '📅 HOY ES DOMINGO — PREPARATE PARA EL LUNES DE MELBET\n\nMañana Melbet DUPLICA tu depósito al 100% — si depositás $50 recibís $100 para apostar. Para tenerlo listo: 1) Tener cuenta activa en Melbet, 2) Depositar mañana lunes antes de las 23:59, 3) Ir a "Mis Bonos" y activar el bono de recarga manualmente antes de apostar. Rollover: 5x el bono en cuotas de 1.40+. Tip: depositá exactamente lo que vayas a usar — el 100% extra es plata real para apostar con fondos dobles.\n\nLink de registro Melbet (afiliado exclusivo PronosticosLATAM): https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration\n\nAl final de tu respuesta invitá al usuario a registrarse en Melbet con ese link.',
+      1: promoBase + '📅 HOY ES LUNES — MELBET DUPLICA TU DEPÓSITO 🟡\n\nPromo activa HOY: Melbet te da el 100% de tu depósito como bono — depositás $50 y tenés $100 para apostar. Cómo activarlo: 1) Ingresá a Melbet, 2) Hacé tu depósito, 3) Antes de apostar andá a "Mis Bonos" y activá el bono de recarga del lunes. Rollover: 5x en cuotas mínimas de 1.40. Tip: usá los fondos dobles en una acumulada de 2-3 partidos con cuotas entre 1.50-1.80 — es la forma más rápida de liberar el bono y sacar ganancia real.\n\nLink de registro Melbet (afiliado exclusivo PronosticosLATAM): https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration\n\nAl final de tu respuesta invitá al usuario a registrarse en Melbet con ese link.',
+      2: promoBase + '📅 HOY ES MARTES — DOS CASAS NUEVAS DUPLICAN TU PRIMER DEPÓSITO 🆕\n\nDos bookmakers nuevos en LATAM están regalando el 100% del primer depósito:\n\n🔵 DBbet: depositás $X y apostás con $2X. Cuotas muy competitivas, retiros rápidos, acepta criptomonedas. Link exclusivo PronosticosLATAM: https://db-bet.co/4bCBGQp\n\n💎 Sapphirebet: también duplica el 100% del primer depósito. Excelentes cuotas en fútbol sudamericano y NBA, soporte en español 24/7. Link exclusivo PronosticosLATAM: https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836&r=email\n\nTip: Si no tenés cuenta en ninguna, este martes es la oportunidad perfecta — son bonos de bienvenida de una sola vez. Abrí cuenta, depositá el mínimo, y ya tenés fondos dobles para arrancar.\n\nAl final de tu respuesta mostrá los dos links de registro para que el usuario elija.',
+      3: promoBase + '📅 HOY ES MIÉRCOLES — PREPARATE: MAÑANA BETWINNER DUPLICA TU DEPÓSITO ⚡\n\nMañana jueves BetWinner hace 100% match de tu depósito — lo que ponés, lo duplican. Para tenerlo listo: 1) Tener cuenta BetWinner activa y verificada, 2) Depositar mañana jueves, 3) Confirmar en "Promociones" que el bono esté activo antes de apostar. Rollover: 5x en cuotas 1.40+. Tip: BetWinner tiene de las mejores cuotas en Champions League y Copa Libertadores — con fondos dobles podés cubrir más mercados.\n\nLink de registro BetWinner (afiliado exclusivo PronosticosLATAM): https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM\n\nAl final de tu respuesta invitá al usuario a registrarse en BetWinner con ese link.',
+      4: promoBase + '📅 HOY ES JUEVES — BETWINNER DUPLICA TU DEPÓSITO HOY ⚡\n\nPromo activa HOY: BetWinner te da el 100% de tu depósito como bono — fondos dobles para apostar. Cómo activarla: 1) Ingresá a BetWinner, 2) Hacé tu depósito, 3) Verificar en sección "Bonos" que se acreditó el 100%. Rollover: 5x en cuotas de 1.40 o más. Tip: BetWinner tiene mercados de goles, corners y tarjetas con muy buenas cuotas — combiná 2-3 partidos de hoy para cumplir el rollover en el mismo día.\n\nLink de registro BetWinner (afiliado exclusivo PronosticosLATAM): https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM\n\nAl final de tu respuesta invitá al usuario a registrarse en BetWinner con ese link.',
+      5: promoBase + '📅 HOY ES VIERNES — PREPARATE: MAÑANA MEGAPARI DUPLICA TU DEPÓSITO 🎰\n\nMañana sábado Megapari hace 100% match — depositás y te duplican el monto al instante. Si querés tener todo listo: 1) Ingresá a Megapari hoy, 2) Podés depositar hoy viernes o mañana temprano, 3) El sábado andá a "Bonos activos" y activá el bono de recarga. Rollover: 6x en cuotas 1.40+. Tip: Megapari tiene cuotas excelentes en NBA y eSports — con fondos dobles podés diversificar y cubrir más partidos del fin de semana.\n\nLink de registro Megapari (afiliado exclusivo PronosticosLATAM): https://proarg.megapari-003572.in/\n\nAl final de tu respuesta invitá al usuario a registrarse en Megapari con ese link.',
+      6: promoBase + '📅 HOY ES SÁBADO — MEGAPARI DUPLICA TU DEPÓSITO HOY 🎰\n\nPromo activa HOY: Megapari hace el 100% de match sobre tu depósito — ponés $50 y apostás con $100. Cómo activarla: 1) Ingresá a tu cuenta Megapari, 2) Hacé tu depósito, 3) Andá a "Bonos activos" y seleccioná el bono de recarga de sábado. Rollover: 6x en cuotas de 1.40 o más. Tip: hoy con ligas europeas + americanas hay decenas de partidos — armá una acumulada de 3-4 partidos con cuotas bajas (1.40-1.60) y liberás el bono en el día.\n\nLink de registro Megapari (afiliado exclusivo PronosticosLATAM): https://proarg.megapari-003572.in/\n\nAl final de tu respuesta invitá al usuario a registrarse en Megapari con ese link.'
     };
-    sendText = promoMap[day] || (promoBase + '¿Qué casas de apuestas tienen las mejores promociones activas hoy? Mencioná Melbet, BetWinner y Megapari con sus bonos más destacados.');
+    sendText = promoMap[day] || (promoBase + '¿Qué casas de apuestas tienen las mejores promociones activas hoy? Mencioná Melbet (https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration), BetWinner (https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM) y Megapari (https://proarg.megapari-003572.in/) con sus bonos más destacados. Incluí los links de registro al final.');
 
   } else {
     // fallback: send as-is
