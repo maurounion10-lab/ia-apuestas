@@ -2564,8 +2564,8 @@
 <div class="hero">
   <div class="hero-text">
     <div class="hero-tag">⚡ IA Actualizada en Tiempo Real<span class="live-dot" style="margin-left:7px;margin-right:0"></span></div>
-    <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apostar</span></h1>
-    <p><strong>Soy la primer IA para apuestas deportivas a la que puedes preguntarle</strong>, hablar e interactuar, armemos una buena combinada. ¡Ya te mandé abajo! 🤙</p>
+    <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apuestas Deportivas</span></h1>
+    <p><strong>Soy la primer IA para apuestas deportivas a la que puedes preguntarle</strong>, hablar e interactuar, armemos una buena combinada.</p>
     <div class="hero-stats">
       <div class="hero-stat"><span class="num" id="heroStatPrecision">–</span><span class="lbl">Precisión IA</span></div>
       <div class="hero-stat"><span class="num" id="heroStatPicks">–</span><span class="lbl">Picks realizados</span></div>
@@ -6734,17 +6734,49 @@ function buildOddsHeader() {} // no-op: replaced by card layout
 // ═══════════════════════════════════════════════
 const bankrollData = {
   initial: 1000,
-  history: [
-    { match:'Man City vs Arsenal',     odds:1.80, stake:100, result:'win',  pl:+80 },
-    { match:'Djokovic vs Medvedev',    odds:1.55, stake:80,  result:'win',  pl:+44 },
-    { match:'Barcelona vs PSG',        odds:2.10, stake:100, result:'loss', pl:-100 },
-    { match:'Lakers vs Heat',          odds:1.90, stake:80,  result:'win',  pl:+72 },
-    { match:'Bayern vs RB Leipzig',    odds:1.60, stake:120, result:'win',  pl:+72 },
-    { match:'River vs Independiente',  odds:1.70, stake:100, result:'loss', pl:-100 },
-    { match:'Alcaraz vs Sinner',       odds:1.75, stake:100, result:'win',  pl:+75 },
-    { match:'Celtics vs Bucks',        odds:1.85, stake:100, result:'win',  pl:+85 },
-  ]
+  history: []
 };
+
+// ── Persistencia de Bankroll por usuario ──────────────────────────────────────
+function _bmKey() {
+  const email = authUser?.email || 'guest';
+  return `gambeta_bm_${email}`;
+}
+function saveBankrollData() {
+  try {
+    localStorage.setItem(_bmKey(), JSON.stringify({
+      initial: bankrollData.initial,
+      history: bankrollData.history
+    }));
+  } catch(e) {}
+}
+function loadBankrollData() {
+  try {
+    const raw = localStorage.getItem(_bmKey());
+    if (raw) {
+      const saved = JSON.parse(raw);
+      bankrollData.initial = saved.initial ?? 1000;
+      bankrollData.history = Array.isArray(saved.history) ? saved.history : [];
+    } else {
+      // Primera vez: empezar limpio
+      bankrollData.initial = 1000;
+      bankrollData.history = [];
+    }
+  } catch(e) {
+    bankrollData.initial = 1000;
+    bankrollData.history = [];
+  }
+  renderBankrollSummary();
+  drawBankrollChart();
+  renderBetsList();
+}
+function clearBankrollData() {
+  bankrollData.initial = 1000;
+  bankrollData.history = [];
+  renderBankrollSummary();
+  drawBankrollChart();
+  renderBetsList();
+}
 function calcBankrollHistory() {
   let bal=bankrollData.initial;
   return [bal,...bankrollData.history.map(b=>{bal+=b.pl;return bal;})];
@@ -6813,6 +6845,7 @@ function addBet() {
   const pl=result==='win'?+(stake*(odds-1)).toFixed(2):result==='loss'?-stake:0;
   bankrollData.history.push({match,odds,stake,result,pl});
   ['bk-match','bk-odds','bk-stake'].forEach(id=>document.getElementById(id).value='');
+  saveBankrollData();  // ← persistir en localStorage
   renderBankrollSummary(); drawBankrollChart(); renderBetsList();
 }
 
@@ -7864,6 +7897,7 @@ sbClient.auth.onAuthStateChange(async (event, session) => {
       joined:   new Date(u.created_at).toLocaleDateString('es')
     };
     updateNavAuth();
+    loadBankrollData();   // ← cargar bankroll real del usuario
     await acLoadFromDB(u.email);
     await sbLoadHistorial();
     closeAuth();
@@ -7871,6 +7905,7 @@ sbClient.auth.onAuthStateChange(async (event, session) => {
   } else if (event === 'SIGNED_OUT') {
     // Solo limpiar UI si había sesión previa
     if (authUser) {
+      clearBankrollData();  // ← limpiar bankroll al cerrar sesión
       authUser = null;
       pendingSocial = null;
       document.getElementById('navUserWrap').classList.remove('visible');
@@ -9545,13 +9580,21 @@ function admSetBankroll() {
     cfg.bankrollInit = val;
     localStorage.setItem(ADMIN_KEY, JSON.stringify(cfg));
   } catch {}
-  if (typeof bankrollData !== 'undefined') { bankrollData.initial = val; renderBankroll && renderBankroll(); }
+  if (typeof bankrollData !== 'undefined') {
+    bankrollData.initial = val;
+    saveBankrollData();
+    renderBankrollSummary(); drawBankrollChart(); renderBetsList();
+  }
   document.getElementById('admBankrollMsg').textContent = `✓ Balance inicial actualizado a $${val}`;
   setTimeout(()=>document.getElementById('admBankrollMsg').textContent='',2500);
 }
 function admResetBankroll() {
   if (!confirm('¿Resetear el bankroll al valor inicial?')) return;
-  if (typeof bankrollData !== 'undefined') { bankrollData.history=[]; renderBankroll && renderBankroll(); }
+  if (typeof bankrollData !== 'undefined') {
+    bankrollData.history = [];
+    saveBankrollData();
+    renderBankrollSummary(); drawBankrollChart(); renderBetsList();
+  }
   document.getElementById('admBankrollMsg').textContent = '✓ Bankroll reseteado';
   setTimeout(()=>document.getElementById('admBankrollMsg').textContent='',2500);
 }
@@ -9649,10 +9692,10 @@ function admSaveConfig() {
 /* ── Botón flotante ── */
 #aiChatBtn {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
-  width: 58px;
-  height: 58px;
+  bottom: 36px;
+  right: 36px;
+  width: 73px;
+  height: 73px;
   border-radius: 50%;
   background: transparent;
   border: none;
@@ -9670,7 +9713,7 @@ function admSaveConfig() {
 #aiChatBtn::before {
   content: '';
   position: absolute;
-  width: 58px; height: 58px;
+  width: 73px; height: 73px;
   border-radius: 50%;
   border: 2px solid rgba(0,200,83,0.6);
   animation: aiPulseRing 2.2s ease-out infinite;
@@ -9678,7 +9721,7 @@ function admSaveConfig() {
 #aiChatBtn::after {
   content: '';
   position: absolute;
-  width: 58px; height: 58px;
+  width: 73px; height: 73px;
   border-radius: 50%;
   border: 2px solid rgba(0,200,83,0.35);
   animation: aiPulseRing 2.2s ease-out infinite 0.7s;
@@ -9961,14 +10004,15 @@ function admSaveConfig() {
 
 /* Mobile */
 @media (max-width: 480px) {
-  #aiChatBox { width: calc(100vw - 24px); right: 12px; bottom: 88px; }
-  #aiChatBtn { right: 16px; bottom: 16px; }
+  #aiChatBox { width: calc(100vw - 24px); right: 12px; bottom: 100px; }
+  #aiChatBtn { right: 24px; bottom: 24px; width: 66px; height: 66px; }
+  #aiChatBtn::before, #aiChatBtn::after { width: 66px; height: 66px; }
 }
 </style>
 
 <!-- Botón flotante -->
 <button id="aiChatBtn" onclick="aiToggleChat()">
-  <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA" style="width:54px;height:54px;border-radius:50%;object-fit:cover;object-position:center top;position:relative;z-index:1">
+  <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA" style="width:68px;height:68px;border-radius:50%;object-fit:cover;object-position:center top;position:relative;z-index:1">
   <span id="aiChatBadge">1</span>
 </button>
 
