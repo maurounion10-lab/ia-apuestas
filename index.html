@@ -1592,20 +1592,16 @@
   .hist-stat-card { background:var(--gris-card); border:1px solid var(--borde); border-radius:12px; padding:14px 16px; text-align:center; }
   .hist-stat-card .hval { font-size:1.6rem; font-weight:800; display:block; }
   .hist-stat-card .hlbl { font-size:0.7rem; color:var(--texto-sec); text-transform:uppercase; letter-spacing:0.4px; }
-  .hist-table-wrap { overflow-x:hidden; overflow-y:auto; max-height:460px; border-radius:14px; border:1px solid var(--borde); scrollbar-width:thin; scrollbar-color:rgba(0,200,83,0.3) transparent; }
-  .hist-table-wrap::-webkit-scrollbar { width:5px; }
+  /* La tabla solo scrollea HORIZONTAL dentro del wrapper.
+     El scroll VERTICAL lo hace la página normalmente — nunca los dos al mismo tiempo. */
+  .hist-table-wrap { overflow-x:auto; overflow-y:visible; border-radius:14px; border:1px solid var(--borde); scrollbar-width:thin; scrollbar-color:rgba(0,200,83,0.3) transparent; }
+  .hist-table-wrap::-webkit-scrollbar { height:5px; }
   .hist-table-wrap::-webkit-scrollbar-track { background:transparent; }
   .hist-table-wrap::-webkit-scrollbar-thumb { background:rgba(0,200,83,0.3); border-radius:10px; }
-  .hist-table { width:100%; border-collapse:collapse; font-size:0.84rem; table-layout:fixed; }
+  .hist-table { width:max-content; min-width:100%; border-collapse:collapse; font-size:0.84rem; }
   .hist-table thead { position:sticky; top:0; z-index:2; }
-  .hist-table th { background:rgba(15,30,15,0.98); backdrop-filter:blur(6px); padding:10px 14px; text-align:left; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--texto-sec); border-bottom:1px solid var(--borde); }
-  .hist-table td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:middle; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-  /* En mobile, ocultar columnas menos críticas para que la tabla entre sin scroll horizontal */
-  @media (max-width:600px) {
-    .hist-table .col-stake, .hist-table .col-marcador { display:none; }
-    .hist-table td { padding:8px 8px; font-size:0.78rem; white-space:normal; }
-    .hist-table th { padding:8px 8px; }
-  }
+  .hist-table th { background:rgba(15,30,15,0.98); backdrop-filter:blur(6px); padding:10px 14px; text-align:left; font-size:0.7rem; text-transform:uppercase; letter-spacing:0.5px; color:var(--texto-sec); border-bottom:1px solid var(--borde); white-space:nowrap; }
+  .hist-table td { padding:10px 14px; border-bottom:1px solid rgba(255,255,255,0.04); vertical-align:middle; white-space:nowrap; }
   .hist-table tr:last-child td { border-bottom:none; }
   .hist-table tr:hover td { background:rgba(255,255,255,0.02); }
   .hist-row-today td { background:rgba(64,160,255,0.07) !important; }
@@ -2446,7 +2442,7 @@
 
     <div class="hist-table-wrap">
       <table class="hist-table">
-        <thead><tr><th>Partido</th><th>Recomendación</th><th>Cuota</th><th class="col-stake">Stake</th><th>Resultado</th><th class="col-marcador">Marcador Final</th><th>P/L</th></tr></thead>
+        <thead><tr><th>Partido</th><th>Recomendación</th><th>Cuota</th><th>Stake</th><th>Resultado</th><th>Marcador Final</th><th>P/L</th></tr></thead>
         <tbody id="histTableBody"></tbody>
       </table>
     </div>
@@ -4384,7 +4380,10 @@ function buildPredsFromOdds() {
   };
 
   // Solo partidos que AÚN NO comenzaron — nunca recomendar partidos en vivo o ya iniciados
+  // Siempre expandimos hasta mínimo 48h para capturar Champions/top-ligas de mañana
+  // aunque ya haya 2+ candidatos en 24h (ej: Brasileirao hoy no debe tapar Champions mañana)
   const WINDOWS = [24, 48, 72, 120, 168];
+  const TOP_PRIO_THRESHOLD = LEAGUE_PRIO.soccer_conmebol_copa_libertadores; // 99+
   let candidates = [];
   for (const hours of WINDOWS) {
     const windowEnd = now + hours * 3600000;
@@ -4396,7 +4395,10 @@ function buildPredsFromOdds() {
       .filter(hasH2HData)
       .sort(sortByPrioThenTime)
       .slice(0, 30);
-    if (candidates.length >= 2) break;
+    // Cortar solo si: hay 2+ candidatos Y ya cubrimos 48h (para no perder Champions/Libertadores de mañana)
+    // O si el mejor candidato ya es Champions/Libertadores en 24h
+    const bestPrio = candidates.length ? getGamePrio(candidates[0].sport_key) : 0;
+    if (candidates.length >= 2 && (hours >= 48 || bestPrio >= TOP_PRIO_THRESHOLD)) break;
   }
 
   const totalRaw = window._rawOddsGames.length;
@@ -5809,7 +5811,7 @@ function renderHistorial(filter) {
         const resultCell = (_admOk && (h.result === 'void' || h.result === 'pending'))
           ? `<span class="result-${h.result} result-editable" title="Click para corregir resultado" onclick="showResultPicker(this,'${mKey}')">${h.result==='void'?'⚪ VOID':'🟡 PEND'} <span style="font-size:0.55rem;opacity:0.5">✏</span></span>`
           : (rMap[h.result] || rMap.void);
-        return `<tr class="${rowClass}" style="${rowStyle}"><td>${rowIcon} <strong>${h.home}</strong> vs ${h.away}</td><td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td class="col-stake">$${h.stake}</td><td>${resultCell}</td><td class="col-marcador">${marcador}</td><td>${plHtml}</td></tr>`;
+        return `<tr class="${rowClass}" style="${rowStyle}"><td>${rowIcon} <strong>${h.home}</strong> vs ${h.away}</td><td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
       }).join('')
     : `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--texto-sec)">📋 El historial se llenará automáticamente con las pronósticos de cada día.</td></tr>`;
 }
