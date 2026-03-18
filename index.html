@@ -7692,7 +7692,7 @@ async function fetchGFeed() {
   try {
     const { data, error } = await sbClient
       .from('acoin_users')
-      .select('nickname, avatar, picks, balance')
+      .select('email, picks, balance')
       .not('picks', 'is', null)
       .order('updated_at', { ascending: false })
       .limit(40);
@@ -7702,12 +7702,12 @@ async function fetchGFeed() {
     // Aplanar todos los picks de todos los usuarios, ordenar por ts desc
     const allBets = [];
     data.forEach(user => {
-      const nick = user.nickname || '???';
-      const ava  = user.avatar  || null;
+      const emailPart = (user.email || 'usuario').split('@')[0];
+      const nick = emailPart.length > 14 ? emailPart.slice(0, 14) : emailPart;
       const bal  = user.balance || 0;
       (user.picks || []).forEach(p => {
         if (p.ts && p.home && p.away && p.pick && p.betAmount) {
-          allBets.push({ nick, ava, bal, ...p });
+          allBets.push({ nick, bal, ...p });
         }
       });
     });
@@ -7726,15 +7726,12 @@ async function fetchGFeed() {
     cnt.textContent = `${recent.length} apuesta${recent.length !== 1 ? 's' : ''}`;
     list.innerHTML = recent.map((b, i) => {
       const initials = b.nick.slice(0, 2).toUpperCase();
-      const avatarHtml = b.ava
-        ? `<img src="${b.ava}" alt="${b.nick}" onerror="this.parentElement.textContent='${initials}'">`
-        : initials;
       const choiceLabel = PICK_LABELS[b.pick] || b.pick;
       const shortHome = b.home.length > 12 ? b.home.slice(0,11)+'…' : b.home;
       const shortAway = b.away.length > 12 ? b.away.slice(0,11)+'…' : b.away;
       return `
         <div class="gfeed-item" style="animation-delay:${i * 0.04}s">
-          <div class="gfeed-avatar">${avatarHtml}</div>
+          <div class="gfeed-avatar">${initials}</div>
           <div class="gfeed-body">
             <div class="gfeed-nick">${b.nick}</div>
             <div class="gfeed-bet"><strong>${shortHome} vs ${shortAway}</strong> · ${choiceLabel} · ${_timeAgo(b.ts)}</div>
