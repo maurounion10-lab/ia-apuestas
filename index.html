@@ -208,28 +208,44 @@
     text-align: left;
   }
   @media (max-width: 768px) {
-    .hero { flex-direction: column; padding: 36px 20px 32px; gap: 24px; }
-    .hero-text { text-align: center; }
+    .hero { flex-direction: column; padding: 36px 20px 32px; gap: 18px; align-items: center; }
+    .hero-text { text-align: center; order: 1; }
+    .hero-mascot-wrap { order: 0; } /* mascot aparece primero en mobile */
+  }
+  /* Punto rojo titilando */
+  .live-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #f44336;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    box-shadow: 0 0 0 0 rgba(244,67,54,0.6);
+    animation: livePulse 1.6s ease-out infinite;
+  }
+  @keyframes livePulse {
+    0%   { box-shadow: 0 0 0 0 rgba(244,67,54,0.6); }
+    70%  { box-shadow: 0 0 0 7px rgba(244,67,54,0); }
+    100% { box-shadow: 0 0 0 0 rgba(244,67,54,0); }
   }
   .hero-mascot {
     flex-shrink: 0;
-    width: 220px;
+    width: 240px;
+    height: 240px;
+    border-radius: 24px;
+    overflow: hidden;
     position: relative;
-    filter: drop-shadow(0 8px 32px rgba(0,180,255,0.3)) drop-shadow(0 0 60px rgba(0,200,83,0.15));
-    animation: heroFloat 4s ease-in-out infinite;
+    box-shadow: 0 8px 40px rgba(0,200,83,0.3), 0 0 0 2px rgba(0,200,83,0.2);
   }
   .hero-mascot img {
     width: 100%;
-    height: auto;
-    display: block;
-    object-fit: contain;
-  }
-  @keyframes heroFloat {
-    0%, 100% { transform: translateY(0px); }
-    50%       { transform: translateY(-10px); }
+    height: 100%;
+    object-fit: cover;
+    object-position: 50% 35%;
   }
   @media (max-width: 768px) {
-    .hero-mascot { width: 150px; }
+    .hero-mascot { width: 170px; height: 170px; border-radius: 20px; }
   }
 
   .hero::before {
@@ -2374,7 +2390,7 @@
 <!-- HERO -->
 <div class="hero">
   <div class="hero-text">
-    <div class="hero-tag">⚡ IA Actualizada en Tiempo Real</div>
+    <div class="hero-tag">⚡ IA Actualizada en Tiempo Real<span class="live-dot" style="margin-left:7px;margin-right:0"></span></div>
     <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apostar</span></h1>
     <p>Soy la primer IA para apuestas deportivas a la que puedes PREGUNTARLE, hablar e interactuar, armemos una buena combinada. ¡Ya te mandé abajo! 🤙</p>
     <div class="hero-stats">
@@ -2383,11 +2399,9 @@
       <div class="hero-stat"><span class="num" id="heroStatLeagues">38</span><span class="lbl">Ligas cubiertas</span></div>
     </div>
   </div>
-  <div style="flex-shrink:0">
+  <div class="hero-mascot-wrap" style="flex-shrink:0">
     <div class="hero-mascot">
-      <img src="https://pbs.twimg.com/media/HDnv0CbXMAAO6_R?format=jpg&name=medium"
-           alt="gambeta.ai Bot"
-           onerror="this.src='https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C'">
+      <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="gambeta.ai Bot">
     </div>
   </div>
 </div>
@@ -2946,7 +2960,7 @@
   <div class="chat-window hidden" id="chatWindow">
     <div class="chat-header">
       <div class="chat-header-info">
-        <div class="chat-avatar"><img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="Bot"></div>
+        <div class="chat-avatar"><img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot"></div>
         <div>
           <h4>gambeta.ai</h4>
           <div class="chat-online">
@@ -2974,7 +2988,7 @@
       🔥 ¡Tengo el mejor pronóstico para hoy!
     </div>
     <button class="chat-bubble" onclick="toggleChat()" id="chatBubble">
-      <img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="Bot">
+      <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot">
       <div class="chat-notify" id="chatNotify">1</div>
     </button>
   </div>
@@ -7896,7 +7910,7 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
     <div class="auth-step active" id="authStep1">
       <div class="auth-brand">
         <div style="width:52px;height:52px;border-radius:50%;overflow:hidden;border:2px solid var(--verde);flex-shrink:0">
-          <img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="Bot" style="width:100%;height:100%;object-fit:cover;object-position:50% 20%">
+          <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot" style="width:100%;height:100%;object-fit:cover;object-position:50% 20%">
         </div>
         <span class="auth-brand-name">gambeta<span>.ai</span></span>
       </div>
@@ -8930,7 +8944,7 @@ function admSaveConfig() {
 
 <!-- Botón flotante -->
 <button id="aiChatBtn" onclick="aiToggleChat()">
-  <img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="IA" style="width:54px;height:54px;border-radius:50%;object-fit:cover;object-position:center top;position:relative;z-index:1">
+  <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA" style="width:54px;height:54px;border-radius:50%;object-fit:cover;object-position:center top;position:relative;z-index:1">
   <span id="aiChatBadge">1</span>
 </button>
 
@@ -8939,7 +8953,7 @@ function admSaveConfig() {
   <!-- Header -->
   <div class="ai-header">
     <div class="ai-header-avatar">
-      <img src="https://lh3.googleusercontent.com/d/1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C" alt="IA" style="width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:center top">
+      <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA" style="width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:center top">
     </div>
     <div class="ai-header-info">
       <div class="ai-header-name">gambeta.ai</div>
@@ -9147,19 +9161,30 @@ function getDailyPromoCta() {
     5: { texto: '🎁 Mañana <strong>Megapari duplica tu depósito</strong> — depositá hoy para tenerlo listo.',  casa: 'Megapari',   link: 'https://proarg.megapari-003572.in/' },
     6: { texto: '🎁 Hoy <strong>Megapari duplica tu depósito</strong> — el bono de sábado está activo.',      casa: 'Megapari',   link: 'https://proarg.megapari-003572.in/' },
   };
+  const BOOK_FAVICONS = {
+    'Melbet':      'https://www.google.com/s2/favicons?domain=melbet.com&sz=64',
+    'BetWinner':   'https://www.google.com/s2/favicons?domain=betwinner.com&sz=64',
+    'Megapari':    'https://www.google.com/s2/favicons?domain=megapari.com&sz=64',
+    'DBbet':       'https://www.google.com/s2/favicons?domain=db-bet.com&sz=64',
+    'SapphireBet': 'https://www.google.com/s2/favicons?domain=sapphirebet.com&sz=64',
+  };
+  const faviconImg = (nombre) => {
+    const src = BOOK_FAVICONS[nombre];
+    return src ? `<img src="${src}" style="width:16px;height:16px;border-radius:3px;vertical-align:middle;margin-right:5px;background:#fff;padding:1px" onerror="this.style.display='none'">` : '';
+  };
   const p = promos[day] || promos[1];
   const btns = p.link2
     ? `<a href="${p.link}" target="_blank" rel="noopener"
-         style="flex-shrink:0;background:var(--verde);color:#000;font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
-         ${p.casa} →
+         style="flex-shrink:0;display:inline-flex;align-items:center;background:var(--verde);color:#000;font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
+         ${faviconImg(p.casa)}${p.casa} →
        </a>
        <a href="${p.link2}" target="_blank" rel="noopener"
-         style="flex-shrink:0;background:rgba(0,200,83,0.2);color:var(--verde);border:1px solid var(--verde);font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
-         ${p.casa2} →
+         style="flex-shrink:0;display:inline-flex;align-items:center;background:rgba(0,200,83,0.2);color:var(--verde);border:1px solid var(--verde);font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
+         ${faviconImg(p.casa2)}${p.casa2} →
        </a>`
     : `<a href="${p.link}" target="_blank" rel="noopener"
-         style="flex-shrink:0;background:var(--verde);color:#000;font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
-         Registrarse →
+         style="flex-shrink:0;display:inline-flex;align-items:center;background:var(--verde);color:#000;font-size:0.75rem;font-weight:800;padding:6px 14px;border-radius:20px;text-decoration:none;white-space:nowrap">
+         ${faviconImg(p.casa)}Registrarse →
        </a>`;
   return `<div style="margin-top:12px;padding:10px 13px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.25);border-radius:10px;font-size:0.8rem;line-height:1.5;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
     <span style="color:#ccc">${p.texto}</span>
@@ -9313,16 +9338,16 @@ function _showPromoDirecta() {
   };
 
   const casas = [
-    { nombre: 'Melbet',      emoji: '🟡', link: 'https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration', color: '#ffa000' },
-    { nombre: 'BetWinner',   emoji: '⚡', link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM',                 color: '#2196f3' },
-    { nombre: 'Megapari',    emoji: '🎰', link: 'https://proarg.megapari-003572.in/',                                                color: '#9c27b0' },
-    { nombre: 'DBbet',       emoji: '🔵', link: 'https://db-bet.co/4bCBGQp',                                                         color: '#00bcd4' },
-    { nombre: 'Sapphirebet', emoji: '💎', link: 'https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836&r=email',   color: '#00acc1' },
+    { nombre: 'Melbet',      logo: 'https://www.google.com/s2/favicons?domain=melbet.com&sz=64',       link: 'https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration', color: '#ffa000' },
+    { nombre: 'BetWinner',   logo: 'https://www.google.com/s2/favicons?domain=betwinner.com&sz=64',    link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM',                 color: '#2196f3' },
+    { nombre: 'Megapari',    logo: 'https://www.google.com/s2/favicons?domain=megapari.com&sz=64',     link: 'https://proarg.megapari-003572.in/',                                                color: '#9c27b0' },
+    { nombre: 'DBbet',       logo: 'https://www.google.com/s2/favicons?domain=db-bet.com&sz=64',       link: 'https://db-bet.co/4bCBGQp',                                                         color: '#00bcd4' },
+    { nombre: 'Sapphirebet', logo: 'https://www.google.com/s2/favicons?domain=sapphirebet.com&sz=64',  link: 'https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836&r=email',   color: '#00acc1' },
   ];
 
   const casasHtml = casas.map(c =>
     `<a href="${c.link}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:10px 13px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;text-decoration:none">` +
-    `<span style="font-size:1.4rem;line-height:1">${c.emoji}</span>` +
+    `<img src="${c.logo}" style="width:32px;height:32px;border-radius:8px;object-fit:contain;background:#fff;padding:2px;flex-shrink:0" onerror="this.style.display='none'">` +
     `<div style="flex:1;min-width:0"><div style="font-size:0.82rem;font-weight:800;color:#fff">${c.nombre}</div>` +
     `<div style="font-size:0.68rem;color:rgba(255,255,255,0.5)">100% bono primer depósito</div></div>` +
     `<span style="background:${c.color};color:#000;font-size:0.65rem;font-weight:800;padding:4px 9px;border-radius:6px;white-space:nowrap">Registrarme →</span></a>`
