@@ -5791,6 +5791,18 @@ function resolveAllGames(scores) {
       else if (p.rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
       else if (p.rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
       else if (p.rec === 'Más de 3.5')     result = totalGoals >= 4 ? 'win' : 'loss';
+      else if (/^Más de (\d+\.?\d*)$/.test(p.rec)) {
+        const line = parseFloat(p.rec.replace('Más de ',''));
+        result = totalGoals > line ? 'win' : 'loss';
+      }
+      else if (/^Menos de (\d+\.?\d*)$/.test(p.rec)) {
+        const line = parseFloat(p.rec.replace('Menos de ',''));
+        result = totalGoals < line ? 'win' : 'loss';
+      }
+      else if (/^Apuesta a [+\-]?\d/.test(p.rec)) {
+        // Corner/handicap bets — no se pueden resolver automáticamente
+        result = 'void';
+      }
       if (result !== 'void' || p.result === 'pending') {
         p.result = result;
         p.finalScore = `${s.scoreH}-${s.scoreA}`;
