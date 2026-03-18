@@ -7207,6 +7207,36 @@ function toggleAuthMode() {
   document.getElementById('emailError').textContent = '';
 }
 
+async function sendMagicLink() {
+  const email = document.getElementById('directEmail').value.trim();
+  const errContainer = document.getElementById('directEmail');
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errContainer.style.borderColor = 'var(--rojo)';
+    errContainer.placeholder = '⚠ Ingresá un email válido';
+    setTimeout(() => { errContainer.style.borderColor = ''; errContainer.placeholder = 'tu@email.com'; }, 2500);
+    return;
+  }
+  const btn = document.getElementById('magicLinkBtn');
+  btn.textContent = '⏳ Enviando...'; btn.disabled = true;
+  try {
+    const { error } = await sbClient.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: window.location.href.split('?')[0] }
+    });
+    if (error) {
+      btn.textContent = '✉️ Enviar link de acceso'; btn.disabled = false;
+      errContainer.style.borderColor = 'var(--rojo)';
+      setTimeout(() => errContainer.style.borderColor = '', 2500);
+    } else {
+      // Mostrar pantalla de confirmación
+      document.getElementById('welcomeMsg').textContent = `Te mandamos un link a ${email} — revisá tu bandeja y hacé clic para entrar. ✉️`;
+      showAuthStep(3);
+    }
+  } catch(e) {
+    btn.textContent = '✉️ Enviar link de acceso'; btn.disabled = false;
+  }
+}
+
 async function selectSocial(provider) {
   // Google: OAuth real → redirect a Supabase
   if (provider === 'google') {
@@ -7871,25 +7901,29 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
         Continuar con Google
         <span class="sarrow">›</span>
       </button>
-      <button class="social-btn" onclick="selectSocial('facebook')">
-        <span class="sicon"><svg width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#1877F2"/><path fill="#fff" d="M16.5 12h-3v8h-3v-8H8.5V9.5H10.5V8c0-2.2 1.3-3.5 3.3-3.5.95 0 1.95.17 1.95.17V6.8h-1.1c-1.08 0-1.42.67-1.42 1.36V9.5h2.42L15.2 12z"/></svg></span>
-        Continuar con Facebook
-        <span class="sarrow">›</span>
+
+      <div class="auth-divider">o con email</div>
+      <input class="auth-input" type="email" id="directEmail" placeholder="tu@email.com" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')sendMagicLink()">
+
+      <!-- Magic Link (opción principal) -->
+      <button class="auth-btn-main" id="magicLinkBtn" onclick="sendMagicLink()" style="margin-bottom:10px">
+        ✉️ Enviar link de acceso
       </button>
-      <button class="social-btn" onclick="selectSocial('twitter')">
-        <span class="sicon"><svg width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#000"/><path fill="#fff" d="M17.75 4h-2.6l-3.4 4.4L8.4 4H3l5.9 7.8L3.2 20h2.6l3.7-4.8 3.5 4.8H18l-6.1-8.1z"/></svg></span>
-        Continuar con X (Twitter)
-        <span class="sarrow">›</span>
-      </button>
-      <button class="social-btn" onclick="selectSocial('apple')">
-        <span class="sicon"><svg width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" rx="5" fill="#111"/><path fill="#fff" d="M17.04 17.33c-.36.82-.79 1.58-1.4 2.16-.82.8-1.7.75-2.55.34-.9-.43-1.72-.44-2.66 0-.97.45-1.84.47-2.65-.37C5.13 16.9 4.3 13.6 5.4 10.72c.72-1.88 2.1-2.97 3.52-2.99 1 .02 1.83.58 2.52.58.69 0 1.98-.72 3.33-.61.57.02 2.15.2 3.17 1.57-.08.05-1.9 1.09-1.88 3.25.02 2.58 2.28 3.44 2.3 3.45-.02.08-.37 1.21-1.32 2.36zM13.87 3.5c-.02 1.85-1.39 3.23-3.15 3.11C10.5 4.84 11.94 3.39 13.87 3.5z"/></svg></span>
-        Continuar con Apple
+      <div style="font-size:0.73rem;color:var(--texto-sec);text-align:center;margin-bottom:14px;line-height:1.4">
+        Te mandamos un link a tu email — hacés clic y entrás. Sin contraseña.
+      </div>
+
+      <!-- Separador -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.1)"></div>
+        <span style="font-size:0.7rem;color:var(--texto-sec)">o preferís contraseña</span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.1)"></div>
+      </div>
+      <button class="social-btn" onclick="selectSocial('email')" style="justify-content:center;font-size:0.82rem;padding:10px 16px">
+        🔑 Usar email + contraseña
         <span class="sarrow">›</span>
       </button>
 
-      <div class="auth-divider">o con email</div>
-      <input class="auth-input" type="email" id="directEmail" placeholder="tu@email.com" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')selectSocial('email')">
-      <button class="auth-btn-main" onclick="selectSocial('email')">Continuar con Email →</button>
       <div class="auth-legal">Al registrarte aceptás los <a href="#">Términos y Condiciones</a> y la <a href="#">Política de Privacidad</a>.</div>
     </div>
 
