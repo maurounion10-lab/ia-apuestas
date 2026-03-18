@@ -3351,6 +3351,7 @@ const sbClient = supabase.createClient(_SB_URL, _SB_KEY, {
     storage: window.localStorage,
     persistSession: true,
     detectSessionInUrl: false,
+    lock: (_name, _timeout, fn) => fn(),  // evita Web Locks API — previene AbortError
   }
 });
 
@@ -7698,7 +7699,7 @@ async function fetchGFeed() {
   try {
     const { data, error } = await sbClient
       .from('acoin_users')
-      .select('email, picks, balance')
+      .select('nickname, avatar, picks, balance, email')
       .not('picks', 'is', null)
       .order('updated_at', { ascending: false })
       .limit(40);
@@ -7708,12 +7709,20 @@ async function fetchGFeed() {
     // Aplanar todos los picks de todos los usuarios, ordenar por ts desc
     const allBets = [];
     data.forEach(user => {
-      const emailPart = (user.email || 'usuario').split('@')[0];
-      const nick = emailPart.length > 14 ? emailPart.slice(0, 14) : emailPart;
+      // Si tiene nickname elegido, usarlo; si no, usar prefijo del email como fallback
+      let nick = (user.nickname && user.nickname.trim())
+        ? user.nickname.trim().slice(0, 16)
+        : null;
+      if (!nick && user.email) {
+        const prefix = user.email.split('@')[0];
+        nick = prefix.slice(0, 1) + '*'.repeat(Math.min(prefix.length - 1, 6));
+      }
+      if (!nick) return;
+      const ava  = user.avatar || null;
       const bal  = user.balance || 0;
       (user.picks || []).forEach(p => {
         if (p.ts && p.home && p.away && p.pick && p.betAmount) {
-          allBets.push({ nick, bal, ...p });
+          allBets.push({ nick, ava, bal, ...p });
         }
       });
     });
@@ -7732,12 +7741,15 @@ async function fetchGFeed() {
     cnt.textContent = `${recent.length} apuesta${recent.length !== 1 ? 's' : ''}`;
     list.innerHTML = recent.map((b, i) => {
       const initials = b.nick.slice(0, 2).toUpperCase();
+      const avatarHtml = b.ava
+        ? `<img src="${b.ava}" alt="${b.nick}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.parentElement.textContent='${initials}'">`
+        : initials;
       const choiceLabel = PICK_LABELS[b.pick] || b.pick;
       const shortHome = b.home.length > 12 ? b.home.slice(0,11)+'…' : b.home;
       const shortAway = b.away.length > 12 ? b.away.slice(0,11)+'…' : b.away;
       return `
         <div class="gfeed-item" style="animation-delay:${i * 0.04}s">
-          <div class="gfeed-avatar">${initials}</div>
+          <div class="gfeed-avatar">${avatarHtml}</div>
           <div class="gfeed-body">
             <div class="gfeed-nick">${b.nick}</div>
             <div class="gfeed-bet"><strong>${shortHome} vs ${shortAway}</strong> · ${choiceLabel} · ${_timeAgo(b.ts)}</div>
@@ -8406,10 +8418,12 @@ function acToast(icon, title, sub) {
 function acCheckDaily() {
   const today = new Date().toLocaleDateString('en-CA');
   if (localStorage.getItem(AC_DAY) === today) return;
-  if (acGet() >= 500) return;
-  acAdd(10000, '🌅 Bonus diario');
+  const bal = acGet();
+  if (bal >= 10000) return;
+  const topUp = 10000 - bal;
+  acAdd(topUp, '🌅 Bonus diario');
   localStorage.setItem(AC_DAY, today);
-  setTimeout(() => acToast('🌅', `+10.000 ${AC_ICON} Gambeta Coins`, 'Bonus diario recibido'), 1200);
+  setTimeout(() => acToast('🌅', `+${acFmt(topUp)} ${AC_ICON} Gambeta Coins`, 'Bonus diario recibido'), 1200);
 }
 
 /* ── Bet state ── */
@@ -9140,14 +9154,22 @@ async function _obPickClubs() {
 
 async function checkOnboarding() {
   if (!authUser) return;
-  if (localStorage.getItem(GB_NICK)) return;
+  // Exigir AMBOS: nickname y avatar. Sin los dos → onboarding obligatorio
+  if (localStorage.getItem(GB_NICK) && localStorage.getItem(GB_AVA)) return;
   // Bloquear página
   const overlay = document.getElementById('onboardingOverlay');
   overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
-  setTimeout(() => { const inp = document.getElementById('obNickInput'); if (inp) inp.focus(); }, 250);
-  // Pre-cargar los 3 clubs en paralelo (step 2 los usará cuando llegue)
+  // Si ya tiene nick pero le falta avatar, saltar directo al paso 2
+  const existingNick = localStorage.getItem(GB_NICK);
   _obCurrentClubs = await _obPickClubs();
+  if (existingNick) {
+    document.getElementById('obStep1').style.display = 'none';
+    document.getElementById('obStep2').style.display = 'block';
+    renderObClubs();
+  } else {
+    setTimeout(() => { const inp = document.getElementById('obNickInput'); if (inp) inp.focus(); }, 250);
+  }
 }
 
 async function obNext() {
