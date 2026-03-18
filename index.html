@@ -9999,7 +9999,7 @@ let _inactivityFired = false; // se dispara una sola vez por sesión
 function _resetInactivityTimer() {
   clearTimeout(_inactivityTimer);
   if (_inactivityFired) return;
-  _inactivityTimer = setTimeout(_sendInactivityPromo, 60_000);
+  _inactivityTimer = setTimeout(_sendInactivityPromo, 420_000); // 7 minutos
 }
 
 function _sendInactivityPromo() {
