@@ -3346,7 +3346,13 @@ const AC_ICON = '<span class="acico">G$</span>';
 // ═══════════════════════════════════════════════
 const _SB_URL = 'https://ixfrtjvhnpapyuphqfxp.supabase.co';
 const _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZnJ0anZobnBhcHl1cGhxZnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MDExOTMsImV4cCI6MjA4OTE3NzE5M30.Lc5cOfvXCrrMlm9Yup5GG6RgCxOB_GSNJnKLTb1-bZQ';
-const sbClient = supabase.createClient(_SB_URL, _SB_KEY);
+const sbClient = supabase.createClient(_SB_URL, _SB_KEY, {
+  auth: {
+    storage: window.localStorage,
+    persistSession: true,
+    detectSessionInUrl: false,
+  }
+});
 
 // Debounced sync — batches rapid changes into one DB write
 let _syncTimer = null;
