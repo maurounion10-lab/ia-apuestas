@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8"><!-- v2 -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>gambeta.ai – La IA que apuesta con vos · Picks gratis</title>
+<title>⚡️ gambeta.ai | Inteligencia Artificial para apostar en Fútbol ⚽️</title>
 
 <!-- SEO -->
-<meta name="description" content="Pronósticos deportivos con IA en tiempo real. Champions, Libertadores, Premier, NBA y más. Registrate gratis y armá tu combinada.">
-<meta name="keywords" content="pronósticos deportivos, apuestas con IA, picks fútbol, Champions League, NBA, Libertadores, inteligencia artificial apuestas">
+<meta name="description" content="🎯 Picks de fútbol gratis generados por IA. Champions League, Premier, Libertadores y más. Pronósticos con probabilidades reales — ¡ES GRATIS!">
+<meta name="keywords" content="pronósticos deportivos, apuestas con IA, picks fútbol, Champions League, Libertadores, inteligencia artificial apuestas">
 <meta name="author" content="gambeta.ai">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://ia-apuestas.pages.dev">
@@ -15,8 +15,8 @@
 <!-- Open Graph (WhatsApp, Facebook, LinkedIn) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://ia-apuestas.pages.dev">
-<meta property="og:title" content="gambeta.ai – La IA que apuesta con vos · Picks gratis">
-<meta property="og:description" content="Pronósticos deportivos con IA en tiempo real. Champions, Libertadores, Premier, NBA y más. Registrate gratis y armá tu combinada.">
+<meta property="og:title" content="⚡️ gambeta.ai | Inteligencia Artificial para apostar en Fútbol ⚽️">
+<meta property="og:description" content="🎯 Picks de fútbol gratis generados por IA. Champions League, Premier, Libertadores y más. Pronósticos con probabilidades reales — ¡ES GRATIS!">
 <meta property="og:image" content="https://ia-apuestas.pages.dev/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -26,8 +26,8 @@
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@gambetaia">
-<meta name="twitter:title" content="gambeta.ai – La IA que apuesta con vos · Picks gratis">
-<meta name="twitter:description" content="Pronósticos deportivos con IA en tiempo real. Champions, Libertadores, Premier, NBA y más. Registrate gratis y armá tu combinada.">
+<meta name="twitter:title" content="⚡️ gambeta.ai | Inteligencia Artificial para apostar en Fútbol ⚽️">
+<meta name="twitter:description" content="🎯 Picks de fútbol gratis generados por IA. Champions League, Premier, Libertadores y más. Pronósticos con probabilidades reales — ¡ES GRATIS!">
 <meta name="twitter:image" content="https://ia-apuestas.pages.dev/og-image.png">
 
 <!-- PWA / Mobile -->
@@ -36,7 +36,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="gambeta.ai">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23112a14'/><defs><linearGradient id='bg' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%2300c853'/><stop offset='100%25' stop-color='%23007c32'/></linearGradient><linearGradient id='bl' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' stop-color='%23ffd600'/><stop offset='100%25' stop-color='%23ff9100'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23bg)'/><path d='M58,10 L34,55 L50,55 L42,90 L66,45 L50,45 Z' fill='url(%23bl)'/><circle cx='75' cy='20' r='6' fill='%2300e676' opacity='0.9'/><circle cx='25' cy='75' r='4' fill='%2300e676' opacity='0.6'/></svg>">
+<link rel="manifest" href="/manifest.json">
+<link rel="apple-touch-icon" sizes="192x192" href="/favicon-192.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png">
 <style>
   :root {
     --verde: #00c853;
@@ -322,9 +325,7 @@
 
   /* ── FEED PÚBLICO G$ ── */
   #gFeedWrap {
-    max-width: 1100px;
-    margin: 0 auto 0;
-    padding: 18px 0 4px;
+    padding: 0 0 4px;
   }
   .gfeed-header {
     display: flex; align-items: center; gap: 8px;
@@ -332,40 +333,69 @@
     text-transform: uppercase; letter-spacing: 1.2px;
     color: rgba(255,214,0,0.7); margin-bottom: 10px;
   }
+  /* ── GFEED TABLE ── */
   .gfeed-list {
-    display: flex; gap: 8px;
-    overflow-x: auto; padding-bottom: 4px;
-    scrollbar-width: none;
+    width: 100%;
+    overflow-x: auto;
   }
-  .gfeed-list::-webkit-scrollbar { display: none; }
-  .gfeed-item {
-    flex-shrink: 0;
-    background: rgba(255,214,0,0.05);
-    border: 1px solid rgba(255,214,0,0.18);
-    border-radius: 12px;
-    padding: 9px 13px;
-    display: flex; align-items: center; gap: 9px;
-    min-width: 220px; max-width: 260px;
-    animation: gfeedIn 0.35s ease both;
+  .gfeed-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .gfeed-table thead th {
+    font-size: 0.62rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1.1px;
+    color: rgba(255,255,255,0.3);
+    padding: 0 14px 10px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+    white-space: nowrap;
+  }
+  .gfeed-table thead th.th-center { text-align: center; }
+  .gfeed-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: background 0.15s;
+    animation: gfeedIn 0.3s ease both;
+  }
+  .gfeed-table tbody tr:last-child { border-bottom: none; }
+  .gfeed-table tbody tr:hover { background: rgba(255,214,0,0.04); }
+  .gfeed-table td {
+    padding: 9px 14px;
+    vertical-align: middle;
   }
   @keyframes gfeedIn {
-    from { opacity:0; transform:translateY(6px); }
+    from { opacity:0; transform:translateY(5px); }
     to   { opacity:1; transform:translateY(0); }
   }
   .gfeed-avatar {
-    width: 32px; height: 32px; border-radius: 50%;
+    width: 30px; height: 30px;
+    background: transparent; border: none;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 800; color: #ffd600;
+    flex-shrink: 0;
+  }
+  .gfeed-avatar.initials {
+    border-radius: 50%;
     background: rgba(255,214,0,0.12);
     border: 1.5px solid rgba(255,214,0,0.3);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.75rem; font-weight: 800; color: #ffd600;
-    flex-shrink: 0; overflow: hidden;
   }
-  .gfeed-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+  .gfeed-nick { font-size: 0.78rem; font-weight: 700; color: #ffd600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:120px; display:inline-block; vertical-align:middle; }
+  .gfeed-time { font-size: 0.65rem; color: var(--texto-sec); white-space:nowrap; }
+  .gfeed-pick {
+    font-size: 0.68rem; font-weight: 800; padding: 3px 9px; border-radius: 20px;
+    background: rgba(255,214,0,0.12); color: #ffd600;
+    border: 1px solid rgba(255,214,0,0.28); white-space:nowrap; display:inline-block;
+  }
+  .gfeed-amount { font-size: 0.88rem; font-weight: 900; color: #ffd600; white-space:nowrap; }
+  .gfeed-odds   { font-size: 0.82rem; font-weight: 700; color: rgba(255,255,255,0.7); }
+  /* aliases para no romper código viejo */
+  .gfeed-card-top { display:flex; align-items:center; gap:9px; }
   .gfeed-body { flex: 1; min-width: 0; }
-  .gfeed-nick { font-size: 0.72rem; font-weight: 700; color: #ffd600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .gfeed-bet  { font-size: 0.68rem; color: var(--texto-sec); margin-top: 1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-  .gfeed-bet strong { color: #fff; }
-  .gfeed-amount { font-size: 0.72rem; font-weight: 800; color: #ffd600; white-space:nowrap; flex-shrink:0; }
+  .gfeed-bet  { font-size: 0.68rem; color: var(--texto-sec); }
+  .gfeed-match { font-size: 0.85rem; font-weight: 700; color: #fff; }
+  .gfeed-footer { display:flex; align-items:center; justify-content:space-between; gap:8px; }
 
   /* ── MAIN LAYOUT ── */
   main {
@@ -576,12 +606,231 @@
     0%, 100% { opacity: 1; }
     50% { opacity: 0.4; }
   }
+  @keyframes bcast-pulse {
+    0%,100% { box-shadow: 0 4px 20px rgba(255,214,0,0.4); }
+    50%      { box-shadow: 0 4px 32px rgba(255,214,0,0.8); }
+  }
+  /* ── Burbuja de mensajes admin ───────────────────── */
+  .bcast-bubble-wrap {
+    position: fixed;
+    bottom: 82px;
+    right: 16px;
+    z-index: 7100;
+    display: none;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+    max-width: 300px;
+  }
+  .bcast-bubble-card {
+    background: linear-gradient(135deg, #1a2a1a, #0f1f0f);
+    border: 1px solid rgba(255,214,0,0.35);
+    border-radius: 18px 18px 4px 18px;
+    padding: 12px 14px;
+    cursor: pointer;
+    box-shadow: 0 6px 28px rgba(255,214,0,0.2);
+    animation: bcast-pulse 2.5s infinite;
+    position: relative;
+    width: 100%;
+  }
+  .bcast-bubble-card:hover { border-color: rgba(255,214,0,0.6); }
+  .bcast-bubble-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+  }
+  .bcast-bubble-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#ffd600,#ff9800);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+  .bcast-bubble-name {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #ffd600;
+    flex: 1;
+  }
+  .bcast-bubble-badge {
+    background: #ef5350;
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    border-radius: 20px;
+    padding: 1px 6px;
+    min-width: 18px;
+    text-align: center;
+  }
+  .bcast-bubble-preview {
+    font-size: 0.78rem;
+    color: rgba(255,255,255,0.75);
+    line-height: 1.45;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 230px;
+  }
+  .bcast-dismiss-btn {
+    position: absolute;
+    top: -8px;
+    left: -8px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(255,61,61,0.9);
+    border: 1.5px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    line-height: 1;
+    z-index: 10;
+  }
+  .bcast-dismiss-btn:hover { background: #ef5350; transform: scale(1.1); }
+  /* ── Panel chat de mensajes ───────────────────────── */
+  .bcast-panel {
+    position: fixed;
+    bottom: 82px;
+    right: 16px;
+    z-index: 7200;
+    width: min(340px, calc(100vw - 32px));
+    background: #0f1a0f;
+    border: 1px solid rgba(255,214,0,0.3);
+    border-radius: 18px;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.6);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: 70vh;
+  }
+  .bcast-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, rgba(255,214,0,0.1), rgba(255,152,0,0.07));
+    border-bottom: 1px solid rgba(255,214,0,0.15);
+  }
+  .bcast-panel-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg,#ffd600,#ff9800);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+  .bcast-panel-title { font-size: 0.85rem; font-weight: 800; color: #fff; }
+  .bcast-panel-sub   { font-size: 0.68rem; color: var(--texto-sec); margin-top: 1px; }
+  .bcast-panel-close {
+    margin-left: auto;
+    background: rgba(255,255,255,0.07);
+    border: none;
+    color: var(--texto-sec);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .bcast-panel-close:hover { background: rgba(255,255,255,0.14); color: #fff; }
+  .bcast-panel-msgs {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .bcast-msg-item {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px 12px 12px 4px;
+    padding: 11px 14px;
+  }
+  .bcast-msg-item.is-new {
+    background: rgba(255,214,0,0.06);
+    border-color: rgba(255,214,0,0.22);
+  }
+  .bcast-msg-new-tag {
+    font-size: 0.6rem;
+    font-weight: 800;
+    color: #ffd600;
+    background: rgba(255,214,0,0.15);
+    border-radius: 4px;
+    padding: 1px 6px;
+    margin-bottom: 6px;
+    display: inline-block;
+  }
+  .bcast-msg-text {
+    font-size: 0.87rem;
+    color: #fff;
+    line-height: 1.6;
+    word-break: break-word;
+  }
+  .bcast-msg-time {
+    font-size: 0.65rem;
+    color: var(--texto-sec);
+    margin-top: 6px;
+    text-align: right;
+  }
+  .bcast-panel-footer {
+    padding: 12px 14px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bcast-read-btn {
+    flex: 1;
+    background: rgba(0,200,83,0.15);
+    border: 1px solid rgba(0,200,83,0.3);
+    color: var(--verde);
+    font-weight: 800;
+    padding: 9px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.82rem;
+  }
+  .bcast-read-btn:hover { background: rgba(0,200,83,0.25); }
+  .bcast-del-btn {
+    background: rgba(255,61,61,0.1);
+    border: 1px solid rgba(255,61,61,0.25);
+    color: #ef5350;
+    font-weight: 700;
+    padding: 9px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.75rem;
+  }
+  .bcast-del-btn:hover { background: rgba(255,61,61,0.18); }
+    50%       { transform: scale(1.1); box-shadow: 0 4px 28px rgba(255,214,0,0.7); }
+  }
+  @keyframes winPulse {
+    0%, 100% { box-shadow: 0 0 32px rgba(0,200,83,0.25), inset 0 0 20px rgba(0,200,83,0.08); }
+    50%       { box-shadow: 0 0 48px rgba(0,200,83,0.45), inset 0 0 28px rgba(0,200,83,0.15); }
+  }
 
   /* ── PREDICTIONS ── */
   #predictions .pred-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 16px;
+    align-items: start;
   }
 
   .pred-card {
@@ -622,6 +871,35 @@
     background: linear-gradient(180deg, rgba(255,214,0,0.13) 0%, var(--gris-card) 55%) !important;
     animation: golden-pulse 2.5s ease-in-out infinite, confetti-pop 0.6s ease-out;
   }
+  .high-conf-stamp {
+    display: inline-flex; align-items: center; justify-content: center;
+    margin: 14px auto 4px;
+    width: max-content;
+    white-space: nowrap;
+    border: 2.5px solid rgba(255,214,0,0.75);
+    border-radius: 6px;
+    padding: 7px 18px;
+    position: relative;
+    transform: rotate(-2deg);
+    background: transparent;
+  }
+  .high-conf-stamp::before {
+    content: '';
+    position: absolute; inset: 3px;
+    border: 1px solid rgba(255,214,0,0.35);
+    border-radius: 4px;
+    pointer-events: none;
+  }
+  .high-conf-stamp-text {
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: rgba(255,214,0,0.85);
+    text-shadow: 0 0 8px rgba(255,214,0,0.4);
+    font-family: 'Courier New', monospace;
+    white-space: nowrap;
+  }
   .pred-golden-win::after {
     content: '';
     position: absolute; inset: 0; border-radius: 16px; pointer-events: none;
@@ -641,6 +919,73 @@
   .pred-card-finished {
     opacity: 0.62;
     filter: saturate(0.7);
+  }
+  /* ── Ficha compacta (partidos ya empezados) ── */
+  .pred-card-compact {
+    padding: 13px 18px !important;
+    min-height: unset !important;
+  }
+  .pred-compact-inner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .pred-compact-match {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    flex: 1;
+    min-width: 0;
+  }
+  .pred-compact-team {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+  }
+  .pred-compact-tname {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 110px;
+  }
+  .pred-compact-score {
+    font-size: 1.05rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    padding: 2px 11px;
+    border-radius: 7px;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .pred-compact-vs {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--texto-sec);
+    flex-shrink: 0;
+    padding: 0 4px;
+  }
+  .pred-compact-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+  }
+  .pred-compact-rec {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #00e676;
+    white-space: nowrap;
+  }
+  .pred-compact-league {
+    font-size: 0.65rem;
+    color: var(--texto-sec);
+    white-space: nowrap;
   }
   /* Badges de resultado */
   .badge-terminado {
@@ -1101,6 +1446,138 @@
     background: none;
     border: none;
     padding: 0;
+  }
+
+  /* ── PUSH NOTIFICATIONS ── */
+  .push-toggle-btn {
+    padding: 9px 18px;
+    background: linear-gradient(135deg, var(--verde), var(--verde-oscuro));
+    border: none;
+    border-radius: 20px;
+    color: #000;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all .2s;
+    font-family: inherit;
+  }
+  .push-toggle-btn:hover { filter: brightness(1.1); }
+  .push-toggle-btn.subscribed {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.6);
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .push-notif-card {
+    background: linear-gradient(135deg, rgba(0,200,83,0.07), rgba(0,229,160,0.03));
+    border-color: rgba(0,200,83,0.25) !important;
+  }
+
+  /* ── MY PICKS PANEL ── */
+  .mypicks-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .mps-card {
+    background: var(--gris-card);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    padding: 14px 12px;
+    text-align: center;
+  }
+  .mps-card.win  { border-color: rgba(0,200,83,0.35); background: rgba(0,200,83,0.06); }
+  .mps-card.loss { border-color: rgba(229,57,53,0.3);  background: rgba(229,57,53,0.05); }
+  .mps-card.roi-pos { border-color: rgba(255,214,0,0.4); background: rgba(255,214,0,0.07); }
+  .mps-card.roi-neg { border-color: rgba(229,57,53,0.3);  background: rgba(229,57,53,0.05); }
+  .mps-val {
+    font-size: 1.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 4px;
+  }
+  .mps-label {
+    font-size: 0.64rem;
+    color: var(--texto-sec);
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    font-weight: 600;
+  }
+  .mypicks-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  .mp-item {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    align-items: center;
+    gap: 10px;
+    background: var(--gris-card);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.82rem;
+  }
+  .mp-item.mp-win  { border-left: 3px solid #00c853; }
+  .mp-item.mp-loss { border-left: 3px solid #ef5350; }
+  .mp-item.mp-pend { border-left: 3px solid rgba(255,214,0,0.5); }
+  .mp-match { font-weight: 700; color: #fff; font-size: 0.78rem; }
+  .mp-sub   { font-size: 0.68rem; color: var(--texto-sec); margin-top:2px; }
+  .mp-badge { font-size: 0.7rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+  .mp-badge.win  { background: rgba(0,200,83,0.15); color: #00c853; }
+  .mp-badge.loss { background: rgba(229,57,53,0.15); color: #ef5350; }
+  .mp-badge.pend { background: rgba(255,214,0,0.1);  color: #ffd600; }
+  .mp-coins { font-size: 0.75rem; font-weight: 800; text-align: right; white-space: nowrap; }
+  .mp-coins.pos { color: #00c853; }
+  .mp-coins.neg { color: #ef5350; }
+  .mp-coins.neu { color: #ffd600; }
+  .mypicks-streak {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+    font-size: 0.72rem;
+  }
+  .streak-dot {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.62rem; font-weight: 800;
+  }
+  .streak-dot.w { background: rgba(0,200,83,0.2); color: #00c853; border: 1px solid rgba(0,200,83,0.4); }
+  .streak-dot.l { background: rgba(229,57,53,0.2); color: #ef5350; border: 1px solid rgba(229,57,53,0.3); }
+  .streak-dot.p { background: rgba(255,214,0,0.1);  color: #ffd600; border: 1px solid rgba(255,214,0,0.3); }
+  @media (max-width:480px) {
+    .mypicks-stats { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* ── SHARE PICK BUTTON ── */
+  .share-pick-btn {
+    width: 100%;
+    margin-top: 10px;
+    padding: 10px 0;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .15s;
+    letter-spacing: .3px;
+  }
+  .share-pick-btn:hover {
+    background: rgba(0,229,160,0.08);
+    border-color: rgba(0,229,160,0.3);
+    color: #00e5a0;
+  }
+  .share-pick-btn:active {
+    transform: scale(0.98);
   }
 
   /* ── CALCULATOR ── */
@@ -1833,9 +2310,9 @@
     font-size: 1.3rem; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
   }
   .rk-pod-avatar {
-    width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 8px;
-    object-fit: contain; background: rgba(255,255,255,0.07); padding: 3px;
-    border: 2px solid rgba(255,255,255,0.12);
+    width: 48px; height: 48px; border-radius: 0; margin: 0 auto 8px;
+    object-fit: contain; background: transparent; padding: 3px;
+    border: none;
   }
   .rk-pod-avatar-text {
     width: 48px; height: 48px; border-radius: 50%; margin: 0 auto 8px;
@@ -1856,7 +2333,7 @@
   .rk-row:hover { background: rgba(255,255,255,0.055); }
   .rk-row.rk-row-me { border-color: rgba(0,200,83,0.4); background: rgba(0,200,83,0.07); }
   .rk-row-num { width: 24px; text-align: center; font-size: 0.8rem; font-weight: 800; color: rgba(255,255,255,0.4); flex-shrink: 0; }
-  .rk-row-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: contain; background: rgba(255,255,255,0.07); padding: 2px; flex-shrink: 0; }
+  .rk-row-avatar { width: 30px; height: 30px; border-radius: 0; object-fit: contain; background: transparent; padding: 2px; flex-shrink: 0; }
   .rk-row-avatar-text { width: 30px; height: 30px; border-radius: 50%; background: rgba(0,200,83,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: var(--verde); flex-shrink: 0; }
   .rk-row-nick { flex: 1; font-size: 0.84rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rk-row-bal  { font-size: 0.78rem; font-weight: 700; color: #ffd600; flex-shrink: 0; }
@@ -2463,19 +2940,19 @@
   }
   .nav-user-btn:hover { background:rgba(0,200,83,0.18); border-color:rgba(0,200,83,0.4); }
   .nav-user-avatar {
-    width:33px; height:33px; border-radius:50%;
-    background:linear-gradient(135deg,var(--verde),#007c2e);
+    width:36px; height:36px;
     display:flex; align-items:center; justify-content:center;
     font-size:0.82rem; font-weight:800; color:#fff; flex-shrink:0;
+    background:transparent; border-radius:0;
   }
   .nav-user-name { font-size:0.83rem; font-weight:600; max-width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .nav-user-chevron { font-size:0.6rem; color:var(--texto-sec); }
 
   .user-dropdown {
     position:absolute; top:calc(100% + 10px); right:0;
-    background:#0a1409; border:1px solid var(--borde); border-radius:14px;
-    padding:8px; min-width:210px;
-    box-shadow:0 14px 40px rgba(0,0,0,0.85); display:none; z-index:10001;
+    background:#0a1409; border:1px solid var(--borde); border-radius:16px;
+    padding:8px; min-width:230px;
+    box-shadow:0 16px 48px rgba(0,0,0,0.9); display:none; z-index:10001;
   }
   .user-dropdown.open { display:block; }
   .user-dd-header { padding:10px 12px 13px; border-bottom:1px solid var(--borde); margin-bottom:5px; }
@@ -2489,7 +2966,7 @@
 
   @media (max-width:820px) {
     .nav-user-name,.nav-user-chevron { display:none; }
-    .nav-user-btn { padding:4px; border-radius:50%; }
+    .nav-user-btn { padding:4px; border-radius:24px; }
     .auth-box { padding:28px 20px 22px; }
   }
 </style>
@@ -2527,6 +3004,7 @@
     <a onclick="navTo('ranking');loadRanking()" style="position:relative">🏆 <span class="nav-text">Ranking</span><span id="rankingNavDot" style="display:none;position:absolute;top:2px;right:-4px;width:7px;height:7px;border-radius:50%;background:#ffd600;box-shadow:0 0 6px #ffd600"></span></a>
     <a onclick="navTo('bot-alerta')">🤖 <span class="nav-text">Bot Alerta</span></a>
     <a onclick="navTo('telegram')">🎁 <span class="nav-text">Promos</span></a>
+    <a href="blog/index.html">📰 <span class="nav-text">Blog</span></a>
   </div>
 
   <!-- Nav usuario registrado -->
@@ -2538,6 +3016,7 @@
     <a onclick="navTo('ranking');loadRanking()" style="position:relative">🏆 <span class="nav-text">Ranking</span></a>
     <a onclick="navTo('bot-alerta')">🤖 <span class="nav-text">Bot Alerta</span></a>
     <a onclick="navTo('telegram')">🎁 <span class="nav-text">Promos</span></a>
+    <a href="blog/index.html">📰 <span class="nav-text">Blog</span></a>
     <a onclick="navTo('mipanel')" style="color:var(--verde)">👤 <span class="nav-text">Mi Panel</span></a>
   </div>
 
@@ -2570,11 +3049,13 @@
           </div>
         </div>
       </div>
+      <button class="user-dd-item" onclick="navTo('mipanel');closeUserMenu()">👤 Mi Panel</button>
       <button class="user-dd-item" onclick="navTo('predictions');closeUserMenu()">🔮 Mis pronósticos</button>
-      <button class="user-dd-item" onclick="navTo('historial');closeUserMenu()">📋 Mi historial</button>
-      <button class="user-dd-item" onclick="navTo('bankroll');closeUserMenu()">💰 Mi bankroll</button>
+      <button class="user-dd-item" onclick="navTo('myPicksPanel');closeUserMenu()">📊 Mis Picks G$</button>
+      <button class="user-dd-item" onclick="navTo('historial');closeUserMenu()">📋 Resultados</button>
+      <button class="user-dd-item" onclick="navTo('bankroll');closeUserMenu()">💰 Bankroll</button>
+      <button class="user-dd-item" onclick="document.getElementById('ranking').style.display='';loadRanking();setTimeout(()=>navTo('ranking'),80);closeUserMenu()">🏆 Ranking G$</button>
       <div class="user-dd-sep"></div>
-      <button class="user-dd-item" onclick="closeUserMenu()">⚙️ Configuración</button>
       <button class="user-dd-item danger" onclick="logoutUser()">↩ Cerrar sesión</button>
     </div>
   </div>
@@ -2606,6 +3087,7 @@
     <a onclick="navTo('ranking');loadRanking();closeMobileNav()">🏆 Ranking G$</a>
     <a onclick="navTo('bot-alerta');closeMobileNav()">🤖 Bot Alerta</a>
     <a onclick="navTo('telegram');closeMobileNav()">🎁 Promos</a>
+    <a href="blog/index.html">📰 Blog</a>
     <div id="drawerAuthRow" style="margin-top:8px;padding-top:12px;border-top:1px solid rgba(0,200,83,0.15)">
       <button onclick="openAuth();closeMobileNav()" style="width:100%;padding:12px;background:linear-gradient(135deg,var(--verde),var(--verde-oscuro));border:none;border-radius:12px;color:#fff;font-size:0.9rem;font-weight:700;cursor:pointer;font-family:inherit;text-align:center;letter-spacing:0.3px">✦ Entrar / Registro Gratis</button>
     </div>
@@ -2613,12 +3095,14 @@
   <!-- Links usuario registrado -->
   <div id="drawerLinksUser" style="display:none">
     <a onclick="navTo('predictions');closeMobileNav()">🔮 Pronósticos IA</a>
+    <a onclick="navTo('myPicksPanel');closeMobileNav()">📊 Mis Picks G$</a>
     <a onclick="navTo('historial');closeMobileNav()">📋 Resultados</a>
     <a onclick="navTo('bankroll');closeMobileNav()">💰 Bankroll Manager</a>
     <a onclick="navTo('calculator');closeMobileNav()">🧮 Calculadora</a>
     <a onclick="navTo('ranking');loadRanking();closeMobileNav()">🏆 Ranking G$</a>
     <a onclick="navTo('bot-alerta');closeMobileNav()">🤖 Bot Alerta</a>
     <a onclick="navTo('telegram');closeMobileNav()">🎁 Promos</a>
+    <a href="blog/index.html">📰 Blog</a>
     <a id="drawerPanelLink" onclick="navTo('mipanel');closeMobileNav()" style="display:none;color:var(--verde)">👤 Mi Panel</a>
   </div>
 </nav>
@@ -2627,7 +3111,7 @@
 <div class="hero">
   <div class="hero-text">
     <div class="hero-tag">⚡ IA Actualizada en Tiempo Real<span class="live-dot" style="margin-left:7px;margin-right:0"></span></div>
-    <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apuestas Deportivas</span></h1>
+    <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apostar en Fútbol</span></h1>
     <p><strong>Soy la primer IA para apuestas deportivas a la que puedes preguntarle</strong>, hablar e interactuar, armemos una buena combinada.</p>
     <div class="hero-stats">
       <div class="hero-stat"><span class="num" id="heroStatPrecision">–</span><span class="lbl">Precisión IA</span></div>
@@ -2644,15 +3128,6 @@
 
 <main>
 
-  <!-- FEED PÚBLICO G$ -->
-  <div id="gFeedWrap" style="display:none">
-    <div class="gfeed-header">
-      <span style="font-size:1rem">🎲</span> Apostando ahora con G$
-      <span id="gFeedCount" style="margin-left:auto;font-size:0.65rem;color:rgba(255,255,255,0.25);font-weight:400;text-transform:none;letter-spacing:0"></span>
-    </div>
-    <div class="gfeed-list" id="gFeedList"></div>
-  </div>
-
   <!-- PREDICTIONS -->
   <section id="predictions">
     <div class="section-title">
@@ -2660,9 +3135,8 @@
       Pronósticos de la IA
     </div>
     <div style="display:flex;gap:8px;margin:0 0 12px;flex-wrap:wrap" id="predSportTabs">
-      <button class="sport-tab active" onclick="filterPredSport('all',this)">🌍 Todos</button>
+      <button class="sport-tab active" onclick="filterPredSport('all',this)">⭐ Principales</button>
       <button class="sport-tab" onclick="filterPredSport('soccer',this)">⚽ Fútbol</button>
-      <button class="sport-tab" onclick="filterPredSport('basketball',this)">🏀 Basket</button>
     </div>
     <div id="predsStatusBar" style="display:none;margin:0 0 12px;padding:8px 12px;border-radius:10px;font-size:0.72rem;display:flex;align-items:center;gap:8px;justify-content:space-between"></div>
     <div class="pred-grid" id="predGrid"></div>
@@ -2688,6 +3162,48 @@
 
   <div class="section-divider"></div>
 
+  <!-- FEED PÚBLICO G$ -->
+  <section id="gFeedWrap" style="display:none">
+    <div class="section-title">
+      <div class="icon">📡</div>
+      En esto pusieron sus G$ otros usuarios:
+    </div>
+    <div class="gfeed-list">
+      <table class="gfeed-table">
+        <thead>
+          <tr>
+            <th class="th-center">Partido</th>
+            <th>Usuario</th>
+            <th>Hora</th>
+            <th>Cuota</th>
+            <th>G$</th>
+          </tr>
+        </thead>
+        <tbody id="gFeedList"></tbody>
+      </table>
+    </div>
+    <div id="gFeedNav" style="display:none;align-items:center;justify-content:center;gap:10px;margin-top:12px">
+      <button id="gFeedPrev" onclick="gFeedPage(-1)" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:5px 14px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='rgba(255,214,0,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">← Anterior</button>
+      <span id="gFeedPageInfo" style="font-size:0.72rem;color:rgba(255,255,255,0.35);font-weight:600"></span>
+      <button id="gFeedNext" onclick="gFeedPage(1)"  style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:5px 14px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='rgba(255,214,0,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">Siguiente →</button>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- MIS PICKS: PANEL PERSONAL DE STATS G$ -->
+  <section id="myPicksPanel" style="display:none">
+    <div class="section-title"><div class="icon">📊</div>Mis Picks · Rendimiento Personal</div>
+    <div class="mypicks-stats" id="myPicksStats"></div>
+    <div class="mypicks-list" id="myPicksList"></div>
+    <div id="myPicksEmpty" style="display:none;text-align:center;padding:28px 0;color:var(--texto-sec);font-size:0.88rem">
+      Todavía no apostaste ningún pick con G$.<br>
+      <span style="font-size:0.78rem;opacity:.6">Usá tus Gambeta Coins en los pronósticos para ver tu rendimiento acá.</span>
+    </div>
+  </section>
+
+  <div class="section-divider" id="myPicksDivider" style="display:none"></div>
+
   <!-- HISTORIAL DE PREDICCIONES -->
   <section id="historial">
     <div class="section-title"><div class="icon">📋</div>Resultados de Pronósticos</div>
@@ -2695,7 +3211,7 @@
 
     <div class="hist-table-wrap">
       <table class="hist-table">
-        <thead><tr><th>Partido</th><th>Recomendación</th><th>Cuota</th><th>Stake</th><th>Resultado</th><th>Marcador Final</th><th>P/L</th></tr></thead>
+        <thead><tr><th style="text-align:center">Partido</th><th>Recomendación</th><th>Cuota</th><th>Stake</th><th>Resultado</th><th>Marcador</th><th>P/L</th></tr></thead>
         <tbody id="histTableBody"></tbody>
       </table>
     </div>
@@ -2798,7 +3314,7 @@
     <div id="rkPodium" style="display:none;margin-bottom:24px"></div>
 
     <!-- List 4–10 -->
-    <div id="rkList" style="display:none;display:flex;flex-direction:column;gap:7px;margin-bottom:24px"></div>
+    <div id="rkList" style="display:none;flex-direction:column;gap:7px;margin-bottom:24px"></div>
 
     <!-- Mi posición (si está logueado) -->
     <div id="rkMyPos" style="display:none"></div>
@@ -2821,6 +3337,16 @@
 
     <!-- Tab: Mis Apuestas -->
     <div class="mipanel-pane active" id="panelBets">
+      <!-- Push notifications card -->
+      <div class="card push-notif-card" id="pushNotifCard" style="margin-bottom:14px;display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div style="flex:1;min-width:160px">
+            <div style="font-size:0.88rem;font-weight:700;color:#fff;margin-bottom:3px">🎁 Pick diario GRATIS</div>
+            <div style="font-size:0.72rem;color:var(--texto-sec);line-height:1.45" id="pushStatusText">Te mandamos el mejor pick gratis como notificación todos los días.</div>
+          </div>
+          <button id="pushToggleBtn" class="push-toggle-btn" onclick="togglePushSubscription()">Activar</button>
+        </div>
+      </div>
       <div class="card">
         <div id="myBetsList"></div>
       </div>
@@ -3082,12 +3608,6 @@
           <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">Principal LATAM</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">Pronósticos generales</div></div>
         </a>
 
-        <!-- Apuestas USA -->
-        <a href="https://t.me/PicksNBAproarg" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
-          <span style="font-size:1.4rem;flex-shrink:0">🏀</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">Apuestas USA</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">NBA · @PicksNBAproarg</div></div>
-        </a>
-
         <!-- Tenis -->
         <a href="https://t.me/TenisLATAM" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
           <span style="font-size:1.4rem;flex-shrink:0">🎾</span>
@@ -3144,7 +3664,6 @@
       <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--texto-sec);margin-bottom:12px">🌐 Redes sociales</div>
       <div style="display:flex;flex-wrap:wrap;gap:10px">
         <a href="https://x.com/Grupo_LATAM" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">𝕏 Fútbol &amp; Sorteos LATAM</a>
-        <a href="https://x.com/NbaProArg" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">𝕏 NBA ProArg</a>
         <a href="https://x.com/TenisLATAM_" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">𝕏 Tenis LATAM</a>
         <a href="https://www.instagram.com/pronosticos.latam" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(200,55,150,0.08);border:1px solid rgba(200,55,150,0.25);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(200,55,150,0.18)'" onmouseout="this.style.background='rgba(200,55,150,0.08)'">📸 Instagram</a>
         <a href="https://www.tiktok.com/@rugbylatam" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">🎵 TikTok Rugby</a>
@@ -3159,11 +3678,6 @@
         <a href="https://t.me/atencionvipproarg" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,214,0,0.12)'" onmouseout="this.style.background='rgba(255,214,0,0.06)'">
           <span style="font-size:1.4rem;flex-shrink:0">👑</span>
           <div><div style="font-size:0.78rem;font-weight:700;color:#ffd600;line-height:1.2">VIP Mauro</div><div style="font-size:0.65rem;color:rgba(255,214,0,0.55)">Temporada completa</div></div>
-        </a>
-
-        <a href="https://t.me/BenjaLatam" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,214,0,0.12)'" onmouseout="this.style.background='rgba(255,214,0,0.06)'">
-          <span style="font-size:1.4rem;flex-shrink:0">🏀</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#ffd600;line-height:1.2">VIP Props NBA</div><div style="font-size:0.65rem;color:rgba(255,214,0,0.55)">Benja LATAM</div></div>
         </a>
 
         <a href="https://t.me/rusolatam" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,214,0,0.12)'" onmouseout="this.style.background='rgba(255,214,0,0.06)'">
@@ -3311,7 +3825,6 @@
       <span class="chat-pill" onclick="sendSuggestion(this)">⚽ Predicción Real Madrid</span>
       <span class="chat-pill" onclick="sendSuggestion(this)">📊 Mejor apuesta hoy</span>
       <span class="chat-pill" onclick="sendSuggestion(this)">🧮 ¿Cómo calculo mi apuesta?</span>
-      <span class="chat-pill" onclick="sendSuggestion(this)">🏀 Lakers vs Celtics</span>
     </div>
     <div class="chat-input-area">
       <input type="text" class="chat-input" id="chatInput" placeholder="Preguntá a la IA..." onkeydown="if(event.key==='Enter') sendChat()">
@@ -3350,9 +3863,15 @@ const sbClient = supabase.createClient(_SB_URL, _SB_KEY, {
   auth: {
     storage: window.localStorage,
     persistSession: true,
-    detectSessionInUrl: false,
+    detectSessionInUrl: true,   // necesario para procesar el token del OAuth (Google login)
     lock: (_name, _timeout, fn) => fn(),  // evita Web Locks API — previene AbortError
   }
+});
+
+// Cliente público (anon, sin JWT) — solo para lecturas públicas como el feed G$
+// Necesario porque la RLS policy "feed_public_read" cubre el rol anon, no authenticated
+const sbAnon = supabase.createClient(_SB_URL, _SB_KEY, {
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
 });
 
 // Debounced sync — batches rapid changes into one DB write
@@ -3360,6 +3879,64 @@ let _syncTimer = null;
 function acScheduleSync() {
   clearTimeout(_syncTimer);
   _syncTimer = setTimeout(acSyncToDB, 1200);
+}
+
+// ── Realtime + sync periódico: única fuente de verdad ──────────────
+let _userRealtimeChannel = null;
+let _periodicSyncInterval = null;
+
+function initUserSync(email) {
+  // 1) Realtime: cuando cualquier browser escribe en la fila del usuario,
+  //    este browser re-mergea automáticamente
+  if (_userRealtimeChannel) {
+    try { sbClient.removeChannel(_userRealtimeChannel); } catch(_) {}
+  }
+  _userRealtimeChannel = sbClient
+    .channel(`user-sync-${email}`)
+    .on('postgres_changes', {
+      event: 'UPDATE',
+      schema: 'public',
+      table: 'acoin_users',
+      filter: `email=eq.${email}`
+    }, async () => {
+      console.log('[Sync] Cambio detectado en otro browser — mergeando...');
+      await acLoadFromDB(email);
+    })
+    .subscribe();
+
+  // 2) Sync periódico cada 3 minutos (coins + historial)
+  clearInterval(_periodicSyncInterval);
+  _periodicSyncInterval = setInterval(async () => {
+    if (authUser?.email) {
+      await acLoadFromDB(authUser.email);
+      await sbLoadHistorial(); // también refresca los resultados
+    }
+  }, 3 * 60 * 1000);
+
+  // 3) Sync al volver al tab
+  document.addEventListener('visibilitychange', async () => {
+    if (document.visibilityState === 'visible' && authUser?.email) {
+      await acLoadFromDB(authUser.email);
+      await sbLoadHistorial();
+    }
+  }, { once: false });
+
+  // 4) Realtime en shared_cache: cuando el admin sube el historial global,
+  //    todos los devices lo reciben al instante
+  try {
+    sbAnon
+      .channel('shared-cache-hist')
+      .on('postgres_changes', {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'shared_cache',
+        filter: `key=eq.${GLOBAL_HIST_KEY}`
+      }, async () => {
+        console.log('[historial] Global actualizado — recargando...');
+        await sbLoadHistorial();
+      })
+      .subscribe();
+  } catch(e) { console.warn('[histRealtime]', e.message); }
 }
 
 async function acSyncToDB() {
@@ -3429,9 +4006,13 @@ async function acLoadFromDB(email) {
     });
     const mergedHist = [...histMap.values()];
 
-    // Picks: union (deduplicate by full JSON string)
-    const pickSet = new Set([...dbPick, ...localPick].map(p => JSON.stringify(p)));
-    const mergedPick = [...pickSet].map(p => { try { return JSON.parse(p); } catch(_) { return p; } });
+    // Picks: union — clave robusta: home+away+ts+pick (no JSON.stringify que varía por orden de campos)
+    const pickMap = new Map();
+    [...dbPick, ...localPick].forEach(p => {
+      const key = `${p.home||''}|${p.away||''}|${p.ts||''}|${p.pick||''}`;
+      if (!pickMap.has(key)) pickMap.set(key, p);
+    });
+    const mergedPick = [...pickMap.values()];
 
     // last_daily: keep the most recent date string
     const mergedDay = localDay > dbDay ? localDay : dbDay;
@@ -3452,13 +4033,17 @@ async function acLoadFromDB(email) {
       acScheduleSync();
     }
   } else {
-    // New user — push whatever is in localStorage to DB
-    await acSyncToDB();
+    // New user — dar bonus de bienvenida ANTES del primer sync a la DB
+    acCheckDaily();
+    await acSyncToDB();  // guarda directamente con balance=10.000
   }
   // Run daily bonus check on the now-accurate merged balance
+  _purgeNbaPicks(); // limpiar picks NBA del historial y G$ antes de renderizar
   acCheckDaily();
   acUpdateUI();
+  applyUserProfile(); // re-aplicar nick/avatar ahora que la DB está cargada
   renderPreds(); // refresh pick buttons with loaded state
+  renderMyPicks(); // actualizar panel de stats personales
 }
 
 // ═══════════════════════════════════════════════
@@ -3888,14 +4473,21 @@ const teamLogos = {
   'Club Bruges':            'https://media.api-sports.io/football/teams/245.png',
   'Red Bull Salzburg':      'https://media.api-sports.io/football/teams/322.png',
   'FC Salzburg':            'https://media.api-sports.io/football/teams/322.png',
-  'Shakhtar Donetsk':       'https://media.api-sports.io/football/teams/238.png',
+  'Shakhtar Donetsk':       'https://r2.thesportsdb.com/images/media/team/badge/sqrxsr1421791799.png',
+  'HNK Rijeka':             'https://r2.thesportsdb.com/images/media/team/badge/z8bxvi1603310975.png',
+  'Rijeka':                 'https://r2.thesportsdb.com/images/media/team/badge/z8bxvi1603310975.png',
+  'NK Rijeka':              'https://r2.thesportsdb.com/images/media/team/badge/z8bxvi1603310975.png',
+  'Lech Poznan':            'https://r2.thesportsdb.com/images/media/team/badge/8zfxyx1685597440.png',
+  'Lech Poznań':            'https://r2.thesportsdb.com/images/media/team/badge/8zfxyx1685597440.png',
+  'KKS Lech Poznan':        'https://r2.thesportsdb.com/images/media/team/badge/8zfxyx1685597440.png',
+  'KKS Lech Poznań':        'https://r2.thesportsdb.com/images/media/team/badge/8zfxyx1685597440.png',
   'Galatasaray':            'https://media.api-sports.io/football/teams/645.png',
   'Fenerbahce':             'https://media.api-sports.io/football/teams/357.png',
   'Besiktas':               'https://media.api-sports.io/football/teams/358.png',
   'Olympiakos':             'https://media.api-sports.io/football/teams/415.png',
   'PAOK':                   'https://media.api-sports.io/football/teams/416.png',
   'Slavia Prague':          'https://media.api-sports.io/football/teams/322.png',
-  'Sparta Prague':          'https://media.api-sports.io/football/teams/316.png',
+  'Sparta Prague':          'https://r2.thesportsdb.com/images/media/team/badge/j00qct1718287150.png',
   // ── ARGENTINA (todos con URLs verificadas de Wikipedia/Wikimedia) ──
   'River Plate':            'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Club_Atl%C3%A9tico_River_Plate_logo.svg/330px-Club_Atl%C3%A9tico_River_Plate_logo.svg.png',
   'River':                  'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Club_Atl%C3%A9tico_River_Plate_logo.svg/330px-Club_Atl%C3%A9tico_River_Plate_logo.svg.png',
@@ -4200,13 +4792,13 @@ const teamLogos = {
   'Fenerbahce':             'https://media.api-sports.io/football/teams/2673.png',
   'Beşiktaş':               'https://media.api-sports.io/football/teams/2674.png',
   'Besiktas':               'https://media.api-sports.io/football/teams/2674.png',
-  'Shakhtar Donetsk':       'https://media.api-sports.io/football/teams/255.png',
+  'Shakhtar Donetsk':       'https://r2.thesportsdb.com/images/media/team/badge/sqrxsr1421791799.png',
   'Red Bull Salzburg':      'https://media.api-sports.io/football/teams/1.png',
   'RB Salzburg':            'https://media.api-sports.io/football/teams/1.png',
   'Slavia Prague':          'https://media.api-sports.io/football/teams/536.png',
   'SK Slavia Prague':       'https://media.api-sports.io/football/teams/536.png',
-  'Sparta Prague':          'https://media.api-sports.io/football/teams/537.png',
-  'AC Sparta Prague':       'https://media.api-sports.io/football/teams/537.png',
+  'Sparta Prague':          'https://r2.thesportsdb.com/images/media/team/badge/j00qct1718287150.png',
+  'AC Sparta Prague':       'https://r2.thesportsdb.com/images/media/team/badge/j00qct1718287150.png',
   'Olympiacos':             'https://media.api-sports.io/football/teams/591.png',
   'PAOK':                   'https://media.api-sports.io/football/teams/601.png',
   'Red Star Belgrade':      'https://media.api-sports.io/football/teams/2668.png',
@@ -4219,8 +4811,8 @@ const teamLogos = {
   'Ferencvaros TC':         'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Ferencvarosi_TC.svg/200px-Ferencvarosi_TC.svg.png',
   'Dinamo Zagreb':          'https://media.api-sports.io/football/teams/2652.png',
   'GNK Dinamo Zagreb':      'https://media.api-sports.io/football/teams/2652.png',
-  'Midtjylland':            'https://media.api-sports.io/football/teams/398.png',
-  'FC Midtjylland':         'https://media.api-sports.io/football/teams/398.png',
+  'Midtjylland':            'https://r2.thesportsdb.com/images/media/team/badge/s5bpcr1755712262.png',
+  'FC Midtjylland':         'https://r2.thesportsdb.com/images/media/team/badge/s5bpcr1755712262.png',
   'Maccabi Tel Aviv':       'https://media.api-sports.io/football/teams/298.png',
   // ── 🇺🇸 MLS ──
   'Inter Miami':            'https://r2.thesportsdb.com/images/media/team/badge/m4it3e1602103647.png',
@@ -4680,6 +5272,22 @@ const teamLogos = {
   'Águilas Doradas': 'https://a.espncdn.com/i/teamlogos/soccer/500/9762.png',
   'Ñublense': 'https://a.espncdn.com/i/teamlogos/soccer/500/7427.png',
   'Örgryte IS': 'https://a.espncdn.com/i/teamlogos/soccer/500/131552.png',
+  // ── EQUIPOS UEFA ADICIONALES (URLs verificadas vía thesportsdb) ──
+  'AEK Larnaca':            'https://r2.thesportsdb.com/images/media/team/badge/150a2b1544814418.png',
+  'AEK Larnaca FC':         'https://r2.thesportsdb.com/images/media/team/badge/150a2b1544814418.png',
+  'NK Celje':               'https://r2.thesportsdb.com/images/media/team/badge/amvs371681106952.png',
+  'FC Celje':               'https://r2.thesportsdb.com/images/media/team/badge/amvs371681106952.png',
+  'Celje':                  'https://r2.thesportsdb.com/images/media/team/badge/amvs371681106952.png',
+  'Sigma Olomouc':          'https://r2.thesportsdb.com/images/media/team/badge/cbcg021578836711.png',
+  'SK Sigma Olomouc':       'https://r2.thesportsdb.com/images/media/team/badge/cbcg021578836711.png',
+  'FC Sigma Olomouc':       'https://r2.thesportsdb.com/images/media/team/badge/cbcg021578836711.png',
+  'KRC Genk':               'https://a.espncdn.com/i/teamlogos/soccer/500/938.png',
+  'Genk':                   'https://a.espncdn.com/i/teamlogos/soccer/500/938.png',
+  'Raków Częstochowa':      'https://r2.thesportsdb.com/images/media/team/badge/vy8paa1579458598.png',
+  'Rakow Czestochowa':      'https://r2.thesportsdb.com/images/media/team/badge/vy8paa1579458598.png',
+  'Rakow':                  'https://r2.thesportsdb.com/images/media/team/badge/vy8paa1579458598.png',
+  'Panathinaikos FC':       'https://a.espncdn.com/i/teamlogos/soccer/500/443.png',
+  'Panathinaikos PAO':      'https://a.espncdn.com/i/teamlogos/soccer/500/443.png',
 };
 
 // Mapa de artículos Wikipedia para tenistas
@@ -5519,7 +6127,7 @@ function renderPreds() {
           rec:        h.rec,
           conf:       h.stake >= 100 ? 'high' : h.stake >= 50 ? 'med' : 'low',
           confLabel:  h.stake >= 100 ? 'Alta' : h.stake >= 50 ? 'Media' : 'Baja',
-          probH: 0, probD: 0, probA: 0,
+          probH: h.probH || 0, probD: h.probD || 0, probA: h.probA || 0,
           odds: [], time: '', bvr: 0, bvrText: '',
           commenceTs: h.commenceTs || (_nowMs - 1), // garantiza que se marque como started
           _sportKey:  h._sportKey || (h.sport === 'basket' ? 'basketball_nba' : 'soccer_argentina_primera_division'),
@@ -5559,19 +6167,27 @@ function renderPreds() {
     let finished  = realPreds.filter(p =>  p._started);
 
     if (sf === 'soccer') {
+      // Fútbol: todos los de fútbol, ordenados por jerarquía de ligas (ya vienen así)
       upcoming = upcoming.filter(p => (p._sportKey || '').includes('soccer'));
       finished = finished.filter(p => (p._sportKey || '').includes('soccer'));
-    } else if (sf === 'basketball') {
-      upcoming = upcoming.filter(p => (p._sportKey || '').includes('basketball'));
-      upcoming = upcoming.slice(0, 6);
-      finished = finished.filter(p => (p._sportKey || '').includes('basketball'));
+      const allSoccer = [...upcoming, ...finished];
+      realPreds = allSoccer.length ? allSoccer : null;
     } else {
-      // Todos: top 6 upcoming + todos los terminados del día
-      upcoming = upcoming.slice(0, 6);
+      // Principales: máximo 6, mínimo 6. Alta + media primero, de mayor a menor confianza
+      const sortConf = (a, b) => (b.bvr || 0) - (a.bvr || 0) || (b.prob || 0) - (a.prob || 0);
+      const allPreds  = [...upcoming, ...finished];
+      let principales = allPreds
+        .filter(p => p.conf === 'high' || p.conf === 'med')
+        .sort(sortConf)
+        .slice(0, 6);
+      // Completar hasta 6 con baja confianza si faltan
+      if (principales.length < 6) {
+        const lowConf = allPreds.filter(p => p.conf === 'low').sort(sortConf);
+        principales = [...principales, ...lowConf].slice(0, 6);
+      }
+      realPreds = principales.length ? principales : null;
     }
-    // Upcoming primero, terminados al final
-    realPreds = [...upcoming, ...finished];
-    if (realPreds.length === 0) realPreds = null;
+    if (realPreds && realPreds.length === 0) realPreds = null;
   }
 
   // Sin datos reales: mostrar skeleton de carga (nunca datos falsos)
@@ -5614,7 +6230,7 @@ function renderPreds() {
       statusBar.style.background = 'rgba(0,200,83,0.08)';
       statusBar.style.border = '1px solid rgba(0,200,83,0.25)';
       statusBar.style.color = '#00c853';
-      const sfLabel = (window._predSportFilter==='soccer') ? ' · ⚽ Fútbol' : (window._predSportFilter==='basketball') ? ' · 🏀 Basket' : '';
+      const sfLabel = (window._predSportFilter==='soccer') ? ' · ⚽ Fútbol' : '';
       statusBar.innerHTML = `<span>📡 Datos en vivo · ${source.length} pronósticos${sfLabel}</span>`;
     } else {
       // No mostrar banner de error a los visitantes
@@ -5735,13 +6351,20 @@ function renderPreds() {
       </div>` : '';
 
     return `
-    <div class="pred-card ${cardClass}" style="${isGameLive ? 'border-color:rgba(229,57,53,0.4)' : (!isStarted && p.conf==='high') ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)' : ''}">
-      ${isHighConfWin ? '<div class="golden-crown-badge">👑</div>' : ''}
+    <div class="pred-card ${cardClass}" style="${
+      isGameLive
+        ? 'border-color:rgba(229,57,53,0.4)'
+        : (!isStarted && (p.bvr||0) >= 6)
+          ? 'border-color:rgba(255,214,0,0.9);box-shadow:0 0 40px rgba(255,214,0,0.35),0 4px 20px rgba(0,0,0,0.5);background:linear-gradient(180deg,rgba(255,214,0,0.14) 0%,rgba(255,160,0,0.06) 40%,var(--gris-card) 80%);outline:1.5px solid rgba(255,214,0,0.4)'
+          : (!isStarted && p.conf==='high')
+            ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)'
+            : ''
+    }">
       <div class="pred-header">
-        <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${(!isStarted && p.conf==='high') ? '<span style="font-size:1rem;filter:drop-shadow(0 1px 4px rgba(255,214,0,0.8))">👑</span>' : ''}${p.league}${(isGameLive || isStarted) ? '' : ' · ' + p.time}</span>
+        <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${p.league}${(isGameLive || isStarted) ? '' : ' · ' + p.time}</span>
         <div style="display:flex;align-items:center;gap:6px">
           ${resultBadgeHtml}
-          ${!isStarted ? `<div style="display:flex;align-items:center;gap:6px">
+          <div style="display:flex;align-items:center;gap:6px">
             <span class="confidence-badge ${p.conf==='high'?'conf-high':p.conf==='med'?'conf-med':'conf-low'}">${p.confLabel}</span>
             <span style="font-size:0.72rem;font-weight:800;
               color:${p.conf==='high'?'#ffd600':p.conf==='med'?'#ffd600':'#ff7043'};
@@ -5751,13 +6374,13 @@ function renderPreds() {
               border-radius:6px;padding:2px 7px;white-space:nowrap">
               💰 $${p.conf==='high'?'100':p.conf==='med'?'50':'25'}
             </span>
-          </div>` : ''}
+          </div>
         </div>
       </div>
       ${bvrHtml}
       <div class="pred-match">
         <div class="pred-team">
-          <div class="pred-emoji">${logoHtml(p.home, 52)}</div>
+          <div class="pred-emoji">${logoHtml(p.home, 64)}</div>
           <div class="pred-tname">${p.home}</div>
         </div>
         ${(!isPending && isGameLive)
@@ -5778,7 +6401,7 @@ function renderPreds() {
           : `<div class="pred-vs">VS</div>`
         }
         <div class="pred-team">
-          <div class="pred-emoji">${logoHtml(p.away, 52)}</div>
+          <div class="pred-emoji">${logoHtml(p.away, 64)}</div>
           <div class="pred-tname">${p.away}</div>
         </div>
       </div>
@@ -5796,7 +6419,7 @@ function renderPreds() {
           </a>` : ''}
         </div>
       </div>
-      ${!p._fromHist ? `
+      ${(p.probH > 0 || p.probA > 0) ? `
       <div class="pred-bars">
         <div class="pred-bar-item">
           <span class="pred-bar-label">Local</span>
@@ -5831,9 +6454,21 @@ function renderPreds() {
             <div style="font-size:1rem;font-weight:800;color:var(--rojo)">${p.probA > 0 ? (100/p.probA).toFixed(2) : '—'}</div>
           </div>
         </div>
-      </div>` : ''}
-      <!-- Botón expandir análisis — solo en picks pre-partido con insight disponible -->
-      ${!isStarted && p.insight ? `
+      </div>` : (isFinishedWin ? `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 0 20px;gap:10px">
+        <div style="
+          width:80px;height:80px;border-radius:50%;
+          background:radial-gradient(circle at 35% 30%, rgba(0,230,100,0.35) 0%, rgba(0,200,83,0.12) 60%, transparent 100%);
+          border:2.5px solid rgba(0,200,83,0.5);
+          box-shadow:0 0 32px rgba(0,200,83,0.25), inset 0 0 20px rgba(0,200,83,0.08);
+          display:flex;align-items:center;justify-content:center;
+          animation:winPulse 2.5s ease-in-out infinite">
+          <span style="font-size:2.4rem;line-height:1;filter:drop-shadow(0 0 8px rgba(0,200,83,0.6))">✅</span>
+        </div>
+        <div style="font-size:0.75rem;font-weight:700;color:rgba(0,200,83,0.8);letter-spacing:1px;text-transform:uppercase">Pronóstico acertado</div>
+      </div>` : '')}
+      <!-- Botón expandir análisis -->
+      ${p.insight ? `
       <button class="pred-expand-btn" onclick="togglePredExpand(${idx})">
         <span>🔍 Ver análisis de la IA</span>
         <span class="pred-expand-arrow" id="pred-arrow-${idx}">▼</span>
@@ -5843,15 +6478,24 @@ function renderPreds() {
         ${h2hHtml ? `<div style="margin-top:4px">${h2hHtml}</div>` : ''}
         ${md ? `<button class="pred-full-btn" onclick="openMatchAnalysis('${p.home}','${p.away}')">Ver análisis estadístico completo →</button>` : ''}
       </div>` : ''}
-      <!-- $A-Coin picks — solo pre-partido -->
-      ${!isStarted ? acPickHTML(
+      <!-- $A-Coin picks -->
+      ${acPickHTML(
         p.home, p.away, p.homeRaw || p.home, p.awayRaw || p.away,
         p.probH > 0 ? parseFloat((100/p.probH).toFixed(2)) : null,
         p.probD > 0 ? parseFloat((100/p.probD).toFixed(2)) : null,
         p.probA > 0 ? parseFloat((100/p.probA).toFixed(2)) : null
-      ) : ''}
-      <!-- CTA casas afiliadas — solo pre-partido -->
-      ${!isStarted ? oddsHtml : ''}
+      )}
+      <!-- CTA casas afiliadas -->
+      ${oddsHtml}
+      <!-- Botón compartir -->
+      <button class="share-pick-btn" onclick="sharePick('${p.home}','${p.away}','${p.rec}',${_bvr},'${p.league}')" title="Compartir este pick">
+        📤 Compartir pick
+      </button>
+      <!-- Sello alta confianza acertada -->
+      ${isHighConfWin ? `
+      <div class="high-conf-stamp">
+        <span class="high-conf-stamp-text">PRONÓSTICO DE ALTA CONFIANZA ACERTADO</span>
+      </div>` : ''}
     </div>
   `}).join('');
 
@@ -6182,7 +6826,12 @@ function sendSuggestion(el) {
 // ═══════════════════════════════════════════════
 
 function navTo(id) {
-  document.getElementById(id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  const el = document.getElementById(id);
+  if (!el) return;
+  if (el.style.display === 'none') el.style.display = '';
+  const navH = document.querySelector('nav')?.offsetHeight || 66;
+  const top  = el.getBoundingClientRect().top + window.scrollY - navH - 10;
+  window.scrollTo({ top, behavior: 'smooth' });
   document.querySelectorAll('.nav-links a, .nav-drawer a').forEach(a => a.classList.remove('active'));
 }
 
@@ -6209,6 +6858,8 @@ const HIST_KEY   = 'apuestas_historial_v1';
 const HIST_STAKE = 100; // stake fijo por predicción
 let histFilter = 'all';
 const HIST_PAGE_SIZE = 10;
+const ADMIN_KEY      = 'apuestas_admin_cfg_v1';
+const ADMIN_SESSION  = 'apuestas_admin_session_v1';
 let histPage = 0;
 let histDateFilter = 'all';
 // Fecha de lanzamiento del sitio — fija para todos los usuarios
@@ -6216,29 +6867,112 @@ const PAGE_LAUNCH_DATE = new Date('2025-03-01');
 
 function loadHistorial()   { try { return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch { return []; } }
 function saveHistorial(arr) {
-  try { localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(-200))); } catch {}
-  // Sync a Supabase en background (debounced 1.5s)
+  const sorted = [...arr].sort((a,b) => (b.commenceTs||0) - (a.commenceTs||0));
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(sorted.slice(-500))); } catch {}
+  // Sync a historial GLOBAL en Supabase (solo admin)
+  if (authUser?.email === 'mauro.union10@gmail.com') {
+    clearTimeout(_globalHistSyncTimer);
+    _globalHistSyncTimer = setTimeout(() => sbSaveGlobalHistorial(sorted), 1500);
+  }
+  // Backup personal (todos los usuarios logueados)
   if (authUser?.email) {
     clearTimeout(_histSyncTimer);
-    _histSyncTimer = setTimeout(() => sbSaveHistorial(arr), 1500);
+    _histSyncTimer = setTimeout(() => sbSaveHistorial(sorted), 3000);
+    // También actualizar columna `predictions` para los stats globales del hero
+    acScheduleSync();
   }
 }
 
 // ── Sync historial ↔ Supabase ──
 let _histSyncTimer = null;
+let _globalHistSyncTimer = null;
+const ADMIN_EMAIL = 'mauro.union10@gmail.com';
+const GLOBAL_HIST_KEY = 'global_historial_v1';
+
+// Guarda el historial GLOBAL en shared_cache (solo admin)
+async function sbSaveGlobalHistorial(arr) {
+  if (authUser?.email !== ADMIN_EMAIL) return;
+  try {
+    const { error } = await sbClient
+      .from('shared_cache')
+      .upsert({ key: GLOBAL_HIST_KEY, data: arr.slice(-500), fetched_at: new Date().toISOString() },
+               { onConflict: 'key' });
+    if (error) console.warn('[globalHistSave]', error.message);
+    else console.log('[globalHistSave] ✓', arr.length, 'entradas');
+  } catch(e) { console.warn('[globalHistSave]', e.message); }
+}
+
+// Lee el historial GLOBAL de shared_cache (todos los usuarios, incluso anónimos)
+async function sbLoadGlobalHistorial() {
+  try {
+    const { data, error } = await sbAnon
+      .from('shared_cache')
+      .select('data, fetched_at')
+      .eq('key', GLOBAL_HIST_KEY)
+      .maybeSingle();
+    if (error || !data?.data) return null;
+    return Array.isArray(data.data) ? data.data : null;
+  } catch(e) { console.warn('[globalHistLoad]', e.message); return null; }
+}
 
 async function sbSaveHistorial(arr) {
   if (!authUser?.email) return;
   try {
     const { error } = await sbClient
       .from('acoin_users')
-      .upsert({ email: authUser.email, historial_full: arr.slice(-200), updated_at: new Date().toISOString() },
+      .upsert({ email: authUser.email, historial_full: arr.slice(-500), updated_at: new Date().toISOString() },
                { onConflict: 'email' });
     if (error) console.warn('[histSave]', error.message);
   } catch(e) { console.warn('[histSave]', e.message); }
 }
 
 async function sbLoadHistorial() {
+  // 1. Cargar historial global (para todos, incluso anónimos)
+  const globalHist = await sbLoadGlobalHistorial();
+
+  if (authUser?.email === ADMIN_EMAIL) {
+    // Admin: merge global + historial_full DB + local → fuente de verdad completa
+    const localHist = loadHistorial();
+
+    // Siempre leer historial_full desde acoin_users (tiene los 46 picks completos)
+    let dbHist = [];
+    try {
+      const { data: dbRow } = await sbClient
+        .from('acoin_users')
+        .select('historial_full')
+        .eq('email', ADMIN_EMAIL)
+        .maybeSingle();
+      if (dbRow?.historial_full?.length) dbHist = dbRow.historial_full;
+      if (dbHist.length) console.log('[globalHist] Admin: historial_full desde DB:', dbHist.length, 'entradas');
+    } catch(e) { console.warn('[globalHist] Error leyendo historial_full:', e.message); }
+
+    // Deduplicar: global + DB + local (en ese orden de prioridad)
+    const _hKey = h => h.id || `${h.home}|||${h.away}|||${h.date||''}`;
+    const allEntries = [...(globalHist||[]), ...dbHist, ...localHist];
+    const seen = new Map();
+    allEntries.forEach(h => { const k = _hKey(h); if (!seen.has(k)) seen.set(k, h); });
+    const merged = [...seen.values()].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0));
+
+    // Actualizar shared_cache si el merge tiene más entradas que lo guardado
+    const prevCount = globalHist?.length || 0;
+    if (merged.length > prevCount) {
+      console.log('[globalHist] Admin: actualizando shared_cache con', merged.length, 'entradas (antes:', prevCount, ')');
+      await sbSaveGlobalHistorial(merged);
+    }
+
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
+    renderHistorial(histFilter);
+    return;
+  }
+
+  // Otros usuarios: usar directamente el global
+  if (globalHist && globalHist.length > 0) {
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(globalHist)); } catch {}
+    renderHistorial(histFilter);
+    return;
+  }
+
+  // Fallback legacy: historial personal en acoin_users
   if (!authUser?.email) return;
   try {
     const { data, error } = await sbClient
@@ -6246,19 +6980,12 @@ async function sbLoadHistorial() {
       .select('historial_full')
       .eq('email', authUser.email)
       .maybeSingle();
-    if (error) { console.warn('[histLoad]', error.message); return; }
-    const dbHist = data?.historial_full;
-    if (!Array.isArray(dbHist) || dbHist.length === 0) {
-      // Usuario nuevo: subir historial local si tiene datos
-      const local = loadHistorial();
-      if (local.length > 0) await sbSaveHistorial(local);
-      return;
-    }
-    // Merge: DB es la fuente de verdad; agregar picks locales que no estén en DB
+    if (error || !data?.historial_full?.length) return;
     const localHist = loadHistorial();
-    const dbKeys   = new Set(dbHist.map(h => h.home + '|||' + h.away));
-    const localOnly = localHist.filter(h => !dbKeys.has(h.home + '|||' + h.away));
-    const merged   = [...dbHist, ...localOnly].slice(-200);
+    const _hKey2 = h => h.id || `${h.home}|||${h.away}|||${h.date||''}`;
+    const dbKeys = new Set(data.historial_full.map(_hKey2));
+    const localOnly = localHist.filter(h => !dbKeys.has(_hKey2(h)));
+    const merged = [...data.historial_full, ...localOnly].slice(-500);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
     renderHistorial(histFilter);
   } catch(e) { console.warn('[histLoad]', e.message); }
@@ -6335,6 +7062,7 @@ function savePredictions(preds) {
       rec: p.rec, odds: impliedOdds, stake,
       result: 'pending', pl: 0,
       commenceTs: p.commenceTs || null,
+      probH: p.probH || 0, probD: p.probD || 0, probA: p.probA || 0,
     });
     added++;
   });
@@ -6351,10 +7079,13 @@ function resolveCompletedGames(scores, skipRender) {
   let changed = false;
   const now = Date.now();
 
+  const TWO_DAYS_MS = 2 * 24 * 3600 * 1000;
   scores.filter(s => s.flag === 'final').forEach(s => {
     pending.forEach(p => {
       if (p.result !== 'pending') return; // ya fue resuelto en esta pasada
       if (!teamsMatch(s.home, p.home) || !teamsMatch(s.away, p.away)) return;
+      // Verificar que el score sea del mismo partido (±2 días del commenceTs)
+      if (s.commenceTs && p.commenceTs && Math.abs(s.commenceTs - p.commenceTs) > TWO_DAYS_MS) return;
 
       const homeWin = s.scoreH > s.scoreA;
       const awayWin = s.scoreA > s.scoreH;
@@ -6458,11 +7189,12 @@ async function loadHistoricalScores() {
       const homeScore = g.scores?.find(s => s.name === g.home_team);
       const awayScore = g.scores?.find(s => s.name === g.away_team);
       return {
-        home:   shortName(g.home_team),
-        away:   shortName(g.away_team),
-        scoreH: parseInt(homeScore?.score) || 0,
-        scoreA: parseInt(awayScore?.score) || 0,
-        flag:   'final',
+        home:        shortName(g.home_team),
+        away:        shortName(g.away_team),
+        scoreH:      parseInt(homeScore?.score) || 0,
+        scoreA:      parseInt(awayScore?.score) || 0,
+        flag:        'final',
+        commenceTs:  g.commence_time ? new Date(g.commence_time).getTime() : null,
       };
     });
 
@@ -6512,11 +7244,14 @@ function resolveAllGames(scores) {
   const hist = loadHistorial();
   const now = Date.now();
   const sevenDaysMs = 7 * 24 * 3600 * 1000;
+  const TWO_DAYS_MS = 2 * 24 * 3600 * 1000;
   let changed = false;
   scores.filter(s => s.flag === 'final').forEach(s => {
     hist.forEach(p => {
       if (p.result === 'win' || p.result === 'loss') return; // ya definitivo, no tocar
       if (!teamsMatch(s.home, p.home) || !teamsMatch(s.away, p.away)) return;
+      // Verificar que sea el mismo partido por fecha (±2 días)
+      if (s.commenceTs && p.commenceTs && Math.abs(s.commenceTs - p.commenceTs) > TWO_DAYS_MS) return;
       const homeWin    = s.scoreH > s.scoreA;
       const awayWin    = s.scoreA > s.scoreH;
       const draw       = s.scoreH === s.scoreA;
@@ -6626,9 +7361,10 @@ function renderHistorial(filter) {
         const recDisplay = (h.rec||'').replace(' Gana','');
         const isHigh = h.stake === 100;
         const isToday = h.date === todayStr;
-        const rowIcon = isHigh ? '<span style="font-size:0.85rem;filter:drop-shadow(0 1px 3px rgba(255,214,0,0.8))">👑</span>' : icon;
         const rowClass = isToday ? 'hist-row-today' : '';
-        const rowStyle = (!isToday && isHigh) ? 'background:rgba(255,214,0,0.03)' : '';
+        const rowStyle = isHigh
+          ? 'background:linear-gradient(90deg,rgba(255,214,0,0.09) 0%,rgba(255,214,0,0.04) 100%);border-left:2px solid rgba(255,214,0,0.45)'
+          : '';
         const marcador = h.finalScore
           ? `<span style="font-weight:700;color:#e0e0e0;letter-spacing:0.5px">${h.finalScore}</span>`
           : `<span style="color:#444">—</span>`;
@@ -6638,7 +7374,10 @@ function renderHistorial(filter) {
         const resultCell = _admOk
           ? `<span style="display:inline-flex;align-items:center;gap:3px">${rMap[h.result]||rMap.void}<span class="result-editable" style="cursor:pointer;font-size:0.6rem;opacity:0.45;margin-left:2px" title="Editar resultado y marcador" onclick="showResultPicker(this,'${mKey}','${h.result}','${mScore}')">✏</span></span>`
           : (rMap[h.result] || rMap.void);
-        return `<tr class="${rowClass}" style="${rowStyle}"><td>${rowIcon} <strong>${h.home}</strong> vs ${h.away}</td><td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
+        const homeShield = logoHtml(h.home, 34);
+        const awayShield = logoHtml(h.away, 34);
+        const matchCell = `<td style="min-width:110px"><span title="${h.home} vs ${h.away}" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle">${homeShield}<span style="font-size:0.62rem;color:var(--texto-sec);font-weight:600">vs</span>${awayShield}</span></td>`;
+        return `<tr class="${rowClass}" style="${rowStyle}">${matchCell}<td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
       }).join('')
     : `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--texto-sec)">📋 El historial se llenará automáticamente con los pronósticos de cada día.</td></tr>`;
 
@@ -7316,7 +8055,8 @@ function matchTime(commence_time) {
 }
 
 // ── API cache helpers (reduce credit usage) ──
-const CACHE_ODDS_TTL   = 60 * 60 * 1000;  // 60 min
+const CACHE_ODDS_TTL   = 3 * 60 * 60 * 1000;  // 3 horas (local)
+const CACHE_ODDS_SB_TTL = 3 * 60 * 60 * 1000; // 3 horas (Supabase compartida)
 const CACHE_SCORES_TTL = 30 * 60 * 1000;  // 30 min
 function cacheSet(key, data) {
   try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data })); } catch(e) {}
@@ -7453,55 +8193,80 @@ function forceRefreshOdds() {
   loadRealOdds();
 }
 
-// Carga cuotas desde el Worker y popula window._rawOddsGames (usado por las fichas)
+// Carga cuotas — primero localStorage, luego caché compartida en Supabase, último el Worker API
 async function loadRealOdds() {
   if (_oddsLoading) return;
 
-  // Usar caché si está fresca
-  const cached = cacheGet('cache_odds_v4', CACHE_ODDS_TTL);
-  if (cached && Array.isArray(cached) && cached.length > 0) {
-    window._rawOddsGames = cached;
-    processOddsIntoComparador(cached);
+  // 1) localStorage fresco → usar directo sin ningún fetch
+  const localCached = cacheGet('cache_odds_v4', CACHE_ODDS_TTL);
+  if (localCached && Array.isArray(localCached) && localCached.length > 0) {
+    window._rawOddsGames = localCached;
+    processOddsIntoComparador(localCached);
     renderPreds();
     return;
   }
 
   _oddsLoading = true;
-  renderPreds(); // muestra skeleton mientras carga
+  renderPreds(); // muestra skeleton
+
+  function useData(combined) {
+    window._rawOddsGames = combined;
+    cacheSet('cache_odds_v4', combined);
+    try { localStorage.setItem('cache_odds_stale', JSON.stringify({ ts: Date.now(), data: combined })); } catch(_) {}
+    processOddsIntoComparador(combined);
+  }
+
+  function useStale() {
+    try {
+      const raw = localStorage.getItem('cache_odds_stale');
+      if (raw) { const { data } = JSON.parse(raw); if (data?.length) { window._rawOddsGames = data; processOddsIntoComparador(data); } }
+    } catch(_) {}
+  }
 
   try {
-    // Traer todas las ligas en una sola llamada
+    // 2) Caché compartida en Supabase — un solo fetch para todos los usuarios
+    const { data: sbRow } = await sbAnon
+      .from('shared_cache')
+      .select('data, fetched_at')
+      .eq('key', 'odds_v1')
+      .maybeSingle();
+
+    if (sbRow?.data && sbRow?.fetched_at) {
+      const age = Date.now() - new Date(sbRow.fetched_at).getTime();
+      if (age < CACHE_ODDS_SB_TTL && Array.isArray(sbRow.data) && sbRow.data.length > 0) {
+        console.log('[Odds] Usando caché Supabase compartida (edad:', Math.round(age/60000), 'min)');
+        useData(sbRow.data);
+        _oddsLoading = false;
+        renderPreds();
+        return;
+      }
+    }
+
+    // 3) Caché vencida o inexistente → llamar al Worker API
+    console.log('[Odds] Fetching desde Worker API...');
     const [resMain, resEur] = await Promise.all([
       fetch(`${WORKER_URL}/odds?category=main`).then(r => r.ok ? r.json() : { data: [] }),
       fetch(`${WORKER_URL}/odds?category=europe`).then(r => r.ok ? r.json() : { data: [] }),
     ]);
     const combined = [...(resMain.data || []), ...(resEur.data || [])];
+
     if (combined.length > 0) {
-      window._rawOddsGames = combined;
-      cacheSet('cache_odds_v4', combined);
-      // Guardar también como stale (respaldo si falla luego)
-      try { localStorage.setItem('cache_odds_stale', JSON.stringify({ ts: Date.now(), data: combined })); } catch(e) {}
-      processOddsIntoComparador(combined);
+      useData(combined);
+      // Guardar en Supabase para compartir con todos los demás usuarios
+      sbAnon.from('shared_cache').upsert({
+        key: 'odds_v1',
+        data: combined,
+        fetched_at: new Date().toISOString()
+      }, { onConflict: 'key' }).then(({ error }) => {
+        if (error) console.warn('[Odds] No se pudo guardar caché Supabase:', error.message);
+        else console.log('[Odds] Caché compartida actualizada en Supabase');
+      });
     } else {
-      // Intentar usar caché stale si la llamada devolvió vacío
-      try {
-        const staleRaw = localStorage.getItem('cache_odds_stale');
-        if (staleRaw) {
-          const { data: staleData } = JSON.parse(staleRaw);
-          if (staleData?.length) { window._rawOddsGames = staleData; processOddsIntoComparador(staleData); }
-        }
-      } catch(e) {}
+      useStale();
     }
   } catch(e) {
-    console.warn('[Odds] Error cargando cuotas:', e);
-    // Usar caché stale como fallback
-    try {
-      const staleRaw = localStorage.getItem('cache_odds_stale');
-      if (staleRaw) {
-        const { data: staleData } = JSON.parse(staleRaw);
-        if (staleData?.length) { window._rawOddsGames = staleData; processOddsIntoComparador(staleData); }
-      }
-    } catch(e2) {}
+    console.warn('[Odds] Error:', e);
+    useStale();
   } finally {
     _oddsLoading = false;
     renderPreds();
@@ -7684,20 +8449,92 @@ async function loadRealScores(retryCount = 0) {
 //  FEED PÚBLICO G$ — apuestas recientes de todos los usuarios
 // ═══════════════════════════════════════════════
 const PICK_LABELS = { home: 'Local', draw: 'Empate', away: 'Visitante' };
+const GFEED_PAGE_SIZE = 5;
+let _gFeedAllBets = [];
+let _gFeedCurrentPage = 0;
+
+function gFeedPage(dir) {
+  const totalPages = Math.ceil(_gFeedAllBets.length / GFEED_PAGE_SIZE);
+  _gFeedCurrentPage = Math.max(0, Math.min(_gFeedCurrentPage + dir, totalPages - 1));
+  _renderGFeedPage();
+}
+
+function _renderGFeedPage() {
+  const list = document.getElementById('gFeedList');
+  const nav  = document.getElementById('gFeedNav');
+  const info = document.getElementById('gFeedPageInfo');
+  const prev = document.getElementById('gFeedPrev');
+  const next = document.getElementById('gFeedNext');
+  if (!list) return;
+
+  const start = _gFeedCurrentPage * GFEED_PAGE_SIZE;
+  const page  = _gFeedAllBets.slice(start, start + GFEED_PAGE_SIZE);
+  const totalPages = Math.ceil(_gFeedAllBets.length / GFEED_PAGE_SIZE);
+
+  list.innerHTML = page.map((b, i) => {
+    // Strip HTML tags to get plain text for initials
+    const plainNick = b.nick.replace(/<[^>]*>/g, '');
+    const initials  = plainNick.slice(0, 2).toUpperCase();
+    let avatarHtml = `<span style="font-size:0.72rem;font-weight:800;color:var(--verde)">${initials}</span>`;
+    if (b.ava) {
+      try {
+        const avaObj = typeof b.ava === 'string' ? JSON.parse(b.ava) : b.ava;
+        const logoUrl = avaObj?.logo || b.ava;
+        avatarHtml = `<img src="${logoUrl}" alt="${plainNick}" style="width:100%;height:100%;object-fit:contain;border-radius:0;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5))" onerror="this.outerHTML='<span style=\\'font-size:0.72rem;font-weight:800;color:var(--verde)\\'>${initials}</span>'">`;
+      } catch(_) {}
+    }
+    const homeShield = logoHtml(b.home, 26);
+    const awayShield = logoHtml(b.away, 26);
+    const matchCell = `<span style="display:inline-flex;flex-direction:column;align-items:flex-start;gap:3px;vertical-align:middle">
+      <span title="${b.home} vs ${b.away}" style="display:inline-flex;align-items:center;gap:6px">
+        ${homeShield}
+        <span style="font-size:0.58rem;color:var(--texto-sec);font-weight:700;letter-spacing:0.5px">vs</span>
+        ${awayShield}
+      </span>
+      ${b.pick ? (()=>{ const lbl={home:`Gana ${b.home}`,away:`Gana ${b.away}`,draw:'Empate'}; return `<span style="font-size:0.67rem;color:rgba(255,255,255,0.75);font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px">${lbl[b.pick]||b.pick}</span>`; })() : ''}
+    </span>`;
+    const oddsDisp = b.odds ? Number(b.odds).toFixed(2) : '—';
+    return `<tr style="animation-delay:${i * 0.04}s">
+      <td class="th-center">${matchCell}</td>
+      <td>
+        <span style="display:inline-flex;align-items:center;gap:9px">
+          <div class="gfeed-avatar${b.ava ? '' : ' initials'}" style="width:36px;height:36px;font-size:0.72rem;flex-shrink:0">${avatarHtml}</div>
+          <span class="gfeed-nick" style="font-size:0.82rem">${b.nick}</span>
+        </span>
+      </td>
+      <td><span class="gfeed-time">${_timeAgo(b.ts)}</span></td>
+      <td><span class="gfeed-odds">${oddsDisp}</span></td>
+      <td><span class="gfeed-amount">G$${b.betAmount.toLocaleString('es-AR')}</span></td>
+    </tr>`;
+  }).join('');
+
+  // Navegación
+  if (totalPages > 1) {
+    nav.style.display = 'flex';
+    info.textContent = `${_gFeedCurrentPage + 1} / ${totalPages}`;
+    prev.disabled = _gFeedCurrentPage === 0;
+    prev.style.opacity = _gFeedCurrentPage === 0 ? '0.35' : '1';
+    next.disabled = _gFeedCurrentPage >= totalPages - 1;
+    next.style.opacity = _gFeedCurrentPage >= totalPages - 1 ? '0.35' : '1';
+  } else {
+    nav.style.display = 'none';
+  }
+}
 
 function _timeAgo(ts) {
   const diff = Date.now() - ts;
   const m = Math.floor(diff / 60000);
-  if (m < 1)  return 'ahora';
-  if (m < 60) return `hace ${m}m`;
+  if (m < 1)  return 'Ahora mismo';
+  if (m < 60) return `Hace ${m} min`;
   const h = Math.floor(m / 60);
-  if (h < 24) return `hace ${h}h`;
-  return `hace ${Math.floor(h/24)}d`;
+  if (h < 24) return `Hace ${h}h`;
+  const d = Math.floor(h / 24);
+  return `Hace ${d} día${d !== 1 ? 's' : ''}`;
 }
 
 async function fetchGFeed() {
   try {
-    const { data, error } = await sbClient
+    const { data, error } = await sbAnon
       .from('acoin_users')
       .select('nickname, avatar, picks, balance, email')
       .not('picks', 'is', null)
@@ -7709,55 +8546,38 @@ async function fetchGFeed() {
     // Aplanar todos los picks de todos los usuarios, ordenar por ts desc
     const allBets = [];
     data.forEach(user => {
+      const vip = user.email ? GAMBETA_VIP[user.email] : null;
       // Si tiene nickname elegido, usarlo; si no, usar prefijo del email como fallback
-      let nick = (user.nickname && user.nickname.trim())
-        ? user.nickname.trim().slice(0, 16)
-        : null;
+      let nick = vip?.nickname
+        || ((user.nickname && user.nickname.trim()) ? user.nickname.trim().slice(0, 16) : null);
       if (!nick && user.email) {
         const prefix = user.email.split('@')[0];
         nick = prefix.slice(0, 1) + '*'.repeat(Math.min(prefix.length - 1, 6));
       }
+      if (vip?.suffix) nick = nick + vip.suffix;
       if (!nick) return;
+      const nickHtml = vip?.nameColor
+        ? `<span style="color:${vip.nameColor};font-weight:800">${nick}</span>`
+        : nick;
       const ava  = user.avatar || null;
       const bal  = user.balance || 0;
       (user.picks || []).forEach(p => {
         if (p.ts && p.home && p.away && p.pick && p.betAmount) {
-          allBets.push({ nick, ava, bal, ...p });
+          allBets.push({ nick: nickHtml, ava, bal, ...p });
         }
       });
     });
 
-    // Ordenar por timestamp más reciente
+    // Ordenar por timestamp más reciente y guardar globalmente
     allBets.sort((a, b) => b.ts - a.ts);
-    const recent = allBets.slice(0, 15);
-
-    if (recent.length === 0) return;
+    if (allBets.length === 0) return;
 
     const wrap = document.getElementById('gFeedWrap');
-    const list = document.getElementById('gFeedList');
-    const cnt  = document.getElementById('gFeedCount');
-    if (!wrap || !list) return;
+    if (!wrap) return;
 
-    cnt.textContent = `${recent.length} apuesta${recent.length !== 1 ? 's' : ''}`;
-    list.innerHTML = recent.map((b, i) => {
-      const initials = b.nick.slice(0, 2).toUpperCase();
-      const avatarHtml = b.ava
-        ? `<img src="${b.ava}" alt="${b.nick}" style="width:100%;height:100%;border-radius:50%;object-fit:cover" onerror="this.parentElement.textContent='${initials}'">`
-        : initials;
-      const choiceLabel = PICK_LABELS[b.pick] || b.pick;
-      const shortHome = b.home.length > 12 ? b.home.slice(0,11)+'…' : b.home;
-      const shortAway = b.away.length > 12 ? b.away.slice(0,11)+'…' : b.away;
-      return `
-        <div class="gfeed-item" style="animation-delay:${i * 0.04}s">
-          <div class="gfeed-avatar">${avatarHtml}</div>
-          <div class="gfeed-body">
-            <div class="gfeed-nick">${b.nick}</div>
-            <div class="gfeed-bet"><strong>${shortHome} vs ${shortAway}</strong> · ${choiceLabel} · ${_timeAgo(b.ts)}</div>
-          </div>
-          <div class="gfeed-amount">G$${b.betAmount.toLocaleString('es-AR')}</div>
-        </div>`;
-    }).join('');
-
+    _gFeedAllBets = allBets;
+    _gFeedCurrentPage = 0;
+    _renderGFeedPage();
     wrap.style.display = '';
   } catch(e) {
     console.warn('[gFeed] Error:', e);
@@ -7768,6 +8588,7 @@ async function fetchGFeed() {
 //  INIT
 // ═══════════════════════════════════════════════
 
+_purgeNbaPicks(); // eliminar picks NBA del historial y G$ al cargar la página
 renderSkeletonScores(6); // mostrar skeleton mientras carga la API
 renderPreds();
 renderStats('futbol');
@@ -7776,6 +8597,16 @@ renderHistorial('all');
 renderBankrollSummary();
 renderBetsList();
 setTimeout(drawBankrollChart, 100);
+
+// ── Carga inmediata del historial GLOBAL (visible para todos, incluso sin login) ──
+(async () => {
+  const g = await sbLoadGlobalHistorial();
+  if (g && g.length > 0) {
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(g)); } catch {}
+    renderHistorial(histFilter);
+    console.log('[globalHist] ✓ Cargado desde Supabase:', g.length, 'entradas');
+  }
+})();
 window.addEventListener('resize', () => { clearTimeout(window._chartTimer); window._chartTimer = setTimeout(drawBankrollChart, 120); });
 loadPlayerPhotos();
 
@@ -7790,7 +8621,7 @@ fetch(`${WORKER_URL}/available`)
   .then(r => r.json())
   .then(j => {
     window._availableSports = j.keys || [];
-    const hasBasket = window._availableSports.some(k => k.includes('basketball'));
+    const hasBasket = false;  // Basketball disabled
     const hasTenis  = window._availableSports.some(k => k.includes('tennis'));
     const hasMMA    = window._availableSports.some(k => k.includes('mma'));
     const hasRugby  = window._availableSports.some(k => k.includes('rugby'));
@@ -7946,6 +8777,24 @@ function authGoBack() {
   showAuthStep(1);
 }
 
+function goToEmailLogin() {
+  pendingSocial = 'email';
+  authIsLogin = true;
+  const direct = document.getElementById('directEmail').value.trim();
+  document.getElementById('leadEmail').value    = direct || '';
+  document.getElementById('leadPassword').value = '';
+  document.getElementById('authStep2Title').textContent  = 'Iniciá sesión';
+  document.getElementById('authStep2Sub').textContent    = 'Ingresá tu email y contraseña.';
+  document.getElementById('authSubmitBtn').textContent   = 'Iniciar sesión →';
+  document.getElementById('authModeText').textContent    = '¿No tenés cuenta?';
+  document.getElementById('authModeLink').textContent    = 'Registrate gratis';
+  document.getElementById('marketingRow').style.display  = 'none';
+  document.getElementById('socialChip').innerHTML        = '🔑 Iniciando sesión con email';
+  document.getElementById('emailError').textContent      = '';
+  showAuthStep(2);
+  setTimeout(() => document.getElementById(direct ? 'leadPassword' : 'leadEmail').focus(), 100);
+}
+
 async function completeAuth() {
   const email    = document.getElementById('leadEmail').value.trim();
   const password = document.getElementById('leadPassword').value;
@@ -7971,7 +8820,14 @@ async function completeAuth() {
       : await sbClient.auth.signUp({ email, password });
 
     if (result.error) {
-      errEl.textContent = '⚠ ' + sbTranslateError(result.error.message);
+      // Si el error es "ya registrado" → auto-cambiar a login y avisar
+      if (result.error.message?.includes('User already registered')) {
+        errEl.textContent = '✅ Ya tenés cuenta — te cambiamos a inicio de sesión.';
+        errEl.style.color = 'var(--verde)';
+        setTimeout(() => { errEl.style.color = ''; toggleAuthMode(); }, 1200);
+      } else {
+        errEl.textContent = '⚠ ' + sbTranslateError(result.error.message);
+      }
     } else if (!authIsLogin && !result.data?.session) {
       // Supabase pidió confirmación por email
       document.getElementById('welcomeMsg').textContent = `Revisá tu bandeja de entrada (${email}) y confirmá tu cuenta para activarla. ✉️`;
@@ -8018,6 +8874,8 @@ function updateNavAuth() {
   renderBetsList();
   renderMyPanel();
   applyUserProfile(); // apodo + escudo si ya completó el onboarding
+  renderMyPicks();   // panel de stats personales G$
+  initPushUI();      // mostrar card de notificaciones push
 }
 
 function toggleUserMenu() {
@@ -8066,6 +8924,7 @@ sbClient.auth.onAuthStateChange(async (event, session) => {
     loadBankrollData();   // ← cargar bankroll real del usuario
     await acLoadFromDB(u.email);
     await sbLoadHistorial();
+    initUserSync(u.email); // ← Realtime + periodic sync: única fuente de verdad
     closeAuth();
     checkOnboarding();
   } else if (event === 'SIGNED_OUT') {
@@ -8495,6 +9354,13 @@ function acConfirmBet(matchId, home, away) {
     openAuth();
     return;
   }
+  // Require complete profile (nickname + avatar) to participate — VIPs exempt
+  const _isVip = authUser?.email && GAMBETA_VIP[authUser.email];
+  if (!_isVip && (!localStorage.getItem(GB_NICK) || !localStorage.getItem(GB_AVA))) {
+    acToast('👤', 'Completá tu perfil', 'Necesitás elegir un nickname y un escudo para participar');
+    setTimeout(checkOnboarding, 800);
+    return;
+  }
   const state = window._acBetState[matchId];
   if (!state || !state.choice || !state.amount) return;
   const picks = acGetPicks();
@@ -8505,13 +9371,16 @@ function acConfirmBet(matchId, home, away) {
     return;
   }
   // Deduct immediately
-  acAdd(-state.amount, `🎲 Apuesta: ${home} vs ${away}`);
+  acAdd(-state.amount, `🎲 Predicción: ${home} vs ${away}`);
   picks.push({
     id: matchId, home, away, pick: state.choice,
     betAmount: state.amount, odds: state.odds,
     ts: Date.now(), evaluated: false
   });
   acSavePicks(picks);
+  renderMyPicks(); // actualizar panel de stats personales
+  // Refrescar feed público ~2 seg después (tiempo suficiente para que el sync llegue a la DB)
+  setTimeout(fetchGFeed, 2000);
   const ret    = Math.round(state.amount * state.odds);
   const labels = { home:'Local', draw:'Empate', away:'Visitante' };
   // Update UI — lock buttons, show pending message
@@ -8561,7 +9430,7 @@ function acEvaluatePicks() {
     p.evaluated = true; p.result = actual; p.correct = correct;
     changed = true;
   });
-  if (changed) { acSavePicks(picks); renderPreds(); }
+  if (changed) { acSavePicks(picks); renderPreds(); renderMyPicks(); }
 }
 
 /* ── Build pick HTML ── */
@@ -8648,6 +9517,36 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
     </div>
   </div>`;
 }
+
+// Detecta si un nombre de equipo pertenece a la NBA por su logo en el diccionario
+function _isNbaTeam(name) {
+  if (!name) return false;
+  const url = (typeof teamLogos !== 'undefined' && teamLogos[name]) || '';
+  return _isNbaAvatar(url);
+}
+
+// Limpia picks NBA del historial de pronósticos (AC_HIST) y de los picks G$ (AC_PICK)
+function _purgeNbaPicks() {
+  try {
+    const hist = JSON.parse(localStorage.getItem(AC_HIST) || '[]');
+    const clean = hist.filter(h => {
+      if (h.sport === 'basket') return false;
+      if (h._sportKey && h._sportKey.includes('basketball')) return false;
+      if (_isNbaTeam(h.home) || _isNbaTeam(h.away)) return false;
+      return true;
+    });
+    if (clean.length !== hist.length) localStorage.setItem(AC_HIST, JSON.stringify(clean));
+  } catch(e) {}
+  try {
+    const picks = JSON.parse(localStorage.getItem(AC_PICK) || '[]');
+    const cleanPicks = picks.filter(p => {
+      if (_isNbaTeam(p.home) || _isNbaTeam(p.away)) return false;
+      if (p._sportKey && p._sportKey.includes('basketball')) return false;
+      return true;
+    });
+    if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
+  } catch(e) {}
+}
 </script>
 
 <!-- AUTH MODAL -->
@@ -8686,13 +9585,17 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
       <!-- Separador -->
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
         <div style="flex:1;height:1px;background:rgba(255,255,255,0.1)"></div>
-        <span style="font-size:0.7rem;color:var(--texto-sec)">o preferís contraseña</span>
+        <span style="font-size:0.7rem;color:var(--texto-sec)">o con contraseña</span>
         <div style="flex:1;height:1px;background:rgba(255,255,255,0.1)"></div>
       </div>
-      <button class="social-btn" onclick="selectSocial('email')" style="justify-content:center;font-size:0.82rem;padding:10px 16px">
-        🔑 Usar email + contraseña
-        <span class="sarrow">›</span>
-      </button>
+      <div style="display:flex;gap:8px">
+        <button class="social-btn" onclick="selectSocial('email')" style="flex:1;justify-content:center;font-size:0.8rem;padding:10px 12px">
+          ✨ Crear cuenta
+        </button>
+        <button class="social-btn" onclick="goToEmailLogin()" style="flex:1;justify-content:center;font-size:0.8rem;padding:10px 12px;border-color:rgba(255,214,0,0.3);color:#ffd600">
+          🔑 Ya tengo cuenta
+        </button>
+      </div>
 
       <div class="auth-legal">Al registrarte aceptás los <a href="#">Términos y Condiciones</a> y la <a href="#">Política de Privacidad</a>.</div>
     </div>
@@ -8779,6 +9682,15 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
       <button class="ob-btn" id="obFinishBtn" onclick="obFinish()" disabled>Elegir este escudo ⚽</button>
     </div>
 
+    <!-- Paso 3: Migración de escudo (basket → fútbol) -->
+    <div id="obStep3" style="display:none">
+      <div class="ob-logo">⚽</div>
+      <div class="ob-title">¡Nuevo escudo!</div>
+      <div class="ob-sub" style="margin-bottom:6px">Tu escudo de básquet fue reemplazado.<br>¿Querés quedarte con el asignado o elegís otro?</div>
+      <div class="ob-clubs" id="obMigrateGrid"></div>
+      <button class="ob-btn" id="obMigrateBtn" onclick="obMigrateFinish()" disabled>Confirmar escudo ✓</button>
+    </div>
+
   </div>
 </div>
 
@@ -8805,6 +9717,7 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
       <button class="adm-tab" onclick="admTab('bankroll',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">💰 Bankroll</button>
       <button class="adm-tab" onclick="admTab('usuarios',this);admLoadUsers();" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">👥 Usuarios</button>
       <button class="adm-tab" onclick="admTab('config',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">🛠 Config</button>
+      <button class="adm-tab" onclick="admTab('mensajes',this);admLoadBroadcastHistory();" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;position:relative">💬 Mensajes<span id="admMsgBadge" style="display:none;position:absolute;top:6px;right:6px;background:#ef5350;color:#fff;font-size:0.6rem;font-weight:800;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center"></span></button>
     </div>
 
     <!-- TAB: HISTORIAL -->
@@ -8864,6 +9777,11 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
         <div style="display:flex;gap:8px;align-items:center">
           <input id="admThreshMed" type="number" min="40" max="80" placeholder="52" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 10px;border-radius:8px;font-size:0.9rem">
           <span style="font-size:0.75rem;color:var(--texto-sec)">% → stake $50</span>
+        </div>
+        <div style="font-size:0.82rem;color:#fff;font-weight:600">Fichas visibles (pronósticos pendientes)</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="admMaxCards" type="number" min="3" max="20" placeholder="6" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 10px;border-radius:8px;font-size:0.9rem">
+          <span style="font-size:0.75rem;color:var(--texto-sec)">fichas (por defecto: 6)</span>
         </div>
         <button onclick="admSaveConfig()" style="background:var(--verde);color:#000;font-weight:700;padding:10px;border-radius:10px;cursor:pointer;font-size:0.85rem;border:none;margin-top:4px">💾 Guardar configuración</button>
       </div>
@@ -8940,15 +9858,69 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
       <div id="admUserList" style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto"></div>
     </div>
 
+    <!-- TAB: MENSAJES -->
+    <div id="adm-mensajes" class="adm-pane" style="padding:16px;display:none;flex-direction:column;gap:12px;height:100%">
+      <div style="font-size:0.72rem;color:var(--texto-sec);background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:10px;padding:10px 12px;line-height:1.6">
+        📢 Los mensajes que envíes llegan <strong style="color:#ffd600">al instante</strong> a los usuarios conectados, y los <strong style="color:#ffd600">offline</strong> los ven la próxima vez que abran la app.
+      </div>
+      <!-- Historial de mensajes enviados -->
+      <div id="admBroadcastHistory" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:180px;max-height:300px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px">
+        <div style="text-align:center;color:var(--texto-sec);font-size:0.78rem;margin:auto">Cargando mensajes...</div>
+      </div>
+      <!-- Compose -->
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <textarea id="admBroadcastInput" placeholder="Escribí tu mensaje para todos los usuarios..." rows="3"
+          style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:10px 12px;border-radius:10px;font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;width:100%;box-sizing:border-box"
+          onkeydown="if(event.ctrlKey&&event.key==='Enter')admSendBroadcast()"></textarea>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button onclick="admSendBroadcast()" style="background:var(--verde);color:#000;font-weight:800;padding:10px 20px;border-radius:10px;cursor:pointer;font-size:0.88rem;border:none;flex-shrink:0">📢 Enviar a todos</button>
+          <span style="font-size:0.72rem;color:var(--texto-sec)">Ctrl+Enter para enviar</span>
+          <div id="admBroadcastMsg" style="font-size:0.78rem;color:var(--verde);margin-left:auto"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: Mensajes del Admin -->
+<!-- ── Burbuja flotante de mensajes admin ── -->
+<div class="bcast-bubble-wrap" id="broadcastNotifBtn">
+  <!-- X rojo esquina superior izquierda: elimina permanentemente esta burbuja -->
+  <button class="bcast-dismiss-btn" onclick="bcastDismissPermanent(event)" title="Eliminar este mensaje">✕</button>
+  <!-- Cuerpo de la burbuja — click para abrir el chat -->
+  <div class="bcast-bubble-card" onclick="showBroadcastModal()">
+    <div class="bcast-bubble-header">
+      <div class="bcast-bubble-avatar">📢</div>
+      <span class="bcast-bubble-name">gambeta.ai</span>
+      <span class="bcast-bubble-badge" id="broadcastNotifCount">1</span>
+    </div>
+    <div class="bcast-bubble-preview" id="bcastBubblePreview">Tenés un mensaje nuevo</div>
+  </div>
+</div>
+
+<!-- ── Panel de chat de mensajes (read-only) ── -->
+<div class="bcast-panel" id="broadcastModal">
+  <div class="bcast-panel-header">
+    <div class="bcast-panel-avatar">📢</div>
+    <div>
+      <div class="bcast-panel-title">gambeta.ai</div>
+      <div class="bcast-panel-sub">Mensajes del equipo · Solo lectura</div>
+    </div>
+    <button class="bcast-panel-close" onclick="closeBroadcastModal()">✕</button>
+  </div>
+  <div class="bcast-panel-msgs" id="broadcastModalContent"></div>
+  <div class="bcast-panel-footer">
+    <button class="bcast-read-btn" onclick="bcastMarkRead()">✓ Entendido</button>
+    <button class="bcast-del-btn" onclick="bcastDismissPermanent(null)">🗑 Eliminar</button>
   </div>
 </div>
 
 <script>
 // ═══ ADMIN PANEL ═══
-const ADMIN_KEY      = 'apuestas_admin_cfg_v1';
-const ADMIN_SESSION  = 'apuestas_admin_session_v1';
-// Hash SHA-256 de la contraseña "mauro2024admin" — cambiala si querés
-const ADMIN_HASH     = '5f22a2e45d2145b8aae35b051fcb8f2546e9502aea4fa5da797fcebb88650ae8';
+// Hash SHA-256 de la contraseña admin
+const ADMIN_HASH     = '522e09aad00e0af69f0b6f8f36b3631b497313a2bf0521c672b9e4b85ba1bd51';
+let   ADMIN_HASH_RUNTIME = ADMIN_HASH;
 
 let adminClickCount = 0, adminClickTimer = null;
 let adminUnlocked   = false;
@@ -8965,6 +9937,8 @@ document.addEventListener('DOMContentLoaded', () => {
   acCheckDaily();
   // Live stats in hero (async, non-blocking)
   loadLiveStats();
+  // Broadcast mensajes del admin
+  setTimeout(() => { checkBroadcastMessages(); initBroadcastRealtime(); }, 2000);
   // Patch historial entries que quedaron con sport='futbol' siendo basket
   (function patchHistorialSport() {
     const NBA_TEAMS = new Set([
@@ -9019,7 +9993,7 @@ async function submitAdminPin() {
   if (!pin) return;
   const hash  = await hashPin(pin);
   // Comparar con hash almacenado en localStorage (o el default)
-  const stored = localStorage.getItem('apuestas_admin_hash') || ADMIN_HASH;
+  const stored = ADMIN_HASH_RUNTIME;
   if (hash === stored) {
     sessionStorage.setItem(ADMIN_SESSION, JSON.stringify({ exp: Date.now() + 4*3600000 }));
     document.getElementById('adminPinOverlay').style.display = 'none';
@@ -9053,6 +10027,7 @@ function openAdmin() {
     const cfg = JSON.parse(localStorage.getItem(ADMIN_KEY)||'{}');
     if (cfg.threshHigh) document.getElementById('admThreshHigh').value = cfg.threshHigh;
     if (cfg.threshMed)  document.getElementById('admThreshMed').value  = cfg.threshMed;
+    if (cfg.maxCards)   document.getElementById('admMaxCards').value   = cfg.maxCards;
     if (cfg.bankrollInit) document.getElementById('admBankrollVal').value = cfg.bankrollInit;
   } catch {}
 }
@@ -9069,7 +10044,9 @@ const GB_AVA  = 'gambeta_avatar';
 // ── Perfiles VIP — overrides forzados por email ──────────────
 const GAMBETA_VIP = {
   'mauro.union10@gmail.com': {
-    suffix: ' 🎩',   // se agrega al final del apodo en toda la UI
+    nickname:  'Mauro Latam',
+    suffix:    ' 🎩',
+    nameColor: '#ffd600',   // dorado — se distingue del resto en tablas y ranking
     avatar: {
       id:    'union_santa_fe',
       name:  'Unión Santa Fe',
@@ -9078,6 +10055,24 @@ const GAMBETA_VIP = {
     }
   }
 };
+
+// ── Apellidos de jugadores para asignación automática ──────────
+const PLAYER_SURNAMES = [
+  'Messi','Mbappé','Haaland','Vinicius','Salah','Kane','Lewandowski',
+  'De Bruyne','Rodri','Bellingham','Pedri','Yamal','Dembélé','Saka',
+  'Rashford','Son','Firmino','Modric','Benzema','Cavani','Suárez',
+  'Falcao','Dybala','Lautaro','Álvarez','De Paul','Mac Allister',
+  'Fernández','Paredes','Correa','Griezmann','Hernández','Gnabry',
+  'Müller','Neuer','Alisson','Ederson','Courtois','Ter Stegen',
+  'Zubimendi','Olmo','Williams','Wirtz','Guirassy','Morata','Vlahović',
+  'Osimhen','Lukaku','Pulisic','Reijnders','Theo','Leão','Giroud',
+  'Camavinga','Tchouaméni','Valverde','Carvajal','Militão','Rüdiger',
+];
+
+// Detecta si un avatar es de equipo de basket (NBA, etc.)
+function _isNbaAvatar(logo) {
+  return logo && (logo.includes('espncdn.com/i/teamlogos/nba') || logo.includes('/nba/500/'));
+}
 
 // ── Pool generado dinámicamente desde teamLogos ──────────────
 // Se construye en tiempo de ejecución: deduplica por URL (1 entrada por logo único)
@@ -9097,6 +10092,7 @@ function _buildObPool() {
   const pool = [];
   for (const [name, url] of Object.entries(teamLogos)) {
     if (seen.has(url)) continue; // mismo logo bajo nombre alternativo → skip
+    if (_isNbaAvatar(url)) continue; // excluir escudos de básquet/NBA
     seen.add(url);
     pool.push({
       id:    name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
@@ -9106,6 +10102,12 @@ function _buildObPool() {
     });
   }
   return pool;
+}
+
+// Elige un club de fútbol al azar del pool (sin NBA)
+function _randomFootballClub() {
+  const pool = _buildObPool();
+  return pool[Math.floor(Math.random() * pool.length)];
 }
 
 let _obSelectedClub  = null;
@@ -9154,16 +10156,43 @@ async function _obPickClubs() {
 
 async function checkOnboarding() {
   if (!authUser) return;
-  // Exigir AMBOS: nickname y avatar. Sin los dos → onboarding obligatorio
-  if (localStorage.getItem(GB_NICK) && localStorage.getItem(GB_AVA)) return;
-  // Bloquear página
+  // VIPs siempre tienen perfil completo — no mostrar onboarding
+  if (GAMBETA_VIP[authUser.email]) return;
+
+  const hasNick = !!localStorage.getItem(GB_NICK);
+  const avaRaw  = localStorage.getItem(GB_AVA);
+  let ava = null;
+  try { ava = avaRaw ? JSON.parse(avaRaw) : null; } catch(_) {}
+
+  // ── Caso 1: Sin perfil en absoluto → asignar automáticamente ──────────────
+  if (!hasNick && !ava) {
+    const surname = PLAYER_SURNAMES[Math.floor(Math.random() * PLAYER_SURNAMES.length)];
+    const club    = _randomFootballClub();
+    localStorage.setItem(GB_NICK, surname);
+    localStorage.setItem(GB_AVA, JSON.stringify({ id: club.id, logo: club.logo, name: club.name, color: club.color }));
+    applyUserProfile();
+    acScheduleSync();
+    return;
+  }
+
+  // ── Caso 2: Avatar de básquet → reemplazar + mostrar migración ────────────
+  if (ava && _isNbaAvatar(ava.logo)) {
+    const club = _randomFootballClub();
+    localStorage.setItem(GB_AVA, JSON.stringify({ id: club.id, logo: club.logo, name: club.name, color: club.color }));
+    applyUserProfile();
+    await _showAvatarMigration();
+    return;
+  }
+
+  // ── Caso 3: Tiene todo → no hacer nada ────────────────────────────────────
+  if (hasNick && ava) return;
+
+  // ── Caso 4: Tiene nick pero sin avatar → mostrar paso 2 (normal) ──────────
   const overlay = document.getElementById('onboardingOverlay');
   overlay.style.display = 'flex';
   document.body.style.overflow = 'hidden';
-  // Si ya tiene nick pero le falta avatar, saltar directo al paso 2
-  const existingNick = localStorage.getItem(GB_NICK);
   _obCurrentClubs = await _obPickClubs();
-  if (existingNick) {
+  if (hasNick) {
     document.getElementById('obStep1').style.display = 'none';
     document.getElementById('obStep2').style.display = 'block';
     renderObClubs();
@@ -9219,6 +10248,70 @@ function obFinish() {
   acScheduleSync();
 }
 
+// ── Migración de escudo de básquet → fútbol ────────────────────────────────
+let _obMigrateClubs = [];   // [auto-asignado, opción2, opción3]
+let _obMigrateSelected = null;
+
+async function _showAvatarMigration() {
+  // El auto-asignado ya está en localStorage; lo leemos para mostrarlo primero
+  let currentAva = null;
+  try { currentAva = JSON.parse(localStorage.getItem(GB_AVA)); } catch(_) {}
+
+  // Sorteamos 2 clubs extra (distintos del auto-asignado)
+  const pool = _buildObPool().filter(c => c.logo !== currentAva?.logo);
+  const extra = [];
+  const used  = new Set();
+  while (extra.length < 2 && used.size < pool.length) {
+    const idx = Math.floor(Math.random() * pool.length);
+    if (!used.has(idx)) { used.add(idx); extra.push(pool[idx]); }
+  }
+
+  // El auto-asignado va primero (pre-seleccionado)
+  _obMigrateClubs    = [currentAva ? { id: currentAva.id, logo: currentAva.logo, name: currentAva.name, color: currentAva.color } : extra[0], ...extra];
+  _obMigrateSelected = _obMigrateClubs[0]?.id || null;
+
+  const fallback = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>`;
+  const grid = document.getElementById('obMigrateGrid');
+  grid.innerHTML = _obMigrateClubs.map((c, i) => `
+    <div class="ob-club-card${i === 0 ? ' selected' : ''}" onclick="obMigrateSelect('${c.id}')" id="obMig_${c.id}">
+      <img src="${c.logo}" alt="${c.name}"
+           onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='${fallback}';this.style.opacity='0.5';}">
+      <div class="ob-club-name">${c.name}</div>
+      ${i === 0 ? '<div style="font-size:0.6rem;color:var(--verde);font-weight:700;letter-spacing:.5px;margin-top:2px">AUTO</div>' : ''}
+    </div>
+  `).join('');
+
+  const btn = document.getElementById('obMigrateBtn');
+  if (btn) btn.disabled = false;
+
+  // Mostrar overlay en paso 3
+  const overlay = document.getElementById('onboardingOverlay');
+  ['obStep1','obStep2'].forEach(id => { const el = document.getElementById(id); if(el) el.style.display = 'none'; });
+  document.getElementById('obStep3').style.display = 'block';
+  overlay.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+}
+
+function obMigrateSelect(id) {
+  _obMigrateSelected = id;
+  document.querySelectorAll('#obMigrateGrid .ob-club-card').forEach(el => el.classList.remove('selected'));
+  const card = document.getElementById('obMig_' + id);
+  if (card) card.classList.add('selected');
+  const btn = document.getElementById('obMigrateBtn');
+  if (btn) btn.disabled = false;
+}
+
+function obMigrateFinish() {
+  const club = _obMigrateClubs.find(c => c.id === _obMigrateSelected) || _obMigrateClubs[0];
+  if (!club) return;
+  localStorage.setItem(GB_AVA, JSON.stringify({ id: club.id, logo: club.logo, name: club.name, color: club.color }));
+  document.getElementById('onboardingOverlay').style.display = 'none';
+  document.getElementById('obStep3').style.display = 'none';
+  document.body.style.overflow = '';
+  applyUserProfile();
+  acScheduleSync();
+}
+
 function applyUserProfile() {
   let nick   = localStorage.getItem(GB_NICK);
   let avaRaw = localStorage.getItem(GB_AVA);
@@ -9230,6 +10323,8 @@ function applyUserProfile() {
     // Forzar avatar VIP siempre (ignora lo que haya en localStorage)
     ava = vip.avatar;
     localStorage.setItem(GB_AVA, JSON.stringify(ava));
+    // Guardar nickname VIP en localStorage para que los checks de perfil lo vean
+    if (vip.nickname) localStorage.setItem(GB_NICK, vip.nickname);
   }
   // Sufijo especial al apodo (ej: "Mauro 🎩")
   const displayNick = nick ? nick + (vip?.suffix || '') : null;
@@ -9246,17 +10341,18 @@ function applyUserProfile() {
     const avatarEl = document.getElementById('navUserAvatar');
     if (avatarEl) {
       avatarEl.innerHTML = `<img src="${ava.logo}" alt="${ava.name}"
-        style="width:100%;height:100%;object-fit:contain;border-radius:50%;padding:2px"
+        style="width:75%;height:75%;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.5))"
         onerror="this.parentElement.textContent='${(displayNick||nick||'?')[0].toUpperCase()}'">`;
-      avatarEl.style.background = 'rgba(0,0,0,0.5)';
-      avatarEl.style.border = `2px solid ${ava.color}66`;
+      avatarEl.style.background = 'transparent';
+      avatarEl.style.border = 'none';
+      avatarEl.style.borderRadius = '0';
     }
     // Badge en el dropdown
     const badge = document.getElementById('ddAvatarBadge');
     if (badge) {
       badge.style.display = 'block';
       badge.innerHTML = `<img src="${ava.logo}" alt="${ava.name}"
-        style="width:30px;height:30px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.6))"
+        style="width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.6))"
         onerror="this.style.display='none'">`;
     }
   }
@@ -9274,10 +10370,14 @@ function rkMaskEmail(email) {
   return user.slice(0, 2) + '***@' + domain;
 }
 
-function rkDisplayName(u) {
-  const base = u.nickname || rkMaskEmail(u.email);
+function rkDisplayName(u, html = false) {
   const vip  = u.email ? GAMBETA_VIP[u.email] : null;
-  return base + (vip?.suffix || '');
+  const base = vip?.nickname || u.nickname || rkMaskEmail(u.email);
+  const full = base + (vip?.suffix || '');
+  if (html && vip?.nameColor) {
+    return `<span style="color:${vip.nameColor};font-weight:800;text-shadow:0 0 8px ${vip.nameColor}40">${full}</span>`;
+  }
+  return full;
 }
 
 function rkAvatarHTML(u, size = 38, textClass = '') {
@@ -9286,7 +10386,7 @@ function rkAvatarHTML(u, size = 38, textClass = '') {
     const ava = vip?.avatar || (u.avatar ? JSON.parse(u.avatar) : null);
     if (ava?.logo) {
       return `<img src="${ava.logo}" class="${textClass || 'rk-row-avatar'}"
-        style="width:${size}px;height:${size}px"
+        style="width:${size}px;height:${size}px;object-fit:contain;border-radius:0"
         onerror="this.outerHTML='<div style=\\'width:${size}px;height:${size}px;border-radius:50%;background:rgba(0,200,83,0.15);display:flex;align-items:center;justify-content:center;font-size:${Math.round(size*0.4)}px;font-weight:800;color:var(--verde)\\'>${rkDisplayName(u)[0]?.toUpperCase()||'?'}</div>'">`;
     }
   } catch(_) {}
@@ -9369,7 +10469,7 @@ async function loadRanking(force = false) {
     podiumEl.innerHTML = `<div class="rk-podium">${
       podOrder.map((u, i) => {
         const bal = parseFloat(u.balance) || 0;
-        const name = rkDisplayName(u);
+        const name = rkDisplayName(u, true);
         const ava  = rkAvatarHTML(u, 48, 'rk-pod-avatar');
         return `
         <div class="rk-pod-card ${podClsOrder[i]}">
@@ -9388,7 +10488,7 @@ async function loadRanking(force = false) {
     listEl.innerHTML = rest.map((u, i) => {
       const rank = i + 4;
       const bal  = parseFloat(u.balance) || 0;
-      const name = rkDisplayName(u);
+      const name = rkDisplayName(u, true);
       const ava  = rkAvatarHTML(u, 30, 'rk-row-avatar');
       const isMe = meEmail && u.email === meEmail;
       return `
@@ -9472,9 +10572,9 @@ async function admLoadUsers() {
   listEl.innerHTML = '';
 
   try {
-    const { data, error, count } = await sbClient
+    const { data, error, count } = await sbAnon
       .from('acoin_users')
-      .select('email, balance, updated_at', { count: 'exact' })
+      .select('email, balance, nickname, updated_at', { count: 'exact' })
       .order('updated_at', { ascending: false });
 
     if (error) throw error;
@@ -9519,11 +10619,14 @@ function admRenderUserList(users) {
     <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px">
       <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.25);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--verde);flex-shrink:0">${i+1}</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:0.82rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.email}</div>
+        <div style="font-size:0.82rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${u.nickname ? `<span style="color:#ffd600">${u.nickname}</span> — ` : ''}${u.email}</div>
         <div style="font-size:0.68rem;color:var(--texto-sec);margin-top:1px">${fecha}</div>
       </div>
-      <div style="text-align:right;flex-shrink:0">
-        <div style="font-size:0.78rem;font-weight:700;color:${bal >= 0 ? '#ffd600' : 'var(--rojo)'}">G$ ${bal.toLocaleString('es-AR')}</div>
+      <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+        <div style="text-align:right">
+          <div style="font-size:0.78rem;font-weight:700;color:${bal >= 0 ? '#ffd600' : 'var(--rojo)'}">G$ ${bal.toLocaleString('es-AR')}</div>
+        </div>
+        <button onclick="admVerPicks('${u.email}')" title="Ver historial de picks" style="background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.25);color:var(--verde);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">📋</button>
       </div>
     </div>`;
   }).join('');
@@ -9787,7 +10890,7 @@ async function admChangePin() {
   if (!p1 || p1.length < 6) { msg.style.color='#ef5350'; msg.textContent='⛔ Mínimo 6 caracteres'; setTimeout(()=>{msg.textContent='';msg.style.color='var(--verde)'},3000); return; }
   if (p1 !== p2)             { msg.style.color='#ef5350'; msg.textContent='⛔ Las contraseñas no coinciden'; setTimeout(()=>{msg.textContent='';msg.style.color='var(--verde)'},3000); return; }
   const hash = await hashPin(p1);
-  localStorage.setItem('apuestas_admin_hash', hash);
+  ADMIN_HASH_RUNTIME = hash; localStorage.setItem('apuestas_admin_hash_bk', hash);
   document.getElementById('admNewPin1').value = '';
   document.getElementById('admNewPin2').value = '';
   msg.style.color = 'var(--verde)';
@@ -9799,10 +10902,225 @@ function admSaveConfig() {
   const cfg = {
     threshHigh: parseInt(document.getElementById('admThreshHigh').value)||62,
     threshMed:  parseInt(document.getElementById('admThreshMed').value)||52,
+    maxCards:   parseInt(document.getElementById('admMaxCards').value)||6,
   };
   try { const s=JSON.parse(localStorage.getItem(ADMIN_KEY)||'{}'); Object.assign(s,cfg); localStorage.setItem(ADMIN_KEY,JSON.stringify(s)); } catch {}
   document.getElementById('admConfigMsg').textContent = '✓ Configuración guardada (se aplica en el próximo reload)';
   setTimeout(()=>document.getElementById('admConfigMsg').textContent='',3000);
+}
+
+// ═══════════════════════════════════════════════════
+//  BROADCAST CHAT — Admin → Todos los usuarios
+// ═══════════════════════════════════════════════════
+const BROADCAST_EMAIL   = '__broadcast__';
+const BROADCAST_SEEN_KEY = 'gambeta_bcast_seen'; // localStorage: array de msg IDs vistos
+
+function _bcastTimeAgo(ts) {
+  const m = Math.floor((Date.now() - ts) / 60000);
+  if (m < 1)  return 'Ahora mismo';
+  if (m < 60) return `Hace ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `Hace ${h}h`;
+  const d = Math.floor(h / 24);
+  return `Hace ${d} día${d !== 1 ? 's' : ''}`;
+}
+
+// ── Cargar mensajes del historial en el panel admin ──
+async function admLoadBroadcastHistory() {
+  const box = document.getElementById('admBroadcastHistory');
+  if (!box) return;
+  box.innerHTML = '<div style="text-align:center;color:var(--texto-sec);font-size:0.78rem;margin:auto">Cargando...</div>';
+  try {
+    const { data, error } = await sbAnon
+      .from('acoin_users')
+      .select('picks')
+      .eq('email', BROADCAST_EMAIL)
+      .maybeSingle();
+    const msgs = (data?.picks || []).sort((a,b) => b.ts - a.ts);
+    if (!msgs.length) {
+      box.innerHTML = '<div style="text-align:center;color:var(--texto-sec);font-size:0.78rem;margin:auto">Sin mensajes enviados aún</div>';
+      return;
+    }
+    box.innerHTML = msgs.map(m => `
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px">
+        <div style="font-size:0.88rem;color:#fff;line-height:1.5">${m.text.replace(/\n/g,'<br>')}</div>
+        <div style="font-size:0.7rem;color:var(--texto-sec);margin-top:6px;display:flex;justify-content:space-between">
+          <span>📢 Admin</span>
+          <span>${_bcastTimeAgo(m.ts)} · ${new Date(m.ts).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    box.innerHTML = `<div style="color:#ff6b6b;font-size:0.78rem">Error: ${e.message}</div>`;
+  }
+}
+
+// ── Admin envía un mensaje ──
+async function admSendBroadcast() {
+  const input = document.getElementById('admBroadcastInput');
+  const msgEl = document.getElementById('admBroadcastMsg');
+  const text  = (input?.value || '').trim();
+  if (!text) return;
+
+  const newMsg = { id: `bcast_${Date.now()}`, text, ts: Date.now() };
+
+  // Leer mensajes existentes
+  let existing = [];
+  try {
+    const { data } = await sbAnon.from('acoin_users').select('picks').eq('email', BROADCAST_EMAIL).maybeSingle();
+    existing = data?.picks || [];
+  } catch {}
+
+  const updated = [newMsg, ...existing].slice(0, 50); // max 50 mensajes
+
+  const { error } = await sbAnon
+    .from('acoin_users')
+    .upsert({ email: BROADCAST_EMAIL, picks: updated, updated_at: new Date().toISOString() }, { onConflict: 'email' });
+
+  if (error) {
+    if (msgEl) { msgEl.style.color='#ef5350'; msgEl.textContent = '✗ Error al enviar'; setTimeout(()=>msgEl.textContent='',3000); }
+    return;
+  }
+
+  input.value = '';
+  if (msgEl) { msgEl.style.color='var(--verde)'; msgEl.textContent = '✓ Mensaje enviado'; setTimeout(()=>msgEl.textContent='',3000); }
+  admLoadBroadcastHistory();
+
+  // Actualizar badge en tab
+  const badge = document.getElementById('admMsgBadge');
+  if (badge) { badge.style.display='block'; badge.textContent='●'; }
+}
+
+// ── Verificar mensajes no leídos al cargar la app ──
+async function checkBroadcastMessages() {
+  try {
+    const { data, error } = await sbAnon
+      .from('acoin_users')
+      .select('picks')
+      .eq('email', BROADCAST_EMAIL)
+      .maybeSingle();
+    if (error || !data?.picks?.length) return;
+
+    const msgs = data.picks;
+    const seen = JSON.parse(localStorage.getItem(BROADCAST_SEEN_KEY) || '[]');
+    const unread = msgs.filter(m => !seen.includes(m.id));
+
+    if (!unread.length) return;
+    _showBroadcastNotif(unread.length);
+    _storeBroadcastMsgs(msgs);
+  } catch(e) { console.warn('[broadcast]', e.message); }
+}
+
+function _storeBroadcastMsgs(msgs) {
+  try { window._broadcastMsgs = msgs; } catch {}
+}
+
+const BROADCAST_DISMISS_KEY = 'gambeta_bcast_dismissed'; // IDs permanentemente eliminados
+
+function _showBroadcastNotif(count) {
+  const wrap   = document.getElementById('broadcastNotifBtn');
+  const badge  = document.getElementById('broadcastNotifCount');
+  const preview = document.getElementById('bcastBubblePreview');
+  if (!wrap) return;
+
+  // No mostrar si está permanentemente descartada
+  const dismissed = JSON.parse(localStorage.getItem(BROADCAST_DISMISS_KEY) || '[]');
+  const msgs = (window._broadcastMsgs || []);
+  const visible = msgs.filter(m => !dismissed.includes(m.id));
+  if (!visible.length) return;
+
+  wrap.style.display = 'flex';
+  if (badge) badge.textContent = count > 1 ? count : '1';
+  if (preview && visible.length) {
+    const first = visible[0];
+    preview.textContent = first.text.length > 55 ? first.text.slice(0,55) + '…' : first.text;
+  }
+}
+
+// ── Abrir panel de chat de mensajes ──
+function showBroadcastModal() {
+  const panel   = document.getElementById('broadcastModal');
+  const content = document.getElementById('broadcastModalContent');
+  if (!panel || !content) return;
+
+  const dismissed = JSON.parse(localStorage.getItem(BROADCAST_DISMISS_KEY) || '[]');
+  const seen      = JSON.parse(localStorage.getItem(BROADCAST_SEEN_KEY) || '[]');
+  const msgs      = (window._broadcastMsgs || [])
+                    .filter(m => !dismissed.includes(m.id))
+                    .sort((a,b) => b.ts - a.ts);
+
+  if (!msgs.length) {
+    document.getElementById('broadcastNotifBtn').style.display = 'none';
+    return;
+  }
+
+  content.innerHTML = msgs.map(m => {
+    const isNew = !seen.includes(m.id);
+    return `
+    <div class="bcast-msg-item${isNew?' is-new':''}">
+      ${isNew ? '<span class="bcast-msg-new-tag">NUEVO</span>' : ''}
+      <div class="bcast-msg-text">${m.text.replace(/\n/g,'<br>')}</div>
+      <div class="bcast-msg-time">${_bcastTimeAgo(m.ts)} · ${new Date(m.ts).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>
+    </div>`;
+  }).join('');
+
+  panel.style.display = 'flex';
+  document.getElementById('broadcastNotifBtn').style.display = 'none';
+}
+
+// ── Cerrar panel (✓ Entendido) — marca como leídos ──
+function bcastMarkRead() {
+  const msgs   = (window._broadcastMsgs || []);
+  const allIds = msgs.map(m => m.id);
+  try { localStorage.setItem(BROADCAST_SEEN_KEY, JSON.stringify(allIds)); } catch {}
+  closeBroadcastModal();
+}
+
+// ── Eliminar permanentemente — nunca volver a mostrar estos mensajes ──
+function bcastDismissPermanent(e) {
+  if (e) e.stopPropagation();
+  const msgs = (window._broadcastMsgs || []);
+  const ids  = msgs.map(m => m.id);
+  const existing = JSON.parse(localStorage.getItem(BROADCAST_DISMISS_KEY) || '[]');
+  const merged   = [...new Set([...existing, ...ids])];
+  try { localStorage.setItem(BROADCAST_DISMISS_KEY, JSON.stringify(merged)); } catch {}
+  // Marcar también como vistos
+  try { localStorage.setItem(BROADCAST_SEEN_KEY, JSON.stringify(merged)); } catch {}
+  closeBroadcastModal();
+  const wrap = document.getElementById('broadcastNotifBtn');
+  if (wrap) wrap.style.display = 'none';
+}
+
+function closeBroadcastModal() {
+  const panel = document.getElementById('broadcastModal');
+  if (panel) panel.style.display = 'none';
+}
+
+// ── Suscripción Realtime — entrega instantánea a usuarios online ──
+function initBroadcastRealtime() {
+  try {
+    sbAnon
+      .channel('db-broadcast')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'acoin_users',
+        filter: `email=eq.${BROADCAST_EMAIL}`
+      }, payload => {
+        const msgs = payload.new?.picks || [];
+        if (!msgs.length) return;
+        const seen   = JSON.parse(localStorage.getItem(BROADCAST_SEEN_KEY) || '[]');
+        const unread = msgs.filter(m => !seen.includes(m.id));
+        if (!unread.length) return;
+        _storeBroadcastMsgs(msgs);
+        _showBroadcastNotif(unread.length);
+        // Toast rápido para el primer mensaje nuevo
+        const first = unread[0];
+        if (typeof showAcoinToast === 'function') {
+          showAcoinToast('📢 Nuevo mensaje de Gambeta.ai', first.text.slice(0,60) + (first.text.length > 60 ? '…' : ''));
+        }
+      })
+      .subscribe();
+  } catch(e) { console.warn('[broadcast/realtime]', e.message); }
 }
 
 </script>
@@ -10147,19 +11465,20 @@ function admSaveConfig() {
 #aiSendBtn:hover { transform: scale(1.08); }
 #aiSendBtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
 #aiImgBtn {
-  width: 34px; height: 34px;
-  border-radius: 50%;
-  background: rgba(0,200,83,0.1);
-  border: 1px solid rgba(0,200,83,0.3);
+  width: auto; height: auto;
+  border-radius: 0;
+  background: transparent;
+  border: none;
   color: rgba(165,214,167,0.85);
-  font-size: 1rem;
+  font-size: 1.25rem;
   cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   flex-shrink: 0;
   align-self: flex-end;
-  transition: background 0.15s, transform 0.15s;
+  padding: 4px;
+  transition: transform 0.15s, opacity 0.15s;
 }
-#aiImgBtn:hover { background: rgba(0,200,83,0.22); transform: scale(1.08); }
+#aiImgBtn:hover { opacity: 0.75; transform: scale(1.1); }
 #aiImgPreview {
   padding: 6px 12px 0;
   display: none;
@@ -10255,7 +11574,6 @@ const LATAM_CHANNELS = {
   nota: "Cuando el usuario pregunte por tipsters, canales, picks gratis, apuestas gratis, dónde seguir pronósticos, grupos de Telegram, o similar, recomienda los siguientes canales y servicios de PronosticosLATAM:",
   gratis: [
     { nombre: "Canal Principal Pronósticos LATAM", url: "https://t.me/+f35dS09pzrI1ZTA5" },
-    { nombre: "Canal Apuestas USA (NBA)", url: "https://t.me/PicksNBAproarg" },
     { nombre: "Canal Apuestas Tenis", url: "https://t.me/TenisLATAM" },
     { nombre: "Canal Apuestas Fútbol", url: "https://t.me/elseleccionado" },
     { nombre: "Canal Apuestas Rugby", url: "https://t.me/apuestasrugby" },
@@ -10265,7 +11583,6 @@ const LATAM_CHANNELS = {
     { nombre: "Tipster Gastón LATAM", url: "https://t.me/gastonlatam" },
     { nombre: "Tipster Tomi LATAM (VIP Gratis)", url: "https://t.me/Tomiilatam" },
     { nombre: "Twitter/X Fútbol LATAM", url: "https://x.com/Grupo_LATAM" },
-    { nombre: "Twitter/X NBA ProArg", url: "https://x.com/NbaProArg" },
     { nombre: "Twitter/X Tenis LATAM", url: "https://x.com/TenisLATAM_" },
     { nombre: "Instagram (sorteos, apuestas, reels)", url: "https://www.instagram.com/pronosticos.latam" },
     { nombre: "TikTok Rugby LATAM", url: "https://www.tiktok.com/@rugbylatam" },
@@ -10274,7 +11591,6 @@ const LATAM_CHANNELS = {
   ],
   vip_pagos: [
     { nombre: "VIP de Temporada de Mauro", url: "https://t.me/atencionvipproarg" },
-    { nombre: "VIP Props Básquet (Benja LATAM)", url: "https://t.me/BenjaLatam" },
     { nombre: "Canal Progresión $1.000 → $50.000", url: "https://t.me/atencionvipproarg" },
     { nombre: "Canal Progresión $5.000 → $250.000", url: "https://t.me/atencionvipproarg" },
     { nombre: "VIP Fútbol + Lives (Ruso LATAM)", url: "https://t.me/rusolatam" },
@@ -10506,7 +11822,6 @@ function aiChannelsCard(msgEl) {
     <div style="display:flex;flex-wrap:wrap;gap:6px">
       ${[
         ['👑 VIP Mauro',      'https://t.me/atencionvipproarg'],
-        ['🏀 Props NBA',      'https://t.me/BenjaLatam'],
         ['⚽ Fútbol+Lives',   'https://t.me/rusolatam'],
         ['🛟 Soporte/Info',   'https://t.me/Atencionvipproarg'],
       ].map(([label, url]) =>
@@ -10678,7 +11993,7 @@ function aiSendChip(chipId) {
 
   } else if (chipId === 'equipos-racha') {
     displayText = '🔥 Equipos en Racha';
-    sendText = '🔥 ¿Cuáles son los equipos en racha ganadora esta semana en Champions League, Copa Libertadores, Premier League y NBA? Dame los 3 o 4 más destacados con su racha actual.';
+    sendText = '🔥 ¿Cuáles son los equipos en racha ganadora esta semana en Champions League, Copa Libertadores, Premier League y La Liga? Dame los 3 o 4 más destacados con su racha actual.';
 
   } else if (chipId === 'gestion-banca') {
     displayText = '💰 Gestión de Banca';
@@ -10865,6 +12180,373 @@ function aiGetMatchContext() {
   </div>
 </div>
 
+<script>
+/* ── MY PICKS PANEL ─────────────────────────────────────────────────────── */
+function renderMyPicks() {
+  const panel   = document.getElementById('myPicksPanel');
+  const divider = document.getElementById('myPicksDivider');
+  if (!panel) return;
 
+  // Solo visible para usuarios logueados
+  const isLogged = !!localStorage.getItem('sb-auth-token') ||
+                   !!localStorage.getItem('supabase.auth.token') ||
+                   !!document.querySelector('.user-nav-controls')?.style?.display?.includes('flex') ||
+                   window._currentUser;
+  if (!isLogged) { panel.style.display = 'none'; if(divider) divider.style.display='none'; return; }
+
+  const picks = acGetPicks();
+  if (!picks || !picks.length) {
+    panel.style.display = 'block';
+    if(divider) divider.style.display = 'block';
+    document.getElementById('myPicksStats').innerHTML = '';
+    document.getElementById('myPicksList').innerHTML  = '';
+    document.getElementById('myPicksEmpty').style.display = 'block';
+    return;
+  }
+
+  panel.style.display = 'block';
+  if(divider) divider.style.display = 'block';
+  document.getElementById('myPicksEmpty').style.display = 'none';
+
+  // ── Calcular stats ──
+  const evaluated = picks.filter(p => p.evaluated);
+  const pending   = picks.filter(p => !p.evaluated);
+  const wins      = evaluated.filter(p => p.correct);
+  const losses    = evaluated.filter(p => !p.correct);
+  const winRate   = evaluated.length ? Math.round((wins.length / evaluated.length) * 100) : 0;
+
+  // Ganancia neta en G$
+  const netCoins  = evaluated.reduce((acc, p) => acc + (p.coinsChange || 0), 0);
+  const totalBet  = picks.reduce((acc, p) => acc + (p.betAmount || 1000), 0);
+  const roi       = totalBet > 0 ? ((netCoins / totalBet) * 100).toFixed(1) : '0.0';
+
+  // Racha actual (últimos evaluados)
+  const lastEval = [...evaluated].sort((a,b) => (b.ts||0) - (a.ts||0));
+  let streak = 0, streakType = '';
+  for (const p of lastEval) {
+    if (!streakType) { streakType = p.correct ? 'W' : 'L'; streak = 1; }
+    else if ((p.correct && streakType==='W') || (!p.correct && streakType==='L')) streak++;
+    else break;
+  }
+  const streakLabel = streak > 1
+    ? (streakType === 'W' ? `🔥 Racha de ${streak} aciertos` : `❄️ Racha de ${streak} fallos`)
+    : '';
+
+  // ── Stats cards HTML ──
+  const roiClass = parseFloat(roi) >= 0 ? 'roi-pos' : 'roi-neg';
+  const roiColor = parseFloat(roi) >= 0 ? '#ffd600' : '#ef5350';
+  const netColor = netCoins >= 0 ? '#00c853' : '#ef5350';
+  const AC_ICON  = 'G$';
+
+  document.getElementById('myPicksStats').innerHTML = `
+    <div class="mps-card">
+      <div class="mps-val">${picks.length}</div>
+      <div class="mps-label">Total picks</div>
+    </div>
+    <div class="mps-card win">
+      <div class="mps-val" style="color:#00c853">${wins.length}</div>
+      <div class="mps-label">Ganados</div>
+    </div>
+    <div class="mps-card loss">
+      <div class="mps-val" style="color:#ef5350">${losses.length}</div>
+      <div class="mps-label">Fallados</div>
+    </div>
+    <div class="mps-card">
+      <div class="mps-val" style="color:${winRate>=50?'#00c853':'#ef5350'}">${winRate}%</div>
+      <div class="mps-label">Acierto</div>
+    </div>
+    <div class="mps-card ${roiClass}">
+      <div class="mps-val" style="color:${roiColor}">${parseFloat(roi)>=0?'+':''}${roi}%</div>
+      <div class="mps-label">ROI</div>
+    </div>
+    <div class="mps-card">
+      <div class="mps-val" style="color:${netColor};font-size:1.1rem">${netCoins>=0?'+':''}${acFmt(netCoins)}</div>
+      <div class="mps-label">${AC_ICON} netos</div>
+    </div>
+  `;
+
+  // ── Racha visual ──
+  const last10 = [...evaluated].sort((a,b) => (b.ts||0) - (a.ts||0)).slice(0, 10).reverse();
+  const streakHtml = last10.length ? `
+    <div class="mypicks-streak">
+      <span style="color:var(--texto-sec);font-size:0.68rem;margin-right:4px">Últimos ${last10.length}:</span>
+      ${last10.map(p => `<div class="streak-dot ${p.correct?'w':'l'}">${p.correct?'✓':'✗'}</div>`).join('')}
+      ${pending.length ? `<div class="streak-dot p">+${pending.length}</div>` : ''}
+      ${streakLabel ? `<span style="color:var(--texto-sec);margin-left:6px">${streakLabel}</span>` : ''}
+    </div>` : '';
+
+  // ── Lista de picks ──
+  const sortedPicks = [...picks].sort((a,b) => (b.ts||0) - (a.ts||0));
+  const listHtml = sortedPicks.map(p => {
+    const isWin  = p.evaluated && p.correct;
+    const isLoss = p.evaluated && !p.correct;
+    const isPend = !p.evaluated;
+    const cls    = isWin ? 'mp-win' : isLoss ? 'mp-loss' : 'mp-pend';
+    const badge  = isWin  ? `<span class="mp-badge win">✅ Ganado</span>`
+                 : isLoss ? `<span class="mp-badge loss">❌ Fallado</span>`
+                 :          `<span class="mp-badge pend">⏳ Pendiente</span>`;
+    const labels = { home:'Local', draw:'Empate', away:'Visitante' };
+    const pickLabel = labels[p.pick] || p.pick;
+    const betAmt = p.betAmount || 1000;
+    const chg = p.coinsChange;
+    const coinsStr = isPend
+      ? `<div class="mp-coins neu">${acFmt(betAmt)} ${AC_ICON}</div>`
+      : chg > 0
+        ? `<div class="mp-coins pos">+${acFmt(chg)} ${AC_ICON}</div>`
+        : `<div class="mp-coins neg">-${acFmt(betAmt)} ${AC_ICON}</div>`;
+    const dateStr = p.ts ? new Date(p.ts).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'}) : '';
+    return `<div class="mp-item ${cls}">
+      <div>
+        <div class="mp-match">${p.home} vs ${p.away}</div>
+        <div class="mp-sub">${pickLabel}${p.odds ? ' · @'+parseFloat(p.odds).toFixed(2) : ''}${dateStr ? ' · '+dateStr : ''}</div>
+      </div>
+      ${badge}
+      ${coinsStr}
+    </div>`;
+  }).join('');
+
+  document.getElementById('myPicksList').innerHTML = streakHtml + listHtml;
+}
+
+/* ── SHARE PICK ─────────────────────────────────────────────────────────── */
+function sharePick(home, away, rec, bvr, league) {
+  const stars = '⭐'.repeat(Math.min(bvr, 6));
+  const text = `🤖 gambeta.ai · Pick IA\n⚽ ${home} vs ${away}\n🏆 ${league}\n✅ ${rec}\n${stars} Confianza ${bvr}/6\n\n📲 Probá gratis en gambeta.ai`;
+  const url = 'https://gambeta.ai';
+
+  if (navigator.share) {
+    // Web Share API nativa (móvil)
+    navigator.share({ title: 'Pick de gambeta.ai', text, url }).catch(() => {});
+  } else {
+    // Fallback: copiar al portapapeles + mostrar toast
+    const full = text + '\n' + url;
+    navigator.clipboard.writeText(full).then(() => {
+      _showShareToast('✅ Pick copiado al portapapeles');
+    }).catch(() => {
+      // último fallback: WhatsApp web
+      window.open('https://wa.me/?text=' + encodeURIComponent(text + '\n' + url), '_blank');
+    });
+  }
+}
+
+function _showShareToast(msg) {
+  let t = document.getElementById('shareToast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'shareToast';
+    t.style.cssText = `
+      position:fixed;bottom:80px;left:50%;transform:translateX(-50%);
+      background:#00e5a0;color:#000;font-weight:700;font-size:0.82rem;
+      padding:10px 20px;border-radius:20px;z-index:9999;
+      box-shadow:0 4px 20px rgba(0,229,160,0.4);
+      pointer-events:none;opacity:0;transition:opacity .2s;
+    `;
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  setTimeout(() => { t.style.opacity = '0'; }, 2500);
+}
+
+/* ── PUSH NOTIFICATIONS ─────────────────────────────────────────────────── */
+const PUSH_WORKER_URL = 'https://gambeta-push.mauro-union10.workers.dev';
+const VAPID_PUBLIC_KEY = 'BDTVKzR-OhVN67PlC1Is8vviD88E5BW4y2Lwv1ce4-Bv3lRMsqr42QBfPuQdQt73p7Fnw7oSC32TiowArd3yHhg';
+
+async function initPushUI() {
+  const card = document.getElementById('pushNotifCard');
+  if (!card) return;
+  // Solo mostrar si el navegador soporta push
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  card.style.display = 'block';
+  await updatePushButtonState();
+}
+
+async function updatePushButtonState() {
+  const btn      = document.getElementById('pushToggleBtn');
+  const statusEl = document.getElementById('pushStatusText');
+  if (!btn || !statusEl) return;
+
+  const perm = Notification.permission;
+  const reg  = await navigator.serviceWorker.getRegistration('/');
+  let sub = reg ? await reg.pushManager.getSubscription() : null;
+
+  if (perm === 'denied') {
+    btn.textContent = 'Bloqueadas';
+    btn.disabled = true;
+    btn.style.opacity = '.4';
+    statusEl.textContent = 'Habilitá las notificaciones en la configuración del navegador.';
+    return;
+  }
+
+  if (sub) {
+    btn.textContent = '🔔 Activadas';
+    btn.classList.add('subscribed');
+    statusEl.textContent = '¡Listo! Te avisamos cuando salgan los picks del día.';
+  } else {
+    btn.textContent = 'Activar';
+    btn.classList.remove('subscribed');
+    statusEl.textContent = 'Te mandamos el mejor pick gratis como notificación todos los días.';
+  }
+}
+
+async function togglePushSubscription() {
+  const btn = document.getElementById('pushToggleBtn');
+  btn.disabled = true;
+
+  const reg = await navigator.serviceWorker.ready;
+  let sub = await reg.pushManager.getSubscription();
+
+  if (sub) {
+    // Desuscribir
+    await sub.unsubscribe();
+    await fetch(`${PUSH_WORKER_URL}/push/unsubscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ endpoint: sub.endpoint }),
+    }).catch(() => {});
+  } else {
+    // Suscribir
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') { btn.disabled = false; return updatePushButtonState(); }
+
+    const appServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: appServerKey,
+    });
+    const email = window._currentUser?.email || null;
+    await fetch(`${PUSH_WORKER_URL}/push/subscribe`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscription: sub.toJSON(), email }),
+    }).catch(() => {});
+  }
+
+  btn.disabled = false;
+  await updatePushButtonState();
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64  = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const raw = window.atob(base64);
+  return Uint8Array.from([...raw].map(c => c.charCodeAt(0)));
+}
+
+/* ── SERVICE WORKER ─────────────────────────────────────────────────────── */
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('[SW] Registrado:', reg.scope))
+      .catch(err => console.warn('[SW] Error:', err));
+  });
+}
+
+// ═══ ADMIN: VER PICKS DE USUARIO ═══
+async function admVerPicks(email) {
+  const modal    = document.getElementById('admUserPicksModal');
+  const emailEl  = document.getElementById('admPicksUserEmail');
+  const statsEl  = document.getElementById('admPicksStats');
+  const listEl   = document.getElementById('admPicksList');
+
+  emailEl.textContent = email;
+  statsEl.innerHTML   = '<div style="font-size:0.78rem;color:var(--texto-sec)">⏳ Cargando...</div>';
+  listEl.innerHTML    = '';
+  modal.style.display = 'block';
+
+  try {
+    const { data, error } = await sbAnon
+      .from('acoin_users')
+      .select('historial_full, balance, nickname')
+      .eq('email', email)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) { statsEl.innerHTML = '<div style="color:#ef5350">Usuario no encontrado</div>'; return; }
+
+    const hist = (data.historial_full || []).slice().reverse();
+
+    const total   = hist.length;
+    const ganados = hist.filter(p => p.result === 'win').length;
+    const perdidos= hist.filter(p => p.result === 'loss').length;
+    const pend    = hist.filter(p => !p.result || p.result === 'pending').length;
+    const wr      = total > 0 ? Math.round((ganados / (ganados + perdidos || 1)) * 100) : 0;
+
+    const statCard = (label, value, color) =>
+      `<div style="flex:1;min-width:90px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;text-align:center">
+        <div style="font-size:1rem;font-weight:800;color:${color}">${value}</div>
+        <div style="font-size:0.65rem;color:var(--texto-sec);margin-top:2px">${label}</div>
+      </div>`;
+
+    statsEl.innerHTML =
+      statCard('Total', total, '#fff') +
+      statCard('Ganados', ganados, 'var(--verde)') +
+      statCard('Perdidos', perdidos, 'var(--rojo)') +
+      statCard('Pendientes', pend, '#ffd600') +
+      statCard('Win Rate', wr + '%', wr >= 55 ? 'var(--verde)' : wr >= 40 ? '#ffd600' : 'var(--rojo)') +
+      statCard('Saldo G$', (data.balance || 0).toLocaleString('es-AR'), '#ffd600');
+
+    if (!hist.length) {
+      listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--texto-sec);font-size:0.82rem">Sin picks registrados</div>';
+      return;
+    }
+
+    const resultIcon = r => r === 'win' ? '✅' : r === 'loss' ? '❌' : '⏳';
+    const resultColor= r => r === 'win' ? 'var(--verde)' : r === 'loss' ? 'var(--rojo)' : '#ffd600';
+    const sportIcon  = s => ({ futbol:'⚽', basket:'🏀', tenis:'🎾', americano:'🏈' }[s] || '🎲');
+
+    listEl.innerHTML = hist.map(p => {
+      // historial_full usa: date, rec, stake, pl — NO ts/pick/betAmount
+      const fecha    = p.date ? new Date(p.date).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric' }) : '–';
+      const cuota    = p.odds ? `x${parseFloat(p.odds).toFixed(2)}` : '–';
+      const selec    = p.rec || '–';
+      const apuesta  = p.stake ? `G$ ${Number(p.stake).toLocaleString('es-AR')}` : '–';
+      const isWin    = p.result === 'win';
+      const isLoss   = p.result === 'loss';
+      const plStr    = (isWin || isLoss) && p.pl != null
+        ? `<span style="font-size:0.68rem;font-weight:700;color:${isWin ? 'var(--verde)' : 'var(--rojo)'}">${isWin ? '+' : ''}G$ ${Number(p.pl).toLocaleString('es-AR')}</span>`
+        : '';
+      return `
+      <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:10px">
+        <div style="font-size:1.1rem;flex-shrink:0">${resultIcon(p.result)}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:0.78rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">
+            ${sportIcon(p.sport)} ${p.home || '?'} vs ${p.away || '?'}
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:3px;align-items:center">
+            <span style="font-size:0.7rem;background:rgba(255,255,255,0.07);border-radius:5px;padding:1px 6px;color:#fff;font-weight:600">${selec}</span>
+            <span style="font-size:0.68rem;color:var(--texto-sec)">${cuota}</span>
+            <span style="font-size:0.7rem;color:#ffd600;font-weight:700">${apuesta}</span>
+            ${plStr}
+            <span style="font-size:0.65rem;color:var(--texto-sec)">${fecha}</span>
+          </div>
+        </div>
+        <div style="font-size:0.75rem;font-weight:700;color:${resultColor(p.result)};flex-shrink:0">
+          ${isWin ? 'GANÓ' : isLoss ? 'PERDIÓ' : 'PEND.'}
+        </div>
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    statsEl.innerHTML = `<div style="color:#ef5350">Error: ${e.message}</div>`;
+    console.error('[admVerPicks]', e);
+  }
+}
+</script>
+
+<!-- MODAL: Picks de usuario -->
+<div id="admUserPicksModal" style="display:none;position:fixed;top:60px;left:0;right:0;bottom:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);overflow-y:auto;padding:20px;box-sizing:border-box">
+  <div style="max-width:600px;margin:0 auto;background:#1a1a2e;border:1px solid rgba(255,255,255,0.1);border-radius:18px;padding:24px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <div>
+        <div style="font-size:1rem;font-weight:800;color:#fff">📋 Historial de picks</div>
+        <div id="admPicksUserEmail" style="font-size:0.75rem;color:var(--texto-sec);margin-top:2px"></div>
+      </div>
+      <button onclick="document.getElementById('admUserPicksModal').style.display='none'" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+    <div id="admPicksStats" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px"></div>
+    <div id="admPicksList" style="display:flex;flex-direction:column;gap:8px;max-height:55vh;overflow-y:auto"></div>
+  </div>
+</div>
 </body>
 </html>
