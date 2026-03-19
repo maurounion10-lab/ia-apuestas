@@ -2955,9 +2955,13 @@
     box-shadow:0 16px 48px rgba(0,0,0,0.9); display:none; z-index:10001;
   }
   .user-dropdown.open { display:block; }
-  .user-dd-header { padding:10px 12px 13px; border-bottom:1px solid var(--borde); margin-bottom:5px; }
+  .user-dd-header { padding:14px 14px 13px; border-bottom:1px solid var(--borde); margin-bottom:5px; }
+  .user-dd-avatar-wrap { width:48px;height:48px;border-radius:50%;background:rgba(0,200,83,0.13);border:2px solid rgba(0,200,83,0.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden; }
+  .user-dd-avatar-wrap img { width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.5)); }
+  .user-dd-avatar-initials { font-size:1.1rem;font-weight:800;color:var(--verde); }
+  .user-dd-nickname { font-weight:800; color:#fff; font-size:1rem; line-height:1.2; }
   .user-dd-name { font-weight:700; color:#fff; font-size:0.9rem; }
-  .user-dd-email { font-size:0.73rem; color:var(--texto-sec); margin-top:2px; word-break:break-all; }
+  .user-dd-email { font-size:0.72rem; color:var(--texto-sec); margin-top:2px; word-break:break-all; }
   .user-dd-plan { display:inline-flex; align-items:center; gap:4px; margin-top:7px; background:rgba(255,214,0,0.13); border:1px solid rgba(255,214,0,0.28); border-radius:6px; padding:3px 9px; font-size:0.68rem; font-weight:700; color:var(--amarillo); }
   .user-dd-item { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:9px; color:var(--texto-sec); font-size:0.84rem; cursor:pointer; transition:all 0.15s; background:none; border:none; width:100%; font-family:inherit; text-align:left; }
   .user-dd-item:hover { background:rgba(255,255,255,0.05); color:#fff; }
@@ -3041,11 +3045,14 @@
     </button>
     <div class="user-dropdown" id="userDropdown">
       <div class="user-dd-header">
-        <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
-          <div id="ddAvatarBadge" style="display:none;width:30px;height:30px;flex-shrink:0"></div>
-          <div>
-            <div class="user-dd-name" id="ddName">—</div>
-            <div class="user-dd-email" id="ddEmail">—</div>
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="user-dd-avatar-wrap" id="ddAvatarBadge">
+            <span class="user-dd-avatar-initials" id="ddAvatarInitials">?</span>
+          </div>
+          <div style="min-width:0">
+            <div class="user-dd-nickname" id="ddNickname" style="display:none"></div>
+            <div class="user-dd-name" id="ddName" style="font-size:0.78rem;font-weight:500;color:var(--texto-sec)">—</div>
+            <div class="user-dd-email" id="ddEmail" style="display:none">—</div>
           </div>
         </div>
       </div>
@@ -6874,11 +6881,8 @@ function saveHistorial(arr) {
     clearTimeout(_globalHistSyncTimer);
     _globalHistSyncTimer = setTimeout(() => sbSaveGlobalHistorial(sorted), 1500);
   }
-  // Backup personal (todos los usuarios logueados)
+  // G$ sync personal (balance, picks propios) — el historial de pronósticos es global (shared_cache)
   if (authUser?.email) {
-    clearTimeout(_histSyncTimer);
-    _histSyncTimer = setTimeout(() => sbSaveHistorial(sorted), 3000);
-    // También actualizar columna `predictions` para los stats globales del hero
     acScheduleSync();
   }
 }
@@ -6916,7 +6920,8 @@ async function sbLoadGlobalHistorial() {
 }
 
 async function sbSaveHistorial(arr) {
-  if (!authUser?.email) return;
+  // El historial de pronósticos es universal (shared_cache). Solo el admin escribe historial_full.
+  if (authUser?.email !== ADMIN_EMAIL) return;
   try {
     const { error } = await sbClient
       .from('acoin_users')
@@ -7376,7 +7381,7 @@ function renderHistorial(filter) {
           : (rMap[h.result] || rMap.void);
         const homeShield = logoHtml(h.home, 34);
         const awayShield = logoHtml(h.away, 34);
-        const matchCell = `<td style="min-width:110px"><span title="${h.home} vs ${h.away}" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle">${homeShield}<span style="font-size:0.62rem;color:var(--texto-sec);font-weight:600">vs</span>${awayShield}</span></td>`;
+        const matchCell = `<td style="min-width:110px;text-align:center"><span title="${h.home} vs ${h.away}" style="display:inline-flex;align-items:center;gap:8px;vertical-align:middle">${homeShield}<span style="font-size:0.62rem;color:var(--texto-sec);font-weight:600">vs</span>${awayShield}</span></td>`;
         return `<tr class="${rowClass}" style="${rowStyle}">${matchCell}<td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
       }).join('')
     : `<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--texto-sec)">📋 El historial se llenará automáticamente con los pronósticos de cada día.</td></tr>`;
@@ -8292,6 +8297,27 @@ async function loadRealScores(retryCount = 0) {
   }
   if (retryCount === 0) _scoresLoading = true;
   try {
+    // Caché compartida en Supabase — evita que cada usuario llame al Worker por separado
+    if (retryCount === 0) {
+      const { data: sbScores } = await sbAnon
+        .from('shared_cache').select('data, fetched_at').eq('key', 'scores_v1').maybeSingle();
+      if (sbScores?.data && sbScores?.fetched_at) {
+        const age = Date.now() - new Date(sbScores.fetched_at).getTime();
+        if (age < CACHE_SCORES_TTL && Array.isArray(sbScores.data) && sbScores.data.length > 0) {
+          console.log('[Scores] Caché Supabase compartida (edad:', Math.round(age/60000), 'min)');
+          cacheSet('cache_scores', sbScores.data);
+          scoresData.length = 0;
+          sbScores.data.forEach(g => scoresData.push(g));
+          _scoresFirstLoad = true;
+          renderScores(currentScoreFilter || currentFilter);
+          resolveCompletedGames(scoresData);
+          acEvaluatePicks();
+          renderPreds();
+          _scoresLoading = false;
+          return;
+        }
+      }
+    }
     const timeoutP = new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 12000));
     const res = await Promise.race([fetch(`${WORKER_URL}/scores`), timeoutP]);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -8423,12 +8449,19 @@ async function loadRealScores(retryCount = 0) {
       scoresData.length = 0;
       mapped.forEach(m => scoresData.push(m));
       cacheSet('cache_scores', mapped); // guardar en caché local
+      // Guardar en Supabase para compartir con todos los usuarios (evita llamadas repetidas al Worker)
+      sbAnon.from('shared_cache').upsert(
+        { key: 'scores_v1', data: mapped, fetched_at: new Date().toISOString() },
+        { onConflict: 'key' }
+      ).then(({ error }) => {
+        if (error) console.warn('[Scores] No se pudo guardar caché Supabase:', error.message);
+        else console.log('[Scores] Caché compartida actualizada en Supabase');
+      });
       _scoresFirstLoad = true; // datos reales recibidos → dejar de mostrar skeleton
       renderScores(currentScoreFilter);
       resolveCompletedGames(scoresData);
       acEvaluatePicks();   // $A-Coin: evaluar picks pendientes contra resultados
       loadPlayerPhotos();
-      // (cuotas section removed)
       renderPreds();  // refrescar badges EN VIVO y marcadores en predicciones
       console.log(`[Worker] scores: ${mapped.length} eventos cargados`);
     }
@@ -8860,6 +8893,9 @@ function updateNavAuth() {
   document.getElementById('navUserName').textContent = authUser.name.split(' ')[0];
   document.getElementById('ddName').textContent = authUser.name;
   document.getElementById('ddEmail').textContent = authUser.email;
+  // Iniciales en avatar del dropdown (hasta que applyUserProfile cargue el logo)
+  const ddInitEl = document.getElementById('ddAvatarInitials');
+  if (ddInitEl) { ddInitEl.textContent = initials; ddInitEl.style.display = 'flex'; }
   // Show Mi Panel, unlock bankroll
   document.getElementById('mipanel').style.display = '';
   document.getElementById('mipanelUser').textContent = '— ' + authUser.name.split(' ')[0];
@@ -10329,31 +10365,60 @@ function applyUserProfile() {
   // Sufijo especial al apodo (ej: "Mauro 🎩")
   const displayNick = nick ? nick + (vip?.suffix || '') : null;
 
+  // Nickname en el nav
   if (displayNick) {
     const navName = document.getElementById('navUserName');
     if (navName) navName.textContent = displayNick;
-    const ddName = document.getElementById('ddName');
-    if (ddName) ddName.textContent = displayNick;
     const miEl = document.getElementById('mipanelUser');
     if (miEl) miEl.textContent = '— ' + displayNick;
   }
+  // Dropdown header: nickname grande + nombre/email debajo
+  const ddNickEl = document.getElementById('ddNickname');
+  const ddNameEl = document.getElementById('ddName');
+  if (ddNickEl && ddNameEl) {
+    if (displayNick) {
+      ddNickEl.textContent = displayNick;
+      ddNickEl.style.display = 'block';
+      // nombre real en tamaño chico si nickname es diferente
+      if (authUser?.name && authUser.name !== displayNick) {
+        ddNameEl.textContent = authUser.name;
+      } else {
+        ddNameEl.style.display = 'none';
+      }
+    } else {
+      ddNickEl.style.display = 'none';
+      if (authUser?.name) ddNameEl.textContent = authUser.name;
+    }
+  }
+
+  // Avatar en nav button
   if (ava) {
     const avatarEl = document.getElementById('navUserAvatar');
     if (avatarEl) {
+      const fallbackInitial = (displayNick||nick||'?')[0].toUpperCase();
       avatarEl.innerHTML = `<img src="${ava.logo}" alt="${ava.name}"
         style="width:75%;height:75%;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.5))"
-        onerror="this.parentElement.textContent='${(displayNick||nick||'?')[0].toUpperCase()}'">`;
+        onerror="this.parentElement.textContent='${fallbackInitial}'">`;
       avatarEl.style.background = 'transparent';
       avatarEl.style.border = 'none';
       avatarEl.style.borderRadius = '0';
     }
-    // Badge en el dropdown
+    // Avatar grande en el dropdown
     const badge = document.getElementById('ddAvatarBadge');
+    const initEl = document.getElementById('ddAvatarInitials');
     if (badge) {
-      badge.style.display = 'block';
+      const fallbackInitial = (displayNick||nick||'?')[0].toUpperCase();
       badge.innerHTML = `<img src="${ava.logo}" alt="${ava.name}"
-        style="width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.6))"
-        onerror="this.style.display='none'">`;
+        style="width:80%;height:80%;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.5))"
+        onerror="this.style.display='none';document.getElementById('ddAvatarInitials').style.display='flex'">
+        <span class='user-dd-avatar-initials' id='ddAvatarInitials' style='display:none'>${fallbackInitial}</span>`;
+    }
+  } else {
+    // Sin avatar: mostrar iniciales
+    const initEl = document.getElementById('ddAvatarInitials');
+    if (initEl && authUser?.name) {
+      initEl.textContent = authUser.name.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+      initEl.style.display = 'flex';
     }
   }
 }
