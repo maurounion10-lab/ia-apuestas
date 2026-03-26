@@ -8350,20 +8350,6 @@ function _timeAgo(ts) {
   return `Hace ${d} día${d !== 1 ? 's' : ''}`;
 }
 
-const GAMBETA_VIP = {
-  'mauro.union10@gmail.com': {
-    nickname:  'Mauro Latam',
-    suffix:    ' 🎩',
-    nameColor: '#ffd600',
-    avatar: {
-      id:    'union_santa_fe',
-      name:  'Unión Santa Fe',
-      color: '#c8002a',
-      logo:  'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Escudo_club_Atl%C3%A9tico_Uni%C3%B3n_de_santa_fe.svg/330px-Escudo_club_Atl%C3%A9tico_Uni%C3%B3n_de_santa_fe.svg.png'
-    }
-  }
-};
-
 async function fetchGFeed() {
   try {
     const { data, error } = await sbAnon
