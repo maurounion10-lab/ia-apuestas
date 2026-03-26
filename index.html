@@ -5707,16 +5707,9 @@ function buildPredsFromOdds() {
     const overOdds = {};
     (totalsMkt?.outcomes || []).forEach(o => {
       const pt = String(o.point);
-      if (!isBasketball) {
-        if (o.name === 'Over') overOdds[pt] = o.price;
-      } else {
+      if (o.name === 'Over') overOdds[pt] = o.price; else {
         // Basket: tomar la primera línea Over/Under disponible
-        if (o.name === 'Over' && !basketOverOdds) {
-          basketOverOdds   = o.price;
-          basketTotalsLine = pt;
         }
-        if (o.name === 'Under' && !basketUnderOdds) {
-          basketUnderOdds = o.price;
         }
       }
     });
@@ -5758,26 +5751,12 @@ function buildPredsFromOdds() {
       { rec: 'Visitante Gana', prob: probA, odds: aO ?? aOP },
       ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dO ?? dOP }] : []),
       // Totales fútbol: Over 1.5 / 2.5 / 3.5
-      ...(!isBasketball ? ['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) })) : []),
       // Ambos Marcan (solo fútbol)
-      ...(!isBasketball && bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
       // Over/Under basket: línea automática (ej: Más de 215.5)
-      ...(isBasketball && basketTotalsLine && basketOverOdds >= MIN_ODDS ? [{
-        rec: `Más de ${basketTotalsLine}`,
-        prob: Math.round(100 / basketOverOdds),
-        odds: basketOverOdds,
         isTotals: true,
-        line: parseFloat(basketTotalsLine),
-        isBasketTotals: true,
       }] : []),
-      ...(isBasketball && basketTotalsLine && basketUnderOdds >= MIN_ODDS ? [{
-        rec: `Menos de ${basketTotalsLine}`,
-        prob: Math.round(100 / basketUnderOdds),
-        odds: basketUnderOdds,
         isTotals: true,
-        line: parseFloat(basketTotalsLine),
-        isBasketTotals: true,
       }] : []),
     ]
     .filter(c => c.prob > 0)
@@ -5786,15 +5765,6 @@ function buildPredsFromOdds() {
     // Ordenar picks: para basket el Over/Under va siempre primero (es la apuesta más relevante);
     // para fútbol ordenar por probabilidad desc y en empate preferir totales reales.
     candidates2.sort((a, b) => {
-      if (isBasketball) {
-        // En basket: prioridad → Over/Under con línea real > moneyline
-        const aIsOU = a.isBasketTotals ? 1 : 0;
-        const bIsOU = b.isBasketTotals ? 1 : 0;
-        if (bIsOU !== aIsOU) return bIsOU - aIsOU; // Over/Under primero
-        // Entre dos O/U: el Over (prob más alta) gana
-        if (b.prob !== a.prob) return b.prob - a.prob;
-        return 0;
-      }
       // Fútbol: por probabilidad; en empate, los totales con cuota real ganan
       if (b.prob !== a.prob) return b.prob - a.prob;
       if (a.isTotals) return -1;
@@ -5845,13 +5815,7 @@ function buildPredsFromOdds() {
     else if (rec === 'Ambos Marcan')
       insight = `Estimación: ${bttsEst}% de probabilidad de que ambos equipos conviertan${fmtO(bttsOddsEst)}. El mercado de goles refleja un partido abierto — ${hN} (${probH}%) vs ${aN} (${probA}%). Buena apuesta de goles de doble vía.`;
     else {
-      const line = best.line;
-      if (best.isBasketTotals) {
-        // Over/Under basket
-        const isOver = rec.startsWith('Más');
-        const pct    = Math.round(100 / (isOver ? basketOverOdds : basketUnderOdds));
-        insight = `Línea de puntos totales en ${line}. El mercado da ${pct}% de probabilidad al ${isOver ? 'Over' : 'Under'}${fmtO(isOver ? basketOverOdds : basketUnderOdds)}. ${hN} (${probH}% de ganar) vs ${aN} (${probA}%). Apuesta con valor estadístico.`;
-      } else {
+      const line = best.line; else {
         // Más de X.5 fútbol
         const pOver = probOver[String(line)];
         insight = `El mercado asigna ${pOver}% de probabilidad a que el partido supere los ${line} goles${fmtO(overOdds[String(line)])}. Partido con perfil ofensivo — ${hN} (${probH}% favorito) vs ${aN} (${probA}%). Apuesta de totales con valor.`;
@@ -7541,7 +7505,6 @@ const matchAnalysisData = {
     probH:42,probD:28,probA:30,
     insight:'Barcelona domina estadísticamente en casa. Atlético siempre es difícil pero Barça es muy goleador. "Ambos Marcan" tiene alta probabilidad dado el estilo ofensivo de ambos equipos.'
   },
-  'Lakers-Celtics':,
 };
 
 function togglePredExpand(idx) {
@@ -7670,7 +7633,6 @@ const teamShortNames = {
   'Angers SCO':               'Angers',
  // ── ──
   'Atlanta Hawks':            'Hawks',
-  'Boston Celtics':           'Celtics',
   'Brooklyn Nets':            'Nets',
   'Charlotte Hornets':        'Hornets',
   'Chicago Bulls':            'Bulls',
@@ -7682,9 +7644,7 @@ const teamShortNames = {
   'Houston Rockets':          'Rockets',
   'Indiana Pacers':           'Pacers',
   'Los Angeles Clippers':     'Clippers',
-  'Los Angeles Lakers':       'Lakers',
   'LA Clippers':              'Clippers',
-  'LA Lakers':                'Lakers',
   'Memphis Grizzlies':        'Grizzlies',
   'Miami Heat':               'Heat',
   'Milwaukee Bucks':          'Bucks',
@@ -9460,7 +9420,6 @@ async function checkOnboarding() {
   }
 
   // ── Caso 2: Avatar de básquet → reemplazar + mostrar migración ────────────
-  if (ava && _isNbaAvatar(ava.logo)) {
     const club = _randomFootballClub();
     localStorage.setItem(GB_AVA, JSON.stringify({ id: club.id, logo: club.logo, name: club.name, color: club.color }));
     applyUserProfile();
