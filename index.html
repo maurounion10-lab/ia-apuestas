@@ -9409,13 +9409,7 @@ async function checkOnboarding() {
     return;
   }
 
-  // ── Caso 2: Avatar de básquet → reemplazar + mostrar migración ────────────
-    const club = _randomFootballClub();
-    localStorage.setItem(GB_AVA, JSON.stringify({ id: club.id, logo: club.logo, name: club.name, color: club.color }));
-    applyUserProfile();
-    await _showAvatarMigration();
-    return;
-  }
+
 
   // ── Caso 3: Tiene todo → no hacer nada ────────────────────────────────────
   if (hasNick && ava) return;
