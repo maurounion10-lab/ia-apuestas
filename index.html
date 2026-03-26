@@ -6602,7 +6602,7 @@ let chatOpen = false;
 
 const chatResponses = {
   'real madrid': '⚽ **Real Madrid** está en gran forma. En la Champions tienen 82% de probabilidad de clasificar según nuestro modelo. Hoy juegan contra Manchester City — la IA recomienda apostar Local (cuota 1.80) con confianza alta del 82%. ¿Querés más detalles sobre el partido?',
-  'mejor apuesta': '🔮 La **mejor apuesta del día** según la IA es: **"Más de 2.5 goles" en Bayern vs Dortmund** (cuota 1.60). El Clásico alemán promedia 3.4 goles en sus últimos 8 partidos. Valor esperado positivo de +$8.40 por cada $100 apostados.', hoy a las 21:30. Celtics lleva 4 victorias consecutivas y domina de visitante este año. La IA recomienda **Celtics -3.5 puntos** con 64% de confianza. Cuota visitante: 1.72.',
+  'mejor apuesta': '🔮 La **mejor apuesta del día** según la IA es: **"Más de 2.5 goles" en Bayern vs Dortmund** (cuota 1.60). El Clásico alemán promedia 3.4 goles en sus últimos 8 partidos. Valor esperado positivo de +$8.40 por cada $100 apostados.',
   'default': (q) => `🤖 Analizando tu consulta sobre **"${q}"**...\n\nBasándome en los datos estadísticos actuales, nuestro modelo indica una tendencia positiva en los mercados relacionados. Te recomiendo revisar los pronósticos de hoy arriba, donde tenemos análisis detallados con probabilidades para los partidos más importantes. ¿Hay algún partido específico que te interese?`
 };
 
@@ -6610,7 +6610,6 @@ function getBotResponse(msg) {
   const lower = msg.toLowerCase();
   if (lower.includes('real madrid') || lower.includes('madrid')) return chatResponses['real madrid'];
   if (lower.includes('mejor apuesta') || lower.includes('mejor') || lower.includes('recomienda')) return chatResponses['mejor apuesta'];
-  if (lower.includes('laker') || lower.includes('celtics') || lower.includes('nba')) return chatResponses['lakers'];
   return chatResponses['default'](msg);
 }
 
