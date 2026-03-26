@@ -5707,10 +5707,7 @@ function buildPredsFromOdds() {
     const overOdds = {};
     (totalsMkt?.outcomes || []).forEach(o => {
       const pt = String(o.point);
-      if (o.name === 'Over') overOdds[pt] = o.price; else {
-        // Basket: tomar la primera línea Over/Under disponible
-        }
-        }
+        if (o.name === 'Over') overOdds[pt] = o.price;
       }
     });
 
@@ -5751,15 +5748,10 @@ function buildPredsFromOdds() {
       { rec: 'Visitante Gana', prob: probA, odds: aO ?? aOP },
       ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dO ?? dOP }] : []),
       // Totales fútbol: Over 1.5 / 2.5 / 3.5
-          .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) })) : []),
+      ...(['1.5','2.5','3.5'].filter(pt => overOdds[pt]).map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
       // Ambos Marcan (solo fútbol)
-      // Over/Under basket: línea automática (ej: Más de 215.5)
-        isTotals: true,
-      }] : []),
-        isTotals: true,
-      }] : []),
-    ]
-    .filter(c => c.prob > 0)
+      ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isTotals: false }] : []),
+    ]    .filter(c => c.prob > 0)
     .filter(c => !c.odds || parseFloat(c.odds) >= MIN_ODDS); // excluir cuotas bajas
 
     // Ordenar picks: para basket el Over/Under va siempre primero (es la apuesta más relevante);
@@ -5815,11 +5807,10 @@ function buildPredsFromOdds() {
     else if (rec === 'Ambos Marcan')
       insight = `Estimación: ${bttsEst}% de probabilidad de que ambos equipos conviertan${fmtO(bttsOddsEst)}. El mercado de goles refleja un partido abierto — ${hN} (${probH}%) vs ${aN} (${probA}%). Buena apuesta de goles de doble vía.`;
     else {
-      const line = best.line; else {
+      const line = best.line;
         // Más de X.5 fútbol
         const pOver = probOver[String(line)];
         insight = `El mercado asigna ${pOver}% de probabilidad a que el partido supere los ${line} goles${fmtO(overOdds[String(line)])}. Partido con perfil ofensivo — ${hN} (${probH}% favorito) vs ${aN} (${probA}%). Apuesta de totales con valor.`;
-      }
     }
 
     return {
