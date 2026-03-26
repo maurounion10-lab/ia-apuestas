@@ -9352,6 +9352,564 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
   </div>`;
 }
 
+
+</script>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="authOverlay" onclick="authOverlayClick(event)">
+  <div class="auth-box" id="authBox">
+    <button class="auth-close" onclick="closeAuth()" aria-label="Cerrar">✕</button>
+
+    <!-- STEP 1: Elegir método -->
+    <div class="auth-step active" id="authStep1">
+      <div class="auth-brand">
+        <div style="width:52px;height:52px;border-radius:50%;overflow:hidden;border:2px solid var(--verde);flex-shrink:0">
+          <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot" style="width:100%;height:100%;object-fit:cover;object-position:50% 20%">
+        </div>
+        <span class="auth-brand-name">gambeta<span>.ai</span></span>
+      </div>
+      <div class="auth-title">Accedé gratis</div>
+      <div class="auth-subtitle">Pronósticos IA, análisis avanzado y calculadora de valor.<br>Registro en menos de 30 segundos.</div>
+
+      <button class="social-btn" onclick="selectSocial('google')">
+        <span class="sicon"><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></span>
+        Continuar con Google
+        <span class="sarrow">›</span>
+      </button>
+
+      <div class="auth-divider">o con email</div>
+      <input class="auth-input" type="email" id="directEmail" placeholder="tu@email.com" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')sendMagicLink()">
+
+      <!-- Magic Link (opción principal) -->
+      <button class="auth-btn-main" id="magicLinkBtn" onclick="sendMagicLink()" style="margin-bottom:10px">
+        ✉️ Enviar link de acceso
+      </button>
+      <div style="font-size:0.73rem;color:var(--texto-sec);text-align:center;margin-bottom:14px;line-height:1.4">
+        Te mandamos un link a tu email — hacés clic y entrás. Sin contraseña.
+      </div>
+
+      <!-- Separador -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.1)"></div>
+        <span style="font-size:0.7rem;color:var(--texto-sec)">o con contraseña</span>
+        <div style="flex:1;height:1px;background:rgba(255,255,255,0.1)"></div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="social-btn" onclick="selectSocial('email')" style="flex:1;justify-content:center;font-size:0.8rem;padding:10px 12px">
+          ✨ Crear cuenta
+        </button>
+        <button class="social-btn" onclick="goToEmailLogin()" style="flex:1;justify-content:center;font-size:0.8rem;padding:10px 12px;border-color:rgba(255,214,0,0.3);color:#ffd600">
+          🔑 Ya tengo cuenta
+        </button>
+      </div>
+
+      <div class="auth-legal">Al registrarte aceptás los <a href="#">Términos y Condiciones</a> y la <a href="#">Política de Privacidad</a>.</div>
+    </div>
+
+    <!-- STEP 2: Email + Password -->
+    <div class="auth-step" id="authStep2">
+      <button class="auth-back" onclick="authGoBack()">← Volver</button>
+      <div id="socialChip" class="auth-social-chip"></div>
+      <div class="auth-title" style="text-align:left" id="authStep2Title">Crear cuenta</div>
+      <div class="auth-subtitle" style="text-align:left;margin-bottom:16px" id="authStep2Sub">Ingresá tu email y elegí una contraseña.</div>
+      <input class="auth-input" type="email" id="leadEmail" placeholder="tu@email.com" onkeydown="if(event.key==='Enter')document.getElementById('leadPassword').focus()">
+      <input class="auth-input" type="password" id="leadPassword" placeholder="Contraseña (mín. 6 caracteres)" style="margin-top:8px" onkeydown="if(event.key==='Enter')completeAuth()">
+      <div id="emailError" style="color:var(--rojo);font-size:0.75rem;min-height:20px;padding:4px 2px"></div>
+      <div class="auth-check-row" id="marketingRow">
+        <input type="checkbox" id="marketingCheck" checked>
+        <label for="marketingCheck">Quiero recibir pronósticos diarios y alertas de valor. Podés darte de baja cuando quieras.</label>
+      </div>
+      <button class="auth-btn-main" id="authSubmitBtn" onclick="completeAuth()">✓ Crear mi cuenta gratis</button>
+      <div style="text-align:center;margin-top:14px;font-size:0.78rem;color:var(--texto-sec)">
+        <span id="authModeText">¿Ya tenés cuenta?</span>
+        <a onclick="toggleAuthMode()" style="color:var(--verde);cursor:pointer;margin-left:5px;font-weight:700;text-decoration:underline" id="authModeLink">Iniciá sesión</a>
+      </div>
+    </div>
+
+    <!-- STEP 3: Bienvenida -->
+    <div class="auth-step" id="authStep3">
+      <div class="auth-welcome">
+        <span class="auth-welcome-icon">🎉</span>
+        <div class="auth-title">¡Bienvenido/a!</div>
+        <div class="auth-subtitle" id="welcomeMsg">Tu cuenta está lista.</div>
+        <div class="auth-perks">
+          ✅ Pronósticos IA desbloqueadas<br>
+          ✅ Historial completo de apuestas<br>
+          ✅ Alertas de valor por email<br>
+          ✅ Calculadora avanzada activa<br>
+          <span class="perk-gold">⭐ Estas cuentas (por ahora) son GRATIS</span>
+        </div>
+        <button class="auth-btn-main" style="margin-top:18px" onclick="closeAuth()">Empezar a ganar →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════ -->
+<!-- PIN OVERLAY -->
+<div id="adminPinOverlay" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:100px 20px 20px">
+  <div style="background:#0f1a0f;border:1px solid rgba(0,200,83,0.3);border-radius:20px;padding:32px;width:100%;max-width:340px;text-align:center;display:flex;flex-direction:column;gap:16px">
+    <div style="font-size:2rem">🔐</div>
+    <div style="font-weight:800;font-size:1rem;color:#fff">Panel Privado</div>
+    <div style="font-size:0.78rem;color:rgba(255,255,255,0.4)">Ingresá tu contraseña para continuar</div>
+    <input id="adminPinInput" type="password" placeholder="Contraseña"
+      style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:12px 16px;border-radius:12px;font-size:1rem;text-align:center;letter-spacing:4px;outline:none;width:100%;box-sizing:border-box"/>
+    <div id="adminPinError" style="display:none;font-size:0.78rem;color:#ef5350;background:rgba(255,61,61,0.1);border:1px solid rgba(255,61,61,0.3);border-radius:8px;padding:8px">
+      ⛔ Contraseña incorrecta
+    </div>
+    <button onclick="submitAdminPin()" style="background:var(--verde);color:#000;font-weight:800;padding:12px;border-radius:12px;cursor:pointer;font-size:0.95rem;border:none">Entrar</button>
+    <button onclick="closeAdminPin()" style="background:transparent;border:none;color:rgba(255,255,255,0.3);font-size:0.78rem;cursor:pointer">Cancelar</button>
+  </div>
+</div>
+
+<!-- ONBOARDING — primera vez que el usuario inicia sesión -->
+<div class="ob-overlay" id="onboardingOverlay">
+  <div class="ob-box">
+
+    <!-- Paso 1: Apodo -->
+    <div id="obStep1">
+      <div class="ob-logo">🎰</div>
+      <div class="ob-title">¿Cómo querés que te llamemos?</div>
+      <div class="ob-sub">Elegí un apodo para aparecer<br>en la comunidad gambeta.ai</div>
+      <input class="ob-input" id="obNickInput" type="text" maxlength="20" placeholder="Tu apodo..."
+        onkeydown="if(event.key==='Enter')obNext()"
+        oninput="document.getElementById('obNickErr').textContent=''">
+      <div class="ob-err" id="obNickErr"></div>
+      <button class="ob-btn" onclick="obNext()">Continuar →</button>
+    </div>
+
+    <!-- Paso 2: Escudo -->
+    <div id="obStep2" style="display:none">
+      <div class="ob-logo">🛡️</div>
+      <div class="ob-title">Elegí tu escudo</div>
+      <div class="ob-sub">Será tu avatar en gambeta.ai</div>
+      <div class="ob-clubs" id="obClubsGrid"></div>
+      <button class="ob-btn" id="obFinishBtn" onclick="obFinish()" disabled>Elegir este escudo ⚽</button>
+    </div>
+
+    <!-- Paso 3: Migración de escudo (basket → fútbol) -->
+    <div id="obStep3" style="display:none">
+      <div class="ob-logo">⚽</div>
+      <div class="ob-title">¡Nuevo escudo!</div>
+      <div class="ob-sub" style="margin-bottom:6px">Tu escudo de básquet fue reemplazado.<br>¿Querés quedarte con el asignado o elegís otro?</div>
+      <div class="ob-clubs" id="obMigrateGrid"></div>
+      <button class="ob-btn" id="obMigrateBtn" onclick="obMigrateFinish()" disabled>Confirmar escudo ✓</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- PANEL ADMIN — acceso: triple clic en logo o Ctrl+Shift+A -->
+<!-- ═══════════════════════════════════════════════ -->
+<div id="adminPanel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9000;backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:70px 16px 16px">
+  <div style="background:#0f1a0f;border:1px solid rgba(0,200,83,0.4);border-radius:20px;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 0 60px rgba(0,200,83,0.15)">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;background:#0f1a0f;z-index:1;border-radius:20px 20px 0 0">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:1.4rem">⚙️</span>
+        <div>
+          <div style="font-weight:800;font-size:1rem;color:#fff">Panel de Administración</div>
+          <div style="font-size:0.7rem;color:var(--verde);letter-spacing:.5px">ACCESO PRIVADO</div>
+        </div>
+      </div>
+      <button onclick="closeAdmin()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center">✕</button>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.07)">
+      <button class="adm-tab active" onclick="admTab('historial',this)" style="flex:1;padding:12px;background:transparent;border:none;color:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid var(--verde)">📋 Historial</button>
+      <button class="adm-tab" onclick="admTab('datos',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">🔄 Datos</button>
+      <button class="adm-tab" onclick="admTab('bankroll',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">💰 Bankroll</button>
+      <button class="adm-tab" onclick="admTab('usuarios',this);admLoadUsers();" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">👥 Usuarios</button>
+      <button class="adm-tab" onclick="admTab('config',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">🛠 Config</button>
+      <button class="adm-tab" onclick="admTab('mensajes',this);admLoadBroadcastHistory();" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;position:relative">💬 Mensajes<span id="admMsgBadge" style="display:none;position:absolute;top:6px;right:6px;background:#ef5350;color:#fff;font-size:0.6rem;font-weight:800;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center"></span></button>
+    </div>
+
+    <!-- TAB: HISTORIAL -->
+    <div id="adm-historial" class="adm-pane" style="padding:20px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button onclick="admClearHist()" style="background:rgba(255,61,61,0.12);border:1px solid rgba(255,61,61,0.4);color:#ef5350;padding:8px 16px;border-radius:10px;cursor:pointer;font-size:0.82rem;font-weight:600">🗑️ Borrar todo el historial</button>
+        <button onclick="admDeduplicateHist()" style="background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);color:var(--verde);padding:8px 16px;border-radius:10px;cursor:pointer;font-size:0.82rem;font-weight:600">🧹 Deduplicar (1 por partido)</button>
+        <button onclick="admExportHist()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 16px;border-radius:10px;cursor:pointer;font-size:0.82rem;font-weight:600">📥 Exportar CSV</button>
+      </div>
+      <div id="admHistTable" style="overflow-x:auto;border:1px solid rgba(255,255,255,0.07);border-radius:12px;max-height:360px;overflow-y:auto"></div>
+      <div id="admHistMsg" style="font-size:0.78rem;color:var(--verde);min-height:18px"></div>
+    </div>
+
+    <!-- TAB: DATOS -->
+    <div id="adm-datos" class="adm-pane" style="padding:20px;display:none;flex-direction:column;gap:12px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button onclick="admRefreshOdds()" style="background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.3);color:#64b5f6;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">🔄 Recargar Cuotas (Odds API)</button>
+        <button onclick="admRefreshScores()" style="background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);color:var(--verde);padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">📡 Recargar Marcadores</button>
+        <button onclick="admRefreshPreds()" style="background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.3);color:#ffd600;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">🔮 Regenerar Pronósticos</button>
+        <button onclick="admResolveNow()" style="background:rgba(255,112,67,0.1);border:1px solid rgba(255,112,67,0.3);color:#ff7043;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">✅ Resolver pendientes ahora</button>
+      </div>
+      <div id="admApiStatus" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;font-size:0.78rem;color:var(--texto-sec);line-height:1.8">
+        <div style="color:#fff;font-weight:600;margin-bottom:6px">Estado de APIs</div>
+        <div>🟡 Cuotas cargadas: <span id="admOddsCount">—</span> partidos</div>
+        <div>🟡 Marcadores: <span id="admScoresCount">—</span> partidos</div>
+        <div>🟡 Pronósticos activos: <span id="admPredsCount">—</span></div>
+      </div>
+
+      <!-- Diagnóstico del Worker -->
+      <button onclick="admDiagWorker()" style="background:rgba(156,39,176,0.15);border:1px solid rgba(156,39,176,0.4);color:#ce93d8;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600;width:100%">🔍 Diagnosticar conexión con el Worker</button>
+      <div id="admWorkerDiag" style="display:none;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;font-size:0.72rem;font-family:monospace;color:#e0e0e0;line-height:1.7;white-space:pre-wrap;word-break:break-all;max-height:260px;overflow-y:auto"></div>
+      <div id="admDatosMsg" style="font-size:0.78rem;color:var(--verde);min-height:18px"></div>
+    </div>
+
+    <!-- TAB: BANKROLL -->
+    <div id="adm-bankroll" class="adm-pane" style="padding:20px;display:none;flex-direction:column;gap:14px">
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px">
+        <div style="font-size:0.78rem;color:var(--texto-sec);margin-bottom:10px">Balance inicial</div>
+        <div style="display:flex;gap:8px">
+          <input id="admBankrollVal" type="number" placeholder="Ej: 1000" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 12px;border-radius:8px;font-size:0.9rem">
+          <button onclick="admSetBankroll()" style="background:var(--verde);color:#000;font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.85rem;border:none">Guardar</button>
+        </div>
+      </div>
+      <button onclick="admResetBankroll()" style="background:rgba(255,61,61,0.1);border:1px solid rgba(255,61,61,0.3);color:#ef5350;padding:10px;border-radius:10px;cursor:pointer;font-size:0.82rem;font-weight:600">🔁 Resetear bankroll al valor inicial</button>
+      <div id="admBankrollMsg" style="font-size:0.78rem;color:var(--verde);min-height:18px"></div>
+    </div>
+
+    <!-- TAB: CONFIG -->
+    <div id="adm-config" class="adm-pane" style="padding:20px;display:none;flex-direction:column;gap:12px">
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:0.82rem;color:#fff;font-weight:600">Umbral de confianza Alta (%)</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="admThreshHigh" type="number" min="50" max="90" placeholder="62" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 10px;border-radius:8px;font-size:0.9rem">
+          <span style="font-size:0.75rem;color:var(--texto-sec)">% → stake $100</span>
+        </div>
+        <div style="font-size:0.82rem;color:#fff;font-weight:600">Umbral de confianza Media (%)</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="admThreshMed" type="number" min="40" max="80" placeholder="52" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 10px;border-radius:8px;font-size:0.9rem">
+          <span style="font-size:0.75rem;color:var(--texto-sec)">% → stake $50</span>
+        </div>
+        <div style="font-size:0.82rem;color:#fff;font-weight:600">Fichas visibles (pronósticos pendientes)</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input id="admMaxCards" type="number" min="3" max="20" placeholder="6" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 10px;border-radius:8px;font-size:0.9rem">
+          <span style="font-size:0.75rem;color:var(--texto-sec)">fichas (por defecto: 6)</span>
+        </div>
+        <button onclick="admSaveConfig()" style="background:var(--verde);color:#000;font-weight:700;padding:10px;border-radius:10px;cursor:pointer;font-size:0.85rem;border:none;margin-top:4px">💾 Guardar configuración</button>
+      </div>
+      <!-- Cambiar contraseña -->
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-size:0.82rem;color:#fff;font-weight:600">🔒 Cambiar contraseña</div>
+        <input id="admNewPin1" type="password" placeholder="Nueva contraseña" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 12px;border-radius:8px;font-size:0.88rem"/>
+        <input id="admNewPin2" type="password" placeholder="Repetir contraseña" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 12px;border-radius:8px;font-size:0.88rem"/>
+        <button onclick="admChangePin()" style="background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-weight:700;padding:9px;border-radius:8px;cursor:pointer;font-size:0.82rem">Actualizar contraseña</button>
+      </div>
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;font-size:0.75rem;color:var(--texto-sec);line-height:1.8">
+        <div style="color:#fff;font-weight:600;margin-bottom:6px">🔑 Acceso al panel</div>
+        <div>Triple clic en el logo de la página</div>
+        <div>Atajo de teclado: <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">Ctrl + Shift + A</code></div>
+      </div>
+      <div id="admConfigMsg" style="font-size:0.78rem;color:var(--verde);min-height:18px"></div>
+    </div>
+
+    <!-- TAB: USUARIOS -->
+    <div id="adm-usuarios" class="adm-pane" style="padding:20px;display:none;flex-direction:column;gap:14px">
+
+      <!-- Header stats -->
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+        <div style="background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div id="admUserTotal" style="font-size:1.6rem;font-weight:800;color:var(--verde)">–</div>
+          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px">Total registrados</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center">
+          <div id="admUserHoy" style="font-size:1.6rem;font-weight:800;color:#fff">–</div>
+          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px">Nuevos hoy</div>
+        </div>
+        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center">
+          <div id="admUserSemana" style="font-size:1.6rem;font-weight:800;color:#fff">–</div>
+          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px">Esta semana</div>
+        </div>
+      </div>
+
+      <!-- G$ stats row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div style="background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div id="admGTotal" style="font-size:1.35rem;font-weight:800;color:#ffd600">–</div>
+          <div style="font-size:0.7rem;color:var(--texto-sec);margin-top:2px">G$ en circulación</div>
+        </div>
+        <div style="background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:14px;text-align:center">
+          <div id="admGAvg" style="font-size:1.35rem;font-weight:800;color:#ffd600">–</div>
+          <div style="font-size:0.7rem;color:var(--texto-sec);margin-top:2px">G$ promedio / usuario</div>
+        </div>
+      </div>
+
+      <!-- Sort buttons -->
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+        <span style="font-size:0.72rem;color:var(--texto-sec)">Ordenar:</span>
+        <button onclick="admSortUsers('date')" id="admSortDate" style="background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.75rem">📅 Más recientes</button>
+        <button onclick="admSortUsers('bal_desc')" id="admSortBalD" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.75rem">🏆 Mayor G$</button>
+        <button onclick="admSortUsers('bal_asc')" id="admSortBalA" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.75rem">📉 Menor G$</button>
+      </div>
+
+      <!-- Actions -->
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button onclick="admLoadUsers()" style="background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-weight:700;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">🔄 Actualizar</button>
+        <button onclick="localStorage.removeItem('ia_live_stats_v1');loadLiveStats();this.textContent='✅ Stats actualizadas';setTimeout(()=>this.textContent='📊 Refrescar stats hero',2000)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">📊 Refrescar stats hero</button>
+        <button onclick="admCopyEmails()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">📋 Copiar todos los emails</button>
+        <button onclick="admExportCSV()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">⬇️ Exportar CSV</button>
+      </div>
+
+      <!-- Search -->
+      <input id="admUserSearch" type="text" placeholder="🔍 Buscar por email..." oninput="admFilterUsers()"
+        style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:9px 14px;border-radius:10px;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box"/>
+
+      <!-- Status message -->
+      <div id="admUserStatus" style="font-size:0.78rem;color:var(--texto-sec);min-height:16px"></div>
+
+      <!-- User list -->
+      <div id="admUserList" style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto"></div>
+    </div>
+
+    <!-- TAB: MENSAJES -->
+    <div id="adm-mensajes" class="adm-pane" style="padding:16px;display:none;flex-direction:column;gap:12px;height:100%">
+      <div style="font-size:0.72rem;color:var(--texto-sec);background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:10px;padding:10px 12px;line-height:1.6">
+        📢 Los mensajes que envíes llegan <strong style="color:#ffd600">al instante</strong> a los usuarios conectados, y los <strong style="color:#ffd600">offline</strong> los ven la próxima vez que abran la app.
+      </div>
+      <!-- Historial de mensajes enviados -->
+      <div id="admBroadcastHistory" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:180px;max-height:300px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px">
+        <div style="text-align:center;color:var(--texto-sec);font-size:0.78rem;margin:auto">Cargando mensajes...</div>
+      </div>
+      <!-- Compose -->
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <textarea id="admBroadcastInput" placeholder="Escribí tu mensaje para todos los usuarios..." rows="3"
+          style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:10px 12px;border-radius:10px;font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;width:100%;box-sizing:border-box"
+          onkeydown="if(event.ctrlKey&&event.key==='Enter')admSendBroadcast()"></textarea>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button onclick="admSendBroadcast()" style="background:var(--verde);color:#000;font-weight:800;padding:10px 20px;border-radius:10px;cursor:pointer;font-size:0.88rem;border:none;flex-shrink:0">📢 Enviar a todos</button>
+          <span style="font-size:0.72rem;color:var(--texto-sec)">Ctrl+Enter para enviar</span>
+          <div id="admBroadcastMsg" style="font-size:0.78rem;color:var(--verde);margin-left:auto"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: Mensajes del Admin -->
+<!-- ── Burbuja flotante de mensajes admin ── -->
+<div class="bcast-bubble-wrap" id="broadcastNotifBtn">
+  <!-- X rojo esquina superior izquierda: elimina permanentemente esta burbuja -->
+  <button class="bcast-dismiss-btn" onclick="bcastDismissPermanent(event)" title="Eliminar este mensaje">✕</button>
+  <!-- Cuerpo de la burbuja — click para abrir el chat -->
+  <div class="bcast-bubble-card" onclick="showBroadcastModal()">
+    <div class="bcast-bubble-header">
+      <div class="bcast-bubble-avatar">📢</div>
+      <span class="bcast-bubble-name">gambeta.ai</span>
+      <span class="bcast-bubble-badge" id="broadcastNotifCount">1</span>
+    </div>
+    <div class="bcast-bubble-preview" id="bcastBubblePreview">Tenés un mensaje nuevo</div>
+  </div>
+</div>
+
+<!-- ── Panel de chat de mensajes (read-only) ── -->
+<div class="bcast-panel" id="broadcastModal">
+  <div class="bcast-panel-header">
+    <div class="bcast-panel-avatar">📢</div>
+    <div>
+      <div class="bcast-panel-title">gambeta.ai</div>
+      <div class="bcast-panel-sub">Mensajes del equipo · Solo lectura</div>
+    </div>
+    <button class="bcast-panel-close" onclick="closeBroadcastModal()">✕</button>
+  </div>
+  <div class="bcast-panel-msgs" id="broadcastModalContent"></div>
+  <div class="bcast-panel-footer">
+    <button class="bcast-read-btn" onclick="bcastMarkRead()">✓ Entendido</button>
+    <button class="bcast-del-btn" onclick="bcastDismissPermanent(null)">🗑 Eliminar</button>
+  </div>
+</div>
+
+<script>
+// ═══ ADMIN PANEL ═══
+// Hash SHA-256 de la contraseña admin
+const ADMIN_HASH     = '522e09aad00e0af69f0b6f8f36b3631b497313a2bf0521c672b9e4b85ba1bd51';
+let   ADMIN_HASH_RUNTIME = ADMIN_HASH;
+
+let adminClickCount = 0, adminClickTimer = null;
+let adminUnlocked   = false;
+
+async function hashPin(pin) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// Triple clic en el logo abre el panel
+document.addEventListener('DOMContentLoaded', () => {
+  // $A-Coin: init balance display + daily bonus
+  acUpdateUI();
+  acCheckDaily();
+  // Live stats in hero (async, non-blocking)
+  loadLiveStats();
+  // Broadcast mensajes del admin
+  setTimeout(() => { checkBroadcastMessages(); initBroadcastRealtime(); }, 2000);
+  // Patch historial entries que quedaron con sport='futbol' siendo basket
+  (function patchHistorialSport() {
+    const NBA_TEAMS = new Set([
+      'Lakers','Celtics','Warriors','Bulls','Heat','Knicks','Nets','Suns','Bucks','Nuggets',
+      'Clippers','Mavericks','Raptors','76ers','Sixers','Thunder','Spurs','Grizzlies','Pelicans',
+      'Hawks','Hornets','Pacers','Pistons','Wizards','Cavaliers','Timberwolves','Jazz','Kings',
+      'Trail Blazers','Magic','Rockets','Blazers','Wolves'
+    ]);
+    try {
+      const hist = JSON.parse(localStorage.getItem('apuestas_historial_v1') || '[]');
+      let changed = false;
+      hist.forEach(h => {
+        if (h.sport === 'futbol' || !h.sport) {
+          const teams = [(h.home||''), (h.away||'')];
+          const isBasket = teams.some(t => NBA_TEAMS.has(t));
+          if (isBasket) { h.sport = 'basket'; changed = true; }
+        }
+      });
+      if (changed) localStorage.setItem('apuestas_historial_v1', JSON.stringify(hist));
+    } catch(_) {}
+  })();
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const logo = document.querySelector('.logo');
+  if (logo) logo.addEventListener('click', () => {
+    adminClickCount++;
+    clearTimeout(adminClickTimer);
+    adminClickTimer = setTimeout(() => adminClickCount = 0, 700);
+    if (adminClickCount >= 3) { adminClickCount = 0; triggerAdmin(); }
+  });
+});
+// Atajo de teclado Ctrl+Shift+A
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); triggerAdmin(); }
+});
+
+function triggerAdmin() {
+  // Verificar sesión activa (válida por 4 horas)
+  try {
+    const s = JSON.parse(sessionStorage.getItem(ADMIN_SESSION)||'null');
+    if (s && s.exp > Date.now()) { openAdmin(); return; }
+  } catch {}
+  // Pedir contraseña
+  document.getElementById('adminPinOverlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('adminPinInput').focus(), 100);
+}
+
+async function submitAdminPin() {
+  const pin   = document.getElementById('adminPinInput').value;
+  const err   = document.getElementById('adminPinError');
+  if (!pin) return;
+  const hash  = await hashPin(pin);
+  // Comparar con hash almacenado en localStorage (o el default)
+  const stored = ADMIN_HASH_RUNTIME;
+  if (hash === stored) {
+    sessionStorage.setItem(ADMIN_SESSION, JSON.stringify({ exp: Date.now() + 4*3600000 }));
+    document.getElementById('adminPinOverlay').style.display = 'none';
+    document.getElementById('adminPinInput').value = '';
+    err.style.display = 'none';
+    openAdmin();
+  } else {
+    err.style.display = 'block';
+    document.getElementById('adminPinInput').value = '';
+    document.getElementById('adminPinInput').focus();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('adminPinInput');
+  if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitAdminPin(); });
+});
+
+function closeAdminPin() {
+  document.getElementById('adminPinOverlay').style.display = 'none';
+  document.getElementById('adminPinInput').value = '';
+  document.getElementById('adminPinError').style.display = 'none';
+}
+
+function openAdmin() {
+  const p = document.getElementById('adminPanel');
+  p.style.display = 'flex';
+  admRefreshStatus();
+  admRenderHistTable();
+  try {
+    const cfg = JSON.parse(localStorage.getItem(ADMIN_KEY)||'{}');
+    if (cfg.threshHigh) document.getElementById('admThreshHigh').value = cfg.threshHigh;
+    if (cfg.threshMed)  document.getElementById('admThreshMed').value  = cfg.threshMed;
+    if (cfg.maxCards)   document.getElementById('admMaxCards').value   = cfg.maxCards;
+    if (cfg.bankrollInit) document.getElementById('admBankrollVal').value = cfg.bankrollInit;
+  } catch {}
+}
+function closeAdmin() {
+  document.getElementById('adminPanel').style.display = 'none';
+}
+
+// ══════════════════════════════════════════════
+//  ONBOARDING — Primera vez en la cuenta
+// ══════════════════════════════════════════════
+const GB_NICK = 'gambeta_nickname';
+const GB_AVA  = 'gambeta_avatar';
+
+// ── Perfiles VIP — overrides forzados por email ──────────────
+const GAMBETA_VIP = {
+  'mauro.union10@gmail.com': {
+    nickname:  'Mauro Latam',
+    suffix:    ' 🎩',
+    nameColor: '#ffd600',   // dorado — se distingue del resto en tablas y ranking
+    avatar: {
+      id:    'union_santa_fe',
+      name:  'Unión Santa Fe',
+      color: '#c8002a',
+      logo:  'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Escudo_club_Atl%C3%A9tico_Uni%C3%B3n_de_santa_fe.svg/330px-Escudo_club_Atl%C3%A9tico_Uni%C3%B3n_de_santa_fe.svg.png'
+    }
+  }
+};
+
+// ── Apellidos de jugadores para asignación automática ──────────
+const PLAYER_SURNAMES = [
+  'Messi','Mbappé','Haaland','Vinicius','Salah','Kane','Lewandowski',
+  'De Bruyne','Rodri','Bellingham','Pedri','Yamal','Dembélé','Saka',
+  'Rashford','Son','Firmino','Modric','Benzema','Cavani','Suárez',
+  'Falcao','Dybala','Lautaro','Álvarez','De Paul','Mac Allister',
+  'Fernández','Paredes','Correa','Griezmann','Hernández','Gnabry',
+  'Müller','Neuer','Alisson','Ederson','Courtois','Ter Stegen',
+  'Zubimendi','Olmo','Williams','Wirtz','Guirassy','Morata','Vlahović',
+  'Osimhen','Lukaku','Pulisic','Reijnders','Theo','Leão','Giroud',
+  'Camavinga','Tchouaméni','Valverde','Carvajal','Militão','Rüdiger',
+];
+
+// Detecta si un avatar es de equipo de basket (NBA, etc.)
+function _isNbaAvatar(logo) {
+  return logo && (logo.includes('espncdn.com/i/teamlogos/nba') || logo.includes('/nba/500/'));
+}
+
+// ── Pool generado dinámicamente desde teamLogos ──────────────
+// Se construye en tiempo de ejecución: deduplica por URL (1 entrada por logo único)
+// y asigna un color de acento consistente por nombre de equipo.
+const _OB_COLOR_PALETTE = [
+  '#e10600','#003f8f','#c8aa6e','#00529b','#dc052d','#6cabdd',
+  '#f7941d','#a50044','#00944a','#ffd600','#9c27b0','#00acc1',
+  '#ff7043','#43a047','#1565c0','#6d4c41','#546e7a','#e91e63'
+];
+function _obColorFromName(name) {
+  let h = 0;
+  for (let i = 0; i < name.length; i++) h = Math.imul(31, h) + name.charCodeAt(i) | 0;
+  return _OB_COLOR_PALETTE[Math.abs(h) % _OB_COLOR_PALETTE.length];
+}
+function _buildObPool() {
+  const seen = new Set();
+  const pool = [];
+  for (const [name, url] of Object.entries(teamLogos)) {
+    if (seen.has(url)) continue; // mismo logo bajo nombre alternativo → skip
+    if (_isNbaAvatar(url)) continue; // excluir escudos de básquet/NBA
+    seen.add(url);
+    pool.push({
+      id:    name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
+      name,
+      logo:  url,
+      color: _obColorFromName(name)
+    });
+  }
+  return pool;
+}
+
 // Elige un club de fútbol al azar del pool (sin )
 function _randomFootballClub() {
   const pool = _buildObPool();
