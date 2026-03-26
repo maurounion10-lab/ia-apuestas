@@ -5708,7 +5708,6 @@ function buildPredsFromOdds() {
     (totalsMkt?.outcomes || []).forEach(o => {
       const pt = String(o.point);
         if (o.name === 'Over') overOdds[pt] = o.price;
-      }
     });
 
     // ── Probabilidades 1X2 ──
