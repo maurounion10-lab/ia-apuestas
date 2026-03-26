@@ -4047,7 +4047,6 @@ async function acLoadFromDB(email) {
     await acSyncToDB();  // guarda directamente con balance=10.000
   }
   // Run daily bonus check on the now-accurate merged balance
-  _purgeNbaPicks(); // limpiar picks NBA del historial y G$ antes de renderizar
   acCheckDaily();
   acUpdateUI();
   applyUserProfile(); // re-aplicar nick/avatar ahora que la DB está cargada
@@ -4649,72 +4648,6 @@ const teamLogos = {
   'Remo':                   'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Clube_do_Remo.svg/200px-Clube_do_Remo.svg.png',
   'Ponte Preta':            'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg/200px-Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg.png',
   'AA Ponte Preta':         'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg/200px-Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg.png',
-  // ── 🏀 NBA ──
-  'Lakers':                 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
-  'LA Lakers':              'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
-  'Los Angeles Lakers':     'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
-  'Celtics':                'https://a.espncdn.com/i/teamlogos/nba/500/bos.png',
-  'Boston Celtics':         'https://a.espncdn.com/i/teamlogos/nba/500/bos.png',
-  'Warriors':               'https://a.espncdn.com/i/teamlogos/nba/500/gs.png',
-  'Golden State Warriors':  'https://a.espncdn.com/i/teamlogos/nba/500/gs.png',
-  'Heat':                   'https://a.espncdn.com/i/teamlogos/nba/500/mia.png',
-  'Miami Heat':             'https://a.espncdn.com/i/teamlogos/nba/500/mia.png',
-  'Suns':                   'https://a.espncdn.com/i/teamlogos/nba/500/phx.png',
-  'Phoenix Suns':           'https://a.espncdn.com/i/teamlogos/nba/500/phx.png',
-  'Bucks':                  'https://a.espncdn.com/i/teamlogos/nba/500/mil.png',
-  'Milwaukee Bucks':        'https://a.espncdn.com/i/teamlogos/nba/500/mil.png',
-  'Nets':                   'https://a.espncdn.com/i/teamlogos/nba/500/bkn.png',
-  'Brooklyn Nets':          'https://a.espncdn.com/i/teamlogos/nba/500/bkn.png',
-  'Nuggets':                'https://a.espncdn.com/i/teamlogos/nba/500/den.png',
-  'Denver Nuggets':         'https://a.espncdn.com/i/teamlogos/nba/500/den.png',
-  'Knicks':                 'https://a.espncdn.com/i/teamlogos/nba/500/ny.png',
-  'New York Knicks':        'https://a.espncdn.com/i/teamlogos/nba/500/ny.png',
-  'Clippers':               'https://a.espncdn.com/i/teamlogos/nba/500/lac.png',
-  'LA Clippers':            'https://a.espncdn.com/i/teamlogos/nba/500/lac.png',
-  'Los Angeles Clippers':   'https://a.espncdn.com/i/teamlogos/nba/500/lac.png',
-  'Bulls':                  'https://a.espncdn.com/i/teamlogos/nba/500/chi.png',
-  'Chicago Bulls':          'https://a.espncdn.com/i/teamlogos/nba/500/chi.png',
-  'Spurs':                  'https://a.espncdn.com/i/teamlogos/nba/500/sa.png',
-  'San Antonio Spurs':      'https://a.espncdn.com/i/teamlogos/nba/500/sa.png',
-  '76ers':                  'https://a.espncdn.com/i/teamlogos/nba/500/phi.png',
-  'Philadelphia 76ers':     'https://a.espncdn.com/i/teamlogos/nba/500/phi.png',
-  'Sixers':                 'https://a.espncdn.com/i/teamlogos/nba/500/phi.png',
-  'Hawks':                  'https://a.espncdn.com/i/teamlogos/nba/500/atl.png',
-  'Atlanta Hawks':          'https://a.espncdn.com/i/teamlogos/nba/500/atl.png',
-  'Hornets':                'https://a.espncdn.com/i/teamlogos/nba/500/cha.png',
-  'Charlotte Hornets':      'https://a.espncdn.com/i/teamlogos/nba/500/cha.png',
-  'Wizards':                'https://a.espncdn.com/i/teamlogos/nba/500/wsh.png',
-  'Washington Wizards':     'https://a.espncdn.com/i/teamlogos/nba/500/wsh.png',
-  'Magic':                  'https://a.espncdn.com/i/teamlogos/nba/500/orl.png',
-  'Orlando Magic':          'https://a.espncdn.com/i/teamlogos/nba/500/orl.png',
-  'Kings':                  'https://a.espncdn.com/i/teamlogos/nba/500/sac.png',
-  'Sacramento Kings':       'https://a.espncdn.com/i/teamlogos/nba/500/sac.png',
-  'Pistons':                'https://a.espncdn.com/i/teamlogos/nba/500/det.png',
-  'Detroit Pistons':        'https://a.espncdn.com/i/teamlogos/nba/500/det.png',
-  'Pacers':                 'https://a.espncdn.com/i/teamlogos/nba/500/ind.png',
-  'Indiana Pacers':         'https://a.espncdn.com/i/teamlogos/nba/500/ind.png',
-  'Raptors':                'https://a.espncdn.com/i/teamlogos/nba/500/tor.png',
-  'Toronto Raptors':        'https://a.espncdn.com/i/teamlogos/nba/500/tor.png',
-  'Cavaliers':              'https://a.espncdn.com/i/teamlogos/nba/500/cle.png',
-  'Cleveland Cavaliers':    'https://a.espncdn.com/i/teamlogos/nba/500/cle.png',
-  'Timberwolves':           'https://a.espncdn.com/i/teamlogos/nba/500/min.png',
-  'Minnesota Timberwolves': 'https://a.espncdn.com/i/teamlogos/nba/500/min.png',
-  'Thunder':                'https://a.espncdn.com/i/teamlogos/nba/500/okc.png',
-  'Oklahoma City Thunder':  'https://a.espncdn.com/i/teamlogos/nba/500/okc.png',
-  'Suns':                   'https://a.espncdn.com/i/teamlogos/nba/500/phx.png',
-  'Phoenix Suns':           'https://a.espncdn.com/i/teamlogos/nba/500/phx.png',
-  'Jazz':                   'https://a.espncdn.com/i/teamlogos/nba/500/utah.png',
-  'Utah Jazz':              'https://a.espncdn.com/i/teamlogos/nba/500/utah.png',
-  'Trail Blazers':          'https://a.espncdn.com/i/teamlogos/nba/500/por.png',
-  'Portland Trail Blazers': 'https://a.espncdn.com/i/teamlogos/nba/500/por.png',
-  'Grizzlies':              'https://a.espncdn.com/i/teamlogos/nba/500/mem.png',
-  'Memphis Grizzlies':      'https://a.espncdn.com/i/teamlogos/nba/500/mem.png',
-  'Pelicans':               'https://a.espncdn.com/i/teamlogos/nba/500/no.png',
-  'New Orleans Pelicans':   'https://a.espncdn.com/i/teamlogos/nba/500/no.png',
-  'Mavericks':              'https://a.espncdn.com/i/teamlogos/nba/500/dal.png',
-  'Dallas Mavericks':       'https://a.espncdn.com/i/teamlogos/nba/500/dal.png',
-  'Rockets':                'https://a.espncdn.com/i/teamlogos/nba/500/hou.png',
-  'Houston Rockets':        'https://a.espncdn.com/i/teamlogos/nba/500/hou.png',
   // ── 🏉 RUGBY UNION – Super Rugby / Champions Cup / Premiership ──
   'Crusaders':              'https://a.espncdn.com/i/teamlogos/rugby/500/crusaders.png',
   'Blues':                  'https://a.espncdn.com/i/teamlogos/rugby/500/blues.png',
@@ -5355,7 +5288,6 @@ const scoresData = [];
 const predsData = [
   { league:'🏆 Champions League', home:'Real Madrid', away:'Man City',   rec:'Local Gana',       conf:'high', confLabel:'Alta (82%)',  probH:48, probD:22, probA:30, odds:['L:1.80','E:3.40','V:4.20'], time:'Hoy 21:00',    insight:'Real Madrid llega en gran momento con 4 victorias seguidas. City sin Rodri pierde control del juego. El Bernabéu y la presión de los aficionados pueden ser factores decisivos. Apuesta recomendada con stake moderado.',    formH:['G','G','E','G','G'], formA:['G','P','G','G','E'] },
   { league:'🇪🇸 La Liga',         home:'Barcelona',  away:'Atlético',   rec:'Ambos Marcan',     conf:'high', confLabel:'Alta (78%)',  probH:42, probD:28, probA:30, odds:['Sí:1.65','No:2.10'],       time:'Hoy 21:00',    insight:'Ambos equipos llevan más de 5 partidos seguidos convirtiendo como locales y visitantes. Barça domina con la pelota (62% posesión), Atleti es efectivo en contragolpe. Tendencia clara hacia partido con goles de ambos bandos.',          formH:['G','G','P','G','G'], formA:['G','G','P','E','G'] },
-  { league:'🏀 NBA',              home:'Lakers',     away:'Celtics',    rec:'Celtics -3.5',     conf:'med',  confLabel:'Media (64%)', probH:38, probD:0,  probA:62, odds:['L:2.10','V:1.72'],         time:'Hoy 21:30',    insight:'Celtics lidera la conferencia este con 52-18. Lakers está en zona play-in y LeBron llega con molestias. Los visitantes promedian 118 pts/partido y son el mejor equipo en pista contraria. Handicap de -3.5 tiene valor.',               formH:['P','G','G','G','P'], formA:['G','G','G','P','G'] },
   { league:'🎾 ATP Miami',        home:'Alcaraz',    away:'Djokovic',   rec:'Alcaraz Gana',     conf:'med',  confLabel:'Media (61%)', probH:55, probD:0,  probA:45, odds:['A:1.85','D:1.95'],         time:'Hoy 18:00',    insight:'Alcaraz es brillante en pista dura bajo el sol de Miami y llega con confianza tras dos torneos seguidos. Djokovic con pocos torneos en 2025 y no ha mostrado su mejor nivel. El español tiene ligera ventaja estadística en duro.',   formH:['G','G','G','P','G'], formA:['G','P','G','G','E'] },
   { league:'🇩🇪 Bundesliga',      home:'Bayern',     away:'Dortmund',   rec:'Más de 2.5 goles', conf:'high', confLabel:'Alta (76%)',  probH:55, probD:20, probA:25, odds:['+2.5:1.60','-2.5:2.20'],   time:'Hoy 20:30',    insight:'Der Klassiker promedia 3.4 goles en los últimos 8 enfrentamientos. Bayern convierte en el 89% de sus partidos en casa. Dortmund anota en el 87% de sus partidos de visita. Alta probabilidad de partido con más de 2.5 goles.',      formH:['G','G','G','E','G'], formA:['G','P','G','G','P'] },
   { league:'🇦🇷 Liga Prof.',       home:'River',      away:'Boca',       rec:'Local o Empate',   conf:'low',  confLabel:'Baja (55%)',  probH:40, probD:30, probA:30, odds:['L:2.20','E:3.00','V:3.10'], time:'Mañana 17:00', insight:'Superclásico históricamente parejo — River gana el 38%, Boca el 30%, empate 32%. Ventaja leve de River como local en el Monumental pero el resultado es altamente impredecible. Apuesta solo con stake bajo o evitar.',            formH:['G','E','G','G','P'], formA:['E','G','P','G','E'] },
@@ -5369,12 +5301,6 @@ const statsData = {
     { name:'Man City',          league:'Premier League',   form:['G','G','P','G','G'], gf:60, ga:29, pts:63, pos:'3°' },
     { name:'River Plate',       league:'Liga Profesional', form:['G','E','G','G','P'], gf:42, ga:18, pts:58, pos:'1°' },
     { name:'Boca Juniors',      league:'Liga Profesional', form:['E','G','P','G','E'], gf:35, ga:22, pts:52, pos:'3°' },
-  ],
-  basket: [
-    { name:'Boston Celtics',        league:'NBA Este',   form:['G','G','G','P','G'], gf:118, ga:105, pts:52, pos:'1° Conf Este'  },
-    { name:'LA Lakers',             league:'NBA Oeste',  form:['P','G','G','G','P'], gf:115, ga:112, pts:38, pos:'6° Conf Oeste' },
-    { name:'Golden State Warriors', league:'NBA Oeste',  form:['G','G','P','G','G'], gf:120, ga:108, pts:42, pos:'5° Conf Oeste' },
-    { name:'Miami Heat',            league:'NBA Este',   form:['G','E','G','P','G'], gf:112, ga:110, pts:36, pos:'7° Conf Este'  },
   ],
   tenis: [
     { name:'Carlos Alcaraz',  league:'ATP Ranking', form:['G','G','G','P','G'], gf:84, ga:38, pts:9800,  pos:'#2 Mundo' },
@@ -5438,47 +5364,7 @@ function renderScores(filter) {
     data = []; // forzar banner siempre
   } else {
     data = scoresData.filter(s => s.sport === filter);
-  }
-  // Fallback para basket: si no hay scores, usar partidos del endpoint /odds
-  if (data.length === 0 && filter === 'basket' && window._rawOddsGames?.length) {
-    const nowTs = Date.now();
-    // Ventana: últimas 4h (puede que empezó hace poco) hasta +36h
-    const windowStart = nowTs - 4 * 3600000;
-    const windowEnd   = nowTs + 36 * 3600000;
-    data = window._rawOddsGames
-      .filter(g => g.sport_key?.includes('basketball'))
-      .filter(g => {
-        const t = new Date(g.commence_time).getTime();
-        return t >= windowStart && t <= windowEnd;
-      })
-      .sort((a, b) => new Date(a.commence_time) - new Date(b.commence_time))
-      .map(g => {
-        const startMs  = new Date(g.commence_time).getTime();
-        const isLive   = startMs <= nowTs && startMs >= nowTs - 4 * 3600000;
-        const minsLeft = (startMs - nowTs) / 60000;
-        const isSoon   = !isLive && minsLeft >= 0 && minsLeft <= 120;
-        const flag     = isLive ? 'live' : isSoon ? 'soon' : 'upcoming';
-        return {
-          sport:    'basket',
-          league:   leagueLabel(g.sport_title),
-          home:     shortName(g.home_team),
-          away:     shortName(g.away_team),
-          homeRaw:  g.home_team,
-          awayRaw:  g.away_team,
-          scoreH:   0,
-          scoreA:   0,
-          status:   flag,
-          time:     isLive ? T('time.live') : matchTime(g.commence_time),
-          flag,
-        };
-      });
-  }
-  // Basket sin datos: si los odds aún no cargaron, mostrar skeleton en vez de "no hay partidos"
-  if (data.length === 0 && filter === 'basket' && !window._rawOddsGames) {
-    renderSkeletonScores(4);
-    return;
-  }
-  if (data.length === 0 && !_scoresFirstLoad && !BANNER_ONLY.has(filter)) {
+  }  if (data.length === 0 && !_scoresFirstLoad && !BANNER_ONLY.has(filter)) {
     // Todavía no llegaron datos de la API → mostrar skeleton
     renderSkeletonScores(6);
     return;
@@ -5664,7 +5550,6 @@ function leagueLabel(sportTitle) {
     'Serie A': 'Serie A',
     'Ligue 1 - France': 'Ligue 1',
     'Ligue 1': 'Ligue 1',
-    'NBA': 'NBA',
     'CONMEBOL Libertadores': 'Libertadores',
     'CONMEBOL Sudamericana': 'Sudamericana',
     'Campeonato Brasileiro Série A': 'Brasileirao',
@@ -5678,7 +5563,7 @@ function buildPredsFromOdds() {
   const now       = Date.now();
 
   // Prioridad por deporte (categoría general)
-  const SPORT_CAT_PRIO = { soccer:40, basketball:30, tennis:20, rugby:10, mma:10 };
+  const SPORT_CAT_PRIO = { soccer:40, tennis:20, rugby:10, mma:10 };
 
   // Prioridad por liga específica — liga más prestigiosa = número más alto
   const LEAGUE_PRIO = {
@@ -5699,8 +5584,6 @@ function buildPredsFromOdds() {
     soccer_mexico_ligamx:                   62,
     soccer_usa_mls:                         55,
     // ── Basketball ──
-    basketball_nba:                         95,
-    basketball_euroleague:                  45,
     // ── Tennis ──
     tennis_atp_french_open:                 85,
     tennis_wta_french_open:                 85,
@@ -5712,7 +5595,6 @@ function buildPredsFromOdds() {
     // Prioridad exacta si existe, sino prio de categoría
     if (LEAGUE_PRIO[k]) return LEAGUE_PRIO[k];
     if (k.includes('soccer'))     return SPORT_CAT_PRIO.soccer;
-    if (k.includes('basketball')) return SPORT_CAT_PRIO.basketball;
     if (k.includes('tennis'))     return SPORT_CAT_PRIO.tennis;
     if (k.includes('rugby'))      return SPORT_CAT_PRIO.rugby;
     return 5;
@@ -5733,22 +5615,7 @@ function buildPredsFromOdds() {
   // aunque ya haya 2+ candidatos en 24h (ej: Brasileirao hoy no debe tapar Champions mañana)
   const WINDOWS = [24, 48, 72, 120, 168];
   const TOP_PRIO_THRESHOLD = LEAGUE_PRIO.soccer_conmebol_copa_libertadores; // 99+
-
-  // Partidos de NBA que empiezan a las 3 AM ART (UTC-3) o más tarde:
-  // no publicarlos hasta las 11 AM ART del mismo día calendario
-  const ART_OFFSET_MS = -3 * 3600000; // UTC-3
-  const isNbaVisible = (g) => {
-    if (g.sport_key !== 'basketball_nba') return true;
-    const t = new Date(g.commence_time).getTime();
-    const gameArtMs   = t + ART_OFFSET_MS;                    // hora ART del partido
-    const gameArtDate = new Date(gameArtMs);
-    const gameHourArt = gameArtDate.getUTCHours();             // 0-23 en ART
-    if (gameHourArt < 3) return true;                         // arranca antes de las 3 AM → siempre visible
-    // Arranca a las 3 AM o más tarde → visible solo desde las 11 AM ART del mismo día
-    const dayStartArt = new Date(gameArtMs); dayStartArt.setUTCHours(0,0,0,0);
-    const showAfter = dayStartArt.getTime() - ART_OFFSET_MS + 11 * 3600000; // 11 AM ART en UTC
-    return now >= showAfter;
-  };
+;
 
   let candidates = [];
   for (const hours of WINDOWS) {
@@ -5758,7 +5625,6 @@ function buildPredsFromOdds() {
         const t = new Date(g.commence_time).getTime();
         return t > now && t <= windowEnd;  // estrictamente futuro
       })
-      .filter(isNbaVisible)   // NBA madrugada: no mostrar hasta las 11 AM ART
       .filter(hasH2HData)
       .sort(sortByPrioThenTime)
       .slice(0, 30);
@@ -5836,13 +5702,9 @@ function buildPredsFromOdds() {
       return null;
     };
     const totalsMkt = findMkt('totals');
-    const isBasketball = (g.sport_key || '').includes('basketball');
 
-    // Over odds — fútbol: busca líneas 1.5/2.5/3.5 · basket: detecta la línea automáticamente
+    // Over odds — fútbol: busca líneas 1.5/2.5/3.5 
     const overOdds = {};
-    let basketTotalsLine = null;
-    let basketOverOdds = null;
-    let basketUnderOdds = null;
     (totalsMkt?.outcomes || []).forEach(o => {
       const pt = String(o.point);
       if (!isBasketball) {
@@ -5970,8 +5832,6 @@ function buildPredsFromOdds() {
     if (aO) oddsPills.push(`V:${aO.toFixed(2)}`);
     if (overOdds['2.5'])    oddsPills.push(`+2.5:${parseFloat(overOdds['2.5']).toFixed(2)}`);
     if (bttsOddsEst)        oddsPills.push(`AM:${bttsOddsEst.toFixed(2)}`);
-    if (basketOverOdds)     oddsPills.push(`O${basketTotalsLine}:${parseFloat(basketOverOdds).toFixed(2)}`);
-    if (basketUnderOdds)    oddsPills.push(`U${basketTotalsLine}:${parseFloat(basketUnderOdds).toFixed(2)}`);
 
     // Insight generado por probabilidades
     const hN = shortName(g.home_team), aN = shortName(g.away_team);
@@ -5990,7 +5850,7 @@ function buildPredsFromOdds() {
         // Over/Under basket
         const isOver = rec.startsWith('Más');
         const pct    = Math.round(100 / (isOver ? basketOverOdds : basketUnderOdds));
-        insight = `Línea de puntos totales en ${line}. El mercado da ${pct}% de probabilidad al ${isOver ? 'Over' : 'Under'}${fmtO(isOver ? basketOverOdds : basketUnderOdds)}. ${hN} (${probH}% de ganar) vs ${aN} (${probA}%). Apuesta de totales NBA con valor estadístico.`;
+        insight = `Línea de puntos totales en ${line}. El mercado da ${pct}% de probabilidad al ${isOver ? 'Over' : 'Under'}${fmtO(isOver ? basketOverOdds : basketUnderOdds)}. ${hN} (${probH}% de ganar) vs ${aN} (${probA}%). Apuesta con valor estadístico.`;
       } else {
         // Más de X.5 fútbol
         const pOver = probOver[String(line)];
@@ -6085,16 +5945,6 @@ function renderPreds() {
   const _nowMs = Date.now();
   const _preserveStarted = (realPreds || []).filter(p => p.commenceTs && p.commenceTs <= _nowMs);
 
-  // Invalidar caché si hay picks de basket sin Over/Under (versión anterior sin esta lógica)
-  if (realPreds) {
-    const basketPreds = realPreds.filter(p => (p._sportKey || '').includes('basketball'));
-    const hasOU = basketPreds.some(p => p.rec && (p.rec.startsWith('Más de') || p.rec.startsWith('Menos de')));
-    if (basketPreds.length > 0 && !hasOU) {
-      localStorage.removeItem('gambeta_daily_preds_v1');
-      realPreds = null;
-    }
-  }
-
   // 2. Si no hay caché, generar desde la API y guardar
   if (!realPreds) {
     try {
@@ -6130,7 +5980,7 @@ function renderPreds() {
       .filter(h => h.date === todayStr && !realPreds.find(p => teamsMatch(p.home, h.home) && teamsMatch(p.away, h.away)))
       .forEach(h => {
         realPreds.push({
-          league:     h.sport === 'basket' ? 'NBA' : 'Fútbol',
+          league:     'Fútbol',
           home:       h.home,
           away:       h.away,
           rec:        h.rec,
@@ -6139,7 +5989,7 @@ function renderPreds() {
           probH: h.probH || 0, probD: h.probD || 0, probA: h.probA || 0,
           odds: [], time: '', bvr: 0, bvrText: '',
           commenceTs: h.commenceTs || (_nowMs - 1), // garantiza que se marque como started
-          _sportKey:  h._sportKey || (h.sport === 'basket' ? 'basketball_nba' : 'soccer_argentina_primera_division'),
+          _sportKey:  h._sportKey || 'soccer_argentina_primera_division',
           _fromHist:  true, // viene del historial, no de la API
         });
       });
@@ -6565,9 +6415,9 @@ const realStatsCache = {};
 function renderStats(sport) {
   if (!document.getElementById('statsGrid')) return;
   const data = realStatsCache[sport] || statsData[sport] || [];
-  const lbl1 = sport==='tenis'?'Juegos G.':sport==='basket'?'Pts/G Prom':'Goles F.';
-  const lbl2 = sport==='tenis'?'Juegos P.':sport==='basket'?'Pts/C Prom':'Goles C.';
-  const lbl3 = sport==='tenis'?'Pts Ranking':sport==='basket'?'Victorias':'Puntos';
+  const lbl1 = sport==='tenis'?'Juegos G.':'Goles F.';
+  const lbl2 = sport==='tenis'?'Juegos P.':'Goles C.';
+  const lbl3 = sport==='tenis'?'Pts Ranking':'Puntos';
   document.getElementById('statsGrid').innerHTML = data.length ? data.map(t => {
     const logoEl = t.badgeUrl
       ? `<img src="${t.badgeUrl}" style="width:54px;height:54px;object-fit:contain;border-radius:6px" onerror="this.style.display='none'">`
@@ -6605,9 +6455,6 @@ const ESPN_LEAGUES = {
     { code:'soccer/ita.1', label:'Serie A',        top:2 },
     { code:'soccer/arg.1', label:'Liga Prof.',     top:2 },
   ],
-  basket: [
-    { code:'basketball/nba', label:'NBA', top:8, nba:true },
-  ],
 };
 
 async function loadRealStats(sport) {
@@ -6630,7 +6477,7 @@ async function loadRealStats(sport) {
       const r = await fetch(`${ESPN}/${lg.code}/standings`);
       const j = await r.json();
 
-      // ESPN NBA tiene grupos de conferencia; fútbol tiene entries directas
+ // ESPN tiene grupos de conferencia; fútbol tiene entries directas
       let entries = [];
       if (j.standings?.entries?.length) {
         entries = j.standings.entries;
@@ -6638,7 +6485,7 @@ async function loadRealStats(sport) {
         j.children.forEach(g => {
           if (g.standings?.entries) entries.push(...g.standings.entries);
         });
-        // NBA: ordenar por victorias desc
+ // : ordenar por victorias desc
         if (lg.nba) entries.sort((a,b) => getStat(b.stats,'wins') - getStat(a.stats,'wins'));
       }
 
@@ -6755,8 +6602,7 @@ let chatOpen = false;
 
 const chatResponses = {
   'real madrid': '⚽ **Real Madrid** está en gran forma. En la Champions tienen 82% de probabilidad de clasificar según nuestro modelo. Hoy juegan contra Manchester City — la IA recomienda apostar Local (cuota 1.80) con confianza alta del 82%. ¿Querés más detalles sobre el partido?',
-  'mejor apuesta': '🔮 La **mejor apuesta del día** según la IA es: **"Más de 2.5 goles" en Bayern vs Dortmund** (cuota 1.60). El Clásico alemán promedia 3.4 goles en sus últimos 8 partidos. Valor esperado positivo de +$8.40 por cada $100 apostados.',
-  'lakers': '🏀 **Lakers vs Celtics** hoy a las 21:30. Celtics lleva 4 victorias consecutivas y domina de visitante este año. La IA recomienda **Celtics -3.5 puntos** con 64% de confianza. Cuota visitante: 1.72.',
+  'mejor apuesta': '🔮 La **mejor apuesta del día** según la IA es: **"Más de 2.5 goles" en Bayern vs Dortmund** (cuota 1.60). El Clásico alemán promedia 3.4 goles en sus últimos 8 partidos. Valor esperado positivo de +$8.40 por cada $100 apostados.', hoy a las 21:30. Celtics lleva 4 victorias consecutivas y domina de visitante este año. La IA recomienda **Celtics -3.5 puntos** con 64% de confianza. Cuota visitante: 1.72.',
   'default': (q) => `🤖 Analizando tu consulta sobre **"${q}"**...\n\nBasándome en los datos estadísticos actuales, nuestro modelo indica una tendencia positiva en los mercados relacionados. Te recomiendo revisar los pronósticos de hoy arriba, donde tenemos análisis detallados con probabilidades para los partidos más importantes. ¿Hay algún partido específico que te interese?`
 };
 
@@ -7063,7 +6909,7 @@ function savePredictions(preds) {
     const stake = p.conf === 'high' ? 100 : p.conf === 'med' ? 50 : 25;
 
     hist.unshift({
-      id, date: today, sport: p._sportKey?.includes('basketball') ? 'basket' : p._sportKey?.includes('tennis') ? 'tenis' : (p.sport || 'futbol'),
+      id, date: today, sport: p._sportKey?.includes('tennis') ? 'tenis' : (p.sport || 'futbol'),
       _sportKey: p._sportKey || null,   // guarda el API key real para resolver scores después
       home: p.home, away: p.away,
       rec: p.rec, odds: impliedOdds, stake,
@@ -7152,7 +6998,6 @@ function resolveCompletedGames(scores, skipRender) {
 
 // Mapeo sport simple → API sport keys a consultar
 const SPORT_KEY_MAP = {
-  basket:  ['basketball_nba', 'basketball_euroleague', 'basketball_ncaab'],
   futbol:  [
     'soccer_argentina_primera_division', 'soccer_brazil_campeonato',
     'soccer_conmebol_copa_libertadores', 'soccer_conmebol_copa_sudamericana',
@@ -7364,7 +7209,7 @@ function renderHistorial(filter) {
         const plHtml = h.result==='pending'||h.result==='void'
           ? '<span style="color:#555">—</span>'
           : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
-        const icon = h.sport==='basket'?'🏀':h.sport==='tenis'?'🎾':'⚽';
+        const icon = h.sport==='tenis'?'🎾':'⚽';
         const recDisplay = (h.rec||'').replace(' Gana','');
         const isHigh = h.stake === 100;
         const isToday = h.date === todayStr;
@@ -7697,15 +7542,7 @@ const matchAnalysisData = {
     probH:42,probD:28,probA:30,
     insight:'Barcelona domina estadísticamente en casa. Atlético siempre es difícil pero Barça es muy goleador. "Ambos Marcan" tiene alta probabilidad dado el estilo ofensivo de ambos equipos.'
   },
-  'Lakers-Celtics': {
-    league:'🏀 NBA', time:'Hoy 21:30', weather:'🏟 Los Angeles · Staples Center',
-    homeForm:['L','W','W','W','L'], awayForm:['W','W','W','L','W'],
-    stats:[{name:'Pts/partido',home:115,away:118,max:130},{name:'Asistencias',home:27,away:29,max:40},{name:'Rebotes',home:44,away:46,max:55},{name:'%Triples',home:36,away:38,max:50}],
-    h2h:[{date:'05/02/25',home:'Lakers',away:'Celtics',score:'114-110',res:'W'},{date:'19/01/25',home:'Celtics',away:'Lakers',score:'118-106',res:'L'},{date:'14/12/24',home:'Lakers',away:'Celtics',score:'120-131',res:'L'},{date:'08/02/24',home:'Celtics',away:'Lakers',score:'126-115',res:'L'}],
-    injuries:{home:[{name:'LeBron James',status:'doubt'},{name:'AD',status:'ok'}],away:[{name:'Jaylen Brown',status:'ok'},{name:'Tatum',status:'ok'}]},
-    probH:38,probD:0,probA:62,
-    insight:'Celtics es el mejor equipo de la conferencia este con 52-18. Lakers está en zona de play-in. Si LeBron no juega al 100%, los Celtics tienen ventaja clara. Recomendación: Celtics -3.5.'
-  },
+  'Lakers-Celtics':,
 };
 
 function togglePredExpand(idx) {
@@ -7832,7 +7669,7 @@ const teamShortNames = {
   'Girondins de Bordeaux':    'Bordeaux',
   'Toulouse FC':              'Toulouse',
   'Angers SCO':               'Angers',
-  // ── NBA ──
+ // ── ──
   'Atlanta Hawks':            'Hawks',
   'Boston Celtics':           'Celtics',
   'Brooklyn Nets':            'Nets',
@@ -7897,7 +7734,6 @@ function leagueLabel(sportTitle) {
     'English Premier League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier',
     'Bundesliga - Germany': '🇩🇪 Bundesliga',
     'Ligue 1 - France': '🇫🇷 Ligue 1',
-    'NBA': '🏀 NBA',
     'Australian Open': '🎾 Australian Open',
     'French Open': '🎾 Roland Garros',
     'Wimbledon': '🎾 Wimbledon',
@@ -7927,7 +7763,7 @@ const LANGS = {
     'nav.scores':'Marcadores','nav.pred':'Pronósticos','nav.calc':'Calculadora',
     'nav.stats':'Stats','nav.hist':'Resultados','nav.cuotas':'Cuotas',
     'nav.bankroll':'Bankroll','auth.enter':'Entrar','auth.register':'Registro Gratis',
-    'tab.all':'Todos','tab.futbol':'Fútbol','tab.basket':'Básquet',
+    'tab.all':'Todos','tab.futbol':'Fútbol',
     'tab.tenis':'Tenis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● EN VIVO','status.soon':'⚡ COMIENZA PRONTO','status.upcoming':'PRÓXIMO','status.final':'FINALIZADO',
     'time.live':'En vivo','time.final':'Final',
@@ -7949,7 +7785,7 @@ const LANGS = {
     'nav.scores':'Scores','nav.pred':'Forecasts','nav.calc':'Calculator',
     'nav.stats':'Stats','nav.hist':'Results','nav.cuotas':'Odds',
     'nav.bankroll':'Bankroll','auth.enter':'Login','auth.register':'Free Sign Up',
-    'tab.all':'All','tab.futbol':'Football','tab.basket':'Basketball',
+    'tab.all':'All','tab.futbol':'Football',
     'tab.tenis':'Tennis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● LIVE','status.soon':'⚡ STARTING SOON','status.upcoming':'UPCOMING','status.final':'FINISHED',
     'time.live':'Live','time.final':'Final',
@@ -7971,7 +7807,7 @@ const LANGS = {
     'nav.scores':'Placar','nav.pred':'Prognósticos','nav.calc':'Calculadora',
     'nav.stats':'Stats','nav.hist':'Resultados','nav.cuotas':'Odds',
     'nav.bankroll':'Bankroll','auth.enter':'Entrar','auth.register':'Registro Grátis',
-    'tab.all':'Todos','tab.futbol':'Futebol','tab.basket':'Basquete',
+    'tab.all':'Todos','tab.futbol':'Futebol',
     'tab.tenis':'Tênis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● AO VIVO','status.soon':'⚡ COMEÇA EM BREVE','status.upcoming':'PRÓXIMO','status.final':'FINALIZADO',
     'time.live':'Ao vivo','time.final':'Final',
@@ -8343,7 +8179,6 @@ async function loadRealScores(retryCount = 0) {
       soccer_south_america_copa_libertadores: 8,
       soccer_south_america_copa_sudamericana: 7,
       soccer_uefa_champs_league: 7,
-      basketball_nba: 7,
       soccer_spain_la_liga: 6,
       soccer_epl: 6,
       tennis_atp_aus_open_singles: 6, tennis_wta_aus_open_singles: 6,
@@ -8371,7 +8206,7 @@ async function loadRealScores(retryCount = 0) {
       mma_mixed_martial_arts: 4,
     };
 
-    // Partidos de hoy en horario local + madrugada (hasta las 3 AM = misma jornada NBA)
+ // Partidos de hoy en horario local + madrugada (hasta las 3 AM = misma jornada )
     const todayLocal    = new Date().toLocaleDateString('en-CA');
     const tomorrowLocal = new Date(Date.now() + 86400000).toLocaleDateString('en-CA');
 
@@ -8410,7 +8245,6 @@ async function loadRealScores(retryCount = 0) {
     const EXTRA_SPORTS = new Set(['rugby', 'ufc']);
     const getSport = key => {
       if (!key) return 'futbol';
-      if (key.includes('basketball')) return 'basket';
       if (key.includes('tennis'))     return 'tenis';
       if (key.includes('rugby'))      return 'rugby';
       if (key.includes('mma') || key.includes('boxing')) return 'ufc';
@@ -8623,7 +8457,6 @@ async function fetchGFeed() {
 //  INIT
 // ═══════════════════════════════════════════════
 
-_purgeNbaPicks(); // eliminar picks NBA del historial y G$ al cargar la página
 renderSkeletonScores(6); // mostrar skeleton mientras carga la API
 renderPreds();
 renderStats('futbol');
@@ -8660,7 +8493,7 @@ fetch(`${WORKER_URL}/available`)
     const hasTenis  = window._availableSports.some(k => k.includes('tennis'));
     const hasMMA    = window._availableSports.some(k => k.includes('mma'));
     const hasRugby  = window._availableSports.some(k => k.includes('rugby'));
-    console.log(`[API] Deportes disponibles: basketball=${hasBasket} tennis=${hasTenis} mma=${hasMMA} rugby=${hasRugby}`);
+    console.log(`[API] Deportes disponibles: tennis=${hasTenis} mma=${hasMMA} rugby=${hasRugby}`);
     console.log(`[API] Sports activos (${window._availableSports.length}):`, window._availableSports.join(', '));
     // Si el tab activo quedó vacío, re-renderizar con el mensaje correcto
     renderScores(currentScoreFilter);
@@ -9219,7 +9052,7 @@ function renderMyTips() {
 
   // Tip 4: Deportes y mercados
   tips.push({ icon: '🤖', title: 'Consejo IA del día', color: 'var(--azul)',
-    body: `La IA detecta que los mercados de tenis (ganador del partido) y NBA (total de puntos) ofrecen mayor eficiencia estadística esta semana. El modelo recomienda enfocarse en partidos con cuotas entre 1.75 y 2.10 con +65% de probabilidad implícita.` });
+    body: `La IA detecta que los mercados de tenis (ganador del partido) ofrecen mayor eficiencia estadística esta semana. El modelo recomienda enfocarse en partidos con cuotas entre 1.75 y 2.10 con +65% de probabilidad implícita.` });
 
   el.innerHTML = tips.map(t => `
     <div class="card" style="margin-bottom:12px;border-left:3px solid ${t.color}">
@@ -9556,593 +9389,7 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
   </div>`;
 }
 
-// Detecta si un nombre de equipo pertenece a la NBA por su logo en el diccionario
-function _isNbaTeam(name) {
-  if (!name) return false;
-  const url = (typeof teamLogos !== 'undefined' && teamLogos[name]) || '';
-  return _isNbaAvatar(url);
-}
-
-// Limpia picks NBA del historial de pronósticos (AC_HIST) y de los picks G$ (AC_PICK)
-function _purgeNbaPicks() {
-  try {
-    const hist = JSON.parse(localStorage.getItem(AC_HIST) || '[]');
-    const clean = hist.filter(h => {
-      if (h.sport === 'basket') return false;
-      if (h._sportKey && h._sportKey.includes('basketball')) return false;
-      if (_isNbaTeam(h.home) || _isNbaTeam(h.away)) return false;
-      return true;
-    });
-    if (clean.length !== hist.length) localStorage.setItem(AC_HIST, JSON.stringify(clean));
-  } catch(e) {}
-  try {
-    const picks = JSON.parse(localStorage.getItem(AC_PICK) || '[]');
-    const cleanPicks = picks.filter(p => {
-      if (_isNbaTeam(p.home) || _isNbaTeam(p.away)) return false;
-      if (p._sportKey && p._sportKey.includes('basketball')) return false;
-      return true;
-    });
-    if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
-  } catch(e) {}
-}
-</script>
-
-<!-- AUTH MODAL -->
-<div class="auth-overlay" id="authOverlay" onclick="authOverlayClick(event)">
-  <div class="auth-box" id="authBox">
-    <button class="auth-close" onclick="closeAuth()" aria-label="Cerrar">✕</button>
-
-    <!-- STEP 1: Elegir método -->
-    <div class="auth-step active" id="authStep1">
-      <div class="auth-brand">
-        <div style="width:52px;height:52px;border-radius:50%;overflow:hidden;border:2px solid var(--verde);flex-shrink:0">
-          <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot" style="width:100%;height:100%;object-fit:cover;object-position:50% 20%">
-        </div>
-        <span class="auth-brand-name">gambeta<span>.ai</span></span>
-      </div>
-      <div class="auth-title">Accedé gratis</div>
-      <div class="auth-subtitle">Pronósticos IA, análisis avanzado y calculadora de valor.<br>Registro en menos de 30 segundos.</div>
-
-      <button class="social-btn" onclick="selectSocial('google')">
-        <span class="sicon"><svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></span>
-        Continuar con Google
-        <span class="sarrow">›</span>
-      </button>
-
-      <div class="auth-divider">o con email</div>
-      <input class="auth-input" type="email" id="directEmail" placeholder="tu@email.com" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')sendMagicLink()">
-
-      <!-- Magic Link (opción principal) -->
-      <button class="auth-btn-main" id="magicLinkBtn" onclick="sendMagicLink()" style="margin-bottom:10px">
-        ✉️ Enviar link de acceso
-      </button>
-      <div style="font-size:0.73rem;color:var(--texto-sec);text-align:center;margin-bottom:14px;line-height:1.4">
-        Te mandamos un link a tu email — hacés clic y entrás. Sin contraseña.
-      </div>
-
-      <!-- Separador -->
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <div style="flex:1;height:1px;background:rgba(255,255,255,0.1)"></div>
-        <span style="font-size:0.7rem;color:var(--texto-sec)">o con contraseña</span>
-        <div style="flex:1;height:1px;background:rgba(255,255,255,0.1)"></div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button class="social-btn" onclick="selectSocial('email')" style="flex:1;justify-content:center;font-size:0.8rem;padding:10px 12px">
-          ✨ Crear cuenta
-        </button>
-        <button class="social-btn" onclick="goToEmailLogin()" style="flex:1;justify-content:center;font-size:0.8rem;padding:10px 12px;border-color:rgba(255,214,0,0.3);color:#ffd600">
-          🔑 Ya tengo cuenta
-        </button>
-      </div>
-
-      <div class="auth-legal">Al registrarte aceptás los <a href="#">Términos y Condiciones</a> y la <a href="#">Política de Privacidad</a>.</div>
-    </div>
-
-    <!-- STEP 2: Email + Password -->
-    <div class="auth-step" id="authStep2">
-      <button class="auth-back" onclick="authGoBack()">← Volver</button>
-      <div id="socialChip" class="auth-social-chip"></div>
-      <div class="auth-title" style="text-align:left" id="authStep2Title">Crear cuenta</div>
-      <div class="auth-subtitle" style="text-align:left;margin-bottom:16px" id="authStep2Sub">Ingresá tu email y elegí una contraseña.</div>
-      <input class="auth-input" type="email" id="leadEmail" placeholder="tu@email.com" onkeydown="if(event.key==='Enter')document.getElementById('leadPassword').focus()">
-      <input class="auth-input" type="password" id="leadPassword" placeholder="Contraseña (mín. 6 caracteres)" style="margin-top:8px" onkeydown="if(event.key==='Enter')completeAuth()">
-      <div id="emailError" style="color:var(--rojo);font-size:0.75rem;min-height:20px;padding:4px 2px"></div>
-      <div class="auth-check-row" id="marketingRow">
-        <input type="checkbox" id="marketingCheck" checked>
-        <label for="marketingCheck">Quiero recibir pronósticos diarios y alertas de valor. Podés darte de baja cuando quieras.</label>
-      </div>
-      <button class="auth-btn-main" id="authSubmitBtn" onclick="completeAuth()">✓ Crear mi cuenta gratis</button>
-      <div style="text-align:center;margin-top:14px;font-size:0.78rem;color:var(--texto-sec)">
-        <span id="authModeText">¿Ya tenés cuenta?</span>
-        <a onclick="toggleAuthMode()" style="color:var(--verde);cursor:pointer;margin-left:5px;font-weight:700;text-decoration:underline" id="authModeLink">Iniciá sesión</a>
-      </div>
-    </div>
-
-    <!-- STEP 3: Bienvenida -->
-    <div class="auth-step" id="authStep3">
-      <div class="auth-welcome">
-        <span class="auth-welcome-icon">🎉</span>
-        <div class="auth-title">¡Bienvenido/a!</div>
-        <div class="auth-subtitle" id="welcomeMsg">Tu cuenta está lista.</div>
-        <div class="auth-perks">
-          ✅ Pronósticos IA desbloqueadas<br>
-          ✅ Historial completo de apuestas<br>
-          ✅ Alertas de valor por email<br>
-          ✅ Calculadora avanzada activa<br>
-          <span class="perk-gold">⭐ Estas cuentas (por ahora) son GRATIS</span>
-        </div>
-        <button class="auth-btn-main" style="margin-top:18px" onclick="closeAuth()">Empezar a ganar →</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ═══════════════════════════════════════════════ -->
-<!-- PIN OVERLAY -->
-<div id="adminPinOverlay" style="display:none;position:fixed;inset:0;z-index:99998;background:rgba(0,0,0,0.92);backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:100px 20px 20px">
-  <div style="background:#0f1a0f;border:1px solid rgba(0,200,83,0.3);border-radius:20px;padding:32px;width:100%;max-width:340px;text-align:center;display:flex;flex-direction:column;gap:16px">
-    <div style="font-size:2rem">🔐</div>
-    <div style="font-weight:800;font-size:1rem;color:#fff">Panel Privado</div>
-    <div style="font-size:0.78rem;color:rgba(255,255,255,0.4)">Ingresá tu contraseña para continuar</div>
-    <input id="adminPinInput" type="password" placeholder="Contraseña"
-      style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:12px 16px;border-radius:12px;font-size:1rem;text-align:center;letter-spacing:4px;outline:none;width:100%;box-sizing:border-box"/>
-    <div id="adminPinError" style="display:none;font-size:0.78rem;color:#ef5350;background:rgba(255,61,61,0.1);border:1px solid rgba(255,61,61,0.3);border-radius:8px;padding:8px">
-      ⛔ Contraseña incorrecta
-    </div>
-    <button onclick="submitAdminPin()" style="background:var(--verde);color:#000;font-weight:800;padding:12px;border-radius:12px;cursor:pointer;font-size:0.95rem;border:none">Entrar</button>
-    <button onclick="closeAdminPin()" style="background:transparent;border:none;color:rgba(255,255,255,0.3);font-size:0.78rem;cursor:pointer">Cancelar</button>
-  </div>
-</div>
-
-<!-- ONBOARDING — primera vez que el usuario inicia sesión -->
-<div class="ob-overlay" id="onboardingOverlay">
-  <div class="ob-box">
-
-    <!-- Paso 1: Apodo -->
-    <div id="obStep1">
-      <div class="ob-logo">🎰</div>
-      <div class="ob-title">¿Cómo querés que te llamemos?</div>
-      <div class="ob-sub">Elegí un apodo para aparecer<br>en la comunidad gambeta.ai</div>
-      <input class="ob-input" id="obNickInput" type="text" maxlength="20" placeholder="Tu apodo..."
-        onkeydown="if(event.key==='Enter')obNext()"
-        oninput="document.getElementById('obNickErr').textContent=''">
-      <div class="ob-err" id="obNickErr"></div>
-      <button class="ob-btn" onclick="obNext()">Continuar →</button>
-    </div>
-
-    <!-- Paso 2: Escudo -->
-    <div id="obStep2" style="display:none">
-      <div class="ob-logo">🛡️</div>
-      <div class="ob-title">Elegí tu escudo</div>
-      <div class="ob-sub">Será tu avatar en gambeta.ai</div>
-      <div class="ob-clubs" id="obClubsGrid"></div>
-      <button class="ob-btn" id="obFinishBtn" onclick="obFinish()" disabled>Elegir este escudo ⚽</button>
-    </div>
-
-    <!-- Paso 3: Migración de escudo (basket → fútbol) -->
-    <div id="obStep3" style="display:none">
-      <div class="ob-logo">⚽</div>
-      <div class="ob-title">¡Nuevo escudo!</div>
-      <div class="ob-sub" style="margin-bottom:6px">Tu escudo de básquet fue reemplazado.<br>¿Querés quedarte con el asignado o elegís otro?</div>
-      <div class="ob-clubs" id="obMigrateGrid"></div>
-      <button class="ob-btn" id="obMigrateBtn" onclick="obMigrateFinish()" disabled>Confirmar escudo ✓</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- PANEL ADMIN — acceso: triple clic en logo o Ctrl+Shift+A -->
-<!-- ═══════════════════════════════════════════════ -->
-<div id="adminPanel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:9000;backdrop-filter:blur(8px);align-items:flex-start;justify-content:center;padding:70px 16px 16px">
-  <div style="background:#0f1a0f;border:1px solid rgba(0,200,83,0.4);border-radius:20px;width:100%;max-width:720px;max-height:90vh;overflow-y:auto;box-shadow:0 0 60px rgba(0,200,83,0.15)">
-    <!-- Header -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid rgba(255,255,255,0.07);position:sticky;top:0;background:#0f1a0f;z-index:1;border-radius:20px 20px 0 0">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:1.4rem">⚙️</span>
-        <div>
-          <div style="font-weight:800;font-size:1rem;color:#fff">Panel de Administración</div>
-          <div style="font-size:0.7rem;color:var(--verde);letter-spacing:.5px">ACCESO PRIVADO</div>
-        </div>
-      </div>
-      <button onclick="closeAdmin()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center">✕</button>
-    </div>
-
-    <!-- Tabs -->
-    <div style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,0.07)">
-      <button class="adm-tab active" onclick="admTab('historial',this)" style="flex:1;padding:12px;background:transparent;border:none;color:#fff;font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid var(--verde)">📋 Historial</button>
-      <button class="adm-tab" onclick="admTab('datos',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">🔄 Datos</button>
-      <button class="adm-tab" onclick="admTab('bankroll',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">💰 Bankroll</button>
-      <button class="adm-tab" onclick="admTab('usuarios',this);admLoadUsers();" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">👥 Usuarios</button>
-      <button class="adm-tab" onclick="admTab('config',this)" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent">🛠 Config</button>
-      <button class="adm-tab" onclick="admTab('mensajes',this);admLoadBroadcastHistory();" style="flex:1;padding:12px;background:transparent;border:none;color:var(--texto-sec);font-size:0.8rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;position:relative">💬 Mensajes<span id="admMsgBadge" style="display:none;position:absolute;top:6px;right:6px;background:#ef5350;color:#fff;font-size:0.6rem;font-weight:800;border-radius:50%;width:16px;height:16px;line-height:16px;text-align:center"></span></button>
-    </div>
-
-    <!-- TAB: HISTORIAL -->
-    <div id="adm-historial" class="adm-pane" style="padding:20px;display:flex;flex-direction:column;gap:12px">
-      <div style="display:flex;gap:10px;flex-wrap:wrap">
-        <button onclick="admClearHist()" style="background:rgba(255,61,61,0.12);border:1px solid rgba(255,61,61,0.4);color:#ef5350;padding:8px 16px;border-radius:10px;cursor:pointer;font-size:0.82rem;font-weight:600">🗑️ Borrar todo el historial</button>
-        <button onclick="admDeduplicateHist()" style="background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);color:var(--verde);padding:8px 16px;border-radius:10px;cursor:pointer;font-size:0.82rem;font-weight:600">🧹 Deduplicar (1 por partido)</button>
-        <button onclick="admExportHist()" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 16px;border-radius:10px;cursor:pointer;font-size:0.82rem;font-weight:600">📥 Exportar CSV</button>
-      </div>
-      <div id="admHistTable" style="overflow-x:auto;border:1px solid rgba(255,255,255,0.07);border-radius:12px;max-height:360px;overflow-y:auto"></div>
-      <div id="admHistMsg" style="font-size:0.78rem;color:var(--verde);min-height:18px"></div>
-    </div>
-
-    <!-- TAB: DATOS -->
-    <div id="adm-datos" class="adm-pane" style="padding:20px;display:none;flex-direction:column;gap:12px">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <button onclick="admRefreshOdds()" style="background:rgba(0,180,255,0.1);border:1px solid rgba(0,180,255,0.3);color:#64b5f6;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">🔄 Recargar Cuotas (Odds API)</button>
-        <button onclick="admRefreshScores()" style="background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);color:var(--verde);padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">📡 Recargar Marcadores</button>
-        <button onclick="admRefreshPreds()" style="background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.3);color:#ffd600;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">🔮 Regenerar Pronósticos</button>
-        <button onclick="admResolveNow()" style="background:rgba(255,112,67,0.1);border:1px solid rgba(255,112,67,0.3);color:#ff7043;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">✅ Resolver pendientes ahora</button>
-      </div>
-      <div id="admApiStatus" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;font-size:0.78rem;color:var(--texto-sec);line-height:1.8">
-        <div style="color:#fff;font-weight:600;margin-bottom:6px">Estado de APIs</div>
-        <div>🟡 Cuotas cargadas: <span id="admOddsCount">—</span> partidos</div>
-        <div>🟡 Marcadores: <span id="admScoresCount">—</span> partidos</div>
-        <div>🟡 Pronósticos activos: <span id="admPredsCount">—</span></div>
-      </div>
-
-      <!-- Diagnóstico del Worker -->
-      <button onclick="admDiagWorker()" style="background:rgba(156,39,176,0.15);border:1px solid rgba(156,39,176,0.4);color:#ce93d8;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600;width:100%">🔍 Diagnosticar conexión con el Worker</button>
-      <div id="admWorkerDiag" style="display:none;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:14px;font-size:0.72rem;font-family:monospace;color:#e0e0e0;line-height:1.7;white-space:pre-wrap;word-break:break-all;max-height:260px;overflow-y:auto"></div>
-      <div id="admDatosMsg" style="font-size:0.78rem;color:var(--verde);min-height:18px"></div>
-    </div>
-
-    <!-- TAB: BANKROLL -->
-    <div id="adm-bankroll" class="adm-pane" style="padding:20px;display:none;flex-direction:column;gap:14px">
-      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px">
-        <div style="font-size:0.78rem;color:var(--texto-sec);margin-bottom:10px">Balance inicial</div>
-        <div style="display:flex;gap:8px">
-          <input id="admBankrollVal" type="number" placeholder="Ej: 1000" style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 12px;border-radius:8px;font-size:0.9rem">
-          <button onclick="admSetBankroll()" style="background:var(--verde);color:#000;font-weight:700;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:0.85rem;border:none">Guardar</button>
-        </div>
-      </div>
-      <button onclick="admResetBankroll()" style="background:rgba(255,61,61,0.1);border:1px solid rgba(255,61,61,0.3);color:#ef5350;padding:10px;border-radius:10px;cursor:pointer;font-size:0.82rem;font-weight:600">🔁 Resetear bankroll al valor inicial</button>
-      <div id="admBankrollMsg" style="font-size:0.78rem;color:var(--verde);min-height:18px"></div>
-    </div>
-
-    <!-- TAB: CONFIG -->
-    <div id="adm-config" class="adm-pane" style="padding:20px;display:none;flex-direction:column;gap:12px">
-      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
-        <div style="font-size:0.82rem;color:#fff;font-weight:600">Umbral de confianza Alta (%)</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="admThreshHigh" type="number" min="50" max="90" placeholder="62" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 10px;border-radius:8px;font-size:0.9rem">
-          <span style="font-size:0.75rem;color:var(--texto-sec)">% → stake $100</span>
-        </div>
-        <div style="font-size:0.82rem;color:#fff;font-weight:600">Umbral de confianza Media (%)</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="admThreshMed" type="number" min="40" max="80" placeholder="52" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 10px;border-radius:8px;font-size:0.9rem">
-          <span style="font-size:0.75rem;color:var(--texto-sec)">% → stake $50</span>
-        </div>
-        <div style="font-size:0.82rem;color:#fff;font-weight:600">Fichas visibles (pronósticos pendientes)</div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <input id="admMaxCards" type="number" min="3" max="20" placeholder="6" style="width:80px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 10px;border-radius:8px;font-size:0.9rem">
-          <span style="font-size:0.75rem;color:var(--texto-sec)">fichas (por defecto: 6)</span>
-        </div>
-        <button onclick="admSaveConfig()" style="background:var(--verde);color:#000;font-weight:700;padding:10px;border-radius:10px;cursor:pointer;font-size:0.85rem;border:none;margin-top:4px">💾 Guardar configuración</button>
-      </div>
-      <!-- Cambiar contraseña -->
-      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
-        <div style="font-size:0.82rem;color:#fff;font-weight:600">🔒 Cambiar contraseña</div>
-        <input id="admNewPin1" type="password" placeholder="Nueva contraseña" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 12px;border-radius:8px;font-size:0.88rem"/>
-        <input id="admNewPin2" type="password" placeholder="Repetir contraseña" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:8px 12px;border-radius:8px;font-size:0.88rem"/>
-        <button onclick="admChangePin()" style="background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-weight:700;padding:9px;border-radius:8px;cursor:pointer;font-size:0.82rem">Actualizar contraseña</button>
-      </div>
-      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;font-size:0.75rem;color:var(--texto-sec);line-height:1.8">
-        <div style="color:#fff;font-weight:600;margin-bottom:6px">🔑 Acceso al panel</div>
-        <div>Triple clic en el logo de la página</div>
-        <div>Atajo de teclado: <code style="background:rgba(255,255,255,0.08);padding:1px 6px;border-radius:4px">Ctrl + Shift + A</code></div>
-      </div>
-      <div id="admConfigMsg" style="font-size:0.78rem;color:var(--verde);min-height:18px"></div>
-    </div>
-
-    <!-- TAB: USUARIOS -->
-    <div id="adm-usuarios" class="adm-pane" style="padding:20px;display:none;flex-direction:column;gap:14px">
-
-      <!-- Header stats -->
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
-        <div style="background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2);border-radius:12px;padding:14px;text-align:center">
-          <div id="admUserTotal" style="font-size:1.6rem;font-weight:800;color:var(--verde)">–</div>
-          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px">Total registrados</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center">
-          <div id="admUserHoy" style="font-size:1.6rem;font-weight:800;color:#fff">–</div>
-          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px">Nuevos hoy</div>
-        </div>
-        <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center">
-          <div id="admUserSemana" style="font-size:1.6rem;font-weight:800;color:#fff">–</div>
-          <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px">Esta semana</div>
-        </div>
-      </div>
-
-      <!-- G$ stats row -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:14px;text-align:center">
-          <div id="admGTotal" style="font-size:1.35rem;font-weight:800;color:#ffd600">–</div>
-          <div style="font-size:0.7rem;color:var(--texto-sec);margin-top:2px">G$ en circulación</div>
-        </div>
-        <div style="background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:14px;text-align:center">
-          <div id="admGAvg" style="font-size:1.35rem;font-weight:800;color:#ffd600">–</div>
-          <div style="font-size:0.7rem;color:var(--texto-sec);margin-top:2px">G$ promedio / usuario</div>
-        </div>
-      </div>
-
-      <!-- Sort buttons -->
-      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
-        <span style="font-size:0.72rem;color:var(--texto-sec)">Ordenar:</span>
-        <button onclick="admSortUsers('date')" id="admSortDate" style="background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.75rem">📅 Más recientes</button>
-        <button onclick="admSortUsers('bal_desc')" id="admSortBalD" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.75rem">🏆 Mayor G$</button>
-        <button onclick="admSortUsers('bal_asc')" id="admSortBalA" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.75rem">📉 Menor G$</button>
-      </div>
-
-      <!-- Actions -->
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button onclick="admLoadUsers()" style="background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-weight:700;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">🔄 Actualizar</button>
-        <button onclick="localStorage.removeItem('ia_live_stats_v1');loadLiveStats();this.textContent='✅ Stats actualizadas';setTimeout(()=>this.textContent='📊 Refrescar stats hero',2000)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">📊 Refrescar stats hero</button>
-        <button onclick="admCopyEmails()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">📋 Copiar todos los emails</button>
-        <button onclick="admExportCSV()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:9px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem">⬇️ Exportar CSV</button>
-      </div>
-
-      <!-- Search -->
-      <input id="admUserSearch" type="text" placeholder="🔍 Buscar por email..." oninput="admFilterUsers()"
-        style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:9px 14px;border-radius:10px;font-size:0.85rem;outline:none;width:100%;box-sizing:border-box"/>
-
-      <!-- Status message -->
-      <div id="admUserStatus" style="font-size:0.78rem;color:var(--texto-sec);min-height:16px"></div>
-
-      <!-- User list -->
-      <div id="admUserList" style="display:flex;flex-direction:column;gap:6px;max-height:320px;overflow-y:auto"></div>
-    </div>
-
-    <!-- TAB: MENSAJES -->
-    <div id="adm-mensajes" class="adm-pane" style="padding:16px;display:none;flex-direction:column;gap:12px;height:100%">
-      <div style="font-size:0.72rem;color:var(--texto-sec);background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:10px;padding:10px 12px;line-height:1.6">
-        📢 Los mensajes que envíes llegan <strong style="color:#ffd600">al instante</strong> a los usuarios conectados, y los <strong style="color:#ffd600">offline</strong> los ven la próxima vez que abran la app.
-      </div>
-      <!-- Historial de mensajes enviados -->
-      <div id="admBroadcastHistory" style="flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:8px;min-height:180px;max-height:300px;background:rgba(0,0,0,0.25);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:12px">
-        <div style="text-align:center;color:var(--texto-sec);font-size:0.78rem;margin:auto">Cargando mensajes...</div>
-      </div>
-      <!-- Compose -->
-      <div style="display:flex;flex-direction:column;gap:8px">
-        <textarea id="admBroadcastInput" placeholder="Escribí tu mensaje para todos los usuarios..." rows="3"
-          style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:10px 12px;border-radius:10px;font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;width:100%;box-sizing:border-box"
-          onkeydown="if(event.ctrlKey&&event.key==='Enter')admSendBroadcast()"></textarea>
-        <div style="display:flex;gap:8px;align-items:center">
-          <button onclick="admSendBroadcast()" style="background:var(--verde);color:#000;font-weight:800;padding:10px 20px;border-radius:10px;cursor:pointer;font-size:0.88rem;border:none;flex-shrink:0">📢 Enviar a todos</button>
-          <span style="font-size:0.72rem;color:var(--texto-sec)">Ctrl+Enter para enviar</span>
-          <div id="admBroadcastMsg" style="font-size:0.78rem;color:var(--verde);margin-left:auto"></div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- MODAL: Mensajes del Admin -->
-<!-- ── Burbuja flotante de mensajes admin ── -->
-<div class="bcast-bubble-wrap" id="broadcastNotifBtn">
-  <!-- X rojo esquina superior izquierda: elimina permanentemente esta burbuja -->
-  <button class="bcast-dismiss-btn" onclick="bcastDismissPermanent(event)" title="Eliminar este mensaje">✕</button>
-  <!-- Cuerpo de la burbuja — click para abrir el chat -->
-  <div class="bcast-bubble-card" onclick="showBroadcastModal()">
-    <div class="bcast-bubble-header">
-      <div class="bcast-bubble-avatar">📢</div>
-      <span class="bcast-bubble-name">gambeta.ai</span>
-      <span class="bcast-bubble-badge" id="broadcastNotifCount">1</span>
-    </div>
-    <div class="bcast-bubble-preview" id="bcastBubblePreview">Tenés un mensaje nuevo</div>
-  </div>
-</div>
-
-<!-- ── Panel de chat de mensajes (read-only) ── -->
-<div class="bcast-panel" id="broadcastModal">
-  <div class="bcast-panel-header">
-    <div class="bcast-panel-avatar">📢</div>
-    <div>
-      <div class="bcast-panel-title">gambeta.ai</div>
-      <div class="bcast-panel-sub">Mensajes del equipo · Solo lectura</div>
-    </div>
-    <button class="bcast-panel-close" onclick="closeBroadcastModal()">✕</button>
-  </div>
-  <div class="bcast-panel-msgs" id="broadcastModalContent"></div>
-  <div class="bcast-panel-footer">
-    <button class="bcast-read-btn" onclick="bcastMarkRead()">✓ Entendido</button>
-    <button class="bcast-del-btn" onclick="bcastDismissPermanent(null)">🗑 Eliminar</button>
-  </div>
-</div>
-
-<script>
-// ═══ ADMIN PANEL ═══
-// Hash SHA-256 de la contraseña admin
-const ADMIN_HASH     = '522e09aad00e0af69f0b6f8f36b3631b497313a2bf0521c672b9e4b85ba1bd51';
-let   ADMIN_HASH_RUNTIME = ADMIN_HASH;
-
-let adminClickCount = 0, adminClickTimer = null;
-let adminUnlocked   = false;
-
-async function hashPin(pin) {
-  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(pin));
-  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
-}
-
-// Triple clic en el logo abre el panel
-document.addEventListener('DOMContentLoaded', () => {
-  // $A-Coin: init balance display + daily bonus
-  acUpdateUI();
-  acCheckDaily();
-  // Live stats in hero (async, non-blocking)
-  loadLiveStats();
-  // Broadcast mensajes del admin
-  setTimeout(() => { checkBroadcastMessages(); initBroadcastRealtime(); }, 2000);
-  // Patch historial entries que quedaron con sport='futbol' siendo basket
-  (function patchHistorialSport() {
-    const NBA_TEAMS = new Set([
-      'Lakers','Celtics','Warriors','Bulls','Heat','Knicks','Nets','Suns','Bucks','Nuggets',
-      'Clippers','Mavericks','Raptors','76ers','Sixers','Thunder','Spurs','Grizzlies','Pelicans',
-      'Hawks','Hornets','Pacers','Pistons','Wizards','Cavaliers','Timberwolves','Jazz','Kings',
-      'Trail Blazers','Magic','Rockets','Blazers','Wolves'
-    ]);
-    try {
-      const hist = JSON.parse(localStorage.getItem('apuestas_historial_v1') || '[]');
-      let changed = false;
-      hist.forEach(h => {
-        if (h.sport === 'futbol' || !h.sport) {
-          const teams = [(h.home||''), (h.away||'')];
-          const isBasket = teams.some(t => NBA_TEAMS.has(t));
-          if (isBasket) { h.sport = 'basket'; changed = true; }
-        }
-      });
-      if (changed) localStorage.setItem('apuestas_historial_v1', JSON.stringify(hist));
-    } catch(_) {}
-  })();
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-  const logo = document.querySelector('.logo');
-  if (logo) logo.addEventListener('click', () => {
-    adminClickCount++;
-    clearTimeout(adminClickTimer);
-    adminClickTimer = setTimeout(() => adminClickCount = 0, 700);
-    if (adminClickCount >= 3) { adminClickCount = 0; triggerAdmin(); }
-  });
-});
-// Atajo de teclado Ctrl+Shift+A
-document.addEventListener('keydown', e => {
-  if (e.ctrlKey && e.shiftKey && e.key === 'A') { e.preventDefault(); triggerAdmin(); }
-});
-
-function triggerAdmin() {
-  // Verificar sesión activa (válida por 4 horas)
-  try {
-    const s = JSON.parse(sessionStorage.getItem(ADMIN_SESSION)||'null');
-    if (s && s.exp > Date.now()) { openAdmin(); return; }
-  } catch {}
-  // Pedir contraseña
-  document.getElementById('adminPinOverlay').style.display = 'flex';
-  setTimeout(() => document.getElementById('adminPinInput').focus(), 100);
-}
-
-async function submitAdminPin() {
-  const pin   = document.getElementById('adminPinInput').value;
-  const err   = document.getElementById('adminPinError');
-  if (!pin) return;
-  const hash  = await hashPin(pin);
-  // Comparar con hash almacenado en localStorage (o el default)
-  const stored = ADMIN_HASH_RUNTIME;
-  if (hash === stored) {
-    sessionStorage.setItem(ADMIN_SESSION, JSON.stringify({ exp: Date.now() + 4*3600000 }));
-    document.getElementById('adminPinOverlay').style.display = 'none';
-    document.getElementById('adminPinInput').value = '';
-    err.style.display = 'none';
-    openAdmin();
-  } else {
-    err.style.display = 'block';
-    document.getElementById('adminPinInput').value = '';
-    document.getElementById('adminPinInput').focus();
-  }
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const inp = document.getElementById('adminPinInput');
-  if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') submitAdminPin(); });
-});
-
-function closeAdminPin() {
-  document.getElementById('adminPinOverlay').style.display = 'none';
-  document.getElementById('adminPinInput').value = '';
-  document.getElementById('adminPinError').style.display = 'none';
-}
-
-function openAdmin() {
-  const p = document.getElementById('adminPanel');
-  p.style.display = 'flex';
-  admRefreshStatus();
-  admRenderHistTable();
-  try {
-    const cfg = JSON.parse(localStorage.getItem(ADMIN_KEY)||'{}');
-    if (cfg.threshHigh) document.getElementById('admThreshHigh').value = cfg.threshHigh;
-    if (cfg.threshMed)  document.getElementById('admThreshMed').value  = cfg.threshMed;
-    if (cfg.maxCards)   document.getElementById('admMaxCards').value   = cfg.maxCards;
-    if (cfg.bankrollInit) document.getElementById('admBankrollVal').value = cfg.bankrollInit;
-  } catch {}
-}
-function closeAdmin() {
-  document.getElementById('adminPanel').style.display = 'none';
-}
-
-// ══════════════════════════════════════════════
-//  ONBOARDING — Primera vez en la cuenta
-// ══════════════════════════════════════════════
-const GB_NICK = 'gambeta_nickname';
-const GB_AVA  = 'gambeta_avatar';
-
-// ── Perfiles VIP — overrides forzados por email ──────────────
-const GAMBETA_VIP = {
-  'mauro.union10@gmail.com': {
-    nickname:  'Mauro Latam',
-    suffix:    ' 🎩',
-    nameColor: '#ffd600',   // dorado — se distingue del resto en tablas y ranking
-    avatar: {
-      id:    'union_santa_fe',
-      name:  'Unión Santa Fe',
-      color: '#c8002a',
-      logo:  'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7c/Escudo_club_Atl%C3%A9tico_Uni%C3%B3n_de_santa_fe.svg/330px-Escudo_club_Atl%C3%A9tico_Uni%C3%B3n_de_santa_fe.svg.png'
-    }
-  }
-};
-
-// ── Apellidos de jugadores para asignación automática ──────────
-const PLAYER_SURNAMES = [
-  'Messi','Mbappé','Haaland','Vinicius','Salah','Kane','Lewandowski',
-  'De Bruyne','Rodri','Bellingham','Pedri','Yamal','Dembélé','Saka',
-  'Rashford','Son','Firmino','Modric','Benzema','Cavani','Suárez',
-  'Falcao','Dybala','Lautaro','Álvarez','De Paul','Mac Allister',
-  'Fernández','Paredes','Correa','Griezmann','Hernández','Gnabry',
-  'Müller','Neuer','Alisson','Ederson','Courtois','Ter Stegen',
-  'Zubimendi','Olmo','Williams','Wirtz','Guirassy','Morata','Vlahović',
-  'Osimhen','Lukaku','Pulisic','Reijnders','Theo','Leão','Giroud',
-  'Camavinga','Tchouaméni','Valverde','Carvajal','Militão','Rüdiger',
-];
-
-// Detecta si un avatar es de equipo de basket (NBA, etc.)
-function _isNbaAvatar(logo) {
-  return logo && (logo.includes('espncdn.com/i/teamlogos/nba') || logo.includes('/nba/500/'));
-}
-
-// ── Pool generado dinámicamente desde teamLogos ──────────────
-// Se construye en tiempo de ejecución: deduplica por URL (1 entrada por logo único)
-// y asigna un color de acento consistente por nombre de equipo.
-const _OB_COLOR_PALETTE = [
-  '#e10600','#003f8f','#c8aa6e','#00529b','#dc052d','#6cabdd',
-  '#f7941d','#a50044','#00944a','#ffd600','#9c27b0','#00acc1',
-  '#ff7043','#43a047','#1565c0','#6d4c41','#546e7a','#e91e63'
-];
-function _obColorFromName(name) {
-  let h = 0;
-  for (let i = 0; i < name.length; i++) h = Math.imul(31, h) + name.charCodeAt(i) | 0;
-  return _OB_COLOR_PALETTE[Math.abs(h) % _OB_COLOR_PALETTE.length];
-}
-function _buildObPool() {
-  const seen = new Set();
-  const pool = [];
-  for (const [name, url] of Object.entries(teamLogos)) {
-    if (seen.has(url)) continue; // mismo logo bajo nombre alternativo → skip
-    if (_isNbaAvatar(url)) continue; // excluir escudos de básquet/NBA
-    seen.add(url);
-    pool.push({
-      id:    name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
-      name,
-      logo:  url,
-      color: _obColorFromName(name)
-    });
-  }
-  return pool;
-}
-
-// Elige un club de fútbol al azar del pool (sin NBA)
+// Elige un club de fútbol al azar del pool (sin )
 function _randomFootballClub() {
   const pool = _buildObPool();
   return pool[Math.floor(Math.random() * pool.length)];
@@ -11873,7 +11120,6 @@ function aiChannelsCard(msgEl) {
       ${[
         ['🌐 Principal',   'https://t.me/+f35dS09pzrI1ZTA5'],
         ['⚽ Fútbol',       'https://t.me/elseleccionado'],
-        ['🏀 NBA',          'https://t.me/PicksNBAproarg'],
         ['🎾 Tenis',        'https://t.me/TenisLATAM'],
         ['🏉 Rugby',        'https://t.me/apuestasrugby'],
         ['🎁 Destraba',     'https://t.me/canaldestrababonos'],
@@ -11916,9 +11162,7 @@ function aiNeedsWeb(msg) {
 }
 
 function _aiDetectSport(msg) {
-  const t = (msg || '').toLowerCase();
-  if (/\b(nba|basket|básquet|basquet|baloncesto|canasta|lakers|celtics|warriors|bulls|heat|spurs|knicks|bucks|nets|suns|nuggets|clippers|thunder|pelicans|pistons|raptors|jazz|grizzlies|hawks|wizards|blazers|pacers|hornets|magic|kings|cavaliers|timberwolves|rockets|mavericks|spurs)\b/.test(t)) return '🏀';
-  if (/\b(tenis|tennis|atp|wta|wimbledon|roland.?garros|us.?open|australian.?open|djokovic|alcaraz|nadal|federer|sinner|swiatek|raqueta|set|game|match.?point)\b/.test(t)) return '🎾';
+  const t = (msg || '').toLowerCase();  if (/\b(tenis|tennis|atp|wta|wimbledon|roland.?garros|us.?open|australian.?open|djokovic|alcaraz|nadal|federer|sinner|swiatek|raqueta|set|game|match.?point)\b/.test(t)) return '🎾';
   if (/\b(nfl|american.?football|superbowl|super.?bowl|touchdown|quarterback|patriots|cowboys|chiefs|eagles|49ers|packers|ravens|broncos|chargers|raiders|bears|giants|jets|dolphins|bills|colts|titans|jaguars|texans|lions|vikings|falcons|saints|bucs|buccaneers|panthers|cardinals|seahawks|rams)\b/.test(t)) return '🏈';
   if (/\b(baseball|béisbol|beisbol|mlb|yankees|dodgers|red.?sox|cubs|mets|giants|cardinals|braves|astros|padres|phillies|mariners|rangers|orioles|tigers|twins|rays|guardians|royals|white.?sox|pirates|brewers|diamondbacks|rockies|athletics|nationals|marlins|reds|angels)\b/.test(t)) return '⚾';
   if (/\b(rugby|six.?nations|all.?blacks|springboks|wallabies|premiership.?rugby|top.?14|rugby.?world.?cup|tries|scrum|lineout)\b/.test(t)) return '🏉';
@@ -12560,7 +11804,7 @@ async function admVerPicks(email) {
 
     const resultIcon = r => r === 'win' ? '✅' : r === 'loss' ? '❌' : '⏳';
     const resultColor= r => r === 'win' ? 'var(--verde)' : r === 'loss' ? 'var(--rojo)' : '#ffd600';
-    const sportIcon  = s => ({ futbol:'⚽', basket:'🏀', tenis:'🎾', americano:'🏈' }[s] || '🎲');
+    const sportIcon  = s => ({ futbol:'⚽', tenis:'🎾', americano:'🏈' }[s] || '🎲');
 
     listEl.innerHTML = hist.map(p => {
       // historial_full usa: date, rec, stake, pl — NO ts/pick/betAmount
