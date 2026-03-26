@@ -5615,7 +5615,6 @@ function buildPredsFromOdds() {
   // aunque ya haya 2+ candidatos en 24h (ej: Brasileirao hoy no debe tapar Champions mañana)
   const WINDOWS = [24, 48, 72, 120, 168];
   const TOP_PRIO_THRESHOLD = LEAGUE_PRIO.soccer_conmebol_copa_libertadores; // 99+
-;
 
   let candidates = [];
   for (const hours of WINDOWS) {
@@ -5626,6 +5625,7 @@ function buildPredsFromOdds() {
         return t > now && t <= windowEnd;  // estrictamente futuro
       })
       .filter(hasH2HData)
+      .filter(g => !g.sport_key?.includes('basketball'))  // excluir NBA — solo fútbol/tenis/rugby
       .sort(sortByPrioThenTime)
       .slice(0, 30);
     // Cortar solo si: hay 2+ candidatos Y ya cubrimos 48h (para no perder Champions/Libertadores de mañana)
@@ -5645,6 +5645,7 @@ function buildPredsFromOdds() {
     candidates = window._rawOddsGames
       .filter(g => new Date(g.commence_time).getTime() > now)
       .filter(hasH2HData)
+      .filter(g => !g.sport_key?.includes('basketball'))  // excluir NBA
       .sort(sortByPrioThenTime)
       .slice(0, 18);
   }
@@ -5653,6 +5654,7 @@ function buildPredsFromOdds() {
     console.warn('[Preds] Fallback L2: sin filtro de tiempo — mostrando cualquier partido con h2h');
     candidates = window._rawOddsGames
       .filter(hasH2HData)
+      .filter(g => !g.sport_key?.includes('basketball'))  // excluir NBA
       .sort(sortByPrioThenTime)
       .slice(0, 18);
   }
@@ -5898,6 +5900,15 @@ function renderPreds() {
   // Guardar partidos ya iniciados ANTES de cualquier invalidación para no perderlos
   const _nowMs = Date.now();
   const _preserveStarted = (realPreds || []).filter(p => p.commenceTs && p.commenceTs <= _nowMs);
+
+  // Invalidar caché si contiene picks de basket (quedaron del día anterior a la eliminación de NBA)
+  if (realPreds) {
+    const hasBasketPreds = realPreds.some(p => (p._sportKey || '').includes('basketball'));
+    if (hasBasketPreds) {
+      try { localStorage.removeItem('gambeta_daily_preds_v1'); } catch(_) {}
+      realPreds = null;
+    }
+  }
 
   // 2. Si no hay caché, generar desde la API y guardar
   if (!realPreds) {
