@@ -2540,6 +2540,9 @@
   .hist-date-btn:hover { border-color:rgba(0,200,83,0.35); color:var(--verde); }
   .hist-date-btn.active { background:rgba(0,200,83,0.14); border-color:rgba(0,200,83,0.5); color:var(--verde); }
   .hist-date-btn.finde-btn.active { background:rgba(255,214,0,0.12); border-color:rgba(255,214,0,0.5); color:var(--amarillo); }
+  .hist-date-btn.conf-high-btn.active { background:rgba(0,200,83,0.14); border-color:rgba(0,200,83,0.5); color:var(--verde); }
+  .hist-date-btn.conf-med-btn.active  { background:rgba(255,214,0,0.12); border-color:rgba(255,214,0,0.5); color:var(--amarillo); }
+  .hist-date-btn.conf-low-btn.active  { background:rgba(100,149,237,0.14); border-color:rgba(100,149,237,0.5); color:#6495ed; }
   /* ── League sub-filter ── */
   .hist-league-filters { display:flex; flex-wrap:wrap; gap:6px; margin-top:0; }
   .hist-league-btn { background:transparent; border:1px solid rgba(255,255,255,0.08); color:var(--texto-sec); padding:4px 10px; border-radius:14px; font-size:0.68rem; font-weight:700; cursor:pointer; transition:all .15s; white-space:nowrap; line-height:1.4; }
@@ -3772,6 +3775,13 @@
       <button id="histDateBtnHoy"   class="hist-date-btn"           onclick="filterHistDate('today',this)">📅 Hoy</button>
       <button id="histDateBtnFinde" class="hist-date-btn finde-btn" onclick="filterHistDate('finde',this)">🏟️ Finde</button>
       <button id="histDateBtnWeek"  class="hist-date-btn"           onclick="filterHistDate('week',this)">📆 Semana</button>
+    </div>
+    <!-- Filtros de confianza -->
+    <div class="hist-date-filters" style="margin-top:6px">
+      <button id="histConfBtnAll"  class="hist-date-btn active"        onclick="filterHistConf('all',this)">🎯 Todas</button>
+      <button id="histConfBtnHigh" class="hist-date-btn conf-high-btn" onclick="filterHistConf('high',this)">🔥 Alta</button>
+      <button id="histConfBtnMed"  class="hist-date-btn conf-med-btn"  onclick="filterHistConf('med',this)">⭐ Media</button>
+      <button id="histConfBtnLow"  class="hist-date-btn conf-low-btn"  onclick="filterHistConf('low',this)">📉 Baja</button>
     </div>
     <!-- Banner resumen finde (se muestra sólo cuando el filtro es 'finde') -->
     <div id="findeBanner" class="finde-banner" style="display:none"></div>
@@ -7957,6 +7967,7 @@ let histPage = 0;
 let histDateFilter = 'all';
 let histLeagueFilter = 'all';
 let histMercadoFilter = 'all';
+let histConfFilter = 'all';
 // Fecha de lanzamiento del sitio — fija para todos los usuarios
 const PAGE_LAUNCH_DATE = new Date('2025-03-01');
 
@@ -8475,6 +8486,11 @@ function renderHistorial(filter) {
     });
   }
 
+  // Filtro por confianza
+  if (histConfFilter !== 'all') {
+    data = data.filter(h => (h.conf || 'low') === histConfFilter);
+  }
+
   // ── Backfill league field from _sportKey for existing historial entries ──
   {
     const allRaw = loadHistorial();
@@ -8801,6 +8817,13 @@ function filterHistDate(f, btn) {
   ['histDateBtnHoy','histDateBtnWeek','histDateBtnAll','histDateBtnFinde'].forEach(id => document.getElementById(id)?.classList.remove('active'));
   btn.classList.add('active');
   histDateFilter = f; histLeagueFilter='all'; histMercadoFilter='all'; histPage=0;
+  renderHistorial(histFilter);
+}
+
+function filterHistConf(f, btn) {
+  ['histConfBtnAll','histConfBtnHigh','histConfBtnMed','histConfBtnLow'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  btn.classList.add('active');
+  histConfFilter = f; histLeagueFilter='all'; histMercadoFilter='all'; histPage=0;
   renderHistorial(histFilter);
 }
 
