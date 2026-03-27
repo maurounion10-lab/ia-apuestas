@@ -7247,12 +7247,50 @@ function renderPreds() {
           <div style="text-align:center;font-size:0.68rem;color:var(--texto-sec);opacity:0.6">Cargando pronósticos...</div>
         </div>`).join('');
     } else {
-      document.getElementById('predGrid').innerHTML = `
-        <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:16px;text-align:center">
-          <div style="font-size:2.5rem">🔍</div>
-          <div style="font-size:1.1rem;font-weight:700;color:var(--texto-pri)">Sin pronósticos de alta confianza hoy</div>
-          <div style="font-size:0.85rem;color:var(--texto-sec);max-width:340px;line-height:1.5">La IA no encontró partidos con suficiente certeza para recomendar. Volvé más tarde cuando haya más partidos disponibles.</div>
-        </div>`;
+      document.getElementById('predGrid').innerHTML = (() => {
+        const _isLogged = !!authUser;
+        const _pushOk   = 'serviceWorker' in navigator && 'PushManager' in window;
+        const _perm     = (typeof Notification !== 'undefined') ? Notification.permission : 'default';
+        const _emailSub = localStorage.getItem('gb_email_notif_v1');
+
+        // ── Card push (solo usuarios logueados, push soportado, no denegado) ──
+        const _pushCard = (_isLogged && _pushOk && _perm !== 'denied') ? `
+          <div id="esNotifCard" style="margin-top:4px;background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.22);border-radius:14px;padding:16px 22px;max-width:320px;width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:10px">
+            <div style="font-size:0.88rem;font-weight:700;color:#fff">🔔 Avisame cuando haya picks</div>
+            <div id="esPushStatus" style="font-size:0.75rem;color:var(--texto-sec);line-height:1.4">${_perm === 'granted' ? '¡Listo! Te avisamos cuando salgan los picks del día.' : 'Una notificación cuando la IA encuentre un pick de calidad.'}</div>
+            <button id="esPushBtn" onclick="subscribeFromEmptyState()" style="background:${_perm==='granted'?'rgba(0,200,83,0.18)':'var(--verde)'};color:${_perm==='granted'?'var(--verde)':'#000'};border:${_perm==='granted'?'1.5px solid rgba(0,200,83,0.5)':'none'};border-radius:30px;padding:9px 22px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .15s">
+              ${_perm === 'granted' ? '🔔 Notificaciones activas' : 'Activar notificaciones'}
+            </button>
+          </div>` : '';
+
+        // ── Card email (solo para no logueados) ──
+        const _emailCard = !_isLogged ? (_emailSub ? `
+          <div style="margin-top:4px;background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.22);border-radius:14px;padding:14px 22px;max-width:320px;width:100%;box-sizing:border-box;text-align:center">
+            <div style="font-size:0.9rem;font-weight:700;color:var(--verde)">✅ ¡Anotado!</div>
+            <div style="font-size:0.75rem;color:var(--texto-sec);margin-top:5px">Te avisamos por mail cuando haya pronósticos de calidad.</div>
+          </div>` : `
+          <div id="esEmailCard" style="margin-top:4px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);border-radius:14px;padding:16px 22px;max-width:320px;width:100%;box-sizing:border-box;display:flex;flex-direction:column;align-items:center;gap:10px">
+            <div style="font-size:0.88rem;font-weight:700;color:#fff">📬 Avisame cuando haya pronósticos</div>
+            <div style="font-size:0.75rem;color:var(--texto-sec);line-height:1.4">Te mandamos un mail solo cuando la IA encuentre picks de alta confianza.</div>
+            <div style="display:flex;gap:8px;width:100%">
+              <input id="esEmailInput" type="email" placeholder="tu@email.com"
+                style="flex:1;min-width:0;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.18);border-radius:8px;padding:9px 12px;color:#fff;font-size:0.82rem;font-family:inherit;outline:none"
+                onfocus="this.style.borderColor='var(--verde)';this.style.boxShadow='0 0 0 2px rgba(0,200,83,0.15)'"
+                onblur="this.style.borderColor='rgba(255,255,255,0.18)';this.style.boxShadow='none'"
+                onkeydown="if(event.key==='Enter')subscribeEmailNotif()">
+              <button onclick="subscribeEmailNotif()" style="background:var(--verde);color:#000;border:none;border-radius:8px;padding:9px 16px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0">Avisame</button>
+            </div>
+          </div>`) : '';
+
+        return `
+          <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px 60px;gap:14px;text-align:center">
+            <div style="font-size:2.5rem">🔍</div>
+            <div style="font-size:1.1rem;font-weight:700;color:var(--texto-pri)">Sin pronósticos de alta confianza hoy</div>
+            <div style="font-size:0.85rem;color:var(--texto-sec);max-width:340px;line-height:1.5">La IA no encontró partidos con suficiente certeza para recomendar. Volvé más tarde cuando haya más partidos disponibles.</div>
+            ${_pushCard}
+            ${_emailCard}
+          </div>`;
+      })();
     }
     window._aiPreds = [];
     return;
@@ -14553,6 +14591,63 @@ async function updatePushButtonState() {
     btn.classList.remove('subscribed');
     statusEl.textContent = 'Te mandamos el mejor pick gratis como notificación todos los días.';
   }
+}
+
+async function subscribeFromEmptyState() {
+  const btn      = document.getElementById('esPushBtn');
+  const statusEl = document.getElementById('esPushStatus');
+  if (btn) btn.disabled = true;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (sub) {
+      await sub.unsubscribe();
+      await fetch(`${PUSH_WORKER_URL}/push/unsubscribe`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ endpoint: sub.endpoint }),
+      }).catch(() => {});
+      if (btn)      { btn.textContent = 'Activar notificaciones'; btn.style.background = 'var(--verde)'; btn.style.color = '#000'; btn.style.border = 'none'; btn.disabled = false; }
+      if (statusEl) statusEl.textContent = 'Una notificación cuando la IA encuentre un pick de calidad.';
+    } else {
+      const perm = await Notification.requestPermission();
+      if (perm !== 'granted') { if (btn) btn.disabled = false; return; }
+      const appServerKey = urlBase64ToUint8Array(VAPID_PUBLIC_KEY);
+      sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: appServerKey });
+      await fetch(`${PUSH_WORKER_URL}/push/subscribe`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subscription: sub.toJSON(), email: authUser?.email || '' }),
+      }).catch(() => {});
+      if (btn)      { btn.textContent = '🔔 Notificaciones activas'; btn.style.background = 'rgba(0,200,83,0.18)'; btn.style.color = 'var(--verde)'; btn.style.border = '1.5px solid rgba(0,200,83,0.5)'; btn.disabled = false; }
+      if (statusEl) statusEl.textContent = '¡Listo! Te avisamos cuando salgan los picks del día.';
+    }
+  } catch(e) {
+    console.warn('[subscribeFromEmptyState]', e);
+    if (btn) btn.disabled = false;
+  }
+  updatePushButtonState().catch(() => {});
+}
+
+function subscribeEmailNotif() {
+  const input = document.getElementById('esEmailInput');
+  if (!input) return;
+  const email = input.value.trim();
+  const ok = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if (!ok) {
+    input.style.borderColor = '#ef5350';
+    input.style.boxShadow   = '0 0 0 2px rgba(239,83,80,0.2)';
+    input.focus();
+    return;
+  }
+  localStorage.setItem('gb_email_notif_v1', email);
+  try {
+    sbAnon.from('notif_subscribers')
+      .upsert({ email, type: 'picks_alert', subscribed_at: new Date().toISOString() }, { onConflict: 'email' })
+      .then(() => {}).catch(() => {});
+  } catch(_) {}
+  const card = document.getElementById('esEmailCard');
+  if (card) card.innerHTML = `
+    <div style="font-size:0.9rem;font-weight:700;color:var(--verde)">✅ ¡Anotado!</div>
+    <div style="font-size:0.75rem;color:var(--texto-sec);margin-top:5px">Te avisamos por mail cuando haya pronósticos de calidad.</div>`;
 }
 
 async function togglePushSubscription() {
