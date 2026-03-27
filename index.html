@@ -3673,9 +3673,9 @@
       <div style="display:flex;flex-wrap:wrap;gap:10px">
         <a href="https://x.com/Grupo_LATAM" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">𝕏 Fútbol &amp; Sorteos LATAM</a>
         <a href="https://x.com/TenisLATAM_" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">𝕏 Tenis LATAM</a>
-        <a href="https://x.com/Gambeta_ai" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(29,155,240,0.12);border:1px solid rgba(29,155,240,0.4);border-radius:30px;padding:8px 16px;text-decoration:none;color:#fff;font-size:0.78rem;font-weight:700;transition:background .2s" onmouseover="this.style.background='rgba(29,155,240,0.22)'" onmouseout="this.style.background='rgba(29,155,240,0.12)'">𝕏&nbsp;<span style="color:#1d9bf0">✔</span>&nbsp;@Gambeta_ai&nbsp;<span style="font-size:0.68rem;font-weight:400;color:rgba(255,255,255,0.55)">Picks automáticos</span></a>
         <a href="https://www.instagram.com/pronosticos.latam" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(200,55,150,0.08);border:1px solid rgba(200,55,150,0.25);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(200,55,150,0.18)'" onmouseout="this.style.background='rgba(200,55,150,0.08)'">📸 Instagram</a>
         <a href="https://www.tiktok.com/@rugbylatam" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">🎵 TikTok Rugby</a>
+        <a href="https://x.com/Gambeta_ai" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(29,155,240,0.12);border:1px solid rgba(29,155,240,0.4);border-radius:30px;padding:8px 16px;text-decoration:none;color:#fff;font-size:0.78rem;font-weight:700;transition:background .2s" onmouseover="this.style.background='rgba(29,155,240,0.22)'" onmouseout="this.style.background='rgba(29,155,240,0.12)'">𝕏&nbsp;<span style="color:#1d9bf0">✔</span>&nbsp;@Gambeta_ai&nbsp;<span style="font-size:0.68rem;font-weight:400;color:rgba(255,255,255,0.55)">Picks automáticos</span></a>
       </div>
     </div>
 
@@ -4044,10 +4044,10 @@ async function acLoadFromDB(email) {
   } else {
     // New user — dar bonus de bienvenida ANTES del primer sync a la DB
     acCheckDaily();
-    await acSync  _purgeNbaPicks(); // limpiar picks NBA del historial y G$ antes de renderizar
-ToDB();  // guarda directamente con balance=10.000
+    await acSyncToDB();  // guarda directamente con balance=10.000
   }
   // Run daily bonus check on the now-accurate merged balance
+  _purgeNbaPicks(); // limpiar picks NBA del historial y G$ antes de renderizar
   acCheckDaily();
   acUpdateUI();
   applyUserProfile(); // re-aplicar nick/avatar ahora que la DB está cargada
@@ -4648,7 +4648,8 @@ const teamLogos = {
   'Clube do Remo':          'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Clube_do_Remo.svg/200px-Clube_do_Remo.svg.png',
   'Remo':                   'https://upload.wikimedia.org/wikipedia/commons/thumb/7/70/Clube_do_Remo.svg/200px-Clube_do_Remo.svg.png',
   'Ponte Preta':            'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg/200px-Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg.png',
-  'AA Ponte Preta':         'https://upload.wikimedia.org/wikipedia/common  // ── 🏀 NBA ──
+  'AA Ponte Preta':         'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg/200px-Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg.png',
+  // ── 🏀 NBA ──
   'Lakers':                 'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
   'LA Lakers':              'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
   'Los Angeles Lakers':     'https://a.espncdn.com/i/teamlogos/nba/500/lal.png',
@@ -4714,7 +4715,6 @@ const teamLogos = {
   'Dallas Mavericks':       'https://a.espncdn.com/i/teamlogos/nba/500/dal.png',
   'Rockets':                'https://a.espncdn.com/i/teamlogos/nba/500/hou.png',
   'Houston Rockets':        'https://a.espncdn.com/i/teamlogos/nba/500/hou.png',
-s/thumb/f/fc/Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg/200px-Associa%C3%A7%C3%A3o_Atletica_Ponte_Preta.svg.png',
   // ── 🏉 RUGBY UNION – Super Rugby / Champions Cup / Premiership ──
   'Crusaders':              'https://a.espncdn.com/i/teamlogos/rugby/500/crusaders.png',
   'Blues':                  'https://a.espncdn.com/i/teamlogos/rugby/500/blues.png',
@@ -5354,8 +5354,8 @@ const scoresData = [];
 
 const predsData = [
   { league:'🏆 Champions League', home:'Real Madrid', away:'Man City',   rec:'Local Gana',       conf:'high', confLabel:'Alta (82%)',  probH:48, probD:22, probA:30, odds:['L:1.80','E:3.40','V:4.20'], time:'Hoy 21:00',    insight:'Real Madrid llega en gran momento con 4 victorias seguidas. City sin Rodri pierde control del juego. El Bernabéu y la presión de los aficionados pueden ser factores decisivos. Apuesta recomendada con stake moderado.',    formH:['G','G','E','G','G'], formA:['G','P','G','G','E'] },
-  { league:'🇪🇸 La Liga',         home:'Barcelona',  away:'Atlético',   rec:'Ambos Marcan',     conf:'high', confLabel:'Alta (78%)',  probH:42, probD:28, probA:30, odds:['Sí:1.65','No:2.10'],       time:'Hoy 21:00',    insight:'Ambos equipos llevan más de 5 partidos seguidos convirtiendo como locales y visitantes. Barça domina con la pelota (62% posesión), Atleti es efectivo en contragolpe.  { league:'🏀 NBA',              home:'Lakers',     away:'Celtics',    rec:'Celtics -3.5',     conf:'med',  confLabel:'Media (64%)', probH:38, probD:0,  probA:62, odds:['L:2.10','V:1.72'],         time:'Hoy 21:30',    insight:'Celtics lidera la conferencia este con 52-18. Lakers está en zona play-in y LeBron llega con molestias. Los visitantes promedian 118 pts/partido y son el mejor equipo en pista contraria. Handicap de -3.5 tiene valor.',               formH:['P','G','G','G','P'], formA:['G','G','G','P','G'] },
- Tendencia clara hacia partido con goles de ambos bandos.',          formH:['G','G','P','G','G'], formA:['G','G','P','E','G'] },
+  { league:'🇪🇸 La Liga',         home:'Barcelona',  away:'Atlético',   rec:'Ambos Marcan',     conf:'high', confLabel:'Alta (78%)',  probH:42, probD:28, probA:30, odds:['Sí:1.65','No:2.10'],       time:'Hoy 21:00',    insight:'Ambos equipos llevan más de 5 partidos seguidos convirtiendo como locales y visitantes. Barça domina con la pelota (62% posesión), Atleti es efectivo en contragolpe. Tendencia clara hacia partido con goles de ambos bandos.',          formH:['G','G','P','G','G'], formA:['G','G','P','E','G'] },
+  { league:'🏀 NBA',              home:'Lakers',     away:'Celtics',    rec:'Celtics -3.5',     conf:'med',  confLabel:'Media (64%)', probH:38, probD:0,  probA:62, odds:['L:2.10','V:1.72'],         time:'Hoy 21:30',    insight:'Celtics lidera la conferencia este con 52-18. Lakers está en zona play-in y LeBron llega con molestias. Los visitantes promedian 118 pts/partido y son el mejor equipo en pista contraria. Handicap de -3.5 tiene valor.',               formH:['P','G','G','G','P'], formA:['G','G','G','P','G'] },
   { league:'🎾 ATP Miami',        home:'Alcaraz',    away:'Djokovic',   rec:'Alcaraz Gana',     conf:'med',  confLabel:'Media (61%)', probH:55, probD:0,  probA:45, odds:['A:1.85','D:1.95'],         time:'Hoy 18:00',    insight:'Alcaraz es brillante en pista dura bajo el sol de Miami y llega con confianza tras dos torneos seguidos. Djokovic con pocos torneos en 2025 y no ha mostrado su mejor nivel. El español tiene ligera ventaja estadística en duro.',   formH:['G','G','G','P','G'], formA:['G','P','G','G','E'] },
   { league:'🇩🇪 Bundesliga',      home:'Bayern',     away:'Dortmund',   rec:'Más de 2.5 goles', conf:'high', confLabel:'Alta (76%)',  probH:55, probD:20, probA:25, odds:['+2.5:1.60','-2.5:2.20'],   time:'Hoy 20:30',    insight:'Der Klassiker promedia 3.4 goles en los últimos 8 enfrentamientos. Bayern convierte en el 89% de sus partidos en casa. Dortmund anota en el 87% de sus partidos de visita. Alta probabilidad de partido con más de 2.5 goles.',      formH:['G','G','G','E','G'], formA:['G','P','G','G','P'] },
   { league:'🇦🇷 Liga Prof.',       home:'River',      away:'Boca',       rec:'Local o Empate',   conf:'low',  confLabel:'Baja (55%)',  probH:40, probD:30, probA:30, odds:['L:2.20','E:3.00','V:3.10'], time:'Mañana 17:00', insight:'Superclásico históricamente parejo — River gana el 38%, Boca el 30%, empate 32%. Ventaja leve de River como local en el Monumental pero el resultado es altamente impredecible. Apuesta solo con stake bajo o evitar.',            formH:['G','E','G','G','P'], formA:['E','G','P','G','E'] },
@@ -5367,14 +5367,14 @@ const statsData = {
     { name:'Barcelona',         league:'La Liga',          form:['G','P','G','G','E'], gf:62, ga:34, pts:65, pos:'2°' },
     { name:'Bayern Munich',     league:'Bundesliga',       form:['G','G','G','E','G'], gf:74, ga:30, pts:68, pos:'1°' },
     { name:'Man City',          league:'Premier League',   form:['G','G','P','G','G'], gf:60, ga:29, pts:63, pos:'3°' },
-    { name:'River Plate',       league:'Liga Profesional', form:['G','E','G','G','P'], gf:42, ga:18, pts:58,  ],
+    { name:'River Plate',       league:'Liga Profesional', form:['G','E','G','G','P'], gf:42, ga:18, pts:58, pos:'1°' },
+    { name:'Boca Juniors',      league:'Liga Profesional', form:['E','G','P','G','E'], gf:35, ga:22, pts:52, pos:'3°' },
+  ],
   basket: [
     { name:'Boston Celtics',        league:'NBA Este',   form:['G','G','G','P','G'], gf:118, ga:105, pts:52, pos:'1° Conf Este'  },
     { name:'LA Lakers',             league:'NBA Oeste',  form:['P','G','G','G','P'], gf:115, ga:112, pts:38, pos:'6° Conf Oeste' },
     { name:'Golden State Warriors', league:'NBA Oeste',  form:['G','G','P','G','G'], gf:120, ga:108, pts:42, pos:'5° Conf Oeste' },
     { name:'Miami Heat',            league:'NBA Este',   form:['G','E','G','P','G'], gf:112, ga:110, pts:36, pos:'7° Conf Este'  },
- pos:'1°' },
-    { name:'Boca Juniors',      league:'Liga Profesional', form:['E','G','P','G','E'], gf:35, ga:22, pts:52, pos:'3°' },
   ],
   tenis: [
     { name:'Carlos Alcaraz',  league:'ATP Ranking', form:['G','G','G','P','G'], gf:84, ga:38, pts:9800,  pos:'#2 Mundo' },
@@ -5434,7 +5434,11 @@ function renderScores(filter) {
   let data;
   if (filter === 'all') {
     data = scoresData.filter(s => !EXTRA.has(s.sport)).slice(0, 8);
-  } else if   }
+  } else if (BANNER_ONLY.has(filter)) {
+    data = []; // forzar banner siempre
+  } else {
+    data = scoresData.filter(s => s.sport === filter);
+  }
   // Fallback para basket: si no hay scores, usar partidos del endpoint /odds
   if (data.length === 0 && filter === 'basket' && window._rawOddsGames?.length) {
     const nowTs = Date.now();
@@ -5475,8 +5479,6 @@ function renderScores(filter) {
     return;
   }
   if (data.length === 0 && !_scoresFirstLoad && !BANNER_ONLY.has(filter)) {
-    data = scoresData.filter(s => s.sport === filter);
-  }  if (data.length === 0 && !_scoresFirstLoad && !BANNER_ONLY.has(filter)) {
     // Todavía no llegaron datos de la API → mostrar skeleton
     renderSkeletonScores(6);
     return;
@@ -5657,12 +5659,12 @@ function leagueLabel(sportTitle) {
     'La Liga - Spain': 'La Liga',
     'La Liga': 'La Liga',
     'Bundesliga - Germany': 'Bundesliga',
-    'Bundesliga    'NBA': 'NBA',
-': 'Bundesliga',
+    'Bundesliga': 'Bundesliga',
     'Serie A - Italy': 'Serie A',
     'Serie A': 'Serie A',
     'Ligue 1 - France': 'Ligue 1',
     'Ligue 1': 'Ligue 1',
+    'NBA': 'NBA',
     'CONMEBOL Libertadores': 'Libertadores',
     'CONMEBOL Sudamericana': 'Sudamericana',
     'Campeonato Brasileiro Série A': 'Brasileirao',
@@ -5671,11 +5673,12 @@ function leagueLabel(sportTitle) {
 }
 
 function buildPredsFromOdds() {
-  if (!window._ra  const SPORT_CAT_PRIO = { soccer:40, basketball:30, tennis:20, rugby:10, mma:10 };
-       = Date.now();
+  if (!window._rawOddsGames || !window._rawOddsGames.length) return null;
+
+  const now       = Date.now();
 
   // Prioridad por deporte (categoría general)
-  const SPORT_CAT_PRIO = { soccer:40, tennis:20, rugby:10, mma:10 };
+  const SPORT_CAT_PRIO = { soccer:40, basketball:30, tennis:20, rugby:10, mma:10 };
 
   // Prioridad por liga específica — liga más prestigiosa = número más alto
   const LEAGUE_PRIO = {
@@ -5692,12 +5695,12 @@ function buildPredsFromOdds() {
     soccer_france_ligue_one:                78,
     soccer_uefa_europa_league:              76,
     soccer_uefa_europa_conference_league:   70,
-    soccer_argentina_primera_n    basketball_nba:                         95,
-    basketball_euroleague:                  45,
-acional:      65,
+    soccer_argentina_primera_nacional:      65,
     soccer_mexico_ligamx:                   62,
     soccer_usa_mls:                         55,
     // ── Basketball ──
+    basketball_nba:                         95,
+    basketball_euroleague:                  45,
     // ── Tennis ──
     tennis_atp_french_open:                 85,
     tennis_wta_french_open:                 85,
@@ -5706,10 +5709,10 @@ acional:      65,
 
   const getGamePrio = k => {
     if (!k) return 0;
-    // Prioridad exacta si exis    if (k.includes('basketball')) return SPORT_CAT_PRIO.basketball;
-te, sino prio de categoría
+    // Prioridad exacta si existe, sino prio de categoría
     if (LEAGUE_PRIO[k]) return LEAGUE_PRIO[k];
     if (k.includes('soccer'))     return SPORT_CAT_PRIO.soccer;
+    if (k.includes('basketball')) return SPORT_CAT_PRIO.basketball;
     if (k.includes('tennis'))     return SPORT_CAT_PRIO.tennis;
     if (k.includes('rugby'))      return SPORT_CAT_PRIO.rugby;
     return 5;
@@ -5727,7 +5730,10 @@ te, sino prio de categoría
 
   // Solo partidos que AÚN NO comenzaron — nunca recomendar partidos en vivo o ya iniciados
   // Siempre expandimos hasta mínimo 48h para capturar Champions/top-ligas de mañana
-  // aunque ya haya 2+ candidatos en 24h (ej: Brasileirao hoy no debe tapar Champ
+  // aunque ya haya 2+ candidatos en 24h (ej: Brasileirao hoy no debe tapar Champions mañana)
+  const WINDOWS = [24, 48, 72, 120, 168];
+  const TOP_PRIO_THRESHOLD = LEAGUE_PRIO.soccer_conmebol_copa_libertadores; // 99+
+
   // Partidos de NBA que empiezan a las 3 AM ART (UTC-3) o más tarde:
   // no publicarlos hasta las 11 AM ART del mismo día calendario
   const ART_OFFSET_MS = -3 * 3600000; // UTC-3
@@ -5743,20 +5749,17 @@ te, sino prio de categoría
     const showAfter = dayStartArt.getTime() - ART_OFFSET_MS + 11 * 3600000; // 11 AM ART en UTC
     return now >= showAfter;
   };
-ions mañana)
-  const WINDOWS = [24, 48, 72, 120, 168];
-  const TOP_PRIO_THRESHOLD = LEAGUE_PRIO.soccer_conmebol_copa_libertadores; // 99+
 
   let candidates = [];
   for (const hours of WINDOWS) {
     const windowEnd = now + hours * 3600000;
     candidates = window._rawOddsGames
-      .filter(      .filter(isNbaVisible)   // NBA madrugada: no mostrar hasta las 11 AM ART
-g => {
-        const t = nuro
+      .filter(g => {
+        const t = new Date(g.commence_time).getTime();
+        return t > now && t <= windowEnd;  // estrictamente futuro
       })
+      .filter(isNbaVisible)   // NBA madrugada: no mostrar hasta las 11 AM ART
       .filter(hasH2HData)
-      .filter(g => !g.sport_key?.includes('basketball'))  // excluir NBA — solo fútbol/tenis/rugby
       .sort(sortByPrioThenTime)
       .slice(0, 30);
     // Cortar solo si: hay 2+ candidatos Y ya cubrimos 48h (para no perder Champions/Libertadores de mañana)
@@ -5772,18 +5775,18 @@ g => {
 
   // Fallback nivel 1: sin límite de ventana pero solo partidos futuros
   if (!candidates.length) {
-    console.warn('[Preds] Fallback L1: sin ventana de tiempo (posible parón internDate(g.commence_time).getTime() > now)
+    console.warn('[Preds] Fallback L1: sin ventana de tiempo (posible parón internacional)');
+    candidates = window._rawOddsGames
+      .filter(g => new Date(g.commence_time).getTime() > now)
       .filter(hasH2HData)
-      .filter(g => !g.sport_key?.includes('basketball'))  // excluir NBA
       .sort(sortByPrioThenTime)
       .slice(0, 18);
   }
   // Fallback nivel 2: CUALQUIER partido con h2h, sin ningún filtro de tiempo
   if (!candidates.length) {
-    console.warn('[Preds] F
+    console.warn('[Preds] Fallback L2: sin filtro de tiempo — mostrando cualquier partido con h2h');
     candidates = window._rawOddsGames
       .filter(hasH2HData)
-      .filter(g => !g.sport_key?.includes('basketball'))  // excluir NBA
       .sort(sortByPrioThenTime)
       .slice(0, 18);
   }
@@ -5827,21 +5830,24 @@ g => {
     // Buscar en todos los bookmakers disponibles (no solo afiliado)
     const findMkt = key => {
       for (const bk of (g.bookmakers || [])) {
-        const m =     const isBasketball = (g.sport_key || '').includes('basketball');
-
-    // Over odds — fútbol: busca líneas 1.5/2.5/3.5 · basket: detecta la línea automáticamente
-eturn m;
+        const m = bk.markets?.find(m => m.key === key);
+        if (m) return m;
       }
-      re    let basketTotalsLine = null;
-    let basketOverOdds = null;
-    let basketUnderOdds = null;
-turn null;
+      return null;
     };
     const totalsMkt = findMkt('totals');
+    const isBasketball = (g.sport_key || '').includes('basketball');
 
-    // Over odds — fú      if (!isBasketball) {
-tbol: busca líneas 1.5/2.5/3.5 
-    const overOdds = {}      } else {
+    // Over odds — fútbol: busca líneas 1.5/2.5/3.5 · basket: detecta la línea automáticamente
+    const overOdds = {};
+    let basketTotalsLine = null;
+    let basketOverOdds = null;
+    let basketUnderOdds = null;
+    (totalsMkt?.outcomes || []).forEach(o => {
+      const pt = String(o.point);
+      if (!isBasketball) {
+        if (o.name === 'Over') overOdds[pt] = o.price;
+      } else {
         // Basket: tomar la primera línea Over/Under disponible
         if (o.name === 'Over' && !basketOverOdds) {
           basketOverOdds   = o.price;
@@ -5851,10 +5857,6 @@ tbol: busca líneas 1.5/2.5/3.5
           basketUnderOdds = o.price;
         }
       }
-;
-    (totalsMkt?.outcomes || []).forEach(o => {
-      const pt = String(o.point);
-        if (o.name === 'Over') overOdds[pt] = o.price;
     });
 
     // ── Probabilidades 1X2 ──
@@ -5891,9 +5893,13 @@ tbol: busca líneas 1.5/2.5/3.5
     const MIN_ODDS = 1.40; // cuota mínima aceptable
     const candidates2 = [
       { rec: 'Local Gana',     prob: probH, odds: hO ?? hOP },
-      { rec: 'Visitante Gana', prob: probA,       ...(!isBasketball ? ['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
+      { rec: 'Visitante Gana', prob: probA, odds: aO ?? aOP },
+      ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dO ?? dOP }] : []),
+      // Totales fútbol: Over 1.5 / 2.5 / 3.5
+      ...(!isBasketball ? ['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) })) : []),
-(pt => overOdds[pt]).map(pt => ({ re      ...(!isBasketball && bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
+      // Ambos Marcan (solo fútbol)
+      ...(!isBasketball && bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
       // Over/Under basket: línea automática (ej: Más de 215.5)
       ...(isBasketball && basketTotalsLine && basketOverOdds >= MIN_ODDS ? [{
         rec: `Más de ${basketTotalsLine}`,
@@ -5913,11 +5919,12 @@ tbol: busca líneas 1.5/2.5/3.5
       }] : []),
     ]
     .filter(c => c.prob > 0)
-      ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isTotals: false }] : []),
-    ]    .filter(c => c.prob > 0)
     .filter(c => !c.odds || parseFloat(c.odds) >= MIN_ODDS); // excluir cuotas bajas
 
-    // Ordenar picks: para basket el Over/Under va siempre primero (es la apues      if (isBasketball) {
+    // Ordenar picks: para basket el Over/Under va siempre primero (es la apuesta más relevante);
+    // para fútbol ordenar por probabilidad desc y en empate preferir totales reales.
+    candidates2.sort((a, b) => {
+      if (isBasketball) {
         // En basket: prioridad → Over/Under con línea real > moneyline
         const aIsOU = a.isBasketTotals ? 1 : 0;
         const bIsOU = b.isBasketTotals ? 1 : 0;
@@ -5926,9 +5933,6 @@ tbol: busca líneas 1.5/2.5/3.5
         if (b.prob !== a.prob) return b.prob - a.prob;
         return 0;
       }
-ta más relevante);
-    // para fútbol ordenar por probabilidad desc y en empate preferir totales reales.
-    candidates2.sort((a, b) => {
       // Fútbol: por probabilidad; en empate, los totales con cuota real ganan
       if (b.prob !== a.prob) return b.prob - a.prob;
       if (a.isTotals) return -1;
@@ -5964,10 +5968,10 @@ ta más relevante);
     if (hO) oddsPills.push(`L:${hO.toFixed(2)}`);
     if (dO) oddsPills.push(`E:${dO.toFixed(2)}`);
     if (aO) oddsPills.push(`V:${aO.toFixed(2)}`);
-    if (overOdds['2.5'])    odds    if (basketOverOdds)     oddsPills.push(`O${basketTotalsLine}:${parseFloat(basketOverOdds).toFixed(2)}`);
-    if (basketUnderOdds)    oddsPills.push(`U${basketTotalsLine}:${parseFloat(basketUnderOdds).toFixed(2)}`);
-Pills.push(`+2.5:${parseFloat(overOdds['2.5']).toFixed(2)}`);
+    if (overOdds['2.5'])    oddsPills.push(`+2.5:${parseFloat(overOdds['2.5']).toFixed(2)}`);
     if (bttsOddsEst)        oddsPills.push(`AM:${bttsOddsEst.toFixed(2)}`);
+    if (basketOverOdds)     oddsPills.push(`O${basketTotalsLine}:${parseFloat(basketOverOdds).toFixed(2)}`);
+    if (basketUnderOdds)    oddsPills.push(`U${basketTotalsLine}:${parseFloat(basketUnderOdds).toFixed(2)}`);
 
     // Insight generado por probabilidades
     const hN = shortName(g.home_team), aN = shortName(g.away_team);
@@ -5979,19 +5983,19 @@ Pills.push(`+2.5:${parseFloat(overOdds['2.5']).toFixed(2)}`);
     else if (rec === 'Empate')
       insight = `Partido muy equilibrado — el mercado da ${probH}% local, ${probD}% empate, ${probA}% visitante. El empate ofrece la cuota más atractiva${fmtO(dO ?? dOP)}. Partido difícil de predecir; stake bajo recomendado.`;
     else if (rec === 'Ambos Marcan')
-      insight = `Estimación: ${bttsEst}% de probabilidad de que ambos equipos conviertan${fmtO(bttsOddsEst)}. El mercado de goles refleja un       if (best.isBasketTotals) {
+      insight = `Estimación: ${bttsEst}% de probabilidad de que ambos equipos conviertan${fmtO(bttsOddsEst)}. El mercado de goles refleja un partido abierto — ${hN} (${probH}%) vs ${aN} (${probA}%). Buena apuesta de goles de doble vía.`;
+    else {
+      const line = best.line;
+      if (best.isBasketTotals) {
         // Over/Under basket
         const isOver = rec.startsWith('Más');
         const pct    = Math.round(100 / (isOver ? basketOverOdds : basketUnderOdds));
         insight = `Línea de puntos totales en ${line}. El mercado da ${pct}% de probabilidad al ${isOver ? 'Over' : 'Under'}${fmtO(isOver ? basketOverOdds : basketUnderOdds)}. ${hN} (${probH}% de ganar) vs ${aN} (${probA}%). Apuesta de totales NBA con valor estadístico.`;
       } else {
-partido abierto — ${hN} (${probH}%) vs ${aN} (${probA}%). Buena apuesta de goles de doble vía.`;
-    else {
-      const line = best.line;
         // Más de X.5 fútbol
         const pOver = probOver[String(line)];
-        insight = `El mercado asigna ${pOver}% de probabilidad a que el partido supere los ${line} goles${fmtO      }
-(overOdds[String(line)])}. Partido con perfil ofensivo — ${hN} (${probH}% favorito) vs ${aN} (${probA}%). Apuesta de totales con valor.`;
+        insight = `El mercado asigna ${pOver}% de probabilidad a que el partido supere los ${line} goles${fmtO(overOdds[String(line)])}. Partido con perfil ofensivo — ${hN} (${probH}% favorito) vs ${aN} (${probA}%). Apuesta de totales con valor.`;
+      }
     }
 
     return {
@@ -6077,14 +6081,16 @@ function renderPreds() {
   // 1. Intentar cargar desde caché diaria
   realPreds = loadDailyPredsCache();
 
-  // Guardar partidos ya iniciados ANTES de cualquier invalidación para no   // Invalidar caché si hay picks de basket sin Over/Under (versión anterior sin esta lógica)
-menceTs && p.commen    const basketPreds = realPreds.filter(p => (p._sportKey || '').includes('basketball'));
+  // Guardar partidos ya iniciados ANTES de cualquier invalidación para no perderlos
+  const _nowMs = Date.now();
+  const _preserveStarted = (realPreds || []).filter(p => p.commenceTs && p.commenceTs <= _nowMs);
+
+  // Invalidar caché si hay picks de basket sin Over/Under (versión anterior sin esta lógica)
+  if (realPreds) {
+    const basketPreds = realPreds.filter(p => (p._sportKey || '').includes('basketball'));
     const hasOU = basketPreds.some(p => p.rec && (p.rec.startsWith('Más de') || p.rec.startsWith('Menos de')));
     if (basketPreds.length > 0 && !hasOU) {
       localStorage.removeItem('gambeta_daily_preds_v1');
-ey || '').includes('basketball'));
-    if (hasBasketPreds) {
-      try { localStorage.removeItem('gambeta_daily_preds_v1'); } catch(_) {}
       realPreds = null;
     }
   }
@@ -6121,20 +6127,19 @@ ey || '').includes('basketball'));
     // Incorporar picks de HOY del historial que no estén ya en la caché
     // (caso: caché fue regenerada y se perdieron picks que ya empezaron)
     hist
-      .filter(h => h.date === t          league:     h.sport === 'basket' ? 'NBA' : 'Fútbol',
-teamsMatch(p.home, h.home) && teamsMatch(p.away, h.away)))
+      .filter(h => h.date === todayStr && !realPreds.find(p => teamsMatch(p.home, h.home) && teamsMatch(p.away, h.away)))
       .forEach(h => {
         realPreds.push({
-          league:     'Fútbol',
+          league:     h.sport === 'basket' ? 'NBA' : 'Fútbol',
           home:       h.home,
           away:       h.away,
           rec:        h.rec,
           conf:       h.stake >= 100 ? 'high' : h.stake >= 50 ? 'med' : 'low',
           confLabel:  h.stake >= 100 ? 'Alta' : h.stake >= 50 ? 'Media' : 'Baja',
           probH: h.probH || 0, probD: h.probD || 0, probA: h.probA || 0,
-               _sportKey:  h._sportKey || (h.sport === 'basket' ? 'basketball_nba' : 'soccer_argentina_primera_division'),
-enceTs || (_nowMs - 1), // garantiza que se marque como started
-          _sportKey:  h._sportKey || 'soccer_argentina_primera_division',
+          odds: [], time: '', bvr: 0, bvrText: '',
+          commenceTs: h.commenceTs || (_nowMs - 1), // garantiza que se marque como started
+          _sportKey:  h._sportKey || (h.sport === 'basket' ? 'basketball_nba' : 'soccer_argentina_primera_division'),
           _fromHist:  true, // viene del historial, no de la API
         });
       });
@@ -6555,12 +6560,14 @@ function updateCalc() {
 let currentStatFilter = 'futbol';
 
 // Cache de stats reales por sport
-const realStatsCache = {}  const lbl1 = sport==='tenis'?'Juegos G.':sport==='basket'?'Pts/G Prom':'Goles F.';
+const realStatsCache = {};
+
+function renderStats(sport) {
+  if (!document.getElementById('statsGrid')) return;
+  const data = realStatsCache[sport] || statsData[sport] || [];
+  const lbl1 = sport==='tenis'?'Juegos G.':sport==='basket'?'Pts/G Prom':'Goles F.';
   const lbl2 = sport==='tenis'?'Juegos P.':sport==='basket'?'Pts/C Prom':'Goles C.';
   const lbl3 = sport==='tenis'?'Pts Ranking':sport==='basket'?'Victorias':'Puntos';
-sport==='tenis'?'Juegos G.':'Goles F.';
-  const lbl2 = sport==='tenis'?'Juegos P.':'Goles C.';
-  const lbl3 = sport==='tenis'?'Pts Ranking':'Puntos';
   document.getElementById('statsGrid').innerHTML = data.length ? data.map(t => {
     const logoEl = t.badgeUrl
       ? `<img src="${t.badgeUrl}" style="width:54px;height:54px;object-fit:contain;border-radius:6px" onerror="this.style.display='none'">`
@@ -6594,12 +6601,12 @@ const ESPN_LEAGUES = {
   futbol: [
     { code:'soccer/esp.1', label:'La Liga',        top:3 },
     { code:'soccer/eng.1', label:'Premier League', top:3 },
-    { code:'soccer/ger.1', label:'B  basket: [
-    { code:'basketball/nba', label:'NBA', top:8, nba:true },
-  ],
-undesliga',     top:2 },
+    { code:'soccer/ger.1', label:'Bundesliga',     top:2 },
     { code:'soccer/ita.1', label:'Serie A',        top:2 },
     { code:'soccer/arg.1', label:'Liga Prof.',     top:2 },
+  ],
+  basket: [
+    { code:'basketball/nba', label:'NBA', top:8, nba:true },
   ],
 };
 
@@ -6616,19 +6623,22 @@ async function loadRealStats(sport) {
   const getStat  = (stats, name) => { const s = stats?.find(x=>x.name===name); return s ? (parseFloat(s.value)||0) : 0; };
   const getStatS = (stats, name) => { const s = stats?.find(x=>x.name===name); return s ? (s.displayValue||'') : ''; };
 
-  c      // ESPN NBA tiene grupos de conferencia; fútbol tiene entries directas
-r = await fetch(`${ESPN}/${lg.code}/standings`);
+  const all = [];
+
+  for (const lg of leagues) {
+    try {
+      const r = await fetch(`${ESPN}/${lg.code}/standings`);
       const j = await r.json();
 
- // ESPN tiene grupos de conferencia; fútbol tiene entries directas
+      // ESPN NBA tiene grupos de conferencia; fútbol tiene entries directas
       let entries = [];
       if (j.standings?.entries?.length) {
         entries = j.standings.entries;
-      } e        // NBA: ordenar por victorias desc
-     j.children.forEach(g => {
+      } else if (j.children?.length) {
+        j.children.forEach(g => {
           if (g.standings?.entries) entries.push(...g.standings.entries);
         });
- // : ordenar por victorias desc
+        // NBA: ordenar por victorias desc
         if (lg.nba) entries.sort((a,b) => getStat(b.stats,'wins') - getStat(a.stats,'wins'));
       }
 
@@ -6745,16 +6755,16 @@ let chatOpen = false;
 
 const chatResponses = {
   'real madrid': '⚽ **Real Madrid** está en gran forma. En la Champions tienen 82% de probabilidad de clasificar según nuestro modelo. Hoy juegan contra Manchester City — la IA recomienda apostar Local (cuota 1.80) con confianza alta del 82%. ¿Querés más detalles sobre el partido?',
-  'mejor apuesta': '🔮 La **mejor apuesta del día** según la IA es: **"Más de 2.5 goles" en Bayern vs  'lakers': '🏀 **Lakers vs Celtics** hoy a las 21:30. Celtics lleva 4 victorias consecutivas y domina de visitante este año. La IA recomienda **Celtics -3.5 puntos** con 64% de confianza. Cuota visitante: 1.72.',
- Dortmund** (cuota 1.60). El Clásico alemán promedia 3.4 goles en sus últimos 8 partidos. Valor esperado positivo de +$8.40 por cada $100 apostados.',
+  'mejor apuesta': '🔮 La **mejor apuesta del día** según la IA es: **"Más de 2.5 goles" en Bayern vs Dortmund** (cuota 1.60). El Clásico alemán promedia 3.4 goles en sus últimos 8 partidos. Valor esperado positivo de +$8.40 por cada $100 apostados.',
+  'lakers': '🏀 **Lakers vs Celtics** hoy a las 21:30. Celtics lleva 4 victorias consecutivas y domina de visitante este año. La IA recomienda **Celtics -3.5 puntos** con 64% de confianza. Cuota visitante: 1.72.',
   'default': (q) => `🤖 Analizando tu consulta sobre **"${q}"**...\n\nBasándome en los datos estadísticos actuales, nuestro modelo indica una tendencia positiva en los mercados relacionados. Te recomiendo revisar los pronósticos de hoy arriba, donde tenemos análisis detallados con probabilidades para los partidos más importantes. ¿Hay algún partido específico que te interese?`
 };
 
 function getBotResponse(msg) {
   const lower = msg.toLowerCase();
-  if (lower.includes('real madrid') || lower.includes('madrid')) return chatResponses['  if (lower.includes('laker') || lower.includes('celtics') || lower.includes('nba')) return chatResponses['lakers'];
-real madrid'];
+  if (lower.includes('real madrid') || lower.includes('madrid')) return chatResponses['real madrid'];
   if (lower.includes('mejor apuesta') || lower.includes('mejor') || lower.includes('recomienda')) return chatResponses['mejor apuesta'];
+  if (lower.includes('laker') || lower.includes('celtics') || lower.includes('nba')) return chatResponses['lakers'];
   return chatResponses['default'](msg);
 }
 
@@ -7049,11 +7059,11 @@ function savePredictions(preds) {
     else if (p.rec === 'Empate'         && p.probD > 0) impliedOdds = parseFloat((100/p.probD).toFixed(2));
     else if (p._bestOdds)                               impliedOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
 
-       id, date: today, sport: p._sportKey?.includes('basketball') ? 'basket' : p._sportKey?.includes('tennis') ? 'tenis' : (p.sport || 'futbol'),
- 100 : p.conf === 'med' ? 50 : 25;
+    // Stake según confianza: Alta=$100, Media=$50, Baja=$25
+    const stake = p.conf === 'high' ? 100 : p.conf === 'med' ? 50 : 25;
 
     hist.unshift({
-      id, date: today, sport: p._sportKey?.includes('tennis') ? 'tenis' : (p.sport || 'futbol'),
+      id, date: today, sport: p._sportKey?.includes('basketball') ? 'basket' : p._sportKey?.includes('tennis') ? 'tenis' : (p.sport || 'futbol'),
       _sportKey: p._sportKey || null,   // guarda el API key real para resolver scores después
       home: p.home, away: p.away,
       rec: p.rec, odds: impliedOdds, stake,
@@ -7135,14 +7145,14 @@ function resolveCompletedGames(scores, skipRender) {
   });
 
   if (changed) {
-    s  basket:  ['basketball_nba', 'basketball_euroleague', 'basketball_ncaab'],
-aveHistorial(hist);
+    saveHistorial(hist);
     if (!skipRender) renderHistorial(histFilter);
   }
 }
 
 // Mapeo sport simple → API sport keys a consultar
 const SPORT_KEY_MAP = {
+  basket:  ['basketball_nba', 'basketball_euroleague', 'basketball_ncaab'],
   futbol:  [
     'soccer_argentina_primera_division', 'soccer_brazil_campeonato',
     'soccer_conmebol_copa_libertadores', 'soccer_conmebol_copa_sudamericana',
@@ -7352,9 +7362,9 @@ function renderHistorial(filter) {
   document.getElementById('histTableBody').innerHTML = data.length
     ? pageData.map(h => {
         const plHtml = h.result==='pending'||h.result==='void'
-          ?        const icon = h.sport==='basket'?'🏀':h.sport==='tenis'?'🎾':'⚽';
- `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
-        const icon = h.sport==='tenis'?'🎾':'⚽';
+          ? '<span style="color:#555">—</span>'
+          : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
+        const icon = h.sport==='basket'?'🏀':h.sport==='tenis'?'🏘':'⚽';
         const recDisplay = (h.rec||'').replace(' Gana','');
         const isHigh = h.stake === 100;
         const isToday = h.date === todayStr;
@@ -7685,7 +7695,8 @@ const matchAnalysisData = {
     h2h:[{date:'21/04/24',home:'Barcelona',away:'Atlético',score:'3-0',res:'W'},{date:'03/12/23',home:'Atlético',away:'Barcelona',score:'1-0',res:'L'},{date:'17/04/23',home:'Barcelona',away:'Atlético',score:'1-0',res:'W'},{date:'06/11/22',home:'Atlético',away:'Barcelona',score:'1-1',res:'D'}],
     injuries:{home:[{name:'Ter Stegen',status:'out'},{name:'Fermín',status:'ok'}],away:[{name:'Griezmann',status:'doubt'},{name:'Oblak',status:'ok'}]},
     probH:42,probD:28,probA:30,
-    insight:'Barcelona domina esta  },
+    insight:'Barcelona domina estadísticamente en casa. Atlético siempre es difícil pero Barça es muy goleador. "Ambos Marcan" tiene alta probabilidad dado el estilo ofensivo de ambos equipos.'
+  },
   'Lakers-Celtics': {
     league:'🏀 NBA', time:'Hoy 21:30', weather:'🏟 Los Angeles · Staples Center',
     homeForm:['L','W','W','W','L'], awayForm:['W','W','W','L','W'],
@@ -7694,7 +7705,6 @@ const matchAnalysisData = {
     injuries:{home:[{name:'LeBron James',status:'doubt'},{name:'AD',status:'ok'}],away:[{name:'Jaylen Brown',status:'ok'},{name:'Tatum',status:'ok'}]},
     probH:38,probD:0,probA:62,
     insight:'Celtics es el mejor equipo de la conferencia este con 52-18. Lakers está en zona de play-in. Si LeBron no juega al 100%, los Celtics tienen ventaja clara. Recomendación: Celtics -3.5.'
-dísticamente en casa. Atlético siempre es difícil pero Barça es muy goleador. "Ambos Marcan" tiene alta probabilidad dado el estilo ofensivo de ambos equipos.'
   },
 };
 
@@ -7817,14 +7827,14 @@ const teamShortNames = {
   'AJ Auxerre':               'Auxerre',
   'Montpellier HSC':          'Montpellier',
   'Le Havre AC':              'Le Havre',
-  'FC Nantes':                'Nantes'  // ── NBA ──
-ice':                 'Nice',
-  'Girond  'Boston Celtics':           'Celtics',
-ins de Bordeaux':    'Bordeaux',
+  'FC Nantes':                'Nantes',
+  'OGC Nice':                 'Nice',
+  'Girondins de Bordeaux':    'Bordeaux',
   'Toulouse FC':              'Toulouse',
   'Angers SCO':               'Angers',
- // ── ──
+  // ── NBA ──
   'Atlanta Hawks':            'Hawks',
+  'Boston Celtics':           'Celtics',
   'Brooklyn Nets':            'Nets',
   'Charlotte Hornets':        'Hornets',
   'Chicago Bulls':            'Bulls',
@@ -7832,13 +7842,13 @@ ins de Bordeaux':    'Bordeaux',
   'Dallas Mavericks':         'Mavericks',
   'Denver Nuggets':           'Nuggets',
   'Detroit Pistons':          'Pistons',
-   'Los Angeles Lakers':       'Lakers',
- 'Golden State Warriors':    'Warriors',
-   'LA Lakers':                'Lakers',
- 'Houston Rockets':          'Rockets',
+  'Golden State Warriors':    'Warriors',
+  'Houston Rockets':          'Rockets',
   'Indiana Pacers':           'Pacers',
   'Los Angeles Clippers':     'Clippers',
+  'Los Angeles Lakers':       'Lakers',
   'LA Clippers':              'Clippers',
+  'LA Lakers':                'Lakers',
   'Memphis Grizzlies':        'Grizzlies',
   'Miami Heat':               'Heat',
   'Milwaukee Bucks':          'Bucks',
@@ -7882,12 +7892,12 @@ function leagueLabel(sportTitle) {
     'Brasileirao Serie A': '🇧🇷 Brasileirão',
     'La Liga': '🇪🇸 La Liga',
     'Serie A - Italy': '🇮🇹 Serie A',
-    'Premier     'NBA': '🏀 NBA',
-League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier',
+    'Premier League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier',
     'EPL': '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier',
     'English Premier League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier',
     'Bundesliga - Germany': '🇩🇪 Bundesliga',
     'Ligue 1 - France': '🇫🇷 Ligue 1',
+    'NBA': '🏀 NBA',
     'Australian Open': '🎾 Australian Open',
     'French Open': '🎾 Roland Garros',
     'Wimbledon': '🎾 Wimbledon',
@@ -7914,11 +7924,10 @@ League': '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier',
 // ══════════════════════════════════════════════
 const LANGS = {
   es: {
-    'nav.sc    'tab.all':'Todos','tab.futbol':'Fútbol','tab.basket':'Básquet',
-nav.calc':'Calculadora',
+    'nav.scores':'Marcadores','nav.pred':'Pronósticos','nav.calc':'Calculadora',
     'nav.stats':'Stats','nav.hist':'Resultados','nav.cuotas':'Cuotas',
     'nav.bankroll':'Bankroll','auth.enter':'Entrar','auth.register':'Registro Gratis',
-    'tab.all':'Todos','tab.futbol':'Fútbol',
+    'tab.all':'Todos','tab.futbol':'Fútbol','tab.basket':'Básquet',
     'tab.tenis':'Tenis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● EN VIVO','status.soon':'⚡ COMIENZA PRONTO','status.upcoming':'PRÓXIMO','status.final':'FINALIZADO',
     'time.live':'En vivo','time.final':'Final',
@@ -7936,11 +7945,11 @@ nav.calc':'Calculadora',
     'ch.ufc.desc':'Análisis de peleas, pronósticos y picks de UFC y boxeo profesional. La comunidad de MMA más grande habla-hispana.',
     'ch.ufc.tip':'Último tip: <strong>Islam Makhachev por decisión unánime</strong> — EASY WIN ✅✅✅',
   },
-  e    'tab.all':'All','tab.futbol':'Football','tab.basket':'Basketball',
-recasts','nav.calc':'Calculator',
+  en: {
+    'nav.scores':'Scores','nav.pred':'Forecasts','nav.calc':'Calculator',
     'nav.stats':'Stats','nav.hist':'Results','nav.cuotas':'Odds',
     'nav.bankroll':'Bankroll','auth.enter':'Login','auth.register':'Free Sign Up',
-    'tab.all':'All','tab.futbol':'Football',
+    'tab.all':'All','tab.futbol':'Football','tab.basket':'Basketball',
     'tab.tenis':'Tennis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● LIVE','status.soon':'⚡ STARTING SOON','status.upcoming':'UPCOMING','status.final':'FINISHED',
     'time.live':'Live','time.final':'Final',
@@ -7959,11 +7968,10 @@ recasts','nav.calc':'Calculator',
     'ch.ufc.tip':'Latest tip: <strong>Islam Makhachev by unanimous decision</strong> — EASY WIN ✅✅✅',
   },
   pt: {
-    'n    'tab.all':'Todos','tab.futbol':'Futebol','tab.basket':'Basquete',
-'nav.calc':'Calculadora',
+    'nav.scores':'Placar','nav.pred':'Prognósticos','nav.calc':'Calculadora',
     'nav.stats':'Stats','nav.hist':'Resultados','nav.cuotas':'Odds',
     'nav.bankroll':'Bankroll','auth.enter':'Entrar','auth.register':'Registro Grátis',
-    'tab.all':'Todos','tab.futbol':'Futebol',
+    'tab.all':'Todos','tab.futbol':'Futebol','tab.basket':'Basquete',
     'tab.tenis':'Tênis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● AO VIVO','status.soon':'⚡ COMEÇA EM BREVE','status.upcoming':'PRÓXIMO','status.final':'FINALIZADO',
     'time.live':'Ao vivo','time.final':'Final',
@@ -8329,13 +8337,13 @@ async function loadRealScores(retryCount = 0) {
       return;
     }
 
-    const SCORE_PRI      basketball_nba: 7,
-O = {
+    const SCORE_PRIO = {
       soccer_argentina_primera_division: 10,
       soccer_argentina_primera_nacional: 9,
       soccer_south_america_copa_libertadores: 8,
       soccer_south_america_copa_sudamericana: 7,
       soccer_uefa_champs_league: 7,
+      basketball_nba: 7,
       soccer_spain_la_liga: 6,
       soccer_epl: 6,
       tennis_atp_aus_open_singles: 6, tennis_wta_aus_open_singles: 6,
@@ -8354,15 +8362,16 @@ O = {
       soccer_brazil_campeonato: 4,
       soccer_uefa_europa_conference_league: 3,
       soccer_mexico_ligamx: 3,
-     // Partidos de hoy en horario local + madrugada (hasta las 3 AM = misma jornada NBA)
-_rugby: 3,
+      soccer_usa_mls: 2,
+      rugbyunion_epcr_champs_cup: 4,
+      rugbyunion_super_rugby: 3,
       rugbyleague_nrl: 3,
       rugbyleague_super_league: 3,
       rugbyunion_premiership: 3,
       mma_mixed_martial_arts: 4,
     };
 
- // Partidos de hoy en horario local + madrugada (hasta las 3 AM = misma jornada )
+    // Partidos de hoy en horario local + madrugada (hasta las 3 AM = misma jornada NBA)
     const todayLocal    = new Date().toLocaleDateString('en-CA');
     const tomorrowLocal = new Date(Date.now() + 86400000).toLocaleDateString('en-CA');
 
@@ -8394,14 +8403,14 @@ _rugby: 3,
       const pa = SCORE_PRIO[a.sport_key] || 1;
       const pb = SCORE_PRIO[b.sport_key] || 1;
       if (pa !== pb) return pb - pa;
-      return new Date(a.commence_time) - new Date(b.commence_      if (key.includes('basketball')) return 'basket';
-time);
+      return new Date(a.commence_time) - new Date(b.commence_time);
     });
 
     // Separar: principales (para Todos/Fútbol/Básquet/Tenis) vs extra (Rugby/UFC solo en su tab)
     const EXTRA_SPORTS = new Set(['rugby', 'ufc']);
     const getSport = key => {
       if (!key) return 'futbol';
+      if (key.includes('basketball')) return 'basket';
       if (key.includes('tennis'))     return 'tenis';
       if (key.includes('rugby'))      return 'rugby';
       if (key.includes('mma') || key.includes('boxing')) return 'ufc';
@@ -8602,8 +8611,7 @@ async function fetchGFeed() {
     if (!wrap) return;
 
     _gFeedAllBets = allBets;
-    _gFeedCurrentPage = _purgeNbaPicks(); // eliminar picks NBA del historial y G$ al cargar la página
-0;
+    _gFeedCurrentPage = 0;
     _renderGFeedPage();
     wrap.style.display = '';
   } catch(e) {
@@ -8615,6 +8623,7 @@ async function fetchGFeed() {
 //  INIT
 // ═══════════════════════════════════════════════
 
+_purgeNbaPicks(); // eliminar picks NBA del historial y G$ al cargar la página
 renderSkeletonScores(6); // mostrar skeleton mientras carga la API
 renderPreds();
 renderStats('futbol');
@@ -8648,10 +8657,10 @@ fetch(`${WORKER_URL}/available`)
   .then(j => {
     window._availableSports = j.keys || [];
     const hasBasket = false;  // Basketball disabled
-       console.log(`[API] Deportes disponibles: basketball=${hasBasket} tennis=${hasTenis} mma=${hasMMA} rugby=${hasRugby}`);
-indow._availableSports.some(k => k.includes('mma'));
+    const hasTenis  = window._availableSports.some(k => k.includes('tennis'));
+    const hasMMA    = window._availableSports.some(k => k.includes('mma'));
     const hasRugby  = window._availableSports.some(k => k.includes('rugby'));
-    console.log(`[API] Deportes disponibles: tennis=${hasTenis} mma=${hasMMA} rugby=${hasRugby}`);
+    console.log(`[API] Deportes disponibles: basketball=${hasBasket} tennis=${hasTenis} mma=${hasMMA} rugby=${hasRugby}`);
     console.log(`[API] Sports activos (${window._availableSports.length}):`, window._availableSports.join(', '));
     // Si el tab activo quedó vacío, re-renderizar con el mensaje correcto
     renderScores(currentScoreFilter);
@@ -8675,7 +8684,7 @@ setInterval(() => loadRealOdds(), 60 * 60 * 1000); // refrescar cuotas/fichas ca
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
     if (!cacheGet('cache_scores', CACHE_SCORES_TTL)) loadRealScores();
-    if (!cacheGet('cache_odds_v4',  CACHE_ODDS_TTlet authUser = null;
+    if (!cacheGet('cache_odds_v4',  CACHE_ODDS_TTL))  loadRealOdds();
   }
 });
 
@@ -8685,7 +8694,7 @@ document.addEventListener('visibilitychange', () => {
 // ═══════════════════════════════════════════════
 //  AUTH / MEMBRESÍA
 // ═══════════════════════════════════════════════
-var authUser = null;
+let authUser = null;
 let pendingSocial = null;
 let authIsLogin = false; // false = registrar, true = iniciar sesión
 
@@ -9205,9 +9214,12 @@ function renderMyTips() {
       body: `Estás en positivo (+$${totalPL.toFixed(0)}). Rebalanceá tu stake al 3-5% del bankroll actual para aprovechar el capital ganado. No retirés ganancias hasta duplicar el bankroll inicial.` });
   } else {
     tips.push({ icon: '🛡️', title: 'Protegé tu bankroll', color: 'var(--naranja)',
-      body: `Estás en negativo (-$${Math.abs(totalPL).toFixed(0)}). Reducí el stake al 2-3% del ban    body: `La IA detecta que los mercados de tenis (ganador del partido) y NBA (total de puntos) ofrecen mayor eficiencia estadística esta semana. El modelo recomienda enfocarse en partidos con cuotas entre 1.75 y 2.10 con +65% de probabilidad implícita.` });
-)',
-    body: `La IA detecta que los mercados de tenis (ganador del partido) ofrecen mayor eficiencia estadística esta semana. El modelo recomienda enfocarse en partidos con cuotas entre 1.75 y 2.10 con +65% de probabilidad implícita.` });
+      body: `Estás en negativo (-$${Math.abs(totalPL).toFixed(0)}). Reducí el stake al 2-3% del bankroll para sobrevivir la racha y recuperarte gradualmente. Nunca aceptes "apuestas de recuperación" de cuotas muy altas.` });
+  }
+
+  // Tip 4: Deportes y mercados
+  tips.push({ icon: '🤖', title: 'Consejo IA del día', color: 'var(--azul)',
+    body: `La IA detecta que los mercados de tenis (ganador del partido) y NBA (total de puntos) ofrecen mayor eficiencia estadística esta semana. El modelo recomienda enfocarse en partidos con cuotas entre 1.75 y 2.10 con +65% de probabilidad implícita.` });
 
   el.innerHTML = tips.map(t => `
     <div class="card" style="margin-bottom:12px;border-left:3px solid ${t.color}">
@@ -9535,7 +9547,16 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
       <input id="acbet-ci-${matchId}" class="acoin-custom-input" type="number"
         placeholder="Ingresá monto personalizado"
         style="display:none"
-        oninput="acCustomAmountInput('$// Detecta si un nombre de equipo pertenece a la NBA por su logo en el diccionario
+        oninput="acCustomAmountInput('${safeId}', this.value)" />
+      <button id="acbet-ok-${matchId}" class="acoin-confirm-btn" disabled
+        onclick="acConfirmBet('${safeId}','${safeHome}','${safeAway}')">
+        Elegí el monto primero
+      </button>
+    </div>
+  </div>`;
+}
+
+// Detecta si un nombre de equipo pertenece a la NBA por su logo en el diccionario
 function _isNbaTeam(name) {
   if (!name) return false;
   const url = (typeof teamLogos !== 'undefined' && teamLogos[name]) || '';
@@ -9564,16 +9585,6 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
-safeId}', this.value)" />
-      <button id="acbet-ok-${matchId}" class="acoin-confirm-btn" disabled
-        onclick="acConfirmBet('${safeId}','${safeHome}','${safeAway}')">
-        Elegí el monto primero
-      </button>
-    </div>
-  </div>`;
-}
-
-
 </script>
 
 <!-- AUTH MODAL -->
@@ -10118,8 +10129,8 @@ function _buildObPool() {
   const seen = new Set();
   const pool = [];
   for (const [name, url] of Object.entries(teamLogos)) {
-    if (seen.has(url)) continue; // mismo logo bajo nom// Elige un club de fútbol al azar del pool (sin NBA)
-ontinue; // excluir escudos de básquet/NBA
+    if (seen.has(url)) continue; // mismo logo bajo nombre alternativo → skip
+    if (_isNbaAvatar(url)) continue; // excluir escudos de básquet/NBA
     seen.add(url);
     pool.push({
       id:    name.toLowerCase().replace(/[^a-z0-9]/g, '_'),
@@ -10131,7 +10142,7 @@ ontinue; // excluir escudos de básquet/NBA
   return pool;
 }
 
-// Elige un club de fútbol al azar del pool (sin )
+// Elige un club de fútbol al azar del pool (sin NBA)
 function _randomFootballClub() {
   const pool = _buildObPool();
   return pool[Math.floor(Math.random() * pool.length)];
@@ -10193,15 +10204,7 @@ async function checkOnboarding() {
 
   // ── Caso 1: Sin perfil en absoluto → asignar automáticamente ──────────────
   if (!hasNick && !ava) {
-    const surname = PLAYER_SURNAMES[Math.floor(Math.random() * PLAYER_SURN  // ── Caso 2: Avatar de básquet → reemplazar + mostrar migración ────────────
-  if (ava && _isNbaAvatar(ava.logo)) {
-    const club = _randomFootballClub();
-    localStorage.setItem(GB_AVA, JSON.stringify({ id: club.id, logo: club.logo, name: club.name, color: club.color }));
-    applyUserProfile();
-    await _showAvatarMigration();
-    return;
-  }
-MES.length)];
+    const surname = PLAYER_SURNAMES[Math.floor(Math.random() * PLAYER_SURNAMES.length)];
     const club    = _randomFootballClub();
     localStorage.setItem(GB_NICK, surname);
     localStorage.setItem(GB_AVA, JSON.stringify({ id: club.id, logo: club.logo, name: club.name, color: club.color }));
@@ -10210,7 +10213,14 @@ MES.length)];
     return;
   }
 
-
+  // ── Caso 2: Avatar de básquet → reemplazar + mostrar migración ────────────────────────
+  if (ava && _isNbaAvatar(ava.logo)) {
+    const club = _randomFootballClub();
+    localStorage.setItem(GB_AVA, JSON.stringify({ id: club.id, logo: club.logo, name: club.name, color: club.color }));
+    applyUserProfile();
+    await _showAvatarMigration();
+    return;
+  }
 
   // ── Caso 3: Tiene todo → no hacer nada ────────────────────────────────────
   if (hasNick && ava) return;
@@ -11858,12 +11868,12 @@ function aiChannelsCard(msgEl) {
   const card = document.createElement('div');
   card.style.cssText = 'margin-top:10px;background:linear-gradient(135deg,rgba(34,158,217,0.12),rgba(0,200,83,0.06));border:1px solid rgba(34,158,217,0.35);border-radius:12px;padding:10px 12px;';
   card.innerHTML = `
-    <div style="font-si        ['🏀 NBA',          'https://t.me/PicksNBAproarg'],
-ze:0.68rem;font-weight:800;color:#229ED9;letter-spacing:0.6px;margin-bottom:8px">📲 CANALES PRONOSTICOSLATAM — GRATIS</div>
+    <div style="font-size:0.68rem;font-weight:800;color:#229ED9;letter-spacing:0.6px;margin-bottom:8px">📲 CANALES PRONOSTICOSLATAM — GRATIS</div>
     <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px">
       ${[
         ['🌐 Principal',   'https://t.me/+f35dS09pzrI1ZTA5'],
         ['⚽ Fútbol',       'https://t.me/elseleccionado'],
+        ['🏀 NBA',          'https://t.me/PicksNBAproarg'],
         ['🎾 Tenis',        'https://t.me/TenisLATAM'],
         ['🏉 Rugby',        'https://t.me/apuestasrugby'],
         ['🎁 Destraba',     'https://t.me/canaldestrababonos'],
@@ -11895,16 +11905,20 @@ function aiNeedsWeb(msg) {
   const lower = msg.toLowerCase();
   const conceptOnly = [
     'qué es ','que es ','what is ','o que é ',
-    'cómo se calcula','  const t = (msg || '').toLowerCase();
-  if (/\b(nba|basket|básquet|basquet|baloncesto|canasta|lakers|celtics|warriors|bulls|heat|spurs|knicks|bucks|nets|suns|nuggets|clippers|thunder|pelicans|pistons|raptors|jazz|grizzlies|hawks|wizards|blazers|pacers|hornets|magic|kings|cavaliers|timberwolves|rockets|mavericks|spurs)\b/.test(t)) return '🏀';
-  if (/\b(tenis|tennis|atp|wta|wimbledon|roland.?garros|us.?open|australian.?open|djokovic|alcaraz|nadal|federer|sinner|swiatek|raqueta|set|game|match.?point)\b/.test(t)) return '🎾';
-ncludes(c));
+    'cómo se calcula','como se calcula','how to calculate',
+    'explícame','explicame','explain ',
+    'define ','definición','definition',
+    'qué significa','que significa','what does',
+  ];
+  const isConcept = conceptOnly.some(c => lower.includes(c));
   if (isConcept && lower.length < 60) return false;
   return true;
 }
 
 function _aiDetectSport(msg) {
-  const t = (msg || '').toLowerCase();  if (/\b(tenis|tennis|atp|wta|wimbledon|roland.?garros|us.?open|australian.?open|djokovic|alcaraz|nadal|federer|sinner|swiatek|raqueta|set|game|match.?point)\b/.test(t)) return '🎾';
+  const t = (msg || '').toLowerCase();
+  if (/\b(nba|basket|básquet|basquet|baloncesto|canasta|lakers|celtics|warriors|bulls|heat|spurs|knicks|bucks|nets|suns|nuggets|clippers|thunder|pelicans|pistons|raptors|jazz|grizzlies|hawks|wizards|blazers|pacers|hornets|magic|kings|cavaliers|timberwolves|rockets|mavericks|spurs)\b/.test(t)) return '🏀';
+  if (/\b(tenis|tennis|atp|wta|wimbledon|roland.?garros|us.?open|australian.?open|djokovic|alcaraz|nadal|federer|sinner|swiatek|raqueta|set|game|match.?point)\b/.test(t)) return '🏘';
   if (/\b(nfl|american.?football|superbowl|super.?bowl|touchdown|quarterback|patriots|cowboys|chiefs|eagles|49ers|packers|ravens|broncos|chargers|raiders|bears|giants|jets|dolphins|bills|colts|titans|jaguars|texans|lions|vikings|falcons|saints|bucs|buccaneers|panthers|cardinals|seahawks|rams)\b/.test(t)) return '🏈';
   if (/\b(baseball|béisbol|beisbol|mlb|yankees|dodgers|red.?sox|cubs|mets|giants|cardinals|braves|astros|padres|phillies|mariners|rangers|orioles|tigers|twins|rays|guardians|royals|white.?sox|pirates|brewers|diamondbacks|rockies|athletics|nationals|marlins|reds|angels)\b/.test(t)) return '⚾';
   if (/\b(rugby|six.?nations|all.?blacks|springboks|wallabies|premiership.?rugby|top.?14|rugby.?world.?cup|tries|scrum|lineout)\b/.test(t)) return '🏉';
@@ -12539,14 +12553,14 @@ async function admVerPicks(email) {
       statCard('Win Rate', wr + '%', wr >= 55 ? 'var(--verde)' : wr >= 40 ? '#ffd600' : 'var(--rojo)') +
       statCard('Saldo G$', (data.balance || 0).toLocaleString('es-AR'), '#ffd600');
 
-        const sportIcon  = s => ({ futbol:'⚽', basket:'🏀', tenis:'🎾', americano:'🏈' }[s] || '🎲');
-g:24px;color:var(--texto-sec);font-size:0.82rem">Sin picks registrados</div>';
+    if (!hist.length) {
+      listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--texto-sec);font-size:0.82rem">Sin picks registrados</div>';
       return;
     }
 
     const resultIcon = r => r === 'win' ? '✅' : r === 'loss' ? '❌' : '⏳';
     const resultColor= r => r === 'win' ? 'var(--verde)' : r === 'loss' ? 'var(--rojo)' : '#ffd600';
-    const sportIcon  = s => ({ futbol:'⚽', tenis:'🎾', americano:'🏈' }[s] || '🎲');
+    const sportIcon  = s => ({ futbol:'⚽', basket:'🏀', tenis:'🏘', americano:'🏈' }[s] || '🎲');
 
     listEl.innerHTML = hist.map(p => {
       // historial_full usa: date, rec, stake, pl — NO ts/pick/betAmount
