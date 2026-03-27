@@ -6515,12 +6515,12 @@ function buildPredsFromOdds() {
     tennis_atp_wimbledon:                   85,
   };
 
-    if (k.includes('basketball')) return 0; // basketball desactivado
   const getGamePrio = k => {
     if (!k) return 0;
     // Prioridad exacta si existe, sino prio de categoría
     if (LEAGUE_PRIO[k]) return LEAGUE_PRIO[k];
     if (k.includes('soccer'))     return SPORT_CAT_PRIO.soccer;
+    if (k.includes('basketball')) return 0; // basketball desactivado
     if (k.includes('tennis'))     return SPORT_CAT_PRIO.tennis;
     if (k.includes('rugby'))      return SPORT_CAT_PRIO.rugby;
     return 5;
