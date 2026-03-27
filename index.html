@@ -4956,10 +4956,10 @@ async function loadLiveStats() {
     const total     = gs.total;
 
     localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({
-      precision, roi: gs.roi, totalPicks: total, ts: Date.now(), source: 'global'
+      precision, roi: gs.roi ?? localStats?.roi, totalPicks: total, ts: Date.now(), source: 'global'
     }));
 
-    heroStatsApply(gs.roi ?? gs.precision, total, true);
+    heroStatsApply(gs.roi ?? localStats?.roi ?? gs.precision, total, true);
   } catch(e) {
     // Sin columna "predictions" en Supabase → stats locales ya aplicadas arriba.
     // Si tampoco había stats locales, mostrar placeholder animado.
