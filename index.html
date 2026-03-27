@@ -6540,6 +6540,11 @@ function buildPredsFromOdds() {
   // Siempre expandimos hasta mínimo 48h para capturar Champions/top-ligas de mañana
   // aunque ya haya 2+ candidatos en 24h (ej: Brasileirao hoy no debe tapar Champions mañana)
   const WINDOWS = [24, 48, 72, 120, 168];
+  const TOP_PRIO_THRESHOLD = LEAGUE_PRIO.soccer_conmebol_copa_libertadores;
+
+  let candidates = [];
+  for (const hours of WINDOWS) {
+    const windowEnd = now + hours * 3600000;
     const baseFilter = g => {
       const t = new Date(g.commence_time).getTime();
       return t > now && t <= windowEnd && !(g.sport_key||'').includes('basketball') && hasH2HData(g);
@@ -6578,11 +6583,6 @@ function buildPredsFromOdds() {
                        window._rawOddsGames.filter(baseFilter).filter(g => getGamePrio(g.sport_key) < 65)
                        .sort(sortByPrioThenTime)).slice(0, 8);
     candidates = [...topTier, ...eurTier, ...rest];
-      })
-      .filter(hasH2HData)
-      .filter(g => !g.sport_key?.includes('basketball'))  // excluir NBA — solo fútbol/tenis/rugby
-      .sort(sortByPrioThenTime)
-      .slice(0, 30);
     // Cortar solo si: hay 2+ candidatos Y ya cubrimos 48h (para no perder Champions/Libertadores de mañana)
     // O si el mejor candidato ya es Champions/Libertadores en 24h
     const bestPrio = candidates.length ? getGamePrio(candidates[0].sport_key) : 0;
@@ -6595,6 +6595,7 @@ function buildPredsFromOdds() {
   console.log(`[Preds] ${candidates.length} candidatos pre-partido | total:${totalRaw} withH2H:${withH2H} futuros:${upcoming}`);
 
   // Fallback nivel 1: sin límite de ventana pero solo partidos futuros
+  if (!candidates.length) {
     console.warn('[Preds] Fallback L1: sin ventana de tiempo (posible parón internacional)');
     candidates = window._rawOddsGames
       .filter(g => new Date(g.commence_time).getTime() > now)
