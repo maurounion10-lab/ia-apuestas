@@ -6471,11 +6471,6 @@ function sportKeyToLeague(sk, home, away) {
   // Fallback por nombre de equipo
   if (home && (_PL_TEAMS.has(home) || _PL_TEAMS.has(away))) return '🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League';
   return null;
-    'CONMEBOL Libertadores': 'Libertadores',
-    'CONMEBOL Sudamericana': 'Sudamericana',
-    'Campeonato Brasileiro Série A': 'Brasileirao',
-  };
-  return map[sportTitle] || sportTitle.split(' - ')[0];
 }
 
 function buildPredsFromOdds() {
