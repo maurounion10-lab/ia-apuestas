@@ -7221,47 +7221,39 @@ function renderPreds() {
   // Sin datos reales: skeleton si está cargando, empty state si ya cargó y el filtro no tiene picks
   if (!realPreds) {
     const isLoading = _oddsLoading || !window._rawOddsGames;
-    const sf = window._predSportFilter || 'all';
-    const hasFilterActive = sf !== 'all' && sf !== 'todos';
-
-    // Si los datos ya cargaron y hay un filtro activo → empty state limpio (no skeleton)
-    if (!isLoading && hasFilterActive) {
-      const labelMap = { europe: '🌍 Fútbol Europeo', latam: '🌎 Latam & Mundo', arg: '🇦🇷 Liga Profesional', bra: '🇧🇷 Brasileirao' };
-      const label = labelMap[sf] || sf;
+    if (isLoading) {
+      document.getElementById('predGrid').innerHTML = [1,2,3].map(() => `
+        <div class="pred-card-skeleton">
+          <div class="skel" style="height:12px;width:55%"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div class="skel" style="height:22px;width:38%"></div>
+            <div class="skel" style="height:22px;width:28%"></div>
+          </div>
+          <div style="display:flex;justify-content:center;gap:24px;padding:10px 0">
+            <div class="skel" style="height:52px;width:52px;border-radius:50%"></div>
+            <div class="skel" style="height:52px;width:52px;border-radius:50%"></div>
+          </div>
+          <div class="skel" style="height:58px;width:100%;border-radius:10px"></div>
+          <div style="display:flex;gap:6px">
+            <div class="skel" style="height:14px;flex:1"></div>
+            <div class="skel" style="height:14px;flex:1"></div>
+            <div class="skel" style="height:14px;flex:1"></div>
+          </div>
+          <div style="display:flex;gap:6px">
+            <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
+            <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
+            <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
+          </div>
+          <div style="text-align:center;font-size:0.68rem;color:var(--texto-sec);opacity:0.6">Cargando pronósticos...</div>
+        </div>`).join('');
+    } else {
       document.getElementById('predGrid').innerHTML = `
-        <div style="grid-column:1/-1;text-align:center;padding:48px 20px;color:var(--texto-sec)">
-          <div style="font-size:2.2rem;margin-bottom:10px">📭</div>
-          <div style="font-size:0.9rem;font-weight:600;color:rgba(255,255,255,0.5);margin-bottom:6px">Sin pronósticos para ${label}</div>
-          <div style="font-size:0.78rem;opacity:0.55">No hay partidos disponibles en esta categoría hoy.<br>Probá con <strong style="color:var(--verde);cursor:pointer" onclick="filterPredSport('todos', document.querySelector('#predSportTabs .sport-tab:last-child'))">Todos los picks</strong>.</div>
+        <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;gap:16px;text-align:center">
+          <div style="font-size:2.5rem">🔍</div>
+          <div style="font-size:1.1rem;font-weight:700;color:var(--texto-pri)">Sin pronósticos de alta confianza hoy</div>
+          <div style="font-size:0.85rem;color:var(--texto-sec);max-width:340px;line-height:1.5">La IA no encontró partidos con suficiente certeza para recomendar. Volvé más tarde cuando haya más partidos disponibles.</div>
         </div>`;
-      window._aiPreds = [];
-      return;
     }
-
-    document.getElementById('predGrid').innerHTML = [1,2,3].map(() => `
-      <div class="pred-card-skeleton">
-        <div class="skel" style="height:12px;width:55%"></div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="skel" style="height:22px;width:38%"></div>
-          <div class="skel" style="height:22px;width:28%"></div>
-        </div>
-        <div style="display:flex;justify-content:center;gap:24px;padding:10px 0">
-          <div class="skel" style="height:52px;width:52px;border-radius:50%"></div>
-          <div class="skel" style="height:52px;width:52px;border-radius:50%"></div>
-        </div>
-        <div class="skel" style="height:58px;width:100%;border-radius:10px"></div>
-        <div style="display:flex;gap:6px">
-          <div class="skel" style="height:14px;flex:1"></div>
-          <div class="skel" style="height:14px;flex:1"></div>
-          <div class="skel" style="height:14px;flex:1"></div>
-        </div>
-        <div style="display:flex;gap:6px">
-          <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
-          <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
-          <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
-        </div>
-        ${isLoading ? `<div style="text-align:center;font-size:0.68rem;color:var(--texto-sec);opacity:0.6">Cargando pronósticos...</div>` : `<div style="text-align:center;font-size:0.68rem;color:var(--texto-sec);opacity:0.6">Sin partidos disponibles</div>`}
-      </div>`).join('');
     window._aiPreds = [];
     return;
   }
