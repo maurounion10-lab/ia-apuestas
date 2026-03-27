@@ -7455,7 +7455,7 @@ function renderPreds() {
           <div class="pred-rec-value">${isFinishedLoss ? '❌' : '✅'} ${p.rec}</div>
         </div>
         <div class="pred-rec-right">
-          ${p._bestOdds ? `<div class="pred-rec-odds">${parseFloat(p._bestOdds).toFixed(2)}</div>` : ''}
+          ${(()=>{ const rp = p.rec==='Local Gana' ? p.probH : p.rec==='Visitante Gana' ? p.probA : p.rec==='Empate' ? p.probD : 0; const ro = rp > 0 ? (100/rp).toFixed(2) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
           ${p._bookKey ? `<a class="pred-rec-book" href="${getBookLink(p._bookKey)}" target="_blank" rel="noopener" title="Apostar en ${p._bookLabel||p._bookKey}" onclick="trackEvent('promo_click',{promo:'${p._bookKey}',type:'bookmaker_rec'})">
             <img src="${getBookLogo(p._bookKey)}" alt="${p._bookLabel||p._bookKey}" onerror="this.style.display='none'">
             <span class="pred-rec-bonus">🎁 Bono</span>
