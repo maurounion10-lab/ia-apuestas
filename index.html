@@ -7993,6 +7993,7 @@ let _histSyncTimer = null;
 let _globalHistSyncTimer = null;
 const ADMIN_EMAIL = 'mauro.union10@gmail.com';
 const GLOBAL_HIST_KEY = 'global_historial_v1';
+const BLOCKED_HIST_IDS = new Set(['fsvmainz05_sigmaolomouc_2026-03-18']);
 
 // Guarda el historial GLOBAL en shared_cache (solo admin)
 async function sbSaveGlobalHistorial(arr) {
@@ -8071,7 +8072,7 @@ async function sbLoadHistorial() {
     const allEntries = [...(globalHist||[]), ...dbHist, ...localHist];
     const seen = new Map();
     allEntries.forEach(h => { const k = _hKey(h); if (!seen.has(k)) seen.set(k, h); });
-    const merged = [...seen.values()].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0));
+    const merged = [...seen.values()].filter(h=>!BLOCKED_HIST_IDS.has(h?.id||'')).sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0));
 
     // Actualizar shared_cache si el merge tiene más entradas que lo guardado
     const prevCount = globalHist?.length || 0;
@@ -8087,7 +8088,8 @@ async function sbLoadHistorial() {
 
   // Otros usuarios: usar directamente el global
   if (globalHist && globalHist.length > 0) {
-    try { localStorage.setItem(HIST_KEY, JSON.stringify(globalHist)); } catch {}
+    const _fg = globalHist.filter(h=>!BLOCKED_HIST_IDS.has(h?.id||''));
+    try { localStorage.setItem(HIST_KEY, JSON.stringify(_fg)); } catch {}
     renderHistorial(histFilter);
     return;
   }
