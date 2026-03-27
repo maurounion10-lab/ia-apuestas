@@ -6654,16 +6654,16 @@ function buildPredsFromOdds() {
       for (const bk of (g.bookmakers || [])) {
         const m = bk.markets?.find(m => m.key === key);
         if (m) return m;
-    // Over odds — fútbol: busca líneas 1.5/2.5/3.5
+      }
       return null;
     };
     const totalsMkt = findMkt('totals');
-      if (o.name === 'Over') overOdds[pt] = o.price;
-    // Over odds — fútbol: busca líneas 1.5/2.5/3.5 
+
+    // Over odds — fútbol: busca líneas 1.5/2.5/3.5
     const overOdds = {};
     (totalsMkt?.outcomes || []).forEach(o => {
       const pt = String(o.point);
-        if (o.name === 'Over') overOdds[pt] = o.price;
+      if (o.name === 'Over') overOdds[pt] = o.price;
     });
 
     // ── Probabilidades 1X2 ──
@@ -6675,59 +6675,56 @@ function buildPredsFromOdds() {
     const probD = dOP ? Math.round(rawD / tot * 100) : 0;
     const probA = Math.round(rawA / tot * 100);
 
-    // Probabilidades de totales fútbol (implícita cruda del over)
+    // Probabilidades de totales fútbol
     const probOver = {};
-    // Solo se muestra si hay cuota REAL de la API (Pinnacle / William Hill).
-    // Sin dato real → no se genera predicción BTTS.
+    ['1.5','2.5','3.5'].forEach(pt => {
       if (overOdds[pt]) probOver[pt] = Math.round(100 / overOdds[pt]);
     });
 
     // ── Ambos Marcan (fútbol) ──
-    // Primero buscar mercado btts real en la API; si no, estimarlo desde Over2.5
+    // Solo se muestra si hay cuota REAL de la API (Pinnacle / William Hill).
+    // Sin dato real → no se genera predicción BTTS.
     const bttsMkt = findMkt('btts') || findMkt('both_teams_to_score');
+    let bttsOddsReal = null;
+    if (bttsMkt) {
+      const yes = (bttsMkt.outcomes || []).find(o => /yes|si|sí/i.test(o.name));
+      if (yes) bttsOddsReal = yes.price;
+    }
     // Solo cuota real — sin estimaciones
     const bttsEst = bttsOddsReal ? Math.round(100 / bttsOddsReal) : null;
     const bttsOddsEst = bttsOddsReal;
     const bttsIsEstimated = false;
-      ? Math.round(100 / bttsOddsReal)
-      : (probOver['2.5'] && probOver['2.5'] >= 50)
-        ? Math.min(probOver['2.5'] + 5, 80)
-        : null;
-    const bttsOddsEst = bttsOddsReal || (bttsEst ? parseFloat((100 / bttsEst).toFixed(2)) : null);
 
     // ── Selección de la MEJOR apuesta ──
-    const MIN_ODDS = 1.40; // cuota mínima aceptable
+    const MIN_ODDS = 1.40;
+    const candidates2 = [
+      { rec: 'Local Gana',     prob: probH, odds: hO ?? hOP },
+      { rec: 'Visitante Gana', prob: probA, odds: aO ?? aOP },
+      ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dO ?? dOP }] : []),
       ...['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) })),
-      // Ambos Marcan (fútbol)
       ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
     ]
     .filter(c => c.prob > 0)
-      // Totales fútbol: Over 1.5 / 2.5 / 3.5
-      ...(['1.5','2.5','3.5'].filter(pt => overOdds[pt]).map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
-    // Ordenar por probabilidad desc; en empate, los totales con cuota real ganan
-    ]    .filter(c => c.prob > 0)
+    .filter(c => !c.odds || parseFloat(c.odds) >= MIN_ODDS);
 
-    // Ordenar picks: para basket el Over/Under va siempre primero (es la apuesta más relevante);
-    // para fútbol ordenar por probabilidad desc y en empate preferir totales reales.
     candidates2.sort((a, b) => {
-      // Fútbol: por probabilidad; en empate, los totales con cuota real ganan
       if (b.prob !== a.prob) return b.prob - a.prob;
       if (a.isTotals) return -1;
       if (b.isTotals) return 1;
       return 0;
     });
 
-    if (!candidates2.length) return null; // todas las cuotas < MIN_ODDS → saltar partido
+    if (!candidates2.length) return null;
     const best     = candidates2[0];
+    const rec      = best.rec;
+    const maxProb  = best.prob || probH;
+    const bestOdds = best.odds;
+
+    let conf, confLabel;
     if (maxProb >= 62)      { conf = 'high'; confLabel = 'Alta'; }
     else if (maxProb >= 52) { conf = 'med';  confLabel = 'Media'; }
     else                    { conf = 'low';  confLabel = 'Baja'; }
-
-    let conf, confLabel;
-    if (maxProb >= 62)      { conf = 'high'; confLabel = `Alta (${maxProb}%)`; }
-    else if (maxProb >= 52) { conf = 'med';  confLabel = `Media (${maxProb}%)`; }
-    else                    { conf = 'low';  confLabel = `Baja (${maxProb}%)`; }
 
     // Bet Value Rating 1–6, alineado con confianza:
     // Alta  (≥62%) → 5-6  |  Media (52-61%) → 3-4  |  Baja (<52%) → 1-2
@@ -6754,7 +6751,7 @@ function buildPredsFromOdds() {
     let insight;
     if (rec === 'Local Gana')
       insight = `${hN} parte como favorito con ${probH}% de probabilidad implícita según el mercado${fmtO(hO)}. ${aN} tiene ${probA}% de chances como visitante. Las cuotas reflejan ventaja clara del local — apuesta con valor en línea de 1X.`;
-      insight = `Ambos equipos con ${bttsEst}% de probabilidad de convertir según el mercado${fmtO(bttsOddsEst)}. ${hN} (${probH}%) vs ${aN} (${probA}%): perfil ofensivo claro, cuota real de Ambos Marcan con valor.`;
+    else if (rec === 'Visitante Gana')
       insight = `${aN} es favorito visitante con ${probA}% de probabilidad implícita${fmtO(aO)}. El mercado descuenta a ${hN} que solo tiene ${probH}% de chances. Valor en apostar al visitante directo.`;
     else if (rec === 'Empate')
       insight = `Partido muy equilibrado — el mercado da ${probH}% local, ${probD}% empate, ${probA}% visitante. El empate ofrece la cuota más atractiva${fmtO(dO ?? dOP)}. Partido difícil de predecir; stake bajo recomendado.`;
@@ -6910,7 +6907,12 @@ function renderPreds() {
     const _16H_REC = 16 * 60 * 60 * 1000;
     const _48H_REC = 48 * 60 * 60 * 1000;
     hist
-      .filter(h => h.date === todayStr && !realPreds.find(p => teamsMatch(p.home, h.home) && teamsMatch(p.away, h.away)))
+      .filter(h => {
+        if (realPreds.find(p => teamsMatch(p.home, h.home) && teamsMatch(p.away, h.away))) return false;
+        const ts = h.commenceTs;
+        if (!ts) return h.date === todayStr;
+        return ts > (_nowMs - _16H_REC);
+      })
       .forEach(h => {
         realPreds.push({
           league:     (function(sk) {
@@ -8621,7 +8623,7 @@ function renderHistorial(filter) {
         const plHtml = h.result==='pending'||h.result==='void'
           ? '<span style="color:#555">—</span>'
           : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
-        const icon = h.sport==='tenis'?'🏘':'⚽';
+        const icon = h.sport==='tenis'?'🎾':'⚽';
         const recDisplay = (h.rec||'').replace(' Gana','');
         const isHigh = h.stake === 130;
         // Fecha real del partido: usar commenceTs si existe, si no h.date
@@ -12229,7 +12231,7 @@ async function admLoadStats() {
 
     const statN = (n, label, icon) => `
       <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px;text-align:center">
-        <div style="font-size:1.5rem;margin-bottom,2px">${icon}</div>
+        <div style="font-size:1.5rem;margin-bottom:2px">${icon}</div>
         <div style="font-size:1.4rem;font-weight:800;color:#fff;line-height:1.1">${n}</div>
         <div style="font-size:0.7rem;font-weight:700;color:var(--texto-sec);margin-top:3px">${label}</div>
       </div>`;
@@ -14046,7 +14048,7 @@ function _showPromoDirecta() {
     3: '🔴 ¿Todavía no te registraste en <strong>DBbet</strong>? Es nuestro Main Sponsor: te dan el <strong>doble de tu primer depósito</strong> y vos bancás que gambeta.ai siga siendo gratis.',
     4: '🔴 <strong>DBbet</strong> — nuestro sponsor — duplica tu primer depósito. <strong>Creá tu cuenta hoy</strong> y apostá con más plata. Sin DBbet no hay gambeta.ai.',
     5: '🔴 Finde de fútbol y <strong>DBbet con el 100% de bono activo</strong> — la combinación perfecta. Registrate, depositá y doblá tu saldo antes de los partidos de hoy.',
-    6: '🔴 Ôltimo día del finde: <strong>DBbet sigue con el bono del 100%</strong> para nuevos usuarios. Registrate ahora y apostá con el doble en los cierres de jornada.'
+    6: '🔴 Último día del finde: <strong>DBbet sigue con el bono del 100%</strong> para nuevos usuarios. Registrate ahora y apostá con el doble en los cierres de jornada.'
   };
 
   // DBbet hero banner
@@ -14626,7 +14628,7 @@ async function admVerPicks(email) {
 
     const resultIcon = r => r === 'win' ? '✅' : r === 'loss' ? '❌' : '⏳';
     const resultColor= r => r === 'win' ? 'var(--verde)' : r === 'loss' ? 'var(--rojo)' : '#ffd600';
-    const sportIcon  = s => ({ futbol:'⚽', tenis:'🏘', americano:'🏈' }[s] || '🎲');
+    const sportIcon  = s => ({ futbol:'⚽', tenis:'🎾', americano:'🏈' }[s] || '🎲');
 
     listEl.innerHTML = hist.map(p => {
       // historial_full usa: date, rec, stake, pl — NO ts/pick/betAmount
