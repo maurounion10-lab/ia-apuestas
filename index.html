@@ -7183,13 +7183,7 @@ function renderPreds() {
           upcomingSlice.push(bestEur);
         }
       }
-      // Completar hasta 6 con baja confianza si faltan (solo si cuota >= 3.00)
-      if (upcomingSlice.length < 6) {
-        const lowConf = upcoming.filter(p => p.conf === 'low' && parseFloat(p._bestOdds||0) >= 3.00).sort(sortConf);
-        upcomingSlice = [...upcomingSlice, ...lowConf].slice(0, 6);
-      }
-      // Terminados: SIEMPRE incluirlos (con badge de resultado) — hasta 16h ya filtrados arriba
-      const principales = [...upcomingSlice, ...finished];
+      // Solo alta y media confianza — no publicar picks de baja confianza
       realPreds = principales.length ? principales : null;
     }
     if (realPreds && realPreds.length === 0) realPreds = null;
