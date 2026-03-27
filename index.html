@@ -3778,7 +3778,7 @@
     </div>
     <!-- Filtros de confianza -->
     <div class="hist-date-filters" style="margin-top:6px">
-      <button id="histConfBtnAll"  class="hist-date-btn active"        onclick="filterHistConf('all',this)">🎯 Todas</button>
+      <button id="histConfBtnAll"  class="hist-date-btn active"        onclick="filterHistConf('all',this)">🎯 Confianza</button>
       <button id="histConfBtnHigh" class="hist-date-btn conf-high-btn" onclick="filterHistConf('high',this)">🔥 Alta</button>
       <button id="histConfBtnMed"  class="hist-date-btn conf-med-btn"  onclick="filterHistConf('med',this)">⭐ Media</button>
       <button id="histConfBtnLow"  class="hist-date-btn conf-low-btn"  onclick="filterHistConf('low',this)">📉 Baja</button>
@@ -4893,6 +4893,11 @@ function computeStatsFromHistorial(rows) {
 }
 
 async function loadLiveStats() {
+  // Invalidar caché de stats si fue guardada sin roi (versión anterior)
+  try {
+    const _sc = localStorage.getItem(STATS_CACHE_KEY);
+    if (_sc) { const _sco = JSON.parse(_sc); if (_sco && !('roi' in _sco)) localStorage.removeItem(STATS_CACHE_KEY); }
+  } catch {}
   // ── PASO 1: mostrar stats locales instantáneamente ──
   // (siempre disponibles, sin esperar red)
   // loadHistorial() está definida más adelante en el código,
@@ -4954,7 +4959,7 @@ async function loadLiveStats() {
       precision, roi: gs.roi, totalPicks: total, ts: Date.now(), source: 'global'
     }));
 
-    heroStatsApply(gs.roi, total, true);
+    heroStatsApply(gs.roi ?? gs.precision, total, true);
   } catch(e) {
     // Sin columna "predictions" en Supabase → stats locales ya aplicadas arriba.
     // Si tampoco había stats locales, mostrar placeholder animado.
@@ -8486,9 +8491,12 @@ function renderHistorial(filter) {
     });
   }
 
-  // Filtro por confianza
+  // Filtro por confianza (deriva de stake si no hay campo conf)
   if (histConfFilter !== 'all') {
-    data = data.filter(h => (h.conf || 'low') === histConfFilter);
+    data = data.filter(h => {
+      const c = h.conf || (h.stake >= 130 ? 'high' : h.stake >= 50 ? 'med' : 'low');
+      return c === histConfFilter;
+    });
   }
 
   // ── Backfill league field from _sportKey for existing historial entries ──
