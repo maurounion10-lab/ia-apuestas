@@ -4549,7 +4549,7 @@ const sbClient = supabase.createClient(_SB_URL, _SB_KEY, {
 // Cliente público (anon, sin JWT) — solo para lecturas públicas como el feed G$
 // Necesario porque la RLS policy "feed_public_read" cubre el rol anon, no authenticated
 const sbAnon = supabase.createClient(_SB_URL, _SB_KEY, {
-  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+  auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'sb-anon-public' }
 });
 
 // ── Analytics: sesión + eventos ──────────────────────────────────────────
