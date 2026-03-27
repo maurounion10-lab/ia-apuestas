@@ -6698,9 +6698,9 @@ function buildPredsFromOdds() {
     // ── Selección de la MEJOR apuesta ──
     const MIN_ODDS = 1.40;
     const candidates2 = [
-      { rec: 'Local Gana',     prob: probH, odds: hO ?? hOP },
-      { rec: 'Visitante Gana', prob: probA, odds: aO ?? aOP },
-      ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dO ?? dOP }] : []),
+      { rec: 'Local Gana',     prob: probH, odds: hOP },
+      { rec: 'Visitante Gana', prob: probA, odds: aOP },
+      ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dOP }] : []),
       ...['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) })),
       ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
