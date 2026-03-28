@@ -7184,6 +7184,7 @@ function renderPreds() {
         }
       }
       // Solo alta y media confianza — no publicar picks de baja confianza
+      const principales = [...upcomingSlice, ...finished];
       realPreds = principales.length ? principales : null;
     }
     if (realPreds && realPreds.length === 0) realPreds = null;
