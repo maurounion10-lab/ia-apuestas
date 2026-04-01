@@ -62,13 +62,28 @@ jobs:
             "fingerprints": []
           }
           JSONEOF
-      - name: Build APK
+      - name: Debug init output
+        run: |
+          echo "=== twa-build/ ==="
+          ls -la twa-build/ 2>/dev/null || echo "(empty)"
+          echo "=== app/build.gradle (first 80 lines) ==="
+          head -80 twa-build/app/build.gradle 2>/dev/null || echo "(not found)"
+          echo "=== JAVA_HOME ==="
+          echo "${JAVA_HOME}"
+          echo "=== ANDROID_HOME ==="
+          echo "${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+      - name: Setup Android SDK for Gradle
+        run: |
+          ANDROID_SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo "sdk.dir=${ANDROID_SDK}" > twa-build/local.properties
+          chmod +x twa-build/gradlew 2>/dev/null || true
+          echo "local.properties set to sdk.dir=${ANDROID_SDK}"
+      - name: Build APK with Gradle
         working-directory: twa-build
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          printf "n\n${JAVA_HOME}\n" | bubblewrap build --skipPwaValidation
+        run: ./gradlew assembleRelease --stacktrace
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
