@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "ai.gambeta.app",
+      "sha256_cert_fingerprints": [
+        "1A:52:30:0F:B1:C9:58:6E:58:EC:FF:27:CF:01:C5:CE:22:A3:71:64:9E:E8:C5:7B:98:BE:6B:6C:4F:D5:27:9A"
+      ]
+    }
+  }
+]
