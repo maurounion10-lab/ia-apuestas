@@ -48,54 +48,6 @@ jobs:
               else:
                   print("PATCH1 WARN: validatePath not found")
 
-          # === PATCH 2: Icon Content-Type validation — bypass it ===
-          # Find the file that throws "invalid Content-Type"
-          result = subprocess.run(
-              ['grep', '-rl', 'invalid Content-Type', f'{npm_root}/@bubblewrap/'],
-              capture_output=True, text=True
-          )
-          icon_files = [f for f in result.stdout.strip().split('\n') if f]
-          print(f"\nIcon error files: {icon_files}")
-
-          for filepath in icon_files:
-              with open(filepath) as f:
-                  c = f.read()
-              print(f"=== {filepath} ===")
-              for i, line in enumerate(c.split('\n'), 1):
-                  if 'Content-Type' in line or 'contentType' in line or 'content-type' in line.lower():
-                      print(f"  L{i}: {line[:200]}")
-
-              # Patch: comment out or remove the Content-Type check
-              # Replace the if block that throws on invalid Content-Type
-              # Pattern: if (!contentType || ...) { throw/return error }
-              patched = re.sub(
-                  r'if\s*\([^)]*[Cc]ontent[-_][Tt]ype[^)]*\)\s*\{[^}]+invalid Content-Type[^}]+\}',
-                  '/* PATCHED: skip Content-Type check */',
-                  c,
-                  flags=re.DOTALL
-              )
-              if patched != c:
-                  with open(filepath, 'w') as f: f.write(patched)
-                  print(f"PATCH2 OK: Content-Type check removed")
-              else:
-                  # Strategy B: just remove the specific error throw line
-                  lines = c.split('\n')
-                  for i, line in enumerate(lines):
-                      if 'invalid Content-Type' in line:
-                          # Comment out this line
-                          lines[i] = '// PATCHED: ' + lines[i]
-                          # Check next lines for related throw/return
-                          for j in range(i+1, min(len(lines), i+5)):
-                              if lines[j].strip().startswith('throw') or (lines[j].strip().startswith('return') and 'error' in lines[j].lower()):
-                                  lines[j] = '// PATCHED: ' + lines[j]
-                                  break
-                              elif lines[j].strip() == '}':
-                                  break
-                          print(f"PATCH2B OK: commented error at L{i+1}")
-                  patched = '\n'.join(lines)
-                  if patched != c:
-                      with open(filepath, 'w') as f: f.write(patched)
-
           print("\nAll patches done")
           PYEOF
       - name: Pre-configure Bubblewrap
