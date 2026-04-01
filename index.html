@@ -5224,6 +5224,10 @@ const teamLogos = {
   'Universidad de Chile':   'https://media.api-sports.io/football/teams/2293.png',
   'U de Chile':             'https://media.api-sports.io/football/teams/2293.png',
   'Universidad Católica':   'https://media.api-sports.io/football/teams/2290.png',
+  'U. Católica':                    'https://media.api-sports.io/football/teams/2290.png',
+  'U Católica':                     'https://media.api-sports.io/football/teams/2290.png',
+  'Universidad Católica de Chile':  'https://media.api-sports.io/football/teams/2290.png',
+  'CD Universidad Católica':        'https://media.api-sports.io/football/teams/2290.png',
   'Cobresal':               'https://media.api-sports.io/football/teams/2291.png',
   'Huachipato':             'https://media.api-sports.io/football/teams/2294.png',
   'Nacional':               'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Nacional_Montevideo.png/200px-Nacional_Montevideo.png',
@@ -7456,7 +7460,15 @@ function renderPreds() {
         <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${(() => {
           const lg = (p.league && p.league !== 'Fútbol' && p.league !== 'Tenis' && p.league !== 'Liga') ? p.league : '';
           const t  = isGameLive ? '🔴 EN VIVO'
-                   : isStarted  ? (p.commenceTs ? new Date(p.commenceTs).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false}) : '')
+                   : isStarted  ? (() => {
+                       if (!p.commenceTs) return '';
+                       const _md = new Date(p.commenceTs);
+                       const _td = new Date(); _td.setHours(0,0,0,0);
+                       const _cd = new Date(_md); _cd.setHours(0,0,0,0);
+                       const _diff = Math.round((_cd - _td) / 86400000);
+                       const _ts = _md.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false});
+                       return (_diff === -1 ? 'Ayer' : _diff === 0 ? 'Hoy' : _diff === 1 ? 'Mañana' : _md.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})) + ' · ' + _ts;
+                     })()
                    : p.time;
           return [lg, t].filter(Boolean).join(' · ');
         })()}</span>
