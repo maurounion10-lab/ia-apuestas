@@ -4757,10 +4757,10 @@ async function acLoadFromDB(email) {
     // Balance: keep the higher value (never lose offline coins or daily bonus)
     const mergedBal = Math.max(localBal, dbBal);
 
-    // History: union by entry key — deduplicate by timestamp + text
+    // History: union by entry key — deduplicate por reason+delta (NOT balance que varía)
     const histMap = new Map();
     [...dbHist, ...localHist].forEach(h => {
-      const key = (h.ts || h.timestamp || h.date || '') + '|' + (h.label || h.text || h.event || JSON.stringify(h));
+      const key = (h.ts || h.timestamp || h.date || '') + '|' + (h.reason || h.label || h.text || h.event || '') + '|' + (h.delta || 0);
       if (!histMap.has(key)) histMap.set(key, h);
     });
     const mergedHist = [...histMap.values()];
@@ -11021,6 +11021,12 @@ function acEvaluatePicks() {
   const picks    = acGetPicks();
   const finished = scoresData.filter(g => g.flag === 'final');
   let changed    = false;
+  // Guard: set of wins ya acreditados en historial para evitar doble-crédito multi-sesión
+  const creditedWins = new Set(
+    (JSON.parse(localStorage.getItem(AC_HIST) || '[]'))
+      .filter(h => h.reason && h.reason.startsWith('✅'))
+      .map(h => h.reason)
+  );
   picks.forEach(p => {
     if (p.evaluated) return;
     const game = finished.find(g =>
@@ -11038,9 +11044,14 @@ function acEvaluatePicks() {
     const odds       = p.odds || 2;
     if (correct) {
       const returnAmt = Math.round(betAmt * odds);
-      acAdd(returnAmt, `✅ ${matchLabel}`);
-      acToast('✅', `+${acFmt(returnAmt)} ${AC_ICON}`, `¡Acertaste! ${matchLabel}`);
-      _addCoinNotif('✅', `+${acFmt(returnAmt)} G$ ganados`, `¡Acertaste! ${matchLabel}`);
+      const winKey = `✅ ${matchLabel}`;
+      // Solo acreditar si este partido no fue ya acreditado (evita doble-crédito)
+      if (!creditedWins.has(winKey)) {
+        acAdd(returnAmt, winKey);
+        creditedWins.add(winKey);
+        acToast('✅', `+${acFmt(returnAmt)} ${AC_ICON}`, `¡Acertaste! ${matchLabel}`);
+        _addCoinNotif('✅', `+${acFmt(returnAmt)} G$ ganados`, `¡Acertaste! ${matchLabel}`);
+      }
       p.coinsChange = returnAmt;
     } else {
       // coins already deducted when bet was placed — no extra penalty
