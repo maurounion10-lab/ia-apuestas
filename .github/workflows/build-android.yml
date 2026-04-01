@@ -128,32 +128,31 @@ jobs:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: |
-          # Use expect to handle any remaining interactive prompts (keystore password, etc.)
           python3 << 'PYEOF'
           import os
           script = r"""#!/usr/bin/expect -f
-set timeout 600
-set store_pass [lindex $argv 0]
-set key_pass [lindex $argv 1]
-set pass_count 0
-spawn bubblewrap build --skipPwaValidation
-expect {
-    -re {Y/n} { send "y\r"; exp_continue }
-    -re {y/N} { send "y\r"; exp_continue }
-    -re {[Pp]assword} {
-        incr pass_count
-        if {$pass_count == 1} {
-            send "$store_pass\r"
-        } else {
-            send "$key_pass\r"
-        }
-        exp_continue
-    }
-    eof
-}
-catch wait result
-exit [lindex $result 3]
-"""
+          set timeout 600
+          set store_pass [lindex $argv 0]
+          set key_pass [lindex $argv 1]
+          set pass_count 0
+          spawn bubblewrap build --skipPwaValidation
+          expect {
+              -re {Y/n} { send "y\r"; exp_continue }
+              -re {y/N} { send "y\r"; exp_continue }
+              -re {[Pp]assword} {
+                  incr pass_count
+                  if {$pass_count == 1} {
+                      send "$store_pass\r"
+                  } else {
+                      send "$key_pass\r"
+                  }
+                  exp_continue
+              }
+              eof
+          }
+          catch wait result
+          exit [lindex $result 3]
+          """
           with open('/tmp/build.exp', 'w') as f:
               f.write(script)
           os.chmod('/tmp/build.exp', 0o755)
