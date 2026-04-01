@@ -27,78 +27,26 @@ jobs:
             "platform-tools" \
             "build-tools;34.0.0" \
             "platforms;android-34" 2>&1 | tail -5
-      - name: Patch bubblewrap JS
+      - name: Patch bubblewrap validatePath
         run: |
           python3 << 'PYEOF'
           import subprocess, glob, re
 
           npm_root = subprocess.check_output(['npm', 'root', '-g']).decode().strip()
-          print(f"npm root: {npm_root}")
-
-          # === PATCH 1: AndroidSdkTools.validatePath — bypass SDK validation ===
           sdk_files = glob.glob(f"{npm_root}/@bubblewrap/**/*AndroidSdkTools.js", recursive=True)
           for sdk_js in sdk_files:
               with open(sdk_js) as f:
                   content = f.read()
-              match = re.search(r'static async validatePath\s*\((\w+)\)\s*\{', content)
-              if match:
-                  param = match.group(1)
-                  brace_pos = match.end() - 1
-                  content = content[:brace_pos+1] + f'\n        return Result_1.Result.ok({param}); // PATCHED' + content[brace_pos+1:]
+              m = re.search(r'static async validatePath\s*\((\w+)\)\s*\{', content)
+              if m:
+                  param = m.group(1)
+                  bp = m.end() - 1
+                  content = content[:bp+1] + f'\n        return Result_1.Result.ok({param}); // PATCHED' + content[bp+1:]
                   with open(sdk_js, 'w') as f:
                       f.write(content)
-                  print(f"PATCH1 OK: validatePath({param}) in {sdk_js}")
+                  print(f"PATCH OK: validatePath({param}) bypassed")
               else:
-                  print(f"PATCH1 WARN: validatePath not found")
-
-          # === PATCH 2: Find verifyChecksum — the REAL checksum logic file ===
-          result = subprocess.run(
-              ['grep', '-rl', 'verifyChecksum', f'{npm_root}/@bubblewrap/'],
-              capture_output=True, text=True
-          )
-          verify_files = [f for f in result.stdout.strip().split('\n') if f and f.endswith('.js')]
-          print(f"\nFiles with verifyChecksum: {verify_files}")
-
-          for filepath in verify_files:
-              with open(filepath) as f:
-                  content = f.read()
-              print(f"\n=== {filepath} ===")
-              for i, line in enumerate(content.split('\n'), 1):
-                  if 'verifyChecksum' in line or 'checksum' in line.lower() or 'prompt' in line:
-                      print(f"  L{i}: {line[:200]}")
-
-              patched = content
-
-              # Patch A: make verifyChecksum() always return false (trigger regeneration)
-              m = re.search(r'(async verifyChecksum\s*\([^)]*\)\s*\{)', patched)
-              if m:
-                  brace_pos = m.end() - 1
-                  patched = patched[:brace_pos+1] + ' return false; /* PATCHED: force regen */ ' + patched[brace_pos+1:]
-                  print(f"PATCH2A OK: verifyChecksum → always false")
-
-              # Patch B: auto-answer the Y/n prompt with true
-              # Pattern: const {varname} = await x.prompt([...])
-              pm = re.search(r'const\s*\{\s*(\w+)\s*\}\s*=\s*await\s+\w+\.prompt\s*\(', patched)
-              if pm:
-                  var_name = pm.group(1)
-                  patched = re.sub(
-                      r'const\s*\{\s*' + re.escape(var_name) + r'\s*\}\s*=\s*await\s+[^;]+;',
-                      f'const {{{var_name}}} = {{{var_name}: true}}; /* PATCHED: auto-yes */',
-                      patched,
-                      count=1
-                  )
-                  print(f"PATCH2B OK: auto-yes for prompt var '{var_name}'")
-              else:
-                  print(f"PATCH2B WARN: prompt assignment not found in {filepath}")
-
-              if patched != content:
-                  with open(filepath, 'w') as f:
-                      f.write(patched)
-                  print(f"File saved: {filepath}")
-              else:
-                  print(f"No changes in {filepath}")
-
-          print("\nAll patches done")
+                  print("PATCH WARN: validatePath not found")
           PYEOF
       - name: Pre-configure Bubblewrap
         run: |
@@ -109,12 +57,81 @@ jobs:
         run: |
           mkdir -p twa-build
           printf '%s' '{"packageId":"ai.gambeta.app","host":"gambeta.ai","name":"gambeta.ai","launcherName":"gambeta.ai","display":"standalone","themeColor":"#00c853","navigationColor":"#0a0f0a","navigationColorDark":"#0a0f0a","backgroundColor":"#0a0f0a","startUrl":"/","iconUrl":"https://gambeta.ai/favicon-512.png","maskableIconUrl":"https://gambeta.ai/favicon-512.png","splashScreenFadeOutDuration":300,"signingKey":{"path":"../android.keystore","alias":"gambeta"},"minSdkVersion":21,"targetSdkVersion":34,"appVersion":"1.0.0","appVersionCode":1,"orientation":"portrait","enableNotifications":false,"generatorApp":"bubblewrap-cli","webManifestUrl":"https://gambeta.ai/manifest.json","fallbackType":"customtabs","features":{},"alphaDependencies":{"enabled":false},"enableSiteSettingsShortcut":true,"isChromeOSOnly":false,"isMetaQuest":false,"fullScopeUrl":"https://gambeta.ai/","fingerprints":[]}' > twa-build/twa-manifest.json
-      - name: Build APK
+      - name: Build APK via PTY runner
         working-directory: twa-build
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: bubblewrap build --skipPwaValidation
+        run: |
+          python3 << 'PYEOF'
+          import os
+          runner = r'''
+import pty, os, sys, select, time
+
+def main():
+    store_pass = os.environ.get('BUBBLEWRAP_KEYSTORE_PASSWORD', '').encode()
+    key_pass = os.environ.get('BUBBLEWRAP_KEY_PASSWORD', '').encode()
+    master_fd, slave_fd = pty.openpty()
+    pid = os.fork()
+    if pid == 0:
+        os.setsid()
+        os.dup2(slave_fd, 0)
+        os.dup2(slave_fd, 1)
+        os.dup2(slave_fd, 2)
+        os.close(master_fd)
+        os.close(slave_fd)
+        os.execvp('bubblewrap', ['bubblewrap', 'build', '--skipPwaValidation'])
+        sys.exit(1)
+    os.close(slave_fd)
+    buf = b''
+    pass_count = [0]
+    while True:
+        try:
+            r, _, _ = select.select([master_fd], [], [], 2.0)
+        except Exception:
+            break
+        if r:
+            try:
+                data = os.read(master_fd, 4096)
+                if not data:
+                    break
+                sys.stdout.buffer.write(data)
+                sys.stdout.buffer.flush()
+                buf += data
+                if b'(Y/n)' in buf or b'(y/N)' in buf or b'[Y/n]' in buf:
+                    print('\n[PTY] Auto-answering Y to prompt')
+                    os.write(master_fd, b'y\r\n')
+                    buf = b''
+                elif b'assword' in buf and b':' in buf:
+                    pass_count[0] += 1
+                    pw = store_pass if pass_count[0] == 1 else key_pass
+                    print(f'\n[PTY] Auto-answering password #{pass_count[0]}')
+                    os.write(master_fd, pw + b'\r\n')
+                    buf = b''
+            except OSError:
+                break
+        try:
+            wpid, status = os.waitpid(pid, os.WNOHANG)
+            if wpid == pid:
+                code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else 1
+                print(f'\n[PTY] Process exited with code {code}')
+                sys.exit(code)
+        except Exception:
+            break
+    try:
+        _, status = os.waitpid(pid, 0)
+        code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else 1
+        print(f'\n[PTY] Final exit code: {code}')
+        sys.exit(code)
+    except Exception:
+        pass
+
+main()
+'''
+          with open('/tmp/pty_runner.py', 'w') as f:
+              f.write(runner)
+          PYEOF
+          python3 /tmp/pty_runner.py
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
