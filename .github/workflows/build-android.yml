@@ -27,7 +27,7 @@ jobs:
             "platform-tools" \
             "build-tools;34.0.0" \
             "platforms;android-34" 2>&1 | tail -5
-      - name: Patch bubblewrap (validatePath + checksum prompt)
+      - name: Patch bubblewrap JS
         run: |
           python3 << 'PYEOF'
           import subprocess, glob, re
@@ -35,7 +35,7 @@ jobs:
           npm_root = subprocess.check_output(['npm', 'root', '-g']).decode().strip()
           print(f"npm root: {npm_root}")
 
-          # === PATCH 1: validatePath in AndroidSdkTools.js ===
+          # === PATCH 1: AndroidSdkTools.validatePath — bypass SDK validation ===
           sdk_files = glob.glob(f"{npm_root}/@bubblewrap/**/*AndroidSdkTools.js", recursive=True)
           for sdk_js in sdk_files:
               with open(sdk_js) as f:
@@ -44,74 +44,61 @@ jobs:
               if match:
                   param = match.group(1)
                   brace_pos = match.end() - 1
-                  early = f'\n        return Result_1.Result.ok({param}); // PATCHED'
-                  content = content[:brace_pos+1] + early + content[brace_pos+1:]
+                  content = content[:brace_pos+1] + f'\n        return Result_1.Result.ok({param}); // PATCHED' + content[brace_pos+1:]
                   with open(sdk_js, 'w') as f:
                       f.write(content)
-                  print(f"PATCH1 OK: validatePath({param}) → early return ok in {sdk_js}")
+                  print(f"PATCH1 OK: validatePath({param}) in {sdk_js}")
               else:
-                  print(f"PATCH1 WARN: validatePath not found in {sdk_js}")
+                  print(f"PATCH1 WARN: validatePath not found")
 
-          # === PATCH 2: checksum/regenerate prompt in build.js ===
-          # Find file containing the "No checksum file" message
+          # === PATCH 2: Find verifyChecksum — the REAL checksum logic file ===
           result = subprocess.run(
-              ['grep', '-rl', 'No checksum', f'{npm_root}/@bubblewrap/'],
+              ['grep', '-rl', 'verifyChecksum', f'{npm_root}/@bubblewrap/'],
               capture_output=True, text=True
           )
-          checksum_files = [f for f in result.stdout.strip().split('\n') if f]
-          print(f"Checksum prompt files: {checksum_files}")
+          verify_files = [f for f in result.stdout.strip().split('\n') if f and f.endswith('.js')]
+          print(f"\nFiles with verifyChecksum: {verify_files}")
 
-          for filepath in checksum_files:
+          for filepath in verify_files:
               with open(filepath) as f:
                   content = f.read()
-
-              # Show relevant lines for diagnostics
+              print(f"\n=== {filepath} ===")
               for i, line in enumerate(content.split('\n'), 1):
-                  if any(kw in line for kw in ['checksum', 'verifyChecksum', 'regenerate', 'No checksum']):
-                      print(f"  L{i}: {line[:160]}")
+                  if 'verifyChecksum' in line or 'checksum' in line.lower() or 'prompt' in line:
+                      print(f"  L{i}: {line[:200]}")
 
               patched = content
 
-              # Strategy A: find `if (!(await x.verifyChecksum()))` and make it `if (true)`
-              patched_a = re.sub(
-                  r'if\s*\(\s*!\s*\(?\s*await\s+\w+\.verifyChecksum\s*\(\s*\)\s*\)?\s*\)',
-                  'if (true) /* PATCHED: always regenerate */',
-                  patched
-              )
-              if patched_a != patched:
-                  print("PATCH2A OK: replaced verifyChecksum check with if(true)")
-                  patched = patched_a
+              # Patch A: make verifyChecksum() always return false (trigger regeneration)
+              m = re.search(r'(async verifyChecksum\s*\([^)]*\)\s*\{)', patched)
+              if m:
+                  brace_pos = m.end() - 1
+                  patched = patched[:brace_pos+1] + ' return false; /* PATCHED: force regen */ ' + patched[brace_pos+1:]
+                  print(f"PATCH2A OK: verifyChecksum → always false")
 
-              # Strategy B: find prompt call assigned to variable and make it auto-true
-              # Pattern: const { varname } = await something.prompt([...])
-              # Find the variable name used in the prompt result
-              prompt_match = re.search(
-                  r'const\s*\{\s*(\w+)\s*\}\s*=\s*await\s+\w+\.prompt\s*\(',
-                  patched
-              )
-              if prompt_match:
-                  var_name = prompt_match.group(1)
-                  print(f"PATCH2B: found prompt var '{var_name}', replacing with auto-true")
-                  # Replace: const { var } = await something.prompt([...]);
-                  # With:    const { var } = { var: true }; // PATCHED
+              # Patch B: auto-answer the Y/n prompt with true
+              # Pattern: const {varname} = await x.prompt([...])
+              pm = re.search(r'const\s*\{\s*(\w+)\s*\}\s*=\s*await\s+\w+\.prompt\s*\(', patched)
+              if pm:
+                  var_name = pm.group(1)
                   patched = re.sub(
                       r'const\s*\{\s*' + re.escape(var_name) + r'\s*\}\s*=\s*await\s+[^;]+;',
-                      f'const {{{var_name}}} = {{{var_name}: true}}; // PATCHED: auto-yes',
+                      f'const {{{var_name}}} = {{{var_name}: true}}; /* PATCHED: auto-yes */',
                       patched,
                       count=1
                   )
-                  print(f"PATCH2B OK: auto-replaced prompt call for '{var_name}'")
+                  print(f"PATCH2B OK: auto-yes for prompt var '{var_name}'")
               else:
-                  print("PATCH2B WARN: could not find prompt assignment pattern")
+                  print(f"PATCH2B WARN: prompt assignment not found in {filepath}")
 
               if patched != content:
                   with open(filepath, 'w') as f:
                       f.write(patched)
-                  print(f"File patched: {filepath}")
+                  print(f"File saved: {filepath}")
               else:
-                  print(f"No patches applied to {filepath}")
+                  print(f"No changes in {filepath}")
 
-          print("Done patching")
+          print("\nAll patches done")
           PYEOF
       - name: Pre-configure Bubblewrap
         run: |
@@ -127,37 +114,7 @@ jobs:
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          python3 << 'PYEOF'
-          import os
-          script = r"""#!/usr/bin/expect -f
-          set timeout 600
-          set store_pass [lindex $argv 0]
-          set key_pass [lindex $argv 1]
-          set pass_count 0
-          spawn bubblewrap build --skipPwaValidation
-          expect {
-              -re {Y/n} { send "y\r"; exp_continue }
-              -re {y/N} { send "y\r"; exp_continue }
-              -re {[Pp]assword} {
-                  incr pass_count
-                  if {$pass_count == 1} {
-                      send "$store_pass\r"
-                  } else {
-                      send "$key_pass\r"
-                  }
-                  exp_continue
-              }
-              eof
-          }
-          catch wait result
-          exit [lindex $result 3]
-          """
-          with open('/tmp/build.exp', 'w') as f:
-              f.write(script)
-          os.chmod('/tmp/build.exp', 0o755)
-          PYEOF
-          /tmp/build.exp "$BUBBLEWRAP_KEYSTORE_PASSWORD" "$BUBBLEWRAP_KEY_PASSWORD"
+        run: bubblewrap build --skipPwaValidation
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
