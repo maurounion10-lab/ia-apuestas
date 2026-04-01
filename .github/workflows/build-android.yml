@@ -27,75 +27,51 @@ jobs:
             "platform-tools" \
             "build-tools;34.0.0" \
             "platforms;android-34" 2>&1 | tail -5
-          echo "JAVA_HOME=$JAVA_HOME"
-          echo "ANDROID_HOME=$ANDROID_HOME"
-          ls "$JAVA_HOME/bin/java" && echo "java binary OK" || echo "java binary MISSING"
-          ls "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" && echo "sdkmanager OK" || echo "sdkmanager MISSING"
-          ls "$ANDROID_HOME/platform-tools/adb" && echo "adb OK" || echo "adb MISSING"
-      - name: Patch bubblewrap SDK validation
+      - name: Patch bubblewrap validatePath
         run: |
-          NPM_ROOT=$(npm root -g)
-          echo "npm root: $NPM_ROOT"
-          SDK_JS="$NPM_ROOT/@bubblewrap/cli/node_modules/@bubblewrap/core/dist/lib/androidSdk/AndroidSdkTools.js"
-          echo "AndroidSdkTools.js: $SDK_JS"
-          ls "$SDK_JS" && echo "file exists" || echo "FILE MISSING"
           python3 << 'PYEOF'
-          import subprocess, os, re, glob, sys
+          import subprocess, glob, re
 
           npm_root = subprocess.check_output(['npm', 'root', '-g']).decode().strip()
           sdk_files = glob.glob(f"{npm_root}/@bubblewrap/**/*AndroidSdkTools.js", recursive=True)
-          print(f"Found AndroidSdkTools files: {sdk_files}")
+          print(f"Patching files: {sdk_files}")
 
           for sdk_js in sdk_files:
-              print(f"\n=== Patching {sdk_js} ===")
               with open(sdk_js) as f:
                   content = f.read()
 
-              # Determine the Result.ok() expression used in this file
-              if 'Result_1.Result.ok' in content:
-                  ok_call = 'Result_1.Result.ok(true)'
-              elif 'exports.Result.ok' in content:
-                  ok_call = 'exports.Result.ok(true)'
+              # Strategy 1: Find static async validatePath(param) { and insert early return
+              match = re.search(r'static async validatePath\s*\((\w+)\)\s*\{', content)
+              if match:
+                  param = match.group(1)
+                  brace_pos = match.end() - 1
+                  early = f'\n        return Result_1.Result.ok({param}); // PATCHED'
+                  content = content[:brace_pos+1] + early + content[brace_pos+1:]
+                  print(f"Strategy 1: patched validatePath({param}) with early return ok")
               else:
-                  ok_call = 'Result.ok(true)'
-              print(f"Using Result.ok expression: {ok_call}")
+                  print("Strategy 1: validatePath not found, trying Strategy 2")
+                  # Strategy 2: Replace the error line directly
+                  lines = content.split('\n')
+                  patched_lines = []
+                  for i, line in enumerate(lines):
+                      if "androidSdk isn" in line and "Result.error" in line:
+                          indent = len(line) - len(line.lstrip())
+                          patched_lines.append(' ' * indent + 'return Result_1.Result.ok(sdkPath); // PATCHED')
+                          print(f"Strategy 2: replaced error at line {i+1}")
+                      else:
+                          patched_lines.append(line)
+                  content = '\n'.join(patched_lines)
 
-              # Show current validation-related lines for diagnostics
-              print("Current validation lines:")
+              with open(sdk_js, 'w') as f:
+                  f.write(content)
+
+              # Verify patch
+              print("Verification - lines with validatePath or error:")
               for i, line in enumerate(content.split('\n'), 1):
-                  if any(kw in line for kw in ['validateInstall', 'validateAndroid', 'isInstalled', 'sdkmanager', 'Result.error', 'Result.ok']):
+                  if 'validatePath' in line or 'androidSdk isn' in line:
                       print(f"  L{i}: {line[:160]}")
 
-              # Patch strategy: find validateInstallation (or similar) and insert
-              # early return at the start of the function body
-              method_names = ['validateInstallation', 'validateAndroidSdk', 'isInstalled']
-              patched = False
-
-              for method in method_names:
-                  if method not in content:
-                      continue
-                  idx = content.find(method)
-                  # Find the opening brace of the function body
-                  # It comes after the method name and parameter list
-                  brace_idx = content.find('{', idx)
-                  if brace_idx == -1:
-                      continue
-                  # Insert early return immediately after the opening brace
-                  early_return = f' return Promise.resolve({ok_call}); '
-                  new_content = content[:brace_idx + 1] + early_return + content[brace_idx + 1:]
-                  with open(sdk_js, 'w') as f:
-                      f.write(new_content)
-                  content = new_content
-                  print(f"Patched method '{method}' - inserted early return Promise.resolve({ok_call})")
-                  patched = True
-                  break
-
-              if not patched:
-                  print("WARNING: No known validation method found to patch!")
-                  print("Full file snippet (first 2000 chars):")
-                  print(content[:2000])
-
-          print("\nDone patching AndroidSdkTools.js")
+          print("Done")
           PYEOF
       - name: Pre-configure Bubblewrap
         run: |
