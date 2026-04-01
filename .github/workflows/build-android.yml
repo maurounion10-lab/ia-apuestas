@@ -20,70 +20,29 @@ jobs:
         run: npm install -g @bubblewrap/cli
       - name: Restore keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android.keystore
-      - name: Fix Android SDK structure for Bubblewrap
+      - name: Setup Android SDK and accept licenses
         run: |
           ANDROID_SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
-          echo "=== Android SDK contents ==="
-          ls "$ANDROID_SDK/" 2>/dev/null
-          echo "=== cmdline-tools ==="
-          ls "$ANDROID_SDK/cmdline-tools/" 2>/dev/null || echo "(missing)"
-          echo "=== platform-tools/adb ==="
-          ls "$ANDROID_SDK/platform-tools/adb" 2>/dev/null || echo "(missing)"
-          # Bubblewrap needs cmdline-tools/latest/bin/sdkmanager
-          # Create the 'latest' symlink if it doesn't exist
+          echo "=== Android SDK: $ANDROID_SDK ==="
           if [ ! -d "$ANDROID_SDK/cmdline-tools/latest" ]; then
-            LATEST_VERSION=$(ls "$ANDROID_SDK/cmdline-tools/" 2>/dev/null | grep -v latest | sort -V | tail -1)
-            if [ -n "$LATEST_VERSION" ]; then
-              ln -sfn "$ANDROID_SDK/cmdline-tools/$LATEST_VERSION" "$ANDROID_SDK/cmdline-tools/latest"
-              echo "Created symlink: cmdline-tools/latest -> $LATEST_VERSION"
-            fi
+            LATEST=$(ls "$ANDROID_SDK/cmdline-tools/" 2>/dev/null | grep -v latest | sort -V | tail -1)
+            [ -n "$LATEST" ] && ln -sfn "$ANDROID_SDK/cmdline-tools/$LATEST" "$ANDROID_SDK/cmdline-tools/latest"
           fi
-          echo "=== sdkmanager path ==="
-          find "$ANDROID_SDK" -name sdkmanager 2>/dev/null | head -5
-      - name: Pre-configure Bubblewrap (skip JDK/SDK interactive prompts)
+          SDKMANAGER="$ANDROID_SDK/cmdline-tools/latest/bin/sdkmanager"
+          echo "=== sdkmanager version ==="
+          JAVA_HOME="$JAVA_HOME" "$SDKMANAGER" --version 2>&1 || echo "sdkmanager failed"
+          echo "=== Accepting licenses ==="
+          yes | JAVA_HOME="$JAVA_HOME" "$SDKMANAGER" --licenses 2>&1 || true
+      - name: Pre-configure Bubblewrap
         run: |
           mkdir -p ~/.bubblewrap
-          JAVA_PATH="${JAVA_HOME}"
-          ANDROID_PATH="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
-          printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' "$JAVA_PATH" "$ANDROID_PATH" \
-            > ~/.bubblewrap/config.json
-          cat ~/.bubblewrap/config.json
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "${ANDROID_HOME:-/usr/local/lib/android/sdk}" > ~/.bubblewrap/config.json
+          echo "Config: $(cat ~/.bubblewrap/config.json)"
       - name: Create twa-manifest.json
         run: |
           mkdir -p twa-build
           cat > twa-build/twa-manifest.json << 'JSONEOF'
-          {
-            "packageId": "ai.gambeta.app",
-            "host": "gambeta.ai",
-            "name": "gambeta.ai",
-            "launcherName": "gambeta.ai",
-            "display": "standalone",
-            "themeColor": "#00c853",
-            "navigationColor": "#0a0f0a",
-            "navigationColorDark": "#0a0f0a",
-            "backgroundColor": "#0a0f0a",
-            "startUrl": "/",
-            "iconUrl": "https://gambeta.ai/favicon-512.png",
-            "maskableIconUrl": "https://gambeta.ai/favicon-512.png",
-            "splashScreenFadeOutDuration": 300,
-            "signingKey": {"path": "../android.keystore", "alias": "gambeta"},
-            "minSdkVersion": 21,
-            "targetSdkVersion": 34,
-            "appVersion": "1.0.0",
-            "appVersionCode": 1,
-            "orientation": "portrait",
-            "enableNotifications": false,
-            "generatorApp": "bubblewrap-cli",
-            "webManifestUrl": "https://gambeta.ai/manifest.json",
-            "fallbackType": "customtabs",
-            "features": {},
-            "alphaDependencies": {"enabled": false},
-            "enableSiteSettingsShortcut": true,
-            "isChromeOSOnly": false,
-            "isMetaQuest": false,
-            "fullScopeUrl": "https://gambeta.ai/",
-            "fingerprints": []
-          }
+          {"packageId":"ai.gambeta.app","host":"gambeta.ai","name":"gambeta.ai","launcherName":"gambeta.ai","display":"standalone","themeColor":"#00c853","navigationColor":"#0a0f0a","navigationColorDark":"#0a0f0a","backgroundColor":"#0a0f0a","startUrl":"/","iconUrl":"https://gambeta.ai/favicon-512.png","maskableIconUrl":"https://gambeta.ai/favicon-512.png","splashScreenFadeOutDuration":300,"signingKey":{"path":"../android.keystore","alias":"gambeta"},"minSdkVersion":21,"targetSdkVersion":34,"appVersion":"1.0.0","appVersionCode":1,"orientation":"portrait","enableNotifications":false,"generatorApp":"bubblewrap-cli","webManifestUrl":"https://gambeta.ai/manifest.json","fallbackType":"customtabs","features":{},"alphaDependencies":{"enabled":false},"enableSiteSettingsShortcut":true,"isChromeOSOnly":false,"isMetaQuest":false,"fullScopeUrl":"https://gambeta.ai/","fingerprints":[]}
           JSONEOF
       - name: Build APK
         working-directory: twa-build
