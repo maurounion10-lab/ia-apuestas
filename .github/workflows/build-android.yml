@@ -27,51 +27,91 @@ jobs:
             "platform-tools" \
             "build-tools;34.0.0" \
             "platforms;android-34" 2>&1 | tail -5
-      - name: Patch bubblewrap validatePath
+      - name: Patch bubblewrap (validatePath + checksum prompt)
         run: |
           python3 << 'PYEOF'
           import subprocess, glob, re
 
           npm_root = subprocess.check_output(['npm', 'root', '-g']).decode().strip()
-          sdk_files = glob.glob(f"{npm_root}/@bubblewrap/**/*AndroidSdkTools.js", recursive=True)
-          print(f"Patching files: {sdk_files}")
+          print(f"npm root: {npm_root}")
 
+          # === PATCH 1: validatePath in AndroidSdkTools.js ===
+          sdk_files = glob.glob(f"{npm_root}/@bubblewrap/**/*AndroidSdkTools.js", recursive=True)
           for sdk_js in sdk_files:
               with open(sdk_js) as f:
                   content = f.read()
-
-              # Strategy 1: Find static async validatePath(param) { and insert early return
               match = re.search(r'static async validatePath\s*\((\w+)\)\s*\{', content)
               if match:
                   param = match.group(1)
                   brace_pos = match.end() - 1
                   early = f'\n        return Result_1.Result.ok({param}); // PATCHED'
                   content = content[:brace_pos+1] + early + content[brace_pos+1:]
-                  print(f"Strategy 1: patched validatePath({param}) with early return ok")
+                  with open(sdk_js, 'w') as f:
+                      f.write(content)
+                  print(f"PATCH1 OK: validatePath({param}) → early return ok in {sdk_js}")
               else:
-                  print("Strategy 1: validatePath not found, trying Strategy 2")
-                  # Strategy 2: Replace the error line directly
-                  lines = content.split('\n')
-                  patched_lines = []
-                  for i, line in enumerate(lines):
-                      if "androidSdk isn" in line and "Result.error" in line:
-                          indent = len(line) - len(line.lstrip())
-                          patched_lines.append(' ' * indent + 'return Result_1.Result.ok(sdkPath); // PATCHED')
-                          print(f"Strategy 2: replaced error at line {i+1}")
-                      else:
-                          patched_lines.append(line)
-                  content = '\n'.join(patched_lines)
+                  print(f"PATCH1 WARN: validatePath not found in {sdk_js}")
 
-              with open(sdk_js, 'w') as f:
-                  f.write(content)
+          # === PATCH 2: checksum/regenerate prompt in build.js ===
+          # Find file containing the "No checksum file" message
+          result = subprocess.run(
+              ['grep', '-rl', 'No checksum', f'{npm_root}/@bubblewrap/'],
+              capture_output=True, text=True
+          )
+          checksum_files = [f for f in result.stdout.strip().split('\n') if f]
+          print(f"Checksum prompt files: {checksum_files}")
 
-              # Verify patch
-              print("Verification - lines with validatePath or error:")
+          for filepath in checksum_files:
+              with open(filepath) as f:
+                  content = f.read()
+
+              # Show relevant lines for diagnostics
               for i, line in enumerate(content.split('\n'), 1):
-                  if 'validatePath' in line or 'androidSdk isn' in line:
+                  if any(kw in line for kw in ['checksum', 'verifyChecksum', 'regenerate', 'No checksum']):
                       print(f"  L{i}: {line[:160]}")
 
-          print("Done")
+              patched = content
+
+              # Strategy A: find `if (!(await x.verifyChecksum()))` and make it `if (true)`
+              patched_a = re.sub(
+                  r'if\s*\(\s*!\s*\(?\s*await\s+\w+\.verifyChecksum\s*\(\s*\)\s*\)?\s*\)',
+                  'if (true) /* PATCHED: always regenerate */',
+                  patched
+              )
+              if patched_a != patched:
+                  print("PATCH2A OK: replaced verifyChecksum check with if(true)")
+                  patched = patched_a
+
+              # Strategy B: find prompt call assigned to variable and make it auto-true
+              # Pattern: const { varname } = await something.prompt([...])
+              # Find the variable name used in the prompt result
+              prompt_match = re.search(
+                  r'const\s*\{\s*(\w+)\s*\}\s*=\s*await\s+\w+\.prompt\s*\(',
+                  patched
+              )
+              if prompt_match:
+                  var_name = prompt_match.group(1)
+                  print(f"PATCH2B: found prompt var '{var_name}', replacing with auto-true")
+                  # Replace: const { var } = await something.prompt([...]);
+                  # With:    const { var } = { var: true }; // PATCHED
+                  patched = re.sub(
+                      r'const\s*\{\s*' + re.escape(var_name) + r'\s*\}\s*=\s*await\s+[^;]+;',
+                      f'const {{{var_name}}} = {{{var_name}: true}}; // PATCHED: auto-yes',
+                      patched,
+                      count=1
+                  )
+                  print(f"PATCH2B OK: auto-replaced prompt call for '{var_name}'")
+              else:
+                  print("PATCH2B WARN: could not find prompt assignment pattern")
+
+              if patched != content:
+                  with open(filepath, 'w') as f:
+                      f.write(patched)
+                  print(f"File patched: {filepath}")
+              else:
+                  print(f"No patches applied to {filepath}")
+
+          print("Done patching")
           PYEOF
       - name: Pre-configure Bubblewrap
         run: |
@@ -87,7 +127,38 @@ jobs:
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: bubblewrap build --skipPwaValidation
+        run: |
+          # Use expect to handle any remaining interactive prompts (keystore password, etc.)
+          python3 << 'PYEOF'
+          import os
+          script = r"""#!/usr/bin/expect -f
+set timeout 600
+set store_pass [lindex $argv 0]
+set key_pass [lindex $argv 1]
+set pass_count 0
+spawn bubblewrap build --skipPwaValidation
+expect {
+    -re {Y/n} { send "y\r"; exp_continue }
+    -re {y/N} { send "y\r"; exp_continue }
+    -re {[Pp]assword} {
+        incr pass_count
+        if {$pass_count == 1} {
+            send "$store_pass\r"
+        } else {
+            send "$key_pass\r"
+        }
+        exp_continue
+    }
+    eof
+}
+catch wait result
+exit [lindex $result 3]
+"""
+          with open('/tmp/build.exp', 'w') as f:
+              f.write(script)
+          os.chmod('/tmp/build.exp', 0o755)
+          PYEOF
+          /tmp/build.exp "$BUBBLEWRAP_KEYSTORE_PASSWORD" "$BUBBLEWRAP_KEY_PASSWORD"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
