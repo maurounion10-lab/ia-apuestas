@@ -20,6 +20,26 @@ jobs:
         run: npm install -g @bubblewrap/cli
       - name: Restore keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android.keystore
+      - name: Fix Android SDK structure for Bubblewrap
+        run: |
+          ANDROID_SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          echo "=== Android SDK contents ==="
+          ls "$ANDROID_SDK/" 2>/dev/null
+          echo "=== cmdline-tools ==="
+          ls "$ANDROID_SDK/cmdline-tools/" 2>/dev/null || echo "(missing)"
+          echo "=== platform-tools/adb ==="
+          ls "$ANDROID_SDK/platform-tools/adb" 2>/dev/null || echo "(missing)"
+          # Bubblewrap needs cmdline-tools/latest/bin/sdkmanager
+          # Create the 'latest' symlink if it doesn't exist
+          if [ ! -d "$ANDROID_SDK/cmdline-tools/latest" ]; then
+            LATEST_VERSION=$(ls "$ANDROID_SDK/cmdline-tools/" 2>/dev/null | grep -v latest | sort -V | tail -1)
+            if [ -n "$LATEST_VERSION" ]; then
+              ln -sfn "$ANDROID_SDK/cmdline-tools/$LATEST_VERSION" "$ANDROID_SDK/cmdline-tools/latest"
+              echo "Created symlink: cmdline-tools/latest -> $LATEST_VERSION"
+            fi
+          fi
+          echo "=== sdkmanager path ==="
+          find "$ANDROID_SDK" -name sdkmanager 2>/dev/null | head -5
       - name: Pre-configure Bubblewrap (skip JDK/SDK interactive prompts)
         run: |
           mkdir -p ~/.bubblewrap
@@ -27,10 +47,7 @@ jobs:
           ANDROID_PATH="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
           printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' "$JAVA_PATH" "$ANDROID_PATH" \
             > ~/.bubblewrap/config.json
-          echo "Bubblewrap config:"
           cat ~/.bubblewrap/config.json
-          echo "Java exists: $(test -d $JAVA_PATH && echo YES || echo NO)"
-          echo "Android exists: $(test -d $ANDROID_PATH && echo YES || echo NO)"
       - name: Create twa-manifest.json
         run: |
           mkdir -p twa-build
