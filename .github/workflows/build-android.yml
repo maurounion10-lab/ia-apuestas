@@ -1,38 +1,30 @@
 name: Build Android TWA
-
 on:
   workflow_dispatch:
   push:
     branches: [main]
     paths: ['.github/workflows/build-android.yml']
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-
       - name: Install Bubblewrap
         run: npm install -g @bubblewrap/cli
-
       - name: Restore keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android.keystore
-
       - name: Init TWA project
         run: |
           mkdir -p twa-build && cd twa-build
           printf 'n\n/opt/hostedtoolcache/Java_Temurin_jdk/17*/x64\n' | \
-            bubblewrap init --manifest https://gambeta.ai/manifest.json --skipPwaValidation 2>&1 | head -80 || true
-
+          bubblewrap init --manifest https://gambeta.ai/manifest.json --skipPwaValidation 2>&1 | head -80 || true
       - name: Override twa-manifest
         run: |
           mkdir -p twa-build
@@ -70,14 +62,13 @@ jobs:
             "fingerprints": []
           }
           JSONEOF
-
       - name: Build APK
         working-directory: twa-build
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: bubblewrap build --skipPwaValidation
-
+        run: |
+          printf "n\n${JAVA_HOME}\n" | bubblewrap build --skipPwaValidation
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
