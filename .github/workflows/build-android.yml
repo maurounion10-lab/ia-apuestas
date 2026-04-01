@@ -20,33 +20,38 @@ jobs:
         run: npm install -g @bubblewrap/cli
       - name: Restore keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android.keystore
-      - name: Read bubblewrap config format and validation source
-        run: |
-          echo "=== Bubblewrap version ==="
-          ls /usr/local/lib/node_modules/@bubblewrap/cli/
-          echo ""
-          echo "=== Config.js ==="
-          CONFIG=$(find /usr/local/lib/node_modules/@bubblewrap -name "Config.js" 2>/dev/null | head -1)
-          echo "Path: $CONFIG"
-          cat "$CONFIG" 2>/dev/null
-          echo ""
-          echo "=== AndroidSdkTools.js (first 120 lines) ==="
-          SDK=$(find /usr/local/lib/node_modules/@bubblewrap -name "AndroidSdkTools.js" 2>/dev/null | head -1)
-          echo "Path: $SDK"
-          head -120 "$SDK" 2>/dev/null
       - name: Accept Android SDK licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null 2>&1 || true
-      - name: Pre-configure Bubblewrap
+      - name: Read bubblewrap source and try both config formats
+        run: |
+          NPM_ROOT=$(npm root -g)
+          echo "=== npm root: $NPM_ROOT ==="
+          echo "=== bubblewrap packages ==="
+          ls "$NPM_ROOT/@bubblewrap/" 2>/dev/null || echo "not found"
+          echo ""
+          echo "=== bubblewrap build --help ==="
+          bubblewrap build --help 2>&1 | head -40 || true
+          echo ""
+          CONFIG_JS=$(find "$NPM_ROOT/@bubblewrap" -name "Config.js" 2>/dev/null | head -1)
+          echo "=== Config.js path: $CONFIG_JS ==="
+          cat "$CONFIG_JS" 2>/dev/null || echo "not found"
+          echo ""
+          SDK_JS=$(find "$NPM_ROOT/@bubblewrap" -name "AndroidSdkTools.js" 2>/dev/null | head -1)
+          echo "=== AndroidSdkTools.js path: $SDK_JS ==="
+          head -100 "$SDK_JS" 2>/dev/null || echo "not found"
+      - name: Pre-configure Bubblewrap (nested format)
         run: |
           mkdir -p ~/.bubblewrap
-          printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "$ANDROID_HOME" > ~/.bubblewrap/config.json
-          echo "Config written: $(cat ~/.bubblewrap/config.json)"
+          cat > ~/.bubblewrap/config.json << CFGEOF
+{"jdkPath":"$JAVA_HOME","androidSdkPath":"$ANDROID_HOME"}
+CFGEOF
+          echo "Config: $(cat ~/.bubblewrap/config.json)"
       - name: Create twa-manifest.json
         run: |
           mkdir -p twa-build
           cat > twa-build/twa-manifest.json << 'JSONEOF'
-          {"packageId":"ai.gambeta.app","host":"gambeta.ai","name":"gambeta.ai","launcherName":"gambeta.ai","display":"standalone","themeColor":"#00c853","navigationColor":"#0a0f0a","navigationColorDark":"#0a0f0a","backgroundColor":"#0a0f0a","startUrl":"/","iconUrl":"https://gambeta.ai/favicon-512.png","maskableIconUrl":"https://gambeta.ai/favicon-512.png","splashScreenFadeOutDuration":300,"signingKey":{"path":"../android.keystore","alias":"gambeta"},"minSdkVersion":21,"targetSdkVersion":34,"appVersion":"1.0.0","appVersionCode":1,"orientation":"portrait","enableNotifications":false,"generatorApp":"bubblewrap-cli","webManifestUrl":"https://gambeta.ai/manifest.json","fallbackType":"customtabs","features":{},"alphaDependencies":{"enabled":false},"enableSiteSettingsShortcut":true,"isChromeOSOnly":false,"isMetaQuest":false,"fullScopeUrl":"https://gambeta.ai/","fingerprints":[]}
-          JSONEOF
+{"packageId":"ai.gambeta.app","host":"gambeta.ai","name":"gambeta.ai","launcherName":"gambeta.ai","display":"standalone","themeColor":"#00c853","navigationColor":"#0a0f0a","navigationColorDark":"#0a0f0a","backgroundColor":"#0a0f0a","startUrl":"/","iconUrl":"https://gambeta.ai/favicon-512.png","maskableIconUrl":"https://gambeta.ai/favicon-512.png","splashScreenFadeOutDuration":300,"signingKey":{"path":"../android.keystore","alias":"gambeta"},"minSdkVersion":21,"targetSdkVersion":34,"appVersion":"1.0.0","appVersionCode":1,"orientation":"portrait","enableNotifications":false,"generatorApp":"bubblewrap-cli","webManifestUrl":"https://gambeta.ai/manifest.json","fallbackType":"customtabs","features":{},"alphaDependencies":{"enabled":false},"enableSiteSettingsShortcut":true,"isChromeOSOnly":false,"isMetaQuest":false,"fullScopeUrl":"https://gambeta.ai/","fingerprints":[]}
+JSONEOF
       - name: Build APK
         working-directory: twa-build
         env:
