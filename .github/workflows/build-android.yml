@@ -20,12 +20,18 @@ jobs:
         run: npm install -g @bubblewrap/cli
       - name: Restore keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android.keystore
-      - name: Init TWA project
+      - name: Pre-configure Bubblewrap (skip JDK/SDK interactive prompts)
         run: |
-          mkdir -p twa-build && cd twa-build
-          printf 'n\n/opt/hostedtoolcache/Java_Temurin_jdk/17*/x64\n' | \
-          bubblewrap init --manifest https://gambeta.ai/manifest.json --skipPwaValidation 2>&1 | head -80 || true
-      - name: Override twa-manifest
+          mkdir -p ~/.bubblewrap
+          JAVA_PATH="${JAVA_HOME}"
+          ANDROID_PATH="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}\n' "$JAVA_PATH" "$ANDROID_PATH" \
+            > ~/.bubblewrap/config.json
+          echo "Bubblewrap config:"
+          cat ~/.bubblewrap/config.json
+          echo "Java exists: $(test -d $JAVA_PATH && echo YES || echo NO)"
+          echo "Android exists: $(test -d $ANDROID_PATH && echo YES || echo NO)"
+      - name: Create twa-manifest.json
         run: |
           mkdir -p twa-build
           cat > twa-build/twa-manifest.json << 'JSONEOF'
@@ -62,28 +68,12 @@ jobs:
             "fingerprints": []
           }
           JSONEOF
-      - name: Debug init output
-        run: |
-          echo "=== twa-build/ ==="
-          ls -la twa-build/ 2>/dev/null || echo "(empty)"
-          echo "=== app/build.gradle (first 80 lines) ==="
-          head -80 twa-build/app/build.gradle 2>/dev/null || echo "(not found)"
-          echo "=== JAVA_HOME ==="
-          echo "${JAVA_HOME}"
-          echo "=== ANDROID_HOME ==="
-          echo "${ANDROID_HOME:-/usr/local/lib/android/sdk}"
-      - name: Setup Android SDK for Gradle
-        run: |
-          ANDROID_SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
-          echo "sdk.dir=${ANDROID_SDK}" > twa-build/local.properties
-          chmod +x twa-build/gradlew 2>/dev/null || true
-          echo "local.properties set to sdk.dir=${ANDROID_SDK}"
-      - name: Build APK with Gradle
+      - name: Build APK
         working-directory: twa-build
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: ./gradlew assembleRelease --stacktrace
+        run: bubblewrap build --skipPwaValidation
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
