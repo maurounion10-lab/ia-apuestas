@@ -66,68 +66,65 @@ jobs:
           python3 << 'PYEOF'
           import os
           runner = r'''
-import pty, os, sys, select, time
-
-def main():
-    store_pass = os.environ.get('BUBBLEWRAP_KEYSTORE_PASSWORD', '').encode()
-    key_pass = os.environ.get('BUBBLEWRAP_KEY_PASSWORD', '').encode()
-    master_fd, slave_fd = pty.openpty()
-    pid = os.fork()
-    if pid == 0:
-        os.setsid()
-        os.dup2(slave_fd, 0)
-        os.dup2(slave_fd, 1)
-        os.dup2(slave_fd, 2)
-        os.close(master_fd)
-        os.close(slave_fd)
-        os.execvp('bubblewrap', ['bubblewrap', 'build', '--skipPwaValidation'])
-        sys.exit(1)
-    os.close(slave_fd)
-    buf = b''
-    pass_count = [0]
-    while True:
-        try:
-            r, _, _ = select.select([master_fd], [], [], 2.0)
-        except Exception:
-            break
-        if r:
-            try:
-                data = os.read(master_fd, 4096)
-                if not data:
-                    break
-                sys.stdout.buffer.write(data)
-                sys.stdout.buffer.flush()
-                buf += data
-                if b'(Y/n)' in buf or b'(y/N)' in buf or b'[Y/n]' in buf:
-                    print('\n[PTY] Auto-answering Y to prompt')
-                    os.write(master_fd, b'y\r\n')
-                    buf = b''
-                elif b'assword' in buf and b':' in buf:
-                    pass_count[0] += 1
-                    pw = store_pass if pass_count[0] == 1 else key_pass
-                    print(f'\n[PTY] Auto-answering password #{pass_count[0]}')
-                    os.write(master_fd, pw + b'\r\n')
-                    buf = b''
-            except OSError:
-                break
-        try:
-            wpid, status = os.waitpid(pid, os.WNOHANG)
-            if wpid == pid:
-                code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else 1
-                print(f'\n[PTY] Process exited with code {code}')
-                sys.exit(code)
-        except Exception:
-            break
-    try:
-        _, status = os.waitpid(pid, 0)
-        code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else 1
-        print(f'\n[PTY] Final exit code: {code}')
-        sys.exit(code)
-    except Exception:
-        pass
-
-main()
-'''
+          import pty, os, sys, select
+          def main():
+              store_pass = os.environ.get('BUBBLEWRAP_KEYSTORE_PASSWORD', '').encode()
+              key_pass = os.environ.get('BUBBLEWRAP_KEY_PASSWORD', '').encode()
+              master_fd, slave_fd = pty.openpty()
+              pid = os.fork()
+              if pid == 0:
+                  os.setsid()
+                  os.dup2(slave_fd, 0)
+                  os.dup2(slave_fd, 1)
+                  os.dup2(slave_fd, 2)
+                  os.close(master_fd)
+                  os.close(slave_fd)
+                  os.execvp('bubblewrap', ['bubblewrap', 'build', '--skipPwaValidation'])
+                  sys.exit(1)
+              os.close(slave_fd)
+              buf = b''
+              pass_count = [0]
+              while True:
+                  try:
+                      r, _, _ = select.select([master_fd], [], [], 2.0)
+                  except Exception:
+                      break
+                  if r:
+                      try:
+                          data = os.read(master_fd, 4096)
+                          if not data:
+                              break
+                          sys.stdout.buffer.write(data)
+                          sys.stdout.buffer.flush()
+                          buf += data
+                          if b'(Y/n)' in buf or b'(y/N)' in buf or b'[Y/n]' in buf:
+                              print('\n[PTY] Auto-answering Y to prompt')
+                              os.write(master_fd, b'y\r\n')
+                              buf = b''
+                          elif b'assword' in buf and b':' in buf:
+                              pass_count[0] += 1
+                              pw = store_pass if pass_count[0] == 1 else key_pass
+                              print(f'\n[PTY] Auto-answering password')
+                              os.write(master_fd, pw + b'\r\n')
+                              buf = b''
+                      except OSError:
+                          break
+                  try:
+                      wpid, status = os.waitpid(pid, os.WNOHANG)
+                      if wpid == pid:
+                          code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else 1
+                          print(f'\n[PTY] Exited with code {code}')
+                          sys.exit(code)
+                  except Exception:
+                      break
+              try:
+                  _, status = os.waitpid(pid, 0)
+                  code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else 1
+                  sys.exit(code)
+              except Exception:
+                  pass
+          main()
+          '''
           with open('/tmp/pty_runner.py', 'w') as f:
               f.write(runner)
           PYEOF
