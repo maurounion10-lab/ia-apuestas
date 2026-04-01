@@ -20,24 +20,27 @@ jobs:
         run: npm install -g @bubblewrap/cli
       - name: Restore keystore
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android.keystore
-      - name: Setup Android SDK and accept licenses
+      - name: Read bubblewrap config format and validation source
         run: |
-          ANDROID_SDK="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
-          echo "=== Android SDK: $ANDROID_SDK ==="
-          if [ ! -d "$ANDROID_SDK/cmdline-tools/latest" ]; then
-            LATEST=$(ls "$ANDROID_SDK/cmdline-tools/" 2>/dev/null | grep -v latest | sort -V | tail -1)
-            [ -n "$LATEST" ] && ln -sfn "$ANDROID_SDK/cmdline-tools/$LATEST" "$ANDROID_SDK/cmdline-tools/latest"
-          fi
-          SDKMANAGER="$ANDROID_SDK/cmdline-tools/latest/bin/sdkmanager"
-          echo "=== sdkmanager version ==="
-          JAVA_HOME="$JAVA_HOME" "$SDKMANAGER" --version 2>&1 || echo "sdkmanager failed"
-          echo "=== Accepting licenses ==="
-          yes | JAVA_HOME="$JAVA_HOME" "$SDKMANAGER" --licenses 2>&1 || true
+          echo "=== Bubblewrap version ==="
+          ls /usr/local/lib/node_modules/@bubblewrap/cli/
+          echo ""
+          echo "=== Config.js ==="
+          CONFIG=$(find /usr/local/lib/node_modules/@bubblewrap -name "Config.js" 2>/dev/null | head -1)
+          echo "Path: $CONFIG"
+          cat "$CONFIG" 2>/dev/null
+          echo ""
+          echo "=== AndroidSdkTools.js (first 120 lines) ==="
+          SDK=$(find /usr/local/lib/node_modules/@bubblewrap -name "AndroidSdkTools.js" 2>/dev/null | head -1)
+          echo "Path: $SDK"
+          head -120 "$SDK" 2>/dev/null
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null 2>&1 || true
       - name: Pre-configure Bubblewrap
         run: |
           mkdir -p ~/.bubblewrap
-          printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "${ANDROID_HOME:-/usr/local/lib/android/sdk}" > ~/.bubblewrap/config.json
-          echo "Config: $(cat ~/.bubblewrap/config.json)"
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "$ANDROID_HOME" > ~/.bubblewrap/config.json
+          echo "Config written: $(cat ~/.bubblewrap/config.json)"
       - name: Create twa-manifest.json
         run: |
           mkdir -p twa-build
