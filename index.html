@@ -7462,9 +7462,8 @@ function renderPreds() {
           const lg = (p.league && p.league !== 'Fútbol' && p.league !== 'Tenis' && p.league !== 'Liga') ? p.league : '';
           const t  = isGameLive ? '🔴 EN VIVO'
                    : isStarted  ? (() => {
-                       if (!p.commenceTs) return '';
-                       const_md = new Date(p.commenceTs);
-                       const _td = new Date(); _td.setHours(0,0,0,0);
+                       if (!p.commenceTs) return '';                       const _md = new Date(p.commenceTs);
+                       const _td = new Date(); _td.setHors(0,0,0,0);
                        const _cd = new Date(_md); _cd.setHours(0,0,0,0);
                        const _diff = Math.round((_cd - _td) / 86400000);
                        const _ts = _md.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false});
