@@ -22,42 +22,41 @@ jobs:
         run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android.keystore
       - name: Accept Android SDK licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null 2>&1 || true
-      - name: Read bubblewrap source and try both config formats
+      - name: Inspect and patch bubblewrap SDK validation
         run: |
           NPM_ROOT=$(npm root -g)
           echo "=== npm root: $NPM_ROOT ==="
-          echo "=== bubblewrap packages ==="
-          ls "$NPM_ROOT/@bubblewrap/" 2>/dev/null || echo "not found"
+          ls "$NPM_ROOT/@bubblewrap/" 2>/dev/null || true
           echo ""
-          echo "=== bubblewrap build --help ==="
-          bubblewrap build --help 2>&1 | head -40 || true
-          echo ""
-          CONFIG_JS=$(find "$NPM_ROOT/@bubblewrap" -name "Config.js" 2>/dev/null | head -1)
-          echo "=== Config.js path: $CONFIG_JS ==="
-          cat "$CONFIG_JS" 2>/dev/null || echo "not found"
+          echo "=== bubblewrap build flags ==="
+          bubblewrap build --help 2>&1 | head -60 || true
           echo ""
           SDK_JS=$(find "$NPM_ROOT/@bubblewrap" -name "AndroidSdkTools.js" 2>/dev/null | head -1)
-          echo "=== AndroidSdkTools.js path: $SDK_JS ==="
-          head -100 "$SDK_JS" 2>/dev/null || echo "not found"
-      - name: Pre-configure Bubblewrap (nested format)
+          echo "=== AndroidSdkTools.js: $SDK_JS ==="
+          cat "$SDK_JS" 2>/dev/null || true
+          echo ""
+          CONFIG_JS=$(find "$NPM_ROOT/@bubblewrap" -name "Config.js" 2>/dev/null | head -1)
+          echo "=== Config.js: $CONFIG_JS ==="
+          cat "$CONFIG_JS" 2>/dev/null || true
+      - name: Pre-configure Bubblewrap
         run: |
           mkdir -p ~/.bubblewrap
-          cat > ~/.bubblewrap/config.json << CFGEOF
-{"jdkPath":"$JAVA_HOME","androidSdkPath":"$ANDROID_HOME"}
-CFGEOF
+          printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "$ANDROID_HOME" > ~/.bubblewrap/config.json
           echo "Config: $(cat ~/.bubblewrap/config.json)"
       - name: Create twa-manifest.json
         run: |
           mkdir -p twa-build
-          cat > twa-build/twa-manifest.json << 'JSONEOF'
-{"packageId":"ai.gambeta.app","host":"gambeta.ai","name":"gambeta.ai","launcherName":"gambeta.ai","display":"standalone","themeColor":"#00c853","navigationColor":"#0a0f0a","navigationColorDark":"#0a0f0a","backgroundColor":"#0a0f0a","startUrl":"/","iconUrl":"https://gambeta.ai/favicon-512.png","maskableIconUrl":"https://gambeta.ai/favicon-512.png","splashScreenFadeOutDuration":300,"signingKey":{"path":"../android.keystore","alias":"gambeta"},"minSdkVersion":21,"targetSdkVersion":34,"appVersion":"1.0.0","appVersionCode":1,"orientation":"portrait","enableNotifications":false,"generatorApp":"bubblewrap-cli","webManifestUrl":"https://gambeta.ai/manifest.json","fallbackType":"customtabs","features":{},"alphaDependencies":{"enabled":false},"enableSiteSettingsShortcut":true,"isChromeOSOnly":false,"isMetaQuest":false,"fullScopeUrl":"https://gambeta.ai/","fingerprints":[]}
-JSONEOF
+          printf '%s' '{"packageId":"ai.gambeta.app","host":"gambeta.ai","name":"gambeta.ai","launcherName":"gambeta.ai","display":"standalone","themeColor":"#00c853","navigationColor":"#0a0f0a","navigationColorDark":"#0a0f0a","backgroundColor":"#0a0f0a","startUrl":"/","iconUrl":"https://gambeta.ai/favicon-512.png","maskableIconUrl":"https://gambeta.ai/favicon-512.png","splashScreenFadeOutDuration":300,"signingKey":{"path":"../android.keystore","alias":"gambeta"},"minSdkVersion":21,"targetSdkVersion":34,"appVersion":"1.0.0","appVersionCode":1,"orientation":"portrait","enableNotifications":false,"generatorApp":"bubblewrap-cli","webManifestUrl":"https://gambeta.ai/manifest.json","fallbackType":"customtabs","features":{},"alphaDependencies":{"enabled":false},"enableSiteSettingsShortcut":true,"isChromeOSOnly":false,"isMetaQuest":false,"fullScopeUrl":"https://gambeta.ai/","fingerprints":[]}' > twa-build/twa-manifest.json
       - name: Build APK
         working-directory: twa-build
         env:
           BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: bubblewrap build --skipPwaValidation
+        run: |
+          EXTRA=""
+          bubblewrap build --help 2>&1 | grep -q "skip-sdk-setup" && EXTRA="--skip-sdk-setup"
+          echo "Running: bubblewrap build --skipPwaValidation $EXTRA"
+          bubblewrap build --skipPwaValidation $EXTRA
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
