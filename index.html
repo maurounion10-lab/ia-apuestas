@@ -6444,7 +6444,11 @@ function shortName(name) {
     // Otros
     'Liverpool FC Uruguay': 'Liverpool UY', 'Caracas FC': 'Caracas',
   };
-  return abbrevs[name] || (name.length > 18 ? name.slice(0,16) + '…' : name);
+  if (abbrevs[name]) return abbrevs[name];
+  // Quitar sufijos comunes: FC, CF, SC, AC, AFC, etc. (al final del nombre)
+  const stripped = name.replace(/\s+(FC|CF|SC|AC|AFC|SFC|RFC|IF|IFK|FK|SK|BK|NK|GNK|BSC|SV|AG)\s*$/i, '').trim();
+  if (stripped !== name) return stripped.length > 18 ? stripped.slice(0,16) + '…' : stripped;
+  return name.length > 18 ? name.slice(0,16) + '…' : name;
 }
 
 function leagueLabel(sportTitle) {
@@ -7325,6 +7329,18 @@ function renderPreds() {
     window._aiPreds = [];
     return;
   }
+  // ── Dedup final: nunca mostrar dos fichas del mismo partido ──
+  // Prioridad: picks de la API (no _fromHist) sobre los del historial
+  if (realPreds && realPreds.length > 1) {
+    const _seen = [];
+    realPreds = realPreds.filter(p => {
+      const alreadySeen = _seen.some(s => teamsMatch(s.home, p.home) && teamsMatch(s.away, p.away));
+      if (alreadySeen) return false; // descartar duplicado
+      _seen.push(p);
+      return true;
+    });
+  }
+
   const source = realPreds;
 
   // ── Banner de estado ──
@@ -9301,7 +9317,11 @@ const teamShortNames = {
 };
 function shortName(name) {
   if (!name) return '';
-  return teamShortNames[name] || (name.length > 18 ? name.slice(0,16) + '…' : name);
+  if (teamShortNames[name]) return teamShortNames[name];
+  // Quitar sufijos comunes: FC, CF, SC, AC, AFC, etc. (al final del nombre)
+  const stripped = name.replace(/\s+(FC|CF|SC|AC|AFC|SFC|RFC|IF|IFK|FK|SK|BK|NK|GNK|BSC|SV|AG)\s*$/i, '').trim();
+  if (stripped !== name) return stripped.length > 18 ? stripped.slice(0,16) + '…' : stripped;
+  return name.length > 18 ? name.slice(0,16) + '…' : name;
 }
 
 function leagueLabel(sportTitle) {
