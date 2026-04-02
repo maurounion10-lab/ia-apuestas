@@ -94,13 +94,32 @@ a:hover{text-decoration:underline}
 </head>
 <body>
 <nav class="nav">
-<div class="nav-logo">gambeta<span>.ai</span></div>
-<div class="nav-links">
-<a href="#pronósticos">Pronósticos</a>
-<a href="#resultados">Resultados</a>
-<a href="#blog">Blog</a>
-</div>
-<a href="https://gambeta.ai" class="nav-cta">Entrar gratis →</a>
+  <a href="https://gambeta.ai" class="nav-logo-wrap">
+    <div class="nav-icon-box">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="22" height="22">
+        <defs>
+          <linearGradient id="bolt-g" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffd600"/>
+            <stop offset="100%" stop-color="#ff9100"/>
+          </linearGradient>
+          <filter id="bolt-glow"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path d="M23,4 L13,22 L20,22 L17,36 L27,18 L20,18 Z" fill="url(#bolt-g)" filter="url(#bolt-glow)"/>
+        <circle cx="30" cy="8" r="2.5" fill="#00c853" opacity="0.9"/>
+        <circle cx="10" cy="30" r="1.8" fill="#00c853" opacity="0.6"/>
+      </svg>
+    </div>
+    <span class="nav-logo-text">gambeta<span>.ai</span></span>
+  </a>
+  <div class="nav-links">
+    <a href="https://gambeta.ai/#pronosticos">🔮 <span class="nav-text">Pronósticos</span></a>
+    <a href="https://gambeta.ai/#historial">📋 <span class="nav-text">Resultados</span></a>
+    <a href="https://gambeta.ai/#ranking">🏆 <span class="nav-text">Ranking</span></a>
+    <a href="https://gambeta.ai/#bot-alerta">🤖 <span class="nav-text">Bot Alerta</span></a>
+    <a href="https://gambeta.ai/#telegram">🎁 <span class="nav-text">Promos</span></a>
+    <a href="/blog/index.html" class="active">📰 <span class="nav-text">Blog</span></a>
+  </div>
+  <a href="https://gambeta.ai" class="nav-links nav-cta-btn">✦ Entrar / Registro Gratis</a>
 </nav>
 
 <div class="breadcrumb">
