@@ -74,15 +74,21 @@ jobs:
           print("Icon PNG created: 512x512 green")
           PYEOF
 
-          # Start local HTTP server to serve the icon
+          # Create a PWA web manifest JSON (bubblewrap fetches this during build)
+          printf '%s' '{"name":"gambeta.ai","short_name":"gambeta.ai","start_url":"/","display":"standalone","theme_color":"#00c853","background_color":"#0a0f0a","icons":[{"src":"/favicon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}' > /tmp/manifest.json
+          echo "manifest.json created"
+
+          # Start local HTTP server to serve the icon AND manifest
           python3 -m http.server 8765 --directory /tmp &
           echo $! > /tmp/http_server.pid
           sleep 1
           HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8765/favicon-512.png)
           echo "Icon server status: $HTTP_STATUS"
+          MANIFEST_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8765/manifest.json)
+          echo "Manifest server status: $MANIFEST_STATUS"
 
-          # Write twa-manifest.json with local icon URL
-          printf '%s' '{"packageId":"ai.gambeta.app","host":"gambeta.ai","name":"gambeta.ai","launcherName":"gambeta.ai","display":"standalone","themeColor":"#00c853","navigationColor":"#0a0f0a","navigationColorDark":"#0a0f0a","backgroundColor":"#0a0f0a","startUrl":"/","iconUrl":"http://localhost:8765/favicon-512.png","maskableIconUrl":"http://localhost:8765/favicon-512.png","splashScreenFadeOutDuration":300,"signingKey":{"path":"../android.keystore","alias":"gambeta"},"minSdkVersion":21,"targetSdkVersion":34,"appVersion":"1.0.0","appVersionCode":1,"orientation":"portrait","enableNotifications":false,"generatorApp":"bubblewrap-cli","webManifestUrl":"https://gambeta.ai/manifest.json","fallbackType":"customtabs","features":{},"alphaDependencies":{"enabled":false},"enableSiteSettingsShortcut":true,"isChromeOSOnly":false,"isMetaQuest":false,"fullScopeUrl":"https://gambeta.ai/","fingerprints":[]}' > twa-build/twa-manifest.json
+          # Write twa-manifest.json with local icon URL and local manifest URL
+          printf '%s' '{"packageId":"ai.gambeta.app","host":"gambeta.ai","name":"gambeta.ai","launcherName":"gambeta.ai","display":"standalone","themeColor":"#00c853","navigationColor":"#0a0f0a","navigationColorDark":"#0a0f0a","backgroundColor":"#0a0f0a","startUrl":"/","iconUrl":"http://localhost:8765/favicon-512.png","maskableIconUrl":"http://localhost:8765/favicon-512.png","splashScreenFadeOutDuration":300,"signingKey":{"path":"../android.keystore","alias":"gambeta"},"minSdkVersion":21,"targetSdkVersion":34,"appVersion":"1.0.0","appVersionCode":1,"orientation":"portrait","enableNotifications":false,"generatorApp":"bubblewrap-cli","webManifestUrl":"http://localhost:8765/manifest.json","fallbackType":"customtabs","features":{},"alphaDependencies":{"enabled":false},"enableSiteSettingsShortcut":true,"isChromeOSOnly":false,"isMetaQuest":false,"fullScopeUrl":"https://gambeta.ai/","fingerprints":[]}' > twa-build/twa-manifest.json
       - name: Build APK via PTY runner
         working-directory: twa-build
         env:
