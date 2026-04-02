@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Aprende a interpretar la sección de Resultados de gambeta.ai: qué es el ROI, qué significan WIN/LOSS/VOID, cómo ver tu rendimiento personal y cómo mejorar tus apuestas.">
+  <meta name="keywords" content="ROI apuestas, resultados gambeta, WIN LOSS VOID, rendimiento apuestas, análisis picks, estrategia apuestas">
+  <meta name="author" content="gambeta.ai">
+  <meta property="og:title" content="Cómo leer los Resultados y tu ROI en gambeta.ai — Guía completa 2025">
+  <meta property="og:description" content="Aprende a interpretar la sección de Resultados de gambeta.ai: qué es el ROI, qué significan WIN/LOSS/VOID, cómo ver tu rendimiento personal y cómo mejorar tus apuestas.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://gambeta.ai/blog/como-leer-resultados.html">
+  <meta property="og:image" content="https://gambeta.ai/og-resultados.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cómo leer los Resultados y tu ROI en gambeta.ai">
+  <meta name="twitter:description" content="Aprende a interpretar la sección de Resultados de gambeta.ai: qué es el ROI, qué significan WIN/LOSS/VOID.">
+  <link rel="canonical" href="https://gambeta.ai/blog/como-leer-resultados.html">
+  <title>Cómo leer los Resultados y tu ROI en gambeta.ai — Guía completa 2025</title>
+  <style>
+    :root {
+      --verde: #00c853;
+      --fondo: #0d0d0d;
+      --fondo2: #161622;
+      --fondo3: #1e1e30;
+      --texto: #e8e8e8;
+      --texto-sec: #9e9e9e;
+      --borde: rgba(255, 255, 255, 0.07);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--fondo);
+      color: var(--texto);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* Sticky Nav */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--fondo2);
+      border-bottom: 1px solid var(--borde);
+      padding: 1rem 2rem;
+    }
+
+    nav .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--verde);
+      text-decoration: none;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    nav a {
+      color: var(--texto);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: var(--verde);
+    }
+
+    .cta-btn {
+      background: var(--verde);
+      color: var(--fondo);
+      padding: 0.6rem 1.2rem;
+      border-radius: 0.4rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.3s;
+    }
+
+    .cta-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      font-size: 0.85rem;
+      color: var(--texto-sec);
+    }
+
+    .breadcrumb a {
+      color: var(--verde);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    /* Hero */
+    .hero {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0, 200, 83, 0.1);
+      color: var(--verde);
+      padding: 0.4rem 0.8rem;
+      border-radius: 0.3rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .meta {
+      display: flex;
+      gap: 1.5rem;
+      color: var(--texto-sec);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .lead {
+      font-size: 1.1rem;
+      color: var(--texto);
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--fondo2);
+      border: 1px solid var(--borde);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin: 2rem auto;
+      max-width: 900px;
+    }
+
+    .toc h2 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: var(--verde);
+    }
+
+    .toc ol {
+      list-style-position: inside;
+      color: var(--texto-sec);
+    }
+
+    .toc li {
+      margin-bottom: 0.5rem;
+    }
+
+    .toc a {
+      color: var(--verde);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    /* Article */
+    article {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0;
+    }
+
+    article h2 {
+      font-size: 2rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      border-top: 1px solid var(--borde);
+      padding-top: 1.5rem;
+    }
+
+    article h3 {
+      font-size: 1.4rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.8rem;
+      color: var(--texto);
+    }
+
+    article p {
+      margin-bottom: 1rem;
+      color: var(--texto);
+      line-height: 1.7;
+    }
+
+    article ul, article ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    article li {
+      margin-bottom: 0.5rem;
+      color: var(--texto);
+    }
+
+    /* Cards */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .card {
+      background: var(--fondo2);
+      border: 1px solid var(--borde);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      transition: border-color 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--verde);
+    }
+
+    .card h4 {
+      color: var(--verde);
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .card p {
+      color: var(--texto-sec);
+      font-size: 0.95rem;
+    }
+
+    /* Highlight Box */
+    .highlight-box {
+      background: rgba(0, 200, 83, 0.05);
+      border-left: 4px solid var(--verde);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0.3rem;
+    }
+
+    .highlight-box p {
+      color: var(--texto);
+      margin: 0;
+    }
+
+    /* Warning Box */
+    .warning-box {
+      background: rgba(255, 152, 0, 0.05);
+      border-left: 4px solid #ff9800;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0.3rem;
+    }
+
+    .warning-box p {
+      color: var(--texto);
+      margin: 0;
+    }
+
+    /* FAQ */
+    .faq {
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 2rem;
+    }
+
+    .faq h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      border: none;
+      padding: 0;
+    }
+
+    .faq-item {
+      background: var(--fondo2);
+      border: 1px solid var(--borde);
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .faq-question {
+      background: var(--fondo3);
+      padding: 1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .faq-question:hover {
+      background: var(--borde);
+    }
+
+    .faq-answer {
+      padding: 1rem;
+      color: var(--texto);
+      display: none;
+    }
+
+    .faq-item.active .faq-answer {
+      display: block;
+    }
+
+    .faq-toggle {
+      color: var(--verde);
+      font-weight: bold;
+    }
+
+    /* CTA Box */
+    .cta-box {
+      background: linear-gradient(135deg, rgba(0, 200, 83, 0.1), transparent);
+      border: 1px solid var(--borde);
+      border-radius: 0.5rem;
+      padding: 2rem;
+      text-align: center;
+      margin: 3rem auto;
+      max-width: 800px;
+    }
+
+    .cta-box h3 {
+      color: var(--verde);
+      margin-bottom: 0.5rem;
+    }
+
+    .cta-box p {
+      color: var(--texto-sec);
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-box .btn {
+      background: var(--verde);
+      color: var(--fondo);
+      padding: 0.8rem 1.6rem;
+      border: none;
+      border-radius: 0.4rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: opacity 0.3s;
+    }
+
+    .cta-box .btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Related Grid */
+    .related {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 2rem;
+    }
+
+    .related h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      border: none;
+      padding: 0;
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .related-card {
+      background: var(--fondo2);
+      border: 1px solid var(--borde);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: var(--texto);
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .related-card:hover {
+      border-color: var(--verde);
+      transform: translateY(-2px);
+    }
+
+    .related-card .badge-small {
+      display: inline-block;
+      background: rgba(0, 200, 83, 0.1);
+      color: var(--verde);
+      padding: 0.3rem 0.6rem;
+      border-radius: 0.3rem;
+      font-size: 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .related-card h3 {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+
+    .related-card p {
+      color: var(--texto-sec);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--fondo2);
+      border-top: 1px solid var(--borde);
+      padding: 2rem;
+      text-align: center;
+      color: var(--texto-sec);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--verde);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      nav .container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+      }
+
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+
+      article h2 {
+        font-size: 1.5rem;
+      }
+
+      article h3 {
+        font-size: 1.2rem;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .related-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sticky Nav -->
+  <nav>
+    <div class="container">
+      <a href="https://gambeta.ai" class="logo">⚽ gambeta.ai</a>
+      <ul>
+        <li><a href="https://gambeta.ai/#pronosticos">Pronósticos</a></li>
+        <li><a href="https://gambeta.ai/#resultados">Resultados</a></li>
+        <li><a href="https://gambeta.ai/blog/index.html">Blog</a></li>
+        <li><a href="https://gambeta.ai" class="cta-btn">Entrar gratis →</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="https://gambeta.ai">Inicio</a> / <a href="https://gambeta.ai/blog/index.html">Blog</a> / Cómo leer los Resultados y tu ROI
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="badge">📋 Manual de usuario</div>
+    <h1>Cómo leer los Resultados y tu ROI en gambeta.ai — Guía completa 2025</h1>
+    <div class="meta">
+      <span>📅 Actualizado: 2025</span>
+      <span>⏱️ Lectura: 8 min</span>
+      <span>📚 Nivel: Principiante</span>
+    </div>
+    <p class="lead">Los resultados no son solo victorias y derrotas. Aprende a leer tu ROI real, identificar patrones y mejorar tu estrategia con los datos de gambeta.ai.</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>📑 Tabla de contenidos</h2>
+    <ol>
+      <li><a href="#seccion-1">Dónde encontrar los Resultados</a></li>
+      <li><a href="#seccion-2">Qué significan WIN, LOSS y VOID</a></li>
+      <li><a href="#seccion-3">Cómo leer el ROI (Retorno sobre la Inversión)</a></li>
+      <li><a href="#seccion-4">Mis Picks: tu rendimiento personal</a></li>
+      <li><a href="#seccion-5">Cómo usar los resultados para mejorar</a></li>
+      <li><a href="#seccion-6">Preguntas frecuentes</a></li>
+    </ol>
+  </div>
+
+  <!-- Article -->
+  <article>
+    <h2 id="seccion-1">Dónde encontrar los Resultados</h2>
+    <p>La sección de Resultados es tu hub de análisis en gambeta.ai. Aquí encontrás un registro completo de todos los picks que has monitoreado o apostado, con detalles precisos sobre su desempeño.</p>
+
+    <h3>Acceso a Resultados</h3>
+    <p>Para acceder a la sección de Resultados:</p>
+    <ol>
+      <li>Inicia sesión en tu cuenta de gambeta.ai</li>
+      <li>Dirígete a la sección <strong>"Resultados"</strong> en el menú principal</li>
+      <li>Verás un listado de todos tus picks con sus estados actuales</li>
+    </ol>
+
+    <h3>Filtros disponibles</h3>
+    <p>Gambeta.ai te permite filtrar tus resultados para un análisis más específico:</p>
+    <ul>
+      <li><strong>Todo:</strong> muestra todos los picks registrados</li>
+      <li><strong>Hoy:</strong> picks de las últimas 24 horas</li>
+      <li><strong>Finde:</strong> picks del fin de semana</li>
+      <li><strong>Semana:</strong> picks de los últimos 7 días</li>
+      <li><strong>Por nivel de confianza:</strong> Alta, Media, Baja (según la IA de gambeta)</li>
+    </ul>
+
+    <h2 id="seccion-2">Qué significan WIN, LOSS y VOID</h2>
+    <p>Cada pick en gambeta.ai tiene un estado que te indica claramente cómo resultó. Es fundamental entender qué significa cada uno:</p>
+
+    <div class="cards">
+      <div class="card">
+        <h4>✅ WIN (Victoria)</h4>
+        <p>El pick acertó correctamente. El evento resultó como lo predijo la IA de gambeta.ai. Ganaste en esta apuesta.</p>
+      </div>
+      <div class="card">
+        <h4>❌ LOSS (Pérdida)</h4>
+        <p>El pick no acertó. El evento resultó diferente a lo predicho. Perdiste esta apuesta.</p>
+      </div>
+      <div class="card">
+        <h4>⚪ VOID (Nulo)</h4>
+        <p>El partido fue cancelado, pospuesto, suspendido o resultó en empate cuando apostaste a un lado. VOID no cuenta en tus cálculos de ROI.</p>
+      </div>
+    </div>
+
+    <div class="highlight-box">
+      <p><strong>Importante:</strong> Los VOID son eventos neutrales que no afectan tu rendimiento real. Si un pick resulta en VOID, se excluye del cálculo de tu ROI final.</p>
+    </div>
+
+    <h2 id="seccion-3">Cómo leer el ROI (Retorno sobre la Inversión)</h2>
+    <p>El ROI es la métrica más importante para evaluar tu rendimiento como apostador. No es solo ganar o perder, sino cuánto estás ganando sobre lo que inviertes.</p>
+
+    <h3>Fórmula del ROI</h3>
+    <p>El ROI se calcula con esta fórmula:</p>
+    <div class="highlight-box">
+      <p><strong>ROI = (Ganancias netas / Inversión total) × 100</strong></p>
+      <p>Por ejemplo: Si invertiste $1,000 y ganaste $150 netos, tu ROI es: (150 / 1,000) × 100 = <strong>15%</strong></p>
+    </div>
+
+    <h3>¿Qué es un buen ROI?</h3>
+    <p>A diferencia de otros mercados financieros, en apuestas deportivas los estándares son más altos:</p>
+    <ul>
+      <li><strong>ROI 0-2%:</strong> Muy conservador, casi neutral</li>
+      <li><strong>ROI 3-5%:</strong> Excelente y sostenible a largo plazo</li>
+      <li><strong>ROI 5-10%:</strong> Excepcional, indica una estrategia muy sólida</li>
+      <li><strong>ROI 10%+:</strong> Profesional, alcanzado solo por expertos</li>
+      <li><strong>ROI negativo:</strong> Pérdidas, necesitas revisar tu estrategia</li>
+    </ul>
+
+    <div class="warning-box">
+      <p><strong>⚠️ Nota:</strong> Un ROI sostenido del 5-10% a largo plazo es considerado excelente en el mundo de las apuestas deportivas. No busques retornos imposibles.</p>
+    </div>
+
+    <h2 id="seccion-4">Mis Picks: tu rendimiento personal</h2>
+    <p>La subsección "Mis Picks" muestra exclusivamente los picks que tú registraste en gambeta.ai usando Gambeta Coins. Esta es tu métrica personal de rendimiento.</p>
+
+    <h3>Qué incluye "Mis Picks"</h3>
+    <ul>
+      <li>Solo los picks que apostaste o registraste con Gambeta Coins</li>
+      <li>Tu ROI personal basado en esos picks específicos</li>
+      <li>Tu tasa de acierto (win rate)</li>
+      <li>Historial completo con fechas, cuotas y resultados</li>
+    </ul>
+
+    <h3>Interpretando tu rendimiento</h3>
+    <p>En "Mis Picks" puedes identificar:</p>
+    <div class="cards">
+      <div class="card">
+        <h4>Patrones de victoria</h4>
+        <p>¿En qué ligas, deportes o tipos de apuestas tienes mejor win rate?</p>
+      </div>
+      <div class="card">
+        <h4>Debilidades</h4>
+        <p>¿Hay eventos específicos donde tiendes a perder más?</p>
+      </div>
+      <div class="card">
+        <h4>Progresión</h4>
+        <p>¿Tu ROI mejora o empeora con el tiempo?</p>
+      </div>
+    </div>
+
+    <h2 id="seccion-5">Cómo usar los resultados para mejorar</h2>
+    <p>Analizar resultados no es solo ver ganancias y pérdidas. Es un proceso de mejora continua.</p>
+
+    <h3>Pasos para mejorar tu estrategia</h3>
+    <ol>
+      <li><strong>Analiza tu ROI histórico:</strong> ¿Mejora o empeora? ¿Hay tendencias?</li>
+      <li><strong>Identifica tus ligas más rentables:</strong> Enfócate en donde ganas más</li>
+      <li><strong>Detecta patrones de pérdidas:</strong> ¿Cuándo y por qué pierdes más?</li>
+      <li><strong>Ajusta tu bankroll:</strong> Si tienes ROI positivo, puedes aumentar apuestas gradualmente</li>
+      <li><strong>Revisa los picks de la IA:</strong> ¿Seguiste los de confianza Alta o apostaste por intuición?</li>
+      <li><strong>Registra tus cambios:</strong> Documenta qué estrategia implementaste y monitorea el impacto</li>
+    </ol>
+
+    <div class="highlight-box">
+      <p><strong>Pro tip:</strong> Los apostadores ganadores usan los resultados como datos, no como emociones. No "celebres" un WIN ni te desesperes por un LOSS. Los datos en Resultados te muestran la verdad objetiva de tu rendimiento.</p>
+    </div>
+
+    <h2 id="seccion-6">Preguntas frecuentes</h2>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Qué ROI es realmente bueno en apuestas? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Un ROI del 5-10% sostenido a largo plazo (meses o años) es excelente. La mayoría de apostadores profesionales trabajan con ROI entre 3-7%. Un ROI del 15%+ es sospechoso y probablemente no sea sostenible. No busques "ganar mucho rápido"—en apuestas, la consistencia es oro.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Por qué mi ROI puede ser negativo al principio? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Es completamente normal tener ROI negativo en tus primeros picks. Todavía estás aprendiendo a usar las predicciones de la IA, a gestionar tu banca y a identificar picks con valor real. La IA de gambeta.ai funciona mejor cuando tienes una muestra grande de datos (100+ picks). No te desanimes por un mal inicio.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Con qué frecuencia se actualiza la sección de Resultados? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Los resultados se actualizan automáticamente cuando los eventos finalizan. Si un partido termina a las 18:45, la sección de Resultados debería reflejar el cambio antes de las 19:00. A veces hay un pequeño retraso si hay incidentes como suspensión de partido.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Qué es VOID y cómo afecta mi ROI? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>VOID ocurre cuando un evento es cancelado, pospuesto, suspendido indefinidamente o resulta en un resultado que invalida tu apuesta (ej: empate cuando apostaste a equipo ganador). El VOID se excluye completamente del cálculo de ROI, como si nunca hubiera existido. Es neutral.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Puedo descargar mis resultados para análisis externo? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Actualmente, puedes ver todos tus resultados en la plataforma y filtrarlos. Para análisis avanzado, puedes captura pantalla o utilizar herramientas de análisis de datos externas importando los datos manualmente. Estamos trabajando en una función de exportación en futuros updates.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- CTA Box -->
+  <div class="cta-box">
+    <h3>¿Listo para mejorar tu rendimiento?</h3>
+    <p>Accede a la sección de Resultados de gambeta.ai y comienza a analizar tus picks como un profesional.</p>
+    <a href="https://gambeta.ai" class="btn">Entrar a mi panel de Resultados</a>
+  </div>
+
+  <!-- Related Articles -->
+  <div class="related">
+    <h2>📚 Artículos relacionados</h2>
+    <div class="related-grid">
+      <a href="/blog/como-usar-pronosticos-ia.html" class="related-card">
+        <div class="badge-small">🔮 Manual</div>
+        <h3>Cómo usar los Pronósticos IA</h3>
+        <p>Aprende a leer e interpretar las predicciones de la IA de gambeta.ai para mejores apuestas.</p>
+      </a>
+
+      <a href="/blog/como-usar-bankroll-manager.html" class="related-card">
+        <div class="badge-small">💰 Manual</div>
+        <h3>Cómo usar el Bankroll Manager</h3>
+        <p>Gestiona tu banca de apuestas de forma inteligente y sostenible con la herramienta de gambeta.ai.</p>
+      </a>
+
+      <a href="/blog/como-usar-la-calculadora.html" class="related-card">
+        <div class="badge-small">🧮 Manual</div>
+        <h3>Cómo usar la Calculadora de Apuestas</h3>
+        <p>Calcula ganancias, cuotas combinadas y stake óptimo antes de apostar.</p>
+      </a>
+
+      <a href="/blog/ranking-gambeta-coins.html" class="related-card">
+        <div class="badge-small">🏆 Manual</div>
+        <h3>Ranking y Gambeta Coins G$</h3>
+        <p>Entendé el sistema de puntos, rankings y cómo canjear tus Gambeta Coins.</p>
+      </a>
+
+      <a href="/blog/como-usar-bot-alerta.html" class="related-card">
+        <div class="badge-small">🤖 Manual</div>
+        <h3>Cómo usar el Bot de Alerta</h3>
+        <p>Recibe notificaciones en tiempo real de los mejores picks de la IA.</p>
+      </a>
+
+      <a href="/blog/como-usar-mi-panel.html" class="related-card">
+        <div class="badge-small">👤 Manual</div>
+        <h3>Mi Panel y canje de premios</h3>
+        <p>Personaliza tu perfil, gestiona tu banca y canjea tus Gambeta Coins por premios.</p>
+      </a>
+
+      <a href="/blog/index.html" class="related-card">
+        <div class="badge-small">📰 Blog</div>
+        <h3>Ver todos los artículos</h3>
+        <p>Explora nuestro blog completo con guías, estrategias y análisis de apuestas.</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 gambeta.ai. Todos los derechos reservados. | <a href="https://gambeta.ai">Inicio</a> | <a href="https://gambeta.ai/blog/index.html">Blog</a></p>
+  </footer>
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Cómo leer los Resultados y tu ROI en gambeta.ai",
+    "description": "Aprende a interpretar la sección de Resultados de gambeta.ai, qué es ROI, WIN/LOSS/VOID, y cómo mejorar tu rendimiento.",
+    "image": "https://gambeta.ai/og-resultados.jpg",
+    "author": {
+      "@type": "Organization",
+      "name": "gambeta.ai"
+    },
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Acceder a la sección de Resultados",
+        "text": "Inicia sesión y dirígete a Resultados en el menú principal."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Entender WIN, LOSS y VOID",
+        "text": "WIN significa victoria, LOSS derrota, VOID evento nulo que no cuenta en ROI."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Calcular tu ROI",
+        "text": "Usa la fórmula: ROI = (Ganancias netas / Inversión total) × 100"
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Analizar Mis Picks",
+        "text": "Revisa tu rendimiento personal en picks que registraste con Gambeta Coins."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Mejorar tu estrategia",
+        "text": "Identifica patrones, ligas rentables y ajusta tu bankroll según resultados."
+      }
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "¿Qué ROI es realmente bueno en apuestas?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Un ROI del 5-10% sostenido a largo plazo es excelente. La mayoría de apostadores profesionales trabajan con ROI entre 3-7%."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Por qué mi ROI puede ser negativo al principio?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Es normal tener ROI negativo en tus primeros picks. La IA funciona mejor con 100+ picks de muestra. Es parte del aprendizaje."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Con qué frecuencia se actualiza la sección de Resultados?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Los resultados se actualizan automáticamente cuando los eventos finalizan, generalmente en menos de 30 minutos."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Qué es VOID y cómo afecta mi ROI?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "VOID ocurre cuando un evento es cancelado o suspendido. Se excluye completamente del cálculo de ROI y es neutral."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Puedo descargar mis resultados para análisis externo?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Actualmente puedes ver y filtrar resultados en la plataforma. Estamos trabajando en una función de exportación para futuros updates."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <script>
+    // FAQ Toggle
+    document.querySelectorAll('.faq-question').forEach(question => {
+      question.addEventListener('click', function() {
+        this.parentElement.classList.toggle('active');
+      });
+    });
+  </script>
+</body>
+</html>

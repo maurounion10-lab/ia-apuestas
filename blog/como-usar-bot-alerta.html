@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cómo usar el Bot de Alerta de gambeta.ai — Alertas en tiempo real para córners</title>
+<meta name="description" content="Guía completa del Bot de Alerta de gambeta.ai: cómo activarlo, cómo funciona el análisis de partidos en vivo, qué significa cada alerta y cómo apostar al córner en el momento exacto.">
+<meta name="keywords" content="Bot de Alerta, alertas en tiempo real, córners, apuestas en vivo, notificaciones, apuestas deportivas">
+<meta name="author" content="gambeta.ai">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://gambeta.ai/blog/como-usar-bot-alerta.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://gambeta.ai/blog/como-usar-bot-alerta.html">
+<meta property="og:title" content="Cómo usar el Bot de Alerta de gambeta.ai — Alertas en tiempo real para córners">
+<meta property="og:description" content="Guía completa del Bot de Alerta de gambeta.ai: cómo activarlo, cómo funciona el análisis de partidos en vivo, qué significa cada alerta y cómo apostar al córner en el momento exacto.">
+<meta property="og:image" content="https://gambeta.ai/og-image.png">
+<meta property="og:locale" content="es_AR">
+<meta property="og:site_name" content="gambeta.ai">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cómo usar el Bot de Alerta de gambeta.ai — Alertas en tiempo real para córners">
+<meta name="twitter:description" content="Guía completa del Bot de Alerta de gambeta.ai: cómo activarlo, cómo funciona el análisis de partidos en vivo, qué significa cada alerta y cómo apostar al córner en el momento exacto.">
+<meta name="twitter:image" content="https://gambeta.ai/og-image.png">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+:root{--verde:#00c853;--fondo:#0d0d0d;--fondo2:#161622;--fondo3:#1e1e30;--texto:#e8e8e8;--texto-sec:#9e9e9e;--borde:rgba(255,255,255,0.07)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--fondo);color:var(--texto);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.75}
+a{color:var(--verde);text-decoration:none}
+a:hover{text-decoration:underline}
+.nav{background:rgba(13,13,13,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--borde);padding:0 24px;display:flex;align-items:center;height:58px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-.5px}
+.nav-logo span{color:var(--verde)}
+.nav-links{margin-left:auto;display:flex;gap:24px}
+.nav-links a{color:var(--texto-sec);font-size:.88rem;transition:color .2s}
+.nav-links a:hover{color:#fff}
+.nav-cta{background:var(--verde);color:#000!important;font-weight:700;padding:7px 18px;border-radius:6px;font-size:.85rem!important}
+.nav-cta:hover{opacity:.9;text-decoration:none!important}
+.breadcrumb{padding:14px 24px;max-width:820px;margin:0 auto;font-size:.82rem;color:var(--texto-sec);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.breadcrumb a{color:var(--texto-sec)}
+.breadcrumb a:hover{color:var(--verde)}
+.breadcrumb span{opacity:.4}
+.hero{background:linear-gradient(160deg,#0d1a12 0%,#0d0d0d 60%);border-bottom:1px solid var(--borde);padding:52px 24px 44px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,83,.12);border:1px solid rgba(0,200,83,.25);color:var(--verde);padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:18px;text-transform:uppercase;letter-spacing:.6px}
+.hero h1{font-size:clamp(1.7rem,4.5vw,2.6rem);font-weight:900;line-height:1.2;max-width:780px;margin:0 auto 18px;letter-spacing:-.5px}
+.hero-meta{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.hero-meta span{color:var(--texto-sec);font-size:.85rem;display:flex;align-items:center;gap:5px}
+.hero p.lead{color:#b0b0b0;max-width:640px;margin:0 auto;font-size:1.05rem;line-height:1.7}
+.toc{background:var(--fondo2);border:1px solid var(--borde);border-left:3px solid var(--verde);border-radius:10px;padding:24px 28px;margin:0 0 36px}
+.toc-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--texto-sec);margin-bottom:12px}
+.toc ol{padding-left:20px}
+.toc li{margin-bottom:6px}
+.toc a{color:var(--texto);font-size:.92rem}
+.toc a:hover{color:var(--verde)}
+.container{max-width:820px;margin:0 auto;padding:44px 24px}
+.article h2{font-size:1.4rem;font-weight:800;margin:40px 0 14px;color:#fff;display:flex;align-items:center;gap:10px}
+.article h2::before{content:'';display:block;width:4px;height:1.4rem;background:var(--verde);border-radius:2px;flex-shrink:0}
+.article h3{font-size:1.1rem;font-weight:700;margin:24px 0 10px;color:#ddd}
+.article p{margin-bottom:16px;color:#ccc;line-height:1.8}
+.article ul,.article ol{margin:0 0 18px 22px}
+.article li{margin-bottom:8px;color:#ccc;line-height:1.75}
+.article strong{color:#fff}
+.steps{display:flex;flex-direction:column;gap:16px;margin:24px 0}
+.step{display:flex;gap:18px;background:var(--fondo2);border:1px solid var(--borde);border-radius:12px;padding:20px}
+.step-num{width:36px;height:36px;min-width:36px;background:var(--verde);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem}
+.step-body h3{font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px}
+.step-body p{color:var(--texto-sec);font-size:.93rem;margin:0;line-height:1.65}
+.highlight{background:linear-gradient(135deg,rgba(0,200,83,.08),rgba(0,200,83,.03));border:1px solid rgba(0,200,83,.2);border-radius:12px;padding:22px 24px;margin:24px 0}
+.highlight-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--verde);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.highlight p{color:#ccc;margin:0;font-size:.95rem;line-height:1.7}
+.warning{background:rgba(255,193,7,.06);border:1px solid rgba(255,193,7,.2);border-radius:12px;padding:20px 24px;margin:24px 0}
+.warning-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#ffc107;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.warning p{color:#ccc;margin:0;font-size:.93rem}
+.faq{margin:40px 0}
+.faq-title{font-size:1.3rem;font-weight:800;margin-bottom:20px;color:#fff}
+.faq-item{border:1px solid var(--borde);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.faq-q{padding:18px 20px;font-weight:700;color:#fff;font-size:.97rem;background:var(--fondo2);display:flex;justify-content:space-between;align-items:center}
+.faq-q::after{content:'＋';color:var(--verde);font-size:1.1rem;flex-shrink:0}
+.faq-a{padding:0 20px 18px;color:#bbb;font-size:.93rem;line-height:1.75;background:var(--fondo2)}
+.cta-box{background:linear-gradient(135deg,#0d1f10,#111120);border:1px solid rgba(0,200,83,.25);border-radius:16px;padding:44px 36px;text-align:center;margin:48px 0}
+.cta-box h3{font-size:1.5rem;font-weight:900;margin-bottom:10px;letter-spacing:-.3px}
+.cta-box p{color:var(--texto-sec);margin-bottom:26px;font-size:1rem}
+.btn-cta{display:inline-block;background:var(--verde);color:#000;font-weight:800;padding:15px 36px;border-radius:9px;font-size:1rem;transition:transform .15s,opacity .15s;letter-spacing:-.2px}
+.btn-cta:hover{opacity:.9;transform:translateY(-1px);text-decoration:none}
+.related{margin-top:48px;padding-top:32px;border-top:1px solid var(--borde)}
+.related-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--texto-sec);margin-bottom:16px}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.related-grid a{background:var(--fondo2);border:1px solid var(--borde);color:var(--texto);padding:14px 16px;border-radius:10px;font-size:.88rem;transition:border-color .2s,color .2s;display:block;line-height:1.4}
+.related-grid a:hover{border-color:var(--verde);color:var(--verde);text-decoration:none}
+.footer{background:#0a0a0a;border-top:1px solid var(--borde);padding:30px 24px;text-align:center}
+.footer p{color:var(--texto-sec);font-size:.83rem}
+.footer a{color:var(--verde)}
+@media(max-width:620px){.nav-links{display:none}.hero{padding:36px 16px 30px}.container{padding:32px 16px}.cta-box{padding:30px 20px}.step{flex-direction:column;gap:12px}.hero-meta{gap:12px}}
+</style>
+</head>
+<body>
+<nav class="nav">
+<div class="nav-logo">gambeta<span>.ai</span></div>
+<div class="nav-links">
+<a href="#pronósticos">Pronósticos</a>
+<a href="#resultados">Resultados</a>
+<a href="#blog">Blog</a>
+</div>
+<a href="https://gambeta.ai" class="nav-cta">Entrar gratis →</a>
+</nav>
+
+<div class="breadcrumb">
+<a href="https://gambeta.ai">Inicio</a>
+<span>›</span>
+<a href="/blog">Blog</a>
+<span>›</span>
+<span>Bot de Alerta</span>
+</div>
+
+<div class="hero">
+<span class="badge">🤖 Manual de usuario</span>
+<h1>Cómo usar el Bot de Alerta de gambeta.ai — Alertas en tiempo real para córners</h1>
+<div class="hero-meta">
+<span>📖 Lectura 7 min</span>
+<span>📅 Actualizado 2025</span>
+<span>👥 Para todos los niveles</span>
+</div>
+<p class="lead">El Bot de Alerta monitorea partidos en vivo y te avisa el momento exacto para apostar al próximo córner — con segundos de ventaja sobre el mercado.</p>
+</div>
+
+<div class="container">
+<nav class="toc">
+<div class="toc-title">Contenido</div>
+<ol>
+<li><a href="#seccion-1">Qué es el Bot de Alerta</a></li>
+<li><a href="#seccion-2">Cómo activar las notificaciones</a></li>
+<li><a href="#seccion-3">Cómo funciona el análisis en tiempo real</a></li>
+<li><a href="#seccion-4">Qué significa cada tipo de alerta</a></li>
+<li><a href="#seccion-5">Estrategia: cómo apostar cuando llega una alerta</a></li>
+<li><a href="#seccion-6">Preguntas frecuentes</a></li>
+</ol>
+</nav>
+
+<article class="article">
+<h2 id="seccion-1">Qué es el Bot de Alerta</h2>
+<p>El <strong>Bot de Alerta</strong> de gambeta.ai es un sistema automatizado de inteligencia artificial que monitorea partidos de fútbol en vivo, específicamente en los últimos 20-30 minutos cuando la acción se intensifica.</p>
+<p>Su función principal: <strong>detectar patrones en tiempo real que predicen un córner inminente</strong> y enviarte una notificación instantánea para que puedas apostar antes de que las casas de apuestas cambien las cuotas.</p>
+<div class="highlight">
+<div class="highlight-title">⚡ Ventaja clave</div>
+<p>La mayoría de los apostadores vieron el córner ocurrir y luego intentan apostar. El Bot de Alerta te avisa ANTES de que ocurra, dándote una ventaja de 2-3 minutos en el mercado.</p>
+</div>
+
+<h2 id="seccion-2">Cómo activar las notificaciones</h2>
+<p>El Bot de Alerta funciona solo si tienes las notificaciones activadas. El proceso es simple y toma menos de un minuto:</p>
+<div class="steps">
+<div class="step">
+<div class="step-num">1</div>
+<div class="step-body">
+<h3>Abre el menú de gambeta.ai</h3>
+<p>Desde tu navegador, busca el ícono 🤖 en el menú principal de la plataforma</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">2</div>
+<div class="step-body">
+<h3>Entra a "Bot Alerta"</h3>
+<p>Haz clic en la sección Bot Alerta para acceder al panel de configuración</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">3</div>
+<div class="step-body">
+<h3>Haz clic en "Activar"</h3>
+<p>Presiona el botón verde de Activar notificaciones</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">4</div>
+<div class="step-body">
+<h3>Acepta los permisos</h3>
+<p>Tu navegador te pedirá confirmación para enviar notificaciones. Haz clic en Permitir</p>
+</div>
+</div>
+</div>
+
+<h3>Bonus: Pick diario GRATIS</h3>
+<p>Además de las alertas de córners, el Bot también te manda un <strong>🎁 Pick diario GRATIS</strong> como notificación push todos los días. Es el mejor pick del día seleccionado por los análisis de gambeta.ai, disponible sin costo para que lo registres en la plataforma.</p>
+
+<h2 id="seccion-3">Cómo funciona el análisis en tiempo real</h2>
+<p>El Bot de Alerta no es magia. Está basado en análisis matemáticos y reconocimiento de patrones en el juego. Estas son las señales que monitorea constantemente:</p>
+<ul>
+<li><strong>Presión ofensiva sostenida:</strong> Un equipo ataca durante más de 30 segundos sin perder la pelota</li>
+<li><strong>Equipo perdiendo que necesita empatar:</strong> Cuando falta poco tiempo y va perdiendo, aumenta la desesperación y los centros</li>
+<li><strong>Lanzamientos desde afuera del área:</strong> Ataques desde las bandas que generan más probabilidad de córner</li>
+<li><strong>Saques de banda cerca del área:</strong> Especialmente en el tercer tercio del campo de defensa</li>
+<li><strong>Espacios descubiertos en defensa:</strong> Cuando la defensa se abre para atacar, hay más espacio para centros</li>
+</ul>
+<p>El sistema procesa estos datos en tiempo real (cada segundo) y cuando detecta una combinación específica de patrones, envía la alerta.</p>
+<div class="warning">
+<div class="warning-title">⚠️ Importante</div>
+<p>El Bot no predice con 100% de exactitud. Es una herramienta de apoyo, no una garantía. La probabilidad de córner se calcula en base a patrones históricos, pero el fútbol siempre tiene variables impredecibles.</p>
+</div>
+
+<h2 id="seccion-4">Qué significa cada tipo de alerta</h2>
+<p>El Bot envía diferentes tipos de alertas según la confianza de su predicción:</p>
+
+<h3>🚨 ALERTA CÓRNER (Alta probabilidad)</h3>
+<p>Esta es la alerta principal. Significa que el sistema detectó una alta probabilidad de córner en los próximos 2 minutos. La confianza del algoritmo está por encima del 75%.</p>
+<p><strong>Qué hacer:</strong> Abre rápidamente la casa de apuestas y busca el mercado de "Próximo Córner" o "Total de Córners". Apuesta antes de que cambie la cuota.</p>
+
+<h3>⚽ ALERTA GOLES (Momentum ofensivo)</h3>
+<p>Detecta patrones de ataque intenso que pueden terminar en gol, no necesariamente córner. Algunos apostadores también juegan "Sí habrá gol" con estas alertas.</p>
+<p><strong>Qué hacer:</strong> Dependiendo de tu estrategia, puedes apostar al próximo gol, a goles totales, o esperar a que vuelva el momentum defensivo.</p>
+
+<h2 id="seccion-5">Estrategia: cómo apostar cuando llega una alerta</h2>
+<p>Una alerta es solo una señal. La forma en que la uses determina si ganás o perdés. Aquí está la estrategia recomendada:</p>
+<div class="steps">
+<div class="step">
+<div class="step-num">1</div>
+<div class="step-body">
+<h3>Confirma visualmenteel partido</h3>
+<p>Cuando recibas la alerta, abre el partido en vivo en una transmisión para ver el estado actual del juego</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">2</div>
+<div class="step-body">
+<h3>Verifica la fase del partido</h3>
+<p>¿Qué minuto es? ¿Qué equipo está atacando? ¿Hay tarjetas rojas o expulsiones? El contexto importa.</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">3</div>
+<div class="step-body">
+<h3>Abre la casa de apuestas</h3>
+<p>Busca el mercado de "Próximo Córner" o "Total de Córners" y analiza la cuota</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">4</div>
+<div class="step-body">
+<h3>Apuesta rápido</h3>
+<p>Las cuotas de apuestas en vivo cambian muy rápido. Tienes 30-60 segundos antes de que baje la cuota del próximo córner</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">5</div>
+<div class="step-body">
+<h3>Registra en gambeta.ai</h3>
+<p>Después de apostar en la casa de apuestas, registra el pick en Pronósticos para ganadores Gambeta Coins</p>
+</div>
+</div>
+</div>
+
+<h3>Pro Tips</h3>
+<ul>
+<li><strong>Cuota mínima:</strong> No apuestes si la cuota está por debajo de 1.50. No vale la pena el riesgo.</li>
+<li><strong>Bancroll management:</strong> Usa el Bankroll Manager de gambeta.ai para no excederte en apuestas por alerta</li>
+<li><strong>Combina alertas:</strong> Si recibes dos alertas CÓRNER en el mismo partido, la probabilidad es aún mayor</li>
+<li><strong>Partidos al final:</strong> Las alertas son más precisas en los últimos 10 minutos cuando la desesperación es real</li>
+</ul>
+
+<h2 id="seccion-6">Preguntas frecuentes</h2>
+<div class="faq">
+<div class="faq-item">
+<div class="faq-q">¿Funciona el Bot de Alerta en todos los partidos?</div>
+<div class="faq-a">No. El Bot solo funciona en partidos de las 5 principales ligas (Premier League, La Liga, Serie A, Bundesliga, Ligue 1) y partidos internacionales importantes. Algunos partidos menores no están incluidos.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Necesito estar con el partido abierto en otro navegador?</div>
+<div class="faq-a">No necesariamente. Puedes recibir la alerta en gambeta.ai y luego abrir el partido. Pero te recomendamos tener una transmisión abierta para confirmar visualmente antes de apostar.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Las alertas llegan en tiempo real?</div>
+<div class="faq-a">Sí, en tiempo real. Cuando el sistema detecta el patrón, la notificación se envía inmediatamente. Puede haber un delay de máximo 5 segundos según tu conexión a internet.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Puedo recibir alertas en el celular?</div>
+<div class="faq-a">Sí. Las notificaciones se envían al navegador que uses. En celular, funciona en navegadores que soporten notificaciones push como Chrome o Edge.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Cuál es la tasa de acierto del Bot?</div>
+<div class="faq-a">El Bot acierta aproximadamente 68-72% de sus alertas CÓRNER, según datos de usuarios. No es 100% pero es consistentemente mayor que la media de apostadores manuales.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Puedo desactivar el Bot cuando quiera?</div>
+<div class="faq-a">Sí. Entra a 🤖 Bot Alerta → Desactivar. Las notificaciones se cortarán inmediatamente. Puedes reactivarlas en cualquier momento.</div>
+</div>
+</div>
+</article>
+
+<div class="cta-box">
+<h3>Activa el Bot de Alerta ahora</h3>
+<p>Recibe alertas en tiempo real de córners y aprovecha la ventaja del mercado antes que otros apostadores.</p>
+<a href="https://gambeta.ai" class="btn-cta">Entrar a gambeta.ai</a>
+</div>
+
+<div class="related">
+<div class="related-title">Artículos relacionados</div>
+<div class="related-grid">
+<a href="/blog/como-usar-pronosticos-ia.html">🔮 Cómo usar los Pronósticos IA</a>
+<a href="/blog/como-leer-resultados.html">📋 Cómo leer los Resultados y tu ROI</a>
+<a href="/blog/como-usar-bankroll-manager.html">💰 Cómo usar el Bankroll Manager</a>
+<a href="/blog/como-usar-la-calculadora.html">🧮 Cómo usar la Calculadora</a>
+<a href="/blog/ranking-gambeta-coins.html">🏆 Ranking y Gambeta Coins G$</a>
+<a href="/blog/como-usar-mi-panel.html">👤 Mi Panel y canje de premios</a>
+<a href="/blog/index.html">📰 Ver todos los artículos</a>
+</div>
+</div>
+</div>
+
+<footer class="footer">
+<p>&copy; 2025 gambeta.ai. Todos los derechos reservados. | <a href="#">Privacidad</a> | <a href="#">Términos</a></p>
+</footer>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Cómo usar el Bot de Alerta de gambeta.ai",
+  "description": "Guía completa para activar y usar el Bot de Alerta que envía notificaciones en tiempo real para apuestas de córners",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "Activa las notificaciones",
+      "text": "Ve a 🤖 Bot Alerta en el menú de gambeta.ai y haz clic en Activar. Acepta los permisos de notificaciones del navegador."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Recibe alertas en tiempo real",
+      "text": "El Bot monitorea partidos en vivo y te envía notificaciones cuando detecta patrones de córner inminente."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Apuesta rápido",
+      "text": "Cuando recibas una alerta, abre la casa de apuestas y busca el mercado de Próximo Córner. Apuesta antes de que cambie la cuota."
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Funciona el Bot de Alerta en todos los partidos?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. El Bot solo funciona en partidos de las 5 principales ligas (Premier League, La Liga, Serie A, Bundesliga, Ligue 1) y partidos internacionales importantes."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Necesito estar con el partido abierto?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No necesariamente. Puedes recibir la alerta en gambeta.ai y luego abrir el partido, aunque se recomienda tener una transmisión para confirmar visualmente."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Las alertas llegan en tiempo real?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, en tiempo real. Cuando el sistema detecta el patrón, la notificación se envía inmediatamente con máximo 5 segundos de delay según tu conexión."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo recibir alertas en el celular?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Las notificaciones se envían al navegador que uses. En celular funciona en navegadores como Chrome o Edge que soporten notificaciones push."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuál es la tasa de acierto del Bot?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El Bot acierta aproximadamente 68-72% de sus alertas CÓRNER, según datos de usuarios. Consistentemente mayor que la media de apostadores manuales."
+      }
+    }
+  ]
+}
+</script>
+</body>
+</html>

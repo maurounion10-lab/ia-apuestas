@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cómo usar Mi Panel en gambeta.ai — Estadísticas, picks y canje de premios</title>
+<meta name="description" content="Guía de Mi Panel en gambeta.ai: cómo ver tus estadísticas personales, gestionar tus apuestas, leer los consejos IA y canjear tus Gambeta Coins por premios reales.">
+<meta name="keywords" content="Mi Panel, estadísticas, ROI, apuestas, consejos IA, Gambeta Coins, canje de premios">
+<meta name="author" content="gambeta.ai">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://gambeta.ai/blog/como-usar-mi-panel.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://gambeta.ai/blog/como-usar-mi-panel.html">
+<meta property="og:title" content="Cómo usar Mi Panel en gambeta.ai — Estadísticas, picks y canje de premios">
+<meta property="og:description" content="Guía de Mi Panel en gambeta.ai: cómo ver tus estadísticas personales, gestionar tus apuestas, leer los consejos IA y canjear tus Gambeta Coins por premios reales.">
+<meta property="og:image" content="https://gambeta.ai/og-image.png">
+<meta property="og:locale" content="es_AR">
+<meta property="og:site_name" content="gambeta.ai">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cómo usar Mi Panel en gambeta.ai — Estadísticas, picks y canje de premios">
+<meta name="twitter:description" content="Guía de Mi Panel en gambeta.ai: cómo ver tus estadísticas personales, gestionar tus apuestas, leer los consejos IA y canjear tus Gambeta Coins por premios reales.">
+<meta name="twitter:image" content="https://gambeta.ai/og-image.png">
+<link rel="icon" href="/favicon.png" type="image/png">
+<style>
+:root{--verde:#00c853;--fondo:#0d0d0d;--fondo2:#161622;--fondo3:#1e1e30;--texto:#e8e8e8;--texto-sec:#9e9e9e;--borde:rgba(255,255,255,0.07)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--fondo);color:var(--texto);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.75}
+a{color:var(--verde);text-decoration:none}
+a:hover{text-decoration:underline}
+.nav{background:rgba(13,13,13,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--borde);padding:0 24px;display:flex;align-items:center;height:58px;position:sticky;top:0;z-index:100}
+.nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-.5px}
+.nav-logo span{color:var(--verde)}
+.nav-links{margin-left:auto;display:flex;gap:24px}
+.nav-links a{color:var(--texto-sec);font-size:.88rem;transition:color .2s}
+.nav-links a:hover{color:#fff}
+.nav-cta{background:var(--verde);color:#000!important;font-weight:700;padding:7px 18px;border-radius:6px;font-size:.85rem!important}
+.nav-cta:hover{opacity:.9;text-decoration:none!important}
+.breadcrumb{padding:14px 24px;max-width:820px;margin:0 auto;font-size:.82rem;color:var(--texto-sec);display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.breadcrumb a{color:var(--texto-sec)}
+.breadcrumb a:hover{color:var(--verde)}
+.breadcrumb span{opacity:.4}
+.hero{background:linear-gradient(160deg,#0d1a12 0%,#0d0d0d 60%);border-bottom:1px solid var(--borde);padding:52px 24px 44px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,83,.12);border:1px solid rgba(0,200,83,.25);color:var(--verde);padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:18px;text-transform:uppercase;letter-spacing:.6px}
+.hero h1{font-size:clamp(1.7rem,4.5vw,2.6rem);font-weight:900;line-height:1.2;max-width:780px;margin:0 auto 18px;letter-spacing:-.5px}
+.hero-meta{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-bottom:18px}
+.hero-meta span{color:var(--texto-sec);font-size:.85rem;display:flex;align-items:center;gap:5px}
+.hero p.lead{color:#b0b0b0;max-width:640px;margin:0 auto;font-size:1.05rem;line-height:1.7}
+.toc{background:var(--fondo2);border:1px solid var(--borde);border-left:3px solid var(--verde);border-radius:10px;padding:24px 28px;margin:0 0 36px}
+.toc-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--texto-sec);margin-bottom:12px}
+.toc ol{padding-left:20px}
+.toc li{margin-bottom:6px}
+.toc a{color:var(--texto);font-size:.92rem}
+.toc a:hover{color:var(--verde)}
+.container{max-width:820px;margin:0 auto;padding:44px 24px}
+.article h2{font-size:1.4rem;font-weight:800;margin:40px 0 14px;color:#fff;display:flex;align-items:center;gap:10px}
+.article h2::before{content:'';display:block;width:4px;height:1.4rem;background:var(--verde);border-radius:2px;flex-shrink:0}
+.article h3{font-size:1.1rem;font-weight:700;margin:24px 0 10px;color:#ddd}
+.article p{margin-bottom:16px;color:#ccc;line-height:1.8}
+.article ul,.article ol{margin:0 0 18px 22px}
+.article li{margin-bottom:8px;color:#ccc;line-height:1.75}
+.article strong{color:#fff}
+.steps{display:flex;flex-direction:column;gap:16px;margin:24px 0}
+.step{display:flex;gap:18px;background:var(--fondo2);border:1px solid var(--borde);border-radius:12px;padding:20px}
+.step-num{width:36px;height:36px;min-width:36px;background:var(--verde);color:#000;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:1rem}
+.step-body h3{font-size:1rem;font-weight:700;color:#fff;margin-bottom:6px}
+.step-body p{color:var(--texto-sec);font-size:.93rem;margin:0;line-height:1.65}
+.highlight{background:linear-gradient(135deg,rgba(0,200,83,.08),rgba(0,200,83,.03));border:1px solid rgba(0,200,83,.2);border-radius:12px;padding:22px 24px;margin:24px 0}
+.highlight-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--verde);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.highlight p{color:#ccc;margin:0;font-size:.95rem;line-height:1.7}
+.warning{background:rgba(255,193,7,.06);border:1px solid rgba(255,193,7,.2);border-radius:12px;padding:20px 24px;margin:24px 0}
+.warning-title{font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:#ffc107;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.warning p{color:#ccc;margin:0;font-size:.93rem}
+.faq{margin:40px 0}
+.faq-title{font-size:1.3rem;font-weight:800;margin-bottom:20px;color:#fff}
+.faq-item{border:1px solid var(--borde);border-radius:10px;margin-bottom:10px;overflow:hidden}
+.faq-q{padding:18px 20px;font-weight:700;color:#fff;font-size:.97rem;background:var(--fondo2);display:flex;justify-content:space-between;align-items:center}
+.faq-q::after{content:'＋';color:var(--verde);font-size:1.1rem;flex-shrink:0}
+.faq-a{padding:0 20px 18px;color:#bbb;font-size:.93rem;line-height:1.75;background:var(--fondo2)}
+.cta-box{background:linear-gradient(135deg,#0d1f10,#111120);border:1px solid rgba(0,200,83,.25);border-radius:16px;padding:44px 36px;text-align:center;margin:48px 0}
+.cta-box h3{font-size:1.5rem;font-weight:900;margin-bottom:10px;letter-spacing:-.3px}
+.cta-box p{color:var(--texto-sec);margin-bottom:26px;font-size:1rem}
+.btn-cta{display:inline-block;background:var(--verde);color:#000;font-weight:800;padding:15px 36px;border-radius:9px;font-size:1rem;transition:transform .15s,opacity .15s;letter-spacing:-.2px}
+.btn-cta:hover{opacity:.9;transform:translateY(-1px);text-decoration:none}
+.related{margin-top:48px;padding-top:32px;border-top:1px solid var(--borde)}
+.related-title{font-size:.78rem;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--texto-sec);margin-bottom:16px}
+.related-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.related-grid a{background:var(--fondo2);border:1px solid var(--borde);color:var(--texto);padding:14px 16px;border-radius:10px;font-size:.88rem;transition:border-color .2s,color .2s;display:block;line-height:1.4}
+.related-grid a:hover{border-color:var(--verde);color:var(--verde);text-decoration:none}
+.footer{background:#0a0a0a;border-top:1px solid var(--borde);padding:30px 24px;text-align:center}
+.footer p{color:var(--texto-sec);font-size:.83rem}
+.footer a{color:var(--verde)}
+@media(max-width:620px){.nav-links{display:none}.hero{padding:36px 16px 30px}.container{padding:32px 16px}.cta-box{padding:30px 20px}.step{flex-direction:column;gap:12px}.hero-meta{gap:12px}}
+</style>
+</head>
+<body>
+<nav class="nav">
+<div class="nav-logo">gambeta<span>.ai</span></div>
+<div class="nav-links">
+<a href="#pronósticos">Pronósticos</a>
+<a href="#resultados">Resultados</a>
+<a href="#blog">Blog</a>
+</div>
+<a href="https://gambeta.ai" class="nav-cta">Entrar gratis →</a>
+</nav>
+
+<div class="breadcrumb">
+<a href="https://gambeta.ai">Inicio</a>
+<span>›</span>
+<a href="/blog">Blog</a>
+<span>›</span>
+<span>Mi Panel</span>
+</div>
+
+<div class="hero">
+<span class="badge">👤 Manual de usuario</span>
+<h1>Cómo usar Mi Panel en gambeta.ai — Estadísticas, picks y canje de premios</h1>
+<div class="hero-meta">
+<span>📖 Lectura 6 min</span>
+<span>📅 Actualizado 2025</span>
+<span>👥 Para todos los niveles</span>
+</div>
+<p class="lead">Mi Panel es tu centro de control en gambeta.ai. Ahí encontrás todo lo que necesitás para entender tu rendimiento y mejorar como apostador.</p>
+</div>
+
+<div class="container">
+<nav class="toc">
+<div class="toc-title">Contenido</div>
+<ol>
+<li><a href="#seccion-1">Cómo acceder a Mi Panel</a></li>
+<li><a href="#seccion-2">Mis Apuestas: el historial completo</a></li>
+<li><a href="#seccion-3">Mis Estadísticas: tu rendimiento detallado</a></li>
+<li><a href="#seccion-4">Consejos IA: recomendaciones personalizadas</a></li>
+<li><a href="#seccion-5">Sección Premios: cómo canjear tus G$</a></li>
+<li><a href="#seccion-6">Preguntas frecuentes</a></li>
+</ol>
+</nav>
+
+<article class="article">
+<h2 id="seccion-1">Cómo acceder a Mi Panel</h2>
+<p>Mi Panel es el área personal de tu cuenta en gambeta.ai. Solo está disponible si has iniciado sesión. Para acceder:</p>
+<div class="steps">
+<div class="step">
+<div class="step-num">1</div>
+<div class="step-body">
+<h3>Busca el ícono 👤 en el menú</h3>
+<p>En la esquina superior derecha de gambeta.ai, verás un ícono de perfil. Haz clic en él.</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">2</div>
+<div class="step-body">
+<h3>Se abrirá el panel</h3>
+<p>Aparecerá un menú desplegable con varias opciones. Haz clic en "Mi Panel"</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">3</div>
+<div class="step-body">
+<h3>Ingresa a tu centro de control</h3>
+<p>Ahora ves todas tus secciones personales: Apuestas, Estadísticas, Consejos IA y Premios</p>
+</div>
+</div>
+</div>
+
+<div class="highlight">
+<div class="highlight-title">💡 Dato importante</div>
+<p>Si no estás logueado, no podrás acceder a Mi Panel. Deberás crear una cuenta o ingresar con tu usuario y contraseña primero.</p>
+</div>
+
+<h2 id="seccion-2">Mis Apuestas: el historial completo</h2>
+<p>En la sección <strong>📝 Mis Apuestas</strong>, encontrás un registro detallado de cada pick que registraste en gambeta.ai.</p>
+
+<h3>Qué información ves en cada apuesta:</h3>
+<ul>
+<li><strong>Fecha y hora:</strong> Cuándo registraste el pick</li>
+<li><strong>Partido:</strong> Nombres de los equipos y liga</li>
+<li><strong>Tipo de mercado:</strong> Goles, córners, tarjetas, etc.</li>
+<li><strong>Cuota:</strong> La cuota a la que apostaste</li>
+<li><strong>Resultado:</strong> WIN (acertaste), LOSS (perdiste), o VOID (apuesta cancelada)</li>
+<li><strong>Ganancia/Pérdida:</strong> Cuánto ganaste o perdiste en esa apuesta</li>
+</ul>
+
+<p>Este historial es fundamental porque te permite ver patrones en tus apuestas. Por ejemplo, podrías descubrir que ganas más en mercados de "Goles" que de "Córners", o que tu mejor desempeño es en la Premier League.</p>
+
+<h3>Cómo usar el historial para mejorar</h3>
+<p>Analiza tus últimas 20-30 apuestas y responde estas preguntas:</p>
+<ul>
+<li>¿Cuál fue mi mercado más rentable?</li>
+<li>¿En qué liga tuve mejor ROI?</li>
+<li>¿Hay patrones en mis pérdidas?</li>
+<li>¿Mi tasa de acierto mejoró a lo largo del tiempo?</li>
+</ul>
+
+<h2 id="seccion-3">Mis Estadísticas: tu rendimiento detallado</h2>
+<p>La sección <strong>📊 Mis Estadísticas</strong> resume tu rendimiento total como apostador. Aquí ves los números que realmente importan:</p>
+
+<h3>Las métricas principales:</h3>
+<ul>
+<li><strong>ROI (Return on Investment):</strong> Tu retorno porcentual total. Si tu ROI es +15%, significa que ganaste el 15% de todo el dinero que apostaste.</li>
+<li><strong>Porcentaje de acierto:</strong> Qué porcentaje de tus picks terminaron en WIN</li>
+<li><strong>Racha actual:</strong> ¿Cuántas apuestas consecutivas ganaste o perdiste ahora?</li>
+<li><strong>Mejor racha:</strong> Tu racha ganadora más larga (ej: 8 wins seguidos)</li>
+<li><strong>Pick más rentable:</strong> Cuál fue tu apuesta que más dinero te generó</li>
+<li><strong>Mercado con más éxito:</strong> El tipo de mercado donde tienes el mejor ROI</li>
+</ul>
+
+<div class="highlight">
+<div class="highlight-title">📊 Interpretación de ROI</div>
+<p>Un ROI de +5% es excelente en apuestas deportivas. Significa que de cada $100 que apuestas, ganas $5 netos. Un ROI de -10% significa que pierdes $10 por cada $100 apostados.</p>
+</div>
+
+<h2 id="seccion-4">Consejos IA: recomendaciones personalizadas</h2>
+<p>Una de las características más poderosas de gambeta.ai es el sistema de <strong>🤖 Consejos IA</strong>. La inteligencia artificial analiza tu historial de apuestas y te da recomendaciones específicas para mejorar.</p>
+
+<h3>Tipos de consejos que recibes:</h3>
+<ul>
+<li><strong>Consejos por mercado:</strong> "Tu ROI en mercados de más de 2.5 goles es +18%. Enfocate en ese mercado."</li>
+<li><strong>Consejos por liga:</strong> "Tienes un ROI negativo en la Serie A. Considera reducir apuestas en esa liga."</li>
+<li><strong>Consejos por cuota:</strong> "Tus apuestas en cuotas entre 1.80 y 2.30 tienen 62% de acierto. Mantén ese rango."</li>
+<li><strong>Consejos de gestión:</strong> "Tus últimas 10 apuestas perdieron. Considera tomar un break antes de continuar."</li>
+<li><strong>Consejos de riesgo:</strong> "Notamos que cambiastes de estrategia hace 3 días. Los resultados empeoraron. ¿Querés volver atrás?"</li>
+</ul>
+
+<p>Estos consejos no son órdenes. Son sugerencias basadas en datos. Tu desempeño anterior es el mejor indicador de lo que probablemente funcione en el futuro.</p>
+
+<div class="warning">
+<div class="warning-title">⚠️ Importante</div>
+<p>Los Consejos IA se basan en datos históricos. No garantizan ganancias futuras. El fútbol tiene variables impredecibles. Usa estos consejos como guía, no como verdad absoluta.</p>
+</div>
+
+<h2 id="seccion-5">Sección Premios: cómo canjear tus G$</h2>
+<p>La sección <strong>🎁 Premios</strong> es donde ves tu saldo de Gambeta Coins y canjeas premios reales.</p>
+
+<h3>Qué ves en esta sección:</h3>
+<ul>
+<li><strong>Tu saldo actual de G$:</strong> Cuántos Gambeta Coins tienes acumulados</li>
+<li><strong>Premios disponibles:</strong> Los diferentes bonos (USD 20, USD 70, USD 230) y qué precio tienen en G$</li>
+<li><strong>Historial de canjes:</strong> Qué premios canjeaste antes y cuándo</li>
+</ul>
+
+<h3>Cómo canjear un premio:</h3>
+<div class="steps">
+<div class="step">
+<div class="step-num">1</div>
+<div class="step-body">
+<h3>Abre Mi Panel → Premios</h3>
+<p>Verás el listado de premios disponibles</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">2</div>
+<div class="step-body">
+<h3>Elige un premio</h3>
+<p>Haz clic en el bono USD que quieres canjear. Debe ser uno que te puedas permitir con tu saldo actual de G$</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">3</div>
+<div class="step-body">
+<h3>Haz clic en "Canjear"</h3>
+<p>Se abrirá una ventana con instrucciones</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">4</div>
+<div class="step-body">
+<h3>Serás redirigido a Telegram</h3>
+<p>El Bot de gambeta.ai en Telegram confirmará tu canje y te pedirá que selecciones la casa de apuestas donde quieres el bono</p>
+</div>
+</div>
+<div class="step">
+<div class="step-num">5</div>
+<div class="step-body">
+<h3>Recibirás el bono en 24 horas</h3>
+<p>La banca libre se acreditará en la casa de apuestas seleccionada</p>
+</div>
+</div>
+</div>
+
+<h3>Casas de apuestas asociadas</h3>
+<p>El bono se puede recibir en cualquiera de las casas de apuestas partner de gambeta.ai. Las opciones disponibles aparecen al momento del canje en Telegram. Elige la que uses más frecuentemente.</p>
+
+<div class="highlight">
+<div class="highlight-title">✅ Pro tip</div>
+<p>La banca libre (free bet) que recibes no es dinero real que puedas retirar. Solo puedes usarla para apostar. Pero si ganas con esa banca libre, sí puedes retirar las ganancias.</p>
+</div>
+
+<h2 id="seccion-6">Preguntas frecuentes</h2>
+<div class="faq">
+<div class="faq-item">
+<div class="faq-q">¿Necesito crear una cuenta para acceder a Mi Panel?</div>
+<div class="faq-a">Sí. Mi Panel es completamente personal. Necesitas estar registrado e iniciado sesión en gambeta.ai para verlo.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Cómo registro una apuesta en Mi Panel?</div>
+<div class="faq-a">No registras apuestas directamente en Mi Panel. Las registras en la sección Pronósticos de gambeta.ai usando Gambeta Coins. Luego aparecen automáticamente en Mis Apuestas.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Los Consejos IA son genéricos o personalizados?</div>
+<div class="faq-a">Son completamente personalizados. El sistema analiza TUS apuestas, TU ROI, TU comportamiento. Dos apostadores nunca recibirán los mismos consejos.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Cuánto tarda el canje de premios?</div>
+<div class="faq-a">El canje se confirma en Telegram y el bono se acredita en la casa de apuestas en máximo 24 horas. Normalmente es mucho más rápido, entre 1-4 horas.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Puedo ver el ROI de otros jugadores?</div>
+<div class="faq-a">No. Tu estadísticas son privadas. Solo tú puedes verlas. Sin embargo, puedes ver el Ranking mensual general de gambeta.ai sin datos específicos.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Qué pasa si cancelo una apuesta?</div>
+<div class="faq-a">Las apuestas canceladas aparecen como VOID en tu historial. No cuentan para tu ROI ni para el ranking, pero sí ves que las registraste.</div>
+</div>
+<div class="faq-item">
+<div class="faq-q">¿Puedo exportar mi historial de apuestas?</div>
+<div class="faq-a">Actualmente Mi Panel no tiene opción de descargar datos en CSV. Pero puedes ver todo el historial y copiar la información manualmente si la necesitas.</div>
+</div>
+</div>
+</article>
+
+<div class="cta-box">
+<h3>Entra a Mi Panel y conoce tu rendimiento</h3>
+<p>Analiza tus estadísticas, recibe consejos personalizados y canjea tus Gambeta Coins por premios reales.</p>
+<a href="https://gambeta.ai" class="btn-cta">Entrar a gambeta.ai</a>
+</div>
+
+<div class="related">
+<div class="related-title">Artículos relacionados</div>
+<div class="related-grid">
+<a href="/blog/como-usar-pronosticos-ia.html">🔮 Cómo usar los Pronósticos IA</a>
+<a href="/blog/como-leer-resultados.html">📋 Cómo leer los Resultados y tu ROI</a>
+<a href="/blog/como-usar-bankroll-manager.html">💰 Cómo usar el Bankroll Manager</a>
+<a href="/blog/como-usar-la-calculadora.html">🧮 Cómo usar la Calculadora</a>
+<a href="/blog/ranking-gambeta-coins.html">🏆 Ranking y Gambeta Coins G$</a>
+<a href="/blog/como-usar-bot-alerta.html">🤖 Cómo usar el Bot de Alerta</a>
+<a href="/blog/index.html">📰 Ver todos los artículos</a>
+</div>
+</div>
+</div>
+
+<footer class="footer">
+<p>&copy; 2025 gambeta.ai. Todos los derechos reservados. | <a href="#">Privacidad</a> | <a href="#">Términos</a></p>
+</footer>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "HowTo",
+  "name": "Cómo usar Mi Panel en gambeta.ai",
+  "description": "Guía completa para acceder a Mi Panel, ver estadísticas personalizadas, recibir consejos IA y canjear Gambeta Coins",
+  "step": [
+    {
+      "@type": "HowToStep",
+      "name": "Accede a Mi Panel",
+      "text": "Haz clic en el ícono 👤 en la esquina superior derecha de gambeta.ai y selecciona Mi Panel del menú desplegable."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Revisa tus estadísticas",
+      "text": "En Mis Estadísticas puedes ver tu ROI, porcentaje de acierto, mejor racha y mercado más rentable."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Lee los Consejos IA",
+      "text": "El sistema analiza tu desempeño y te recomienda ajustes específicos para mejorar tu ROI."
+    },
+    {
+      "@type": "HowToStep",
+      "name": "Canjea tus G$ por premios",
+      "text": "Ve a Premios, elige un bono USD, haz clic en Canjear y confirma en Telegram. Recibirás el bono en 24 horas."
+    }
+  ]
+}
+</script>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "¿Necesito crear una cuenta para acceder a Mi Panel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí. Mi Panel es completamente personal. Necesitas estar registrado e iniciado sesión en gambeta.ai para verlo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cómo registro una apuesta en Mi Panel?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No registras apuestas en Mi Panel. Las registras en Pronósticos usando Gambeta Coins y aparecen automáticamente en Mis Apuestas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Los Consejos IA son personalizados?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Sí, son completamente personalizados. El sistema analiza TUS apuestas, TU ROI y TU comportamiento específico."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Cuánto tarda el canje de premios?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "El canje se confirma en Telegram y el bono se acredita en máximo 24 horas. Normalmente entre 1-4 horas."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "¿Puedo ver el ROI de otros jugadores?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Tu estadísticas son privadas. Solo tú puedes verlas. Puedes ver el Ranking mensual general sin datos específicos."
+      }
+    }
+  ]
+}
+</script>
+</body>
+</html>

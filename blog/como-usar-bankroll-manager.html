@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Guía para usar el Bankroll Manager de gambeta.ai: registrá tu banca, seguí tu evolución, entendé el sistema de stakes y apostá sin arriesgar más de lo que podés perder.">
+  <meta name="keywords" content="bankroll management, gestión de banca, stakes apuestas, control de dinero, apuestas responsables, evolución banca">
+  <meta name="author" content="gambeta.ai">
+  <meta property="og:title" content="Cómo usar el Bankroll Manager de gambeta.ai — Gestión de banca inteligente">
+  <meta property="og:description" content="Guía para usar el Bankroll Manager de gambeta.ai: registrá tu banca, seguí tu evolución, entendé el sistema de stakes y apostá sin arriesgar más de lo que podés perder.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://gambeta.ai/blog/como-usar-bankroll-manager.html">
+  <meta property="og:image" content="https://gambeta.ai/og-bankroll.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Cómo usar el Bankroll Manager de gambeta.ai">
+  <meta name="twitter:description" content="Gestiona tu banca de apuestas de forma inteligente y sostenible con el Bankroll Manager.">
+  <link rel="canonical" href="https://gambeta.ai/blog/como-usar-bankroll-manager.html">
+  <title>Cómo usar el Bankroll Manager de gambeta.ai — Gestión de banca inteligente</title>
+  <style>
+    :root {
+      --verde: #00c853;
+      --fondo: #0d0d0d;
+      --fondo2: #161622;
+      --fondo3: #1e1e30;
+      --texto: #e8e8e8;
+      --texto-sec: #9e9e9e;
+      --borde: rgba(255, 255, 255, 0.07);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--fondo);
+      color: var(--texto);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* Sticky Nav */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--fondo2);
+      border-bottom: 1px solid var(--borde);
+      padding: 1rem 2rem;
+    }
+
+    nav .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    nav .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--verde);
+      text-decoration: none;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    nav a {
+      color: var(--texto);
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: var(--verde);
+    }
+
+    .cta-btn {
+      background: var(--verde);
+      color: var(--fondo);
+      padding: 0.6rem 1.2rem;
+      border-radius: 0.4rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: opacity 0.3s;
+    }
+
+    .cta-btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Breadcrumb */
+    .breadcrumb {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem 2rem;
+      font-size: 0.85rem;
+      color: var(--texto-sec);
+    }
+
+    .breadcrumb a {
+      color: var(--verde);
+      text-decoration: none;
+    }
+
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+
+    /* Hero */
+    .hero {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+      border-bottom: 1px solid var(--borde);
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(0, 200, 83, 0.1);
+      color: var(--verde);
+      padding: 0.4rem 0.8rem;
+      border-radius: 0.3rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 1rem;
+      line-height: 1.2;
+    }
+
+    .meta {
+      display: flex;
+      gap: 1.5rem;
+      color: var(--texto-sec);
+      font-size: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .lead {
+      font-size: 1.1rem;
+      color: var(--texto);
+      max-width: 600px;
+      line-height: 1.5;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--fondo2);
+      border: 1px solid var(--borde);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin: 2rem auto;
+      max-width: 900px;
+    }
+
+    .toc h2 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      color: var(--verde);
+    }
+
+    .toc ol {
+      list-style-position: inside;
+      color: var(--texto-sec);
+    }
+
+    .toc li {
+      margin-bottom: 0.5rem;
+    }
+
+    .toc a {
+      color: var(--verde);
+      text-decoration: none;
+    }
+
+    .toc a:hover {
+      text-decoration: underline;
+    }
+
+    /* Article */
+    article {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 0;
+    }
+
+    article h2 {
+      font-size: 2rem;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+      border-top: 1px solid var(--borde);
+      padding-top: 1.5rem;
+    }
+
+    article h3 {
+      font-size: 1.4rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.8rem;
+      color: var(--texto);
+    }
+
+    article p {
+      margin-bottom: 1rem;
+      color: var(--texto);
+      line-height: 1.7;
+    }
+
+    article ul, article ol {
+      margin-left: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    article li {
+      margin-bottom: 0.5rem;
+      color: var(--texto);
+    }
+
+    /* Cards */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .card {
+      background: var(--fondo2);
+      border: 1px solid var(--borde);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      transition: border-color 0.3s;
+    }
+
+    .card:hover {
+      border-color: var(--verde);
+    }
+
+    .card h4 {
+      color: var(--verde);
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+
+    .card p {
+      color: var(--texto-sec);
+      font-size: 0.95rem;
+    }
+
+    /* Highlight Box */
+    .highlight-box {
+      background: rgba(0, 200, 83, 0.05);
+      border-left: 4px solid var(--verde);
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0.3rem;
+    }
+
+    .highlight-box p {
+      color: var(--texto);
+      margin: 0;
+    }
+
+    /* Warning Box */
+    .warning-box {
+      background: rgba(255, 152, 0, 0.05);
+      border-left: 4px solid #ff9800;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0.3rem;
+    }
+
+    .warning-box p {
+      color: var(--texto);
+      margin: 0;
+    }
+
+    /* FAQ */
+    .faq {
+      max-width: 900px;
+      margin: 3rem auto;
+      padding: 2rem;
+    }
+
+    .faq h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      border: none;
+      padding: 0;
+    }
+
+    .faq-item {
+      background: var(--fondo2);
+      border: 1px solid var(--borde);
+      border-radius: 0.5rem;
+      margin-bottom: 1rem;
+      overflow: hidden;
+    }
+
+    .faq-question {
+      background: var(--fondo3);
+      padding: 1rem;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      transition: background 0.3s;
+    }
+
+    .faq-question:hover {
+      background: var(--borde);
+    }
+
+    .faq-answer {
+      padding: 1rem;
+      color: var(--texto);
+      display: none;
+    }
+
+    .faq-item.active .faq-answer {
+      display: block;
+    }
+
+    .faq-toggle {
+      color: var(--verde);
+      font-weight: bold;
+    }
+
+    /* CTA Box */
+    .cta-box {
+      background: linear-gradient(135deg, rgba(0, 200, 83, 0.1), transparent);
+      border: 1px solid var(--borde);
+      border-radius: 0.5rem;
+      padding: 2rem;
+      text-align: center;
+      margin: 3rem auto;
+      max-width: 800px;
+    }
+
+    .cta-box h3 {
+      color: var(--verde);
+      margin-bottom: 0.5rem;
+    }
+
+    .cta-box p {
+      color: var(--texto-sec);
+      margin-bottom: 1.5rem;
+    }
+
+    .cta-box .btn {
+      background: var(--verde);
+      color: var(--fondo);
+      padding: 0.8rem 1.6rem;
+      border: none;
+      border-radius: 0.4rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      transition: opacity 0.3s;
+    }
+
+    .cta-box .btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Related Grid */
+    .related {
+      max-width: 1200px;
+      margin: 3rem auto;
+      padding: 2rem;
+    }
+
+    .related h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+      border: none;
+      padding: 0;
+    }
+
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .related-card {
+      background: var(--fondo2);
+      border: 1px solid var(--borde);
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      text-decoration: none;
+      color: var(--texto);
+      transition: border-color 0.3s, transform 0.3s;
+    }
+
+    .related-card:hover {
+      border-color: var(--verde);
+      transform: translateY(-2px);
+    }
+
+    .related-card .badge-small {
+      display: inline-block;
+      background: rgba(0, 200, 83, 0.1);
+      color: var(--verde);
+      padding: 0.3rem 0.6rem;
+      border-radius: 0.3rem;
+      font-size: 0.8rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .related-card h3 {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+
+    .related-card p {
+      color: var(--texto-sec);
+      font-size: 0.9rem;
+      margin: 0;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--fondo2);
+      border-top: 1px solid var(--borde);
+      padding: 2rem;
+      text-align: center;
+      color: var(--texto-sec);
+      font-size: 0.9rem;
+    }
+
+    footer a {
+      color: var(--verde);
+      text-decoration: none;
+    }
+
+    footer a:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      nav .container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+        width: 100%;
+      }
+
+      .hero h1 {
+        font-size: 1.8rem;
+      }
+
+      article h2 {
+        font-size: 1.5rem;
+      }
+
+      article h3 {
+        font-size: 1.2rem;
+      }
+
+      .cards {
+        grid-template-columns: 1fr;
+      }
+
+      .related-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Sticky Nav -->
+  <nav>
+    <div class="container">
+      <a href="https://gambeta.ai" class="logo">⚽ gambeta.ai</a>
+      <ul>
+        <li><a href="https://gambeta.ai/#pronosticos">Pronósticos</a></li>
+        <li><a href="https://gambeta.ai/#resultados">Resultados</a></li>
+        <li><a href="https://gambeta.ai/blog/index.html">Blog</a></li>
+        <li><a href="https://gambeta.ai" class="cta-btn">Entrar gratis →</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a href="https://gambeta.ai">Inicio</a> / <a href="https://gambeta.ai/blog/index.html">Blog</a> / Cómo usar el Bankroll Manager
+  </div>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="badge">💰 Manual de usuario</div>
+    <h1>Cómo usar el Bankroll Manager de gambeta.ai — Gestión de banca inteligente</h1>
+    <div class="meta">
+      <span>📅 Actualizado: 2025</span>
+      <span>⏱️ Lectura: 10 min</span>
+      <span>📚 Nivel: Principiante</span>
+    </div>
+    <p class="lead">La diferencia entre un apostador rentable y uno que pierde está en la gestión del dinero. El Bankroll Manager de gambeta.ai te da el control que necesitás.</p>
+  </div>
+
+  <!-- TOC -->
+  <div class="toc">
+    <h2>📑 Tabla de contenidos</h2>
+    <ol>
+      <li><a href="#seccion-1">Qué es el Bankroll Manager</a></li>
+      <li><a href="#seccion-2">Cómo configurar tu banca inicial</a></li>
+      <li><a href="#seccion-3">Cómo registrar depósitos y retiros</a></li>
+      <li><a href="#seccion-4">Evolución de la banca: el gráfico</a></li>
+      <li><a href="#seccion-5">El sistema de stakes de gambeta.ai</a></li>
+      <li><a href="#seccion-6">Reglas de oro del bankroll management</a></li>
+      <li><a href="#seccion-7">Preguntas frecuentes</a></li>
+    </ol>
+  </div>
+
+  <!-- Article -->
+  <article>
+    <h2 id="seccion-1">Qué es el Bankroll Manager</h2>
+    <p>El Bankroll Manager es la herramienta central de gambeta.ai para gestionar tu dinero de apuestas. No es una billetera digital ni se conecta a tu casa de apuestas. Es un registro y análisis de tu capital dedicado exclusivamente a apuestas deportivas.</p>
+
+    <h3>¿Qué es el bankroll?</h3>
+    <p><strong>Bankroll</strong> es el dinero total que destinás exclusivamente a apuestas. No es tu sueldo, no es tu presupuesto mensual. Es dinero que podrías perder sin afectar tu vida normal.</p>
+
+    <div class="highlight-box">
+      <p><strong>Diferencia importante:</strong> El Bankroll Manager de gambeta.ai no accede a tu cuenta bancaria ni a tus casas de apuestas. Vos ingresás manualmente cada movimiento para que gambeta.ai pueda analizar tu evolución.</p>
+    </div>
+
+    <h3>Para qué sirve el Bankroll Manager</h3>
+    <ul>
+      <li><strong>Registrar tu banca inicial:</strong> Establece desde cuánto dinero empezás</li>
+      <li><strong>Rastrear depósitos y retiros:</strong> Controla cada movimiento de dinero</li>
+      <li><strong>Ver la evolución gráfica:</strong> Visualiza si tu banca crece o disminuye en el tiempo</li>
+      <li><strong>Calcular el ROI real:</strong> Conoce exactamente tu retorno sobre inversión</li>
+      <li><strong>Establecer limites:</strong> Fija stop-loss y objetivos</li>
+      <li><strong>Mejorar disciplina:</strong> La visibilidad es el primer paso para mejorar</li>
+    </ul>
+
+    <h2 id="seccion-2">Cómo configurar tu banca inicial</h2>
+    <p>Configurar tu banca es el primer paso y solo toma 2 minutos. Aquí te muestro cómo hacerlo.</p>
+
+    <h3>Paso 1: Accede al Bankroll Manager</h3>
+    <ol>
+      <li>Inicia sesión en tu cuenta de gambeta.ai</li>
+      <li>En el menú principal, buscá <strong>💰 Bankroll Manager</strong></li>
+      <li>Haz clic para abrir la herramienta</li>
+    </ol>
+
+    <h3>Paso 2: Define tu banca inicial</h3>
+    <ol>
+      <li>Busca el botón <strong>"Configurar banca inicial"</strong> o <strong>"+ Nueva banca"</strong></li>
+      <li>Ingresa el monto que vas a usar para apuestas (ej: $5,000)</li>
+      <li>Selecciona la moneda (Pesos, Dólares, etc.)</li>
+      <li>Establece la fecha de inicio (por defecto es hoy)</li>
+      <li>Haz clic en <strong>"Crear banca"</strong></li>
+    </ol>
+
+    <div class="highlight-box">
+      <p><strong>Pro tip:</strong> Elige una cantidad que puedas permitirte perder sin afectar tu vida. Si no tienes certeza, comienza con cantidad pequeña ($1,000-$5,000) y aumenta a medida que mejoras tu estrategia.</p>
+    </div>
+
+    <h3>Paso 3: Verifica tu saldo inicial</h3>
+    <p>Una vez creada, deberías ver tu banca inicial en el dashboard del Bankroll Manager. Este será tu punto de partida para todos los cálculos futuros.</p>
+
+    <h2 id="seccion-3">Cómo registrar depósitos y retiros</h2>
+    <p>A medida que apostás y que tu capital en las casas de apuestas cambia, registrá los movimientos en el Bankroll Manager.</p>
+
+    <h3>Registrar un depósito</h3>
+    <p>Un depósito es cuando agregás dinero a tu bankroll (nueva inversión):</p>
+    <ol>
+      <li>En el Bankroll Manager, busca <strong>"+ Agregar depósito"</strong></li>
+      <li>Ingresa el monto depositado (ej: $2,000)</li>
+      <li>Selecciona la fecha del depósito</li>
+      <li>Añade una descripción si lo deseas (ej: "Ganancia de trabajo extra")</li>
+      <li>Haz clic en <strong>"Registrar depósito"</strong></li>
+    </ol>
+
+    <h3>Registrar un retiro</h3>
+    <p>Un retiro es cuando sacás dinero de tu bankroll (para gastos personales o como ganancia):</p>
+    <ol>
+      <li>En el Bankroll Manager, busca <strong>"+ Agregar retiro"</strong></li>
+      <li>Ingresa el monto retirado (ej: $1,500)</li>
+      <li>Selecciona la fecha del retiro</li>
+      <li>Haz clic en <strong>"Registrar retiro"</strong></li>
+    </ol>
+
+    <div class="warning-box">
+      <p><strong>⚠️ Importante:</strong> Registra SOLO los movimientos de tu bankroll de apuestas. No registres dinero para otras cosas. La precisión de los datos determina la precisión de tu ROI.</p>
+    </div>
+
+    <h2 id="seccion-4">Evolución de la banca: el gráfico</h2>
+    <p>El gráfico de evolución es lo más importante del Bankroll Manager. Te muestra la tendencia de tu banca en el tiempo.</p>
+
+    <h3>Qué muestra el gráfico</h3>
+    <ul>
+      <li><strong>Eje X (horizontal):</strong> El tiempo (días, semanas, meses)</li>
+      <li><strong>Eje Y (vertical):</strong> El valor de tu banca en dinero</li>
+      <li><strong>Línea verde:</strong> Tu banca actual con todas las apuestas resultadas</li>
+      <li><strong>Puntos rojos:</strong> Depósitos y retiros realizados</li>
+    </ul>
+
+    <h3>Cómo interpretar el gráfico</h3>
+    <div class="cards">
+      <div class="card">
+        <h4>📈 Tendencia al alza</h4>
+        <p>Tu banca está creciendo. Significa que ganás más de lo que perdés. ¡Vas bien!</p>
+      </div>
+      <div class="card">
+        <h4>📉 Tendencia a la baja</h4>
+        <p>Tu banca disminuye. Perdés más que ganas. Necesitas revisar tu estrategia.</p>
+      </div>
+      <div class="card">
+        <h4>➡️ Línea plana</h4>
+        <p>Tu banca se mantiene estable. Ganancias y pérdidas se equilibran (ROI cercano a 0%).</p>
+      </div>
+    </div>
+
+    <h2 id="seccion-5">El sistema de stakes de gambeta.ai</h2>
+    <p>Un stake es la cantidad de dinero que apostás en un pick específico. El Bankroll Manager te ayuda a calcular el stake recomendado.</p>
+
+    <h3>Stake simple (% fijo del bankroll)</h3>
+    <p>La forma más común es usar un porcentaje fijo de tu bankroll:</p>
+    <div class="highlight-box">
+      <p><strong>Stake recomendado = Bankroll × 2-5%</strong></p>
+      <p>Ejemplo: Si tu bankroll es $5,000, apostá entre $100 y $250 por pick.</p>
+    </div>
+
+    <h3>Stake según confianza</h3>
+    <p>Gambeta.ai sugiere ajustar el stake según la confianza del pick:</p>
+    <ul>
+      <li><strong>Confianza Alta:</strong> Hasta 5% del bankroll</li>
+      <li><strong>Confianza Media:</strong> Hasta 3% del bankroll</li>
+      <li><strong>Confianza Baja:</strong> Máximo 1% del bankroll</li>
+    </ul>
+
+    <h3>Criterio de Kelly (avanzado)</h3>
+    <p>Para apostadores más experimentados, gambeta.ai ofrece cálculo de Kelly en la Calculadora:</p>
+    <div class="highlight-box">
+      <p><strong>f = (bp - q) / b</strong></p>
+      <p>Donde: b = cuota-1, p = probabilidad de ganar, q = probabilidad de perder</p>
+      <p>Esto calcula el stake óptimo matemáticamente. Úsalo solo si entiendes probabilidades.</p>
+    </div>
+
+    <h2 id="seccion-6">Reglas de oro del bankroll management</h2>
+    <p>Estas reglas son no-negociables si querés ser un apostador profesional y rentable:</p>
+
+    <div class="cards">
+      <div class="card">
+        <h4>🎯 Regla 1: Nunca apostar más del 5%</h4>
+        <p>Nunca pongas más del 5% de tu bankroll en un solo pick. Esto protege tu capital.</p>
+      </div>
+      <div class="card">
+        <h4>🚫 Regla 2: Nunca perseguir pérdidas</h4>
+        <p>Si perdés, no aumentes el stake para "recuperar" rápido. Eso es el camino a la ruina.</p>
+      </div>
+      <div class="card">
+        <h4>⛔ Regla 3: Tener un stop-loss mensual</h4>
+        <p>Si pierdes, por ejemplo, 20% de tu banca en un mes, PARA de apostar ese mes. Tómate un descanso.</p>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h4>📊 Regla 4: Usar solo dinero que puedes perder</h4>
+        <p>Tu bankroll debe ser dinero que podrías perder sin afectar tu vida financiera normal.</p>
+      </div>
+      <div class="card">
+        <h4>💰 Regla 5: No mezclar fondos</h4>
+        <p>Tu bankroll debe estar separado de tu dinero para vivir. Es sagrado.</p>
+      </div>
+      <div class="card">
+        <h4>📈 Regla 6: Aumentar bankroll solo con ganancias</h4>
+        <p>Solo agrega dinero nuevo si ganaste y quieres invertir más. No reinviertas pérdidas.</p>
+      </div>
+    </div>
+
+    <div class="warning-box">
+      <p><strong>⚠️ Advertencia:</strong> El bankroll management es lo que separa a los apostadores profesionales de los que pierden dinero. Ignora estas reglas bajo tu propio riesgo.</p>
+    </div>
+
+    <h2 id="seccion-7">Preguntas frecuentes</h2>
+    <div class="faq">
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Cuánto dinero necesito para empezar? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Teóricamente, podrías empezar con tan poco como $100-$500. Sin embargo, si apostás solo entre 2-5%, los stakes serían muy pequeños (2-25 pesos). Lo ideal es comenzar con $1,000-$5,000 para tener stakes manejables. Recuerda: solo invierte dinero que puedas perder.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Qué pasa si pierdo el 50% de mi banca? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Es parte del juego. Los apostadores profesionales experimentan bajadas del 20-30% regularmente. Lo importante es que tu ROI a largo plazo siga siendo positivo. Revisa tu estrategia: ¿estás siguiendo picks de alta confianza? ¿apostás sin plan? ¿el bankroll era dinero que no podías perder? Una vez identificado el problema, ajusta y continúa.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿El manager se sincroniza con mi casa de apuestas? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>No. El Bankroll Manager de gambeta.ai es independiente. Vos ingresás manualmente cada depósito, retiro y apuesta. Esto es así porque gambeta.ai no tiene acceso a tus cuentas en casas de apuestas por razones de seguridad. Tú controlas todos tus datos.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Puedo tener múltiples bankrolls? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Sí. Algunos apostadores prefieren tener bankrolls separados por estrategia, deporte o casa de apuestas. El Bankroll Manager te permite crear múltiples bancos para un análisis más granular. Recomendamos empezar con uno solo hasta que ganes experiencia.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Cómo calcula gambeta.ai mi ROI exacto? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>ROI = (Ganancia neta / Inversión total) × 100. La ganancia neta es la diferencia entre tu banca actual y tu banca inicial más los depósitos, menos los retiros. La inversión total es el dinero que realmente apostaste. El Bankroll Manager lo calcula automáticamente.</p>
+        </div>
+      </div>
+
+      <div class="faq-item">
+        <div class="faq-question">
+          ¿Qué es el stop-loss mensual que mencionas? <span class="faq-toggle">+</span>
+        </div>
+        <div class="faq-answer">
+          <p>Es una regla que estableces: si pierdes X% de tu bankroll en un mes, dejas de apostar el resto del mes. Ejemplo: si estableces 20% de stop-loss y tu bankroll es $5,000, si pierdes $1,000 en un mes, PARAS hasta el próximo mes. Esto previene que las pérdidas en rachas malas se salgan de control.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- CTA Box -->
+  <div class="cta-box">
+    <h3>Comienza a gestionar tu banca hoy</h3>
+    <p>El Bankroll Manager de gambeta.ai te permite tomar control de tu dinero y ver exactamente cómo evolucionas como apostador.</p>
+    <a href="https://gambeta.ai" class="btn">Configurar mi Bankroll Manager</a>
+  </div>
+
+  <!-- Related Articles -->
+  <div class="related">
+    <h2>📚 Artículos relacionados</h2>
+    <div class="related-grid">
+      <a href="/blog/como-usar-pronosticos-ia.html" class="related-card">
+        <div class="badge-small">🔮 Manual</div>
+        <h3>Cómo usar los Pronósticos IA</h3>
+        <p>Aprende a leer e interpretar las predicciones de la IA de gambeta.ai para mejores apuestas.</p>
+      </a>
+
+      <a href="/blog/como-leer-resultados.html" class="related-card">
+        <div class="badge-small">📋 Manual</div>
+        <h3>Cómo leer los Resultados y tu ROI</h3>
+        <p>Interpreta tus resultados, qué es WIN/LOSS/VOID, y cómo mejorar tu estrategia con los datos.</p>
+      </a>
+
+      <a href="/blog/como-usar-la-calculadora.html" class="related-card">
+        <div class="badge-small">🧮 Manual</div>
+        <h3>Cómo usar la Calculadora de Apuestas</h3>
+        <p>Calcula ganancias, cuotas combinadas y stake óptimo antes de apostar.</p>
+      </a>
+
+      <a href="/blog/ranking-gambeta-coins.html" class="related-card">
+        <div class="badge-small">🏆 Manual</div>
+        <h3>Ranking y Gambeta Coins G$</h3>
+        <p>Entendé el sistema de puntos, rankings y cómo canjear tus Gambeta Coins.</p>
+      </a>
+
+      <a href="/blog/como-usar-bot-alerta.html" class="related-card">
+        <div class="badge-small">🤖 Manual</div>
+        <h3>Cómo usar el Bot de Alerta</h3>
+        <p>Recibe notificaciones en tiempo real de los mejores picks de la IA.</p>
+      </a>
+
+      <a href="/blog/como-usar-mi-panel.html" class="related-card">
+        <div class="badge-small">👤 Manual</div>
+        <h3>Mi Panel y canje de premios</h3>
+        <p>Personaliza tu perfil, gestiona tu banca y canjea tus Gambeta Coins por premios.</p>
+      </a>
+
+      <a href="/blog/index.html" class="related-card">
+        <div class="badge-small">📰 Blog</div>
+        <h3>Ver todos los artículos</h3>
+        <p>Explora nuestro blog completo con guías, estrategias y análisis de apuestas.</p>
+      </a>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 gambeta.ai. Todos los derechos reservados. | <a href="https://gambeta.ai">Inicio</a> | <a href="https://gambeta.ai/blog/index.html">Blog</a></p>
+  </footer>
+
+  <!-- Schema.org Structured Data -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "Cómo usar el Bankroll Manager de gambeta.ai",
+    "description": "Guía completa para gestionar tu banca de apuestas, registrar movimientos y mejorar tu ROI.",
+    "image": "https://gambeta.ai/og-bankroll.jpg",
+    "author": {
+      "@type": "Organization",
+      "name": "gambeta.ai"
+    },
+    "step": [
+      {
+        "@type": "HowToStep",
+        "name": "Acceder al Bankroll Manager",
+        "text": "Inicia sesión en gambeta.ai y dirígete a la sección Bankroll Manager en el menú."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Configurar banca inicial",
+        "text": "Ingresa el monto total que dedicarás a apuestas como tu banca inicial."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Registrar movimientos",
+        "text": "Ingresa depósitos y retiros para mantener tu banca actualizada."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Analizar gráfico de evolución",
+        "text": "Revisa la línea de tendencia de tu banca para ver si crece o disminuye."
+      },
+      {
+        "@type": "HowToStep",
+        "name": "Aplicar reglas de oro",
+        "text": "Nunca apostar más del 5%, tener stop-loss mensual y no perseguir pérdidas."
+      }
+    ]
+  }
+  </script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "¿Cuánto dinero necesito para empezar?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Lo ideal es comenzar con $1,000-$5,000 para tener stakes manejables. Podrías empezar con menos, pero los stakes serían muy pequeños."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Qué pasa si pierdo el 50% de mi banca?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Es parte normal del proceso. Revisa tu estrategia, identifica problemas y ajusta. Lo importante es que tu ROI a largo plazo sea positivo."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿El manager se sincroniza con mi casa de apuestas?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "No. El Bankroll Manager es independiente. Tú ingresas manualmente cada movimiento por razones de seguridad."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Puedo tener múltiples bankrolls?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Sí. Algunos apostadores tienen bankrolls separados por estrategia. Se recomienda comenzar con uno solo."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Cómo calcula gambeta.ai mi ROI exacto?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "ROI = (Ganancia neta / Inversión total) × 100. El Bankroll Manager lo calcula automáticamente."
+        }
+      },
+      {
+        "@type": "Question",
+        "name": "¿Qué es el stop-loss mensual?",
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": "Es una regla que estableces: si pierdes X% en un mes, dejas de apostar hasta el próximo mes. Previene que las pérdidas en rachas malas se descontrolen."
+        }
+      }
+    ]
+  }
+  </script>
+
+  <script>
+    // FAQ Toggle
+    document.querySelectorAll('.faq-question').forEach(question => {
+      question.addEventListener('click', function() {
+        this.parentElement.classList.toggle('active');
+      });
+    });
+  </script>
+</body>
+</html>

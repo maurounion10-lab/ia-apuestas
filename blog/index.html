@@ -3,160 +3,284 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blog de apuestas con IA | gambeta.ai</title>
-  <meta name="description" content="Guías, estrategias y análisis sobre apuestas deportivas con inteligencia artificial. Aprende a apostar mejor con gambeta.ai.">
+  <title>Blog de apuestas con IA | Guías y estrategias — gambeta.ai</title>
+  <meta name="description" content="Guías completas, manuales de uso y estrategias sobre apuestas deportivas con inteligencia artificial. Aprendé a usar gambeta.ai y apostá con criterio.">
+  <meta name="keywords" content="blog apuestas IA, guías apuestas deportivas, pronósticos inteligencia artificial, estrategia apuestas fútbol, gambeta.ai blog">
+  <meta name="author" content="gambeta.ai">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://gambeta.ai/blog/index.html">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://gambeta.ai/blog/index.html">
-  <meta property="og:title" content="Blog de apuestas con IA | gambeta.ai">
-  <meta property="og:description" content="Guías, estrategias y análisis sobre apuestas deportivas con inteligencia artificial.">
+  <meta property="og:title" content="Blog de apuestas con IA | Guías y estrategias — gambeta.ai">
+  <meta property="og:description" content="Guías completas, manuales de uso y estrategias sobre apuestas deportivas con inteligencia artificial.">
   <meta property="og:image" content="https://gambeta.ai/og-image.png">
+  <meta property="og:locale" content="es_AR">
+  <meta property="og:site_name" content="gambeta.ai">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Blog de apuestas con IA | gambeta.ai">
+  <meta name="twitter:description" content="Guías completas y estrategias sobre apuestas deportivas con IA.">
+  <meta name="twitter:image" content="https://gambeta.ai/og-image.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Blog gambeta.ai",
+    "description": "Guías, manuales y estrategias sobre apuestas deportivas con inteligencia artificial.",
+    "url": "https://gambeta.ai/blog/index.html",
+    "publisher": {
+      "@type": "Organization",
+      "name": "gambeta.ai",
+      "url": "https://gambeta.ai",
+      "logo": {"@type": "ImageObject", "url": "https://gambeta.ai/favicon.png"}
+    }
+  }
+  </script>
   <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
   <style>
-    :root {
-      --verde:#00c853; --fondo:#0f0f0f; --fondo2:#1a1a2e;
-      --texto:#e8e8e8; --texto-sec:#9e9e9e; --borde:rgba(255,255,255,0.08);
-    }
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{background:var(--fondo);color:var(--texto);font-family:'Segoe UI',system-ui,sans-serif;}
-    .nav{background:#111;border-bottom:1px solid var(--borde);padding:0 24px;display:flex;align-items:center;height:56px;position:sticky;top:0;z-index:100;}
-    .nav-logo{font-size:1.2rem;font-weight:800;color:#fff;text-decoration:none;}
-    .nav-logo span{color:var(--verde);}
-    .nav-links{margin-left:auto;display:flex;gap:20px;}
-    .nav-links a{color:var(--texto-sec);text-decoration:none;font-size:.9rem;}
-    .nav-links a:hover{color:var(--verde);}
-    .hero{background:linear-gradient(135deg,#1a1a2e,#0f0f0f);border-bottom:1px solid var(--borde);padding:48px 24px;text-align:center;}
-    .hero h1{font-size:clamp(1.8rem,4vw,2.6rem);font-weight:800;margin-bottom:12px;}
-    .hero h1 span{color:var(--verde);}
-    .hero p{color:var(--texto-sec);max-width:560px;margin:0 auto;font-size:1.05rem;}
-    .grid{max-width:1100px;margin:48px auto;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;}
-    .card{background:var(--fondo2);border:1px solid var(--borde);border-radius:14px;padding:24px;text-decoration:none;color:var(--texto);transition:border-color .2s,transform .2s;display:flex;flex-direction:column;gap:10px;}
-    .card:hover{border-color:var(--verde);transform:translateY(-2px);}
-    .card-badge{display:inline-block;background:rgba(0,200,83,.12);border:1px solid rgba(0,200,83,.25);color:var(--verde);padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:600;text-transform:uppercase;width:fit-content;}
-    .card h2{font-size:1.05rem;font-weight:700;line-height:1.35;}
-    .card p{color:var(--texto-sec);font-size:.88rem;line-height:1.6;flex:1;}
-    .read-more{color:var(--verde);font-size:.85rem;font-weight:600;}
-    .footer{background:#111;border-top:1px solid var(--borde);padding:28px 24px;text-align:center;margin-top:48px;}
-    .footer p{color:var(--texto-sec);font-size:.85rem;}
-    .footer a{color:var(--verde);text-decoration:none;}
-    @media(max-width:600px){.nav-links{display:none;}.grid{padding:0 16px;}}
+    :root{--verde:#00c853;--fondo:#0d0d0d;--fondo2:#161622;--fondo3:#1e1e30;--texto:#e8e8e8;--texto-sec:#9e9e9e;--borde:rgba(255,255,255,0.07)}
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{background:var(--fondo);color:var(--texto);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;line-height:1.6}
+    a{text-decoration:none}
+    .nav{background:rgba(13,13,13,.95);backdrop-filter:blur(12px);border-bottom:1px solid var(--borde);padding:0 24px;display:flex;align-items:center;height:58px;position:sticky;top:0;z-index:100}
+    .nav-logo{font-size:1.2rem;font-weight:800;color:#fff;letter-spacing:-.5px}
+    .nav-logo span{color:var(--verde)}
+    .nav-links{margin-left:auto;display:flex;gap:24px;align-items:center}
+    .nav-links a{color:var(--texto-sec);font-size:.88rem;transition:color .2s}
+    .nav-links a:hover{color:#fff}
+    .nav-cta{background:var(--verde);color:#000!important;font-weight:700;padding:7px 18px;border-radius:6px;font-size:.85rem!important}
+    .nav-cta:hover{opacity:.9}
+    .hero{background:linear-gradient(160deg,#0d1a12 0%,#0d0d0d 55%);border-bottom:1px solid var(--borde);padding:56px 24px 48px;text-align:center}
+    .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,83,.12);border:1px solid rgba(0,200,83,.25);color:var(--verde);padding:5px 14px;border-radius:20px;font-size:.78rem;font-weight:700;margin-bottom:18px;text-transform:uppercase;letter-spacing:.6px}
+    .hero h1{font-size:clamp(1.9rem,5vw,2.8rem);font-weight:900;letter-spacing:-.6px;margin-bottom:14px;line-height:1.15}
+    .hero h1 em{color:var(--verde);font-style:normal}
+    .hero p{color:#999;max-width:560px;margin:0 auto;font-size:1rem}
+    .section-header{max-width:1100px;margin:52px auto 20px;padding:0 24px;display:flex;align-items:center;gap:14px}
+    .section-header h2{font-size:1.15rem;font-weight:800;color:#fff;white-space:nowrap}
+    .section-tag{background:rgba(0,200,83,.12);border:1px solid rgba(0,200,83,.2);color:var(--verde);padding:3px 12px;border-radius:20px;font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+    .section-line{flex:1;height:1px;background:var(--borde)}
+    .manuals-grid{max-width:1100px;margin:0 auto 8px;padding:0 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+    .manual-card{background:var(--fondo2);border:1px solid var(--borde);border-radius:14px;padding:22px 24px;color:var(--texto);transition:border-color .2s,transform .15s;display:flex;flex-direction:column;gap:10px;position:relative;overflow:hidden}
+    .manual-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--verde);opacity:0;transition:opacity .2s}
+    .manual-card:hover{border-color:rgba(0,200,83,.35);transform:translateY(-2px)}
+    .manual-card:hover::before{opacity:1}
+    .card-icon{font-size:1.6rem;line-height:1}
+    .card-badge{display:inline-block;background:rgba(0,200,83,.1);border:1px solid rgba(0,200,83,.2);color:var(--verde);padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;width:fit-content}
+    .manual-card h3{font-size:1rem;font-weight:700;color:#fff;line-height:1.35}
+    .manual-card p{color:var(--texto-sec);font-size:.87rem;line-height:1.6;flex:1}
+    .card-link{color:var(--verde);font-size:.84rem;font-weight:700;display:flex;align-items:center;gap:4px;margin-top:4px}
+    .blog-grid{max-width:1100px;margin:0 auto;padding:0 24px 64px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+    .blog-card{background:var(--fondo2);border:1px solid var(--borde);border-radius:12px;padding:22px;color:var(--texto);transition:border-color .2s,transform .15s;display:flex;flex-direction:column;gap:8px}
+    .blog-card:hover{border-color:rgba(255,255,255,.15);transform:translateY(-2px)}
+    .blog-card-tag{display:inline-block;background:rgba(255,255,255,.05);border:1px solid var(--borde);color:var(--texto-sec);padding:2px 10px;border-radius:20px;font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;width:fit-content}
+    .blog-card h3{font-size:.97rem;font-weight:700;color:#ddd;line-height:1.35}
+    .blog-card p{color:var(--texto-sec);font-size:.85rem;line-height:1.6;flex:1}
+    .blog-card-link{color:var(--texto-sec);font-size:.82rem;font-weight:600;display:flex;align-items:center;gap:3px;margin-top:4px;transition:color .2s}
+    .blog-card:hover .blog-card-link{color:var(--verde)}
+    .cta-banner{max-width:1100px;margin:8px auto 52px;padding:0 24px}
+    .cta-inner{background:linear-gradient(135deg,#0d1f10,#111120);border:1px solid rgba(0,200,83,.2);border-radius:16px;padding:40px;display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+    .cta-inner h3{font-size:1.3rem;font-weight:900;letter-spacing:-.3px}
+    .cta-inner p{color:var(--texto-sec);margin-top:6px;font-size:.95rem}
+    .btn-cta{display:inline-block;background:var(--verde);color:#000;font-weight:800;padding:14px 32px;border-radius:9px;font-size:.97rem;white-space:nowrap;transition:opacity .15s,transform .15s}
+    .btn-cta:hover{opacity:.9;transform:translateY(-1px)}
+    .footer{background:#0a0a0a;border-top:1px solid var(--borde);padding:30px 24px;text-align:center}
+    .footer p{color:var(--texto-sec);font-size:.83rem}
+    .footer a{color:var(--verde)}
+    @media(max-width:640px){.nav-links{display:none}.hero{padding:40px 16px 34px}.manuals-grid,.blog-grid{padding:0 16px}.section-header{padding:0 16px}.cta-banner{padding:0 16px}.cta-inner{padding:28px 20px}}
   </style>
 </head>
 <body>
+
 <nav class="nav">
   <a href="https://gambeta.ai" class="nav-logo">gambeta<span>.ai</span></a>
   <div class="nav-links">
     <a href="https://gambeta.ai/#pronosticos">Pronósticos</a>
     <a href="https://gambeta.ai/#resultados">Resultados</a>
-    <a href="https://gambeta.ai/blog/index.html">Blog</a>
+    <a href="https://gambeta.ai/#ranking">Ranking</a>
+    <a href="https://gambeta.ai" class="nav-cta">Entrar gratis →</a>
   </div>
 </nav>
+
 <header class="hero">
-  <h1>Blog <span>gambeta.ai</span></h1>
-  <p>Guías, estrategias y análisis sobre apuestas deportivas con inteligencia artificial.</p>
+  <div class="hero-badge">📰 Blog gambeta.ai</div>
+  <h1>Guías, estrategias y<br><em>manuales de uso</em></h1>
+  <p>Todo lo que necesitás para usar gambeta.ai al máximo y apostar con inteligencia.</p>
 </header>
-<main class="grid">
-  
-    <a href="/blog/apuestas-multiples.html" class="card">
-      <div class="card-badge">Estrategia</div>
-      <h2>Apuestas múltiples en fútbol: cuándo usarlas y cuándo evitarlas</h2>
-      <p>Guía completa sobre las apuestas múltiples o combinadas en fútbol. Cómo calcularlas, qué riesgos implican y cómo la IA de gambeta.ai las analiza.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/mercados-rentables.html" class="card">
-      <div class="card-badge">Estrategia</div>
-      <h2>Los mercados más rentables para apostar en fútbol</h2>
-      <p>Descubrí qué mercados de apuestas generan más valor a largo plazo: handicap asiático, over/under, ambos marcan y más. Análisis con IA.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/cuotas-y-probabilidades.html" class="card">
-      <div class="card-badge">Fundamentos</div>
-      <h2>Cuotas y probabilidades: cómo convertirlas y encontrar valor</h2>
-      <p>Entendé la relación entre cuotas y probabilidades reales. Cómo calcular el valor esperado y por qué es la base de apostar con inteligencia.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/gestion-bankroll.html" class="card">
-      <div class="card-badge">Gestión</div>
-      <h2>Gestión de bankroll para apostadores: la guía definitiva</h2>
-      <p>Aprendé a gestionar tu bankroll con disciplina. Sistema plano, Kelly Criterion y más. La base para apostar de forma sostenible.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/como-ganar-en-futbol.html" class="card">
-      <div class="card-badge">Estrategia</div>
-      <h2>Cómo ganar apostando al fútbol: lo que separa a los profesionales</h2>
-      <p>Los apostadores ganadores a largo plazo tienen hábitos y estrategias específicas. Conocé qué hacen diferente y cómo aplicarlo con ayuda de la IA.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/confianza-6-6.html" class="card">
-      <div class="card-badge">Plataforma</div>
-      <h2>Qué significa confianza 6/6 en gambeta.ai</h2>
-      <p>Entendé el sistema de confianza de gambeta.ai del 1 al 6. Cómo se calcula, qué implica cada nivel y cómo usarlo para tus apuestas.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/como-hablar-con-la-ia.html" class="card">
-      <div class="card-badge">Plataforma</div>
-      <h2>Cómo hablar con la IA de gambeta.ai para sacarle el máximo</h2>
-      <p>Guía práctica para usar el chat de IA de gambeta.ai. Qué preguntas hacerle, cómo interpretar sus respuestas y trucos para obtener mejores picks.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/donde-encontrar-valor.html" class="card">
-      <div class="card-badge">Estrategia</div>
-      <h2>Dónde encontrar valor en las apuestas de fútbol</h2>
-      <p>Las casas de apuestas no son perfectas. Hay mercados, situaciones y contextos donde las cuotas ofrecen valor real. Aprendé a identificarlos.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/ia-estadisticas-futbol.html" class="card">
-      <div class="card-badge">Tecnología</div>
-      <h2>IA y estadísticas de fútbol: cómo trabajan juntas</h2>
-      <p>Cómo la inteligencia artificial procesa estadísticas de fútbol para generar pronósticos confiables. Variables que el ojo humano no puede procesar.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/ia-tiempo-real-futbol.html" class="card">
-      <div class="card-badge">Tecnología</div>
-      <h2>IA en tiempo real para apostar al fútbol: picks actualizados al instante</h2>
-      <p>La IA de gambeta.ai procesa datos en tiempo real antes de cada partido. Alineaciones, lesiones y cuotas actualizadas para que no te pierdas nada.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/ia-apostar-futbol-valor.html" class="card">
-      <div class="card-badge">Tecnología</div>
-      <h2>IA para apostar con valor en fútbol: cómo el machine learning encuentra picks rentables</h2>
-      <p>Cómo los modelos de machine learning encuentran valor en las apuestas de fútbol. La matemática detrás de gambeta.ai explicada de forma simple.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/ia-champions-league.html" class="card">
-      <div class="card-badge">Ligas</div>
-      <h2>IA para la Champions League: picks y análisis de la mejor competencia</h2>
-      <p>Cómo gambeta.ai analiza la Champions League con IA. Los mercados más rentables, los equipos con mejor valor y los picks históricos de la competencia.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/ia-para-apostar.html" class="card">
-      <div class="card-badge">Fundamentos</div>
-      <h2>Inteligencia artificial para apostar: qué es y cómo usarla</h2>
-      <p>Introducción completa a la inteligencia artificial aplicada a las apuestas deportivas. Cómo funciona, qué ventajas da y cómo empezar con gambeta.ai.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/ia-vs-tipster.html" class="card">
-      <div class="card-badge">Estrategia</div>
-      <h2>IA vs tipster humano: ¿quién da mejores picks de fútbol?</h2>
-      <p>Comparamos la inteligencia artificial contra los tipsters humanos en picks de fútbol. Ventajas, desventajas y por qué gambeta.ai combina lo mejor de ambos.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/que-puede-hacer-la-ia.html" class="card">
-      <div class="card-badge">Plataforma</div>
-      <h2>¿Qué puede hacer la IA por tus apuestas deportivas?</h2>
-      <p>Casos de uso concretos de la IA de gambeta.ai: análisis de partidos, picks diarios, gestión de bankroll, alertas en tiempo real y más.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-    <a href="/blog/futuro-ia-apuestas.html" class="card">
-      <div class="card-badge">Tecnología</div>
-      <h2>El futuro de la IA en las apuestas deportivas</h2>
-      <p>Hacia dónde va la inteligencia artificial en el mundo de las apuestas. Modelos predictivos, datos en tiempo real y lo que se viene para apostadores.</p>
-      <span class="read-more">Leer artículo →</span>
-    </a>
-</main>
+
+<div class="section-header">
+  <h2>📖 Manuales de la plataforma</h2>
+  <div class="section-tag">Nuevo</div>
+  <div class="section-line"></div>
+</div>
+
+<div class="manuals-grid">
+  <a href="/blog/como-usar-pronosticos-ia.html" class="manual-card">
+    <div class="card-icon">🔮</div>
+    <div class="card-badge">Manual de usuario</div>
+    <h3>Cómo usar los Pronósticos IA</h3>
+    <p>Qué significa cada pick, cómo filtrar por liga o confianza, y cómo interpretar el stake sugerido.</p>
+    <div class="card-link">Leer guía →</div>
+  </a>
+  <a href="/blog/como-leer-resultados.html" class="manual-card">
+    <div class="card-icon">📋</div>
+    <div class="card-badge">Manual de usuario</div>
+    <h3>Cómo leer los Resultados y tu ROI</h3>
+    <p>Qué son WIN, LOSS y VOID, cómo calcular tu ROI real y cómo usar los datos para mejorar.</p>
+    <div class="card-link">Leer guía →</div>
+  </a>
+  <a href="/blog/como-usar-bankroll-manager.html" class="manual-card">
+    <div class="card-icon">💰</div>
+    <div class="card-badge">Manual de usuario</div>
+    <h3>Cómo usar el Bankroll Manager</h3>
+    <p>Configurá tu banca, registrá tus apuestas y seguí tu evolución con el gestor inteligente.</p>
+    <div class="card-link">Leer guía →</div>
+  </a>
+  <a href="/blog/como-usar-la-calculadora.html" class="manual-card">
+    <div class="card-icon">🧮</div>
+    <div class="card-badge">Manual de usuario</div>
+    <h3>Cómo usar la Calculadora de Apuestas</h3>
+    <p>Calculá ganancias potenciales, cuotas combinadas y el stake óptimo con el criterio de Kelly.</p>
+    <div class="card-link">Leer guía →</div>
+  </a>
+  <a href="/blog/ranking-gambeta-coins.html" class="manual-card">
+    <div class="card-icon">🏆</div>
+    <div class="card-badge">Manual de usuario</div>
+    <h3>Ranking y Gambeta Coins (G$)</h3>
+    <p>Cómo ganar G$, escalar en el ranking mensual y canjear tus monedas por premios reales.</p>
+    <div class="card-link">Leer guía →</div>
+  </a>
+  <a href="/blog/como-usar-bot-alerta.html" class="manual-card">
+    <div class="card-icon">🤖</div>
+    <div class="card-badge">Manual de usuario</div>
+    <h3>Cómo usar el Bot de Alerta</h3>
+    <p>Activá alertas en tiempo real para córners y partidos en vivo. Apostá en el momento exacto.</p>
+    <div class="card-link">Leer guía →</div>
+  </a>
+  <a href="/blog/como-usar-mi-panel.html" class="manual-card">
+    <div class="card-icon">👤</div>
+    <div class="card-badge">Manual de usuario</div>
+    <h3>Cómo usar Mi Panel</h3>
+    <p>Tus estadísticas personales, historial de apuestas, consejos IA y canje de premios.</p>
+    <div class="card-link">Leer guía →</div>
+  </a>
+</div>
+
+<div class="cta-banner">
+  <div class="cta-inner">
+    <div>
+      <h3>⚡ Probá gambeta.ai gratis</h3>
+      <p>Picks diarios con IA, bot de alertas, ranking con premios reales. Sin costo.</p>
+    </div>
+    <a href="https://gambeta.ai" class="btn-cta">Ver pronósticos de hoy →</a>
+  </div>
+</div>
+
+<div class="section-header">
+  <h2>📊 Estrategia y conocimiento</h2>
+  <div class="section-line"></div>
+</div>
+
+<div class="blog-grid">
+  <a href="/blog/gestion-bankroll.html" class="blog-card">
+    <div class="blog-card-tag">Estrategia</div>
+    <h3>Gestión de Bankroll: la base de todo apostador rentable</h3>
+    <p>Sin gestión de dinero, ninguna estrategia funciona a largo plazo.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/cuotas-y-probabilidades.html" class="blog-card">
+    <div class="blog-card-tag">Fundamentos</div>
+    <h3>Cuotas y probabilidades: cómo leer el mercado</h3>
+    <p>Entendé la relación entre cuotas y probabilidades para identificar apuestas con valor real.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/donde-encontrar-valor.html" class="blog-card">
+    <div class="blog-card-tag">Estrategia</div>
+    <h3>Dónde encontrar valor en las apuestas deportivas</h3>
+    <p>El valor está en la diferencia entre probabilidad real y cuota, no en el resultado más probable.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/apuestas-multiples.html" class="blog-card">
+    <div class="blog-card-tag">Estrategia</div>
+    <h3>Apuestas múltiples: cuándo convienen y cuándo no</h3>
+    <p>Las combinadas son tentadoras pero tienen matemática en contra. Sabé cuándo usarlas.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/mercados-rentables.html" class="blog-card">
+    <div class="blog-card-tag">Mercados</div>
+    <h3>Los mercados más rentables del fútbol para apostar</h3>
+    <p>Algunos mercados tienen márgenes más bajos y más ineficiencias explotables.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/como-ganar-en-futbol.html" class="blog-card">
+    <div class="blog-card-tag">Estrategia</div>
+    <h3>Cómo ganar apostando al fútbol de forma consistente</h3>
+    <p>La consistencia viene de la disciplina, no de la suerte.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/confianza-6-6.html" class="blog-card">
+    <div class="blog-card-tag">Análisis</div>
+    <h3>Confianza 6/6: qué significa y cómo aprovecharlo</h3>
+    <p>Cuando todos los indicadores apuntan al mismo resultado, ¿qué hacer?</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/ia-para-apostar.html" class="blog-card">
+    <div class="blog-card-tag">Inteligencia artificial</div>
+    <h3>Cómo usa la IA para hacer pronósticos deportivos</h3>
+    <p>El proceso detrás de cada pick: datos, modelos y por qué la IA supera al ojo humano.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/ia-vs-tipster.html" class="blog-card">
+    <div class="blog-card-tag">Inteligencia artificial</div>
+    <h3>IA vs Tipster: ¿quién da mejores pronósticos?</h3>
+    <p>Comparativa objetiva entre inteligencia artificial y tipsters humanos.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/como-hablar-con-la-ia.html" class="blog-card">
+    <div class="blog-card-tag">Tutorial</div>
+    <h3>Cómo hablar con la IA de gambeta.ai para sacarle el máximo</h3>
+    <p>Qué preguntas hacerle y trucos para obtener mejores análisis.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/ia-estadisticas-futbol.html" class="blog-card">
+    <div class="blog-card-tag">Inteligencia artificial</div>
+    <h3>Estadísticas de fútbol que la IA analiza para predecir</h3>
+    <p>De xG a presión ofensiva: las variables con más peso en los modelos de predicción.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/ia-tiempo-real-futbol.html" class="blog-card">
+    <div class="blog-card-tag">Inteligencia artificial</div>
+    <h3>IA en tiempo real: cómo funciona el análisis en vivo</h3>
+    <p>El Bot de Alerta y la ventaja de los segundos en el mercado in-play.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/ia-apostar-futbol-valor.html" class="blog-card">
+    <div class="blog-card-tag">Estrategia</div>
+    <h3>Cómo usar IA para encontrar valor en apuestas de fútbol</h3>
+    <p>El edge de la IA está en detectar ineficiencias que el ojo humano no ve.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/ia-champions-league.html" class="blog-card">
+    <div class="blog-card-tag">Análisis</div>
+    <h3>IA y Champions League: cómo apostamos la competición más impredecible</h3>
+    <p>La Champions tiene sus propias reglas estadísticas que la IA contempla en cada pick.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/futuro-ia-apuestas.html" class="blog-card">
+    <div class="blog-card-tag">Tendencias</div>
+    <h3>El futuro de la IA en las apuestas deportivas</h3>
+    <p>Hacia dónde va la inteligencia artificial aplicada al betting.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+  <a href="/blog/que-puede-hacer-la-ia.html" class="blog-card">
+    <div class="blog-card-tag">Inteligencia artificial</div>
+    <h3>Qué puede (y qué no puede) hacer la IA en apuestas</h3>
+    <p>Expectativas realistas sobre el uso de inteligencia artificial para apostar al fútbol.</p>
+    <div class="blog-card-link">Leer →</div>
+  </a>
+</div>
+
 <footer class="footer">
-  <p>© 2025 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar en Fútbol · 18+</p>
+  <p>© 2025 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar en Fútbol · Jugá responsablemente · +18</p>
 </footer>
+
 </body>
 </html>
