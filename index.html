@@ -5222,13 +5222,13 @@ const teamLogos = {
   'Colo-Colo':              'https://media.api-sports.io/football/teams/2288.png',
   'Universidad de Chile':   'https://media.api-sports.io/football/teams/2293.png',
   'U de Chile':             'https://media.api-sports.io/football/teams/2293.png',
-  'Universidad Católica':   'https://media.api-sports.io/football/teams/2290.png',
-  'U. Católica':                    'https://media.api-sports.io/football/teams/2290.png',
-  'U Católica':                     'https://media.api-sports.io/football/teams/2290.png',
-  'Universidad Católica de Chile':  'https://media.api-sports.io/football/teams/2290.png',
-  'CD Universidad Católica':        'https://media.api-sports.io/football/teams/2290.png',
-    'Universidad Católica (CHI)':     'https://media.api-sports.io/football/teams/2290.png',
-  'Cobresal':               'https://media.api-sports.io/football/teams/2291.png',
+  'Universidad Católica':   'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg/250px-Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png',
+  'U. Católica':                    'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg/250px-Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png',
+  'U Católica':                     'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg/250px-Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png',
+  'Universidad Católica de Chile':  'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg/250px-Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png',
+  'CD Universidad Católica':        'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg/250px-Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png',
+    'Universidad Católica (CHI)':     'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg/250px-Escudo_Club_Deportivo_Universidad_Cat%C3%B3lica.svg.png',
+  'Cobresal':               'https://upload.wikimedia.org/wikipedia/en/5/54/CD_Cobresal.png',
   'Huachipato':             'https://media.api-sports.io/football/teams/2294.png',
   'Nacional':               'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Nacional_Montevideo.png/200px-Nacional_Montevideo.png',
   'Club Nacional':          'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Nacional_Montevideo.png/200px-Nacional_Montevideo.png',
@@ -6824,6 +6824,7 @@ function buildPredsFromOdds() {
       _bookKey:   isAffiliate ? bmUsed?.key   : null,
       _bookLabel: isAffiliate ? bmUsed?.title : null,
       _sportKey:  g.sport_key || '',
+      _confLocked: true, // conf y bvr quedan bloqueados desde la primera asignación
     };
     } catch(e) {
       console.error('[buildPredsFromOdds] Error en partido:', g?.home_team, 'vs', g?.away_team, e.message);
@@ -6890,11 +6891,12 @@ function renderPreds() {
 
   // 1. Intentar cargar desde caché diaria — SOLO si los datos de odds aún no cargaron.
   // Cuando _rawOddsGames está disponible, siempre recalcular para reflejar cuotas actuales (BTTS real, etc.)
-  realPreds = (window._rawOddsGames && window._rawOddsGames.length) ? null : loadDailyPredsCache();
+  const _cachedPreds = loadDailyPredsCache(); // siempre leer caché para preservar conf bloqueadas
+  realPreds = (window._rawOddsGames && window._rawOddsGames.length) ? null : _cachedPreds;
 
   // Guardar partidos ya iniciados ANTES de cualquier invalidación para no perderlos
   const _nowMs = Date.now();
-  const _preserveStarted = (realPreds || []).filter(p => p.commenceTs && p.commenceTs <= _nowMs);
+  const _preserveStarted = ((_cachedPreds || realPreds) || []).filter(p => p.commenceTs && p.commenceTs <= _nowMs);
 
   // Invalidar caché si hay picks de basket (ya no se soportan)
   if (realPreds) {
@@ -6918,6 +6920,19 @@ function renderPreds() {
           }
         });
         realPreds = base;
+      }
+      // ── LEY FUNDAMENTAL: conf/bvr asignados una vez son INMUTABLES ──
+      // Si el pick ya existía en el caché anterior con conf bloqueada, preservar sus valores.
+      if (_cachedPreds && _cachedPreds.length && realPreds) {
+        realPreds.forEach(p => {
+          const prev = _cachedPreds.find(c => teamsMatch(c.home, p.home) && teamsMatch(c.away, p.away));
+          if (prev && prev._confLocked) {
+            p.conf        = prev.conf;
+            p.bvr         = prev.bvr;
+            p.bvrText     = prev.bvrText;
+            p._confLocked = true;
+          }
+        });
       }
       if (realPreds && realPreds.length) {
         saveDailyPredsCache(realPreds);
@@ -7021,7 +7036,12 @@ function renderPreds() {
           const pb = b.prob || Math.max(b.probH||0, b.probA||0);
           return pb - pa;
         })[0];
-      if (_best) { _best.bvr = 6; _best.bvrText = 'Máxima'; }
+      if (_best) {
+        _best.bvr         = 6;
+        _best.bvrText     = 'Máxima';
+        _best._confLocked = true; // ← confianza inmutable: no puede bajar una vez asignada
+        saveDailyPredsCache(realPreds); // guardar inmediatamente con el lock
+      }
     }
   }
 
