@@ -53,91 +53,53 @@
       --borde: rgba(255,255,255,0.08);
     }
     * { margin:0; padding:0; box-sizing:border-box; }
-    body { background:var(--fondo); color:var(--texto); font-family:'Segoe UI',system-ui,sans-serif; line-height:1.7; }
+    body {padding-top:66px; background:var(--fondo); color:var(--texto); font-family:'Segoe UI',system-ui,sans-serif; line-height:1.7; }
 
     /* NAV */
-    .nav {
-      background:#111; border-bottom:1px solid var(--borde);
-      padding:0 24px; display:flex; align-items:center; height:56px;
-      position:sticky; top:0; z-index:100;
-    }
-    .nav-logo { font-size:1.2rem; font-weight:800; color:#fff; text-decoration:none; }
-    .nav-logo span { color:var(--verde); }
-    .nav-links { margin-left:auto; display:flex; gap:20px; }
-    .nav-links a { color:var(--texto-sec); text-decoration:none; font-size:.9rem; transition:color .2s; }
-    .nav-links a:hover { color:var(--verde); }
-
-    /* HERO */
-    .hero {
-      background:linear-gradient(135deg,#1a1a2e 0%,#0f0f0f 100%);
-      border-bottom:1px solid var(--borde); padding:48px 24px 40px;
-      text-align:center;
-    }
-    .badge {
-      display:inline-block; background:rgba(0,200,83,.15);
-      border:1px solid rgba(0,200,83,.3); color:var(--verde);
-      padding:4px 14px; border-radius:20px; font-size:.8rem; font-weight:600;
-      margin-bottom:16px; text-transform:uppercase; letter-spacing:.5px;
-    }
-    .hero h1 { font-size:clamp(1.6rem,4vw,2.4rem); font-weight:800; line-height:1.25; max-width:760px; margin:0 auto 16px; }
-    .hero p { color:var(--texto-sec); max-width:640px; margin:0 auto; font-size:1.05rem; }
-
-    /* ARTICLE */
-    .container { max-width:760px; margin:0 auto; padding:48px 24px; }
-    .article h2 { font-size:1.35rem; font-weight:700; margin:32px 0 12px; color:#fff; border-left:3px solid var(--verde); padding-left:14px; }
-    .article p { margin-bottom:16px; color:var(--texto); line-height:1.8; }
-    .article ul, .article ol { margin:0 0 16px 20px; }
-    .article li { margin-bottom:8px; color:var(--texto); line-height:1.7; }
-    .article strong { color:#fff; }
-
-    /* CTA */
-    .cta-box {
-      background:linear-gradient(135deg,#1a2e1a,#0f1f0f);
-      border:1px solid rgba(0,200,83,.3); border-radius:16px;
-      padding:40px 32px; text-align:center; margin:48px 0;
-    }
-    .cta-box h3 { font-size:1.4rem; font-weight:700; margin-bottom:10px; }
-    .cta-box p { color:var(--texto-sec); margin-bottom:24px; }
-    .btn-cta {
-      display:inline-block; background:var(--verde); color:#000;
-      font-weight:700; padding:14px 32px; border-radius:8px;
-      text-decoration:none; font-size:1rem; transition:opacity .2s;
-    }
-    .btn-cta:hover { opacity:.88; }
-
-    /* RELATED */
-    .related { margin-top:48px; padding-top:32px; border-top:1px solid var(--borde); }
-    .related h4 { font-size:1rem; font-weight:700; margin-bottom:16px; color:var(--texto-sec); text-transform:uppercase; letter-spacing:.5px; }
-    .related-links { display:flex; flex-wrap:wrap; gap:10px; }
-    .related-links a {
-      background:var(--fondo2); border:1px solid var(--borde);
-      color:var(--texto); text-decoration:none; padding:8px 16px;
-      border-radius:20px; font-size:.85rem; transition:border-color .2s;
-    }
-    .related-links a:hover { border-color:var(--verde); color:var(--verde); }
-
-    /* FOOTER */
-    .footer { background:#111; border-top:1px solid var(--borde); padding:28px 24px; text-align:center; }
-    .footer p { color:var(--texto-sec); font-size:.85rem; }
-    .footer a { color:var(--verde); text-decoration:none; }
-
-    @media(max-width:600px) {
-      .nav-links { display:none; }
-      .hero { padding:32px 16px; }
-      .container { padding:32px 16px; }
-      .cta-box { padding:28px 20px; }
-    }
+    a{text-decoration:none;color:inherit}
+    nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 28px;height:66px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:10000;box-shadow:0 1px 0 rgba(0,200,83,0.08),0 8px 32px rgba(0,0,0,0.6);gap:16px}
+    .nav-logo-wrap{display:flex;align-items:center;gap:11px;text-decoration:none;flex-shrink:0}
+    .nav-icon-box{width:42px;height:42px;background:linear-gradient(135deg,#0d2a0d 0%,#112011 100%);border:1px solid rgba(0,200,83,0.35);border-radius:11px;display:flex;align-items:center;justify-content:center;box-shadow:0 0 12px rgba(0,200,83,0.2),inset 0 1px 0 rgba(0,200,83,0.1);flex-shrink:0}
+    .nav-logo-text{font-size:1.08rem;font-weight:900;color:#fff;letter-spacing:-.5px;white-space:nowrap}
+    .nav-logo-text span{color:#00c853}
+    .nav-links{display:flex;gap:2px;flex:1;justify-content:center}
+    .nav-links a{color:rgba(165,214,167,0.65);text-decoration:none;padding:7px 12px;border-radius:8px;font-size:.82rem;font-weight:500;transition:all .18s;white-space:nowrap}
+    .nav-links a:hover{color:#fff;background:rgba(0,200,83,0.08)}
+    .nav-links a.active{color:#00c853;background:rgba(0,200,83,0.12);font-weight:700}
+    .nav-cta-btn{background:linear-gradient(135deg,#00c853,#00a846)!important;color:#000!important;font-weight:700!important;padding:8px 18px;border-radius:8px;font-size:.82rem!important;white-space:nowrap;box-shadow:0 2px 12px rgba(0,200,83,0.3)}
+    .nav-cta-btn:hover{opacity:.9}
+    @media(max-width:640px){.nav-links{display:none}}
   </style>
 </head>
 <body>
 
 <nav class="nav">
-  <a href="https://gambeta.ai" class="nav-logo">gambeta<span>.ai</span></a>
+  <a href="https://gambeta.ai" class="nav-logo-wrap">
+    <div class="nav-icon-box">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="22" height="22">
+        <defs>
+          <linearGradient id="bolt-g" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffd600"/>
+            <stop offset="100%" stop-color="#ff9100"/>
+          </linearGradient>
+          <filter id="bolt-glow"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <path d="M23,4 L13,22 L20,22 L17,36 L27,18 L20,18 Z" fill="url(#bolt-g)" filter="url(#bolt-glow)"/>
+        <circle cx="30" cy="8" r="2.5" fill="#00c853" opacity="0.9"/>
+        <circle cx="10" cy="30" r="1.8" fill="#00c853" opacity="0.6"/>
+      </svg>
+    </div>
+    <span class="nav-logo-text">gambeta<span>.ai</span></span>
+  </a>
   <div class="nav-links">
-    <a href="https://gambeta.ai/#pronosticos">Pronósticos</a>
-    <a href="https://gambeta.ai/#resultados">Resultados</a>
-    <a href="https://gambeta.ai/blog/index.html">Blog</a>
+    <a href="https://gambeta.ai/#pronosticos">🔮 <span class="nav-text">Pronósticos</span></a>
+    <a href="https://gambeta.ai/#historial">📋 <span class="nav-text">Resultados</span></a>
+    <a href="https://gambeta.ai/#ranking">🏆 <span class="nav-text">Ranking</span></a>
+    <a href="https://gambeta.ai/#bot-alerta">🤖 <span class="nav-text">Bot Alerta</span></a>
+    <a href="https://gambeta.ai/#telegram">🎁 <span class="nav-text">Promos</span></a>
+    <a href="/blog/index.html">📰 <span class="nav-text">Blog</span></a>
   </div>
+  <a href="https://gambeta.ai/?openauth=1&returnTo=/blog/mercados-rentables.html" class="nav-links nav-cta-btn">✦ Entrar / Registro Gratis</a>
 </nav>
 
 <header class="hero">
@@ -189,5 +151,42 @@
   <p>© 2025 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar en Fútbol · 18+</p>
 </footer>
 
+<!-- Blog Auth: sesión Supabase → muestra escudo + nombre igual al sitio principal -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function() {
+  var SB_URL = 'https://ixfrtjvhnpapyuphqfxp.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZnJ0anZobnBhcHl1cGhxZnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MDExOTMsImV4cCI6MjA4OTE3NzE5M30.Lc5cOfvXCrrMlm9Yup5GG6RgCxOB_GSNJnKLTb1-bZQ';
+  var sb = supabase.createClient(SB_URL, SB_KEY);
+  sb.auth.getSession().then(function(r) {
+    var session = r.data && r.data.session;
+    if (!session || !session.user) return;
+    var nick = localStorage.getItem('gambeta_nickname');
+    var meta = session.user.user_metadata || {};
+    var rawName = nick || meta.full_name || meta.name || session.user.email.split('@')[0];
+    var firstName = rawName.replace(/[._-]/g,' ').replace(/\b\w/g, function(c){return c.toUpperCase();}).split(' ')[0];
+    var avaRaw = localStorage.getItem('gambeta_avatar');
+    var ava = null;
+    try { ava = avaRaw ? JSON.parse(avaRaw) : null; } catch(e) {}
+    var ctaBtn = document.querySelector('.nav-cta-btn');
+    if (!ctaBtn) return;
+    var avatarHtml;
+    if (ava && ava.logo) {
+      avatarHtml = '<img src="' + ava.logo + '" alt="' + (ava.name||'') + '" style="width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5));border-radius:4px;">';
+    } else {
+      var initials = firstName.slice(0,2).toUpperCase();
+      avatarHtml = '<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(0,200,83,0.2);border:1px solid rgba(0,200,83,0.4);font-size:0.75rem;font-weight:800;color:#00c853;">' + initials + '</span>';
+    }
+    ctaBtn.innerHTML = avatarHtml + '<span style="margin-left:7px;">' + firstName + '</span>';
+    ctaBtn.href = 'https://gambeta.ai/#mipanel';
+    ctaBtn.style.setProperty('background','rgba(0,200,83,0.1)','important');
+    ctaBtn.style.setProperty('color','#e8e8e8','important');
+    ctaBtn.style.setProperty('border','1px solid rgba(0,200,83,0.3)','important');
+    ctaBtn.style.setProperty('box-shadow','none','important');
+    ctaBtn.style.setProperty('display','inline-flex','important');
+    ctaBtn.style.setProperty('align-items','center','important');
+  });
+})();
+</script>
 </body>
 </html>
