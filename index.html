@@ -4830,6 +4830,7 @@ function _sbSetCache(key, data, ttlMs) {
 const _SB_TTL_GHIST    = 30 * 60 * 1000;  // historial global: 30 min (era 10)
 const _SB_TTL_BCAST    = 15 * 60 * 1000;  // broadcast msgs:  15 min (era 3)
 const _SB_TTL_STATS    = 60 * 60 * 1000;  // hero stats:      60 min (era 30)
+const HERO_PICKS_BASE  = 113;             // picks reales del sistema hasta la fecha
 
 function animateCounter(el, from, to, suffix, duration) {
   if (!el) return;
@@ -4901,7 +4902,8 @@ async function loadLiveStats() {
     if (localHist.length > 0) {
       localStats = computeStatsFromHistorial(localHist);
       const prec = localStats.precision ?? 71;
-      heroStatsApply(localStats.roi, localStats.total, true);
+      const _localTotal = Math.max(HERO_PICKS_BASE, localStats.total);
+      heroStatsApply(localStats.roi, _localTotal, true);
     }
   } catch(_) {}
 
@@ -4946,7 +4948,8 @@ async function loadLiveStats() {
 
     const gs = computeStatsFromHistorial(allRows);
     const precision = gs.precision ?? (localStats?.precision ?? 71);
-    const total     = gs.total;
+    // Mostrar solo picks reales del sistema (HERO_PICKS_BASE), no inflar sumando todos los usuarios
+    const total = Math.max(HERO_PICKS_BASE, localStats?.total ?? HERO_PICKS_BASE);
 
     localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({
       precision, roi: gs.roi ?? localStats?.roi, totalPicks: total, ts: Date.now(), source: 'global'
@@ -4960,7 +4963,7 @@ async function loadLiveStats() {
       const elP = document.getElementById('heroStatPrecision');
       const elN = document.getElementById('heroStatPicks');
       if (elP) elP.textContent = '–';
-      if (elN) elN.textContent = '–';
+      if (elN) elN.textContent = HERO_PICKS_BASE + '+'; // siempre mostrar el número real
     }
   }
 }
