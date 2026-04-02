@@ -10121,10 +10121,13 @@ function sbTranslateError(msg) {
 }
 
 let _authOpenTime = 0;
+let _authScrollY = 0;
 function openAuth() {
+  _authScrollY = window.scrollY;          // guardar posición antes de bloquear scroll
   document.getElementById('authOverlay').classList.add('open');
   showAuthStep(1);
   document.body.style.overflow = 'hidden';
+  document.body.style.top = `-${_authScrollY}px`;  // anclar visualmente
   _authOpenTime = Date.now();
   // Limpiar honeypot al abrir
   const hp = document.getElementById('hpWebsite');
@@ -10133,6 +10136,8 @@ function openAuth() {
 function closeAuth() {
   document.getElementById('authOverlay').classList.remove('open');
   document.body.style.overflow = '';
+  document.body.style.top = '';
+  window.scrollTo({ top: _authScrollY, behavior: 'instant' }); // restaurar posición exacta
 }
 function authOverlayClick(e) {
   if (e.target === document.getElementById('authOverlay')) closeAuth();
@@ -10186,9 +10191,11 @@ async function sendMagicLink() {
 async function selectSocial(provider) {
   // Google: OAuth real → redirect a Supabase
   if (provider === 'google') {
+    // Guardar sección actual para restaurarla después del redirect OAuth
+    sessionStorage.setItem('_gb_oauth_hash', location.hash || '');
     await sbClient.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: window.location.href.split('?')[0] }
+      options: { redirectTo: window.location.origin + window.location.pathname }
     });
     return;
   }
@@ -10472,6 +10479,17 @@ async function _handleAuthSession(u) {
   // Esto garantiza que el escudo VIP/club se muestre aunque algún paso previo
   // haya sobreescrito el avatar durante la carga inicial.
   setTimeout(applyUserProfile, 300);
+  // Restaurar sección guardada antes del redirect OAuth (Google login)
+  const _savedHash = sessionStorage.getItem('_gb_oauth_hash');
+  if (_savedHash) {
+    sessionStorage.removeItem('_gb_oauth_hash');
+    if (_savedHash && _savedHash !== '#') {
+      setTimeout(() => {
+        const el = document.querySelector(_savedHash);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 400);
+    }
+  }
 }
 
 // ── Escucha cambios de sesión Supabase (login/logout/refresh de token) ──
