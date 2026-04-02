@@ -7204,20 +7204,25 @@ function renderPreds() {
       if (!realPreds.length) realPreds = null;
     } else {
       // Principales: terminados siempre visibles (hasta 16h) + máximo 6 sin iniciar alta/media.
+      // EXCEPCIÓN: si hay filtro de tiempo activo (HOY/PRÓXIMOS) no limitar a 6 — mostrar todos los que pasen el filtro
+      const _tf = window._predTimeFilter || 'all';
+      const _timeFilterActive = _tf === 'today' || _tf === 'upcoming';
       const sortConf = (a, b) => (b.bvr || 0) - (a.bvr || 0) || (b.prob || 0) - (a.prob || 0);
       const isEuropePick = p => { const sk = p._sportKey||''; return sk.includes('soccer') && !sk.includes('argentina') && !sk.includes('brazil') && !sk.includes('conmebol'); };
       // Upcoming: solo alta y media confianza (bvr>=3), cuota >= 3.00 para baja
       const highMedUp = upcoming.filter(p => p.conf === 'high' || p.conf === 'med').sort(sortConf);
-      let upcomingSlice = highMedUp.slice(0, 6);
-      // Si no hay ningún pick europeo en los 6 pero sí existe uno de alta/media confianza, intercambiar el de menor BVR
-      const hasEurInTop6 = upcomingSlice.some(isEuropePick);
-      if (!hasEurInTop6) {
-        const bestEur = highMedUp.find(isEuropePick);
-        if (bestEur && upcomingSlice.length === 6) {
-          const last = upcomingSlice[upcomingSlice.length - 1];
-          if ((bestEur.bvr || 0) >= (last.bvr || 0)) upcomingSlice[upcomingSlice.length - 1] = bestEur;
-        } else if (bestEur) {
-          upcomingSlice.push(bestEur);
+      let upcomingSlice = _timeFilterActive ? highMedUp : highMedUp.slice(0, 6);
+      if (!_timeFilterActive) {
+        // Si no hay ningún pick europeo en los 6 pero sí existe uno de alta/media confianza, intercambiar el de menor BVR
+        const hasEurInTop6 = upcomingSlice.some(isEuropePick);
+        if (!hasEurInTop6) {
+          const bestEur = highMedUp.find(isEuropePick);
+          if (bestEur && upcomingSlice.length === 6) {
+            const last = upcomingSlice[upcomingSlice.length - 1];
+            if ((bestEur.bvr || 0) >= (last.bvr || 0)) upcomingSlice[upcomingSlice.length - 1] = bestEur;
+          } else if (bestEur) {
+            upcomingSlice.push(bestEur);
+          }
         }
       }
       // Solo alta y media confianza — no publicar picks de baja confianza
