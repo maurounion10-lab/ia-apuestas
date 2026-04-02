@@ -11655,10 +11655,19 @@ document.addEventListener('DOMContentLoaded', () => {
   if (_oaParams.get('openauth') === '1') {
     const _returnTo = _oaParams.get('returnTo') || '';
     if (_returnTo) sessionStorage.setItem('_gb_return_to', _returnTo);
-    // Esperar a que Supabase verifique la sesión antes de abrir el modal
-    setTimeout(() => { if (!authUser) openAuth(); }, 800);
     // Limpiar los parámetros de la URL sin recargar la página
     history.replaceState(null, '', location.pathname + location.hash);
+    // Esperar a que Supabase verifique la sesión
+    setTimeout(() => {
+      const _rt = sessionStorage.getItem('_gb_return_to');
+      if (authUser) {
+        // Ya logueado → volver al blog directamente
+        if (_rt) { sessionStorage.removeItem('_gb_return_to'); window.location.href = _rt; }
+      } else {
+        // No logueado → abrir modal
+        openAuth();
+      }
+    }, 900);
   }
 });
 
