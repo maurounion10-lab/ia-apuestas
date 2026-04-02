@@ -10479,6 +10479,13 @@ async function _handleAuthSession(u) {
   // Esto garantiza que el escudo VIP/club se muestre aunque algún paso previo
   // haya sobreescrito el avatar durante la carga inicial.
   setTimeout(applyUserProfile, 300);
+  // Si el usuario vino del blog, volver al blog después del login
+  const _returnTo = sessionStorage.getItem('_gb_return_to');
+  if (_returnTo) {
+    sessionStorage.removeItem('_gb_return_to');
+    setTimeout(() => { window.location.href = _returnTo; }, 600);
+    return;
+  }
   // Restaurar sección guardada antes del redirect OAuth (Google login)
   const _savedHash = sessionStorage.getItem('_gb_oauth_hash');
   if (_savedHash) {
@@ -11643,11 +11650,14 @@ document.addEventListener('DOMContentLoaded', () => {
     try { sessionStorage.setItem('_gb_pv', '1'); } catch {}
     trackEvent('pageview', { ref: document.referrer ? document.referrer.split('/')[2] : 'direct' });
   }
-  // Abrir modal de login automáticamente si viene del blog (/?openauth=1)
-  if (new URLSearchParams(location.search).get('openauth') === '1') {
+  // Abrir modal de login automáticamente si viene del blog (/?openauth=1&returnTo=/blog/...)
+  const _oaParams = new URLSearchParams(location.search);
+  if (_oaParams.get('openauth') === '1') {
+    const _returnTo = _oaParams.get('returnTo') || '';
+    if (_returnTo) sessionStorage.setItem('_gb_return_to', _returnTo);
     // Esperar a que Supabase verifique la sesión antes de abrir el modal
     setTimeout(() => { if (!authUser) openAuth(); }, 800);
-    // Limpiar el parámetro de la URL sin recargar la página
+    // Limpiar los parámetros de la URL sin recargar la página
     history.replaceState(null, '', location.pathname + location.hash);
   }
 });
