@@ -4922,7 +4922,8 @@ async function loadLiveStats() {
       } catch { return null; }
     })();
     if (cachedStats) {
-      heroStatsApply(cachedStats.roi ?? cachedStats.precision, cachedStats.totalPicks, true);
+      const _cachedTotal = Math.max(HERO_PICKS_BASE, localStats?.total ?? HERO_PICKS_BASE);
+      heroStatsApply(cachedStats.roi ?? cachedStats.precision, _cachedTotal, true);
       return; // caché fresco, no hacer query
     }
 
