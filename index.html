@@ -6444,6 +6444,7 @@ function shortName(name) {
     'Universidad Católica': 'U. Católica', 'CD Universidad Católica': 'U. Católica',
     'Universidad Católica de Chile': 'U. Católica', 'Universidad Católica (CHI)': 'U. Católica',
     'U Católica': 'U. Católica',
+    'Universidad Catól…': 'U. Católica', 'Universidad Cat…': 'U. Católica', // nombres truncados del historial antiguo
     'Coquimbo Unido': 'Coquimbo',
     // Otros
     'Liverpool FC Uruguay': 'Liverpool UY', 'Caracas FC': 'Caracas',
@@ -8221,6 +8222,7 @@ function migrateHistStakes() {
 // Normaliza nombre de equipo para comparación fuzzy
 function normTeam(s) {
   return (s||'').toLowerCase()
+    .replace(/[\u2026\.]{1,3}$/, '')               // quita "…" o "..." al final (nombres truncados)
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // quita acentos: é→e, ó→o, ú→u, ñ→n, etc.
     .replace(/[^a-z0-9]/g,'');
 }
@@ -8235,6 +8237,13 @@ function teamsMatch(a, b) {
   const wa = na.match(/.{5,}/g) || [];
   const wb = nb.match(/.{5,}/g) || [];
   if (wa.some(w => nb.includes(w)) || wb.some(w => na.includes(w))) return true;
+  // Coincidencia por abreviatura canónica — cubre "Universidad Catól…" vs "U. Católica"
+  // (nombres guardados en historial antes de que se añadiera la abreviatura)
+  if (typeof shortName === 'function') {
+    const sa = normTeam(shortName(a.replace(/[\u2026\.]{1,3}$/, '').trim()));
+    const sb = normTeam(shortName(b.replace(/[\u2026\.]{1,3}$/, '').trim()));
+    if (sa && sb && sa === sb) return true;
+  }
   return false;
 }
 
@@ -9322,6 +9331,7 @@ const teamShortNames = {
   'Universidad Católica de Chile': 'U. Católica',
   'Universidad Católica (CHI)': 'U. Católica',
   'U Católica':               'U. Católica',
+  'Universidad Catól…':       'U. Católica', // nombre truncado del historial antiguo
   'Coquimbo Unido':           'Coquimbo',
 };
 function shortName(name) {
