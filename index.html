@@ -8418,14 +8418,23 @@ async function sbSaveLockedPicks(preds, force = false) {
   });
   if (!Object.keys(map).length) return;
   try {
-    const client = (typeof authUser !== 'undefined' && authUser) ? sbClient : sbAnon;
-    // force=true (admin): ignoreDuplicates:false para pisar cualquier lock anterior
-    const { error } = await client
-      .from('shared_cache')
-      .upsert({ key: _lockedPicksKey(), data: map, fetched_at: new Date().toISOString() },
-               { onConflict: 'key', ignoreDuplicates: !force });
-    if (!error) { window._sbLockedPicks = map; console.log('[lockedPicks] Guardados en Supabase:', Object.keys(map).length, 'picks'); }
-    else console.warn('[lockedPicks] Error al guardar:', error.message);
+    const key = _lockedPicksKey();
+    if (force) {
+      // Admin override: RLS bloquea UPDATE → delete + insert
+      await sbClient.from('shared_cache').delete().eq('key', key);
+      const { error } = await sbClient.from('shared_cache').insert({ key, data: map, fetched_at: new Date().toISOString() });
+      if (!error) { window._sbLockedPicks = map; console.log('[lockedPicks] Force-guardados:', Object.keys(map).length, 'picks'); }
+      else console.warn('[lockedPicks] Error force-insert:', error.message);
+    } else {
+      // Primera escritura del día (cualquier usuario)
+      const client = (typeof authUser !== 'undefined' && authUser) ? sbClient : sbAnon;
+      const { error } = await client
+        .from('shared_cache')
+        .upsert({ key, data: map, fetched_at: new Date().toISOString() },
+                 { onConflict: 'key', ignoreDuplicates: true });
+      if (!error) { window._sbLockedPicks = map; console.log('[lockedPicks] Guardados:', Object.keys(map).length, 'picks'); }
+      else console.warn('[lockedPicks] Error:', error.message);
+    }
   } catch(e) { console.warn('[lockedPicks] Error al guardar:', e.message); }
 }
 
@@ -8480,10 +8489,10 @@ async function sbLoadEstrellaOverride() {
 async function sbSaveEstrellaOverride(home, away) {
   if (authUser?.email !== ADMIN_EMAIL) return;
   try {
+    await sbClient.from('shared_cache').delete().eq('key', _estrellaKey());
     const { error } = await sbClient
       .from('shared_cache')
-      .upsert({ key: _estrellaKey(), data: { home, away }, fetched_at: new Date().toISOString() },
-               { onConflict: 'key' });
+      .insert({ key: _estrellaKey(), data: { home, away }, fetched_at: new Date().toISOString() });
     if (!error) {
       window._estrellaOverride = { home, away };
       renderPreds();
@@ -8571,10 +8580,9 @@ async function _adminMigrateMaxima() {
   }
   if (!changed) return;
   try {
-    const { error } = await sbClient
-      .from('shared_cache')
-      .upsert({ key: _lockedPicksKey(), data: lp, fetched_at: new Date().toISOString() },
-               { onConflict: 'key' });
+    const key = _lockedPicksKey();
+    await sbClient.from('shared_cache').delete().eq('key', key);
+    const { error } = await sbClient.from('shared_cache').insert({ key, data: lp, fetched_at: new Date().toISOString() });
     if (!error) { console.log('[migrateMaxima] ✓ Guardado en Supabase'); renderPreds(); }
     else console.warn('[migrateMaxima] Error:', error.message);
   } catch(e) { console.warn('[migrateMaxima]', e.message); }
@@ -8651,18 +8659,16 @@ async function admForceMaxima(mk) {
   window._sbLockedPicks[mk].conf    = 'high';
 
   try {
-    const { error } = await sbClient
-      .from('shared_cache')
-      .upsert({ key: _lockedPicksKey(), data: window._sbLockedPicks, fetched_at: new Date().toISOString() },
-               { onConflict: 'key' });
-    if (!error) {
-      if (statusEl) { statusEl.style.background='rgba(0,200,83,0.1)'; statusEl.style.color='#00c853'; statusEl.textContent='✅ Guardado. Todos los usuarios verán Máxima.'; }
-      console.log('[admForceMaxima] ✓', mk, '→ Máxima');
-      setTimeout(() => { document.getElementById('confPickerOverlay')?.remove(); renderPreds(); }, 1500);
-    } else {
-      if (statusEl) { statusEl.style.background='rgba(255,61,61,0.1)'; statusEl.style.color='#ef5350'; statusEl.textContent='❌ Error: ' + error.message; }
-      console.warn('[admForceMaxima] Error:', error.message);
-    }
+    const key = _lockedPicksKey();
+    const payload = { key, data: window._sbLockedPicks, fetched_at: new Date().toISOString() };
+    // RLS bloquea UPDATE → delete primero, luego insert fresco
+    const { error: delErr } = await sbClient.from('shared_cache').delete().eq('key', key);
+    if (delErr) throw new Error('delete: ' + delErr.message);
+    const { error: insErr } = await sbClient.from('shared_cache').insert(payload);
+    if (insErr) throw new Error('insert: ' + insErr.message);
+    if (statusEl) { statusEl.style.background='rgba(0,200,83,0.1)'; statusEl.style.color='#00c853'; statusEl.textContent='✅ Guardado. Todos los usuarios verán Máxima.'; }
+    console.log('[admForceMaxima] ✓', mk, '→ Máxima');
+    setTimeout(() => { document.getElementById('confPickerOverlay')?.remove(); renderPreds(); }, 1500);
   } catch(e) {
     if (statusEl) { statusEl.style.background='rgba(255,61,61,0.1)'; statusEl.style.color='#ef5350'; statusEl.textContent='❌ ' + e.message; }
     console.warn('[admForceMaxima]', e.message);
