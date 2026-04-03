@@ -1,5 +1,5 @@
-// gambeta.ai — Service Worker v1.2
-const CACHE_NAME = 'gambeta-v3';
+// gambeta.ai — Service Worker v1.3
+const CACHE_NAME = 'gambeta-v4';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
