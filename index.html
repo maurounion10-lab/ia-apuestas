@@ -8584,60 +8584,89 @@ async function _adminMigrateMaxima() {
 // Abre popup con todos los picks del día; admin elige uno y lo sube a Máxima (bvr=6)
 function admOpenConfPicker() {
   if (authUser?.email !== ADMIN_EMAIL) return;
-  const preds = (window._allAvailablePicks || [])
-    .filter(p => !p._started)
-    .sort((a,b) => (b.bvr||0)-(a.bvr||0));
-  if (!preds.length) { alert('No hay picks disponibles ahora.'); return; }
-  const listHtml = preds.map(p => {
-    const bvrLbl = p.bvrText || (p.bvr>=6?'Máxima':p.bvr>=5?'Alta':p.bvr>=4?'Media-Alta':p.bvr>=3?'Media':'Baja');
-    const isMax  = (p.bvr||0) >= 6;
-    return `<button onclick="admForceMaxima(${JSON.stringify(p.home)},${JSON.stringify(p.away)})"
+
+  // Fuente de datos: primero _sbLockedPicks (siempre cargado), luego _allAvailablePicks como enriquecimiento
+  const lockKeys = Object.keys(window._sbLockedPicks || {});
+  const livePicks = window._allAvailablePicks || [];
+
+  // Construir lista unificada: cada key del lock, enriquecida con home/away de livePicks si existe
+  const items = lockKeys.map(mk => {
+    const ld = window._sbLockedPicks[mk];
+    // Intentar encontrar el partido vivo para obtener nombres legibles
+    const live = livePicks.find(p => _matchKeyLP(p.home, p.away) === mk);
+    // Reconstruir nombres desde la key si no hay live
+    const parts = mk.replace(/_vs_/, '|||').split('|||');
+    const home = live?.home || parts[0]?.replace(/_/g,' ') || mk;
+    const away = live?.away || parts[1]?.replace(/_/g,' ') || '';
+    const rec  = live?.rec  || ld.rec || '';
+    return { mk, home, away, rec, bvr: ld.bvr||1, bvrText: ld.bvrText||'Baja' };
+  }).sort((a,b) => b.bvr - a.bvr);
+
+  if (!items.length) {
+    alert('El lock de picks aún no cargó. Esperá unos segundos y reintentá.');
+    return;
+  }
+
+  const listHtml = items.map(it => {
+    const isMax = it.bvr >= 6;
+    const color = isMax ? '#ffd600' : it.bvr >= 5 ? '#66bb6a' : it.bvr >= 4 ? '#e64a19' : '#aaa';
+    return `<button id="cpbtn_${it.mk}" onclick="admForceMaxima('${it.mk}')"
       style="display:flex;align-items:center;justify-content:space-between;width:100%;
       background:${isMax?'rgba(255,214,0,0.12)':'rgba(255,255,255,0.04)'};
       border:1px solid ${isMax?'rgba(255,214,0,0.5)':'rgba(255,255,255,0.1)'};
       border-radius:10px;padding:10px 14px;cursor:pointer;color:#fff;margin-bottom:6px;gap:8px;text-align:left">
-      <div>
-        <div style="font-size:0.82rem;font-weight:700">${p.home} vs ${p.away}</div>
-        <div style="font-size:0.7rem;color:var(--texto-sec)">${p.rec||''}</div>
+      <div style="min-width:0">
+        <div style="font-size:0.84rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${it.home} vs ${it.away}</div>
+        <div style="font-size:0.7rem;color:var(--texto-sec)">${it.rec}</div>
       </div>
-      <span style="font-size:0.72rem;font-weight:800;color:${isMax?'#ffd600':p.bvr>=5?'#66bb6a':'#aaa'};white-space:nowrap">${bvrLbl}${isMax?' ✓':''}</span>
+      <span style="font-size:0.75rem;font-weight:800;color:${color};white-space:nowrap;flex-shrink:0">${it.bvrText}${isMax?' ✓':''}</span>
     </button>`;
   }).join('');
+
+  document.getElementById('confPickerOverlay')?.remove();
   const overlay = document.createElement('div');
   overlay.id = 'confPickerOverlay';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px';
-  overlay.innerHTML = `<div style="background:#0f1a0f;border:1px solid rgba(255,214,0,0.4);border-radius:16px;padding:20px;max-width:440px;width:100%;max-height:80vh;overflow-y:auto">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-      <div style="font-weight:800;color:#fff;font-size:0.95rem">💰 Elevar pick a Máxima Confianza</div>
-      <button onclick="document.getElementById('confPickerOverlay').remove()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer">✕</button>
-    </div>
-    <div style="font-size:0.72rem;color:var(--texto-sec);margin-bottom:12px">El pick seleccionado queda con bvr=6 para todos los usuarios (se guarda en Supabase).</div>
-    ${listHtml}
-  </div>`;
+  overlay.innerHTML = `
+    <div style="background:#0f1a0f;border:1px solid rgba(0,200,83,0.4);border-radius:16px;padding:20px;max-width:460px;width:100%;max-height:82vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="font-weight:800;color:#fff;font-size:0.95rem">💰 Elevar pick a Máxima Confianza</div>
+        <button onclick="document.getElementById('confPickerOverlay').remove()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
+      </div>
+      <div style="font-size:0.72rem;color:var(--texto-sec);margin-bottom:14px">Tocá el partido → queda bvr=6 para todos los usuarios.</div>
+      <div id="confPickerStatus" style="display:none;padding:8px 12px;border-radius:8px;font-size:0.8rem;font-weight:700;margin-bottom:10px"></div>
+      ${listHtml}
+    </div>`;
   document.body.appendChild(overlay);
 }
 
-async function admForceMaxima(home, away) {
-  document.getElementById('confPickerOverlay')?.remove();
+async function admForceMaxima(mk) {
   if (authUser?.email !== ADMIN_EMAIL) return;
-  // Actualizar en memoria local
-  const mk = _matchKeyLP(home, away);
+  const statusEl = document.getElementById('confPickerStatus');
+  if (statusEl) { statusEl.style.display='block'; statusEl.style.background='rgba(255,214,0,0.1)'; statusEl.style.color='#ffd600'; statusEl.textContent='⏳ Guardando…'; }
+
   if (!window._sbLockedPicks[mk]) window._sbLockedPicks[mk] = {};
-  const lp = window._sbLockedPicks[mk];
-  lp.bvr     = 6;
-  lp.bvrText = 'Máxima';
-  lp.conf    = 'high';
-  // Persistir en Supabase (force override)
+  window._sbLockedPicks[mk].bvr     = 6;
+  window._sbLockedPicks[mk].bvrText = 'Máxima';
+  window._sbLockedPicks[mk].conf    = 'high';
+
   try {
     const { error } = await sbClient
       .from('shared_cache')
       .upsert({ key: _lockedPicksKey(), data: window._sbLockedPicks, fetched_at: new Date().toISOString() },
-               { onConflict: 'key' }); // sin ignoreDuplicates → sobreescribe
+               { onConflict: 'key' });
     if (!error) {
-      console.log('[admForceMaxima] ✓', home, 'vs', away, '→ Máxima');
-      renderPreds();
-    } else console.warn('[admForceMaxima] Error Supabase:', error.message);
-  } catch(e) { console.warn('[admForceMaxima]', e.message); }
+      if (statusEl) { statusEl.style.background='rgba(0,200,83,0.1)'; statusEl.style.color='#00c853'; statusEl.textContent='✅ Guardado. Todos los usuarios verán Máxima.'; }
+      console.log('[admForceMaxima] ✓', mk, '→ Máxima');
+      setTimeout(() => { document.getElementById('confPickerOverlay')?.remove(); renderPreds(); }, 1500);
+    } else {
+      if (statusEl) { statusEl.style.background='rgba(255,61,61,0.1)'; statusEl.style.color='#ef5350'; statusEl.textContent='❌ Error: ' + error.message; }
+      console.warn('[admForceMaxima] Error:', error.message);
+    }
+  } catch(e) {
+    if (statusEl) { statusEl.style.background='rgba(255,61,61,0.1)'; statusEl.style.color='#ef5350'; statusEl.textContent='❌ ' + e.message; }
+    console.warn('[admForceMaxima]', e.message);
+  }
 }
 
 // Guarda el historial GLOBAL en shared_cache (solo admin)
