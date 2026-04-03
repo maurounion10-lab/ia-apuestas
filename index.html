@@ -8547,6 +8547,66 @@ async function admClearEstrella() {
 
 sbLoadEstrellaOverride();
 
+// ── Admin: elevar confianza de un pick manualmente ──
+// Abre popup con todos los picks del día; admin elige uno y lo sube a Máxima (bvr=6)
+function admOpenConfPicker() {
+  if (authUser?.email !== ADMIN_EMAIL) return;
+  const preds = (window._allAvailablePicks || [])
+    .filter(p => !p._started)
+    .sort((a,b) => (b.bvr||0)-(a.bvr||0));
+  if (!preds.length) { alert('No hay picks disponibles ahora.'); return; }
+  const listHtml = preds.map(p => {
+    const bvrLbl = p.bvrText || (p.bvr>=6?'Máxima':p.bvr>=5?'Alta':p.bvr>=4?'Media-Alta':p.bvr>=3?'Media':'Baja');
+    const isMax  = (p.bvr||0) >= 6;
+    return `<button onclick="admForceMaxima(${JSON.stringify(p.home)},${JSON.stringify(p.away)})"
+      style="display:flex;align-items:center;justify-content:space-between;width:100%;
+      background:${isMax?'rgba(255,214,0,0.12)':'rgba(255,255,255,0.04)'};
+      border:1px solid ${isMax?'rgba(255,214,0,0.5)':'rgba(255,255,255,0.1)'};
+      border-radius:10px;padding:10px 14px;cursor:pointer;color:#fff;margin-bottom:6px;gap:8px;text-align:left">
+      <div>
+        <div style="font-size:0.82rem;font-weight:700">${p.home} vs ${p.away}</div>
+        <div style="font-size:0.7rem;color:var(--texto-sec)">${p.rec||''}</div>
+      </div>
+      <span style="font-size:0.72rem;font-weight:800;color:${isMax?'#ffd600':p.bvr>=5?'#66bb6a':'#aaa'};white-space:nowrap">${bvrLbl}${isMax?' ✓':''}</span>
+    </button>`;
+  }).join('');
+  const overlay = document.createElement('div');
+  overlay.id = 'confPickerOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.innerHTML = `<div style="background:#0f1a0f;border:1px solid rgba(255,214,0,0.4);border-radius:16px;padding:20px;max-width:440px;width:100%;max-height:80vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+      <div style="font-weight:800;color:#fff;font-size:0.95rem">💰 Elevar pick a Máxima Confianza</div>
+      <button onclick="document.getElementById('confPickerOverlay').remove()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer">✕</button>
+    </div>
+    <div style="font-size:0.72rem;color:var(--texto-sec);margin-bottom:12px">El pick seleccionado queda con bvr=6 para todos los usuarios (se guarda en Supabase).</div>
+    ${listHtml}
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+async function admForceMaxima(home, away) {
+  document.getElementById('confPickerOverlay')?.remove();
+  if (authUser?.email !== ADMIN_EMAIL) return;
+  // Actualizar en memoria local
+  const mk = _matchKeyLP(home, away);
+  if (!window._sbLockedPicks[mk]) window._sbLockedPicks[mk] = {};
+  const lp = window._sbLockedPicks[mk];
+  lp.bvr     = 6;
+  lp.bvrText = 'Máxima';
+  lp.conf    = 'high';
+  // Persistir en Supabase (force override)
+  try {
+    const { error } = await sbClient
+      .from('shared_cache')
+      .upsert({ key: _lockedPicksKey(), data: window._sbLockedPicks, fetched_at: new Date().toISOString() },
+               { onConflict: 'key' }); // sin ignoreDuplicates → sobreescribe
+    if (!error) {
+      console.log('[admForceMaxima] ✓', home, 'vs', away, '→ Máxima');
+      renderPreds();
+    } else console.warn('[admForceMaxima] Error Supabase:', error.message);
+  } catch(e) { console.warn('[admForceMaxima]', e.message); }
+}
+
 // Guarda el historial GLOBAL en shared_cache (solo admin)
 async function sbSaveGlobalHistorial(arr) {
   if (authUser?.email !== ADMIN_EMAIL) return;
@@ -12047,6 +12107,7 @@ function _purgeNbaPicks() {
         <button onclick="admResolveNow()" style="background:rgba(255,112,67,0.1);border:1px solid rgba(255,112,67,0.3);color:#ff7043;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">✅ Resolver pendientes ahora</button>
         <button onclick="adminResetLockedPicks()" style="background:rgba(156,39,176,0.15);border:1px solid rgba(156,39,176,0.5);color:#ce93d8;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600;grid-column:1/-1">🔑 Resetear Lock de Picks HOY (fuerza relectura de cuotas)</button>
         <button onclick="admOpenEstrellaPicker()" style="background:rgba(255,214,0,0.12);border:1px solid rgba(255,214,0,0.45);color:#ffd600;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600;grid-column:1/-1">⭐ Elegir Pick Estrella del Finde</button>
+        <button onclick="admOpenConfPicker()" style="background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.45);color:var(--verde);padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600;grid-column:1/-1">💰 Elevar pick a Máxima Confianza</button>
       </div>
       <div id="admApiStatus" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;font-size:0.78rem;color:var(--texto-sec);line-height:1.8">
         <div style="color:#fff;font-weight:600;margin-bottom:6px">Estado de APIs</div>
