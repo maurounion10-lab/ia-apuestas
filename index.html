@@ -3818,7 +3818,7 @@
       </table>
       <div class="hist-legend">
         <span class="hl-item"><span class="hl-dot" style="background:rgba(0,200,83,0.25);border:1px solid rgba(0,200,83,0.5)"></span> Partido de HOY</span>
-        <span class="hl-item"><span class="hl-dot" style="background:rgba(255,214,0,0.18);border:1px solid rgba(255,214,0,0.5)"></span> Apuesta Máxima ($150) / Alta ($130)</span>
+        <span class="hl-item"><span class="hl-dot" style="background:rgba(255,214,0,0.18);border:1px solid rgba(255,214,0,0.5)"></span> Apuesta Máxima ($170) / Alta ($130)</span>
         <span class="hl-item">✅ WIN &nbsp; ❌ LOSS &nbsp; ⚪ VOID &nbsp; 🟡 PEND</span>
       </div>
       <!-- Sub-filtro por liga (se rellena dinámicamente en renderHistorial) -->
@@ -7168,7 +7168,7 @@ function renderPreds() {
         const dotsHtml = Array.from({length:6}, (_,i) =>
           `<div class="dot${i<dotsFilled?'':' empty'}"></div>`).join('');
         const bvrLabel = star.bvrText || (dotsFilled===6?'Máxima':dotsFilled>=5?'Alta':dotsFilled>=4?'Media-Alta':'Media');
-        const stakeLabel = (star.bvr||0) >= 6 ? '$150' : star.conf==='high' ? '$130' : (star.bvr||0) === 4 ? '$50' : star.conf==='med' ? '$30' : '$15';
+        const stakeLabel = (star.bvr||0) >= 6 ? '$170' : star.conf==='high' ? '$130' : (star.bvr||0) === 4 ? '$50' : star.conf==='med' ? '$30' : '$15';
         estrellaEl.style.display = 'block';
         estrellaEl.innerHTML = `
           <div class="estrella-card">
@@ -8408,7 +8408,7 @@ function migrateHistStakes() {
       else if (conf === 'med')                   bvr = 3;
       else                                       bvr = 1;
     }
-    const correctStake = bvr >= 6 ? 150 : bvr === 5 ? 130 : bvr === 4 ? 50 : bvr === 3 ? 30 : 15;
+    const correctStake = bvr >= 6 ? 170 : bvr === 5 ? 130 : bvr === 4 ? 50 : bvr === 3 ? 30 : 15;
     if (p.stake !== correctStake) {
       p.stake = correctStake;
       if      (p.result === 'win')  p.pl = parseFloat(((odds - 1) * correctStake).toFixed(2));
@@ -8487,9 +8487,9 @@ function savePredictions(preds) {
     else if (p.rec === 'Empate'         && p.probD > 0) impliedOdds = parseFloat((100/p.probD).toFixed(2));
     else if (p._bestOdds)                               impliedOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
 
-    // Stake según confianza/bvr: Máxima(6)=$150, Alta(5)=$130, Media-Alta(4)=$50, Media(3)=$30, Baja=$15
+    // Stake según confianza/bvr: Máxima(6)=$170, Alta(5)=$130, Media-Alta(4)=$50, Media(3)=$30, Baja=$15
     const _bvrS = p.bvr || (p.conf === 'high' ? 5 : p.conf === 'med' ? 3 : 1);
-    const stake = _bvrS >= 6 ? 150 : _bvrS === 5 ? 130 : _bvrS === 4 ? 50 : _bvrS === 3 ? 30 : 15;
+    const stake = _bvrS >= 6 ? 170 : _bvrS === 5 ? 130 : _bvrS === 4 ? 50 : _bvrS === 3 ? 30 : 15;
 
     hist.unshift({
       id, date: today, sport: p._sportKey?.includes('tennis') ? 'tenis' : (p.sport || 'futbol'),
