@@ -1361,22 +1361,24 @@
   }
   .bvr-gems {
     display: flex;
-    gap: 4px;
+    gap: 1px;
+    align-items: center;
     flex: 1;
   }
   .bvr-gem {
-    width: 12px;
-    height: 22px;
-    /* Rayito ⚡ — clip-path de rayo */
-    clip-path: polygon(68% 0%, 30% 54%, 52% 54%, 24% 100%, 68% 46%, 46% 46%, 68% 0%);
-    background: rgba(255,255,255,0.12);
-    transition: all 0.2s;
+    font-size: 1.05rem;
+    line-height: 1;
+    display: inline-block;
+    opacity: 0.14;
+    filter: grayscale(1);
+    transition: opacity 0.2s, filter 0.2s, text-shadow 0.2s;
+    user-select: none;
   }
-  /* BVR 1-2 = Baja (rojo) | 3-4 = Media (naranja) | 5-6 = Alta (verde/dorado) */
-  .bvr-gem.active-1, .bvr-gem.active-2 { background: #d32f2f; box-shadow: 0 0 6px rgba(211,47,47,0.7); }
-  .bvr-gem.active-3, .bvr-gem.active-4 { background: #e64a19; box-shadow: 0 0 5px rgba(230,74,25,0.6); }
-  .bvr-gem.active-5 { background: #66bb6a; box-shadow: 0 0 6px rgba(102,187,106,0.6); }
-  .bvr-gem.active-6 { background: linear-gradient(135deg,#ffd600,#ff9800); box-shadow: 0 0 8px rgba(255,214,0,0.7); }
+  /* BVR 1-2 = Baja (rojo) | 3-4 = Media (naranja) | 5 = Alta (verde) | 6 = Máxima (dorado) */
+  .bvr-gem.active-1, .bvr-gem.active-2 { opacity:1; filter:hue-rotate(155deg) saturate(3) brightness(1.1); }
+  .bvr-gem.active-3, .bvr-gem.active-4 { opacity:1; filter:hue-rotate(22deg) saturate(2.2); }
+  .bvr-gem.active-5 { opacity:1; filter:hue-rotate(88deg) saturate(2.5) brightness(1.1); }
+  .bvr-gem.active-6 { opacity:1; filter:none; text-shadow:0 0 10px rgba(255,214,0,0.9), 0 0 4px rgba(255,180,0,0.6); }
   .bvr-text {
     font-size: 0.65rem;
     font-weight: 800;
@@ -2564,8 +2566,8 @@
   .estrella-card { position:relative; border:1px solid rgba(255,214,0,0.45); border-radius:16px; background:linear-gradient(135deg,rgba(255,214,0,0.1) 0%,rgba(255,214,0,0.03) 60%,transparent 100%); padding:16px; margin-bottom:18px; overflow:hidden; }
   .estrella-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(255,214,0,0.18); border:1px solid rgba(255,214,0,0.4); border-radius:20px; padding:3px 10px; font-size:0.68rem; font-weight:800; color:var(--amarillo); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
   .estrella-conf-dots { display:flex; gap:4px; align-items:center; }
-  .estrella-conf-dots .dot { width:11px; height:20px; border-radius:0; clip-path:polygon(68% 0%,30% 54%,52% 54%,24% 100%,68% 46%,46% 46%,68% 0%); background:rgba(255,255,255,0.15); box-shadow:none; }
-  .estrella-conf-dots .dot.empty { background:rgba(255,255,255,0.1); box-shadow:none; }
+  .estrella-conf-dots .dot { font-size:1.15rem; line-height:1; display:inline-block; filter:none; text-shadow:0 0 10px rgba(255,214,0,0.85), 0 0 4px rgba(255,180,0,0.5); }
+  .estrella-conf-dots .dot.empty { filter:grayscale(1); opacity:0.18; text-shadow:none; }
   .estrella-conf-dots.lvl-1 .dot:not(.empty),.estrella-conf-dots.lvl-2 .dot:not(.empty) { background:#d32f2f; box-shadow:0 0 4px rgba(211,47,47,0.7); }
   .estrella-conf-dots.lvl-3 .dot:not(.empty),.estrella-conf-dots.lvl-4 .dot:not(.empty) { background:#e64a19; box-shadow:0 0 4px rgba(230,74,25,0.6); }
   .estrella-conf-dots.lvl-5 .dot:not(.empty) { background:#66bb6a; box-shadow:0 0 4px rgba(102,187,106,0.6); }
@@ -7167,7 +7169,7 @@ function renderPreds() {
         // bvr ya es 1-6, usarlo directamente para los dots
         const dotsFilled = star.bvr || 1;
         const dotsHtml = Array.from({length:6}, (_,i) =>
-          `<div class="dot${i<dotsFilled?'':' empty'}"></div>`).join('');
+          `<span class="dot${i<dotsFilled?'':' empty'}">⚡</span>`).join('');
         const bvrLabel = star.bvrText || (dotsFilled===6?'Máxima':dotsFilled>=5?'Alta':dotsFilled>=4?'Media-Alta':'Media');
         const stakeLabel = (star.bvr||0) >= 6 ? '$170' : star.conf==='high' ? '$130' : (star.bvr||0) === 4 ? '$50' : star.conf==='med' ? '$30' : '$15';
         estrellaEl.style.display = 'block';
@@ -7502,7 +7504,7 @@ function renderPreds() {
     const _bvr     = p.bvr     || (p.conf==='high' ? 5 : p.conf==='med' ? 3 : 1);
     const _bvrText = p.bvrText || (p.conf==='high' ? 'Alta' : p.conf==='med' ? 'Media' : 'Baja');
     const _bvrGemsHtml = Array.from({length:6}, (_,i) =>
-      `<div class="bvr-gem ${i < _bvr ? 'active-'+_bvr : ''}"></div>`
+      `<span class="bvr-gem ${i < _bvr ? 'active-'+_bvr : ''}">⚡</span>`
     ).join('');
     const bvrHtml = `<div class="bvr-wrap">
       <span class="bvr-label">Confianza IA</span>
