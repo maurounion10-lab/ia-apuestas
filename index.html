@@ -8493,13 +8493,17 @@ function _estrellaKey() {
     : new Date(now.getFullYear(), now.getMonth(), now.getDate());
   return 'estrella_finde_v1_' + d.toISOString().slice(0, 10);
 }
+// Estrella override — usa acoin_users.admin_cfg (shared_cache tiene RLS que bloquea writes)
 async function sbLoadEstrellaOverride() {
   try {
     const { data } = await sbAnon
-      .from('shared_cache').select('data').eq('key', _estrellaKey()).maybeSingle();
-    if (data?.data?.home) {
-      window._estrellaOverride = data.data;
-      console.log('[estrella] Override cargado:', data.data.home, 'vs', data.data.away);
+      .from('acoin_users').select('admin_cfg').eq('email', _ADMIN_OVERRIDES_EMAIL).maybeSingle();
+    const cfg = data?.admin_cfg;
+    const today = new Date().toISOString().slice(0,10);
+    const ov = cfg?.estrella_override;
+    if (ov?.home && ov?.date === today) {
+      window._estrellaOverride = { home: ov.home, away: ov.away };
+      console.log('[estrella] Override cargado:', ov.home, 'vs', ov.away);
       if (window._rawOddsGames?.length) renderPreds();
     }
   } catch(e) { console.warn('[estrella] Error al cargar override:', e.message); }
@@ -8507,21 +8511,33 @@ async function sbLoadEstrellaOverride() {
 async function sbSaveEstrellaOverride(home, away) {
   if (authUser?.email !== ADMIN_EMAIL) return;
   try {
-    await sbClient.from('shared_cache').delete().eq('key', _estrellaKey());
+    const { data } = await sbClient
+      .from('acoin_users').select('admin_cfg').eq('email', ADMIN_EMAIL).maybeSingle();
+    const cfg = data?.admin_cfg || {};
+    const today = new Date().toISOString().slice(0,10);
+    cfg.estrella_override = { home, away, date: today };
     const { error } = await sbClient
-      .from('shared_cache')
-      .insert({ key: _estrellaKey(), data: { home, away }, fetched_at: new Date().toISOString() });
+      .from('acoin_users')
+      .upsert({ email: ADMIN_EMAIL, admin_cfg: cfg, updated_at: new Date().toISOString() },
+               { onConflict: 'email' });
     if (!error) {
       window._estrellaOverride = { home, away };
       renderPreds();
-      console.log('[estrella] Override guardado:', home, 'vs', away);
+      console.log('[estrella] Override guardado en acoin_users:', home, 'vs', away);
     } else console.warn('[estrella] Error al guardar:', error.message);
   } catch(e) { console.warn('[estrella] Error al guardar:', e.message); }
 }
 async function sbClearEstrellaOverride() {
   if (authUser?.email !== ADMIN_EMAIL) return;
   try {
-    await sbClient.from('shared_cache').delete().eq('key', _estrellaKey());
+    const { data } = await sbClient
+      .from('acoin_users').select('admin_cfg').eq('email', ADMIN_EMAIL).maybeSingle();
+    const cfg = data?.admin_cfg || {};
+    delete cfg.estrella_override;
+    await sbClient
+      .from('acoin_users')
+      .upsert({ email: ADMIN_EMAIL, admin_cfg: cfg, updated_at: new Date().toISOString() },
+               { onConflict: 'email' });
     window._estrellaOverride = null;
     renderPreds();
     console.log('[estrella] Override eliminado');
@@ -8648,6 +8664,32 @@ const _HARDCODED_MAXIMA = {
   // Intentar de inmediato y luego a los 2s (cuando Supabase haya respondido)
   _apply();
   setTimeout(_apply, 2000);
+})();
+
+// ── Estrella del Finde hardcodeada por fecha (independiente de Supabase) ──
+const _HARDCODED_ESTRELLA = {
+  '2026-04-03': { home: 'Mallorca', away: 'Real Madrid' },
+};
+(function _applyHardcodedEstrella() {
+  const today = new Date().toISOString().slice(0, 10);
+  const estrella = _HARDCODED_ESTRELLA[today];
+  if (!estrella) return;
+  function _apply() {
+    // Solo sobreescribir si no hay un override más reciente cargado de Supabase
+    if (!window._estrellaOverride) {
+      window._estrellaOverride = estrella;
+      if (window._rawOddsGames?.length) renderPreds();
+    }
+  }
+  _apply();
+  setTimeout(_apply, 500);  // antes de que llegue Supabase (sbLoadEstrellaOverride puede tardar ~1s)
+  setTimeout(() => {
+    // Después de Supabase: si no se guardó ningún otro override, asegurar el hardcode
+    if (!window._estrellaOverride) {
+      window._estrellaOverride = estrella;
+      if (window._rawOddsGames?.length) renderPreds();
+    }
+  }, 3000);
 })();
 
 // ── Admin: elevar confianza de un pick manualmente ──
