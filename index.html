@@ -3658,31 +3658,28 @@
     </div>
     <!-- Fila 1: accesos rápidos principales -->
     <div style="display:flex;gap:5px;margin:0 0 5px;flex-wrap:wrap" id="predSportTabs">
-      <button class="sport-tab active" style="padding:6px 14px;font-size:0.78rem;white-space:nowrap" onclick="filterPredSport('all',this)">⭐ Principales</button>
-      <button class="sport-tab" style="padding:6px 14px;font-size:0.78rem;white-space:nowrap" onclick="filterPredSport('todos',this)">📋 Todos</button>
-      <!-- UEFA -->
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('champions',this)">🏆 Champions</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('europa',this)">🟠 Europa League</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('conference',this)">🟣 Conference</button>
-      <!-- Ligas Europa -->
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('premier',this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('laliga',this)">🇪🇸 La Liga</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('bundesliga',this)">🇩🇪 Bundesliga</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('seriea',this)">🇮🇹 Serie A</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('ligue1',this)">🇫🇷 Ligue 1</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('eredivisie',this)">🇳🇱 Eredivisie</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('scotland',this)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('turkey',this)">🇹🇷 Süper Lig</button>
-      <!-- LATAM / Mundo -->
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('arg',this)">🇦🇷 Argentina</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('bra',this)">🇧🇷 Brasil</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('libertadores',this)">🌎 Libertadores</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('sudamericana',this)">🌎 Sudamericana</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('mexico',this)">🇲🇽 Liga MX</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('mls',this)">🇺🇸 MLS</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('uruguay',this)">🇺🇾 Uruguay</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('saudi',this)">🇸🇦 Arabia</button>
-      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('japan',this)">🇯🇵 Japón</button>
+      <button class="sport-tab active" data-league="all"          style="padding:6px 14px;font-size:0.78rem;white-space:nowrap" onclick="filterPredSport('all',this)">⭐ Principales</button>
+      <button class="sport-tab"        data-league="todos"        style="padding:6px 14px;font-size:0.78rem;white-space:nowrap" onclick="filterPredSport('todos',this)">📋 Todos</button>
+      <button class="sport-tab"        data-league="champions"    style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('champions',this)">🏆 Champions</button>
+      <button class="sport-tab"        data-league="europa"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('europa',this)">🟠 Europa League</button>
+      <button class="sport-tab"        data-league="conference"   style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('conference',this)">🟣 Conference</button>
+      <button class="sport-tab"        data-league="premier"      style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('premier',this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</button>
+      <button class="sport-tab"        data-league="laliga"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('laliga',this)">🇪🇸 La Liga</button>
+      <button class="sport-tab"        data-league="bundesliga"   style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('bundesliga',this)">🇩🇪 Bundesliga</button>
+      <button class="sport-tab"        data-league="seriea"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('seriea',this)">🇮🇹 Serie A</button>
+      <button class="sport-tab"        data-league="ligue1"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('ligue1',this)">🇫🇷 Ligue 1</button>
+      <button class="sport-tab"        data-league="eredivisie"   style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('eredivisie',this)">🇳🇱 Eredivisie</button>
+      <button class="sport-tab"        data-league="scotland"     style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('scotland',this)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</button>
+      <button class="sport-tab"        data-league="turkey"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('turkey',this)">🇹🇷 Süper Lig</button>
+      <button class="sport-tab"        data-league="arg"          style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('arg',this)">🇦🇷 Argentina</button>
+      <button class="sport-tab"        data-league="bra"          style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('bra',this)">🇧🇷 Brasil</button>
+      <button class="sport-tab"        data-league="libertadores" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('libertadores',this)">🌎 Libertadores</button>
+      <button class="sport-tab"        data-league="sudamericana" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('sudamericana',this)">🌎 Sudamericana</button>
+      <button class="sport-tab"        data-league="mexico"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('mexico',this)">🇲🇽 Liga MX</button>
+      <button class="sport-tab"        data-league="mls"          style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('mls',this)">🇺🇸 MLS</button>
+      <button class="sport-tab"        data-league="uruguay"      style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('uruguay',this)">🇺🇾 Uruguay</button>
+      <button class="sport-tab"        data-league="saudi"        style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('saudi',this)">🇸🇦 Arabia</button>
+      <button class="sport-tab"        data-league="japan"        style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('japan',this)">🇯🇵 Japón</button>
     </div>
     <!-- Sub-filtros de tiempo -->
     <div style="display:flex;gap:6px;margin:0 0 12px;flex-wrap:wrap" id="predTimeTabs">
@@ -7207,6 +7204,10 @@ function renderPreds() {
     }
   } catch(eStr) { console.warn('[estrella]', eStr); }
 
+  // Guardar picks completos y actualizar visibilidad de tabs de liga
+  window._allAvailablePicks = realPreds ? realPreds.slice() : [];
+  refreshLeagueTabs(window._allAvailablePicks);
+
   // Filtrar por deporte según tab activo
   if (realPreds) {
     const sf = window._predSportFilter || 'all';
@@ -8182,6 +8183,45 @@ const BLOCKED_HIST_IDS = new Set(['fsvmainz05_sigmaolomouc_2026-03-18']);
 //  el PRIMER usuario los escribe, todos los demás los leen.
 // ══════════════════════════════════════════════════════════════
 window._sbLockedPicks = {}; // { "home_vs_away": {conf,bvr,bvrText,bestOdds,hO,aO,dO} }
+
+// ══════════════════════════════════════════════════════════════
+// LEAGUE TAB VISIBILITY — oculta tabs sin picks disponibles
+// ══════════════════════════════════════════════════════════════
+const LEAGUE_FILTER_PATTERNS = {
+  champions:    ['champs_league','champions'],
+  europa:       ['europa_league'],
+  conference:   ['conference_league'],
+  premier:      ['england_premier','soccer_epl'],
+  laliga:       ['spain_la_liga'],
+  bundesliga:   ['germany_bundesliga'],
+  seriea:       ['italy_serie_a','italy_serie'],
+  ligue1:       ['france_ligue'],
+  eredivisie:   ['netherlands_eredivisie','eredivisie'],
+  scotland:     ['scotland'],
+  turkey:       ['turkey'],
+  libertadores: ['copa_libertadores'],
+  sudamericana: ['copa_sudamericana'],
+  arg:          ['argentina'],
+  bra:          ['brazil'],
+  mexico:       ['mexico_ligamx','ligamx'],
+  mls:          ['usa_mls','soccer_mls'],
+  uruguay:      ['uruguay'],
+  saudi:        ['saudi'],
+  japan:        ['japan_j_league','j_league']
+};
+function refreshLeagueTabs(allPicks) {
+  document.querySelectorAll('#predSportTabs button[data-league]').forEach(btn => {
+    const key = btn.dataset.league;
+    if (!key || key === 'all' || key === 'todos') return;
+    const patterns = LEAGUE_FILTER_PATTERNS[key];
+    if (!patterns) return;
+    const has = (allPicks || []).some(p => {
+      const sk = p._sportKey || '';
+      return patterns.some(k => sk.includes(k));
+    });
+    btn.style.display = has ? '' : 'none';
+  });
+}
 
 function _lockedPicksKey() {
   const now = new Date();
