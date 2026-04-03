@@ -13669,7 +13669,7 @@ async function admLoadBroadcastHistory() {
         : '';
       return `
       <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;position:relative">
-        <div style="font-size:0.88rem;color:#fff;line-height:1.5;padding-right:28px">${m.text.replace(/\n/g,'<br>')}</div>
+        <div style="font-size:0.88rem;color:#fff;line-height:1.5;padding-right:28px">${_linkify(m.text)}</div>
         ${imgThumb}${pickThumb}
         <div style="font-size:0.7rem;color:var(--texto-sec);margin-top:6px;display:flex;justify-content:space-between;align-items:center">
           <span>📢 Admin${m.sticky ? ' 📌' : ''}${m.imageUrl ? ' 🖼️' : ''}${m.pick ? ' ⚽' : ''}</span>
@@ -13832,6 +13832,12 @@ function _bcastFilterVisible(msgs) {
     return true;
   });
 }
+function _linkify(text) {
+  return (text || '').replace(/\n/g, '<br>').replace(
+    /(https?:\/\/[^\s<"]+)/g,
+    '<a href="$1" target="_blank" rel="noopener" style="color:#00c853;text-decoration:underline;word-break:break-all;">$1</a>'
+  );
+}
 
 // Render cascade stack (máx 3 tarjetas + pill "+N más")
 function _renderBcastStack() {
@@ -13919,7 +13925,7 @@ function showBroadcastModal() {
     return `
     <div class="bcast-msg-item${isNew?' is-new':''}">
       ${isNew ? '<span class="bcast-msg-new-tag">NUEVO</span>' : ''}
-      <div class="bcast-msg-text">${m.text.replace(/\n/g,'<br>')}</div>
+      <div class="bcast-msg-text">${_linkify(m.text)}</div>
       ${imgHtml}
       ${pickHtml}
       <div class="bcast-msg-time">${_bcastTimeAgo(m.ts)} · ${new Date(m.ts).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>
@@ -14060,7 +14066,7 @@ function _renderInboxList() {
       return `
       <div onclick="inboxMarkRead('${item.id}')" style="background:${bg};border:1px solid ${border};border-radius:12px;padding:12px 14px;cursor:pointer;transition:background .15s;position:relative">
         ${dot}
-        <div style="font-size:0.83rem;color:${isUnread ? '#fff' : 'rgba(255,255,255,0.7)'};line-height:1.55;font-weight:${isUnread ? '600' : '400'};padding-right:${isUnread ? '18px' : '0'}">${item.text.replace(/\n/g,'<br>')}</div>
+        <div style="font-size:0.83rem;color:${isUnread ? '#fff' : 'rgba(255,255,255,0.7)'};line-height:1.55;font-weight:${isUnread ? '600' : '400'};padding-right:${isUnread ? '18px' : '0'}">${_linkify(item.text)}</div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:6px">
           <span style="font-size:0.65rem;color:var(--texto-sec)">📢 gambeta.ai${item.sticky ? ' 📌' : ''} · ${_bcastTimeAgo(item.ts)} · ${dateStr}</span>
           ${isUnread ? `<span style="font-size:0.6rem;font-weight:800;color:var(--verde);background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.25);border-radius:6px;padding:1px 6px">NUEVO</span>` : ''}
