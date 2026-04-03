@@ -6862,6 +6862,8 @@ function buildPredsFromOdds() {
       return null;
     }
   }).filter(Boolean).filter(p => {
+    // Picks ya bloqueados globalmente NUNCA se filtran (son inmutables)
+    if (window._sbLockedPicks?.[ _matchKeyLP(p.home, p.away)]) return true;
     // Filtro de calidad: bvr 1 o 2 solo si la cuota es >= 3.00
     if ((p.bvr || 0) <= 2) {
       const odds = parseFloat(p._bestOdds || 0);
@@ -6986,25 +6988,39 @@ function renderPreds() {
         realPreds = base;
       }
       // ── LEY FUNDAMENTAL: conf/bvr/cuota asignados una vez son INMUTABLES ──
-      // Si el pick ya existía en el caché anterior con conf bloqueada, preservar sus valores.
-      if (_cachedPreds && _cachedPreds.length && realPreds) {
+      // Fuentes de bloqueo (en orden de prioridad):
+      //   1. Supabase shared_cache (global — igual para TODOS los usuarios)
+      //   2. Caché local del navegador (fallback si Supabase no respondió aún)
+      if (realPreds) {
         realPreds.forEach(p => {
-          const prev = _cachedPreds.find(c => teamsMatch(c.home, p.home) && teamsMatch(c.away, p.away));
-          if (prev && prev._confLocked) {
-            p.conf        = prev.conf;
-            p.bvr         = prev.bvr;
-            p.bvrText     = prev.bvrText;
-            p._confLocked = true;
-            // Cuota también inmutable — una vez publicada no cambia aunque el mercado se mueva
-            if (prev._bestOdds != null) p._bestOdds = prev._bestOdds;
-            if (prev._hO != null)       p._hO       = prev._hO;
-            if (prev._aO != null)       p._aO       = prev._aO;
-            if (prev._dO != null)       p._dO       = prev._dO;
+          const mk = _matchKeyLP(p.home, p.away);
+          // 1. Lock global desde Supabase
+          const gl = window._sbLockedPicks[mk];
+          if (gl) {
+            p.conf = gl.conf; p.bvr = gl.bvr; p.bvrText = gl.bvrText; p._confLocked = true;
+            if (gl.bestOdds != null) p._bestOdds = gl.bestOdds;
+            if (gl.hO != null)       p._hO       = gl.hO;
+            if (gl.aO != null)       p._aO       = gl.aO;
+            if (gl.dO != null)       p._dO       = gl.dO;
+            return;
+          }
+          // 2. Fallback: caché local del navegador
+          if (_cachedPreds?.length) {
+            const prev = _cachedPreds.find(c => teamsMatch(c.home, p.home) && teamsMatch(c.away, p.away));
+            if (prev?._confLocked) {
+              p.conf = prev.conf; p.bvr = prev.bvr; p.bvrText = prev.bvrText; p._confLocked = true;
+              if (prev._bestOdds != null) p._bestOdds = prev._bestOdds;
+              if (prev._hO != null)       p._hO       = prev._hO;
+              if (prev._aO != null)       p._aO       = prev._aO;
+              if (prev._dO != null)       p._dO       = prev._dO;
+            }
           }
         });
       }
       if (realPreds && realPreds.length) {
         saveDailyPredsCache(realPreds);
+        // Escribir a Supabase si aún no hay picks globales (solo el primer usuario del día)
+        sbSaveLockedPicks(realPreds);
       }
     } catch(e) {
       console.error('[renderPreds] buildPredsFromOdds crash:', e.stack || e.message);
@@ -8155,6 +8171,62 @@ let _globalHistSyncTimer = null;
 const ADMIN_EMAIL = 'mauro.union10@gmail.com';
 const GLOBAL_HIST_KEY = 'global_historial_v1';
 const BLOCKED_HIST_IDS = new Set(['fsvmainz05_sigmaolomouc_2026-03-18']);
+
+// ══════════════════════════════════════════════════════════════
+//  PICKS BLOQUEADOS GLOBALES — shared_cache en Supabase
+//  Una vez calculados para el día, conf/bvr/cuota son ley:
+//  el PRIMER usuario los escribe, todos los demás los leen.
+// ══════════════════════════════════════════════════════════════
+window._sbLockedPicks = {}; // { "home_vs_away": {conf,bvr,bvrText,bestOdds,hO,aO,dO} }
+
+function _lockedPicksKey() {
+  const now = new Date();
+  const d = now.getHours() < 6
+    ? new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+    : new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return 'locked_picks_v1_' + d.toISOString().slice(0, 10);
+}
+
+function _matchKeyLP(home, away) {
+  return (normTeam(home || '') + '_vs_' + normTeam(away || '')).toLowerCase().replace(/\s+/g,'');
+}
+
+async function sbLoadLockedPicks() {
+  try {
+    const { data } = await sbAnon
+      .from('shared_cache').select('data').eq('key', _lockedPicksKey()).maybeSingle();
+    if (data?.data && typeof data.data === 'object') {
+      window._sbLockedPicks = data.data;
+      console.log('[lockedPicks] Cargados desde Supabase:', Object.keys(data.data).length, 'picks');
+    }
+  } catch(e) { console.warn('[lockedPicks] Error al cargar:', e.message); }
+}
+
+async function sbSaveLockedPicks(preds) {
+  if (!preds?.length) return;
+  // Solo guardar si aún NO hay picks en Supabase para hoy (el primero gana)
+  if (Object.keys(window._sbLockedPicks).length) return;
+  const map = {};
+  preds.forEach(p => {
+    map[_matchKeyLP(p.home, p.away)] = {
+      conf: p.conf, bvr: p.bvr, bvrText: p.bvrText,
+      bestOdds: p._bestOdds, hO: p._hO, aO: p._aO, dO: p._dO
+    };
+  });
+  if (!Object.keys(map).length) return;
+  try {
+    const client = (typeof authUser !== 'undefined' && authUser) ? sbClient : sbAnon;
+    const { error } = await client
+      .from('shared_cache')
+      .upsert({ key: _lockedPicksKey(), data: map, fetched_at: new Date().toISOString() },
+               { onConflict: 'key', ignoreDuplicates: true }); // ignoreDuplicates → primer usuario gana
+    if (!error) { window._sbLockedPicks = map; console.log('[lockedPicks] Guardados en Supabase:', Object.keys(map).length, 'picks'); }
+    else console.warn('[lockedPicks] Error al guardar:', error.message);
+  } catch(e) { console.warn('[lockedPicks] Error al guardar:', e.message); }
+}
+
+// Carga picks bloqueados en cuanto la página arranca (antes de renderizar)
+sbLoadLockedPicks();
 
 // Guarda el historial GLOBAL en shared_cache (solo admin)
 async function sbSaveGlobalHistorial(arr) {
