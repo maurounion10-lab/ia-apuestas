@@ -3863,7 +3863,7 @@
       </table>
       <div class="hist-legend">
         <span class="hl-item"><span class="hl-dot" style="background:rgba(0,200,83,0.25);border:1px solid rgba(0,200,83,0.5)"></span> Partido de HOY</span>
-        <span class="hl-item"><span class="hl-dot" style="background:rgba(255,214,0,0.18);border:1px solid rgba(255,214,0,0.5)"></span> Apuesta Máxima ($170) / Alta ($130)</span>
+        <span class="hl-item"><span class="hl-dot" style="background:rgba(255,214,0,0.18);border:1px solid rgba(255,214,0,0.5)"></span> Máxima ($170) · Alta ($130) · Media-Alta ($50) · Media ($30) · Baja ($15)</span>
         <span class="hl-item">✅ WIN &nbsp; ❌ LOSS &nbsp; ⚪ VOID &nbsp; 🟡 PEND</span>
       </div>
       <!-- Sub-filtro por liga (se rellena dinámicamente en renderHistorial) -->
@@ -4597,7 +4597,7 @@
         <div style="font-size:1.6rem;margin-bottom:10px">💰</div>
         <div style="font-size:0.65rem;font-weight:800;letter-spacing:1px;color:var(--verde);text-transform:uppercase;margin-bottom:4px">Paso 4</div>
         <div style="font-size:0.95rem;font-weight:700;color:#fff;margin-bottom:6px">Apostá con criterio</div>
-        <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);line-height:1.5">Seguí el stake sugerido por nivel de confianza. Máxima = $170, Alta = $130 y así.</div>
+        <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);line-height:1.5">Seguí el stake sugerido: Máxima = $170 · Alta = $130 · Media-Alta = $50 · Media = $30 · Baja = $15.</div>
       </div>
 
     </div>
@@ -7187,11 +7187,13 @@ function renderPreds() {
           away:       h.away,
           rec:        h.rec,
           conf:       h.stake >= 130 ? 'high' : h.stake >= 30 ? 'med' : 'low',
-          confLabel:  h.stake >= 130 ? 'Alta' : h.stake >= 30 ? 'Media' : 'Baja',
+          confLabel:  h.stake >= 170 ? 'Máxima' : h.stake >= 130 ? 'Alta' : h.stake >= 50 ? 'Media-Alta' : h.stake >= 30 ? 'Media' : 'Baja',
           probH: h.probH || 0, probD: h.probD || 0, probA: h.probA || 0,
           _hO: h._hO || null, _aO: h._aO || null, _dO: h._dO || null,
           _bestOdds: h._bestOdds || h.odds || null,
-          odds: [], time: '', bvr: 0, bvrText: '',
+          odds: [], time: '',
+          bvr: h.bvr || (h.stake >= 170 ? 6 : h.stake >= 130 ? 5 : h.stake >= 50 ? 4 : h.stake >= 30 ? 3 : h.stake >= 15 ? 2 : 1),
+          bvrText: h.bvrText || (h.stake >= 170 ? 'Máxima' : h.stake >= 130 ? 'Alta' : h.stake >= 50 ? 'Media-Alta' : h.stake >= 30 ? 'Media' : 'Baja'),
           commenceTs: h.commenceTs || (_nowMs - 1), // garantiza que se marque como started
           _sportKey:  h._sportKey || 'soccer_argentina_primera_division',
           _fromHist:  true, // viene del historial, no de la API
@@ -8474,11 +8476,12 @@ async function sbLoadHistorial() {
       if (!bvr) {
         const maxProb = Math.max(p.probH || 0, p.probA || 0);
         const conf = p.conf || (p.stake >= 130 ? 'high' : p.stake >= 30 ? 'med' : 'low');
-        if      (conf === 'high' && maxProb >= 75) bvr = 6;
-        else if (conf === 'high')                  bvr = 5;
-        else if (conf === 'med'  && maxProb >= 58) bvr = 4;
-        else if (conf === 'med')                   bvr = 3;
-        else                                       bvr = 1;
+        if      (p.stake >= 170 || p.bvrText === 'Máxima')  bvr = 6;
+        else if (conf === 'high' && maxProb >= 75)           bvr = 6;
+        else if (conf === 'high')                            bvr = 5;
+        else if (conf === 'med'  && maxProb >= 58)           bvr = 4;
+        else if (conf === 'med')                             bvr = 3;
+        else                                                 bvr = 1;
       }
       const correctStake = bvr >= 6 ? 170 : bvr === 5 ? 130 : bvr === 4 ? 50 : bvr === 3 ? 30 : 15;
       if (p.stake !== correctStake) {
@@ -8531,7 +8534,7 @@ async function sbLoadHistorial() {
 }
 
 // Migración: recalcula stake y P/L según nuevo esquema bvr
-// Máxima(6)=$150 | Alta(5)=$130 | Media-Alta(4)=$50 | Media(3)=$30 | Baja=$15
+// Máxima(6)=$170 | Alta(5)=$130 | Media-Alta(4)=$50 | Media(3)=$30 | Baja=$15
 function migrateHistStakes() {
   const hist = loadHistorial();
   let changed = false;
@@ -8542,11 +8545,12 @@ function migrateHistStakes() {
     if (!bvr) {
       const maxProb = Math.max(p.probH || 0, p.probA || 0);
       const conf = p.conf || (p.stake >= 130 ? 'high' : p.stake >= 30 ? 'med' : 'low');
-      if      (conf === 'high' && maxProb >= 75) bvr = 6;
-      else if (conf === 'high')                  bvr = 5;
-      else if (conf === 'med'  && maxProb >= 58) bvr = 4;
-      else if (conf === 'med')                   bvr = 3;
-      else                                       bvr = 1;
+      if      (p.stake >= 170 || p.bvrText === 'Máxima')  bvr = 6;
+      else if (conf === 'high' && maxProb >= 75)           bvr = 6;
+      else if (conf === 'high')                            bvr = 5;
+      else if (conf === 'med'  && maxProb >= 58)           bvr = 4;
+      else if (conf === 'med')                             bvr = 3;
+      else                                                 bvr = 1;
     }
     const correctStake = bvr >= 6 ? 170 : bvr === 5 ? 130 : bvr === 4 ? 50 : bvr === 3 ? 30 : 15;
     if (p.stake !== correctStake) {
@@ -9128,6 +9132,7 @@ function renderHistorial(filter) {
           : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
         const icon = h.sport==='tenis'?'🎾':'⚽';
         const recDisplay = (h.rec||'').replace(' Gana','');
+        const isMax  = h.stake >= 170;
         const isHigh = h.stake >= 130;
         // Fecha real del partido: usar commenceTs si existe, si no h.date
         const gameDate = h.commenceTs
@@ -9135,7 +9140,9 @@ function renderHistorial(filter) {
           : (h.date || '—');
         const isToday = gameDate === todayStr;
         const rowClass = isToday ? 'hist-row-today' : '';
-        const rowStyle = isHigh
+        const rowStyle = isMax
+          ? 'background:linear-gradient(90deg,rgba(255,214,0,0.15) 0%,rgba(255,214,0,0.06) 100%);border-left:3px solid rgba(255,214,0,0.7)'
+          : isHigh
           ? 'background:linear-gradient(90deg,rgba(255,214,0,0.09) 0%,rgba(255,214,0,0.04) 100%);border-left:2px solid rgba(255,214,0,0.45)'
           : '';
         const marcador = h.finalScore
