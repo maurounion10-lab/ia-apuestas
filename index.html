@@ -6444,7 +6444,7 @@ function shortName(name) {
     'Universidad Católica': 'U. Católica', 'CD Universidad Católica': 'U. Católica',
     'Universidad Católica de Chile': 'U. Católica', 'Universidad Católica (CHI)': 'U. Católica',
     'U Católica': 'U. Católica',
-    'Universidad Catól…': 'U. Católica', 'Universidad Cat…': 'U. Católica', // nombres truncados del historial antiguo
+    'Universidad Catól…': 'U. Católica', 'Universidad Cat…': 'U. Católica', 'Universidad Cató…': 'U. Católica', // nombres truncados del historial antiguo
     'Coquimbo Unido': 'Coquimbo',
     // Otros
     'Liverpool FC Uruguay': 'Liverpool UY', 'Caracas FC': 'Caracas',
@@ -6935,7 +6935,7 @@ function renderPreds() {
         });
         realPreds = base;
       }
-      // ── LEY FUNDAMENTAL: conf/bvr asignados una vez son INMUTABLES ──
+      // ── LEY FUNDAMENTAL: conf/bvr/cuota asignados una vez son INMUTABLES ──
       // Si el pick ya existía en el caché anterior con conf bloqueada, preservar sus valores.
       if (_cachedPreds && _cachedPreds.length && realPreds) {
         realPreds.forEach(p => {
@@ -6945,6 +6945,11 @@ function renderPreds() {
             p.bvr         = prev.bvr;
             p.bvrText     = prev.bvrText;
             p._confLocked = true;
+            // Cuota también inmutable — una vez publicada no cambia aunque el mercado se mueva
+            if (prev._bestOdds != null) p._bestOdds = prev._bestOdds;
+            if (prev._hO != null)       p._hO       = prev._hO;
+            if (prev._aO != null)       p._aO       = prev._aO;
+            if (prev._dO != null)       p._dO       = prev._dO;
           }
         });
       }
@@ -7448,9 +7453,9 @@ function renderPreds() {
     // Badge de resultado
     const resultBadgeHtml = isStarted
       ? (histResult === 'win'
-          ? `<span class="badge-result-win">✅ GANADO${finalScore ? ' · '+finalScore : ''}</span>`
+          ? `<span class="badge-result-win">✅${finalScore ? ' · '+finalScore : ''}</span>`
           : histResult === 'loss'
-          ? `<span class="badge-result-loss">❌ PERDIDO${finalScore ? ' · '+finalScore : ''}</span>`
+          ? `<span class="badge-result-loss">❌${finalScore ? ' · '+finalScore : ''}</span>`
           : `<span class="badge-result-pending">⏳ Pendiente</span>`)
       : '';
 
@@ -7572,7 +7577,7 @@ function renderPreds() {
           <div class="pred-rec-value">${isFinishedLoss ? '❌' : '✅'} ${p.rec}</div>
         </div>
         <div class="pred-rec-right">
-          ${(()=>{ const rp = p.rec==='Local Gana' ? p.probH : p.rec==='Visitante Gana' ? p.probA : p.rec==='Empate' ? p.probD : 0; const ro = rp > 0 ? (100/rp).toFixed(2) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
+          ${(()=>{ const rp = p.rec==='Local Gana' ? p.probH : p.rec==='Visitante Gana' ? p.probA : p.rec==='Empate' ? p.probD : 0; const ro = p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : (rp > 0 ? (100/rp).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
           ${p._bookKey ? `<a class="pred-rec-book" href="${getBookLink(p._bookKey)}" target="_blank" rel="noopener" title="Apostar en ${p._bookLabel||p._bookKey}" onclick="trackEvent('promo_click',{promo:'${p._bookKey}',type:'bookmaker_rec'})">
             <img src="${getBookLogo(p._bookKey)}" alt="${p._bookLabel||p._bookKey}" onerror="this.style.display='none'">
             <span class="pred-rec-bonus">🎁 Bono</span>
@@ -8237,11 +8242,11 @@ function teamsMatch(a, b) {
   const wa = na.match(/.{5,}/g) || [];
   const wb = nb.match(/.{5,}/g) || [];
   if (wa.some(w => nb.includes(w)) || wb.some(w => na.includes(w))) return true;
-  // Coincidencia por abreviatura canónica — cubre "Universidad Catól…" vs "U. Católica"
-  // (nombres guardados en historial antes de que se añadiera la abreviatura)
+  // Coincidencia por abreviatura canónica — cubre "Universidad Cató…" vs "U. Católica"
+  // IMPORTANTE: llamar shortName con el nombre COMPLETO (incluyendo "…") para que las claves del mapa coincidan
   if (typeof shortName === 'function') {
-    const sa = normTeam(shortName(a.replace(/[\u2026\.]{1,3}$/, '').trim()));
-    const sb = normTeam(shortName(b.replace(/[\u2026\.]{1,3}$/, '').trim()));
+    const sa = normTeam(shortName(a));
+    const sb = normTeam(shortName(b));
     if (sa && sb && sa === sb) return true;
   }
   return false;
@@ -8255,7 +8260,10 @@ function savePredictions(preds) {
   const todayKey = new Date().toISOString().slice(0,10);
   let added = 0;
 
+  const _BLOCKED_SPORT_KEYS_SAVE = ['soccer_chile_campeonato', 'soccer_portugal_primeira_liga'];
   preds.forEach(p => {
+    // Excluir ligas bloqueadas (Portugal, Chile)
+    if (p._sportKey && _BLOCKED_SPORT_KEYS_SAVE.includes(p._sportKey)) return;
     // Excluir partidos EN VIVO o ya comenzados — solo guardar pronósticos pre-partido
     if (p.commenceTs && p.commenceTs <= Date.now()) return;
     // Para auto-publicar finde: los viernes guardamos picks de sábado y domingo también
@@ -8383,10 +8391,10 @@ const SPORT_KEY_MAP = {
     'soccer_italy_serie_a', 'soccer_france_ligue_one',
     'soccer_uefa_champs_league', 'soccer_uefa_europa_league',
     'soccer_uefa_europa_conference_league',
-    'soccer_portugal_primeira_liga', 'soccer_netherlands_eredivisie',
+    'soccer_netherlands_eredivisie',
     'soccer_scotland_premiership', 'soccer_turkey_super_league',
     'soccer_mexico_ligamx', 'soccer_usa_mls',
-    'soccer_chile_campeonato', 'soccer_uruguay_primera_division',
+    'soccer_uruguay_primera_division',
     'soccer_saudi_professional_league', 'soccer_japan_j_league'
   ],
   tenis:   ['tennis_atp_french_open', 'tennis_wta']
@@ -8538,7 +8546,22 @@ function renderHistorial(filter) {
   resolveCompletedGames(scoresData || [], true);
   // Buscar scores históricos del servidor para pendientes sin resolver
   loadHistoricalScores();
-  const all  = loadHistorial();
+  // ── Ligas bloqueadas: remover del storage y no mostrar ──
+  const BLOCKED_SPORT_KEYS = ['soccer_chile_campeonato', 'soccer_portugal_primeira_liga'];
+  // Equipos bloqueados por nombre (por si fueron guardados sin _sportKey correcto)
+  const _normB = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+  const BLOCKED_TEAMS = ['palestino','ucatolica','universidadcatolica','universidadcat'];
+  const allRaw = loadHistorial();
+  const allClean = allRaw.filter(h => {
+    if (BLOCKED_SPORT_KEYS.includes(h._sportKey)) return false;
+    const nh = _normB(h.home), na = _normB(h.away);
+    if (BLOCKED_TEAMS.some(t => nh.startsWith(t) || na.startsWith(t))) return false;
+    // Primeira Liga: filtrar también por nombre de liga si viene del campo league
+    if ((h.league||'').toLowerCase().includes('primeira liga')) return false;
+    return true;
+  });
+  if (allClean.length < allRaw.length) saveHistorial(allClean); // limpia storage silenciosamente
+  const all = allClean;
   // ── Deduplicar: mismo partido (home+away fuzzy) en el mismo día ──
   const dedupedAll = [];
   for (const h of all) {
@@ -9332,6 +9355,8 @@ const teamShortNames = {
   'Universidad Católica (CHI)': 'U. Católica',
   'U Católica':               'U. Católica',
   'Universidad Catól…':       'U. Católica', // nombre truncado del historial antiguo
+  'Universidad Cató…':        'U. Católica', // variante de truncado
+  'Universidad Cat…':         'U. Católica',
   'Coquimbo Unido':           'Coquimbo',
 };
 function shortName(name) {
