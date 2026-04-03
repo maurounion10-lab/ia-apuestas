@@ -13840,64 +13840,69 @@ function initBroadcastRealtime() {
 /* ── Botón flotante ── */
 #aiChatBtn {
   position: fixed;
-  bottom: 36px;
-  right: 36px;
-  width: 73px;
-  height: 73px;
-  border-radius: 50%;
-  background: transparent;
-  border: none;
+  bottom: 24px;
+  right: 24px;
+  height: 46px;
+  padding: 0 16px 0 10px;
+  border-radius: 30px;
+  background: #0d1a0d;
+  border: 1px solid rgba(0,200,83,0.4);
   cursor: pointer;
   z-index: 9000;
-  box-shadow: 0 4px 18px rgba(0,200,83,0.5);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,200,83,0.12);
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: transform 0.2s, box-shadow 0.2s;
+  gap: 8px;
+  transition: box-shadow 0.2s, background 0.2s, transform 0.15s;
   overflow: visible;
+  white-space: nowrap;
 }
-#aiChatBtn:hover { transform: scale(1.1); box-shadow: 0 6px 28px rgba(0,200,83,0.7); }
-/* anillo de pulso */
-#aiChatBtn::before {
-  content: '';
-  position: absolute;
-  width: 73px; height: 73px;
+#aiChatBtn:hover {
+  background: #122012;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.65), 0 0 0 1px rgba(0,200,83,0.28);
+  transform: translateY(-2px);
+}
+#aiChatBtn:active { transform: translateY(0); }
+#aiChatBtn .chat-btn-avatar {
+  width: 30px; height: 30px;
   border-radius: 50%;
-  border: 2px solid rgba(0,200,83,0.6);
-  animation: aiPulseRing 2.2s ease-out infinite;
+  object-fit: cover;
+  object-position: center top;
+  border: 1.5px solid rgba(0,200,83,0.45);
+  flex-shrink: 0;
 }
-#aiChatBtn::after {
-  content: '';
-  position: absolute;
-  width: 73px; height: 73px;
+#aiChatBtn .chat-btn-label {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.1px;
+}
+#aiChatBtn .chat-btn-dot {
+  width: 7px; height: 7px;
+  background: var(--verde);
   border-radius: 50%;
-  border: 2px solid rgba(0,200,83,0.35);
-  animation: aiPulseRing 2.2s ease-out infinite 0.7s;
+  flex-shrink: 0;
+  box-shadow: 0 0 5px rgba(0,200,83,0.8);
 }
-@keyframes aiPulseRing {
-  0%   { transform: scale(1);   opacity: 1; }
-  100% { transform: scale(1.7); opacity: 0; }
-}
-#aiChatBtn svg { position: relative; z-index: 1; }
 #aiChatBadge {
   position: absolute;
-  top: 0px; right: 0px;
-  width: 20px; height: 20px;
-  font-size: 0.68rem; font-weight: 900; color: #fff;
+  top: -5px; right: -5px;
+  min-width: 18px; height: 18px;
+  font-size: 0.62rem; font-weight: 900; color: #fff;
   display: flex; align-items: center; justify-content: center;
   background: #e53935;
   border-radius: 50%;
   border: 2px solid #0a1a0a;
-  box-shadow: 0 0 10px rgba(229,57,53,0.8);
-  animation: badge-pulse 1.8s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(229,57,53,0.7);
   z-index: 2;
+  padding: 0 3px;
 }
 @keyframes aiBlink { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
 /* ── Popup chat ── */
 #aiChatBox {
   position: fixed;
-  bottom: 98px;
+  bottom: 80px;
   right: 24px;
   width: 340px;
   max-height: 540px;
@@ -14153,15 +14158,16 @@ function initBroadcastRealtime() {
 
 /* Mobile */
 @media (max-width: 480px) {
-  #aiChatBox { width: calc(100vw - 24px); right: 12px; bottom: 100px; }
-  #aiChatBtn { right: 24px; bottom: 24px; width: 66px; height: 66px; }
-  #aiChatBtn::before, #aiChatBtn::after { width: 66px; height: 66px; }
+  #aiChatBox { width: calc(100vw - 24px); right: 12px; bottom: 76px; }
+  #aiChatBtn { right: 16px; bottom: 16px; }
 }
 </style>
 
 <!-- Botón flotante -->
 <button id="aiChatBtn" onclick="aiToggleChat()">
-  <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA" style="width:68px;height:68px;border-radius:50%;object-fit:cover;object-position:center top;position:relative;z-index:1">
+  <img class="chat-btn-avatar" src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA">
+  <span class="chat-btn-label">Chat IA</span>
+  <span class="chat-btn-dot"></span>
   <span id="aiChatBadge">1</span>
 </button>
 
