@@ -3818,7 +3818,7 @@
       </table>
       <div class="hist-legend">
         <span class="hl-item"><span class="hl-dot" style="background:rgba(0,200,83,0.25);border:1px solid rgba(0,200,83,0.5)"></span> Partido de HOY</span>
-        <span class="hl-item"><span class="hl-dot" style="background:rgba(255,214,0,0.18);border:1px solid rgba(255,214,0,0.5)"></span> Apuesta Alta ($130)</span>
+        <span class="hl-item"><span class="hl-dot" style="background:rgba(255,214,0,0.18);border:1px solid rgba(255,214,0,0.5)"></span> Apuesta Máxima ($150) / Alta ($130)</span>
         <span class="hl-item">✅ WIN &nbsp; ❌ LOSS &nbsp; ⚪ VOID &nbsp; 🟡 PEND</span>
       </div>
       <!-- Sub-filtro por liga (se rellena dinámicamente en renderHistorial) -->
@@ -7072,8 +7072,8 @@ function renderPreds() {
           home:       h.home,
           away:       h.away,
           rec:        h.rec,
-          conf:       h.stake >= 130 ? 'high' : h.stake >= 50 ? 'med' : 'low',
-          confLabel:  h.stake >= 130 ? 'Alta' : h.stake >= 50 ? 'Media' : 'Baja',
+          conf:       h.stake >= 130 ? 'high' : h.stake >= 30 ? 'med' : 'low',
+          confLabel:  h.stake >= 130 ? 'Alta' : h.stake >= 30 ? 'Media' : 'Baja',
           probH: h.probH || 0, probD: h.probD || 0, probA: h.probA || 0,
           _hO: h._hO || null, _aO: h._aO || null, _dO: h._dO || null,
           _bestOdds: h._bestOdds || h.odds || null,
@@ -7168,7 +7168,7 @@ function renderPreds() {
         const dotsHtml = Array.from({length:6}, (_,i) =>
           `<div class="dot${i<dotsFilled?'':' empty'}"></div>`).join('');
         const bvrLabel = star.bvrText || (dotsFilled===6?'Máxima':dotsFilled>=5?'Alta':dotsFilled>=4?'Media-Alta':'Media');
-        const stakeLabel = star.conf==='high' ? '$130' : star.conf==='med' ? '$50' : '$15';
+        const stakeLabel = (star.bvr||0) >= 6 ? '$150' : star.conf==='high' ? '$130' : (star.bvr||0) === 4 ? '$50' : star.conf==='med' ? '$30' : '$15';
         estrellaEl.style.display = 'block';
         estrellaEl.innerHTML = `
           <div class="estrella-card">
@@ -8390,14 +8390,25 @@ async function sbLoadHistorial() {
   } catch(e) { console.warn('[histLoad]', e.message); }
 }
 
-// Migración: recalcula stake y P/L de entradas antiguas según odds almacenadas
+// Migración: recalcula stake y P/L según nuevo esquema bvr
+// Máxima(6)=$150 | Alta(5)=$130 | Media-Alta(4)=$50 | Media(3)=$30 | Baja=$15
 function migrateHistStakes() {
   const hist = loadHistorial();
   let changed = false;
   hist.forEach(p => {
     const odds = parseFloat(p.odds) || 1;
-    const impliedProb = (1 / odds) * 100;
-    const correctStake = impliedProb >= 62 ? 130 : impliedProb >= 52 ? 50 : 15;
+    // Reconstruir bvr desde los datos guardados si no viene almacenado
+    let bvr = p.bvr || 0;
+    if (!bvr) {
+      const maxProb = Math.max(p.probH || 0, p.probA || 0);
+      const conf = p.conf || (p.stake >= 130 ? 'high' : p.stake >= 30 ? 'med' : 'low');
+      if      (conf === 'high' && maxProb >= 75) bvr = 6;
+      else if (conf === 'high')                  bvr = 5;
+      else if (conf === 'med'  && maxProb >= 58) bvr = 4;
+      else if (conf === 'med')                   bvr = 3;
+      else                                       bvr = 1;
+    }
+    const correctStake = bvr >= 6 ? 150 : bvr === 5 ? 130 : bvr === 4 ? 50 : bvr === 3 ? 30 : 15;
     if (p.stake !== correctStake) {
       p.stake = correctStake;
       if      (p.result === 'win')  p.pl = parseFloat(((odds - 1) * correctStake).toFixed(2));
@@ -8476,8 +8487,9 @@ function savePredictions(preds) {
     else if (p.rec === 'Empate'         && p.probD > 0) impliedOdds = parseFloat((100/p.probD).toFixed(2));
     else if (p._bestOdds)                               impliedOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
 
-    // Stake según confianza: Alta=$130, Media=$50, Baja=$15
-    const stake = p.conf === 'high' ? 130 : p.conf === 'med' ? 50 : 15;
+    // Stake según confianza/bvr: Máxima(6)=$150, Alta(5)=$130, Media-Alta(4)=$50, Media(3)=$30, Baja=$15
+    const _bvrS = p.bvr || (p.conf === 'high' ? 5 : p.conf === 'med' ? 3 : 1);
+    const stake = _bvrS >= 6 ? 150 : _bvrS === 5 ? 130 : _bvrS === 4 ? 50 : _bvrS === 3 ? 30 : 15;
 
     hist.unshift({
       id, date: today, sport: p._sportKey?.includes('tennis') ? 'tenis' : (p.sport || 'futbol'),
@@ -8486,6 +8498,7 @@ function savePredictions(preds) {
       league: p.league || null,
       rec: p.rec, odds: impliedOdds, stake,
       result: 'pending', pl: 0,
+      conf: p.conf || null, bvr: p.bvr || 0, bvrText: p.bvrText || null,
       commenceTs: p.commenceTs || null,
       probH: p.probH || 0, probD: p.probD || 0, probA: p.probA || 0,
       _hO: p._hO || null, _aO: p._aO || null, _dO: p._dO || null,
@@ -8799,7 +8812,7 @@ function renderHistorial(filter) {
   // Filtro por confianza (deriva de stake si no hay campo conf)
   if (histConfFilter !== 'all') {
     data = data.filter(h => {
-      const c = h.conf || (h.stake >= 130 ? 'high' : h.stake >= 50 ? 'med' : 'low');
+      const c = h.conf || (h.stake >= 130 ? 'high' : h.stake >= 30 ? 'med' : 'low');
       return c === histConfFilter;
     });
   }
@@ -8975,7 +8988,7 @@ function renderHistorial(filter) {
           : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
         const icon = h.sport==='tenis'?'🎾':'⚽';
         const recDisplay = (h.rec||'').replace(' Gana','');
-        const isHigh = h.stake === 130;
+        const isHigh = h.stake >= 130;
         // Fecha real del partido: usar commenceTs si existe, si no h.date
         const gameDate = h.commenceTs
           ? new Date(h.commenceTs).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})
