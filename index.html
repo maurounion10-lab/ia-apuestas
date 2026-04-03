@@ -3867,6 +3867,7 @@
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px;flex-wrap:wrap">
       <div id="rkMonthLabel" style="font-size:0.82rem;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.5px"></div>
       <div style="display:flex;gap:6px;align-items:center">
+        <button id="rkResetAbrilBtn" onclick="rkResetConGananciasAbril()" style="display:none;background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.35);color:#00c853;font-size:0.7rem;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit">🔄 Reset Abril</button>
         <button id="rkCerrarMesBtn" onclick="rkCerrarMes()" style="display:none;background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.35);color:#ffd600;font-size:0.7rem;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit">🏁 Cerrar mes</button>
         <button onclick="loadRanking(true)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:0.72rem;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit">↻ Actualizar</button>
       </div>
@@ -12587,9 +12588,11 @@ async function loadRanking(force = false) {
   if (monthLabel) {
     monthLabel.textContent = `${RK_MONTH_NAMES[mm2] || ''} '${yy2} — En curso`;
   }
-  // Mostrar botón "Cerrar mes" solo al admin
+  // Mostrar botones admin solo al admin
   const cerrarBtn = document.getElementById('rkCerrarMesBtn');
   if (cerrarBtn) cerrarBtn.style.display = (authUser?.email === ADMIN_EMAIL) ? 'block' : 'none';
+  const resetAbrilBtn = document.getElementById('rkResetAbrilBtn');
+  if (resetAbrilBtn) resetAbrilBtn.style.display = (authUser?.email === ADMIN_EMAIL) ? 'block' : 'none';
   rkStartCountdown();
   // Sincronizar ganadores históricos estáticos y cargar hall of fame
   rkSyncStaticWinners().then(() => loadPastWinners());
@@ -12853,6 +12856,78 @@ async function rkCerrarMes() {
   } catch(e) {
     alert('❌ Error al cerrar el mes: ' + (e.message || e));
     console.error('[rkCerrarMes]', e);
+  }
+}
+
+// ── Reset Abril: deja 10.000 base + ganancias desde el 1 de Abril ──
+async function rkResetConGananciasAbril() {
+  if (authUser?.email !== ADMIN_EMAIL) return;
+
+  if (!confirm(
+    '¿Resetear fichas a $10.000 preservando ganancias de Abril?\n\n' +
+    '• Los Top 10 de Marzo empezaron Abril con sus balances conocidos.\n' +
+    '• Todos los demás empezaron con $10.000.\n' +
+    '• Fórmula: nuevo = $10.000 + max(0, actual − inicio_abril)\n\n' +
+    '¡Esta acción no se puede deshacer!'
+  )) return;
+
+  try {
+    // Mapa de balances al inicio de Abril (= cierre de Marzo) para los Top 10 conocidos
+    const march31Map = {};
+    (RK_STATIC_WINNERS['winners_2026_03'] || []).forEach(w => {
+      if (w.email) march31Map[w.email.toLowerCase()] = w.balance;
+    });
+
+    // Leer TODOS los usuarios (paginamos de a 1000 por si hay muchos)
+    let allUsers = [];
+    let from = 0;
+    const PAGE = 1000;
+    while (true) {
+      const { data, error } = await sbClient
+        .from('acoin_users')
+        .select('email, balance')
+        .not('email', 'is', null)
+        .range(from, from + PAGE - 1);
+      if (error) throw error;
+      if (!data || data.length === 0) break;
+      allUsers = allUsers.concat(data);
+      if (data.length < PAGE) break;
+      from += PAGE;
+    }
+
+    // Filtrar internos (eventos, broadcast, etc.)
+    const realUsers = allUsers.filter(u => u.email && !u.email.startsWith('__'));
+
+    let updated = 0;
+    let errors = 0;
+    for (const u of realUsers) {
+      const emailLow  = u.email.toLowerCase();
+      const abrilStart = march31Map[emailLow] ?? 10000;
+      const aprilGains = Math.max(0, (u.balance || 0) - abrilStart);
+      const newBalance = 10000 + aprilGains;
+
+      if (Math.abs((u.balance || 0) - newBalance) < 0.01) continue;
+
+      const { error: e } = await sbClient
+        .from('acoin_users')
+        .update({ balance: newBalance })
+        .eq('email', u.email);
+      if (e) { errors++; console.warn('[Reset] Error en', u.email, e.message); }
+      else updated++;
+    }
+
+    alert(
+      `✅ Reset completado.\n` +
+      `• ${updated} fichas actualizadas\n` +
+      `• ${errors} errores\n` +
+      `• ${realUsers.length - updated - errors} sin cambios`
+    );
+
+    _rkLoaded = false;
+    await loadRanking(true);
+  } catch(e) {
+    alert('❌ Error en Reset Abril: ' + (e.message || e));
+    console.error('[rkResetConGananciasAbril]', e);
   }
 }
 
