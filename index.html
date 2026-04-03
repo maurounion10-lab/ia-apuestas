@@ -6798,41 +6798,61 @@ function buildPredsFromOdds() {
 
   return candidates.map(g => {
     try {
-    // Solo usar las casas afiliadas, en orden de prioridad
-    const AFFILIATE_KEYS = ['megapari','melbet','betwinner','dbbet','sapphire'];
-    const hasH2H = b => b.markets?.some(m => m.key === 'h2h');
-    let bm = null;
-    for (const key of AFFILIATE_KEYS) {
-      bm = g.bookmakers.find(b => b.key === key && hasH2H(b));
-      if (bm) break;
+    // ── Bookmakers en orden de prioridad por cobertura real (h2h + totals) ──
+    // Primario: onexbet (máxima cobertura), Secundario: betrivers, etc.
+    const PRIMARY_BOOKS   = ['onexbet','betrivers','unibet_nl','betsson','williamhill','pinnacle'];
+    const FALLBACK_BOOKS  = ['nordicbet','pmu_fr','betonlineag','lowvig','betanysports','betmgm'];
+    const ALL_PRIORITY    = [...PRIMARY_BOOKS, ...FALLBACK_BOOKS];
+    // Afiliados: solo para el link de apuesta, NO para cuotas
+    const AFFILIATE_KEYS  = ['megapari','melbet','betwinner','dbbet','sapphire'];
+
+    const hasH2H    = b => b.markets?.some(m => m.key === 'h2h');
+    const hasTotals = b => b.markets?.some(m => m.key === 'totals');
+
+    // Elegir bookmaker principal: el primero de la lista de prioridad que tenga h2h
+    let bmMain = null;
+    for (const key of ALL_PRIORITY) {
+      const found = g.bookmakers.find(b => b.key === key && hasH2H(b));
+      if (found) { bmMain = found; break; }
     }
-    // Si ninguna casa afiliada tiene h2h, usar cualquiera solo para calcular probabilidades
-    // pero marcar como sin afiliado (_bookKey = null)
-    const bmFallback = bm || g.bookmakers.find(b => hasH2H(b));
-    const isAffiliate = !!bm;
-    const bmUsed = bm || bmFallback;
-    const market = bmUsed?.markets?.find(m => m.key === 'h2h');
+    if (!bmMain) bmMain = g.bookmakers.find(b => hasH2H(b));
+
+    // Afiliado: solo para el link de apuesta
+    let bmAffiliate = null;
+    for (const key of AFFILIATE_KEYS) {
+      bmAffiliate = g.bookmakers.find(b => b.key === key && hasH2H(b));
+      if (bmAffiliate) break;
+    }
+    const isAffiliate = !!bmAffiliate;
+
+    // Cuotas h2h del bookmaker PRINCIPAL (único origen de cuotas)
+    const market = bmMain?.markets?.find(m => m.key === 'h2h');
     const outs   = market?.outcomes || [];
 
     const homeOut = outs.find(o => o.name === g.home_team);
     const awayOut = outs.find(o => o.name === g.away_team);
     const drawOut = outs.find(o => o.name === 'Draw');
 
-    // Precios reales del mercado — siempre disponibles para cuota universal
     const hO = homeOut?.price || null;
     const aO = awayOut?.price || null;
     const dO = drawOut?.price || null;
-    // Alias para cálculo de probabilidades (mismo valor)
-    const hOP = hO;
-    const aOP = aO;
-    const dOP = dO;
+    const hOP = hO, aOP = aO, dOP = dO;
 
-    // ── Mercados de totales y BTTS ──
-    // Buscar en todos los bookmakers disponibles (no solo afiliado)
-    const findMkt = key => {
+    // ── Mercados de totales y BTTS — MISMO bookmaker principal, luego fallback en orden ──
+    const findMkt = mktKey => {
+      // 1. Intentar desde el bookmaker principal
+      const mainMkt = bmMain?.markets?.find(m => m.key === mktKey);
+      if (mainMkt) return mainMkt;
+      // 2. Intentar en orden de prioridad
+      for (const key of ALL_PRIORITY) {
+        const bk = g.bookmakers.find(b => b.key === key);
+        const mkt = bk?.markets?.find(m => m.key === mktKey);
+        if (mkt) return mkt;
+      }
+      // 3. Cualquier bookmaker (último recurso)
       for (const bk of (g.bookmakers || [])) {
-        const m = bk.markets?.find(m => m.key === key);
-        if (m) return m;
+        const mkt = bk.markets?.find(m => m.key === mktKey);
+        if (mkt) return mkt;
       }
       return null;
     };
@@ -7187,13 +7207,13 @@ function renderPreds() {
           away:       h.away,
           rec:        h.rec,
           conf:       h.stake >= 130 ? 'high' : h.stake >= 30 ? 'med' : 'low',
-          confLabel:  h.stake >= 170 ? 'Máxima' : h.stake >= 130 ? 'Alta' : h.stake >= 50 ? 'Media-Alta' : h.stake >= 30 ? 'Media' : 'Baja',
+          confLabel:  h.stake >= 150 ? 'Máxima' : h.stake >= 130 ? 'Alta' : h.stake >= 50 ? 'Media-Alta' : h.stake >= 30 ? 'Media' : 'Baja',
           probH: h.probH || 0, probD: h.probD || 0, probA: h.probA || 0,
           _hO: h._hO || null, _aO: h._aO || null, _dO: h._dO || null,
           _bestOdds: h._bestOdds || h.odds || null,
           odds: [], time: '',
-          bvr: h.bvr || (h.stake >= 170 ? 6 : h.stake >= 130 ? 5 : h.stake >= 50 ? 4 : h.stake >= 30 ? 3 : h.stake >= 15 ? 2 : 1),
-          bvrText: h.bvrText || (h.stake >= 170 ? 'Máxima' : h.stake >= 130 ? 'Alta' : h.stake >= 50 ? 'Media-Alta' : h.stake >= 30 ? 'Media' : 'Baja'),
+          bvr: h.bvr || (h.stake >= 150 ? 6 : h.stake >= 130 ? 5 : h.stake >= 50 ? 4 : h.stake >= 30 ? 3 : h.stake >= 15 ? 2 : 1),
+          bvrText: h.bvrText || (h.stake >= 150 ? 'Máxima' : h.stake >= 130 ? 'Alta' : h.stake >= 50 ? 'Media-Alta' : h.stake >= 30 ? 'Media' : 'Baja'),
           commenceTs: h.commenceTs || (_nowMs - 1), // garantiza que se marque como started
           _sportKey:  h._sportKey || 'soccer_argentina_primera_division',
           _fromHist:  true, // viene del historial, no de la API
@@ -8476,7 +8496,7 @@ async function sbLoadHistorial() {
       if (!bvr) {
         const maxProb = Math.max(p.probH || 0, p.probA || 0);
         const conf = p.conf || (p.stake >= 130 ? 'high' : p.stake >= 30 ? 'med' : 'low');
-        if      (p.stake >= 170 || p.bvrText === 'Máxima')  bvr = 6;
+        if      (p.stake >= 150 || p.bvrText === 'Máxima')  bvr = 6;
         else if (conf === 'high' && maxProb >= 75)           bvr = 6;
         else if (conf === 'high')                            bvr = 5;
         else if (conf === 'med'  && maxProb >= 58)           bvr = 4;
@@ -8559,7 +8579,7 @@ function migrateHistStakes() {
     if (!bvr) {
       const maxProb = Math.max(p.probH || 0, p.probA || 0);
       const conf = p.conf || (p.stake >= 130 ? 'high' : p.stake >= 30 ? 'med' : 'low');
-      if      (p.stake >= 170 || p.bvrText === 'Máxima')  bvr = 6;
+      if      (p.stake >= 150 || p.bvrText === 'Máxima')  bvr = 6;
       else if (conf === 'high' && maxProb >= 75)           bvr = 6;
       else if (conf === 'high')                            bvr = 5;
       else if (conf === 'med'  && maxProb >= 58)           bvr = 4;
@@ -9163,7 +9183,7 @@ function renderHistorial(filter) {
           : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
         const icon = h.sport==='tenis'?'🎾':'⚽';
         const recDisplay = (h.rec||'').replace(' Gana','');
-        const isMax  = h.stake >= 170;
+        const isMax  = h.stake >= 150;
         const isHigh = h.stake >= 130;
         // Fecha real del partido: usar commenceTs si existe, si no h.date
         const gameDate = h.commenceTs
