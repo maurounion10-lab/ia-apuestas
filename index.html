@@ -899,6 +899,52 @@
     margin-top: 6px;
     text-align: right;
   }
+  /* Imagen adjunta en mensaje broadcast */
+  .bcast-msg-image {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    margin-top: 10px;
+    display: block;
+  }
+  /* Mini-ficha de pick adjunto */
+  .bcast-pick-card {
+    margin-top: 10px;
+    background: linear-gradient(135deg, rgba(0,200,83,0.1), rgba(0,200,83,0.04));
+    border: 1px solid rgba(0,200,83,0.3);
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+  .bcast-pick-teams {
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .bcast-pick-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .bcast-pick-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--verde);
+    background: rgba(0,200,83,0.12);
+    border: 1px solid rgba(0,200,83,0.25);
+    border-radius: 6px;
+    padding: 2px 8px;
+  }
+  .bcast-pick-odds {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #ffd600;
+  }
+  .bcast-pick-bvr {
+    font-size: 0.78rem;
+    letter-spacing: 1px;
+  }
   .bcast-panel-footer {
     padding: 12px 14px;
     border-top: 1px solid rgba(255,255,255,0.06);
@@ -3862,7 +3908,6 @@
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px;flex-wrap:wrap">
       <div id="rkMonthLabel" style="font-size:0.82rem;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.5px"></div>
       <div style="display:flex;gap:6px;align-items:center">
-       
         <button id="rkCerrarMesBtn" onclick="rkCerrarMes()" style="display:none;background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.35);color:#ffd600;font-size:0.7rem;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit">🏁 Cerrar mes</button>
         <button onclick="loadRanking(true)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:0.72rem;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit">↻ Actualizar</button>
       </div>
@@ -12624,7 +12669,7 @@ async function loadRanking(force = false) {
   if (monthLabel) {
     monthLabel.textContent = `${RK_MONTH_NAMES[mm2] || ''} '${yy2} — En curso`;
   }
-  // Mostrar botones admin solo al admin
+  // Botón "Cerrar mes" solo visible para el admin
   const cerrarBtn = document.getElementById('rkCerrarMesBtn');
   if (cerrarBtn) cerrarBtn.style.display = (authUser?.email === ADMIN_EMAIL) ? 'block' : 'none';
   rkStartCountdown();
@@ -12936,11 +12981,11 @@ async function rkResetConGananciasAbril() {
     let errors = 0;
     for (const u of realUsers) {
       const emailLow  = u.email.toLowerCase();
-      const abrilStart = march31Map[emailLow] ?? 10000;
+      const abrilStart = march31Map[emailLow] ?? 10000; // inicio de Abril para este user
       const aprilGains = Math.max(0, (u.balance || 0) - abrilStart);
       const newBalance = 10000 + aprilGains;
 
-      if (Math.abs((u.balance || 0) - newBalance) < 0.01) continue;
+      if (Math.abs((u.balance || 0) - newBalance) < 0.01) continue; // ya está bien
 
       const { error: e } = await sbClient
         .from('acoin_users')
@@ -12954,7 +12999,7 @@ async function rkResetConGananciasAbril() {
       `✅ Reset completado.\n` +
       `• ${updated} fichas actualizadas\n` +
       `• ${errors} errores\n` +
-      `• ${realUsers.length - updated - errors} sin cambios`
+      `• ${realUsers.length - updated - errors} sin cambios (ya tenían el valor correcto)`
     );
 
     _rkLoaded = false;
@@ -13705,7 +13750,7 @@ async function admSendBroadcast() {
     .upsert({ email: BROADCAST_EMAIL, picks: updated, updated_at: new Date().toISOString() }, { onConflict: 'email' });
 
   if (error) {
-    if (msgEl) { msgEl.style.color='#ef5350'; msgEl.textContent = '\u2717 Error al enviar'; setTimeout(()=>msgEl.textContent='',3000); }
+    if (msgEl) { msgEl.style.color='#ef5350'; msgEl.textContent = '✗ Error al enviar'; setTimeout(()=>msgEl.textContent='',3000); }
     return;
   }
 
@@ -13716,12 +13761,12 @@ async function admSendBroadcast() {
   const prevWrap = document.getElementById('admBcastImagePreview'); if (prevWrap) prevWrap.style.display = 'none';
   // Invalidar caché de broadcast para que todos los usuarios vean el nuevo mensaje
   try { localStorage.removeItem(_SB_CACHE_PREFIX + 'bcast'); } catch {}
-  if (msgEl) { msgEl.style.color='var(--verde)'; msgEl.textContent = '\u2713 Mensaje enviado'; setTimeout(()=>msgEl.textContent='',3000); }
+  if (msgEl) { msgEl.style.color='var(--verde)'; msgEl.textContent = '✓ Mensaje enviado'; setTimeout(()=>msgEl.textContent='',3000); }
   admLoadBroadcastHistory();
 
   // Actualizar badge en tab
   const badge = document.getElementById('admMsgBadge');
-  if (badge) { badge.style.display='block'; badge.textContent='\u25cf'; }
+  if (badge) { badge.style.display='block'; badge.textContent='●'; }
 
   // ── Mostrar la tarjeta en el stack izquierdo para el admin al instante ──
   // Actualizar _broadcastMsgs con el mensaje recién enviado y renderizar
@@ -13803,26 +13848,26 @@ function _renderBcastStack() {
   stack.innerHTML = shown.map((m, i) => {
     const delay   = `${i * 60}ms`;
     const preview = (m.text || '').replace(/\n/g, ' ');
-    const short   = preview.length > 58 ? preview.slice(0, 58) + '\u2026' : preview;
+    const short   = preview.length > 58 ? preview.slice(0, 58) + '…' : preview;
     const hasImg  = !!m.imageUrl;
     const hasPick = !!(m.pick?.home && m.pick?.away);
-    const extras  = [hasImg ? '\uD83D\uDDBC\uFE0F' : '', hasPick ? '\u26BD' : ''].filter(Boolean).join(' ');
+    const extras  = [hasImg ? '🖼️' : '', hasPick ? '⚽' : ''].filter(Boolean).join(' ');
     return `
     <div class="bcast-card${m.sticky ? ' is-sticky' : ''}"
          style="animation-delay:${delay}"
          onclick="showBroadcastModal()">
       <button class="bcast-card-dismiss"
               onclick="event.stopPropagation();bcastDismissCard('${m.id}')"
-              title="Cerrar">\u2715</button>
-      <div class="bcast-card-icon">\uD83D\uDCE2</div>
+              title="Cerrar">✕</button>
+      <div class="bcast-card-icon">📢</div>
       <div class="bcast-card-body">
-        <div class="bcast-card-label">gambeta.ai${m.sticky ? ' <span title="Mensaje fijo">\uD83D\uDCCC</span>' : ''}${extras ? ` <span style="opacity:.7;font-size:.7rem">${extras}</span>` : ''}</div>
+        <div class="bcast-card-label">gambeta.ai${m.sticky ? ' <span title="Mensaje fijo">📌</span>' : ''}${extras ? ` <span style="opacity:.7;font-size:.7rem">${extras}</span>` : ''}</div>
         <div class="bcast-card-text">${short}</div>
       </div>
     </div>`;
   }).join('');
   if (overflow > 0) {
-    stack.innerHTML += `<div class="bcast-overflow-pill" onclick="showBroadcastModal()">+${overflow} m\u00e1s</div>`;
+    stack.innerHTML += `<div class="bcast-overflow-pill" onclick="showBroadcastModal()">+${overflow} más</div>`;
   }
   stack.classList.add('visible');
 }
@@ -13838,6 +13883,7 @@ function bcastDismissCard(id) {
 function _showBroadcastNotif(count) {
   _renderBcastStack();
 }
+
 // ── Abrir panel de chat de mensajes ──
 function showBroadcastModal() {
   const panel   = document.getElementById('broadcastModal');
