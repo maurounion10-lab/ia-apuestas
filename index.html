@@ -7294,11 +7294,21 @@ function renderPreds() {
       } else if (sfE === 'bra') {
         predsForEstrella = realPreds.filter(p => (p._sportKey || '').includes('brazil'));
       }
-      // El estrella: pick Alta sin iniciar con mayor prob/bvr
-      const candidates = predsForEstrella
-        .filter(p => p.conf === 'high' && !p._started)
-        .sort((a,b) => (b.bvr||0)-(a.bvr||0) || (b.prob||0)-(a.prob||0));
-      const star = candidates[0] || null;
+      // Override de admin: si hay un pick del finde pinneado, usarlo primero
+      let star = null;
+      if (window._estrellaOverride) {
+        const ov = window._estrellaOverride;
+        star = realPreds.find(p =>
+          teamsMatch(p.home, ov.home) && teamsMatch(p.away, ov.away)
+        ) || null;
+      }
+      // Fallback automático: pick Alta sin iniciar con mayor bvr/prob
+      if (!star) {
+        const candidates = predsForEstrella
+          .filter(p => p.conf === 'high' && !p._started)
+          .sort((a,b) => (b.bvr||0)-(a.bvr||0) || (b.prob||0)-(a.prob||0));
+        star = candidates[0] || null;
+      }
       if (star) {
         const sHome = logoHtml(star.home, 42);
         const sAway = logoHtml(star.away, 42);
@@ -8326,7 +8336,8 @@ const BLOCKED_HIST_IDS = new Set(['fsvmainz05_sigmaolomouc_2026-03-18']);
 //  Una vez calculados para el día, conf/bvr/cuota son ley:
 //  el PRIMER usuario los escribe, todos los demás los leen.
 // ══════════════════════════════════════════════════════════════
-window._sbLockedPicks = {}; // { "home_vs_away": {conf,bvr,bvrText,bestOdds,hO,aO,dO} }
+window._sbLockedPicks   = {}; // { "home_vs_away": {conf,bvr,bvrText,bestOdds,hO,aO,dO} }
+window._estrellaOverride = null; // {home,away} — pick estrella del finde forzado por admin
 
 // ══════════════════════════════════════════════════════════════
 // LEAGUE TAB VISIBILITY — oculta tabs sin picks disponibles
@@ -8446,6 +8457,95 @@ async function adminResetLockedPicks() {
 
 // Carga picks bloqueados en cuanto la página arranca (antes de renderizar)
 sbLoadLockedPicks();
+
+// ── Pick Estrella override (admin puede pinear cualquier pick como estrella del finde) ──
+function _estrellaKey() {
+  const now = new Date();
+  const d = now.getHours() < 6
+    ? new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1)
+    : new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  return 'estrella_finde_v1_' + d.toISOString().slice(0, 10);
+}
+async function sbLoadEstrellaOverride() {
+  try {
+    const { data } = await sbAnon
+      .from('shared_cache').select('data').eq('key', _estrellaKey()).maybeSingle();
+    if (data?.data?.home) {
+      window._estrellaOverride = data.data;
+      console.log('[estrella] Override cargado:', data.data.home, 'vs', data.data.away);
+      if (window._rawOddsGames?.length) renderPreds();
+    }
+  } catch(e) { console.warn('[estrella] Error al cargar override:', e.message); }
+}
+async function sbSaveEstrellaOverride(home, away) {
+  if (authUser?.email !== ADMIN_EMAIL) return;
+  try {
+    const { error } = await sbClient
+      .from('shared_cache')
+      .upsert({ key: _estrellaKey(), data: { home, away }, fetched_at: new Date().toISOString() },
+               { onConflict: 'key' });
+    if (!error) {
+      window._estrellaOverride = { home, away };
+      renderPreds();
+      console.log('[estrella] Override guardado:', home, 'vs', away);
+    } else console.warn('[estrella] Error al guardar:', error.message);
+  } catch(e) { console.warn('[estrella] Error al guardar:', e.message); }
+}
+async function sbClearEstrellaOverride() {
+  if (authUser?.email !== ADMIN_EMAIL) return;
+  try {
+    await sbClient.from('shared_cache').delete().eq('key', _estrellaKey());
+    window._estrellaOverride = null;
+    renderPreds();
+    console.log('[estrella] Override eliminado');
+  } catch(e) { console.warn('[estrella] Error al eliminar override:', e.message); }
+}
+
+// Función admin: abre selector de estrella del finde
+function admOpenEstrellaPicker() {
+  const preds = (window._allAvailablePicks || [])
+    .filter(p => p.conf === 'high' && !p._started)
+    .sort((a,b) => (b.bvr||0)-(a.bvr||0));
+  if (!preds.length) { alert('No hay picks Alta/Máxima disponibles ahora.'); return; }
+  const listHtml = preds.map((p,i) => {
+    const bvrLbl = p.bvrText || (p.bvr>=6?'Máxima':p.bvr>=5?'Alta':p.bvr>=4?'Media-Alta':'Media');
+    const isActive = window._estrellaOverride &&
+      teamsMatch(p.home, window._estrellaOverride.home) &&
+      teamsMatch(p.away, window._estrellaOverride.away);
+    return `<button onclick="admSetEstrella(${JSON.stringify(p.home)},${JSON.stringify(p.away)})"
+      style="display:flex;align-items:center;justify-content:space-between;width:100%;background:${isActive?'rgba(255,214,0,0.15)':'rgba(255,255,255,0.04)'};
+      border:1px solid ${isActive?'rgba(255,214,0,0.5)':'rgba(255,255,255,0.1)'};border-radius:10px;padding:10px 14px;
+      cursor:pointer;color:#fff;margin-bottom:6px;gap:8px;text-align:left">
+      <span style="font-size:0.82rem;font-weight:700">${p.home} vs ${p.away}</span>
+      <span style="font-size:0.72rem;color:${p.bvr>=6?'#ffd600':'#66bb6a'};font-weight:800">${bvrLbl}</span>
+    </button>`;
+  }).join('');
+  const clearBtn = window._estrellaOverride
+    ? `<button onclick="admClearEstrella()" style="width:100%;margin-top:4px;padding:8px;background:rgba(255,61,61,0.1);border:1px solid rgba(255,61,61,0.3);color:#ef5350;border-radius:8px;cursor:pointer;font-size:0.8rem;font-weight:600">✕ Quitar override (volver a automático)</button>`
+    : '';
+  const overlay = document.createElement('div');
+  overlay.id = 'estrellaPickerOverlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.innerHTML = `<div style="background:#0f1a0f;border:1px solid rgba(255,214,0,0.4);border-radius:16px;padding:20px;max-width:420px;width:100%;max-height:80vh;overflow-y:auto">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div style="font-weight:800;color:#fff;font-size:0.95rem">⭐ Elegir Pick Estrella del Finde</div>
+      <button onclick="document.getElementById('estrellaPickerOverlay').remove()" style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.1);color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer">✕</button>
+    </div>
+    ${listHtml}
+    ${clearBtn}
+  </div>`;
+  document.body.appendChild(overlay);
+}
+async function admSetEstrella(home, away) {
+  document.getElementById('estrellaPickerOverlay')?.remove();
+  await sbSaveEstrellaOverride(home, away);
+}
+async function admClearEstrella() {
+  document.getElementById('estrellaPickerOverlay')?.remove();
+  await sbClearEstrellaOverride();
+}
+
+sbLoadEstrellaOverride();
 
 // Guarda el historial GLOBAL en shared_cache (solo admin)
 async function sbSaveGlobalHistorial(arr) {
@@ -11946,6 +12046,7 @@ function _purgeNbaPicks() {
         <button onclick="admRefreshPreds()" style="background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.3);color:#ffd600;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">🔮 Regenerar Pronósticos</button>
         <button onclick="admResolveNow()" style="background:rgba(255,112,67,0.1);border:1px solid rgba(255,112,67,0.3);color:#ff7043;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">✅ Resolver pendientes ahora</button>
         <button onclick="adminResetLockedPicks()" style="background:rgba(156,39,176,0.15);border:1px solid rgba(156,39,176,0.5);color:#ce93d8;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600;grid-column:1/-1">🔑 Resetear Lock de Picks HOY (fuerza relectura de cuotas)</button>
+        <button onclick="admOpenEstrellaPicker()" style="background:rgba(255,214,0,0.12);border:1px solid rgba(255,214,0,0.45);color:#ffd600;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600;grid-column:1/-1">⭐ Elegir Pick Estrella del Finde</button>
       </div>
       <div id="admApiStatus" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;font-size:0.78rem;color:var(--texto-sec);line-height:1.8">
         <div style="color:#fff;font-weight:600;margin-bottom:6px">Estado de APIs</div>
