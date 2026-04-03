@@ -7317,8 +7317,12 @@ function renderPreds() {
         const sHome = logoHtml(star.home, 42);
         const sAway = logoHtml(star.away, 42);
         const rec = (star.rec||'').replace(' Gana','');
-        // Cuota: usar _bestOdds (número real) o extraer de _hO/_aO/_dO según recomendación
-        const oddsNum = parseFloat(star._bestOdds || star._hO || star._aO || star._dO || 0);
+        // Cuota: misma lógica que la ficha — basada en rec para evitar cuotas distintas
+        const _recOdds = star.rec === 'Local Gana'     ? star._hO
+                       : star.rec === 'Visitante Gana' ? star._aO
+                       : star.rec === 'Empate'         ? star._dO
+                       : null;
+        const oddsNum = parseFloat(_recOdds || star._bestOdds || star._hO || star._aO || star._dO || 0);
         const cuotaDisplay = oddsNum > 0 ? oddsNum.toFixed(2) : '—';
         const probPct = 0; // porcentaje removido del display
         // bvr ya es 1-6, usarlo directamente para los dots
@@ -7647,12 +7651,22 @@ function renderPreds() {
       </a>
     </div>`;
 
-  // ── Pick del Finde: mejor 6/6 sin iniciar en fin de semana ──
+  // ── Pick del Finde: sólo el pick pinneado por admin (_estrellaOverride) ──
   const _dow = new Date().getDay();
   const _isFindeW = _dow === 5 || _dow === 6 || _dow === 0;
-  const _findePickIdx = _isFindeW
-    ? source.findIndex(p => (p.bvr || 0) >= 6 && !p._started)
-    : -1;
+  const _findePickIdx = (() => {
+    if (!_isFindeW) return -1;
+    // Si hay override de admin, usar ese pick exacto
+    if (window._estrellaOverride) {
+      const idx = source.findIndex(p =>
+        teamsMatch(p.home, window._estrellaOverride.home) &&
+        teamsMatch(p.away, window._estrellaOverride.away)
+      );
+      if (idx !== -1) return idx;
+    }
+    // Fallback: primer bvr=6 sin iniciar (comportamiento original)
+    return source.findIndex(p => (p.bvr || 0) >= 6 && !p._started);
+  })();
 
   document.getElementById('predGrid').innerHTML = source.map((p, idx) => {
     // BVR: usar valor guardado en p, o derivar de p.conf para datos estáticos
