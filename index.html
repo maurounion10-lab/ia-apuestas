@@ -6687,14 +6687,14 @@ function buildPredsFromOdds() {
     const awayOut = outs.find(o => o.name === g.away_team);
     const drawOut = outs.find(o => o.name === 'Draw');
 
-    // Solo exponer cuotas si vienen de una casa afiliada
-    const hO = isAffiliate ? (homeOut?.price || null) : null;
-    const aO = isAffiliate ? (awayOut?.price || null) : null;
-    const dO = isAffiliate ? (drawOut?.price || null) : null;
-    // Para calcular probabilidades siempre usar los precios reales
-    const hOP = homeOut?.price || null;
-    const aOP = awayOut?.price || null;
-    const dOP = drawOut?.price || null;
+    // Precios reales del mercado — siempre disponibles para cuota universal
+    const hO = homeOut?.price || null;
+    const aO = awayOut?.price || null;
+    const dO = drawOut?.price || null;
+    // Alias para cálculo de probabilidades (mismo valor)
+    const hOP = hO;
+    const aOP = aO;
+    const dOP = dO;
 
     // ── Mercados de totales y BTTS ──
     // Buscar en todos los bookmakers disponibles (no solo afiliado)
@@ -7577,7 +7577,7 @@ function renderPreds() {
           <div class="pred-rec-value">${isFinishedLoss ? '❌' : '✅'} ${p.rec}</div>
         </div>
         <div class="pred-rec-right">
-          ${(()=>{ const rp = p.rec==='Local Gana' ? p.probH : p.rec==='Visitante Gana' ? p.probA : p.rec==='Empate' ? p.probD : 0; const ro = p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : (rp > 0 ? (100/rp).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
+          ${(()=>{ const ro = p.rec==='Local Gana' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null) : p.rec==='Visitante Gana' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null) : p.rec==='Empate' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
           ${p._bookKey ? `<a class="pred-rec-book" href="${getBookLink(p._bookKey)}" target="_blank" rel="noopener" title="Apostar en ${p._bookLabel||p._bookKey}" onclick="trackEvent('promo_click',{promo:'${p._bookKey}',type:'bookmaker_rec'})">
             <img src="${getBookLogo(p._bookKey)}" alt="${p._bookLabel||p._bookKey}" onerror="this.style.display='none'">
             <span class="pred-rec-bonus">🎁 Bono</span>
