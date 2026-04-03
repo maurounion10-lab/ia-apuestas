@@ -8484,15 +8484,29 @@ async function sbLoadHistorial() {
         else                                                 bvr = 1;
       }
       const correctStake = bvr >= 6 ? 170 : bvr === 5 ? 130 : bvr === 4 ? 50 : bvr === 3 ? 30 : 15;
-      if (p.stake !== correctStake) {
-        p.stake = correctStake;
-        if      (p.result === 'win')  p.pl = parseFloat(((odds - 1) * correctStake).toFixed(2));
-        else if (p.result === 'loss') p.pl = -correctStake;
+
+      // Corregir cuota: usar cuota real del bookmaker si está disponible
+      let correctOdds = odds;
+      if      (p.rec === 'Local Gana'     && p._hO)  correctOdds = parseFloat(parseFloat(p._hO).toFixed(2));
+      else if (p.rec === 'Visitante Gana' && p._aO)  correctOdds = parseFloat(parseFloat(p._aO).toFixed(2));
+      else if (p.rec === 'Empate'         && p._dO)  correctOdds = parseFloat(parseFloat(p._dO).toFixed(2));
+      else if (p._bestOdds)                           correctOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
+
+      const stakeChanged = p.stake !== correctStake;
+      const oddsChanged  = correctOdds > 1 && Math.abs((p.odds || 0) - correctOdds) > 0.005;
+
+      if (stakeChanged || oddsChanged) {
+        if (stakeChanged) p.stake = correctStake;
+        if (oddsChanged)  p.odds  = correctOdds;
+        const finalOdds  = p.odds;
+        const finalStake = p.stake;
+        if      (p.result === 'win')  p.pl = parseFloat(((finalOdds - 1) * finalStake).toFixed(2));
+        else if (p.result === 'loss') p.pl = -finalStake;
         else                          p.pl = 0;
         stakesMigrated++;
       }
     });
-    if (stakesMigrated) console.log('[globalHist] Migración stakes:', stakesMigrated, 'entradas corregidas');
+    if (stakesMigrated) console.log('[globalHist] Migración stakes+odds:', stakesMigrated, 'entradas corregidas');
 
     // Actualizar shared_cache si el merge tiene más entradas o hubo migración de stakes
     const prevCount = globalHist?.length || 0;
@@ -8553,10 +8567,24 @@ function migrateHistStakes() {
       else                                                 bvr = 1;
     }
     const correctStake = bvr >= 6 ? 170 : bvr === 5 ? 130 : bvr === 4 ? 50 : bvr === 3 ? 30 : 15;
-    if (p.stake !== correctStake) {
-      p.stake = correctStake;
-      if      (p.result === 'win')  p.pl = parseFloat(((odds - 1) * correctStake).toFixed(2));
-      else if (p.result === 'loss') p.pl = -correctStake;
+
+    // Corregir cuota: usar cuota real del bookmaker si está disponible
+    let correctOdds = odds;
+    if      (p.rec === 'Local Gana'     && p._hO)  correctOdds = parseFloat(parseFloat(p._hO).toFixed(2));
+    else if (p.rec === 'Visitante Gana' && p._aO)  correctOdds = parseFloat(parseFloat(p._aO).toFixed(2));
+    else if (p.rec === 'Empate'         && p._dO)  correctOdds = parseFloat(parseFloat(p._dO).toFixed(2));
+    else if (p._bestOdds)                           correctOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
+
+    const stakeChanged = p.stake !== correctStake;
+    const oddsChanged  = correctOdds > 1 && Math.abs((p.odds || 0) - correctOdds) > 0.005;
+
+    if (stakeChanged || oddsChanged) {
+      if (stakeChanged) p.stake = correctStake;
+      if (oddsChanged)  p.odds  = correctOdds;
+      const finalOdds  = p.odds;
+      const finalStake = p.stake;
+      if      (p.result === 'win')  p.pl = parseFloat(((finalOdds - 1) * finalStake).toFixed(2));
+      else if (p.result === 'loss') p.pl = -finalStake;
       else                          p.pl = 0;
       changed = true;
     }
@@ -8623,13 +8651,16 @@ function savePredictions(preds) {
 
     const id = `${matchKey}_${todayKey}`;
 
-    // Calcular cuota implícita del resultado recomendado
-    // Para totales/btts usar la cuota real si está disponible
+    // Cuota real del bookmaker — priorizar siempre la cuota real sobre la implícita
     let impliedOdds = 2.0;
-    if      (p.rec === 'Local Gana'     && p.probH > 0) impliedOdds = parseFloat((100/p.probH).toFixed(2));
+    if      (p.rec === 'Local Gana'     && p._hO)  impliedOdds = parseFloat(parseFloat(p._hO).toFixed(2));
+    else if (p.rec === 'Visitante Gana' && p._aO)  impliedOdds = parseFloat(parseFloat(p._aO).toFixed(2));
+    else if (p.rec === 'Empate'         && p._dO)  impliedOdds = parseFloat(parseFloat(p._dO).toFixed(2));
+    else if (p._bestOdds)                           impliedOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
+    // Fallback: cuota implícita de probabilidades si no hay cuota real
+    else if (p.rec === 'Local Gana'     && p.probH > 0) impliedOdds = parseFloat((100/p.probH).toFixed(2));
     else if (p.rec === 'Visitante Gana' && p.probA > 0) impliedOdds = parseFloat((100/p.probA).toFixed(2));
     else if (p.rec === 'Empate'         && p.probD > 0) impliedOdds = parseFloat((100/p.probD).toFixed(2));
-    else if (p._bestOdds)                               impliedOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
 
     // Stake según confianza/bvr: Máxima(6)=$170, Alta(5)=$130, Media-Alta(4)=$50, Media(3)=$30, Baja=$15
     const _bvrS = p.bvr || (p.conf === 'high' ? 5 : p.conf === 'med' ? 3 : 1);
