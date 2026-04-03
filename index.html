@@ -8556,37 +8556,81 @@ async function admClearEstrella() {
 
 sbLoadEstrellaOverride();
 
-// ── Migración automática: eleva picks específicos a Máxima cuando admin abre la página ──
-// Agrega aquí los picks que querés forzar a Máxima: { key: 'home_vs_away' }
-// El key es: normTeam(home) + '_vs_' + normTeam(away), todo lowercase sin espacios/tildes
-const _ADMIN_FORCE_MAXIMA = [
-  'mallorca_vs_realmadrid',
-  'coquimbo_vs_cobresal',
-];
-async function _adminMigrateMaxima() {
-  // Esperar hasta que el lock esté cargado en memoria
-  await new Promise(r => setTimeout(r, 1500));
-  const lp = window._sbLockedPicks;
-  if (!Object.keys(lp).length) return; // no hay lock todavía, nada que migrar
-  let changed = false;
-  for (const k of _ADMIN_FORCE_MAXIMA) {
-    if (lp[k] && lp[k].bvr !== 6) {
-      lp[k].bvr     = 6;
-      lp[k].bvrText = 'Máxima';
-      lp[k].conf    = 'high';
-      changed = true;
-      console.log('[migrateMaxima] Elevado a Máxima:', k);
-    }
-  }
-  if (!changed) return;
+// ── Admin overrides: bvr forzado por admin, guardado en acoin_users (no shared_cache) ──
+// Se lee en sbLoadAdminOverrides() al cargar la página — aplica a _sbLockedPicks en memoria.
+// Los overrides se guardan como array de {mk, date} en el campo last_daily del admin.
+// Usamos acoin_users porque shared_cache tiene RLS que bloquea INSERT/UPDATE autenticado.
+
+const _ADMIN_OVERRIDES_EMAIL = ADMIN_EMAIL;
+
+async function sbLoadAdminOverrides() {
   try {
-    const key = _lockedPicksKey();
-    await sbClient.from('shared_cache').delete().eq('key', key);
-    const { error } = await sbClient.from('shared_cache').insert({ key, data: lp, fetched_at: new Date().toISOString() });
-    if (!error) { console.log('[migrateMaxima] ✓ Guardado en Supabase'); renderPreds(); }
-    else console.warn('[migrateMaxima] Error:', error.message);
-  } catch(e) { console.warn('[migrateMaxima]', e.message); }
+    const { data } = await sbAnon
+      .from('acoin_users').select('admin_cfg').eq('email', _ADMIN_OVERRIDES_EMAIL).maybeSingle();
+    const cfg = data?.admin_cfg;
+    if (!cfg?.maxima_overrides?.length) return;
+    const today = new Date().toISOString().slice(0,10);
+    const todayOvr = cfg.maxima_overrides.filter(o => o.date === today);
+    if (!todayOvr.length) return;
+    todayOvr.forEach(o => {
+      if (!window._sbLockedPicks[o.mk]) window._sbLockedPicks[o.mk] = {};
+      window._sbLockedPicks[o.mk].bvr     = 6;
+      window._sbLockedPicks[o.mk].bvrText = 'Máxima';
+      window._sbLockedPicks[o.mk].conf    = 'high';
+    });
+    console.log('[adminOverrides] Aplicados:', todayOvr.length, 'overrides de Máxima');
+    if (window._rawOddsGames?.length) renderPreds();
+  } catch(e) { console.warn('[adminOverrides] Error al cargar:', e.message); }
 }
+
+async function sbSaveAdminOverride(mk) {
+  if (authUser?.email !== ADMIN_EMAIL) return;
+  try {
+    const { data } = await sbClient
+      .from('acoin_users').select('admin_cfg').eq('email', ADMIN_EMAIL).maybeSingle();
+    const cfg = data?.admin_cfg || {};
+    const overrides = (cfg.maxima_overrides || []).filter(o => o.mk !== mk); // dedup
+    const today = new Date().toISOString().slice(0,10);
+    overrides.push({ mk, date: today });
+    cfg.maxima_overrides = overrides;
+    const { error } = await sbClient
+      .from('acoin_users')
+      .upsert({ email: ADMIN_EMAIL, admin_cfg: cfg, updated_at: new Date().toISOString() },
+               { onConflict: 'email' });
+    if (error) throw new Error(error.message);
+    console.log('[adminOverrides] ✓ Guardado override Máxima:', mk);
+  } catch(e) { throw e; }
+}
+
+sbLoadAdminOverrides();
+
+// ── Overrides hardcodeados por fecha — no dependen de Supabase ──
+// Se aplican en memoria para TODOS los usuarios. Agregar cuando sea necesario.
+const _HARDCODED_MAXIMA = {
+  '2026-04-03': ['mallorca_vs_realmadrid', 'coquimbo_vs_cobresal'],
+};
+(function _applyHardcodedMaxima() {
+  const today = new Date().toISOString().slice(0, 10);
+  const keys  = _HARDCODED_MAXIMA[today] || [];
+  if (!keys.length) return;
+  // Aplicar cuando el lock esté disponible (puede llegar async)
+  function _apply() {
+    let changed = false;
+    keys.forEach(mk => {
+      if (!window._sbLockedPicks[mk]) window._sbLockedPicks[mk] = {};
+      if (window._sbLockedPicks[mk].bvr !== 6) {
+        window._sbLockedPicks[mk].bvr     = 6;
+        window._sbLockedPicks[mk].bvrText = 'Máxima';
+        window._sbLockedPicks[mk].conf    = 'high';
+        changed = true;
+      }
+    });
+    if (changed && window._rawOddsGames?.length) renderPreds();
+  }
+  // Intentar de inmediato y luego a los 2s (cuando Supabase haya respondido)
+  _apply();
+  setTimeout(_apply, 2000);
+})();
 
 // ── Admin: elevar confianza de un pick manualmente ──
 // Abre popup con todos los picks del día; admin elige uno y lo sube a Máxima (bvr=6)
@@ -8653,20 +8697,16 @@ async function admForceMaxima(mk) {
   const statusEl = document.getElementById('confPickerStatus');
   if (statusEl) { statusEl.style.display='block'; statusEl.style.background='rgba(255,214,0,0.1)'; statusEl.style.color='#ffd600'; statusEl.textContent='⏳ Guardando…'; }
 
+  // Aplicar en memoria inmediatamente
   if (!window._sbLockedPicks[mk]) window._sbLockedPicks[mk] = {};
   window._sbLockedPicks[mk].bvr     = 6;
   window._sbLockedPicks[mk].bvrText = 'Máxima';
   window._sbLockedPicks[mk].conf    = 'high';
 
   try {
-    const key = _lockedPicksKey();
-    const payload = { key, data: window._sbLockedPicks, fetched_at: new Date().toISOString() };
-    // RLS bloquea UPDATE → delete primero, luego insert fresco
-    const { error: delErr } = await sbClient.from('shared_cache').delete().eq('key', key);
-    if (delErr) throw new Error('delete: ' + delErr.message);
-    const { error: insErr } = await sbClient.from('shared_cache').insert(payload);
-    if (insErr) throw new Error('insert: ' + insErr.message);
-    if (statusEl) { statusEl.style.background='rgba(0,200,83,0.1)'; statusEl.style.color='#00c853'; statusEl.textContent='✅ Guardado. Todos los usuarios verán Máxima.'; }
+    // Guardar en acoin_users (admin_cfg) — tabla que sí permite escrituras autenticadas
+    await sbSaveAdminOverride(mk);
+    if (statusEl) { statusEl.style.background='rgba(0,200,83,0.1)'; statusEl.style.color='#00c853'; statusEl.textContent='✅ Guardado. Todos los usuarios verán Máxima al recargar.'; }
     console.log('[admForceMaxima] ✓', mk, '→ Máxima');
     setTimeout(() => { document.getElementById('confPickerOverlay')?.remove(); renderPreds(); }, 1500);
   } catch(e) {
