@@ -3481,9 +3481,7 @@
   <div class="nav-links" id="navLinksGuest">
     <a onclick="navTo('predictions')">🔮 <span class="nav-text">Pronósticos</span></a>
     <a onclick="navTo('historial')">📋 <span class="nav-text">Resultados</span></a>
-    <a onclick="navTo('ranking');loadRanking()" style="position:relative">🏆 <span class="nav-text">Ranking</span><span id="rankingNavDot" style="display:none;position:absolute;top:2px;right:-4px;width:7px;height:7px;border-radius:50%;background:#ffd600;box-shadow:0 0 6px #ffd600"></span></a>
-    <a onclick="navTo('bot-alerta')">🤖 <span class="nav-text">Bot Alerta</span></a>
-    <a onclick="navTo('telegram')">🎁 <span class="nav-text">Promos</span></a>
+    <a onclick="navTo('ranking')" style="position:relative">🏆 <span class="nav-text">Ranking</span><span id="rankingNavDot" style="display:none;position:absolute;top:2px;right:-4px;width:7px;height:7px;border-radius:50%;background:#ffd600;box-shadow:0 0 6px #ffd600"></span></a>
     <a href="blog/index.html">📰 <span class="nav-text">Blog</span></a>
   </div>
 
@@ -3491,13 +3489,9 @@
   <div class="nav-links" id="navLinksUser" style="display:none">
     <a onclick="navTo('predictions')">🔮 <span class="nav-text">Pronósticos</span></a>
     <a onclick="navTo('historial')">📋 <span class="nav-text">Resultados</span></a>
+    <a onclick="navTo('ranking')" style="position:relative">🏆 <span class="nav-text">Ranking</span></a>
     <a onclick="navTo('bankroll')">💰 <span class="nav-text">Bankroll</span></a>
-    <a onclick="navTo('calculator')">🧮 <span class="nav-text">Calculadora</span></a>
-    <a onclick="navTo('ranking');loadRanking()" style="position:relative">🏆 <span class="nav-text">Ranking</span></a>
-    <a onclick="navTo('bot-alerta')">🤖 <span class="nav-text">Bot Alerta</span></a>
-    <a onclick="navTo('telegram')">🎁 <span class="nav-text">Promos</span></a>
     <a href="blog/index.html">📰 <span class="nav-text">Blog</span></a>
-    <a onclick="navTo('mipanel')" style="color:var(--verde)">👤 <span class="nav-text">Mi Panel</span></a>
   </div>
 
   <!-- $A-Coin widget -->
@@ -3540,7 +3534,7 @@
       <button class="user-dd-item" onclick="navTo('myPicksPanel');closeUserMenu()">📊 Mis Picks G$</button>
       <button class="user-dd-item" onclick="navTo('historial');closeUserMenu()">📋 Resultados</button>
       <button class="user-dd-item" onclick="navTo('bankroll');closeUserMenu()">💰 Bankroll</button>
-      <button class="user-dd-item" onclick="document.getElementById('ranking').style.display='';loadRanking();setTimeout(()=>navTo('ranking'),80);closeUserMenu()">🏆 Ranking G$</button>
+      <button class="user-dd-item" onclick="navTo('ranking');closeUserMenu()">🏆 Ranking G$</button>
       <div class="user-dd-sep"></div>
       <button class="user-dd-item danger" onclick="logoutUser()">↩ Cerrar sesión</button>
     </div>
@@ -3838,7 +3832,7 @@
   <!-- ══════════════════════════════════════════════
        RANKING MENSUAL G$ COINS
   ══════════════════════════════════════════════ -->
-  <section id="ranking" style="display:none">
+  <section id="ranking">
     <div class="section-title"><div class="icon">🏆</div>Ranking Mensual · Gambeta Coins</div>
 
     <!-- Prize banner -->
@@ -12068,6 +12062,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }, 900);
   }
+});
+
+// Cargar ranking al inicio (la sección es siempre visible)
+document.addEventListener('DOMContentLoaded', () => {
+  loadRanking();
 });
 
 document.addEventListener('DOMContentLoaded', () => {
