@@ -7133,10 +7133,14 @@ function renderPreds() {
           const gl = window._sbLockedPicks[mk];
           if (gl) {
             p.conf = gl.conf; p.bvr = gl.bvr; p.bvrText = gl.bvrText; p._confLocked = true;
+            if (gl.rec      != null) p.rec    = gl.rec;       // recomendación inmutable
             if (gl.bestOdds != null) p._bestOdds = gl.bestOdds;
-            if (gl.hO != null)       p._hO       = gl.hO;
-            if (gl.aO != null)       p._aO       = gl.aO;
-            if (gl.dO != null)       p._dO       = gl.dO;
+            if (gl.hO       != null) p._hO    = gl.hO;
+            if (gl.aO       != null) p._aO    = gl.aO;
+            if (gl.dO       != null) p._dO    = gl.dO;
+            if (gl.probH    != null) p.probH  = gl.probH;     // probs fijas para que 100/prob sea consistente
+            if (gl.probD    != null) p.probD  = gl.probD;
+            if (gl.probA    != null) p.probA  = gl.probA;
             return;
           }
           // 2. Fallback: caché local del navegador
@@ -7144,10 +7148,14 @@ function renderPreds() {
             const prev = _cachedPreds.find(c => teamsMatch(c.home, p.home) && teamsMatch(c.away, p.away));
             if (prev?._confLocked) {
               p.conf = prev.conf; p.bvr = prev.bvr; p.bvrText = prev.bvrText; p._confLocked = true;
+              if (prev.rec      != null) p.rec    = prev.rec;
               if (prev._bestOdds != null) p._bestOdds = prev._bestOdds;
-              if (prev._hO != null)       p._hO       = prev._hO;
-              if (prev._aO != null)       p._aO       = prev._aO;
-              if (prev._dO != null)       p._dO       = prev._dO;
+              if (prev._hO      != null) p._hO    = prev._hO;
+              if (prev._aO      != null) p._aO    = prev._aO;
+              if (prev._dO      != null) p._dO    = prev._dO;
+              if (prev.probH    != null) p.probH  = prev.probH;
+              if (prev.probD    != null) p.probD  = prev.probD;
+              if (prev.probA    != null) p.probA  = prev.probA;
             }
           }
         });
@@ -7834,15 +7842,15 @@ function renderPreds() {
         <div style="display:flex;gap:6px">
           <button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="home" onclick="acSelectOutcome('${_cardMatchId}','home',${_cardOddsH})" style="flex:1;text-align:center;background:rgba(41,182,246,0.08);border:1px solid rgba(41,182,246,0.2);border-radius:8px;padding:6px 4px">
             <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Local</div>
-            <div style="font-size:1rem;font-weight:800;color:var(--azul)">${p.probH > 0 ? (100/p.probH).toFixed(2) : (p._hO ? parseFloat(p._hO).toFixed(2) : '—')}</div>
+            <div style="font-size:1rem;font-weight:800;color:var(--azul)">${p._hO ? parseFloat(p._hO).toFixed(2) : (p.probH > 0 ? (100/p.probH).toFixed(2) : '—')}</div>
           </button>
           ${(p.probD > 0 || p._dO) ? `<button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="draw" onclick="acSelectOutcome('${_cardMatchId}','draw',${_cardOddsD||3})" style="flex:1;text-align:center;background:rgba(255,214,0,0.08);border:1px solid rgba(255,214,0,0.2);border-radius:8px;padding:6px 4px">
             <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Empate</div>
-            <div style="font-size:1rem;font-weight:800;color:var(--amarillo)">${p.probD > 0 ? (100/p.probD).toFixed(2) : parseFloat(p._dO).toFixed(2)}</div>
+            <div style="font-size:1rem;font-weight:800;color:var(--amarillo)">${p._dO ? parseFloat(p._dO).toFixed(2) : (p.probD > 0 ? (100/p.probD).toFixed(2) : '—')}</div>
           </button>` : ''}
           <button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="away" onclick="acSelectOutcome('${_cardMatchId}','away',${_cardOddsA})" style="flex:1;text-align:center;background:rgba(255,61,61,0.08);border:1px solid rgba(255,61,61,0.2);border-radius:8px;padding:6px 4px">
             <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Visitante</div>
-            <div style="font-size:1rem;font-weight:800;color:var(--rojo)">${p.probA > 0 ? (100/p.probA).toFixed(2) : (p._aO ? parseFloat(p._aO).toFixed(2) : '—')}</div>
+            <div style="font-size:1rem;font-weight:800;color:var(--rojo)">${p._aO ? parseFloat(p._aO).toFixed(2) : (p.probA > 0 ? (100/p.probA).toFixed(2) : '—')}</div>
           </button>
         </div>
       </div>` : ((p._hO || p._aO) ? `
@@ -8378,6 +8386,8 @@ async function sbLoadLockedPicks() {
     if (data?.data && typeof data.data === 'object') {
       window._sbLockedPicks = data.data;
       console.log('[lockedPicks] Cargados desde Supabase:', Object.keys(data.data).length, 'picks');
+      // Re-renderizar si la página ya estaba pintada (race condition: odds cargaron antes que Supabase)
+      if (window._rawOddsGames?.length) renderPreds();
     }
   } catch(e) { console.warn('[lockedPicks] Error al cargar:', e.message); }
 }
@@ -8390,7 +8400,9 @@ async function sbSaveLockedPicks(preds) {
   preds.forEach(p => {
     map[_matchKeyLP(p.home, p.away)] = {
       conf: p.conf, bvr: p.bvr, bvrText: p.bvrText,
-      bestOdds: p._bestOdds, hO: p._hO, aO: p._aO, dO: p._dO
+      rec: p.rec,                                    // recomendación fija (Local/Visitante/Empate)
+      bestOdds: p._bestOdds, hO: p._hO, aO: p._aO, dO: p._dO,
+      probH: p.probH, probD: p.probD, probA: p.probA  // probs para que cuotas implícitas sean consistentes
     };
   });
   if (!Object.keys(map).length) return;
