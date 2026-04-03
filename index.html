@@ -1365,10 +1365,11 @@
     flex: 1;
   }
   .bvr-gem {
-    width: 18px;
-    height: 14px;
-    clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
-    background: rgba(255,255,255,0.1);
+    width: 12px;
+    height: 22px;
+    /* Rayito ⚡ — clip-path de rayo */
+    clip-path: polygon(68% 0%, 30% 54%, 52% 54%, 24% 100%, 68% 46%, 46% 46%, 68% 0%);
+    background: rgba(255,255,255,0.12);
     transition: all 0.2s;
   }
   /* BVR 1-2 = Baja (rojo) | 3-4 = Media (naranja) | 5-6 = Alta (verde/dorado) */
@@ -2563,7 +2564,7 @@
   .estrella-card { position:relative; border:1px solid rgba(255,214,0,0.45); border-radius:16px; background:linear-gradient(135deg,rgba(255,214,0,0.1) 0%,rgba(255,214,0,0.03) 60%,transparent 100%); padding:16px; margin-bottom:18px; overflow:hidden; }
   .estrella-badge { display:inline-flex; align-items:center; gap:5px; background:rgba(255,214,0,0.18); border:1px solid rgba(255,214,0,0.4); border-radius:20px; padding:3px 10px; font-size:0.68rem; font-weight:800; color:var(--amarillo); text-transform:uppercase; letter-spacing:0.8px; margin-bottom:10px; }
   .estrella-conf-dots { display:flex; gap:4px; align-items:center; }
-  .estrella-conf-dots .dot { width:9px; height:9px; border-radius:50%; background:rgba(255,255,255,0.15); box-shadow:none; }
+  .estrella-conf-dots .dot { width:11px; height:20px; border-radius:0; clip-path:polygon(68% 0%,30% 54%,52% 54%,24% 100%,68% 46%,46% 46%,68% 0%); background:rgba(255,255,255,0.15); box-shadow:none; }
   .estrella-conf-dots .dot.empty { background:rgba(255,255,255,0.1); box-shadow:none; }
   .estrella-conf-dots.lvl-1 .dot:not(.empty),.estrella-conf-dots.lvl-2 .dot:not(.empty) { background:#d32f2f; box-shadow:0 0 4px rgba(211,47,47,0.7); }
   .estrella-conf-dots.lvl-3 .dot:not(.empty),.estrella-conf-dots.lvl-4 .dot:not(.empty) { background:#e64a19; box-shadow:0 0 4px rgba(230,74,25,0.6); }
@@ -7627,7 +7628,7 @@ function renderPreds() {
               border:1px solid ${p.conf==='high'?'rgba(255,214,0,0.45)':p.conf==='med'?'rgba(255,214,0,0.3)':'rgba(255,112,67,0.3)'};
               box-shadow:${p.conf==='high'?'0 0 6px rgba(255,214,0,0.2)':''};
               border-radius:6px;padding:2px 7px;white-space:nowrap">
-              💰 $${p.conf==='high'?'130':p.conf==='med'?'50':'15'}
+              💰 $${_bvr >= 6 ? '170' : p.conf==='high' ? '130' : _bvr === 4 ? '50' : p.conf==='med' ? '30' : '15'}
             </span>
           </div>
         </div>
