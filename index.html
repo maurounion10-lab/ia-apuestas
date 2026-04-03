@@ -3656,13 +3656,29 @@
       <div class="icon">🔮</div>
       Pronósticos de la IA
     </div>
-    <div style="display:flex;gap:8px;margin:0 0 8px;flex-wrap:wrap" id="predSportTabs">
-      <button class="sport-tab active" onclick="filterPredSport('all',this)">⭐ Principales</button>
-      <button class="sport-tab" onclick="filterPredSport('europe',this)">🌍 Fútbol Europeo</button>
-      <button class="sport-tab" onclick="filterPredSport('latam',this)">🌎 Latam & Mundo</button>
-      <button class="sport-tab" onclick="filterPredSport('arg',this)">🇦🇷 Liga Profesional</button>
-      <button class="sport-tab" onclick="filterPredSport('bra',this)">🇧🇷 Brasileirao</button>
-      <button class="sport-tab" onclick="filterPredSport('todos',this)">📋 Todos</button>
+    <div style="display:flex;gap:6px;margin:0 0 8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-ms-overflow-style:none" id="predSportTabs">
+      <button class="sport-tab active" style="white-space:nowrap" onclick="filterPredSport('all',this)">⭐ Principales</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('champions',this)">🏆 Champions</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('europa',this)">🟠 Europa League</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('conference',this)">🟣 Conference</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('premier',this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('laliga',this)">🇪🇸 La Liga</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('bundesliga',this)">🇩🇪 Bundesliga</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('seriea',this)">🇮🇹 Serie A</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('ligue1',this)">🇫🇷 Ligue 1</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('eredivisie',this)">🇳🇱 Eredivisie</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('scotland',this)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('turkey',this)">🇹🇷 Süper Lig</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('libertadores',this)">🌎 Libertadores</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('sudamericana',this)">🌎 Sudamericana</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('arg',this)">🇦🇷 Argentina</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('bra',this)">🇧🇷 Brasil</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('mexico',this)">🇲🇽 Liga MX</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('mls',this)">🇺🇸 MLS</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('uruguay',this)">🇺🇾 Uruguay</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('saudi',this)">🇸🇦 Arabia Saudita</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('japan',this)">🇯🇵 Japón</button>
+      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('todos',this)">📋 Todos</button>
     </div>
     <!-- Sub-filtros de tiempo -->
     <div style="display:flex;gap:6px;margin:0 0 12px;flex-wrap:wrap" id="predTimeTabs">
@@ -7194,44 +7210,59 @@ function renderPreds() {
     const _nowFilter = Date.now();
     finished = finished.filter(p => !p.commenceTs || (_nowFilter - p.commenceTs) < _16H_MS);
 
-    if (sf === 'europe') {
-      // Fútbol Europeo: ligas UEFA + Portugal + Países Bajos + Escocia + Turquía
-      const EURO_KEYS = ['uefa','epl','england_premier','spain_la_liga','germany_bundesliga',
-                         'italy_serie','france_ligue','portugal','netherlands','eredivisie',
-                         'scotland','turkey'];
-      const isEurope = p => {
-        const sk = p._sportKey || '';
-        return sk.includes('soccer') && EURO_KEYS.some(k => sk.includes(k));
-      };
-      upcoming = upcoming.filter(isEurope);
-      finished = finished.filter(isEurope);
-      const allEurope = [...upcoming, ...finished];
-      realPreds = allEurope.length ? allEurope : null;
-    } else if (sf === 'latam') {
-      // Latam & Mundo: MLS, Liga MX, Chile, Uruguay, Saudi, Japón (no Arg/Bra top)
-      const LATAM_KEYS = ['mexico','ligamx','usa_mls','mls','chile','uruguay','saudi','japan','j_league'];
-      const isLatam = p => {
-        const sk = p._sportKey || '';
-        return sk.includes('soccer') && LATAM_KEYS.some(k => sk.includes(k));
-      };
-      upcoming = upcoming.filter(isLatam);
-      finished = finished.filter(isLatam);
-      const allLatam = [...upcoming, ...finished];
-      realPreds = allLatam.length ? allLatam : null;
+    // ── Filtros por liga individual ───────────────────────────────────────────
+    const _leagueFilter = (keys) => {
+      const fn = p => { const sk = p._sportKey || ''; return keys.some(k => sk.includes(k)); };
+      upcoming = upcoming.filter(fn); finished = finished.filter(fn);
+      const all = [...upcoming, ...finished];
+      realPreds = all.length ? all : null;
+    };
+    if (sf === 'champions') {
+      _leagueFilter(['champs_league','champions']);
+    } else if (sf === 'europa') {
+      _leagueFilter(['europa_league']);
+    } else if (sf === 'conference') {
+      _leagueFilter(['conference_league']);
+    } else if (sf === 'premier') {
+      _leagueFilter(['england_premier','soccer_epl']);
+    } else if (sf === 'laliga') {
+      _leagueFilter(['spain_la_liga']);
+    } else if (sf === 'bundesliga') {
+      _leagueFilter(['germany_bundesliga']);
+    } else if (sf === 'seriea') {
+      _leagueFilter(['italy_serie_a','italy_serie']);
+    } else if (sf === 'ligue1') {
+      _leagueFilter(['france_ligue']);
+    } else if (sf === 'eredivisie') {
+      _leagueFilter(['netherlands_eredivisie','eredivisie']);
+    } else if (sf === 'scotland') {
+      _leagueFilter(['scotland']);
+    } else if (sf === 'turkey') {
+      _leagueFilter(['turkey']);
+    } else if (sf === 'libertadores') {
+      _leagueFilter(['copa_libertadores']);
+    } else if (sf === 'sudamericana') {
+      _leagueFilter(['copa_sudamericana']);
     } else if (sf === 'arg') {
-      // Liga Profesional Argentina
-      const isArg = p => (p._sportKey || '').includes('argentina');
-      upcoming = upcoming.filter(isArg);
-      finished = finished.filter(isArg);
-      const allArg = [...upcoming, ...finished];
-      realPreds = allArg.length ? allArg : null;
+      _leagueFilter(['argentina']);
     } else if (sf === 'bra') {
-      // Brasileirao
-      const isBra = p => (p._sportKey || '').includes('brazil');
-      upcoming = upcoming.filter(isBra);
-      finished = finished.filter(isBra);
-      const allBra = [...upcoming, ...finished];
-      realPreds = allBra.length ? allBra : null;
+      _leagueFilter(['brazil']);
+    } else if (sf === 'mexico') {
+      _leagueFilter(['mexico_ligamx','ligamx']);
+    } else if (sf === 'mls') {
+      _leagueFilter(['usa_mls','soccer_mls']);
+    } else if (sf === 'uruguay') {
+      _leagueFilter(['uruguay']);
+    } else if (sf === 'saudi') {
+      _leagueFilter(['saudi']);
+    } else if (sf === 'japan') {
+      _leagueFilter(['japan_j_league','j_league']);
+    // ── Legados (por si quedan referencias) ──────────────────────────────────
+    } else if (sf === 'europe') {
+      _leagueFilter(['uefa','epl','england_premier','spain_la_liga','germany_bundesliga',
+                     'italy_serie','france_ligue','netherlands','eredivisie','scotland','turkey']);
+    } else if (sf === 'latam') {
+      _leagueFilter(['mexico','ligamx','usa_mls','mls','uruguay','saudi','japan','j_league']);
     } else if (sf === 'soccer') {
       // Fútbol: todos los de fútbol (fallback legacy)
       upcoming = upcoming.filter(p => (p._sportKey || '').includes('soccer'));
@@ -7400,13 +7431,17 @@ function renderPreds() {
       statusBar.style.background = 'rgba(0,200,83,0.08)';
       statusBar.style.border = '1px solid rgba(0,200,83,0.25)';
       statusBar.style.color = '#00c853';
-      const sfLabel = window._predSportFilter==='europe' ? ' · 🌍 Fútbol Europeo'
-                    : window._predSportFilter==='latam'  ? ' · 🌎 Latam & Mundo'
-                    : window._predSportFilter==='arg'    ? ' · 🇦🇷 Liga Profesional'
-                    : window._predSportFilter==='bra'    ? ' · 🇧🇷 Brasileirao'
-                    : window._predSportFilter==='todos'  ? ' · 📋 Todos'
-                    : window._predSportFilter==='soccer' ? ' · ⚽ Fútbol'
-                    : '';
+      const _sfLabels = {
+        champions:'🏆 Champions', europa:'🟠 Europa League', conference:'🟣 Conference',
+        premier:'🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League', laliga:'🇪🇸 La Liga', bundesliga:'🇩🇪 Bundesliga',
+        seriea:'🇮🇹 Serie A', ligue1:'🇫🇷 Ligue 1', eredivisie:'🇳🇱 Eredivisie',
+        scotland:'🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia', turkey:'🇹🇷 Süper Lig',
+        libertadores:'🌎 Libertadores', sudamericana:'🌎 Sudamericana',
+        arg:'🇦🇷 Argentina', bra:'🇧🇷 Brasil', mexico:'🇲🇽 Liga MX',
+        mls:'🇺🇸 MLS', uruguay:'🇺🇾 Uruguay', saudi:'🇸🇦 Arabia Saudita', japan:'🇯🇵 Japón',
+        todos:'📋 Todos', soccer:'⚽ Fútbol', europe:'🌍 Fútbol Europeo', latam:'🌎 Latam'
+      };
+      const sfLabel = _sfLabels[window._predSportFilter] ? ' · ' + _sfLabels[window._predSportFilter] : '';
       statusBar.innerHTML = `<span>📡 Datos en vivo · ${source.length} pronósticos${sfLabel}</span>`;
     } else {
       // No mostrar banner de error a los visitantes
