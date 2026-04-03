@@ -8392,29 +8392,56 @@ async function sbLoadLockedPicks() {
   } catch(e) { console.warn('[lockedPicks] Error al cargar:', e.message); }
 }
 
-async function sbSaveLockedPicks(preds) {
+async function sbSaveLockedPicks(preds, force = false) {
   if (!preds?.length) return;
-  // Solo guardar si aún NO hay picks en Supabase para hoy (el primero gana)
-  if (Object.keys(window._sbLockedPicks).length) return;
+  // Sin force: solo guardar si aún NO hay picks en Supabase para hoy (el primero gana)
+  if (!force && Object.keys(window._sbLockedPicks).length) return;
   const map = {};
   preds.forEach(p => {
     map[_matchKeyLP(p.home, p.away)] = {
       conf: p.conf, bvr: p.bvr, bvrText: p.bvrText,
-      rec: p.rec,                                    // recomendación fija (Local/Visitante/Empate)
+      rec: p.rec,                                      // recomendación fija (Local/Visitante/Empate)
       bestOdds: p._bestOdds, hO: p._hO, aO: p._aO, dO: p._dO,
-      probH: p.probH, probD: p.probD, probA: p.probA  // probs para que cuotas implícitas sean consistentes
+      probH: p.probH, probD: p.probD, probA: p.probA   // probs para que cuotas implícitas sean consistentes
     };
   });
   if (!Object.keys(map).length) return;
   try {
     const client = (typeof authUser !== 'undefined' && authUser) ? sbClient : sbAnon;
+    // force=true (admin): ignoreDuplicates:false para pisar cualquier lock anterior
     const { error } = await client
       .from('shared_cache')
       .upsert({ key: _lockedPicksKey(), data: map, fetched_at: new Date().toISOString() },
-               { onConflict: 'key', ignoreDuplicates: true }); // ignoreDuplicates → primer usuario gana
+               { onConflict: 'key', ignoreDuplicates: !force });
     if (!error) { window._sbLockedPicks = map; console.log('[lockedPicks] Guardados en Supabase:', Object.keys(map).length, 'picks'); }
     else console.warn('[lockedPicks] Error al guardar:', error.message);
   } catch(e) { console.warn('[lockedPicks] Error al guardar:', e.message); }
+}
+
+// Admin: resetea el lock del día y regenera picks frescos desde la API
+async function adminResetLockedPicks() {
+  if (authUser?.email !== ADMIN_EMAIL) return;
+  const btn = event?.target;
+  const orig = btn?.textContent;
+  if (btn) { btn.textContent = '⏳ Reseteando…'; btn.disabled = true; }
+  try {
+    // 1. Borrar lock actual de Supabase
+    const { error: delErr } = await sbClient
+      .from('shared_cache').delete().eq('key', _lockedPicksKey());
+    if (delErr) throw new Error(delErr.message);
+    // 2. Limpiar memoria local
+    window._sbLockedPicks = {};
+    // 3. Limpiar caché de odds para forzar re-fetch
+    localStorage.removeItem('cache_odds_v7');
+    localStorage.removeItem(DAILY_PREDS_KEY || 'gambeta_daily_preds_v9');
+    // 4. Recargar odds y re-renderizar (el flujo normal guardará el nuevo lock)
+    if (btn) { btn.textContent = '🔄 Recargando cuotas…'; }
+    await loadOdds();  // recarga odds y llama renderPreds() internamente
+    if (btn) { btn.textContent = '✅ Lock reseteado'; setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 3000); }
+  } catch(e) {
+    console.error('[adminResetLock]', e.message);
+    if (btn) { btn.textContent = '❌ Error: ' + e.message; setTimeout(() => { btn.textContent = orig; btn.disabled = false; }, 4000); }
+  }
 }
 
 // Carga picks bloqueados en cuanto la página arranca (antes de renderizar)
@@ -11918,6 +11945,7 @@ function _purgeNbaPicks() {
         <button onclick="admRefreshScores()" style="background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);color:var(--verde);padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">📡 Recargar Marcadores</button>
         <button onclick="admRefreshPreds()" style="background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.3);color:#ffd600;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">🔮 Regenerar Pronósticos</button>
         <button onclick="admResolveNow()" style="background:rgba(255,112,67,0.1);border:1px solid rgba(255,112,67,0.3);color:#ff7043;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600">✅ Resolver pendientes ahora</button>
+        <button onclick="adminResetLockedPicks()" style="background:rgba(156,39,176,0.15);border:1px solid rgba(156,39,176,0.5);color:#ce93d8;padding:12px;border-radius:12px;cursor:pointer;font-size:0.85rem;font-weight:600;grid-column:1/-1">🔑 Resetear Lock de Picks HOY (fuerza relectura de cuotas)</button>
       </div>
       <div id="admApiStatus" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;font-size:0.78rem;color:var(--texto-sec);line-height:1.8">
         <div style="color:#fff;font-weight:600;margin-bottom:6px">Estado de APIs</div>
