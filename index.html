@@ -8351,10 +8351,36 @@ async function sbLoadHistorial() {
     allEntries.forEach(h => { const k = _hKey(h); if (!seen.has(k)) seen.set(k, h); });
     const merged = [...seen.values()].filter(h=>!BLOCKED_HIST_IDS.has(h?.id||'')).sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0));
 
-    // Actualizar shared_cache si el merge tiene más entradas que lo guardado
+    // ── Migración global de stakes (backtesting) ──────────────────────────────
+    // Máxima(6)=$170 | Alta(5)=$130 | Media-Alta(4)=$50 | Media(3)=$30 | Baja=$15
+    let stakesMigrated = 0;
+    merged.forEach(p => {
+      const odds = parseFloat(p.odds) || 1;
+      let bvr = p.bvr || 0;
+      if (!bvr) {
+        const maxProb = Math.max(p.probH || 0, p.probA || 0);
+        const conf = p.conf || (p.stake >= 130 ? 'high' : p.stake >= 30 ? 'med' : 'low');
+        if      (conf === 'high' && maxProb >= 75) bvr = 6;
+        else if (conf === 'high')                  bvr = 5;
+        else if (conf === 'med'  && maxProb >= 58) bvr = 4;
+        else if (conf === 'med')                   bvr = 3;
+        else                                       bvr = 1;
+      }
+      const correctStake = bvr >= 6 ? 170 : bvr === 5 ? 130 : bvr === 4 ? 50 : bvr === 3 ? 30 : 15;
+      if (p.stake !== correctStake) {
+        p.stake = correctStake;
+        if      (p.result === 'win')  p.pl = parseFloat(((odds - 1) * correctStake).toFixed(2));
+        else if (p.result === 'loss') p.pl = -correctStake;
+        else                          p.pl = 0;
+        stakesMigrated++;
+      }
+    });
+    if (stakesMigrated) console.log('[globalHist] Migración stakes:', stakesMigrated, 'entradas corregidas');
+
+    // Actualizar shared_cache si el merge tiene más entradas o hubo migración de stakes
     const prevCount = globalHist?.length || 0;
-    if (merged.length > prevCount) {
-      console.log('[globalHist] Admin: actualizando shared_cache con', merged.length, 'entradas (antes:', prevCount, ')');
+    if (merged.length > prevCount || stakesMigrated > 0) {
+      console.log('[globalHist] Admin: actualizando shared_cache con', merged.length, 'entradas (antes:', prevCount, ', stakes migrados:', stakesMigrated, ')');
       await sbSaveGlobalHistorial(merged);
     }
 
