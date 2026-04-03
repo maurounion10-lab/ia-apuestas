@@ -5530,9 +5530,9 @@ const teamLogos = {
   // ── ⭐ CHAMPIONS / EUROPA / CONFERENCE LEAGUE ──
   'Ajax':                   'https://media.api-sports.io/football/teams/194.png',
   'AFC Ajax':               'https://media.api-sports.io/football/teams/194.png',
-  'Feyenoord':              'https://media.api-sports.io/football/teams/197.png',
-  'PSV':                    'https://media.api-sports.io/football/teams/196.png',
-  'PSV Eindhoven':          'https://media.api-sports.io/football/teams/196.png',
+  'Feyenoord':              'https://media.api-sports.io/football/teams/196.png',
+  'PSV':                    'https://media.api-sports.io/football/teams/197.png',
+  'PSV Eindhoven':          'https://media.api-sports.io/football/teams/197.png',
   'AZ':                     'https://media.api-sports.io/football/teams/6809.png',
   'Porto':                  'https://media.api-sports.io/football/teams/212.png',
   'FC Porto':               'https://media.api-sports.io/football/teams/212.png',
@@ -8261,9 +8261,14 @@ function savePredictions(preds) {
   let added = 0;
 
   const _BLOCKED_SPORT_KEYS_SAVE = ['soccer_chile_campeonato', 'soccer_portugal_primeira_liga'];
+  const _normBSave = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+  const _BLOCKED_TEAMS_SAVE = ['palestino','ucatolica','universidadcatolica','universidadcat'];
   preds.forEach(p => {
-    // Excluir ligas bloqueadas (Portugal, Chile)
+    // Excluir ligas bloqueadas (Portugal, Chile) por sportKey
     if (p._sportKey && _BLOCKED_SPORT_KEYS_SAVE.includes(p._sportKey)) return;
+    // Excluir también por nombre de equipo (por si sportKey viene vacío)
+    const _nh = _normBSave(p.home), _na = _normBSave(p.away);
+    if (_BLOCKED_TEAMS_SAVE.some(t => _nh.includes(t) || _na.includes(t))) return;
     // Excluir partidos EN VIVO o ya comenzados — solo guardar pronósticos pre-partido
     if (p.commenceTs && p.commenceTs <= Date.now()) return;
     // Para auto-publicar finde: los viernes guardamos picks de sábado y domingo también
@@ -8555,9 +8560,10 @@ function renderHistorial(filter) {
   const allClean = allRaw.filter(h => {
     if (BLOCKED_SPORT_KEYS.includes(h._sportKey)) return false;
     const nh = _normB(h.home), na = _normB(h.away);
-    if (BLOCKED_TEAMS.some(t => nh.startsWith(t) || na.startsWith(t))) return false;
-    // Primeira Liga: filtrar también por nombre de liga si viene del campo league
+    if (BLOCKED_TEAMS.some(t => nh.includes(t) || na.includes(t))) return false;
+    // Primeira Liga / Chile: filtrar también por nombre de liga
     if ((h.league||'').toLowerCase().includes('primeira liga')) return false;
+    if ((h.league||'').toLowerCase().includes('chile')) return false;
     return true;
   });
   if (allClean.length < allRaw.length) saveHistorial(allClean); // limpia storage silenciosamente
