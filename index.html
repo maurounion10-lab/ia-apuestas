@@ -8547,6 +8547,39 @@ async function admClearEstrella() {
 
 sbLoadEstrellaOverride();
 
+// ── Migración automática: eleva picks específicos a Máxima cuando admin abre la página ──
+// Agrega aquí los picks que querés forzar a Máxima: { key: 'home_vs_away' }
+// El key es: normTeam(home) + '_vs_' + normTeam(away), todo lowercase sin espacios/tildes
+const _ADMIN_FORCE_MAXIMA = [
+  'mallorca_vs_realmadrid',
+  'coquimbo_vs_cobresal',
+];
+async function _adminMigrateMaxima() {
+  // Esperar hasta que el lock esté cargado en memoria
+  await new Promise(r => setTimeout(r, 1500));
+  const lp = window._sbLockedPicks;
+  if (!Object.keys(lp).length) return; // no hay lock todavía, nada que migrar
+  let changed = false;
+  for (const k of _ADMIN_FORCE_MAXIMA) {
+    if (lp[k] && lp[k].bvr !== 6) {
+      lp[k].bvr     = 6;
+      lp[k].bvrText = 'Máxima';
+      lp[k].conf    = 'high';
+      changed = true;
+      console.log('[migrateMaxima] Elevado a Máxima:', k);
+    }
+  }
+  if (!changed) return;
+  try {
+    const { error } = await sbClient
+      .from('shared_cache')
+      .upsert({ key: _lockedPicksKey(), data: lp, fetched_at: new Date().toISOString() },
+               { onConflict: 'key' });
+    if (!error) { console.log('[migrateMaxima] ✓ Guardado en Supabase'); renderPreds(); }
+    else console.warn('[migrateMaxima] Error:', error.message);
+  } catch(e) { console.warn('[migrateMaxima]', e.message); }
+}
+
 // ── Admin: elevar confianza de un pick manualmente ──
 // Abre popup con todos los picks del día; admin elige uno y lo sube a Máxima (bvr=6)
 function admOpenConfPicker() {
@@ -11170,6 +11203,8 @@ async function _handleAuthSession(u) {
   await sbLoadHistorial();
   initUserSync(u.email);
   closeAuth();
+  // Migración puntual: elevar picks a Máxima si admin y aún no están en bvr=6
+  if (u.email === ADMIN_EMAIL) _adminMigrateMaxima();
   checkOnboarding();
   // Re-aplicar avatar/apodo después de que todo el setup async haya terminado.
   // Esto garantiza que el escudo VIP/club se muestre aunque algún paso previo
