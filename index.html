@@ -3656,29 +3656,33 @@
       <div class="icon">🔮</div>
       Pronósticos de la IA
     </div>
-    <div style="display:flex;gap:6px;margin:0 0 8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;-ms-overflow-style:none" id="predSportTabs">
-      <button class="sport-tab active" style="white-space:nowrap" onclick="filterPredSport('all',this)">⭐ Principales</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('champions',this)">🏆 Champions</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('europa',this)">🟠 Europa League</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('conference',this)">🟣 Conference</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('premier',this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('laliga',this)">🇪🇸 La Liga</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('bundesliga',this)">🇩🇪 Bundesliga</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('seriea',this)">🇮🇹 Serie A</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('ligue1',this)">🇫🇷 Ligue 1</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('eredivisie',this)">🇳🇱 Eredivisie</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('scotland',this)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('turkey',this)">🇹🇷 Süper Lig</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('libertadores',this)">🌎 Libertadores</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('sudamericana',this)">🌎 Sudamericana</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('arg',this)">🇦🇷 Argentina</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('bra',this)">🇧🇷 Brasil</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('mexico',this)">🇲🇽 Liga MX</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('mls',this)">🇺🇸 MLS</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('uruguay',this)">🇺🇾 Uruguay</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('saudi',this)">🇸🇦 Arabia Saudita</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('japan',this)">🇯🇵 Japón</button>
-      <button class="sport-tab" style="white-space:nowrap" onclick="filterPredSport('todos',this)">📋 Todos</button>
+    <!-- Fila 1: accesos rápidos principales -->
+    <div style="display:flex;gap:5px;margin:0 0 5px;flex-wrap:wrap" id="predSportTabs">
+      <button class="sport-tab active" style="padding:6px 14px;font-size:0.78rem;white-space:nowrap" onclick="filterPredSport('all',this)">⭐ Principales</button>
+      <button class="sport-tab" style="padding:6px 14px;font-size:0.78rem;white-space:nowrap" onclick="filterPredSport('todos',this)">📋 Todos</button>
+      <!-- UEFA -->
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('champions',this)">🏆 Champions</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('europa',this)">🟠 Europa League</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('conference',this)">🟣 Conference</button>
+      <!-- Ligas Europa -->
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('premier',this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier League</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('laliga',this)">🇪🇸 La Liga</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('bundesliga',this)">🇩🇪 Bundesliga</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('seriea',this)">🇮🇹 Serie A</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('ligue1',this)">🇫🇷 Ligue 1</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('eredivisie',this)">🇳🇱 Eredivisie</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('scotland',this)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('turkey',this)">🇹🇷 Süper Lig</button>
+      <!-- LATAM / Mundo -->
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('arg',this)">🇦🇷 Argentina</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('bra',this)">🇧🇷 Brasil</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('libertadores',this)">🌎 Libertadores</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('sudamericana',this)">🌎 Sudamericana</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('mexico',this)">🇲🇽 Liga MX</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('mls',this)">🇺🇸 MLS</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('uruguay',this)">🇺🇾 Uruguay</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('saudi',this)">🇸🇦 Arabia</button>
+      <button class="sport-tab" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('japan',this)">🇯🇵 Japón</button>
     </div>
     <!-- Sub-filtros de tiempo -->
     <div style="display:flex;gap:6px;margin:0 0 12px;flex-wrap:wrap" id="predTimeTabs">
