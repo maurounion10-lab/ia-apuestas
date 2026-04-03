@@ -12591,8 +12591,8 @@ async function loadRanking(force = false) {
   const cerrarBtn = document.getElementById('rkCerrarMesBtn');
   if (cerrarBtn) cerrarBtn.style.display = (authUser?.email === ADMIN_EMAIL) ? 'block' : 'none';
   rkStartCountdown();
-  // Cargar hall of fame en paralelo
-  loadPastWinners();
+  // Sincronizar ganadores históricos estáticos y cargar hall of fame
+  rkSyncStaticWinners().then(() => loadPastWinners());
 
   // Show loading, hide others
   ['rkLoading','rkPodium','rkList','rkMyPos','rkEmpty'].forEach(id => {
@@ -12732,6 +12732,38 @@ const RK_MONTH_NAMES = {
   '01':'Ene','02':'Feb','03':'Mar','04':'Abr','05':'May','06':'Jun',
   '07':'Jul','08':'Ago','09':'Sep','10':'Oct','11':'Nov','12':'Dic'
 };
+
+// ── Ganadores históricos hardcodeados (se sincronizan a shared_cache al iniciar) ──
+const RK_STATIC_WINNERS = {
+  'winners_2026_03': [
+    { nickname:'Ederson',  balance: 97000,  email:'sshisa98@gmail.com' },
+    { nickname:'Pavl',     balance: 78770,  email:'paulybritney@gmail.com' },
+    { nickname:'Salah',    balance: 39007,  email:'matii_fernandez11@hotmail.com' },
+    { nickname:'Paredes',  balance: 31050,  email:'bocapasion98santi@gmail.com' },
+    { nickname:'Olmo',     balance: 24300,  email:'crisclark22@gmail.com' },
+    { nickname:'Dembélé',  balance: 24050,  email:'maximartin303@gmail.com' },
+    { nickname:'Benzema',  balance: 23470,  email:'federiconicocozzani@gmail.com' },
+    { nickname:'Joaco',    balance: 22660,  email:'joaquinantelo1@gmail.com' },
+    { nickname:'alejo',    balance: 20920,  email:'emaaanuel2020@gmail.com' },
+    { nickname:'PITI',     balance: 20628,  email:'rhapsody_piti75@hotmail.com' },
+  ]
+};
+
+// Guarda los winners estáticos en shared_cache si todavía no existen
+async function rkSyncStaticWinners() {
+  if (authUser?.email !== ADMIN_EMAIL) return;
+  for (const [key, data] of Object.entries(RK_STATIC_WINNERS)) {
+    try {
+      const { data: existing } = await sbClient
+        .from('shared_cache').select('key').eq('key', key).maybeSingle();
+      if (!existing) {
+        await sbClient.from('shared_cache')
+          .upsert({ key, data, fetched_at: new Date().toISOString() }, { onConflict: 'key' });
+        console.log('[HallOfFame] Guardado:', key);
+      }
+    } catch(e) { console.warn('[HallOfFame] Error sync:', key, e.message); }
+  }
+}
 
 async function loadPastWinners() {
   try {
