@@ -3862,7 +3862,7 @@
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px;flex-wrap:wrap">
       <div id="rkMonthLabel" style="font-size:0.82rem;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.5px"></div>
       <div style="display:flex;gap:6px;align-items:center">
-        <button id="rkResetAbrilBtn" onclick="rkResetConGananciasAbril()" style="display:none;background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.35);color:#00c853;font-size:0.7rem;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit">🔄 Reset Abril</button>
+       
         <button id="rkCerrarMesBtn" onclick="rkCerrarMes()" style="display:none;background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.35);color:#ffd600;font-size:0.7rem;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit">🏁 Cerrar mes</button>
         <button onclick="loadRanking(true)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:0.72rem;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit">↻ Actualizar</button>
       </div>
@@ -11937,6 +11937,42 @@ function _purgeNbaPicks() {
         <textarea id="admBroadcastInput" placeholder="Escribí tu mensaje para todos los usuarios..." rows="3"
           style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.15);color:#fff;padding:10px 12px;border-radius:10px;font-size:0.88rem;resize:vertical;font-family:inherit;outline:none;width:100%;box-sizing:border-box"
           onkeydown="if(event.ctrlKey&&event.key==='Enter')admSendBroadcast()"></textarea>
+
+        <!-- Imagen URL -->
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:0.75rem;color:var(--texto-sec);white-space:nowrap">🖼️ Imagen:</span>
+          <input id="admBroadcastImageUrl" type="url" placeholder="URL de imagen (opcional — drive, imgur, etc.)"
+            style="flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:7px 10px;border-radius:8px;font-size:0.8rem;font-family:inherit;outline:none">
+          <button onclick="admBcastPreviewImage()" title="Previsualizar" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--texto-sec);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:0.8rem">👁️</button>
+        </div>
+        <div id="admBcastImagePreview" style="display:none;border-radius:10px;overflow:hidden;max-height:140px">
+          <img id="admBcastImagePreviewImg" src="" style="width:100%;max-height:140px;object-fit:cover;display:block">
+        </div>
+
+        <!-- Pick adjunto -->
+        <details style="background:rgba(0,200,83,0.04);border:1px solid rgba(0,200,83,0.18);border-radius:10px;padding:10px 12px">
+          <summary style="font-size:0.78rem;font-weight:700;color:var(--verde);cursor:pointer;user-select:none">⚽ Adjuntar apuesta (opcional)</summary>
+          <div style="display:flex;flex-direction:column;gap:7px;margin-top:10px">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+              <input id="admBcastPickHome" placeholder="Local (ej: Real Madrid)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:7px 10px;border-radius:8px;font-size:0.8rem;font-family:inherit;outline:none">
+              <input id="admBcastPickAway" placeholder="Visitante (ej: Man City)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:7px 10px;border-radius:8px;font-size:0.8rem;font-family:inherit;outline:none">
+            </div>
+            <input id="admBcastPickLabel" placeholder="Pick (ej: Local gana, Más de 2.5, Ambos anotan)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:7px 10px;border-radius:8px;font-size:0.8rem;font-family:inherit;outline:none">
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+              <input id="admBcastPickOdds" type="number" step="0.01" min="1" placeholder="Cuota (ej: 2.10)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;padding:7px 10px;border-radius:8px;font-size:0.8rem;font-family:inherit;outline:none">
+              <select id="admBcastPickBvr" style="background:#1a2a1a;border:1px solid rgba(255,255,255,0.12);color:#fff;padding:7px 10px;border-radius:8px;font-size:0.8rem;font-family:inherit;outline:none">
+                <option value="">Confianza</option>
+                <option value="6">💰💰💰💰💰💰 Máxima</option>
+                <option value="5">💰💰💰💰💰 Alta</option>
+                <option value="4">💰💰💰💰 Media-Alta</option>
+                <option value="3">💰💰💰 Media</option>
+                <option value="2">💰💰 Baja</option>
+                <option value="1">💰 Muy baja</option>
+              </select>
+            </div>
+          </div>
+        </details>
+
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;background:rgba(255,214,0,0.05);border:1px solid rgba(255,214,0,0.15);border-radius:8px;padding:7px 10px">
           <input type="checkbox" id="admBroadcastSticky" style="accent-color:#ffd600">
           <span style="font-size:0.78rem;font-weight:700;color:#ffd600">📌 Sticky</span>
@@ -12591,8 +12627,6 @@ async function loadRanking(force = false) {
   // Mostrar botones admin solo al admin
   const cerrarBtn = document.getElementById('rkCerrarMesBtn');
   if (cerrarBtn) cerrarBtn.style.display = (authUser?.email === ADMIN_EMAIL) ? 'block' : 'none';
-  const resetAbrilBtn = document.getElementById('rkResetAbrilBtn');
-  if (resetAbrilBtn) resetAbrilBtn.style.display = (authUser?.email === ADMIN_EMAIL) ? 'block' : 'none';
   rkStartCountdown();
   // Sincronizar ganadores históricos estáticos y cargar hall of fame
   rkSyncStaticWinners().then(() => loadPastWinners());
@@ -13575,15 +13609,30 @@ async function admLoadBroadcastHistory() {
       box.innerHTML = '<div style="text-align:center;color:var(--texto-sec);font-size:0.78rem;margin:auto">Sin mensajes enviados aún</div>';
       return;
     }
-    box.innerHTML = msgs.map(m => `
+    box.innerHTML = msgs.map(m => {
+      const imgThumb = m.imageUrl
+        ? `<img src="${m.imageUrl}" style="width:100%;max-height:90px;object-fit:cover;border-radius:7px;margin-top:7px;display:block" onerror="this.style.display='none'">`
+        : '';
+      const pickBvr = m.pick?.bvr ? '💰'.repeat(Math.min(6, m.pick.bvr)) : '';
+      const pickThumb = (m.pick?.home && m.pick?.away)
+        ? `<div style="margin-top:7px;padding:7px 10px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.2);border-radius:8px;font-size:0.75rem">
+             <span style="color:#fff;font-weight:700">⚽ ${m.pick.home} vs ${m.pick.away}</span>
+             ${m.pick.label ? `<span style="color:var(--verde);margin-left:6px">${m.pick.label}</span>` : ''}
+             ${m.pick.odds  ? `<span style="color:#ffd600;margin-left:6px">@ ${m.pick.odds}</span>` : ''}
+             ${pickBvr      ? `<span style="margin-left:6px">${pickBvr}</span>` : ''}
+           </div>`
+        : '';
+      return `
       <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px 12px;position:relative">
         <div style="font-size:0.88rem;color:#fff;line-height:1.5;padding-right:28px">${m.text.replace(/\n/g,'<br>')}</div>
+        ${imgThumb}${pickThumb}
         <div style="font-size:0.7rem;color:var(--texto-sec);margin-top:6px;display:flex;justify-content:space-between;align-items:center">
-          <span>📢 Admin${m.sticky ? ' 📌' : ''}</span>
+          <span>📢 Admin${m.sticky ? ' 📌' : ''}${m.imageUrl ? ' 🖼️' : ''}${m.pick ? ' ⚽' : ''}</span>
           <span>${_bcastTimeAgo(m.ts)} · ${new Date(m.ts).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</span>
         </div>
         <button onclick="admDeleteBroadcast('${m.id}')" title="Eliminar mensaje" style="position:absolute;top:8px;right:8px;background:rgba(239,83,80,0.12);border:1px solid rgba(239,83,80,0.3);color:#ef5350;border-radius:6px;width:26px;height:26px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;transition:background .15s" onmouseover="this.style.background='rgba(239,83,80,0.3)'" onmouseout="this.style.background='rgba(239,83,80,0.12)'">🗑️</button>
-      </div>`).join('');
+      </div>`;
+    }).join('');
   } catch(e) {
     box.innerHTML = `<div style="color:#ff6b6b;font-size:0.78rem">Error: ${e.message}</div>`;
   }
@@ -13612,14 +13661,35 @@ async function admDeleteBroadcast(msgId) {
 }
 
 // ── Admin envía un mensaje ──
+function admBcastPreviewImage() {
+  const url = (document.getElementById('admBroadcastImageUrl')?.value || '').trim();
+  const wrap = document.getElementById('admBcastImagePreview');
+  const img  = document.getElementById('admBcastImagePreviewImg');
+  if (!url || !wrap || !img) return;
+  img.src = url;
+  wrap.style.display = 'block';
+}
+
 async function admSendBroadcast() {
   const input = document.getElementById('admBroadcastInput');
   const msgEl = document.getElementById('admBroadcastMsg');
   const text  = (input?.value || '').trim();
-  if (!text) return;
+  if (!text) { if (msgEl) { msgEl.style.color='#ef5350'; msgEl.textContent='Escribí un mensaje'; setTimeout(()=>msgEl.textContent='',2000); } return; }
 
-  const sticky = document.getElementById('admBroadcastSticky')?.checked || false;
-  const newMsg = { id: `bcast_${Date.now()}`, text, ts: Date.now(), sticky };
+  const sticky   = document.getElementById('admBroadcastSticky')?.checked || false;
+  const imageUrl = (document.getElementById('admBroadcastImageUrl')?.value || '').trim() || null;
+
+  // Pick adjunto (solo si tiene home + away como mínimo)
+  const pickHome  = (document.getElementById('admBcastPickHome')?.value  || '').trim();
+  const pickAway  = (document.getElementById('admBcastPickAway')?.value  || '').trim();
+  const pickLabel = (document.getElementById('admBcastPickLabel')?.value || '').trim();
+  const pickOdds  = parseFloat(document.getElementById('admBcastPickOdds')?.value) || null;
+  const pickBvr   = parseInt(document.getElementById('admBcastPickBvr')?.value)   || null;
+  const pick = (pickHome && pickAway)
+    ? { home: pickHome, away: pickAway, label: pickLabel || null, odds: pickOdds, bvr: pickBvr }
+    : null;
+
+  const newMsg = { id: `bcast_${Date.now()}`, text, ts: Date.now(), sticky, imageUrl, pick };
 
   // Leer mensajes existentes
   let existing = [];
@@ -13635,19 +13705,23 @@ async function admSendBroadcast() {
     .upsert({ email: BROADCAST_EMAIL, picks: updated, updated_at: new Date().toISOString() }, { onConflict: 'email' });
 
   if (error) {
-    if (msgEl) { msgEl.style.color='#ef5350'; msgEl.textContent = '✗ Error al enviar'; setTimeout(()=>msgEl.textContent='',3000); }
+    if (msgEl) { msgEl.style.color='#ef5350'; msgEl.textContent = '\u2717 Error al enviar'; setTimeout(()=>msgEl.textContent='',3000); }
     return;
   }
 
   input.value = '';
+  // Limpiar campos extra
+  ['admBroadcastImageUrl','admBcastPickHome','admBcastPickAway','admBcastPickLabel','admBcastPickOdds'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const bvrSel = document.getElementById('admBcastPickBvr'); if (bvrSel) bvrSel.value = '';
+  const prevWrap = document.getElementById('admBcastImagePreview'); if (prevWrap) prevWrap.style.display = 'none';
   // Invalidar caché de broadcast para que todos los usuarios vean el nuevo mensaje
   try { localStorage.removeItem(_SB_CACHE_PREFIX + 'bcast'); } catch {}
-  if (msgEl) { msgEl.style.color='var(--verde)'; msgEl.textContent = '✓ Mensaje enviado'; setTimeout(()=>msgEl.textContent='',3000); }
+  if (msgEl) { msgEl.style.color='var(--verde)'; msgEl.textContent = '\u2713 Mensaje enviado'; setTimeout(()=>msgEl.textContent='',3000); }
   admLoadBroadcastHistory();
 
   // Actualizar badge en tab
   const badge = document.getElementById('admMsgBadge');
-  if (badge) { badge.style.display='block'; badge.textContent='●'; }
+  if (badge) { badge.style.display='block'; badge.textContent='\u25cf'; }
 
   // ── Mostrar la tarjeta en el stack izquierdo para el admin al instante ──
   // Actualizar _broadcastMsgs con el mensaje recién enviado y renderizar
@@ -13729,23 +13803,26 @@ function _renderBcastStack() {
   stack.innerHTML = shown.map((m, i) => {
     const delay   = `${i * 60}ms`;
     const preview = (m.text || '').replace(/\n/g, ' ');
-    const short   = preview.length > 58 ? preview.slice(0, 58) + '…' : preview;
+    const short   = preview.length > 58 ? preview.slice(0, 58) + '\u2026' : preview;
+    const hasImg  = !!m.imageUrl;
+    const hasPick = !!(m.pick?.home && m.pick?.away);
+    const extras  = [hasImg ? '\uD83D\uDDBC\uFE0F' : '', hasPick ? '\u26BD' : ''].filter(Boolean).join(' ');
     return `
     <div class="bcast-card${m.sticky ? ' is-sticky' : ''}"
          style="animation-delay:${delay}"
          onclick="showBroadcastModal()">
       <button class="bcast-card-dismiss"
               onclick="event.stopPropagation();bcastDismissCard('${m.id}')"
-              title="Cerrar">✕</button>
-      <div class="bcast-card-icon">📢</div>
+              title="Cerrar">\u2715</button>
+      <div class="bcast-card-icon">\uD83D\uDCE2</div>
       <div class="bcast-card-body">
-        <div class="bcast-card-label">gambeta.ai${m.sticky ? ' <span title="Mensaje fijo">📌</span>' : ''}</div>
+        <div class="bcast-card-label">gambeta.ai${m.sticky ? ' <span title="Mensaje fijo">\uD83D\uDCCC</span>' : ''}${extras ? ` <span style="opacity:.7;font-size:.7rem">${extras}</span>` : ''}</div>
         <div class="bcast-card-text">${short}</div>
       </div>
     </div>`;
   }).join('');
   if (overflow > 0) {
-    stack.innerHTML += `<div class="bcast-overflow-pill" onclick="showBroadcastModal()">+${overflow} más</div>`;
+    stack.innerHTML += `<div class="bcast-overflow-pill" onclick="showBroadcastModal()">+${overflow} m\u00e1s</div>`;
   }
   stack.classList.add('visible');
 }
@@ -13761,7 +13838,6 @@ function bcastDismissCard(id) {
 function _showBroadcastNotif(count) {
   _renderBcastStack();
 }
-
 // ── Abrir panel de chat de mensajes ──
 function showBroadcastModal() {
   const panel   = document.getElementById('broadcastModal');
@@ -13780,11 +13856,26 @@ function showBroadcastModal() {
   }
 
   content.innerHTML = msgs.map(m => {
-    const isNew = !seen.includes(m.id);
+    const isNew   = !seen.includes(m.id);
+    const imgHtml = m.imageUrl
+      ? `<img src="${m.imageUrl}" class="bcast-msg-image" onerror="this.style.display='none'" alt="imagen">`
+      : '';
+    const pickBvr  = m.pick?.bvr ? '💰'.repeat(Math.min(6, m.pick.bvr)) : '';
+    const pickHtml = (m.pick?.home && m.pick?.away) ? `
+      <div class="bcast-pick-card">
+        <div class="bcast-pick-teams">⚽ ${m.pick.home} vs ${m.pick.away}</div>
+        <div class="bcast-pick-row">
+          ${m.pick.label ? `<span class="bcast-pick-label">${m.pick.label}</span>` : ''}
+          ${m.pick.odds  ? `<span class="bcast-pick-odds">@ ${m.pick.odds}</span>` : ''}
+          ${pickBvr      ? `<span class="bcast-pick-bvr">${pickBvr}</span>` : ''}
+        </div>
+      </div>` : '';
     return `
     <div class="bcast-msg-item${isNew?' is-new':''}">
       ${isNew ? '<span class="bcast-msg-new-tag">NUEVO</span>' : ''}
       <div class="bcast-msg-text">${m.text.replace(/\n/g,'<br>')}</div>
+      ${imgHtml}
+      ${pickHtml}
       <div class="bcast-msg-time">${_bcastTimeAgo(m.ts)} · ${new Date(m.ts).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</div>
     </div>`;
   }).join('');
