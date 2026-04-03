@@ -6910,7 +6910,17 @@ function renderPreds() {
 
   // Guardar partidos ya iniciados ANTES de cualquier invalidación para no perderlos
   const _nowMs = Date.now();
-  const _preserveStarted = ((_cachedPreds || realPreds) || []).filter(p => p.commenceTs && p.commenceTs <= _nowMs);
+  const _BKEYS_PS = ['soccer_chile_campeonato', 'soccer_portugal_primeira_liga'];
+  const _normPS = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+  const _BTEAMS_PS = ['palestino','ucatolica','universidadcatolica','universidadcat'];
+  const _preserveStarted = ((_cachedPreds || realPreds) || []).filter(p => {
+    if (!p.commenceTs || p.commenceTs > _nowMs) return false;
+    if (p._sportKey && _BKEYS_PS.includes(p._sportKey)) return false;
+    const nh = _normPS(p.home), na = _normPS(p.away);
+    if (_BTEAMS_PS.some(t => nh.includes(t) || na.includes(t))) return false;
+    if ((p.league||'').toLowerCase().includes('chile') || (p.league||'').toLowerCase().includes('primeira liga')) return false;
+    return true;
+  });
 
   // Invalidar caché si hay picks de basket (ya no se soportan)
   if (realPreds) {
@@ -6918,6 +6928,30 @@ function renderPreds() {
     if (hasBasket) {
       localStorage.removeItem('gambeta_daily_preds_v9');
       realPreds = null;
+    }
+  }
+
+  // ── Limpiar picks bloqueados del caché diario (Chile, Portugal, equipos explícitos) ──
+  {
+    const _BKEYS = ['soccer_chile_campeonato', 'soccer_portugal_primeira_liga'];
+    const _normDC = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+    const _BTEAMS = ['palestino','ucatolica','universidadcatolica','universidadcat'];
+    const _isBlocked = p => {
+      if (p._sportKey && _BKEYS.includes(p._sportKey)) return true;
+      const nh = _normDC(p.home), na = _normDC(p.away);
+      if (_BTEAMS.some(t => nh.includes(t) || na.includes(t))) return true;
+      if ((p.league||'').toLowerCase().includes('chile')) return true;
+      if ((p.league||'').toLowerCase().includes('primeira liga')) return true;
+      return false;
+    };
+    if (realPreds) {
+      const clean = realPreds.filter(p => !_isBlocked(p));
+      if (clean.length < realPreds.length) { realPreds = clean; saveDailyPredsCache(clean); }
+    }
+    // También purgar del _cachedPreds si aún no se usó
+    if (_cachedPreds) {
+      const clean2 = _cachedPreds.filter(p => !_isBlocked(p));
+      if (clean2.length < _cachedPreds.length) saveDailyPredsCache(clean2);
     }
   }
 
