@@ -8449,15 +8449,13 @@ async function sbLoadLockedPicks() {
 
 async function sbSaveLockedPicks(preds, force = false) {
   if (!preds?.length) return;
-  // Sin force: solo guardar si aún NO hay picks en Supabase para hoy (el primero gana)
-  if (!force && Object.keys(window._sbLockedPicks).length) return;
   const map = {};
   preds.forEach(p => {
     map[_matchKeyLP(p.home, p.away)] = {
       conf: p.conf, bvr: p.bvr, bvrText: p.bvrText,
-      rec: p.rec,                                      // recomendación fija (Local/Visitante/Empate)
+      rec: p.rec,
       bestOdds: p._bestOdds, hO: p._hO, aO: p._aO, dO: p._dO,
-      probH: p.probH, probD: p.probD, probA: p.probA   // probs para que cuotas implícitas sean consistentes
+      probH: p.probH, probD: p.probD, probA: p.probA
     };
   });
   if (!Object.keys(map).length) return;
@@ -8470,14 +8468,29 @@ async function sbSaveLockedPicks(preds, force = false) {
       if (!error) { window._sbLockedPicks = map; console.log('[lockedPicks] Force-guardados:', Object.keys(map).length, 'picks'); }
       else console.warn('[lockedPicks] Error force-insert:', error.message);
     } else {
-      // Primera escritura del día (cualquier usuario)
+      // ── Regla "el primero gana" — verificar Supabase antes de escribir ──
+      // Aunque _sbLockedPicks esté vacío en memoria (race condition),
+      // si ya hay un lock en Supabase, usarlo y NO sobreescribir.
       const client = (typeof authUser !== 'undefined' && authUser) ? sbClient : sbAnon;
+      const { data: existing } = await client
+        .from('shared_cache').select('data').eq('key', key).maybeSingle();
+      if (existing?.data && Object.keys(existing.data).length > 0) {
+        // Ya existe lock — usarlo en memoria sin tocar Supabase
+        if (!Object.keys(window._sbLockedPicks).length) {
+          window._sbLockedPicks = existing.data;
+          console.log('[lockedPicks] Lock existente en Supabase — no se sobreescribe. Picks:', Object.keys(existing.data).length);
+          if (window._rawOddsGames?.length) renderPreds();
+        }
+        return;
+      }
+      // No existe lock todavía — guardar el primero
       const { error } = await client
         .from('shared_cache')
-        .upsert({ key, data: map, fetched_at: new Date().toISOString() },
-                 { onConflict: 'key', ignoreDuplicates: true });
-      if (!error) { window._sbLockedPicks = map; console.log('[lockedPicks] Guardados:', Object.keys(map).length, 'picks'); }
-      else console.warn('[lockedPicks] Error:', error.message);
+        .insert({ key, data: map, fetched_at: new Date().toISOString() });
+      if (!error) {
+        window._sbLockedPicks = map;
+        console.log('[lockedPicks] Primer lock del día guardado:', Object.keys(map).length, 'picks');
+      } else console.warn('[lockedPicks] Error al guardar primer lock:', error.message);
     }
   } catch(e) { console.warn('[lockedPicks] Error al guardar:', e.message); }
 }
