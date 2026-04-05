@@ -11113,12 +11113,20 @@ async function sendMagicLink() {
     return;
   }
   const btn = document.getElementById('magicLinkBtn');
-  btn.textContent = '⏳ Enviando...'; btn.disabled = true;
+  btn.textContent = '🚀 Enviando...'; btn.disabled = true;
+  // Timeout de 12 segundos para no quedar colgado si Supabase tarda
+  const timeoutId = setTimeout(() => {
+    btn.textContent = '✉️ Enviar link de acceso'; btn.disabled = false;
+    errContainer.style.borderColor = 'var(--rojo)';
+    errContainer.placeholder = '⚠ Sin respuesta — intentá de nuevo';
+    setTimeout(() => { errContainer.style.borderColor = ''; errContainer.placeholder = 'tu@email.com'; }, 3000);
+  }, 12000);
   try {
     const { error } = await sbClient.auth.signInWithOtp({
       email,
       options: { emailRedirectTo: window.location.href.split('?')[0] }
     });
+    clearTimeout(timeoutId);
     if (error) {
       btn.textContent = '✉️ Enviar link de acceso'; btn.disabled = false;
       errContainer.style.borderColor = 'var(--rojo)';
@@ -11129,6 +11137,7 @@ async function sendMagicLink() {
       showAuthStep(3);
     }
   } catch(e) {
+    clearTimeout(timeoutId);
     btn.textContent = '✉️ Enviar link de acceso'; btn.disabled = false;
   }
 }
