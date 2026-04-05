@@ -7762,7 +7762,7 @@ function renderPreds() {
           ? `<span class="badge-result-win">✅${finalScore ? ' · '+finalScore : ''}</span>`
           : histResult === 'loss'
           ? `<span class="badge-result-loss">❌${finalScore ? ' · '+finalScore : ''}</span>`
-          : `<span class="badge-result-pending">⏳ Pendiente</span>`)
+          : '')
       : '';
 
     // H2H mini (solo para datos estáticos con matchAnalysisData)
