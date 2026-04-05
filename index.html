@@ -7554,7 +7554,11 @@ function renderPreds() {
         return false; // sin fecha → no incluir en próximos
       });
     } else if (tf === 'finished') {
-      realPreds = realPreds.filter(p => !!p._started);
+      // TERMINADOS = solo partidos con resultado real (win/loss/void), excluye EN VIVO y pendientes
+      realPreds = realPreds.filter(p => {
+        const res = p._histResult || 'pending';
+        return !!p._started && res !== 'pending';
+      });
     }
     if (!realPreds.length) realPreds = null;
   }
