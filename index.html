@@ -11238,6 +11238,21 @@ function toggleAuthMode() {
   document.getElementById('emailError').textContent = '';
 }
 
+// Dominios populares con typos comunes → corrección sugerida
+const _EMAIL_TYPOS = {
+  'gmai.com':'gmail.com','gmial.com':'gmail.com','gmail.co':'gmail.com','gmail.cm':'gmail.com',
+  'hotmial.com':'hotmail.com','hotmai.com':'hotmail.com','hotmal.com':'hotmail.com','homail.com':'hotmail.com',
+  'outlok.com':'outlook.com','outloo.com':'outlook.com','otulook.com':'outlook.com',
+  'yaho.com':'yahoo.com','yahooo.com':'yahoo.com','yahou.com':'yahoo.com','yhoo.com':'yahoo.com',
+  'iclod.com':'icloud.com','iclould.com':'icloud.com','icoud.com':'icloud.com',
+  'protonmai.com':'protonmail.com','protonmial.com':'protonmail.com',
+};
+function _suggestEmailFix(email) {
+  const [user, domain] = email.toLowerCase().split('@');
+  if (!domain) return null;
+  return _EMAIL_TYPOS[domain] ? `${user}@${_EMAIL_TYPOS[domain]}` : null;
+}
+
 async function sendMagicLink() {
   const email = document.getElementById('directEmail').value.trim();
   const inputEl = document.getElementById('directEmail');
@@ -11247,6 +11262,13 @@ async function sendMagicLink() {
     inputEl.style.borderColor = 'var(--rojo)';
     inputEl.placeholder = '⚠ Ingresá un email válido';
     setTimeout(() => { inputEl.style.borderColor = ''; inputEl.placeholder = 'tu@email.com'; }, 2500);
+    return;
+  }
+  const suggestion = _suggestEmailFix(email);
+  if (suggestion) {
+    errEl.innerHTML = `⚠ ¿Quisiste decir <strong style="cursor:pointer;text-decoration:underline" onclick="document.getElementById('directEmail').value='${suggestion}';document.getElementById('magicLinkError').textContent='';sendMagicLink()">${suggestion}</strong>?`;
+    inputEl.style.borderColor = 'var(--amarillo)';
+    setTimeout(() => { inputEl.style.borderColor = ''; }, 4000);
     return;
   }
   const btn = document.getElementById('magicLinkBtn');
@@ -11379,6 +11401,11 @@ async function completeAuth() {
 
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
     errEl.textContent = '⚠ Ingresá un email válido para continuar.';
+    document.getElementById('leadEmail').focus(); return;
+  }
+  const _fix = _suggestEmailFix(email);
+  if (_fix) {
+    errEl.innerHTML = `⚠ ¿Quisiste decir <strong style="cursor:pointer;text-decoration:underline" onclick="document.getElementById('leadEmail').value='${_fix}';document.getElementById('emailError').textContent=''">${_fix}</strong>?`;
     document.getElementById('leadEmail').focus(); return;
   }
   if (password.length < 6) {
