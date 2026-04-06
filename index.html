@@ -2595,6 +2595,7 @@
   .hist-date-btn:hover { border-color:rgba(0,200,83,0.35); color:var(--verde); }
   .hist-date-btn.active { background:rgba(0,200,83,0.14); border-color:rgba(0,200,83,0.5); color:var(--verde); }
   .hist-date-btn.finde-btn.active { background:rgba(255,214,0,0.12); border-color:rgba(255,214,0,0.5); color:var(--amarillo); }
+  .hist-date-btn.conf-max-btn.active  { background:rgba(255,214,0,0.18); border-color:rgba(255,214,0,0.7); color:var(--amarillo); font-weight:800; }
   .hist-date-btn.conf-high-btn.active { background:rgba(0,200,83,0.14); border-color:rgba(0,200,83,0.5); color:var(--verde); }
   .hist-date-btn.conf-med-btn.active  { background:rgba(255,214,0,0.12); border-color:rgba(255,214,0,0.5); color:var(--amarillo); }
   .hist-date-btn.conf-low-btn.active  { background:rgba(100,149,237,0.14); border-color:rgba(100,149,237,0.5); color:#6495ed; }
@@ -3846,6 +3847,7 @@
     <!-- Filtros de confianza -->
     <div class="hist-date-filters" style="margin-top:6px">
       <button id="histConfBtnAll"  class="hist-date-btn active"        onclick="filterHistConf('all',this)">🎯 Confianza</button>
+      <button id="histConfBtnMax"  class="hist-date-btn conf-max-btn"  onclick="filterHistConf('max',this)">⭐ Máxima</button>
       <button id="histConfBtnHigh" class="hist-date-btn conf-high-btn" onclick="filterHistConf('high',this)">🔥 Alta</button>
       <button id="histConfBtnMed"  class="hist-date-btn conf-med-btn"  onclick="filterHistConf('med',this)">⭐ Media</button>
       <button id="histConfBtnLow"  class="hist-date-btn conf-low-btn"  onclick="filterHistConf('low',this)">📉 Baja</button>
@@ -9506,10 +9508,13 @@ function renderHistorial(filter) {
     });
   }
 
-  // Filtro por confianza (deriva de stake si no hay campo conf)
+  // Filtro por confianza (deriva de stake/bvr si no hay campo conf)
   if (histConfFilter !== 'all') {
     data = data.filter(h => {
+      const isMax = h.bvr >= 6 || h.stake >= 150 || h.bvrText === 'Máxima' || h.confLabel === 'Máxima';
+      if (histConfFilter === 'max')  return isMax;
       const c = h.conf || (h.stake >= 130 ? 'high' : h.stake >= 30 ? 'med' : 'low');
+      if (histConfFilter === 'high') return c === 'high' && !isMax;
       return c === histConfFilter;
     });
   }
@@ -9847,7 +9852,7 @@ function filterHistDate(f, btn) {
 }
 
 function filterHistConf(f, btn) {
-  ['histConfBtnAll','histConfBtnHigh','histConfBtnMed','histConfBtnLow'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+  ['histConfBtnAll','histConfBtnMax','histConfBtnHigh','histConfBtnMed','histConfBtnLow'].forEach(id => document.getElementById(id)?.classList.remove('active'));
   btn.classList.add('active');
   histConfFilter = f; histLeagueFilter='all'; histMercadoFilter='all'; histPage=0;
   renderHistorial(histFilter);
