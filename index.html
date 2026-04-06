@@ -6949,8 +6949,11 @@ function buildPredsFromOdds() {
 
     candidates2.sort((a, b) => {
       if (b.prob !== a.prob) return b.prob - a.prob;
-      if (a.isTotals) return -1;
-      if (b.isTotals) return 1;
+      // En empate de probabilidad: 1X2 > totals > btts
+      if (a.isTotals && !b.isTotals) return 1;   // totals pierden vs 1X2
+      if (!a.isTotals && b.isTotals) return -1;  // 1X2 gana vs totals
+      if (a.isBtts  && !b.isBtts)   return 1;   // btts pierde vs todo
+      if (!a.isBtts && b.isBtts)    return -1;
       return 0;
     });
 
