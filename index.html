@@ -8461,6 +8461,12 @@ function _matchKeyLP(home, away) {
   return (normTeam(home || '') + '_vs_' + normTeam(away || '')).toLowerCase().replace(/\s+/g,'');
 }
 
+// Promise que se resuelve cuando sbLoadLockedPicks termina (con o sin datos)
+// loadRealOdds la espera antes de renderizar — garantiza picks consistentes entre dispositivos
+let _sbLockedPicksReady = null;
+let _sbLockedPicksResolve = null;
+_sbLockedPicksReady = new Promise(res => { _sbLockedPicksResolve = res; });
+
 async function sbLoadLockedPicks() {
   try {
     const { data } = await sbAnon
@@ -8468,10 +8474,14 @@ async function sbLoadLockedPicks() {
     if (data?.data && typeof data.data === 'object') {
       window._sbLockedPicks = data.data;
       console.log('[lockedPicks] Cargados desde Supabase:', Object.keys(data.data).length, 'picks');
-      // Re-renderizar si la página ya estaba pintada (race condition: odds cargaron antes que Supabase)
-      if (window._rawOddsGames?.length) renderPreds();
     }
   } catch(e) { console.warn('[lockedPicks] Error al cargar:', e.message); }
+  finally {
+    // Siempre resolver la promise para desbloquear loadRealOdds
+    if (_sbLockedPicksResolve) { _sbLockedPicksResolve(); _sbLockedPicksResolve = null; }
+    // Re-renderizar si los picks ya estaban pintados (race: odds cargaron antes que Supabase)
+    if (window._rawOddsGames?.length) renderPreds();
+  }
 }
 
 async function sbSaveLockedPicks(preds, force = false) {
@@ -10544,12 +10554,17 @@ function forceRefreshOdds() {
 async function loadRealOdds() {
   if (_oddsLoading) return;
 
-  // 1) localStorage fresco → usar directo sin ningún fetch
+  // 1) localStorage fresco → esperar lock global antes de renderizar (máx 4s)
   const localCached = cacheGet('cache_odds_v7', CACHE_ODDS_TTL);
   if (localCached && Array.isArray(localCached) && localCached.length > 0) {
     window._rawOddsGames = localCached;
     processOddsIntoComparador(localCached);
-    renderPreds();
+    // Esperar a que sbLoadLockedPicks termine antes del primer render
+    // Garantiza que todos los dispositivos aplican el mismo lock global
+    const lockWait = _sbLockedPicksReady
+      ? Promise.race([_sbLockedPicksReady, new Promise(r => setTimeout(r, 4000))])
+      : Promise.resolve();
+    lockWait.then(() => renderPreds());
     return;
   }
 
