@@ -7486,15 +7486,15 @@ function renderPreds() {
     let upcoming  = realPreds.filter(p => !p._started).sort(sortByConf);
     let finished  = realPreds.filter(p =>  p._started).sort(sortByConf);
 
-    // ── Límite: máx 2 picks "Más de 1.5" de fútbol argentino ──
-    // Ya están ordenados por confianza (sortByConf), así que los 2 primeros son los mejores.
+    // ── Límite: máx 1 pick "Más de 1.5" de fútbol argentino (solo el mejor) ──
+    // Ya están ordenados por confianza (sortByConf), así que el primero es el mejor.
     (function _limitArgOver15() {
       let cnt = 0;
       upcoming = upcoming.filter(p => {
         const isArgO15 = (p._sportKey || '').includes('argentina') && p.rec === 'Más de 1.5';
         if (!isArgO15) return true;
         cnt++;
-        return cnt <= 2;
+        return cnt <= 1;
       });
     })();
 
