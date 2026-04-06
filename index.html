@@ -11190,7 +11190,8 @@ function sbTranslateError(msg) {
   if (msg.includes('Email not confirmed'))          return 'Confirmá tu email antes de iniciar sesión.';
   if (msg.includes('User already registered'))      return 'Este email ya está registrado. Usá "Iniciá sesión".';
   if (msg.includes('Password should be at least'))  return 'La contraseña debe tener al menos 6 caracteres.';
-  if (msg.includes('rate limit'))                   return 'Demasiados intentos. Esperá unos minutos.';
+  if (msg.includes('rate limit') || msg.includes('after') && msg.includes('second'))
+                                                    return 'Demasiados intentos. Esperá 1 minuto e intentá de nuevo.';
   if (msg.includes('network'))                      return 'Sin conexión. Revisá tu internet.';
   return msg;
 }
@@ -11235,11 +11236,13 @@ function toggleAuthMode() {
 
 async function sendMagicLink() {
   const email = document.getElementById('directEmail').value.trim();
-  const errContainer = document.getElementById('directEmail');
+  const inputEl = document.getElementById('directEmail');
+  const errEl   = document.getElementById('magicLinkError');
+  errEl.textContent = '';
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errContainer.style.borderColor = 'var(--rojo)';
-    errContainer.placeholder = '⚠ Ingresá un email válido';
-    setTimeout(() => { errContainer.style.borderColor = ''; errContainer.placeholder = 'tu@email.com'; }, 2500);
+    inputEl.style.borderColor = 'var(--rojo)';
+    inputEl.placeholder = '⚠ Ingresá un email válido';
+    setTimeout(() => { inputEl.style.borderColor = ''; inputEl.placeholder = 'tu@email.com'; }, 2500);
     return;
   }
   const btn = document.getElementById('magicLinkBtn');
@@ -11247,9 +11250,8 @@ async function sendMagicLink() {
   // Timeout de 12 segundos para no quedar colgado si Supabase tarda
   const timeoutId = setTimeout(() => {
     btn.textContent = '✉️ Enviar link de acceso'; btn.disabled = false;
-    errContainer.style.borderColor = 'var(--rojo)';
-    errContainer.placeholder = '⚠ Sin respuesta — intentá de nuevo';
-    setTimeout(() => { errContainer.style.borderColor = ''; errContainer.placeholder = 'tu@email.com'; }, 3000);
+    errEl.textContent = '⚠ Sin respuesta del servidor. Intentá de nuevo.';
+    setTimeout(() => { errEl.textContent = ''; }, 4000);
   }, 12000);
   try {
     const { error } = await sbClient.auth.signInWithOtp({
@@ -11259,16 +11261,25 @@ async function sendMagicLink() {
     clearTimeout(timeoutId);
     if (error) {
       btn.textContent = '✉️ Enviar link de acceso'; btn.disabled = false;
-      errContainer.style.borderColor = 'var(--rojo)';
-      setTimeout(() => errContainer.style.borderColor = '', 2500);
+      // Rate limit: Supabase permite 1 OTP por minuto por email
+      if (error.status === 429 || error.message?.toLowerCase().includes('rate limit') || error.message?.toLowerCase().includes('after')) {
+        const secsMatch = error.message?.match(/after (\d+) second/);
+        const secs = secsMatch ? secsMatch[1] : '60';
+        errEl.textContent = `⏱ Ya enviamos un link a este email. Esperá ${secs} segundos e intentá de nuevo.`;
+      } else {
+        errEl.textContent = '⚠ No pudimos enviar el link. Probá registrarte con contraseña.';
+      }
+      setTimeout(() => { errEl.textContent = ''; }, 10000);
     } else {
       // Mostrar pantalla de confirmación
-      document.getElementById('welcomeMsg').textContent = `Te mandamos un link a ${email} — revisá tu bandeja y hacé clic para entrar. ✉️`;
+      document.getElementById('welcomeMsg').textContent = `Te mandamos un link a ${email} — revisá tu bandeja (y spam) y hacé clic para entrar. ✉️`;
       showAuthStep(3);
     }
   } catch(e) {
     clearTimeout(timeoutId);
     btn.textContent = '✉️ Enviar link de acceso'; btn.disabled = false;
+    errEl.textContent = '⚠ Error de conexión. Intentá de nuevo.';
+    setTimeout(() => { errEl.textContent = ''; }, 4000);
   }
 }
 
@@ -11391,9 +11402,13 @@ async function completeAuth() {
       } else {
         errEl.textContent = '⚠ ' + sbTranslateError(result.error.message);
       }
+    } else if (!authIsLogin) {
+      // Registro exitoso: mostrar feedback mientras onAuthStateChange toma el control
+      errEl.textContent = '✅ ¡Cuenta creada! Iniciando sesión...';
+      errEl.style.color = 'var(--verde)';
+      setTimeout(() => { errEl.style.color = ''; errEl.textContent = ''; }, 4000);
     }
-    // Si hay sesión, onAuthStateChange lo maneja automáticamente
-    // (Confirm email está desactivado en Supabase → sesión se crea directamente al registrarse)
+    // onAuthStateChange cierra el modal y carga los datos del usuario automáticamente
   } catch(e) {
     errEl.textContent = '⚠ Error de conexión. Intentá de nuevo.';
   } finally {
@@ -12329,9 +12344,10 @@ function _purgeNbaPicks() {
       <input class="auth-input" type="email" id="directEmail" placeholder="tu@email.com" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')sendMagicLink()">
 
       <!-- Magic Link (opción principal) -->
-      <button class="auth-btn-main" id="magicLinkBtn" onclick="sendMagicLink()" style="margin-bottom:10px">
+      <button class="auth-btn-main" id="magicLinkBtn" onclick="sendMagicLink()" style="margin-bottom:6px">
         ✉️ Enviar link de acceso
       </button>
+      <div id="magicLinkError" style="color:var(--rojo);font-size:0.78rem;min-height:18px;padding:2px 4px;text-align:center;margin-bottom:4px"></div>
       <div style="font-size:0.73rem;color:var(--texto-sec);text-align:center;margin-bottom:14px;line-height:1.4">
         Te mandamos un link a tu email — hacés clic y entrás. Sin contraseña.
       </div>
