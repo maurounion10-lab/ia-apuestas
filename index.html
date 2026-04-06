@@ -9511,7 +9511,7 @@ function renderHistorial(filter) {
   // Filtro por confianza (deriva de stake/bvr si no hay campo conf)
   if (histConfFilter !== 'all') {
     data = data.filter(h => {
-      const bvr = h.bvr || (h.stake >= 170 ? 6 : h.stake >= 130 ? 5 : h.stake >= 50 ? 4 : h.stake >= 30 ? 3 : h.stake >= 15 ? 2 : 1);
+      const bvr = h.bvr || (h.stake >= 150 ? 6 : h.stake >= 130 ? 5 : h.stake >= 50 ? 4 : h.stake >= 30 ? 3 : h.stake >= 15 ? 2 : 1);
       if (histConfFilter === 'max')  return bvr >= 6;
       const c = h.conf || (h.stake >= 130 ? 'high' : h.stake >= 30 ? 'med' : 'low');
       return c === histConfFilter;
