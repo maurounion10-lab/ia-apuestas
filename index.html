@@ -12083,6 +12083,23 @@ function acCheckDaily() {
     }
   }
 
+  // ── Recarga retroactiva: quedó en 0 sin AC_BUST (quiebra anterior al feature) ──
+  // Si es un día nuevo y el balance es 0 sin picks pendientes → recarga directa
+  if (localStorage.getItem(AC_DAY) !== today) {
+    const bal = acGet();
+    if (bal === 0 && pendingPicks.length === 0) {
+      localStorage.removeItem(AC_BUST);
+      acAdd(10000, '💸 Recarga de emergencia');
+      localStorage.setItem(AC_DAY, today);
+      acScheduleSync();
+      setTimeout(() => {
+        acToast('💸', `+${acFmt(10000)} ${AC_ICON} Gambeta Coins`, '¡Recarga lista! Seguí apostando 🔥');
+        _addCoinNotif('💸', `+${acFmt(10000)} G$ Gambeta Coins`, 'Recarga de emergencia — ¡dale de nuevo!');
+      }, 1200);
+      return;
+    }
+  }
+
   if (localStorage.getItem(AC_DAY) === today) return;
   const bal = acGet();
   // Si ya tiene saldo completo, marcar el día igualmente (no necesita recarga)
