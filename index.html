@@ -13066,18 +13066,11 @@ async function checkOnboarding() {
   // ── Caso 3: Tiene todo → no hacer nada ────────────────────────────────────
   if (hasNick && ava) return;
 
-  // ── Caso 4: Tiene nick pero sin avatar → mostrar paso 2 (normal) ──────────
-  const overlay = document.getElementById('onboardingOverlay');
-  overlay.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-  _obCurrentClubs = await _obPickClubs();
-  if (hasNick) {
-    document.getElementById('obStep1').style.display = 'none';
-    document.getElementById('obStep2').style.display = 'block';
-    renderObClubs();
-  } else {
-    setTimeout(() => { const inp = document.getElementById('obNickInput'); if (inp) inp.focus(); }, 250);
-  }
+  // ── Caso 4: Tiene nick pero sin avatar → asignar club automáticamente ────────
+  const club = _randomFootballClub();
+  localStorage.setItem(GB_AVA, JSON.stringify({ id: club.id, logo: club.logo, name: club.name, color: club.color }));
+  applyUserProfile();
+  acScheduleSync();
 }
 
 async function obNext() {
