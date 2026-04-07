@@ -13294,22 +13294,6 @@ function rkMaskEmail(email) {
   return user.slice(0, 2) + '***@' + domain;
 }
 
-// ── Set de emails que alguna vez estuvieron en Top 10 ──────────────────────
-const RK_CHAMPIONS_SET = new Set(
-  Object.values(RK_STATIC_WINNERS).flatMap(arr => arr.map(u => u.email))
-);
-
-// Badge dorado para ex-campeones (inline, sin romper layout)
-function rkChampionBadge(email) {
-  if (!email || !RK_CHAMPIONS_SET.has(email)) return '';
-  // Buscar en qué mes/meses ganó para el tooltip
-  const months = Object.entries(RK_STATIC_WINNERS)
-    .filter(([, arr]) => arr.some(u => u.email === email))
-    .map(([key]) => { const [,yyyy,mm] = key.split('_'); return `${RK_MONTH_NAMES[mm]||mm} '${(yyyy||'').slice(2)}`; });
-  const tip = months.join(', ');
-  return `<span title="Top 10 — ${tip}" style="display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(255,214,0,0.22),rgba(255,160,0,0.12));border:1px solid rgba(255,214,0,0.5);border-radius:5px;padding:1px 5px;font-size:0.62em;font-weight:900;color:#ffd600;letter-spacing:0.3px;vertical-align:middle;margin-left:5px;line-height:1.4;white-space:nowrap;flex-shrink:0">🏆 TOP10</span>`;
-}
-
 function rkDisplayName(u, html = false) {
   const vip  = u.email ? GAMBETA_VIP[u.email] : null;
   const base = vip?.nickname || u.nickname || rkMaskEmail(u.email);
@@ -13529,6 +13513,21 @@ const RK_STATIC_WINNERS = {
     { nickname:'PITI',     balance: 20628,  email:'rhapsody_piti75@hotmail.com' },
   ]
 };
+
+// ── Set de emails que alguna vez estuvieron en Top 10 ──────────────────────
+const RK_CHAMPIONS_SET = new Set(
+  Object.values(RK_STATIC_WINNERS).flatMap(arr => arr.map(u => u.email))
+);
+
+// Badge dorado para ex-campeones (inline, sin romper layout)
+function rkChampionBadge(email) {
+  if (!email || !RK_CHAMPIONS_SET.has(email)) return '';
+  const months = Object.entries(RK_STATIC_WINNERS)
+    .filter(([, arr]) => arr.some(u => u.email === email))
+    .map(([key]) => { const [,yyyy,mm] = key.split('_'); return `${RK_MONTH_NAMES[mm]||mm} '${(yyyy||'').slice(2)}`; });
+  const tip = months.join(', ');
+  return `<span title="Top 10 — ${tip}" style="display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,rgba(255,214,0,0.22),rgba(255,160,0,0.12));border:1px solid rgba(255,214,0,0.5);border-radius:5px;padding:1px 5px;font-size:0.62em;font-weight:900;color:#ffd600;letter-spacing:0.3px;vertical-align:middle;margin-left:5px;line-height:1.4;white-space:nowrap;flex-shrink:0">🏆 TOP10</span>`;
+}
 
 // Guarda los winners estáticos en shared_cache si todavía no existen
 async function rkSyncStaticWinners() {
