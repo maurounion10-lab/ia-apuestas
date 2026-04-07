@@ -4665,6 +4665,7 @@ const AC_BAL  = 'acoin_balance';
 const AC_PICK = 'acoin_picks';
 const AC_HIST = 'acoin_history';
 const AC_DAY  = 'acoin_last_daily';
+const AC_BUST = 'acoin_bust_date';   // fecha en que el usuario quedó en G$0 sin picks pendientes
 const AC_GOAL = 100000;
 // Ícono moneda dorada — usar en template literals con ${AC_ICON}
 const AC_ICON = '<span class="acico">G$</span>';
@@ -4843,7 +4844,8 @@ async function acSyncToDB() {
     balance:     acGet(),
     picks:       acGetPicks(),
     history:     JSON.parse(localStorage.getItem(AC_HIST) || '[]'),
-    last_daily:  localStorage.getItem(AC_DAY) || null,
+    last_daily:  localStorage.getItem(AC_DAY)  || null,
+    bust_date:   localStorage.getItem(AC_BUST) || null,
     predictions: predsSlim,   // ← historial de pronósticos para stats globales
     nickname:    localStorage.getItem(GB_NICK) || null,
     avatar:      localStorage.getItem(GB_AVA)  || null,
@@ -4905,11 +4907,18 @@ async function acLoadFromDB(email) {
     // last_daily: keep the most recent date string
     const mergedDay = localDay > dbDay ? localDay : dbDay;
 
+    // bust_date: keep if set in either side
+    const localBust = localStorage.getItem(AC_BUST) || '';
+    const dbBust    = data.bust_date || '';
+    const mergedBust = localBust || dbBust;
+
     // Write merged result to localStorage
     localStorage.setItem(AC_BAL,  mergedBal);
     localStorage.setItem(AC_HIST, JSON.stringify(mergedHist));
     localStorage.setItem(AC_PICK, JSON.stringify(mergedPick));
-    if (mergedDay) localStorage.setItem(AC_DAY, mergedDay);
+    if (mergedDay)  localStorage.setItem(AC_DAY,  mergedDay);
+    if (mergedBust) localStorage.setItem(AC_BUST, mergedBust);
+    else            localStorage.removeItem(AC_BUST);
 
     // Nickname / avatar: DB wins only if local is empty (so we don't lose onboarding done offline)
     if (data.nickname && !localStorage.getItem(GB_NICK)) localStorage.setItem(GB_NICK, data.nickname);
@@ -12040,16 +12049,46 @@ function acToast(icon, title, sub) {
   _toastTimer = setTimeout(() => t.classList.remove('show'), 3900);
 }
 
+/* ── Marcar quiebra: llamar cuando el balance llega a 0 sin picks pendientes ── */
+function acCheckBust() {
+  if (acGet() > 0) return;
+  if (acGetPicks().filter(p => !p.evaluated).length > 0) return;
+  if (localStorage.getItem(AC_BUST)) return; // ya registrado
+  const today = new Date().toLocaleDateString('en-CA');
+  localStorage.setItem(AC_BUST, today);
+  acScheduleSync();
+  acToast('💸', 'Te quedaste sin G$', 'Mañana te recargamos G$ 10.000 para que vuelvas a jugar 💪');
+}
+
 /* ── Daily bonus ── */
 function acCheckDaily() {
   const today = new Date().toLocaleDateString('en-CA');
+  const pendingPicks = acGetPicks().filter(p => !p.evaluated);
+
+  // ── Recarga de emergencia: quedó en 0 el día anterior ──────────────────
+  const bustDate = localStorage.getItem(AC_BUST);
+  if (bustDate && bustDate < today && pendingPicks.length === 0) {
+    localStorage.removeItem(AC_BUST);
+    const bal = acGet();
+    const topUp = 10000 - bal;
+    if (topUp > 0) {
+      acAdd(topUp, '💸 Recarga de emergencia');
+      localStorage.setItem(AC_DAY, today);
+      acScheduleSync();
+      setTimeout(() => {
+        acToast('💸', `+${acFmt(topUp)} ${AC_ICON} Gambeta Coins`, '¡Recarga lista! Seguí apostando 🔥');
+        _addCoinNotif('💸', `+${acFmt(topUp)} G$ Gambeta Coins`, 'Recarga de emergencia — ¡dale de nuevo!');
+      }, 1200);
+      return;
+    }
+  }
+
   if (localStorage.getItem(AC_DAY) === today) return;
   const bal = acGet();
   // Si ya tiene saldo completo, marcar el día igualmente (no necesita recarga)
   if (bal >= 10000) { localStorage.setItem(AC_DAY, today); return; }
   // NO recargar mientras haya apuestas sin resolver —
   // cuando se resuelvan, acEvaluatePicks() volverá a llamar acCheckDaily()
-  const pendingPicks = acGetPicks().filter(p => !p.evaluated);
   if (pendingPicks.length > 0) return; // no marcar AC_DAY → reintentará al resolver
   const topUp = 10000 - bal;
   acAdd(topUp, '🌅 Bonus diario');
@@ -12222,7 +12261,7 @@ function acEvaluatePicks() {
     p.evaluated = true; p.result = actual; p.correct = correct;
     changed = true;
   });
-  if (changed) { acSavePicks(picks); renderPreds(); renderMyPicks(); acCheckDaily(); }
+  if (changed) { acSavePicks(picks); renderPreds(); renderMyPicks(); acCheckBust(); acCheckDaily(); }
 }
 
 /* ── Build pick HTML ── */
