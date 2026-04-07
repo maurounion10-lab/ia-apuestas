@@ -1,0 +1,9 @@
+# Cloudflare Pages custom headers
+
+# Bloquear indexación de endpoints internos de API
+/api/*
+  X-Robots-Tag: noindex, nofollow
+
+# Bloquear indexación de URLs con parámetros de auth
+/?openauth=*
+  X-Robots-Tag: noindex, nofollow
