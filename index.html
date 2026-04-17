@@ -10796,7 +10796,24 @@ let histConfFilter = 'all';
 // Fecha de lanzamiento del sitio — fija para todos los usuarios
 const PAGE_LAUNCH_DATE = new Date('2025-03-01');
 
-function loadHistorial()   { try { return JSON.parse(localStorage.getItem(HIST_KEY)||'[]'); } catch { return []; } }
+function loadHistorial() {
+  try {
+    const hist = JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
+    // Aplicar overrides manuales de resultado (se definen más abajo en HIST_RESULT_OVERRIDES)
+    if (typeof HIST_RESULT_OVERRIDES !== 'undefined') {
+      const _nOv = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+      hist.forEach(h => {
+        const ovKey = _nOv(h.home) + '|||' + _nOv(h.away);
+        const ov = HIST_RESULT_OVERRIDES[ovKey];
+        if (!ov) return;
+        h.result = ov.result;
+        if (ov.finalScore !== undefined) h.finalScore = ov.finalScore;
+        if (ov.result === 'void') h.pl = 0;
+      });
+    }
+    return hist;
+  } catch { return []; }
+}
 function saveHistorial(arr) {
   const sorted = [...arr].sort((a,b) => (b.commenceTs||0) - (a.commenceTs||0));
   try { localStorage.setItem(HIST_KEY, JSON.stringify(sorted.slice(-500))); } catch {}
@@ -10820,6 +10837,12 @@ let _globalHistSyncTimer = null;
 const ADMIN_EMAIL = 'mauro.union10@gmail.com';
 const GLOBAL_HIST_KEY = 'global_historial_v1';
 const BLOCKED_HIST_IDS = new Set(['fsvmainz05_sigmaolomouc_2026-03-18', 'seattle_realsaltlake_2026-04-12', 'indmedellin_estudianteslp_2026-04-08', 'cusco_flamengo_2026-04-08', 'junior_palmeiras_2026-04-08', 'sportingcristal_cerroporteno_2026-04-08']);
+
+// Overrides manuales de resultado — clave: normTeam(home)+'|||'+normTeam(away)
+// Valor: { result: 'win'|'loss'|'void', finalScore (opcional) }
+const HIST_RESULT_OVERRIDES = {
+  'sassuolo|||como': { result: 'void' },
+};
 
 // ══════════════════════════════════════════════════════════════
 //  PICKS BLOQUEADOS GLOBALES — shared_cache en Supabase
