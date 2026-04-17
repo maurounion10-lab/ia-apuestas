@@ -6655,6 +6655,13 @@ function shortName(name) {
     'Fluminense-RJ': 'Fluminense', 'Flamengo-RJ': 'Flamengo',
     'Palmeiras-SP': 'Palmeiras', 'Corinthians-SP': 'Corinthians',
     'Bragantino-SP': 'Bragantino', 'Clube Atlético Mineiro': 'Atl. Mineiro',
+    // ESPN usa siglas de estado para equipos brasileños: Atlético-MG, Atlético-GO, etc.
+    'Atlético-MG': 'Atl. Mineiro', 'Atletico-MG': 'Atl. Mineiro',
+    'Atlético Mineiro': 'Atl. Mineiro', 'Atletico Mineiro': 'Atl. Mineiro',
+    'Atlético-GO': 'Atlético Goianiense', 'Atletico-GO': 'Atlético Goianiense',
+    'Athletico-PR': 'At. Paranaense',
+    'América-MG': 'América Mineiro', 'America-MG': 'América Mineiro',
+    'América Mineiro': 'América Mineiro',
     // Con ciudad en el nombre
     'Libertad Asuncion': 'Libertad', 'Libertad Asunción': 'Libertad',
     'Peñarol Montevideo': 'Peñarol', 'Nacional de Montevideo': 'Nacional',
@@ -10430,6 +10437,15 @@ const teamShortNames = {
   'Corinthians-SP':           'Corinthians',
   'Bragantino-SP':            'Bragantino',
   'Clube Atlético Mineiro':   'Atl. Mineiro',
+  // ESPN usa siglas de estado → mapear a nombre estándar
+  'Atlético-MG':              'Atl. Mineiro',
+  'Atletico-MG':              'Atl. Mineiro',
+  'Atlético Mineiro':         'Atl. Mineiro',
+  'Atletico Mineiro':         'Atl. Mineiro',
+  'Atlético-GO':              'Atlético Goianiense',
+  'Athletico-PR':             'At. Paranaense',
+  'América-MG':               'América Mineiro',
+  'America-MG':               'América Mineiro',
   // Con ciudad en el nombre
   'Libertad Asuncion':        'Libertad',
   'Libertad Asunción':        'Libertad',
