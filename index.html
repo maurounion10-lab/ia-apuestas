@@ -10271,7 +10271,7 @@ function renderPreds() {
       <div class="pred-recommendation">
         <div class="pred-rec-left">
           <div class="pred-rec-label">🤖 Recomendación IA</div>
-          <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '🎯'} ${(p.rec||'').replace('Local Gana','Gana Local').replace('Visitante Gana','Gana Visitante').replace(/^(Más de \d+\.\d+)$/,'$1 goles')}</div>
+          <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '🎯'} ${(p.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'').replace(/^(Más de \d+\.\d+)$/,'$1 goles')}</div>
         </div>
         <div class="pred-rec-right">
           ${(()=>{ const ro = p.rec==='Gana Local' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null) : p.rec==='Gana Visitante' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null) : p.rec==='Empate' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
@@ -12424,7 +12424,7 @@ function renderHistorial(filter) {
           ? '<span style="color:#555">—</span>'
           : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
         const icon = h.sport==='tenis'?'🎾':'⚽';
-        const recDisplay = (h.rec||'').replace(' Gana','').replace(/^(Más de \d+\.\d+)$/,'$1 goles');
+        const recDisplay = (h.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'').replace(/^(Más de \d+\.\d+)$/,'$1 goles');
         const isMax  = h.stake >= 150;
         const isHigh = h.stake >= 130;
         // Fecha real del partido: usar commenceTs si existe, si no h.date
@@ -17724,7 +17724,7 @@ function admRenderHistTable() {
       <tr style="border-top:1px solid rgba(255,255,255,0.04)">
         <td style="padding:8px 12px;color:var(--texto-sec)">${h.date||'—'}</td>
         <td style="padding:8px 12px;color:#fff;font-weight:600">${h.home} vs ${h.away}</td>
-        <td style="padding:8px 12px;color:var(--verde)">${(h.rec||'').replace(' Gana','').replace(/^(Más de \d+\.\d+)$/,'$1 goles')}</td>
+        <td style="padding:8px 12px;color:var(--verde)">${(h.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'').replace(/^(Más de \d+\.\d+)$/,'$1 goles')}</td>
         <td style="padding:8px 12px">$${h.stake||0}</td>
         <td style="padding:8px 12px">
           <select onchange="admSetResult(${i},this.value)" style="background:#1a2a1a;border:1px solid rgba(255,255,255,0.15);color:#fff;padding:3px 6px;border-radius:6px;font-size:0.75rem">
