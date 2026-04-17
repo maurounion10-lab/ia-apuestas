@@ -10826,17 +10826,42 @@ const ADMIN_EMAIL = 'mauro.union10@gmail.com';
 const GLOBAL_HIST_KEY = 'global_historial_v1';
 const BLOCKED_HIST_IDS = new Set(['fsvmainz05_sigmaolomouc_2026-03-18', 'seattle_realsaltlake_2026-04-12', 'indmedellin_estudianteslp_2026-04-08', 'cusco_flamengo_2026-04-08', 'junior_palmeiras_2026-04-08', 'sportingcristal_cerroporteno_2026-04-08']);
 
+// Pares de equipos a bloquear del historial (normTeam(home)+'|||'+normTeam(away))
+// Usado cuando los picks no tienen id o el id no matchea BLOCKED_HIST_IDS
+const BLOCKED_HIST_TEAMS = new Set([
+  'indmedellin|||estudianteslp',  // Copa Abr-8
+  'indmedellin|||estudiantesdlp',
+  'cusco|||flamengo',
+  'junior|||palmeiras',
+  'sportingcristal|||cerroporteno',
+]);
+
 // Overrides manuales de resultado — clave: normTeam(home)+'|||'+normTeam(away)
 // Valor: { result: 'win'|'loss'|'void', finalScore (opcional) }
 const HIST_RESULT_OVERRIDES = {
-  'sassuolo|||como': { result: 'void' },
+  'sassuolo|||como':       { result: 'void' },
+  'sassuolo|||como1907':   { result: 'void' },
+  'ussassuolo|||como':     { result: 'void' },
+  'ussassuolo|||como1907': { result: 'void' },
 };
+
+// Helper: normaliza nombre de equipo para comparación
+const _normHist = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+
+// Retorna true si una entrada del historial debe ser bloqueada
+function _isHistBlocked(h) {
+  if (!h) return true;
+  if (BLOCKED_HIST_IDS.has(h.id||'')) return true;
+  const key = _normHist(h.home) + '|||' + _normHist(h.away);
+  if (BLOCKED_HIST_TEAMS.has(key)) return true;
+  return false;
+}
+
 // Aplica HIST_RESULT_OVERRIDES in-place a un array de picks (modifica los objetos)
 function _applyHistOverrides(arr) {
   if (!arr?.length) return arr;
-  const _nOv = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
   arr.forEach(h => {
-    const ov = HIST_RESULT_OVERRIDES[_nOv(h.home) + '|||' + _nOv(h.away)];
+    const ov = HIST_RESULT_OVERRIDES[_normHist(h.home) + '|||' + _normHist(h.away)];
     if (!ov) return;
     h.result = ov.result;
     if (ov.finalScore !== undefined) h.finalScore = ov.finalScore;
@@ -11424,7 +11449,7 @@ async function sbLoadHistorial() {
     const allEntries = [...(globalHist||[]), ...dbHist, ...localHist];
     const seen = new Map();
     allEntries.forEach(h => { const k = _hKey(h); if (!seen.has(k)) seen.set(k, h); });
-    const merged = [...seen.values()].filter(h=>!BLOCKED_HIST_IDS.has(h?.id||'')).sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0));
+    const merged = [...seen.values()].filter(h=>!_isHistBlocked(h)).sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0));
 
     // ── Migración global de stakes (backtesting) ──────────────────────────────
     // Máxima(6)=$170 | Alta(5)=$130 | Media-Alta(4)=$50 | Media(3)=$30 | Baja=$15
@@ -11483,7 +11508,7 @@ async function sbLoadHistorial() {
   // IMPORTANTE: si local tiene resultado resuelto (win/loss) y global dice "pending",
   // preferir el resultado local (el cliente ya resolvió contra ESPN scores)
   if (globalHist && globalHist.length > 0) {
-    const _fg = globalHist.filter(h=>!BLOCKED_HIST_IDS.has(h?.id||''));
+    const _fg = globalHist.filter(h=>!_isHistBlocked(h));
     const _localHist = loadHistorial();
     const _hKeyM = h => h.id || `${h.home}|||${h.away}|||${h.commenceTs||h.date||''}`;
     // Indexar locales por key para lookup rápido
@@ -12184,6 +12209,7 @@ function renderHistorial(filter) {
   const BLOCKED_TEAMS = ['palestino','ucatolica','universidadcatolica','universidadcat'];
   const allRaw = loadHistorial();
   const allClean = allRaw.filter(h => {
+    if (_isHistBlocked(h)) return false;
     if (BLOCKED_SPORT_KEYS.includes(h._sportKey)) return false;
     const nh = _normB(h.home), na = _normB(h.away);
     if (BLOCKED_TEAMS.some(t => nh.includes(t) || na.includes(t))) return false;
