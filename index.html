@@ -353,14 +353,14 @@
   /* ── HERO ── */
   .hero {
     background: linear-gradient(135deg, #071007 0%, #0d200d 40%, #071207 100%);
-    padding: 50px 32px 44px;
+    padding: 28px 32px 22px;
     position: relative;
     overflow: hidden;
     border-bottom: 1px solid var(--borde);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 40px;
+    gap: 36px;
   }
   .hero-text {
     flex: 1;
@@ -368,7 +368,7 @@
     text-align: left;
   }
   @media (max-width: 768px) {
-    .hero { flex-direction: column; padding: 36px 20px 32px; gap: 18px; align-items: center; }
+    .hero { flex-direction: column; padding: 20px 20px 16px; gap: 12px; align-items: center; }
     .hero-text { text-align: center; order: 1; }
     .hero-mascot-wrap { order: 0; } /* mascot aparece primero en mobile */
   }
@@ -391,9 +391,9 @@
   }
   .hero-mascot {
     flex-shrink: 0;
-    width: 240px;
-    height: 240px;
-    border-radius: 24px;
+    width: 180px;
+    height: 180px;
+    border-radius: 20px;
     overflow: hidden;
     position: relative;
     box-shadow: 0 8px 40px rgba(0,200,83,0.3), 0 0 0 2px rgba(0,200,83,0.2);
@@ -405,7 +405,7 @@
     object-position: 50% 35%;
   }
   @media (max-width: 768px) {
-    .hero-mascot { width: 170px; height: 170px; border-radius: 20px; }
+    .hero-mascot { width: 130px; height: 130px; border-radius: 16px; }
   }
 
   .hero::before {
@@ -426,19 +426,19 @@
     background: rgba(0,200,83,0.12);
     border: 1px solid rgba(0,200,83,0.3);
     color: var(--verde);
-    padding: 6px 14px;
+    padding: 5px 12px;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 600;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     letter-spacing: 0.5px;
   }
 
   .hero h1 {
-    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-size: clamp(1.6rem, 4vw, 2.6rem);
     font-weight: 900;
     line-height: 1.15;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
     letter-spacing: -1px;
   }
   .hero h1 .highlight {
@@ -448,15 +448,15 @@
 
   .hero p {
     color: var(--texto-sec);
-    font-size: 1.1rem;
+    font-size: 1rem;
     max-width: 550px;
-    margin: 0 auto 32px;
-    line-height: 1.7;
+    margin: 0 auto 18px;
+    line-height: 1.6;
   }
 
   .hero-stats {
     display: flex;
-    gap: 48px;
+    gap: 32px;
     justify-content: center;
     flex-wrap: wrap;
   }
@@ -464,7 +464,7 @@
     text-align: center;
   }
   .hero-stat .num {
-    font-size: 2rem;
+    font-size: 1.6rem;
     font-weight: 800;
     color: var(--verde);
     display: block;
@@ -561,7 +561,7 @@
   main {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 32px 20px;
+    padding: 20px 20px 32px;
     overflow: hidden;
     width: 100%;
   }
@@ -585,7 +585,7 @@
   .section-title {
     font-size: 1.3rem;
     font-weight: 700;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     display: flex;
     align-items: center;
     gap: 10px;
@@ -9721,6 +9721,7 @@ function renderPreds() {
         star = candidates[0] || null;
       }
       if (star) {
+        window._estrellaStarPick = star;
         const sHome = logoHtml(star.home, 42);
         const sAway = logoHtml(star.away, 42);
         const rec = (star.rec||'').replace('Gana ','').replace(/^(Más de \d+\.\d+)$/,'$1 goles');
@@ -9767,11 +9768,13 @@ function renderPreds() {
           </div>`;
       } else {
         estrellaEl.style.display = 'none';
+        window._estrellaStarPick = null;
       }
     } else if (estrellaEl) {
       estrellaEl.style.display = 'none';
+      window._estrellaStarPick = null;
     }
-  } catch(eStr) { console.warn('[estrella]', eStr); }
+  } catch(eStr) { console.warn('[estrella]', eStr); window._estrellaStarPick = null; }
 
   // Guardar picks completos y actualizar visibilidad de tabs de liga
   window._allAvailablePicks = realPreds ? realPreds.slice() : [];
@@ -10036,7 +10039,10 @@ function renderPreds() {
   // En el home solo mostramos hasta 9 picks; en la sub-página completa se ven todos
   const _isPicksSubPage = document.body.dataset.gbpage === 'picks';
   const HOME_PICKS_LIMIT = 9;
-  const source = _isPicksSubPage ? realPreds : realPreds.slice(0, HOME_PICKS_LIMIT);
+  // Excluir el pick estrella del grid para no duplicarlo (ya se muestra arriba en estrellaContainer)
+  const _sp = window._estrellaStarPick;
+  const _dedupeEstrella = arr => !_sp ? arr : arr.filter(p => !(teamsMatch(p.home, _sp.home) && teamsMatch(p.away, _sp.away)));
+  const source = _isPicksSubPage ? _dedupeEstrella(realPreds) : _dedupeEstrella(realPreds).slice(0, HOME_PICKS_LIMIT);
 
   // ── Banner de estado ──
   const statusBar = document.getElementById('predsStatusBar');
