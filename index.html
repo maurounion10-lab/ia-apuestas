@@ -9477,15 +9477,34 @@ function renderHistorial(filter) {
   if (allClean.length < allRaw.length) saveHistorial(allClean); // limpia storage silenciosamente
   const all = allClean;
   // ── Deduplicar: mismo partido (home+away fuzzy) en el mismo día ──
+  // Prioridad: win/loss > pending (si hay dos del mismo partido, quedarse con el resuelto)
   const dedupedAll = [];
   for (const h of all) {
-    const alreadyIn = dedupedAll.some(x =>
-      teamsMatch(x.home, h.home) && teamsMatch(x.away, h.away) &&
-      (x.commenceTs && h.commenceTs
-        ? Math.abs(x.commenceTs - h.commenceTs) < 3 * 3600000  // mismo partido ±3h
-        : x.date === h.date)
-    );
-    if (!alreadyIn) dedupedAll.push(h);
+    const dupIdx = dedupedAll.findIndex(x => {
+      if (!teamsMatch(x.home, h.home) || !teamsMatch(x.away, h.away)) return false;
+      // Mismo partido: comparar por commenceTs si ambos lo tienen, sino por rec+fecha
+      if (x.commenceTs && h.commenceTs)
+        return Math.abs(x.commenceTs - h.commenceTs) < 6 * 3600000; // mismo partido ±6h
+      if (x.commenceTs || h.commenceTs) {
+        // Uno tiene ts y el otro no: comparar fecha de ese ts con h.date o x.date
+        const tsDate = new Date(x.commenceTs || h.commenceTs).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
+        const otherDate = x.commenceTs ? h.date : x.date;
+        return tsDate === otherDate;
+      }
+      return x.date === h.date;
+    });
+    if (dupIdx === -1) {
+      dedupedAll.push(h);
+    } else {
+      // Reemplazar si el nuevo está resuelto y el existente está pendiente
+      const existing = dedupedAll[dupIdx];
+      const existingResolved = existing.result !== 'pending';
+      const newResolved = h.result !== 'pending';
+      if (newResolved && !existingResolved) {
+        dedupedAll[dupIdx] = h; // reemplazar pending por resuelto
+      }
+      // Si ambos resueltos o ambos pending → mantener el existente (ya en lista)
+    }
   }
   // Si había duplicados, sanear el storage silenciosamente
   if (dedupedAll.length < all.length) saveHistorial(dedupedAll);
@@ -9699,7 +9718,7 @@ function renderHistorial(filter) {
           ? '<span style="color:#555">—</span>'
           : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
         const icon = h.sport==='tenis'?'🎾':'⚽';
-        const recDisplay = (h.rec||'').replace(' Gana','');
+        const recDisplay = h.rec || '';
         const isMax  = h.stake >= 150;
         const isHigh = h.stake >= 130;
         // Fecha real del partido: usar commenceTs si existe, si no h.date
@@ -14173,7 +14192,7 @@ function admRenderHistTable() {
       <tr style="border-top:1px solid rgba(255,255,255,0.04)">
         <td style="padding:8px 12px;color:var(--texto-sec)">${h.date||'—'}</td>
         <td style="padding:8px 12px;color:#fff;font-weight:600">${h.home} vs ${h.away}</td>
-        <td style="padding:8px 12px;color:var(--verde)">${(h.rec||'').replace(' Gana','')}</td>
+        <td style="padding:8px 12px;color:var(--verde)">${h.rec||''}</td>
         <td style="padding:8px 12px">$${h.stake||0}</td>
         <td style="padding:8px 12px">
           <select onchange="admSetResult(${i},this.value)" style="background:#1a2a1a;border:1px solid rgba(255,255,255,0.15);color:#fff;padding:3px 6px;border-radius:6px;font-size:0.75rem">
