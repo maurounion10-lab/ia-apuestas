@@ -7801,8 +7801,23 @@ function renderPreds() {
 
     // Estado del partido para la tarjeta
     const isStarted      = !!p._started;
-    const histResult     = p._histResult || 'pending'; // 'win'|'loss'|'void'|'pending'
+    let   histResult     = p._histResult || 'pending'; // 'win'|'loss'|'void'|'pending'
     const histScore      = p._histScore  || null;
+
+    // Si el historial dice pending pero ya tenemos score final en memoria → resolver en vivo
+    if (histResult === 'pending' && liveEntry?.flag === 'final') {
+      const _sH = liveEntry.scoreH, _sA = liveEntry.scoreA;
+      const _hw = _sH > _sA, _aw = _sA > _sH, _dr = _sH === _sA;
+      const _tot = _sH + _sA, _btts = _sH > 0 && _sA > 0;
+      if      (p.rec === 'Local Gana')     histResult = _hw  ? 'win' : 'loss';
+      else if (p.rec === 'Visitante Gana') histResult = _aw  ? 'win' : 'loss';
+      else if (p.rec === 'Empate')         histResult = _dr  ? 'win' : 'loss';
+      else if (p.rec === 'Ambos Marcan')   histResult = _btts ? 'win' : 'loss';
+      else if (p.rec === 'Más de 1.5')     histResult = _tot >= 2 ? 'win' : 'loss';
+      else if (p.rec === 'Más de 2.5')     histResult = _tot >= 3 ? 'win' : 'loss';
+      else if (p.rec === 'Más de 3.5')     histResult = _tot >= 4 ? 'win' : 'loss';
+    }
+
     const isFinishedWin  = isStarted && histResult === 'win';
     const isFinishedLoss = isStarted && histResult === 'loss';
     const isHighConfWin  = isFinishedWin && p.conf === 'high';
@@ -9216,7 +9231,9 @@ function resolveCompletedGames(scores, skipRender) {
   scores.filter(s => s.flag === 'final').forEach(s => {
     pending.forEach(p => {
       if (p.result !== 'pending') return; // ya fue resuelto en esta pasada
-      if (!teamsMatch(s.home, p.home) || !teamsMatch(s.away, p.away)) return;
+      const sHome = s.homeRaw || s.home;
+      const sAway = s.awayRaw || s.away;
+      if (!teamsMatch(sHome, p.home) || !teamsMatch(sAway, p.away)) return;
       // Verificar que el score sea del mismo partido (±2 días del commenceTs)
       if (s.commenceTs && p.commenceTs && Math.abs(s.commenceTs - p.commenceTs) > TWO_DAYS_MS) return;
 
