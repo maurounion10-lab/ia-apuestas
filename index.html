@@ -10799,19 +10799,7 @@ const PAGE_LAUNCH_DATE = new Date('2025-03-01');
 function loadHistorial() {
   try {
     const hist = JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
-    // Aplicar overrides manuales de resultado (se definen más abajo en HIST_RESULT_OVERRIDES)
-    if (typeof HIST_RESULT_OVERRIDES !== 'undefined') {
-      const _nOv = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
-      hist.forEach(h => {
-        const ovKey = _nOv(h.home) + '|||' + _nOv(h.away);
-        const ov = HIST_RESULT_OVERRIDES[ovKey];
-        if (!ov) return;
-        h.result = ov.result;
-        if (ov.finalScore !== undefined) h.finalScore = ov.finalScore;
-        if (ov.result === 'void') h.pl = 0;
-      });
-    }
-    return hist;
+    return _applyHistOverrides(hist);
   } catch { return []; }
 }
 function saveHistorial(arr) {
@@ -10843,6 +10831,19 @@ const BLOCKED_HIST_IDS = new Set(['fsvmainz05_sigmaolomouc_2026-03-18', 'seattle
 const HIST_RESULT_OVERRIDES = {
   'sassuolo|||como': { result: 'void' },
 };
+// Aplica HIST_RESULT_OVERRIDES in-place a un array de picks (modifica los objetos)
+function _applyHistOverrides(arr) {
+  if (!arr?.length) return arr;
+  const _nOv = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+  arr.forEach(h => {
+    const ov = HIST_RESULT_OVERRIDES[_nOv(h.home) + '|||' + _nOv(h.away)];
+    if (!ov) return;
+    h.result = ov.result;
+    if (ov.finalScore !== undefined) h.finalScore = ov.finalScore;
+    if (ov.result === 'void') h.pl = 0;
+  });
+  return arr;
+}
 
 // ══════════════════════════════════════════════════════════════
 //  PICKS BLOQUEADOS GLOBALES — shared_cache en Supabase
@@ -11472,6 +11473,7 @@ async function sbLoadHistorial() {
       await sbSaveGlobalHistorial(merged);
     }
 
+    _applyHistOverrides(merged);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
     renderHistorial(histFilter);
     return;
@@ -11499,6 +11501,7 @@ async function sbLoadHistorial() {
     const _globalKeys = new Set(_mergedGlobal.map(_hKeyM));
     const _localOnly = _localHist.filter(h => !_globalKeys.has(_hKeyM(h)));
     const _merged = [..._mergedGlobal, ..._localOnly].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,500);
+    _applyHistOverrides(_merged);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(_merged)); } catch {}
     renderHistorial(histFilter);
     // Re-trigger score resolution after merge (guard might have expired)
