@@ -7449,11 +7449,6 @@ function renderPreds() {
                 <div style="font-size:0.62rem;color:${dotsFilled>=6?'#ffd600':dotsFilled>=5?'#66bb6a':dotsFilled>=3?'#e64a19':'#d32f2f'};margin-top:3px">${dotsFilled}/6 · ${bvrLabel}</div>
               </div>
             </div>
-            <div style="display:flex;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,214,0,0.12);flex-wrap:wrap">
-              <div><span style="font-size:0.65rem;color:var(--texto-sec)">CUOTA</span><div style="font-weight:800;color:var(--amarillo)">${cuotaDisplay}</div></div>
-              <div><span style="font-size:0.65rem;color:var(--texto-sec)">STAKE</span><div style="font-weight:800;color:#fff">${stakeLabel}</div></div>
-              <div><span style="font-size:0.65rem;color:var(--texto-sec)">HORARIO</span><div style="font-weight:700;color:var(--texto-sec);font-size:0.85rem">${star.time||'—'}</div></div>
-            </div>
           </div>`;
       } else {
         estrellaEl.style.display = 'none';
