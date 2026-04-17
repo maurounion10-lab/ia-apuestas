@@ -10041,7 +10041,13 @@ function renderPreds() {
   const HOME_PICKS_LIMIT = 9;
   // Excluir el pick estrella del grid para no duplicarlo (ya se muestra arriba en estrellaContainer)
   const _sp = window._estrellaStarPick;
-  const _dedupeEstrella = arr => !_sp ? arr : arr.filter(p => !(teamsMatch(p.home, _sp.home) && teamsMatch(p.away, _sp.away)));
+  const _normE = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+  const _dedupeEstrella = arr => {
+    if (!_sp || !_sp.home || !_sp.away) return arr;
+    const _spH = _normE(_sp.home), _spA = _normE(_sp.away);
+    if (!_spH || !_spA) return arr;
+    return arr.filter(p => !(_normE(p.home) === _spH && _normE(p.away) === _spA));
+  };
   const source = _isPicksSubPage ? _dedupeEstrella(realPreds) : _dedupeEstrella(realPreds).slice(0, HOME_PICKS_LIMIT);
 
   // ── Banner de estado ──
