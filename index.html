@@ -9315,6 +9315,87 @@ const SPORT_KEY_MAP = {
   tenis:   ['tennis_atp_french_open', 'tennis_wta']
 };
 
+// Mapa de sport keys (The Odds API) → slugs de ESPN para fallback directo
+const ESPN_SLUG_MAP = {
+  'soccer_brazil_campeonato':               'bra.1',
+  'soccer_argentina_primera_division':      'arg.1',
+  'soccer_argentina_primera_nacional':      'arg.nacional',
+  'soccer_epl':                             'eng.1',
+  'soccer_england_premier_league':          'eng.1',
+  'soccer_spain_la_liga':                   'esp.1',
+  'soccer_italy_serie_a':                   'ita.1',
+  'soccer_germany_bundesliga':              'ger.1',
+  'soccer_france_ligue_one':                'fra.1',
+  'soccer_portugal_primeira_liga':          'por.1',
+  'soccer_netherlands_eredivisie':          'ned.1',
+  'soccer_mexico_ligamx':                   'mex.1',
+  'soccer_chile_campeonato':                'chi.1',
+  'soccer_uruguay_primera_division':        'uru.1',
+  'soccer_usa_mls':                         'usa.1',
+  'soccer_conmebol_copa_libertadores':      'conmebol.libertadores',
+  'soccer_south_america_copa_libertadores': 'conmebol.libertadores',
+  'soccer_conmebol_copa_sudamericana':      'conmebol.sudamericana',
+  'soccer_south_america_copa_sudamericana': 'conmebol.sudamericana',
+  'soccer_uefa_champs_league':              'uefa.champions',
+  'soccer_uefa_europa_league':              'uefa.europa',
+  'soccer_uefa_europa_conference_league':   'uefa.conference',
+  'soccer_scotland_premiership':            'sco.1',
+  'soccer_turkey_super_league':             'tur.1',
+  'soccer_saudi_professional_league':       'sau.1',
+  'soccer_japan_j_league':                  'jpn.1',
+};
+
+// Fetch scores directamente desde ESPN (fallback cuando el Worker está vacío)
+async function fetchESPNScores(sportKeys, daysBack = 4) {
+  const slugs = new Set();
+  sportKeys.forEach(k => { if (ESPN_SLUG_MAP[k]) slugs.add(ESPN_SLUG_MAP[k]); });
+  // Si no hay match, cubrir las ligas más habituales
+  if (!slugs.size) {
+    ['bra.1','arg.1','eng.1','esp.1','ita.1','ger.1','fra.1',
+     'conmebol.libertadores','conmebol.sudamericana'].forEach(s => slugs.add(s));
+  }
+
+  const dates = [];
+  for (let d = 1; d <= daysBack; d++) {
+    const dt = new Date(Date.now() - d * 86400000);
+    dates.push(dt.toISOString().slice(0,10).replace(/-/g,''));
+  }
+
+  const scores = [];
+  const parseESPN = (json) => {
+    (json.events || []).forEach(ev => {
+      const comp = ev.competitions?.[0];
+      if (!comp?.status?.type?.completed) return;
+      const home = comp.competitors?.find(c => c.homeAway === 'home');
+      const away = comp.competitors?.find(c => c.homeAway === 'away');
+      if (!home || !away) return;
+      scores.push({
+        home:       shortName(home.team?.displayName || home.team?.name || ''),
+        away:       shortName(away.team?.displayName || away.team?.name || ''),
+        scoreH:     parseInt(home.score) || 0,
+        scoreA:     parseInt(away.score) || 0,
+        flag:       'final',
+        commenceTs: ev.date ? new Date(ev.date).getTime() : null,
+      });
+    });
+  };
+
+  const fetches = [];
+  for (const slug of slugs) {
+    for (const date of dates) {
+      fetches.push(
+        fetch(`https://site.api.espn.com/apis/site/v2/sports/soccer/${slug}/scoreboard?dates=${date}`)
+          .then(r => r.ok ? r.json() : null)
+          .then(json => { if (json) parseESPN(json); })
+          .catch(() => null)
+      );
+    }
+  }
+  await Promise.allSettled(fetches);
+  console.log(`[ESPN] ${scores.length} partidos finalizados de ${slugs.size} ligas`);
+  return scores;
+}
+
 // Carga scores históricos (últimos 3 días) para resolver predicciones pendientes
 async function loadHistoricalScores() {
   const hist = loadHistorial();
@@ -9393,6 +9474,18 @@ async function loadHistoricalScores() {
     if (allScores.length) {
       console.log('[historicalScores] encontrados:', allScores.length, 'partidos finalizados en', needed.size, 'ligas');
       resolveAllGames(allScores);
+    } else {
+      // Worker devolvió vacío → fallback directo a ESPN (sin coste)
+      console.log('[historicalScores] Worker vacío, consultando ESPN directamente...');
+      try {
+        const espnScores = await fetchESPNScores([...needed]);
+        if (espnScores.length) {
+          console.log('[historicalScores] ESPN encontró', espnScores.length, 'partidos finalizados');
+          resolveAllGames(espnScores);
+        } else {
+          console.warn('[historicalScores] ESPN tampoco devolvió datos');
+        }
+      } catch(espnErr) { console.warn('[historicalScores/ESPN]', espnErr); }
     }
   } catch(e) { console.warn('[historicalScores]', e); }
 }
