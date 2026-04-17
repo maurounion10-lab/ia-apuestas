@@ -10124,6 +10124,7 @@ function renderPreds() {
     const histScore      = p._histScore  || null;
     const isFinishedWin  = isStarted && histResult === 'win'  && !isGameLive; // no mostrar como acertado si aún está en vivo
     const isFinishedLoss = isStarted && histResult === 'loss' && !isGameLive;
+    const isVoid         = isStarted && histResult === 'void' && !isGameLive;
     // Color de bolsitas según resultado
     const _gemsResultClass = isFinishedWin ? 'result-win' : isFinishedLoss ? 'result-loss' : '';
     const bvrHtml = `<div class="bvr-wrap">
@@ -10359,15 +10360,16 @@ function renderPreds() {
       </div>` : ''}
       <!-- Sello de resultado (solo partidos terminados) -->
       ${isStarted ? `
-      <div class="pred-result-stamp ${isHighConfWin ? 'stamp-highconf' : isFinishedWin ? 'stamp-win' : isFinishedLoss ? 'stamp-loss' : 'stamp-pending'}">
-        <span class="pred-result-stamp-icon">${isHighConfWin ? '🏆' : isFinishedWin ? '✅' : isFinishedLoss ? '❌' : '⏳'}</span>
+      <div class="pred-result-stamp ${isHighConfWin ? 'stamp-highconf' : isFinishedWin ? 'stamp-win' : isFinishedLoss ? 'stamp-loss' : isVoid ? 'stamp-pending' : 'stamp-pending'}">
+        <span class="pred-result-stamp-icon">${isHighConfWin ? '🏆' : isFinishedWin ? '✅' : isFinishedLoss ? '❌' : isVoid ? '⚪' : '⏳'}</span>
         <div class="pred-result-stamp-body">
           <span class="pred-result-stamp-text">${
             isHighConfWin ? 'Alta Confianza Acertado' :
             isFinishedWin ? 'Pronóstico Acertado' :
-            isFinishedLoss ? 'Pronóstico Fallado' : 'Resultado Pendiente'
+            isFinishedLoss ? 'Pronóstico Fallado' :
+            isVoid ? 'Apuesta Nula · Devuelta' : 'Resultado Pendiente'
           }</span>
-          ${finalScore ? `<span class="pred-result-stamp-sub">Resultado final: ${finalScore}</span>` : ''}
+          ${finalScore && !isVoid ? `<span class="pred-result-stamp-sub">Resultado final: ${finalScore}</span>` : ''}
         </div>
       </div>` : ''}
       <!-- CTA casas afiliadas — solo para partidos no iniciados -->
