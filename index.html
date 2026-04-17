@@ -10108,12 +10108,6 @@ function renderPreds() {
     const _bvrGemsHtml = Array.from({length:6}, (_,i) =>
       `<span class="bvr-gem ${i < _bvr ? 'active-'+_bvr : ''}">💰</span>`
     ).join('');
-    const _gemsResultClass = isFinishedWin ? 'result-win' : isFinishedLoss ? 'result-loss' : '';
-    const bvrHtml = `<div class="bvr-wrap">
-      <span class="bvr-label">Confianza IA</span>
-      <div class="bvr-gems ${_gemsResultClass}">${_bvrGemsHtml}</div>
-      <span class="bvr-label" style="color:rgba(255,255,255,0.35);font-size:0.6rem">${_bvr}/6</span>
-    </div>`;
 
     const oddsHtml = affCtaHtml;
 
@@ -10131,6 +10125,13 @@ function renderPreds() {
     const histScore      = p._histScore  || null;
     const isFinishedWin  = isStarted && histResult === 'win'  && !isGameLive; // no mostrar como acertado si aún está en vivo
     const isFinishedLoss = isStarted && histResult === 'loss' && !isGameLive;
+    // Color de bolsitas según resultado
+    const _gemsResultClass = isFinishedWin ? 'result-win' : isFinishedLoss ? 'result-loss' : '';
+    const bvrHtml = `<div class="bvr-wrap">
+      <span class="bvr-label">Confianza IA</span>
+      <div class="bvr-gems ${_gemsResultClass}">${_bvrGemsHtml}</div>
+      <span class="bvr-label" style="color:rgba(255,255,255,0.35);font-size:0.6rem">${_bvr}/6</span>
+    </div>`;
     const isHighConfWin  = isFinishedWin && (p.bvr >= 6 || (!p.bvr && p.conf === 'high')); // bvr≥6 = máxima confianza → dorado
     const isPending      = isStarted && (histResult === 'pending' || isGameLive); // en vivo = pendiente todavía
     // Score final — si no está en historial intentar desde scoresData (solo si el partido terminó)
