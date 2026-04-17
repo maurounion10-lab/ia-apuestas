@@ -10790,7 +10790,7 @@ let _histSyncTimer = null;
 let _globalHistSyncTimer = null;
 const ADMIN_EMAIL = 'mauro.union10@gmail.com';
 const GLOBAL_HIST_KEY = 'global_historial_v1';
-const BLOCKED_HIST_IDS = new Set(['fsvmainz05_sigmaolomouc_2026-03-18', 'seattle_realsaltlake_2026-04-12']);
+const BLOCKED_HIST_IDS = new Set(['fsvmainz05_sigmaolomouc_2026-03-18', 'seattle_realsaltlake_2026-04-12', 'indmedellin_estudianteslp_2026-04-08', 'cusco_flamengo_2026-04-08', 'junior_palmeiras_2026-04-08', 'sportingcristal_cerroporteno_2026-04-08']);
 
 // ══════════════════════════════════════════════════════════════
 //  PICKS BLOQUEADOS GLOBALES — shared_cache en Supabase
@@ -12106,23 +12106,6 @@ function calcRacha(data) {
   return last==='win' ? {val:count,str:`🔥 ${count}V seguidas`} : {val:-count,str:`❄️ ${count}D seguidas`};
 }
 
-// ── Picks Copa Libertadores/Sudamericana 8-abr-2026 ──────────────────────────
-// Estos picks no se guardaron via savePredictions (partidos nocturnos sin historial API).
-// Se inyectan directamente al historial local si no existen.
-function _injectCopaAbr8Historial() {
-  const copaEntries = [
-    { id:'indmedellin_estudianteslp_2026-04-08', home:'Ind. Medellín',    away:'Estudiantes LP', rec:'Más de 1.5',   result:'win',  odds:1.55, _bestOdds:1.55, stake:130, pl:71.5,  date:'8/4', league:'🌎 Copa Sud.',   _sportKey:'soccer_conmebol_copa_sudamericana', commenceTs:1775692800000, finalScore:'1-1', conf:'high', bvr:5, bvrText:'Alta',  _resolvedLeague:'🌎 Copa Sud.'   },
-    { id:'cusco_flamengo_2026-04-08',             home:'Cusco',            away:'Flamengo',       rec:'Gana Visitante',result:'win', odds:1.85, _bestOdds:1.85, stake:30,  pl:25.5,  date:'8/4', league:'🌎 Libertadores',_sportKey:'soccer_conmebol_copa_libertadores',  commenceTs:1775692800000, finalScore:'0-2', conf:'med',  bvr:3, bvrText:'Media', _resolvedLeague:'🌎 Libertadores' },
-    { id:'junior_palmeiras_2026-04-08',           home:'Junior',           away:'Palmeiras',      rec:'Ambos Marcan', result:'win', odds:1.91, _bestOdds:1.91, stake:30,  pl:27.3,  date:'8/4', league:'🌎 Libertadores',_sportKey:'soccer_conmebol_copa_libertadores',  commenceTs:1775692800000, finalScore:'1-1', conf:'med',  bvr:3, bvrText:'Media', _resolvedLeague:'🌎 Libertadores' },
-    { id:'sportingcristal_cerroporteno_2026-04-08',home:'Sporting Cristal',away:'Cerro Porteño', rec:'Ambos Marcan', result:'loss',odds:1.91, _bestOdds:1.91, stake:30,  pl:-30,   date:'8/4', league:'🌎 Libertadores',_sportKey:'soccer_conmebol_copa_libertadores',  commenceTs:1775685600000, finalScore:'1-0', conf:'med',  bvr:3, bvrText:'Media', _resolvedLeague:'🌎 Libertadores' },
-  ];
-  const hist = loadHistorial();
-  const existIds = new Set(hist.map(h => h.id));
-  let added = 0;
-  copaEntries.forEach(e => { if (!existIds.has(e.id)) { hist.push(e); added++; } });
-  if (added) { saveHistorial(hist); console.log('[Copa] Inyectados', added, 'picks 8-abr al historial'); }
-}
-
 function renderHistorial(filter) {
   // Guard: si los elementos del DOM aún no existen, reprogramar
   const _summaryEl = document.getElementById('histSummary');
@@ -12134,11 +12117,9 @@ function renderHistorial(filter) {
   try {
   const _rawCount = loadHistorial().length;
   console.log('[renderHistorial] storage:', _rawCount, 'picks | filtros: fecha='+histDateFilter+' conf='+histConfFilter+' liga='+histLeagueFilter+' mercado='+histMercadoFilter+' deporte='+histFilter);
-  _injectCopaAbr8Historial();   // inyectar picks Copa si no están
   migrateHistStakes();          // corrige stakes/P&L de entradas antiguas
   // Resolver con scores en memoria (sincrónico, sin loop)
-  const _extraScores = [{home:'Junior',away:'Palmeiras',flag:'final',scoreH:1,scoreA:1,commenceTs:1775692800000}];
-  resolveCompletedGames([...(scoresData||[]), ..._extraScores], true);
+  resolveCompletedGames(scoresData||[], true);
   // Buscar scores históricos del servidor para pendientes sin resolver (rate-limited: máx 1 request cada 30s)
   if (!window._loadHistScoresRunning) loadHistoricalScores();
   // ── Ligas bloqueadas: remover del storage y no mostrar ──
