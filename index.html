@@ -1512,9 +1512,12 @@
   }
   /* BVR 1-2 = Baja (rojo) | 3-4 = Media (naranja) | 5 = Alta (verde) | 6 = Máxima (dorado) */
   .bvr-gem.active-1, .bvr-gem.active-2 { opacity:1; filter:sepia(1) saturate(4) hue-rotate(300deg) brightness(1.1); }
-  .bvr-gem.active-3, .bvr-gem.active-4 { opacity:1; filter:sepia(1) saturate(3) hue-rotate(330deg); }
-  .bvr-gem.active-5 { opacity:1; filter:sepia(1) saturate(3) hue-rotate(60deg) brightness(1.1); }
+  .bvr-gem.active-3, .bvr-gem.active-4 { opacity:1; filter:sepia(1) saturate(2) brightness(0.85) grayscale(0.3); text-shadow:0 0 6px rgba(176,190,197,0.5); }
+  .bvr-gem.active-5 { opacity:1; filter:sepia(1) saturate(4) hue-rotate(15deg) brightness(0.9); text-shadow:0 0 8px rgba(180,120,10,0.6); }
   .bvr-gem.active-6 { opacity:1; filter:sepia(1) saturate(5) brightness(1.25); text-shadow:0 0 12px rgba(255,214,0,0.95), 0 0 5px rgba(255,180,0,0.7); }
+  /* Resultado: WIN → bolsitos verdes, LOSS → bolsitos rojos */
+  .bvr-gems.result-win  .bvr-gem[class*="active"] { filter:sepia(1) saturate(3) hue-rotate(60deg) brightness(1.2) !important; text-shadow:0 0 10px rgba(0,200,83,0.7) !important; opacity:1 !important; }
+  .bvr-gems.result-loss .bvr-gem[class*="active"] { filter:sepia(1) saturate(4) hue-rotate(300deg) brightness(1.1) !important; text-shadow:0 0 10px rgba(255,61,61,0.7) !important; opacity:1 !important; }
   .bvr-text { display: none; }
 
   .confidence-badge {
@@ -1523,7 +1526,8 @@
     padding: 4px 10px;
     border-radius: 8px;
   }
-  .conf-high {
+  /* Máxima (bvr=6) — oro brillante */
+  .conf-max {
     background: linear-gradient(135deg, rgba(255,214,0,0.22), rgba(255,180,0,0.12));
     color: #ffd600;
     border: 1px solid rgba(255,214,0,0.6);
@@ -1531,7 +1535,17 @@
     text-shadow: 0 0 8px rgba(255,214,0,0.5);
     letter-spacing: 0.3px;
   }
-  .conf-med { background: rgba(255,145,0,0.2); color: var(--naranja); border: 1px solid rgba(255,145,0,0.4); }
+  /* Alta (bvr=5) — ámbar oscuro, oro menos brillante */
+  .conf-high {
+    background: rgba(175, 120, 10, 0.18);
+    color: #c9920e;
+    border: 1px solid rgba(175, 120, 10, 0.5);
+    letter-spacing: 0.3px;
+  }
+  /* Media-Alta (bvr=4) — plata */
+  .conf-med-alta { background: rgba(144,164,174,0.14); color: #b0bec5; border: 1px solid rgba(144,164,174,0.35); }
+  /* Media (bvr=3) — plata más suave */
+  .conf-med { background: rgba(120,144,156,0.12); color: #90a4ae; border: 1px solid rgba(120,144,156,0.3); }
 
   .pred-match {
     display: flex;
@@ -7058,13 +7072,13 @@ const teamLogos = {
   'Grêmio':           'https://r2.thesportsdb.com/images/media/team/badge/uvpwyt1473538089.png',
   'Gremio':           'https://r2.thesportsdb.com/images/media/team/badge/uvpwyt1473538089.png',
   'Internacional':           'https://r2.thesportsdb.com/images/media/team/badge/yprvxx1473538097.png',
-  'Sport Club Internacional':'https://media.api-sports.io/football/teams/115.png',
+  'Sport Club Internacional':'https://r2.thesportsdb.com/images/media/team/badge/yprvxx1473538097.png',
   'Athletico Paranaense':           'https://r2.thesportsdb.com/images/media/team/badge/irzu1u1554237406.png',
   'Atletico Paranaense':            'https://r2.thesportsdb.com/images/media/team/badge/irzu1u1554237406.png',
   'Atlético Paranaense':            'https://r2.thesportsdb.com/images/media/team/badge/irzu1u1554237406.png',
   'Atletico Mineiro':           'https://r2.thesportsdb.com/images/media/team/badge/x5lixs1743742872.png',
   'Atlético Mineiro':           'https://r2.thesportsdb.com/images/media/team/badge/x5lixs1743742872.png',
-  'Atlético-MG':            'https://media.api-sports.io/football/teams/1062.png',
+  'Atlético-MG':            'https://r2.thesportsdb.com/images/media/team/badge/x5lixs1743742872.png',
   // ── BRASIL (completo Série A) ──
   'Cruzeiro':               'https://media.api-sports.io/football/teams/120.png',
   'Cruzeiro EC':            'https://media.api-sports.io/football/teams/120.png',
@@ -7210,8 +7224,8 @@ const teamLogos = {
   'Beşiktaş JK':            'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/BesiktasJK-Logo.svg/330px-BesiktasJK-Logo.svg.png',
   'Besiktas JK':            'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/BesiktasJK-Logo.svg/330px-BesiktasJK-Logo.svg.png',
   'Shakhtar Donetsk':       'https://r2.thesportsdb.com/images/media/team/badge/sqrxsr1421791799.png',
-  'Red Bull Salzburg':      'https://media.api-sports.io/football/teams/1.png',
-  'RB Salzburg':            'https://media.api-sports.io/football/teams/1.png',
+  'Red Bull Salzburg':      'https://media.api-sports.io/football/teams/322.png',
+  'RB Salzburg':            'https://media.api-sports.io/football/teams/322.png',
   'Slavia Prague':          'https://a.espncdn.com/i/teamlogos/soccer/500/494.png',
   'SK Slavia Prague':       'https://a.espncdn.com/i/teamlogos/soccer/500/494.png',
   'Sparta Prague':          'https://r2.thesportsdb.com/images/media/team/badge/j00qct1718287150.png',
@@ -7529,7 +7543,7 @@ const teamLogos = {
   'Go Ahead Eagles': 'https://a.espncdn.com/i/teamlogos/soccer/500/3706.png',
   'Go Ahead':        'https://a.espncdn.com/i/teamlogos/soccer/500/3706.png',
   'Goztepe': 'https://a.espncdn.com/i/teamlogos/soccer/500/789.png',
-  'Grasshoppers': 'https://a.espncdn.com/i/teamlogos/soccer/500/492.png',
+  'Grasshoppers': 'https://a.espncdn.com/i/teamlogos/soccer/500/1942.png',
   'Grazer AK': 'https://a.espncdn.com/i/teamlogos/soccer/500/21846.png',
   'Guabirá': 'https://a.espncdn.com/i/teamlogos/soccer/500/9497.png',
   'Guarani': 'https://a.espncdn.com/i/teamlogos/soccer/500/7385.png',
@@ -7795,8 +7809,8 @@ const teamLogos = {
   'QRM':                    'https://media.api-sports.io/football/teams/2827.png',
   'Red Star':               'https://media.api-sports.io/football/teams/1094.png',
   'Red Star FC':            'https://media.api-sports.io/football/teams/1094.png',
-  'Troyes':                 'https://media.api-sports.io/football/teams/538.png',
-  'ESTAC Troyes':           'https://media.api-sports.io/football/teams/538.png',
+  'Troyes':                 'https://a.espncdn.com/i/teamlogos/soccer/500/5491.png',
+  'ESTAC Troyes':           'https://a.espncdn.com/i/teamlogos/soccer/500/5491.png',
   'Guingamp':               'https://media.api-sports.io/football/teams/105.png',
   'EA Guingamp':            'https://media.api-sports.io/football/teams/105.png',
   'Niort':                  'https://media.api-sports.io/football/teams/1097.png',
@@ -7821,9 +7835,9 @@ const teamLogos = {
   '1. FC Heidenheim':       'https://media.api-sports.io/football/teams/10768.png',
   'Hamburger SV':           'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Hamburger_SV_logo.svg/200px-Hamburger_SV_logo.svg.png',
   'Hamburg':                'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f7/Hamburger_SV_logo.svg/200px-Hamburger_SV_logo.svg.png',
-  'Fortuna Düsseldorf':     'https://media.api-sports.io/football/teams/167.png',
-  'Dusseldorf':             'https://media.api-sports.io/football/teams/167.png',
-  'Fortuna Dusseldorf':     'https://media.api-sports.io/football/teams/167.png',
+  'Fortuna Düsseldorf':     'https://a.espncdn.com/i/teamlogos/soccer/500/2702.png',
+  'Dusseldorf':             'https://a.espncdn.com/i/teamlogos/soccer/500/2702.png',
+  'Fortuna Dusseldorf':     'https://a.espncdn.com/i/teamlogos/soccer/500/2702.png',
   'SpVgg Greuther Fürth':   'https://media.api-sports.io/football/teams/185.png',
   'Greuther Furth':         'https://media.api-sports.io/football/teams/185.png',
   'Greuther Fürth':         'https://media.api-sports.io/football/teams/185.png',
@@ -7831,13 +7845,13 @@ const teamLogos = {
   'Karlsruhe':              'https://media.api-sports.io/football/teams/3011.png',
   'Hannover 96':            'https://media.api-sports.io/football/teams/166.png',
   'Hannover':               'https://media.api-sports.io/football/teams/166.png',
-  'Schalke 04':             'https://media.api-sports.io/football/teams/162.png',
-  'Schalke':                'https://media.api-sports.io/football/teams/162.png',
-  'FC Schalke 04':          'https://media.api-sports.io/football/teams/162.png',
-  'SV Darmstadt 98':        'https://media.api-sports.io/football/teams/169.png',
-  'Darmstadt':              'https://media.api-sports.io/football/teams/169.png',
-  'Kaiserslautern':         'https://media.api-sports.io/football/teams/172.png',
-  '1. FC Kaiserslautern':   'https://media.api-sports.io/football/teams/172.png',
+  'Schalke 04':             'https://a.espncdn.com/i/teamlogos/soccer/500/508.png',
+  'Schalke':                'https://a.espncdn.com/i/teamlogos/soccer/500/508.png',
+  'FC Schalke 04':          'https://a.espncdn.com/i/teamlogos/soccer/500/508.png',
+  'SV Darmstadt 98':        'https://media.api-sports.io/football/teams/175.png',
+  'Darmstadt':              'https://media.api-sports.io/football/teams/175.png',
+  'Kaiserslautern':         'https://a.espncdn.com/i/teamlogos/soccer/500/2730.png',
+  '1. FC Kaiserslautern':   'https://a.espncdn.com/i/teamlogos/soccer/500/2730.png',
   'Paderborn':              'https://media.api-sports.io/football/teams/186.png',
   'SC Paderborn':           'https://media.api-sports.io/football/teams/186.png',
   'Preußen Münster':        'https://media.api-sports.io/football/teams/5484.png',
@@ -7870,11 +7884,11 @@ const teamLogos = {
   'Frosinone Calcio':       'https://media.api-sports.io/football/teams/493.png',
   'Bari':                   'https://media.api-sports.io/football/teams/488.png',
   'SSC Bari':               'https://media.api-sports.io/football/teams/488.png',
-  'Brescia':                'https://media.api-sports.io/football/teams/489.png',
-  'Brescia Calcio':         'https://media.api-sports.io/football/teams/489.png',
-  'Palermo':                'https://media.api-sports.io/football/teams/496.png',
-  'US Palermo':             'https://media.api-sports.io/football/teams/496.png',
-  'Cosenza':                'https://media.api-sports.io/football/teams/1579.png',
+  'Brescia':                'https://a.espncdn.com/i/teamlogos/soccer/500/519.png',
+  'Brescia Calcio':         'https://a.espncdn.com/i/teamlogos/soccer/500/519.png',
+  'Palermo':                'https://a.espncdn.com/i/teamlogos/soccer/500/6011.png',
+  'US Palermo':             'https://a.espncdn.com/i/teamlogos/soccer/500/6011.png',
+  'Cosenza':                'https://a.espncdn.com/i/teamlogos/soccer/500/1935.png',
   'Juve Stabia':            'https://media.api-sports.io/football/teams/521.png',
   'SS Juve Stabia':         'https://media.api-sports.io/football/teams/521.png',
   'Catanzaro':              'https://media.api-sports.io/football/teams/10264.png',
@@ -7893,7 +7907,7 @@ const teamLogos = {
   'AC Reggiana':            'https://media.api-sports.io/football/teams/10296.png',
   'Sudtirol':               'https://media.api-sports.io/football/teams/10265.png',
   'FC Sudtirol':            'https://media.api-sports.io/football/teams/10265.png',
-  'Cittadella':             'https://media.api-sports.io/football/teams/492.png',
+  'Cittadella':             'https://a.espncdn.com/i/teamlogos/soccer/500/1944.png',
 
   // ── PREMIER LEAGUE 2025-26 (recién ascendidos) ───────────────────────────
   'Sunderland':             'https://upload.wikimedia.org/wikipedia/en/thumb/7/77/Logo_Sunderland.svg/330px-Logo_Sunderland.svg.png',
@@ -7902,8 +7916,8 @@ const teamLogos = {
   'Sheffield Utd':          'https://media.api-sports.io/football/teams/62.png',
   'Leeds United':           'https://media.api-sports.io/football/teams/63.png',
   'Leeds':                  'https://media.api-sports.io/football/teams/63.png',
-  'Coventry City':          'https://media.api-sports.io/football/teams/34.png',
-  'Coventry':               'https://media.api-sports.io/football/teams/34.png',
+  'Coventry City':          'https://a.espncdn.com/i/teamlogos/soccer/500/1966.png',
+  'Coventry':               'https://a.espncdn.com/i/teamlogos/soccer/500/1966.png',
   'Hull City':              'https://media.api-sports.io/football/teams/60.png',
   'Hull':                   'https://media.api-sports.io/football/teams/60.png',
   'Middlesbrough':          'https://media.api-sports.io/football/teams/25.png',
@@ -7916,16 +7930,16 @@ const teamLogos = {
   'Stoke City':             'https://media.api-sports.io/football/teams/76.png',
   'Stoke':                  'https://media.api-sports.io/football/teams/76.png',
   'Watford':                'https://media.api-sports.io/football/teams/38.png',
-  'West Brom':              'https://media.api-sports.io/football/teams/80.png',
-  'West Bromwich Albion':   'https://media.api-sports.io/football/teams/80.png',
-  'Plymouth Argyle':        'https://media.api-sports.io/football/teams/715.png',
-  'Plymouth':               'https://media.api-sports.io/football/teams/715.png',
-  'Cardiff City':           'https://media.api-sports.io/football/teams/33.png',
-  'Cardiff':                'https://media.api-sports.io/football/teams/33.png',
+  'West Brom':              'https://a.espncdn.com/i/teamlogos/soccer/500/163.png',
+  'West Bromwich Albion':   'https://a.espncdn.com/i/teamlogos/soccer/500/163.png',
+  'Plymouth Argyle':        'https://a.espncdn.com/i/teamlogos/soccer/500/1968.png',
+  'Plymouth':               'https://a.espncdn.com/i/teamlogos/soccer/500/1968.png',
+  'Cardiff City':           'https://a.espncdn.com/i/teamlogos/soccer/500/4524.png',
+  'Cardiff':                'https://a.espncdn.com/i/teamlogos/soccer/500/4524.png',
   'Blackburn Rovers':       'https://media.api-sports.io/football/teams/29.png',
   'Blackburn':              'https://media.api-sports.io/football/teams/29.png',
-  'Derby County':           'https://media.api-sports.io/football/teams/36.png',
-  'Derby':                  'https://media.api-sports.io/football/teams/36.png',
+  'Derby County':           'https://a.espncdn.com/i/teamlogos/soccer/500/4549.png',
+  'Derby':                  'https://a.espncdn.com/i/teamlogos/soccer/500/4549.png',
   'Oxford United':          'https://media.api-sports.io/football/teams/72.png',
   'Oxford':                 'https://media.api-sports.io/football/teams/72.png',
   'Portsmouth':             'https://media.api-sports.io/football/teams/1284.png',
@@ -7937,8 +7951,8 @@ const teamLogos = {
   'Queens Park Rangers':    'https://media.api-sports.io/football/teams/69.png',
   'Bristol City':           'https://media.api-sports.io/football/teams/31.png',
   'Bristol':                'https://media.api-sports.io/football/teams/31.png',
-  'Wigan Athletic':         'https://media.api-sports.io/football/teams/84.png',
-  'Wigan':                  'https://media.api-sports.io/football/teams/84.png',
+  'Wigan Athletic':         'https://a.espncdn.com/i/teamlogos/soccer/500/1973.png',
+  'Wigan':                  'https://a.espncdn.com/i/teamlogos/soccer/500/1973.png',
   'Burnley':                'https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/Burnley_FC_Logo.svg/330px-Burnley_FC_Logo.svg.png',
   'Burnley FC':             'https://upload.wikimedia.org/wikipedia/en/thumb/6/6d/Burnley_FC_Logo.svg/330px-Burnley_FC_Logo.svg.png',
   'Ipswich Town':           'https://media.api-sports.io/football/teams/57.png',
@@ -8128,8 +8142,8 @@ const teamLogos = {
   'Torino FC':              'https://media.api-sports.io/football/teams/503.png',
   'Genoa':                  'https://media.api-sports.io/football/teams/495.png',
   'Genoa CFC':              'https://media.api-sports.io/football/teams/495.png',
-  'Sampdoria':              'https://media.api-sports.io/football/teams/510.png',
-  'UC Sampdoria':           'https://media.api-sports.io/football/teams/510.png',
+  'Sampdoria':              'https://a.espncdn.com/i/teamlogos/soccer/500/5555.png',
+  'UC Sampdoria':           'https://a.espncdn.com/i/teamlogos/soccer/500/5555.png',
   'Verona':                 'https://media.api-sports.io/football/teams/504.png',
   'Hellas Verona':          'https://media.api-sports.io/football/teams/504.png',
   'Monza':                  'https://media.api-sports.io/football/teams/1579.png',
@@ -10094,9 +10108,10 @@ function renderPreds() {
     const _bvrGemsHtml = Array.from({length:6}, (_,i) =>
       `<span class="bvr-gem ${i < _bvr ? 'active-'+_bvr : ''}">💰</span>`
     ).join('');
+    const _gemsResultClass = isFinishedWin ? 'result-win' : isFinishedLoss ? 'result-loss' : '';
     const bvrHtml = `<div class="bvr-wrap">
       <span class="bvr-label">Confianza IA</span>
-      <div class="bvr-gems">${_bvrGemsHtml}</div>
+      <div class="bvr-gems ${_gemsResultClass}">${_bvrGemsHtml}</div>
       <span class="bvr-label" style="color:rgba(255,255,255,0.35);font-size:0.6rem">${_bvr}/6</span>
     </div>`;
 
@@ -10216,17 +10231,17 @@ function renderPreds() {
         })()}</span>
         <div style="display:flex;align-items:center;gap:6px">
           ${resultBadgeHtml}
-          <div style="display:flex;align-items:center;gap:6px">
-            <span class="confidence-badge ${p.conf==='high'?'conf-high':'conf-med'}">${p.confLabel}</span>
-            <span style="font-size:0.72rem;font-weight:800;
-              color:${p.conf==='high'?'#ffd600':'#ff9100'};
-              background:${p.conf==='high'?'rgba(255,214,0,0.15)':'rgba(255,145,0,0.12)'};
-              border:1px solid ${p.conf==='high'?'rgba(255,214,0,0.45)':'rgba(255,145,0,0.4)'};
-              box-shadow:${p.conf==='high'?'0 0 6px rgba(255,214,0,0.2)':''};
-              border-radius:6px;padding:2px 7px;white-space:nowrap">
-              💰 $${_bvr >= 6 ? '170' : (_bvr === 5 || p.conf==='high') ? '130' : _bvr === 4 ? '50' : (_bvr === 3 || p.conf==='med') ? '30' : '15'}
-            </span>
-          </div>
+          <div style="display:flex;align-items:center;gap:6px">${(()=>{
+            const _cbClass = _bvr >= 6 ? 'conf-max' : _bvr === 5 ? 'conf-high' : _bvr === 4 ? 'conf-med-alta' : 'conf-med';
+            const _stakeAmt = _bvr >= 6 ? '170' : _bvr === 5 ? '130' : _bvr === 4 ? '50' : '30';
+            const _sc = _bvr >= 6 ? {c:'#ffd600',bg:'rgba(255,214,0,0.15)',b:'rgba(255,214,0,0.45)',sh:'0 0 6px rgba(255,214,0,0.2)'}
+                       : _bvr === 5 ? {c:'#c9920e',bg:'rgba(175,120,10,0.14)',b:'rgba(175,120,10,0.45)',sh:''}
+                       : {c:'#90a4ae',bg:'rgba(120,144,156,0.12)',b:'rgba(120,144,156,0.3)',sh:''};
+            return `<span class="confidence-badge ${_cbClass}">${p.confLabel}</span>
+            <span style="font-size:0.72rem;font-weight:800;color:${_sc.c};background:${_sc.bg};border:1px solid ${_sc.b};box-shadow:${_sc.sh};border-radius:6px;padding:2px 7px;white-space:nowrap">
+              💰 $${_stakeAmt}
+            </span>`;
+          })()}</div>
         </div>
       </div>
       ${bvrHtml}
