@@ -10506,6 +10506,20 @@ function matchTime(commence_time) {
 
 // ── API cache helpers (reduce credit usage) ──
 const CACHE_ODDS_TTL   = 3 * 60 * 60 * 1000;  // 3 horas (local)
+// Limpiar caché stale si es de un día diferente al actual (evita tabla vieja entre sesiones)
+try {
+  const _staleRaw = localStorage.getItem('cache_odds_stale_v7');
+  if (_staleRaw) {
+    const _staleObj = JSON.parse(_staleRaw);
+    const _staleDate = new Date(_staleObj.ts || 0).toISOString().slice(0, 10);
+    const _today = new Date().toISOString().slice(0, 10);
+    if (_staleDate !== _today) {
+      localStorage.removeItem('cache_odds_stale_v7');
+      localStorage.removeItem('cache_odds_v7');
+      console.log('[Cache] Caché de odds del día anterior eliminada');
+    }
+  }
+} catch(_) {}
 const CACHE_ODDS_SB_TTL = 3 * 60 * 60 * 1000; // 3 horas (Supabase compartida)
 const CACHE_SCORES_TTL = 30 * 60 * 1000;  // 30 min
 function cacheSet(key, data) {
@@ -10654,26 +10668,9 @@ function forceRefreshOdds() {
   loadRealOdds();
 }
 
-// Carga cuotas — localStorage primero, luego Worker API directo (sin Supabase compartido)
+// Carga cuotas — stale-while-revalidate: caché para velocidad + siempre refresca en background
 async function loadRealOdds() {
   if (_oddsLoading) return;
-
-  // 1) localStorage fresco → esperar lock global antes de renderizar (máx 4s)
-  const localCached = cacheGet('cache_odds_v7', CACHE_ODDS_TTL);
-  if (localCached && Array.isArray(localCached) && localCached.length > 0) {
-    window._rawOddsGames = localCached;
-    processOddsIntoComparador(localCached);
-    // Esperar a que sbLoadLockedPicks termine antes del primer render
-    // Garantiza que todos los dispositivos aplican el mismo lock global
-    const lockWait = _sbLockedPicksReady
-      ? Promise.race([_sbLockedPicksReady, new Promise(r => setTimeout(r, 4000))])
-      : Promise.resolve();
-    lockWait.then(() => renderPreds());
-    return;
-  }
-
-  _oddsLoading = true;
-  renderPreds(); // muestra skeleton
 
   function useData(combined) {
     window._rawOddsGames = combined;
@@ -10685,19 +10682,56 @@ async function loadRealOdds() {
   function useStale() {
     try {
       const raw = localStorage.getItem('cache_odds_stale_v7');
-      if (raw) { const { data } = JSON.parse(raw); if (data?.length) { window._rawOddsGames = data; processOddsIntoComparador(data); } }
+      if (raw) {
+        const { ts, data } = JSON.parse(raw);
+        // Stale máx 6 horas — si es más viejo, ignorar
+        const MAX_STALE = 6 * 60 * 60 * 1000;
+        if (data?.length && (Date.now() - ts) < MAX_STALE) {
+          window._rawOddsGames = data;
+          processOddsIntoComparador(data);
+        }
+      }
     } catch(_) {}
   }
 
-  try {
-    // 2) Worker API directo — datos frescos con BTTS real
+  async function fetchFresh() {
     console.log('[Odds] Fetching desde Worker API...');
     const [resMain, resEur] = await Promise.all([
       fetch(`${WORKER_URL}/odds?category=main`).then(r => r.ok ? r.json() : { data: [] }),
       fetch(`${WORKER_URL}/odds?category=europe`).then(r => r.ok ? r.json() : { data: [] }),
     ]);
-    const combined = [...(resMain.data || []), ...(resEur.data || [])];
+    return [...(resMain.data || []), ...(resEur.data || [])];
+  }
 
+  // 1) Si hay caché fresco → renderizar inmediatamente y refrescar en background (stale-while-revalidate)
+  const localCached = cacheGet('cache_odds_v7', CACHE_ODDS_TTL);
+  if (localCached && Array.isArray(localCached) && localCached.length > 0) {
+    window._rawOddsGames = localCached;
+    processOddsIntoComparador(localCached);
+    const lockWait = _sbLockedPicksReady
+      ? Promise.race([_sbLockedPicksReady, new Promise(r => setTimeout(r, 4000))])
+      : Promise.resolve();
+    lockWait.then(() => renderPreds());
+
+    // Refresco silencioso en background — actualiza si los datos cambiaron
+    fetchFresh().then(combined => {
+      if (!combined.length) return;
+      const newHash = combined.map(o => o.id || o.home_team).join('|');
+      const oldHash = (window._rawOddsGames || []).map(o => o.id || o.home_team).join('|');
+      if (newHash !== oldHash) {
+        useData(combined);
+        renderPreds();
+      }
+    }).catch(e => console.warn('[Odds BG] Error al refrescar:', e));
+    return;
+  }
+
+  // 2) Sin caché → fetch directo mostrando skeleton
+  _oddsLoading = true;
+  renderPreds(); // muestra skeleton
+
+  try {
+    const combined = await fetchFresh();
     if (combined.length > 0) {
       useData(combined);
     } else {
