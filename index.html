@@ -9363,7 +9363,7 @@ async function fetchESPNScores(sportKeys, daysBack = 4) {
   }
 
   const dates = [];
-  for (let d = 1; d <= daysBack; d++) {
+  for (let d = 0; d <= daysBack; d++) {   // d=0 = hoy, d=1 = ayer, etc.
     const dt = new Date(Date.now() - d * 86400000);
     dates.push(dt.toISOString().slice(0,10).replace(/-/g,''));
   }
