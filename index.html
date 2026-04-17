@@ -10811,7 +10811,7 @@ function loadHistorial() {
   } catch { return []; }
 }
 function saveHistorial(arr) {
-  const sorted = [...arr].sort((a,b) => (b.commenceTs||0) - (a.commenceTs||0));
+  const sorted = _applyHistOverrides([...arr].sort((a,b) => (b.commenceTs||0) - (a.commenceTs||0)));
   try { localStorage.setItem(HIST_KEY, JSON.stringify(sorted.slice(-500))); } catch {}
   // Sync a historial GLOBAL en Supabase (solo admin)
   if (authUser?.email === 'mauro.union10@gmail.com') {
@@ -11499,14 +11499,20 @@ async function sbLoadHistorial() {
     });
     if (stakesMigrated) console.log('[globalHist] Migración stakes+odds:', stakesMigrated, 'entradas corregidas');
 
-    // Actualizar shared_cache si el merge tiene más entradas o hubo migración de stakes
+    // Aplicar overrides ANTES de cualquier guardado — Sassuolo/void, etc.
+    // Detectar si algún override cambió algo (para forzar escritura en Supabase)
+    const _preOverrideSnapshot = JSON.stringify(merged.map(h => ({ id: h.id||'', result: h.result, pl: h.pl })));
+    _applyHistOverrides(merged);
+    const _postOverrideSnapshot = JSON.stringify(merged.map(h => ({ id: h.id||'', result: h.result, pl: h.pl })));
+    const overridesChanged = _preOverrideSnapshot !== _postOverrideSnapshot;
+
+    // Actualizar shared_cache si el merge tiene más entradas, hubo migración de stakes, o los overrides cambiaron algo
     const prevCount = globalHist?.length || 0;
-    if (merged.length > prevCount || stakesMigrated > 0) {
-      console.log('[globalHist] Admin: actualizando shared_cache con', merged.length, 'entradas (antes:', prevCount, ', stakes migrados:', stakesMigrated, ')');
-      await sbSaveGlobalHistorial(merged);
+    if (merged.length > prevCount || stakesMigrated > 0 || overridesChanged) {
+      console.log('[globalHist] Admin: actualizando shared_cache con', merged.length, 'entradas (antes:', prevCount, ', stakes:', stakesMigrated, ', overrides cambiados:', overridesChanged, ')');
+      await sbSaveGlobalHistorial(merged); // ya tiene overrides aplicados
     }
 
-    _applyHistOverrides(merged);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
     renderHistorial(histFilter);
     return;
