@@ -10401,6 +10401,25 @@ function renderPreds() {
 
   // Load engagement data (likes, comments) for card buttons
   setTimeout(() => { if (typeof window._loadCardEngagement === 'function') window._loadCardEngagement(); }, 500);
+
+  // Auto-crear hilo de foro para cada pronóstico (solo si hay sesión autenticada)
+  if (window.sbClient && typeof window.forumEnsureThread === 'function') {
+    source.forEach(p => {
+      if (!p || !p.home || !p.away) return;
+      window.forumEnsureThread({
+        id:         _matchKeyLP(p.home, p.away),
+        home:       p.home       || '',
+        away:       p.away       || '',
+        league:     p.league     || '',
+        match_date: p.match_date || p.date || '',
+        rec:        p.rec        || '',
+        bvr:        p.bvr        || 3,
+        bvrText:    p.bvrText    || '',
+        conf:       p.conf       || '',
+        confLabel:  p.confLabel  || ''
+      });
+    });
+  }
 }
 
 // ═══════════════════════════════════════════════
