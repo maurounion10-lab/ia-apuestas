@@ -10231,17 +10231,12 @@ function renderPreds() {
         })()}</span>
         <div style="display:flex;align-items:center;gap:6px">
           ${resultBadgeHtml}
-          <div style="display:flex;align-items:center;gap:6px">${(()=>{
-            const _cbClass = _bvr >= 6 ? 'conf-max' : _bvr === 5 ? 'conf-high' : _bvr === 4 ? 'conf-med-alta' : 'conf-med';
-            const _stakeAmt = _bvr >= 6 ? '170' : _bvr === 5 ? '130' : _bvr === 4 ? '50' : '30';
-            const _sc = _bvr >= 6 ? {c:'#ffd600',bg:'rgba(255,214,0,0.15)',b:'rgba(255,214,0,0.45)',sh:'0 0 6px rgba(255,214,0,0.2)'}
-                       : _bvr === 5 ? {c:'#c9920e',bg:'rgba(175,120,10,0.14)',b:'rgba(175,120,10,0.45)',sh:''}
-                       : {c:'#90a4ae',bg:'rgba(120,144,156,0.12)',b:'rgba(120,144,156,0.3)',sh:''};
-            return `<span class="confidence-badge ${_cbClass}">${p.confLabel}</span>
-            <span style="font-size:0.72rem;font-weight:800;color:${_sc.c};background:${_sc.bg};border:1px solid ${_sc.b};box-shadow:${_sc.sh};border-radius:6px;padding:2px 7px;white-space:nowrap">
-              💰 $${_stakeAmt}
-            </span>`;
-          })()}</div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="confidence-badge ${_bvr >= 6 ? 'conf-max' : _bvr === 5 ? 'conf-high' : _bvr === 4 ? 'conf-med-alta' : 'conf-med'}">${p.confLabel}</span>
+            <span style="font-size:0.72rem;font-weight:800;color:${_bvr>=6?'#ffd600':_bvr===5?'#c9920e':'#90a4ae'};background:${_bvr>=6?'rgba(255,214,0,0.15)':_bvr===5?'rgba(175,120,10,0.14)':'rgba(120,144,156,0.12)'};border:1px solid ${_bvr>=6?'rgba(255,214,0,0.45)':_bvr===5?'rgba(175,120,10,0.45)':'rgba(120,144,156,0.3)'};${_bvr>=6?'box-shadow:0 0 6px rgba(255,214,0,0.2);':''}border-radius:6px;padding:2px 7px;white-space:nowrap">
+              \u{1F4B0} $${_bvr >= 6 ? '170' : _bvr === 5 ? '130' : _bvr === 4 ? '50' : '30'}
+            </span>
+          </div>
         </div>
       </div>
       ${bvrHtml}
