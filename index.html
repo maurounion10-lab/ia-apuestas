@@ -6392,12 +6392,21 @@ function initUserSync(email) {
     sbAnon
       .channel('shared-cache-hist')
       .on('postgres_changes', {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'shared_cache',
+        filter: `key=eq.${GLOBAL_HIST_KEY}`
+      }, async () => {
+        console.log('[historial] Global actualizado (INSERT) — recargando...');
+        await sbLoadHistorial();
+      })
+      .on('postgres_changes', {
         event: 'UPDATE',
         schema: 'public',
         table: 'shared_cache',
         filter: `key=eq.${GLOBAL_HIST_KEY}`
       }, async () => {
-        console.log('[historial] Global actualizado — recargando...');
+        console.log('[historial] Global actualizado (UPDATE) — recargando...');
         await sbLoadHistorial();
       })
       .subscribe();
@@ -10921,7 +10930,7 @@ function saveHistorial(arr) {
 let _histSyncTimer = null;
 let _globalHistSyncTimer = null;
 const ADMIN_EMAIL = 'mauro.union10@gmail.com';
-const GLOBAL_HIST_KEY = 'global_historial_v1';
+const GLOBAL_HIST_KEY = 'global_historial_v2';
 const BLOCKED_HIST_IDS = new Set(['fsvmainz05_sigmaolomouc_2026-03-18', 'seattle_realsaltlake_2026-04-12', 'indmedellin_estudianteslp_2026-04-08', 'cusco_flamengo_2026-04-08', 'junior_palmeiras_2026-04-08', 'sportingcristal_cerroporteno_2026-04-08']);
 
 // Pares de equipos a bloquear del historial (normTeam(home)+'|||'+normTeam(away))
@@ -11471,35 +11480,53 @@ async function admForceMaxima(mk) {
 }
 
 // Guarda el historial GLOBAL en shared_cache (solo admin)
+// Usa DELETE + INSERT en vez de UPSERT para evitar restricciones RLS en UPDATE
 async function sbSaveGlobalHistorial(arr) {
   if (authUser?.email !== ADMIN_EMAIL) return;
   try {
-    const { error } = await sbClient
+    const payload = arr.slice(-500);
+    const now = new Date().toISOString();
+    // Intentar UPSERT primero (funciona si la fila fue creada por este usuario)
+    const { error: upsertErr } = await sbClient
       .from('shared_cache')
-      .upsert({ key: GLOBAL_HIST_KEY, data: arr.slice(-500), fetched_at: new Date().toISOString() },
-               { onConflict: 'key' });
-    if (error) console.warn('[globalHistSave]', error.message);
-    else console.log('[globalHistSave] ✓', arr.length, 'entradas');
+      .upsert({ key: GLOBAL_HIST_KEY, data: payload, fetched_at: now }, { onConflict: 'key' });
+    if (!upsertErr) {
+      console.log('[globalHistSave] ✓ upsert', arr.length, 'entradas');
+      return;
+    }
+    // Si UPSERT falla (RLS USING), hacer DELETE + INSERT
+    console.warn('[globalHistSave] upsert falló, intentando DELETE+INSERT:', upsertErr.message);
+    await sbClient.from('shared_cache').delete().eq('key', GLOBAL_HIST_KEY);
+    const { error: insErr } = await sbClient
+      .from('shared_cache')
+      .insert({ key: GLOBAL_HIST_KEY, data: payload, fetched_at: now });
+    if (insErr) console.warn('[globalHistSave] insert también falló:', insErr.message);
+    else console.log('[globalHistSave] ✓ delete+insert', arr.length, 'entradas');
   } catch(e) { console.warn('[globalHistSave]', e.message); }
 }
 
-// Lee el historial GLOBAL — usa el proxy /api/sb con caché de servidor Cloudflare
-// El caché es compartido entre todos los usuarios (edge cache), no por navegador
+// Lee el historial GLOBAL — lee de shared_cache (acceso público para todos los usuarios)
 async function sbLoadGlobalHistorial() {
   // 1. Caché local como backup secundario (10 min)
   const cached = _sbGetCache('ghist');
   if (cached) return Array.isArray(cached) ? cached : null;
   try {
-    // 2. Proxy de Cloudflare con caché de servidor
-    const resp = await fetch('/api/sb?type=historial');
-    if (!resp.ok) throw new Error(`proxy ${resp.status}`);
-    const rows = await resp.json();
-    const result = rows?.[0]?.historial_full;
-    if (!Array.isArray(result)) return null;
-    _sbSetCache('ghist', result, _SB_TTL_GHIST);
-    return result;
+    // 2. Leer de shared_cache (acceso anon público)
+    const { data, error } = await sbAnon
+      .from('shared_cache')
+      .select('data')
+      .eq('key', GLOBAL_HIST_KEY)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    const result = Array.isArray(data?.data) ? data.data : null;
+    if (result) {
+      _sbSetCache('ghist', result, _SB_TTL_GHIST);
+      return result;
+    }
+    throw new Error('no data in shared_cache');
   } catch(e) {
-    // 3. Fallback directo a Supabase si el proxy falla
+    // 3. Fallback: leer historial_full del admin desde acoin_users
+    console.warn('[globalHistLoad] shared_cache falló, usando fallback:', e.message);
     try {
       const { data, error } = await sbAnon
         .from('acoin_users').select('historial_full').eq('email', ADMIN_EMAIL).maybeSingle();
