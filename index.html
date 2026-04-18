@@ -10051,10 +10051,14 @@ function renderPreds() {
     const tf = window._predTimeFilter || 'all';
     if (tf === 'today') {
       // HOY = partidos del día calendario en Argentina (UTC-3), universal para todos los usuarios
-      const { start: _tsStart, end: _tsEnd, key: _todayARKey } = _arTodayBounds();
+      const { start: _tsStart, end: _tsEnd } = _arTodayBounds();
+      const _arDDMM = _arTodayDDMM(); // "DD/MM" para comparar con p.date
       realPreds = realPreds.filter(p => {
         if (p.commenceTs) return p.commenceTs >= _tsStart && p.commenceTs <= _tsEnd;
-        if (p.date) return _arDayKey(new Date(p.date).getTime()) === _todayARKey;
+        if (p.date) {
+          // p.date puede ser "DD/MM" o "DD/MM/YYYY" — comparar como string AR
+          return p.date === _arDDMM || p.date.startsWith(_arDDMM + '/');
+        }
         return true; // sin fecha → incluir por defecto
       });
     } else if (tf === 'upcoming') {
@@ -10063,7 +10067,7 @@ function renderPreds() {
       const _tomorrowMs = _todayEndAR + 1;
       realPreds = realPreds.filter(p => {
         if (p.commenceTs) return p.commenceTs >= _tomorrowMs;
-        if (p.date) return new Date(p.date).getTime() >= _tomorrowMs;
+        if (p.date) { const d = _arParseDate(p.date); return d ? d.getTime() >= _tomorrowMs : false; }
         return false; // sin fecha → no incluir en próximos
       });
     } else if (tf === 'finished') {
@@ -10934,19 +10938,49 @@ let histDateFilter = 'all';
 let histLeagueFilter = 'all';
 
 // ── Zona horaria Argentina (UTC-3, sin cambio de horario) ────────────────────
-// Todas las comparaciones de "HOY" usan AR como referencia universal
-function _arTodayBounds() {
-  const AR_OFFSET = -3 * 3600 * 1000; // UTC-3 fijo
-  const arNow = new Date(Date.now() + AR_OFFSET);
-  const yy = arNow.getUTCFullYear(), mm = arNow.getUTCMonth(), dd = arNow.getUTCDate();
-  // 00:00 AR = 03:00 UTC del mismo día calendario AR
-  const start = Date.UTC(yy, mm, dd) - AR_OFFSET; // = Date.UTC(yy,mm,dd) + 3h
-  return { start, end: start + 86400000 - 1, key: `${yy}-${mm}-${dd}` };
-}
-// Clave de día en zona AR para un timestamp UTC (ms)
+// Todas las comparaciones de "HOY" usan AR como referencia universal.
+// Argentina es siempre UTC-3 (sin DST).
+const _AR_OFFSET_MS = 3 * 3600 * 1000; // 3 horas en ms (AR = UTC-3, sumamos 3h para invertir)
+
+// Clave de día en zona AR para un timestamp UTC en ms → "YYYY-MM-DD"
 function _arDayKey(tsMs) {
-  const d = new Date(tsMs - 3 * 3600 * 1000); // shift to AR
-  return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`;
+  if (!tsMs || isNaN(tsMs)) return '';
+  // Restar 3h para llevar UTC → AR, luego leer componentes UTC del resultado
+  const d = new Date(tsMs - _AR_OFFSET_MS);
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${String(d.getUTCDate()).padStart(2,'0')}`;
+}
+
+// Retorna { start, end (ms UTC), key "YYYY-MM-DD" } del día de hoy en AR
+function _arTodayBounds() {
+  const k = _arDayKey(Date.now()); // "YYYY-MM-DD" en AR
+  const [yy, mm, dd] = k.split('-').map(Number);
+  // 00:00 AR = 03:00 UTC del mismo día calendario AR
+  const start = Date.UTC(yy, mm-1, dd) + _AR_OFFSET_MS;
+  return { start, end: start + 86400000 - 1, key: k };
+}
+
+// Parsea un string de fecha de forma segura al mediodía UTC (evita desfase de zona)
+// Soporta "YYYY-MM-DD", "YYYY-MM-DDTHH:MM:SSZ" (ISO), y "DD/MM" o "DD/MM/YYYY" (formato AR)
+function _arParseDate(raw) {
+  if (!raw) return null;
+  raw = String(raw).trim();
+  // ISO date-only: "2026-04-18" → parsear al mediodía UTC para no cruzar medianoche AR
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return new Date(raw + 'T12:00:00Z');
+  // ISO con tiempo: parsear normal
+  if (/^\d{4}-\d{2}-\d{2}T/.test(raw)) return new Date(raw);
+  // Formato AR "DD/MM" o "DD/MM/YYYY"
+  const arM = raw.match(/^(\d{2})\/(\d{2})(?:\/(\d{4}))?$/);
+  if (arM) {
+    const yy = arM[3] ? parseInt(arM[3]) : new Date().getFullYear();
+    return new Date(Date.UTC(yy, parseInt(arM[2])-1, parseInt(arM[1]), 12, 0, 0));
+  }
+  return new Date(raw); // fallback genérico
+}
+
+// Hoy en Argentina como "DD/MM" (para comparar con p.date del historial/picks)
+function _arTodayDDMM() {
+  const k = _arTodayBounds().key; // "YYYY-MM-DD"
+  return k.slice(8,10) + '/' + k.slice(5,7);
 }
 // ─────────────────────────────────────────────────────────────────────────────
 let histMercadoFilter = 'all';
@@ -12446,16 +12480,18 @@ function renderHistorial(filter) {
   if (histDateFilter !== 'all') {
     const now = new Date();
     const sevenDaysAgo = new Date(now); sevenDaysAgo.setDate(now.getDate() - 7);
-    const _arBounds = _arTodayBounds();
-    const _todayARKey = _arBounds.key;
+    const _todayARKey = _arTodayBounds().key;
 
     const getGameDate = (h) => {
       if (h.commenceTs) return new Date(h.commenceTs);
       if (!h.date) return null;
-      const parts = h.date.split('/');
-      if (parts.length < 2) return null;
-      const d = new Date(now.getFullYear(), parseInt(parts[1])-1, parseInt(parts[0]));
-      if (d > now) d.setFullYear(now.getFullYear()-1);
+      // h.date = "DD/MM" o "DD/MM/YYYY" — parsear al mediodía UTC para no cruzar medianoche AR
+      const d = _arParseDate(h.date);
+      if (!d || isNaN(d.getTime())) return null;
+      // Si el año es incierto (solo "DD/MM"), ajustar si la fecha parece futura
+      if (!h.date.includes('/') || h.date.split('/').length < 3) {
+        if (d.getTime() > now.getTime() + 86400000) d.setUTCFullYear(d.getUTCFullYear()-1);
+      }
       return d;
     };
 
@@ -12497,12 +12533,15 @@ function renderHistorial(filter) {
       data = filter==='all' ? allRaw : allRaw.filter(h=>h.sport===filter);
       if (histDateFilter !== 'all') {
         const nb = new Date();
-        const _arBounds2 = _arTodayBounds();
-        const s7  = new Date(nb); s7.setDate(nb.getDate()-7);
+        const _todayARKey2 = _arTodayBounds().key;
+        const s7 = new Date(nb); s7.setDate(nb.getDate()-7);
         data = data.filter(h => {
           let gd = h.commenceTs ? new Date(h.commenceTs) : null;
-          if (!gd && h.date) { const p=h.date.split('/'); if(p.length>=2){gd=new Date(nb.getFullYear(),parseInt(p[1])-1,parseInt(p[0]));if(gd>nb)gd.setFullYear(nb.getFullYear()-1);}}
-          if (histDateFilter==='today') return gd ? _arDayKey(gd.getTime())===_arBounds2.key : false;
+          if (!gd && h.date) {
+            gd = _arParseDate(h.date);
+            if (gd && !isNaN(gd.getTime()) && gd.getTime() > nb.getTime()+86400000) gd.setUTCFullYear(gd.getUTCFullYear()-1);
+          }
+          if (histDateFilter==='today') return gd ? _arDayKey(gd.getTime())===_todayARKey2 : false;
           if (histDateFilter==='week')  return gd ? gd>=s7 : false;
           if (histDateFilter==='finde') return gd ? (gd.getDay()===6||gd.getDay()===0) : false;
           return true;
@@ -20780,8 +20819,9 @@ async function _fpRenderList() {
       if (ts > 0 && ts < 1e12) ts *= 1000; // segundos → ms
       if (!ts) {
         // fallback: match_date del thread o pick_data (formato "YYYY-MM-DD" o ISO)
+        // Usar _arParseDate para evitar que "YYYY-MM-DD" se parsee como medianoche UTC (= día anterior en AR)
         const mdRaw = t.match_date || pd.match_date || '';
-        if (mdRaw) { const d = new Date(mdRaw); if (!isNaN(d.getTime())) ts = d.getTime(); }
+        if (mdRaw) { const d = _arParseDate(mdRaw); if (d && !isNaN(d.getTime())) ts = d.getTime(); }
       }
       if (!ts && t.created_at) {
         // último fallback: usar created_at del hilo (los hilos se crean el mismo día que el partido)
