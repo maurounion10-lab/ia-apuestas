@@ -20694,6 +20694,11 @@ async function _fpRenderList() {
         const mdRaw = t.match_date || pd.match_date || '';
         if (mdRaw) { const d = new Date(mdRaw); if (!isNaN(d.getTime())) ts = d.getTime(); }
       }
+      if (!ts && t.created_at) {
+        // último fallback: usar created_at del hilo (los hilos se crean el mismo día que el partido)
+        const d = new Date(t.created_at);
+        if (!isNaN(d.getTime())) ts = d.getTime();
+      }
       const likes = likeCounts[t.id] || 0;
       const comments = postCounts[t.id] || 0;
       const score = likes + comments;
