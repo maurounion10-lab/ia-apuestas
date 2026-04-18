@@ -10335,7 +10335,7 @@ function renderPreds() {
     const _cardOddsA = p._aO ? parseFloat(p._aO) : (p.probA > 0 ? parseFloat((100/p.probA).toFixed(2)) : 2);
 
     return `
-    <div class="pred-card ${cardClass}" style="${
+    <div class="pred-card ${cardClass}" data-thread-id="${_matchKeyLP(p.home, p.away)}" data-bvr="${_bvr}" data-started="${isStarted ? 1 : 0}" data-commence-ts="${p.commenceTs || 0}" style="${
       isGameLive
         ? 'border-color:rgba(229,57,53,0.4)'
         : (!isStarted && !isMaxConf && p.conf==='high')
@@ -20706,8 +20706,9 @@ async function _loadCardEngagement() {
       };
     });
 
-    // Update DOM
+    // Update DOM counters + re-ordenar grid por engagement
     _updateCardEngagementUI();
+    _reorderCardsByEngagement();
   } catch(e) { console.warn('_loadCardEngagement error', e); }
 }
 
@@ -20757,8 +20758,33 @@ window.cardLikeThread = async function(threadId, btn) {
   } catch(e) { console.error('cardLikeThread error', e); }
 };
 
+/* ── Re-ordenar grid de picks por engagement (bvr × 100 + engagement bonus) ── */
+function _reorderCardsByEngagement() {
+  const grid = document.getElementById('predGrid');
+  if (!grid) return;
+  const cards = [...grid.querySelectorAll('.pred-card[data-thread-id]')];
+  if (cards.length < 2) return;
+
+  const scoreCard = card => {
+    const tid      = card.dataset.threadId;
+    const bvr      = parseInt(card.dataset.bvr)        || 0;
+    const started  = card.dataset.started === '1';
+    const ts       = parseInt(card.dataset.commenceTs) || 0;
+    const eng      = tid && _cardLikes[tid]
+      ? (_cardLikes[tid].likes || 0) + (_cardLikes[tid].comments || 0)
+      : 0;
+    const basePenalty = started ? -100000 : 0;
+    return basePenalty + bvr * 100 + Math.min(eng, 50) - ts / 1e13;
+  };
+
+  cards.sort((a, b) => scoreCard(b) - scoreCard(a));
+  cards.forEach(card => grid.appendChild(card));
+  console.log('[Engagement] Grid re-ordenado por engagement');
+}
+
 // Expose to global scope so renderPreds can call it
 window._loadCardEngagement = _loadCardEngagement;
+window._reorderCardsByEngagement = _reorderCardsByEngagement;
 
 /* ── Tab switch ── */
 window.fpSetTab = function(tab, btn) {
