@@ -1442,6 +1442,101 @@
     from { opacity: 0; transform: translateY(4px); }
     to   { opacity: 1; transform: translateY(0); }
   }
+  /* ── Soccer ball loading animation ── */
+  @keyframes ballBounce {
+    0%   { transform: translateY(0) rotate(0deg); animation-timing-function: ease-in; }
+    45%  { transform: translateY(68px) rotate(160deg); animation-timing-function: ease-out; }
+    55%  { transform: translateY(68px) rotate(200deg); animation-timing-function: ease-in; }
+    100% { transform: translateY(0) rotate(360deg); animation-timing-function: ease-out; }
+  }
+  @keyframes ballShadow {
+    0%,100% { transform: scaleX(1); opacity: 0.35; }
+    50%     { transform: scaleX(0.35); opacity: 0.12; }
+  }
+  @keyframes ballRoll {
+    0%   { left: 5%; }
+    100% { left: 85%; }
+  }
+  @keyframes shadowRoll {
+    0%   { left: 5%; }
+    100% { left: 85%; }
+  }
+  .gb-ball-loader {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px 56px;
+    gap: 0;
+    position: relative;
+    min-height: 240px;
+    user-select: none;
+  }
+  .gb-ball-track {
+    position: relative;
+    width: 220px;
+    height: 110px;
+    margin-bottom: 24px;
+  }
+  .gb-ball-wrap {
+    position: absolute;
+    top: 0;
+    left: 5%;
+    animation: ballRoll 1.4s cubic-bezier(0.45,0,0.55,1) infinite alternate;
+  }
+  .gb-ball {
+    font-size: 2.6rem;
+    line-height: 1;
+    animation: ballBounce 0.7s infinite;
+    display: block;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+  }
+  .gb-ball-shadow {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 34px;
+    height: 8px;
+    background: rgba(0,0,0,0.5);
+    border-radius: 50%;
+    filter: blur(3px);
+    animation: ballShadow 0.7s infinite;
+    animation: ballRoll 1.4s cubic-bezier(0.45,0,0.55,1) infinite alternate, ballShadow 0.7s infinite;
+  }
+  .gb-ball-ground {
+    position: absolute;
+    bottom: 0;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(0,200,83,0.4) 30%, rgba(0,200,83,0.6) 50%, rgba(0,200,83,0.4) 70%, transparent);
+    border-radius: 2px;
+  }
+  .gb-loader-text {
+    font-size: 0.88rem;
+    color: var(--texto-sec);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    animation: loadingDots 1.4s steps(4, end) infinite;
+  }
+  @keyframes loadingDots {
+    0%   { content: 'Cargando picks'; }
+    25%  { content: 'Cargando picks.'; }
+    50%  { content: 'Cargando picks..'; }
+    75%  { content: 'Cargando picks...'; }
+    100% { content: 'Cargando picks'; }
+  }
+  .gb-loader-dots::after {
+    content: '';
+    animation: dotCycle 1.4s steps(4, end) infinite;
+  }
+  @keyframes dotCycle {
+    0%   { content: ''; }
+    25%  { content: '.'; }
+    50%  { content: '..'; }
+    75%  { content: '...'; }
+  }
   .skel {
     background: linear-gradient(90deg, rgba(255,255,255,0.04) 25%, rgba(255,255,255,0.09) 50%, rgba(255,255,255,0.04) 75%);
     background-size: 800px 100%;
@@ -9941,34 +10036,21 @@ function renderPreds() {
   if (!realPreds) {
     const isLoading = _oddsLoading || !window._rawOddsGames;
     if (isLoading) {
-      document.getElementById('predGrid').innerHTML = [1,2,3].map(() => `
-        <div class="pred-card-skeleton">
-          <div class="skel" style="height:12px;width:55%"></div>
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div class="skel" style="height:22px;width:38%"></div>
-            <div class="skel" style="height:22px;width:28%"></div>
+      document.getElementById('predGrid').innerHTML = `
+        <div class="gb-ball-loader">
+          <div class="gb-ball-track">
+            <div class="gb-ball-wrap">
+              <span class="gb-ball">⚽</span>
+            </div>
+            <div class="gb-ball-ground"></div>
           </div>
-          <div style="display:flex;justify-content:center;gap:24px;padding:10px 0">
-            <div class="skel" style="height:52px;width:52px;border-radius:50%"></div>
-            <div class="skel" style="height:52px;width:52px;border-radius:50%"></div>
-          </div>
-          <div class="skel" style="height:58px;width:100%;border-radius:10px"></div>
-          <div style="display:flex;gap:6px">
-            <div class="skel" style="height:14px;flex:1"></div>
-            <div class="skel" style="height:14px;flex:1"></div>
-            <div class="skel" style="height:14px;flex:1"></div>
-          </div>
-          <div style="display:flex;gap:6px">
-            <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
-            <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
-            <div class="skel" style="height:44px;flex:1;border-radius:10px"></div>
-          </div>
-          <div style="text-align:center;font-size:0.68rem;color:var(--texto-sec);opacity:0.6">Cargando pronósticos...</div>
-        </div>`).join('') + `
-      <div style="text-align:center;padding:8px 0 16px;opacity:0;animation:fadeInSlow 1s 8s forwards">
-        <button onclick="if(window._oddsLoading){return;}cacheSet('cache_odds_v8',null);loadRealOdds();" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--texto-sec);padding:8px 20px;border-radius:20px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(0,200,83,0.4)';this.style.color='var(--verde)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='var(--texto-sec)'">🔄 Reintentar</button>
-        <div style="font-size:0.65rem;color:var(--texto-sec);opacity:0.5;margin-top:6px">La carga está tardando más de lo normal</div>
-      </div>`;
+          <div class="gb-loader-text">Cargando picks<span class="gb-loader-dots"></span></div>
+          <div style="font-size:0.72rem;color:var(--texto-sec);opacity:0.45;margin-top:6px">La IA está analizando los partidos de hoy</div>
+        </div>
+        <div style="grid-column:1/-1;text-align:center;padding:0 0 8px;opacity:0;animation:fadeInSlow 1s 10s forwards">
+          <button onclick="if(window._oddsLoading){return;}cacheSet('cache_odds_v8',null);loadRealOdds();" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--texto-sec);padding:8px 20px;border-radius:20px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(0,200,83,0.4)';this.style.color='var(--verde)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='var(--texto-sec)'">🔄 Reintentar</button>
+          <div style="font-size:0.65rem;color:var(--texto-sec);opacity:0.5;margin-top:6px">La carga está tardando más de lo normal</div>
+        </div>`;
     } else {
       document.getElementById('predGrid').innerHTML = (() => {
         const _isLogged = !!authUser;
