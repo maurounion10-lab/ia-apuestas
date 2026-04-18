@@ -10373,7 +10373,14 @@ function renderPreds() {
                        const _ts = _md.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false});
                        return (_diff === -1 ? 'Ayer' : _diff === 0 ? 'Hoy' : _diff === 1 ? 'Mañ.' : _md.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})) + ' · ' + _ts;
                      })()
-                   : p.time;
+                   : p.time || (p.commenceTs ? (() => {
+                       const _md = new Date(p.commenceTs);
+                       const _td = new Date(); _td.setHours(0,0,0,0);
+                       const _cd = new Date(_md); _cd.setHours(0,0,0,0);
+                       const _diff = Math.round((_cd - _td) / 86400000);
+                       const _ts = _md.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false});
+                       return (_diff === -1 ? 'Ayer' : _diff === 0 ? 'Hoy' : _diff === 1 ? 'Mañ.' : _md.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})) + ' · ' + _ts;
+                     })() : '');
           return [lg, t].filter(Boolean).join(' · ');
         })()}</span>
         <div style="display:flex;align-items:center;gap:6px">
