@@ -9781,12 +9781,13 @@ function renderPreds() {
 
   // ── Weekend Máxima: ya se aplica arriba (antes de saves). Noop aquí. ──
 
-  // ── Pick Estrella del Finde (viernes, sábado o domingo) ──
+  // ── Pick Estrella del Finde (viernes, sábado o domingo) — solo en sub-página picks ──
   try {
     const estrellaEl = document.getElementById('estrellaContainer');
     const dow = new Date().getDay(); // 0=Dom,5=Vie,6=Sáb
     const isFindeWindow = dow === 5 || dow === 6 || dow === 0;
-    if (estrellaEl && isFindeWindow && realPreds && realPreds.length) {
+    const _isPicksForEstrella = document.body.dataset.gbpage === 'picks';
+    if (estrellaEl && isFindeWindow && _isPicksForEstrella && realPreds && realPreds.length) {
       // Respetar el filtro de deporte activo para la Estrella
       const sfE = window._predSportFilter || 'all';
       let predsForEstrella = realPreds;
