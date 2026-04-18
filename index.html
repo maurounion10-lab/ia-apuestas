@@ -6136,7 +6136,7 @@
         <div class="bk-lock-perk"><span>⭐</span> Estas cuentas (por ahora) son GRATIS</div>
       </div>
       <button class="bk-lock-btn" onclick="openAuth()">Crear cuenta gratuita →</button>
-      <button class="bk-lock-secondary" onclick="openAuth()">Ya tengo cuenta · Iniciar sesión</button>
+      <button class="bk-lock-secondary" onclick="openAuthLogin()">Ya tengo cuenta · Iniciar sesión</button>
     </div>
 
     <!-- Bankroll content (logged-in users only) -->
@@ -9443,7 +9443,7 @@ function renderPreds() {
               // Sync asíncrono en Supabase (una sola vez por render)
               clearTimeout(window._syncLockBvrTimer);
               window._syncLockBvrTimer = setTimeout(() => {
-                const _pSnap = { home: p.home, away: p.away, bvr: p.bvr, bvrText: p.bvrText,
+                const _pSnap = { id: p.id, home: p.home, away: p.away, bvr: p.bvr, bvrText: p.bvrText,
                   conf: p.conf, rec: p.rec, _bestOdds: p._bestOdds, _hO: p._hO, _aO: p._aO, _dO: p._dO,
                   probH: p.probH, probD: p.probD, probA: p.probA, commenceTs: p.commenceTs, _sportKey: p._sportKey };
                 sbSaveLockedPicks([_pSnap]);
@@ -14536,6 +14536,11 @@ function openAuth() {
   // Limpiar honeypot al abrir
   const hp = document.getElementById('hpWebsite');
   if (hp) hp.value = '';
+}
+// Abre el overlay directamente en el formulario de login (para "Ya tengo cuenta")
+function openAuthLogin() {
+  openAuth();
+  goToEmailLogin();
 }
 function closeAuth() {
   document.getElementById('authOverlay').classList.remove('open');
@@ -21084,10 +21089,14 @@ window.fpBackToList = function() {
 };
 
 /* ── Load posts ── */
+let _fpLoadPostsBusy = false;
 async function _fpLoadPosts() {
+  if (_fpLoadPostsBusy) return;          // evitar doble llamada concurrente (realtime + submit)
+  _fpLoadPostsBusy = true;
   const list = $('fpPostsList');
-  if (!list) return;
-  list.innerHTML = '<div class="fp-loading">⏳</div>';
+  if (!list) { _fpLoadPostsBusy = false; return; }
+  // Solo mostrar spinner si la lista está vacía (primer carga), no en recargas por realtime
+  if (!list.children.length) list.innerHTML = '<div class="fp-loading">⏳</div>';
 
   try {
     const { data: posts, error } = await (window.sbAnon || window.sbClient)
@@ -21171,12 +21180,14 @@ async function _fpLoadPosts() {
       }
     });
 
-    // scroll to bottom
-    list.scrollTop = list.scrollHeight;
+    // scroll to bottom suavemente (solo si hay posts)
+    if (list.children.length) list.lastElementChild?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
   } catch(e) {
     console.error('Forum posts error', e);
     list.innerHTML = '<div class="fp-empty">⚠️ Error: ' + (e.message||'') + '</div>';
+  } finally {
+    _fpLoadPostsBusy = false;
   }
 }
 
@@ -21369,7 +21380,7 @@ function _fpJoinCtaHtml() {
       </div>
       <div class="fp-join-cta-btns">
         <button class="fp-join-btn-primary" onclick="openAuth()">✦ Registro Gratis</button>
-        <button class="fp-join-btn-sec" onclick="openAuth()">Ya tengo cuenta</button>
+        <button class="fp-join-btn-sec" onclick="openAuthLogin()">Ya tengo cuenta</button>
       </div>
     </div>
   `;
@@ -21662,7 +21673,13 @@ function _fpUnsubscribe() {
 /* ── Auto-create thread for a pick (called by pick renderer) ── */
 window.forumEnsureThread = async function(pick) {
   // pick = { id, home, away, league, match_date, prediction/pick, confidence/conf, ... }
-  if (!pick || !pick.id) return;
+  if (!pick) return;
+  // Generar ID si no existe: slug de home_vs_away (igual al formato usado en los threads existentes)
+  if (!pick.id && pick.home && pick.away) {
+    const slug = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+    pick = { ...pick, id: slug(pick.home) + '_vs_' + slug(pick.away) };
+  }
+  if (!pick.id) return;
   try {
     const sb = window.sbAnon || window.sbClient;
     const { data: existing } = await sb
