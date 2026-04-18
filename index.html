@@ -10504,16 +10504,17 @@ function renderPreds() {
     source.forEach(p => {
       if (!p || !p.home || !p.away) return;
       window.forumEnsureThread({
-        id:         _matchKeyLP(p.home, p.away),
-        home:       p.home       || '',
-        away:       p.away       || '',
-        league:     p.league     || '',
-        match_date: p.match_date || p.date || '',
-        rec:        p.rec        || '',
-        bvr:        p.bvr        || 3,
-        bvrText:    p.bvrText    || '',
-        conf:       p.conf       || '',
-        confLabel:  p.confLabel  || ''
+        id:          _matchKeyLP(p.home, p.away),
+        home:        p.home        || '',
+        away:        p.away        || '',
+        league:      p.league      || '',
+        match_date:  p.match_date  || p.date || '',
+        commenceTs:  p.commenceTs  || 0,
+        rec:         p.rec         || '',
+        bvr:         p.bvr         || 3,
+        bvrText:     p.bvrText     || '',
+        conf:        p.conf        || '',
+        confLabel:   p.confLabel   || ''
       });
     });
   }
@@ -20677,22 +20678,31 @@ async function _fpRenderList() {
     _fpAccOpen = null;
     _fpView = 'list';
 
+    // Helper: normaliza fecha local a "YYYY-M-D" (sin padding) para comparar días
+    const _dayKey = d => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    const todayKey = _dayKey(now);
+
     // Enrich all threads with engagement score (likes + comments)
     const allItems = [];
     threads.forEach(t => {
       const pd = t.pick_data || {};
+      // ts: preferir commenceTs, fallback a match_date del thread o del pick_data
       let ts = Number(pd.commenceTs || 0);
-      if (ts > 0 && ts < 1e12) ts *= 1000;
+      if (ts > 0 && ts < 1e12) ts *= 1000; // segundos → ms
+      if (!ts) {
+        // fallback: match_date del thread o pick_data (formato "YYYY-MM-DD" o ISO)
+        const mdRaw = t.match_date || pd.match_date || '';
+        if (mdRaw) { const d = new Date(mdRaw); if (!isNaN(d.getTime())) ts = d.getTime(); }
+      }
       const likes = likeCounts[t.id] || 0;
       const comments = postCounts[t.id] || 0;
       const score = likes + comments;
       const enriched = { ...t, _ts: ts, _score: score, _likes: likes, _comments: comments };
 
       if (_fpTab === 'hoy') {
+        // Comparar por día local (independiente de zona horaria UTC)
         const matchDay = ts ? new Date(ts) : null;
-        const todayStr = `${now.getFullYear()}-${now.getMonth()}-${now.getDate()}`;
-        const matchStr = matchDay ? `${matchDay.getFullYear()}-${matchDay.getMonth()}-${matchDay.getDate()}` : null;
-        if (!matchStr || matchStr !== todayStr) return;
+        if (!matchDay || _dayKey(matchDay) !== todayKey) return;
       }
 
       // Include upcoming + played within last 5 days
@@ -21506,10 +21516,21 @@ window.forumEnsureThread = async function(pick) {
     const sb = window.sbAnon || window.sbClient;
     const { data: existing } = await sb
       .from('forum_threads')
-      .select('id')
+      .select('id, pick_data')
       .eq('id', String(pick.id))
       .maybeSingle();
-    if (existing) return;
+    if (existing) {
+      // Parchar hilos viejos que no tienen commenceTs en pick_data
+      const oldPd = existing.pick_data || {};
+      if (!oldPd.commenceTs && pick.commenceTs) {
+        try {
+          await sbClient.from('forum_threads')
+            .update({ pick_data: { ...oldPd, commenceTs: pick.commenceTs } })
+            .eq('id', String(pick.id));
+        } catch(_) {}
+      }
+      return;
+    }
 
     // create thread + AI post
     await sbClient.from('forum_threads').insert([{
