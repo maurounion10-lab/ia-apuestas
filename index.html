@@ -20762,13 +20762,23 @@ async function _fpRenderList() {
 
   const now = new Date();
   const nowMs = now.getTime();
-  const fiveDaysAgoMs = nowMs - 5 * 86400000;
+  const fiveDaysAgoMs = nowMs - 7 * 86400000; // ventana de 7 días para no filtrar partidos de hoy jugados de noche
 
-  // Tab date filter (para pestaña "hoy" no filtramos por created_at sino por commenceTs)
+  // Tab date filter
+  // Para HOY: los hilos pueden haberse creado hasta 5 días antes del partido (picks anticipados),
+  // así que buscamos en una ventana amplia y filtramos por fecha del partido en el cliente.
+  // Para SEMANA: últimos 7 días de created_at.
   let fromDate = null;
-  if (_fpTab === 'semana') {
+  let queryLimit = 200;
+  if (_fpTab === 'hoy') {
+    // Buscar hilos creados en los últimos 5 días (cubre picks generados con anticipación)
+    const d = new Date(now); d.setDate(d.getDate() - 5);
+    fromDate = d.toISOString();
+    queryLimit = 500; // sin límite bajo para no perder hilos de hoy
+  } else if (_fpTab === 'semana') {
     const d = new Date(now); d.setDate(d.getDate() - 7);
     fromDate = d.toISOString();
+    queryLimit = 300;
   }
 
   try {
@@ -20777,7 +20787,7 @@ async function _fpRenderList() {
     // Fetch threads
     let q = db.from('forum_threads').select('*').order('created_at', { ascending: false });
     if (fromDate) q = q.gte('created_at', fromDate);
-    const { data: threads, error } = await q.limit(100);
+    const { data: threads, error } = await q.limit(queryLimit);
     if (error) throw error;
 
     if (!threads || threads.length === 0) {
@@ -20814,17 +20824,26 @@ async function _fpRenderList() {
     const allItems = [];
     threads.forEach(t => {
       const pd = t.pick_data || {};
-      // ts: preferir commenceTs, fallback a match_date del thread o del pick_data
-      let ts = Number(pd.commenceTs || 0);
-      if (ts > 0 && ts < 1e12) ts *= 1000; // segundos → ms
+      // ts: preferir commenceTs del pick_data (puede ser número o string ISO)
+      let ts = 0;
+      if (pd.commenceTs) {
+        const n = Number(pd.commenceTs);
+        if (!isNaN(n) && n > 0) {
+          ts = n < 1e12 ? n * 1000 : n; // segundos → ms
+        } else if (typeof pd.commenceTs === 'string') {
+          // Es un string ISO como "2026-04-18T23:00:00Z"
+          const d = new Date(pd.commenceTs);
+          if (!isNaN(d.getTime())) ts = d.getTime();
+        }
+      }
+      // Fallback: match_date del thread o del pick_data
+      // Usar _arParseDate para evitar que "YYYY-MM-DD" se parsee como medianoche UTC (= día anterior en AR)
       if (!ts) {
-        // fallback: match_date del thread o pick_data (formato "YYYY-MM-DD" o ISO)
-        // Usar _arParseDate para evitar que "YYYY-MM-DD" se parsee como medianoche UTC (= día anterior en AR)
-        const mdRaw = t.match_date || pd.match_date || '';
+        const mdRaw = t.match_date || pd.match_date || pd.date || '';
         if (mdRaw) { const d = _arParseDate(mdRaw); if (d && !isNaN(d.getTime())) ts = d.getTime(); }
       }
+      // Último fallback: created_at del hilo
       if (!ts && t.created_at) {
-        // último fallback: usar created_at del hilo (los hilos se crean el mismo día que el partido)
         const d = new Date(t.created_at);
         if (!isNaN(d.getTime())) ts = d.getTime();
       }
