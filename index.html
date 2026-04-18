@@ -4391,13 +4391,14 @@
   /* ── Top 3 engagement gold highlights ── */
   .fp-acc.fp-rank-1 { border: 1.5px solid rgba(255,215,0,0.7); background: linear-gradient(135deg, rgba(255,215,0,0.12) 0%, rgba(255,180,0,0.06) 100%); box-shadow: 0 0 12px rgba(255,215,0,0.18); }
   .fp-acc.fp-rank-1 .fp-acc-hdr { background: linear-gradient(90deg, rgba(255,215,0,0.10) 0%, transparent 70%); }
-  .fp-acc.fp-rank-1::before { content:'🥇'; position:absolute; top:8px; right:10px; font-size:1.1rem; z-index:1; }
   .fp-acc.fp-rank-2 { border: 1.5px solid rgba(255,215,0,0.38); background: linear-gradient(135deg, rgba(255,215,0,0.06) 0%, transparent 100%); box-shadow: 0 0 8px rgba(255,215,0,0.09); }
   .fp-acc.fp-rank-2 .fp-acc-hdr { background: linear-gradient(90deg, rgba(255,215,0,0.05) 0%, transparent 60%); }
-  .fp-acc.fp-rank-2::before { content:'🥈'; position:absolute; top:8px; right:10px; font-size:1rem; z-index:1; }
   .fp-acc.fp-rank-3 { border: 1.5px solid rgba(255,215,0,0.18); background: rgba(255,215,0,0.025); }
-  .fp-acc.fp-rank-3::before { content:'🥉'; position:absolute; top:8px; right:10px; font-size:0.95rem; z-index:1; }
   .fp-acc.fp-rank-1, .fp-acc.fp-rank-2, .fp-acc.fp-rank-3 { position: relative; }
+  .fp-acc.fp-rank-1::before, .fp-acc.fp-rank-2::before, .fp-acc.fp-rank-3::before { position:absolute; top:6px; left:7px; z-index:2; font-size:0.58rem; font-weight:800; padding:1px 5px; border-radius:20px; line-height:1.5; pointer-events:none; }
+  .fp-acc.fp-rank-1::before { content:'#1'; background:rgba(255,215,0,0.22); color:#ffd600; border:1px solid rgba(255,215,0,0.5); }
+  .fp-acc.fp-rank-2::before { content:'#2'; background:rgba(180,180,180,0.15); color:#c0c0c0; border:1px solid rgba(180,180,180,0.35); }
+  .fp-acc.fp-rank-3::before { content:'#3'; background:rgba(180,100,40,0.15); color:#cd7f32; border:1px solid rgba(180,100,40,0.35); }
 
   /* ── Match banner inside accordion ── */
   .fp-match-banner {
@@ -11038,6 +11039,7 @@ const HIST_RESULT_OVERRIDES = {
   'ussassuolo|||como1907':   { result: 'loss' },
   // Union Santa Fe 2-3 Newell's (17/4) — "Local Gana" → fallo
   'unionsantafe|||newells':  { result: 'loss' },
+  'lens|||toulouse':         { bvr: 6, bvrText: 'Máxima', stake: 170 },
 };
 
 // Helper: normaliza nombre de equipo para comparación
@@ -11058,10 +11060,14 @@ function _applyHistOverrides(arr) {
   arr.forEach(h => {
     const ov = HIST_RESULT_OVERRIDES[_normHist(h.home) + '|||' + _normHist(h.away)];
     if (!ov) return;
-    h.result = ov.result;
+    if (ov.bvr   !== undefined) { h.bvr = ov.bvr; h.bvrText = ov.bvrText || h.bvrText; }
+    if (ov.stake !== undefined) h.stake = ov.stake;
+    if (ov.result !== undefined) h.result = ov.result;
     if (ov.finalScore !== undefined) h.finalScore = ov.finalScore;
-    if (ov.result === 'void') h.pl = 0;
-    else if (ov.result === 'loss') h.pl = -(h.stake || 30);
+    const st = h.stake || 30;
+    if (h.result === 'void')       h.pl = 0;
+    else if (h.result === 'loss')  h.pl = -st;
+    else if (h.result === 'win')   h.pl = parseFloat(((h.odds - 1) * st).toFixed(2));
   });
   return arr;
 }
@@ -11662,7 +11668,14 @@ async function sbLoadHistorial() {
     const _hKey = h => h.id || `${h.home}|||${h.away}|||${h.date||''}`;
     const allEntries = [...(globalHist||[]), ...dbHist, ...localHist];
     const seen = new Map();
-    allEntries.forEach(h => { const k = _hKey(h); if (!seen.has(k)) seen.set(k, h); });
+    allEntries.forEach(h => {
+      const k = _hKey(h);
+      if (!seen.has(k)) { seen.set(k, h); } else {
+        const ex = seen.get(k);
+        if (ex.result === 'pending' && (h.result === 'pending' || !h.result) && (h.bvr||0) > (ex.bvr||0))
+          seen.set(k, { ...ex, bvr: h.bvr, bvrText: h.bvrText||ex.bvrText, conf: h.conf||ex.conf, stake: h.stake||ex.stake });
+      }
+    });
     const merged = [...seen.values()].filter(h=>!_isHistBlocked(h)).sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0));
 
     // ── Migración global de stakes (backtesting) ──────────────────────────────
@@ -11707,9 +11720,9 @@ async function sbLoadHistorial() {
 
     // Aplicar overrides ANTES de cualquier guardado — Sassuolo/void, etc.
     // Detectar si algún override cambió algo (para forzar escritura en Supabase)
-    const _preOverrideSnapshot = JSON.stringify(merged.map(h => ({ id: h.id||'', result: h.result, pl: h.pl })));
+    const _preOverrideSnapshot = JSON.stringify(merged.map(h => ({ id: h.id||'', result: h.result, pl: h.pl, bvr: h.bvr||0, stake: h.stake||0 })));
     _applyHistOverrides(merged);
-    const _postOverrideSnapshot = JSON.stringify(merged.map(h => ({ id: h.id||'', result: h.result, pl: h.pl })));
+    const _postOverrideSnapshot = JSON.stringify(merged.map(h => ({ id: h.id||'', result: h.result, pl: h.pl, bvr: h.bvr||0, stake: h.stake||0 })));
     const overridesChanged = _preOverrideSnapshot !== _postOverrideSnapshot;
 
     // Actualizar shared_cache si el merge tiene más entradas, hubo migración de stakes, o los overrides cambiaron algo
