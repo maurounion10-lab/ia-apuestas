@@ -10983,10 +10983,13 @@ const BLOCKED_HIST_TEAMS = new Set([
 // Overrides manuales de resultado — clave: normTeam(home)+'|||'+normTeam(away)
 // Valor: { result: 'win'|'loss'|'void', finalScore (opcional) }
 const HIST_RESULT_OVERRIDES = {
-  'sassuolo|||como':       { result: 'void' },
-  'sassuolo|||como1907':   { result: 'void' },
-  'ussassuolo|||como':     { result: 'void' },
-  'ussassuolo|||como1907': { result: 'void' },
+  // Sassuolo 2-1 Como (16/4) — "Gana Visitante" → fallo
+  'sassuolo|||como':         { result: 'loss' },
+  'sassuolo|||como1907':     { result: 'loss' },
+  'ussassuolo|||como':       { result: 'loss' },
+  'ussassuolo|||como1907':   { result: 'loss' },
+  // Union Santa Fe 2-3 Newell's (17/4) — "Local Gana" → fallo
+  'unionsantafe|||newells':  { result: 'loss' },
 };
 
 // Helper: normaliza nombre de equipo para comparación
@@ -11010,6 +11013,7 @@ function _applyHistOverrides(arr) {
     h.result = ov.result;
     if (ov.finalScore !== undefined) h.finalScore = ov.finalScore;
     if (ov.result === 'void') h.pl = 0;
+    else if (ov.result === 'loss') h.pl = -(h.stake || 30);
   });
   return arr;
 }
