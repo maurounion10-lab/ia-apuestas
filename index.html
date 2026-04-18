@@ -20768,14 +20768,13 @@ async function _fpRenderList() {
   // Para HOY: los hilos pueden haberse creado hasta 5 días antes del partido (picks anticipados),
   // así que buscamos en una ventana amplia y filtramos por fecha del partido en el cliente.
   // Para SEMANA: últimos 7 días de created_at.
+  // Para HOY: NO filtrar por created_at — los picks se pueden haber generado con semanas de
+  // anticipación (UCL, Copa Libertadores, etc.). El filtrado por fecha del partido lo hace
+  // el cliente con _arDayKey. Traer todos los hilos con limit alto.
+  // Para SEMANA: limitar a los últimos 7 días de created_at.
   let fromDate = null;
-  let queryLimit = 200;
-  if (_fpTab === 'hoy') {
-    // Buscar hilos creados en los últimos 5 días (cubre picks generados con anticipación)
-    const d = new Date(now); d.setDate(d.getDate() - 5);
-    fromDate = d.toISOString();
-    queryLimit = 500; // sin límite bajo para no perder hilos de hoy
-  } else if (_fpTab === 'semana') {
+  let queryLimit = 500;
+  if (_fpTab === 'semana') {
     const d = new Date(now); d.setDate(d.getDate() - 7);
     fromDate = d.toISOString();
     queryLimit = 300;
