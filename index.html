@@ -10050,23 +10050,20 @@ function renderPreds() {
   if (realPreds) {
     const tf = window._predTimeFilter || 'all';
     if (tf === 'today') {
-      // HOY = partidos cuyo commenceTs cae entre 00:00 y 23:59 de hoy (local)
-      // Incluye: pendientes de hoy, en juego y terminados de hoy
-      const _todayStart = new Date(); _todayStart.setHours(0,0,0,0);
-      const _todayEnd   = new Date(); _todayEnd.setHours(23,59,59,999);
-      const _tsStart = _todayStart.getTime(), _tsEnd = _todayEnd.getTime();
+      // HOY = partidos del día calendario en Argentina (UTC-3), universal para todos los usuarios
+      const { start: _tsStart, end: _tsEnd, key: _todayARKey } = _arTodayBounds();
       realPreds = realPreds.filter(p => {
         if (p.commenceTs) return p.commenceTs >= _tsStart && p.commenceTs <= _tsEnd;
-        if (p.date) { const d = new Date(p.date); d.setHours(0,0,0,0); return d.getTime() === _todayStart.getTime(); }
+        if (p.date) return _arDayKey(new Date(p.date).getTime()) === _todayARKey;
         return true; // sin fecha → incluir por defecto
       });
     } else if (tf === 'upcoming') {
-      // PRÓXIMOS = solo partidos de mañana en adelante (no los de hoy pendientes)
-      const _tomorrow = new Date(); _tomorrow.setHours(0,0,0,0); _tomorrow.setDate(_tomorrow.getDate() + 1);
-      const _tomorrowMs = _tomorrow.getTime();
+      // PRÓXIMOS = solo partidos de mañana en adelante (en zona Argentina)
+      const { end: _todayEndAR } = _arTodayBounds();
+      const _tomorrowMs = _todayEndAR + 1;
       realPreds = realPreds.filter(p => {
         if (p.commenceTs) return p.commenceTs >= _tomorrowMs;
-        if (p.date) { const d = new Date(p.date); d.setHours(0,0,0,0); return d.getTime() >= _tomorrowMs; }
+        if (p.date) return new Date(p.date).getTime() >= _tomorrowMs;
         return false; // sin fecha → no incluir en próximos
       });
     } else if (tf === 'finished') {
@@ -10935,6 +10932,23 @@ const ADMIN_SESSION  = 'apuestas_admin_session_v1';
 let histPage = 0;
 let histDateFilter = 'all';
 let histLeagueFilter = 'all';
+
+// ── Zona horaria Argentina (UTC-3, sin cambio de horario) ────────────────────
+// Todas las comparaciones de "HOY" usan AR como referencia universal
+function _arTodayBounds() {
+  const AR_OFFSET = -3 * 3600 * 1000; // UTC-3 fijo
+  const arNow = new Date(Date.now() + AR_OFFSET);
+  const yy = arNow.getUTCFullYear(), mm = arNow.getUTCMonth(), dd = arNow.getUTCDate();
+  // 00:00 AR = 03:00 UTC del mismo día calendario AR
+  const start = Date.UTC(yy, mm, dd) - AR_OFFSET; // = Date.UTC(yy,mm,dd) + 3h
+  return { start, end: start + 86400000 - 1, key: `${yy}-${mm}-${dd}` };
+}
+// Clave de día en zona AR para un timestamp UTC (ms)
+function _arDayKey(tsMs) {
+  const d = new Date(tsMs - 3 * 3600 * 1000); // shift to AR
+  return `${d.getUTCFullYear()}-${d.getUTCMonth()}-${d.getUTCDate()}`;
+}
+// ─────────────────────────────────────────────────────────────────────────────
 let histMercadoFilter = 'all';
 let histConfFilter = 'all';
 // Fecha de lanzamiento del sitio — fija para todos los usuarios
@@ -12431,8 +12445,9 @@ function renderHistorial(filter) {
   // Filtro por fecha
   if (histDateFilter !== 'all') {
     const now = new Date();
-    const todayStr = now.toLocaleDateString('es-AR', {day:'2-digit', month:'2-digit'});
     const sevenDaysAgo = new Date(now); sevenDaysAgo.setDate(now.getDate() - 7);
+    const _arBounds = _arTodayBounds();
+    const _todayARKey = _arBounds.key;
 
     const getGameDate = (h) => {
       if (h.commenceTs) return new Date(h.commenceTs);
@@ -12447,8 +12462,8 @@ function renderHistorial(filter) {
     data = data.filter(h => {
       const gd = getGameDate(h);
       if (histDateFilter === 'today') {
-        const gStr = gd ? gd.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'}) : h.date;
-        return gStr === todayStr;
+        if (!gd) return false;
+        return _arDayKey(gd.getTime()) === _todayARKey;
       }
       if (histDateFilter === 'week')  return gd ? gd >= sevenDaysAgo : false;
       if (histDateFilter === 'finde') return gd ? (gd.getDay()===6 || gd.getDay()===0) : false;
@@ -12482,12 +12497,12 @@ function renderHistorial(filter) {
       data = filter==='all' ? allRaw : allRaw.filter(h=>h.sport===filter);
       if (histDateFilter !== 'all') {
         const nb = new Date();
-        const ts2 = nb.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
+        const _arBounds2 = _arTodayBounds();
         const s7  = new Date(nb); s7.setDate(nb.getDate()-7);
         data = data.filter(h => {
           let gd = h.commenceTs ? new Date(h.commenceTs) : null;
           if (!gd && h.date) { const p=h.date.split('/'); if(p.length>=2){gd=new Date(nb.getFullYear(),parseInt(p[1])-1,parseInt(p[0]));if(gd>nb)gd.setFullYear(nb.getFullYear()-1);}}
-          if (histDateFilter==='today') return (gd?gd.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'}):h.date)===ts2;
+          if (histDateFilter==='today') return gd ? _arDayKey(gd.getTime())===_arBounds2.key : false;
           if (histDateFilter==='week')  return gd ? gd>=s7 : false;
           if (histDateFilter==='finde') return gd ? (gd.getDay()===6||gd.getDay()===0) : false;
           return true;
@@ -20753,9 +20768,8 @@ async function _fpRenderList() {
     _fpAccOpen = null;
     _fpView = 'list';
 
-    // Helper: normaliza fecha local a "YYYY-M-D" (sin padding) para comparar días
-    const _dayKey = d => `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
-    const todayKey = _dayKey(now);
+    // Helper: clave de día en zona Argentina (universal para todos los usuarios)
+    const todayKey = _arDayKey(now.getTime());
 
     // Enrich all threads with engagement score (likes + comments)
     const allItems = [];
@@ -20780,9 +20794,8 @@ async function _fpRenderList() {
       const enriched = { ...t, _ts: ts, _score: score, _likes: likes, _comments: comments };
 
       if (_fpTab === 'hoy') {
-        // Comparar por día local (independiente de zona horaria UTC)
-        const matchDay = ts ? new Date(ts) : null;
-        if (!matchDay || _dayKey(matchDay) !== todayKey) return;
+        // Comparar por día calendario en Argentina (universal para todos los usuarios)
+        if (!ts || _arDayKey(ts) !== todayKey) return;
       }
 
       // Include upcoming + played within last 5 days
