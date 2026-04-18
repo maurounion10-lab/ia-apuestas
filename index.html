@@ -4085,6 +4085,9 @@
   body[data-gbpage="ranking"] .gb-cross-nav,
   body[data-gbpage="ranking"] footer { display: none !important; }
 
+  /* Ranking solo visible en su sub-página — oculto en home y en cualquier otra sección */
+  body:not([data-gbpage="ranking"]) #ranking { display: none !important; }
+
   /* Ocultar dividers de sección en páginas dedicadas */
   body[data-gbpage] .section-divider { display: none !important; }
 
