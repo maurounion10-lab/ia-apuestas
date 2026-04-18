@@ -4067,6 +4067,24 @@
   body[data-gbpage="stats"] #myPicksPanel { display: block !important; }
   body[data-gbpage="stats"] #myPicksDivider { display: block !important; }
 
+  /* Ocultar elementos en modo ranking */
+  body[data-gbpage="ranking"] #gbHero,
+  body[data-gbpage="ranking"] #predictions,
+  body[data-gbpage="ranking"] #gFeedWrap,
+  body[data-gbpage="ranking"] #gbDbbetMid,
+  body[data-gbpage="ranking"] #myPicksPanel,
+  body[data-gbpage="ranking"] #myPicksDivider,
+  body[data-gbpage="ranking"] #historial,
+  body[data-gbpage="ranking"] #mipanel,
+  body[data-gbpage="ranking"] #bot-alerta,
+  body[data-gbpage="ranking"] #telegram,
+  body[data-gbpage="ranking"] #calculator,
+  body[data-gbpage="ranking"] #bankroll,
+  body[data-gbpage="ranking"] #gbBlog,
+  body[data-gbpage="ranking"] .section-page-cta,
+  body[data-gbpage="ranking"] .gb-cross-nav,
+  body[data-gbpage="ranking"] footer { display: none !important; }
+
   /* Ocultar dividers de sección en páginas dedicadas */
   body[data-gbpage] .section-divider { display: none !important; }
 
@@ -5245,6 +5263,23 @@
       <button id="gFeedPrev" onclick="gFeedPage(-1)" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:5px 14px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='rgba(255,214,0,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">← Anterior</button>
       <span id="gFeedPageInfo" style="font-size:0.72rem;color:rgba(255,255,255,0.35);font-weight:600"></span>
       <button id="gFeedNext" onclick="gFeedPage(1)"  style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:5px 14px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='rgba(255,214,0,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">Siguiente →</button>
+    </div>
+    <!-- CTA Ranking Mensual -->
+    <div style="text-align:center;margin-top:18px">
+      <button onclick="gbNavToPage('ranking')" style="
+        display:inline-flex;align-items:center;gap:8px;
+        background:linear-gradient(135deg,rgba(255,214,0,0.18),rgba(255,180,0,0.1));
+        border:1px solid rgba(255,214,0,0.45);
+        color:#ffd600;font-size:0.85rem;font-weight:800;
+        padding:11px 24px;border-radius:30px;cursor:pointer;
+        font-family:inherit;letter-spacing:0.2px;
+        transition:background 0.18s,border-color 0.18s,box-shadow 0.18s;
+        box-shadow:0 0 12px rgba(255,214,0,0.08)
+      "
+      onmouseover="this.style.background='linear-gradient(135deg,rgba(255,214,0,0.28),rgba(255,180,0,0.18))';this.style.boxShadow='0 0 20px rgba(255,214,0,0.2)'"
+      onmouseout="this.style.background='linear-gradient(135deg,rgba(255,214,0,0.18),rgba(255,180,0,0.1))';this.style.boxShadow='0 0 12px rgba(255,214,0,0.08)'">
+        🏆 Ver Ranking Mensual G$
+      </button>
     </div>
   </section>
 
@@ -10841,7 +10876,7 @@ function sendSuggestion(el) {
 function navTo(id) {
   // Si estamos en una página dedicada, navegar al hash correcto en vez de scroll
   if (document.body.dataset.gbpage) {
-    const _pageRoute = { predictions: 'picks', historial: 'historial', myPicksPanel: 'stats', ranking: '', 'bot-alerta': '', telegram: '', calculator: '', bankroll: '' };
+    const _pageRoute = { predictions: 'picks', historial: 'historial', myPicksPanel: 'stats', ranking: 'ranking', 'bot-alerta': '', telegram: '', calculator: '', bankroll: '' };
     if (id in _pageRoute) {
       const hash = _pageRoute[id];
       if (hash) { window.location.hash = hash; return; }
@@ -14184,10 +14219,10 @@ loadPlayerPhotos();
 
 // ── ROUTING DE PÁGINAS DEDICADAS (hash-based) ─────────────────────────────
 const _GB_PAGE_CFG = {
-  picks:     { label: '🔮 Picks del Día',   title: 'Picks · gambeta.ai' },
-  historial: { label: '📋 Resultados',       title: 'Resultados · gambeta.ai' },
-  stats:     { label: '📊 Estadísticas',     title: 'Estadísticas · gambeta.ai' },
-
+  picks:     { label: '🔮 Picks del Día',          title: 'Picks · gambeta.ai' },
+  historial: { label: '📋 Resultados',              title: 'Resultados · gambeta.ai' },
+  stats:     { label: '📊 Estadísticas',            title: 'Estadísticas · gambeta.ai' },
+  ranking:   { label: '🏆 Ranking Mensual · G$',   title: 'Ranking G$ · gambeta.ai' },
 };
 
 let _gbScrollBeforePage = 0;  // guarda el scroll antes de abrir una sub-página
@@ -14238,6 +14273,13 @@ function gbSetPage(page) {
     });
     document.getElementById('histDateBtnAll')?.classList.add('active');
     renderHistorial('all');
+  }
+  // En ranking: cargar el ranking y asegurar que #ranking sea visible
+  if (page === 'ranking') {
+    const rkSection = document.getElementById('ranking');
+    if (rkSection) rkSection.style.display = '';
+    loadRanking?.();
+    rkStartCountdown?.();
   }
 }
 
