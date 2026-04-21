@@ -23,9 +23,9 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Decode keystore from secret
+      - name: Decode keystore
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/gambeta-release.keystore
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/gambeta-release.keystore
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
@@ -34,9 +34,9 @@ jobs:
         working-directory: android
         env:
           KEYSTORE_PATH:     gambeta-release.keystore
-          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-          KEY_ALIAS:         ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD:      ${{ secrets.KEY_PASSWORD }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS:         ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD:      ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew bundleRelease
 
       - name: Upload AAB artifact
