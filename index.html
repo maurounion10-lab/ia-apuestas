@@ -9803,7 +9803,8 @@ function renderPreds() {
         const homeWin = se.scoreH > se.scoreA, awayWin = se.scoreA > se.scoreH, draw = se.scoreH === se.scoreA;
         const bttsMet = se.scoreH > 0 && se.scoreA > 0;
         const rec = p.rec || '';
-        let result = 'void';
+        // Ninguna apuesta es void — null = mercado no reconocido → queda pending
+        let result = null;
         if      (rec === 'Gana Local')     result = homeWin  ? 'win' : 'loss';
         else if (rec === 'Gana Visitante') result = awayWin  ? 'win' : 'loss';
         else if (rec === 'Empate')         result = draw     ? 'win' : 'loss';
@@ -9815,6 +9816,7 @@ function renderPreds() {
           const line = parseFloat(rec.replace('Más de ',''));
           result = totalGoals > line ? 'win' : 'loss';
         }
+        if (!result) return p; // mercado no reconocido → mostrar como pending
         console.log('[Preds] Rescatado resuelto:', p.home, 'vs', p.away, '→', result, se.scoreH+'-'+se.scoreA);
         return { ...p, _histResult: result, _histScore: `${se.scoreH}-${se.scoreA}` };
       });
@@ -11086,10 +11088,9 @@ function _applyHistOverrides(arr) {
     // Corregir resultado
     if (ov.result !== undefined) h.result = ov.result;
     if (ov.finalScore !== undefined) h.finalScore = ov.finalScore;
-    // Recalcular pl con el stake (posiblemente corregido)
+    // Recalcular pl con el stake (posiblemente corregido) — void no existe, siempre win o loss
     const st = h.stake || 30;
-    if (h.result === 'void')       h.pl = 0;
-    else if (h.result === 'loss')  h.pl = -st;
+    if (h.result === 'loss')  h.pl = -st;
     else if (h.result === 'win')   h.pl = parseFloat(((h.odds - 1) * st).toFixed(2));
   });
   return arr;
@@ -11787,7 +11788,8 @@ async function sbLoadHistorial() {
     const _mergedGlobal = _fg.map(g => {
       const k = _hKeyM(g);
       const loc = _localMap.get(k);
-      if (loc && (g.result === 'pending' || g.result === 'void') && (loc.result === 'win' || loc.result === 'loss')) {
+      // void nunca es definitivo — siempre puede sobreescribirse con win/loss
+      if (loc && (g.result === 'pending' || g.result === 'void' || g.result === 'null') && (loc.result === 'win' || loc.result === 'loss')) {
         return { ...g, result: loc.result, finalScore: loc.finalScore || g.finalScore, pl: loc.pl ?? g.pl };
       }
       return g;
@@ -12020,7 +12022,8 @@ function resolveCompletedGames(scores, skipRender) {
       const totalGoals = s.scoreH + s.scoreA;
       const bttsMet    = s.scoreH > 0 && s.scoreA > 0;
 
-      let result = 'void';
+      // Ninguna apuesta es void — siempre win o loss
+      let result = null; // null = mercado no reconocido → queda pending
       if      (p.rec === 'Gana Local')     result = homeWin    ? 'win' : 'loss';
       else if (p.rec === 'Gana Visitante') result = awayWin    ? 'win' : 'loss';
       else if (p.rec === 'Empate')         result = draw       ? 'win' : 'loss';
@@ -12039,29 +12042,17 @@ function resolveCompletedGames(scores, skipRender) {
         result = totalGoals < line ? 'win' : 'loss';
       }
 
-      p.result = result;
-      p.finalScore = `${s.scoreH}-${s.scoreA}`;
-      p.pl = result === 'win' ? parseFloat(((p.odds - 1) * p.stake).toFixed(2))
-           : result === 'loss' ? -p.stake : 0;
-      changed = true;
+      // Solo actualizar si se pudo determinar win/loss — nunca dejar void
+      if (result === 'win' || result === 'loss') {
+        p.result = result;
+        p.finalScore = `${s.scoreH}-${s.scoreA}`;
+        p.pl = result === 'win' ? parseFloat(((p.odds - 1) * p.stake).toFixed(2)) : -p.stake;
+        changed = true;
+      }
     });
   });
 
-  // Fallback solo para pronósticos muy viejos (>7 días) que nunca pudieron resolverse
-  hist.filter(h => h.result === 'pending').forEach(p => {
-    let cutoff = null;
-    if (p.commenceTs) {
-      cutoff = p.commenceTs + 7 * 86400000; // 7 días después del partido
-    } else if (p.id) {
-      const m = p.id.match(/(\d{4}-\d{2}-\d{2})$/);
-      if (m) cutoff = new Date(m[1]).getTime() + 7 * 86400000;
-    }
-    if (cutoff && now > cutoff) {
-      p.result = 'void';
-      p.pl = 0;
-      changed = true;
-    }
-  });
+  // Picks viejos sin resolver: dejarlos pending para resolución manual — nunca poner void
 
   if (changed) {
     saveHistorial(hist);
@@ -12415,7 +12406,8 @@ function resolveAllGames(scores) {
       const draw       = s.scoreH === s.scoreA;
       const totalGoals = s.scoreH + s.scoreA;
       const bttsMet    = s.scoreH > 0 && s.scoreA > 0;
-      let result = 'void';
+      // Ninguna apuesta es void — siempre win o loss
+      let result = null; // null = mercado no reconocido → queda pending
       if      (p.rec === 'Gana Local')     result = homeWin       ? 'win' : 'loss';
       else if (p.rec === 'Gana Visitante') result = awayWin       ? 'win' : 'loss';
       else if (p.rec === 'Empate')         result = draw          ? 'win' : 'loss';
@@ -12431,15 +12423,12 @@ function resolveAllGames(scores) {
         const line = parseFloat(p.rec.replace('Menos de ',''));
         result = totalGoals < line ? 'win' : 'loss';
       }
-      else if (/^Apuesta a [+\-]?\d/.test(p.rec)) {
-        // Corner/handicap bets — no se pueden resolver automáticamente
-        result = 'void';
-      }
-      if (result !== 'void' || p.result === 'pending') {
+      // Corner/handicap y otros mercados sin lógica automática → queda pending para resolución manual
+      // Solo actualizar si se determinó win/loss — nunca poner void
+      if (result === 'win' || result === 'loss') {
         p.result = result;
         p.finalScore = `${s.scoreH}-${s.scoreA}`;
-        p.pl = result === 'win' ? parseFloat(((p.odds - 1) * p.stake).toFixed(2))
-             : result === 'loss' ? -p.stake : 0;
+        p.pl = result === 'win' ? parseFloat(((p.odds - 1) * p.stake).toFixed(2)) : -p.stake;
         changed = true;
       }
     });
