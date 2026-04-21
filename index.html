@@ -9571,9 +9571,13 @@ const BLOCKED_HIST_TEAMS = new Set([
   'sportingcristal|||cerroporteno',
 ]);
 
-// Overrides manuales de resultado — clave: normTeam(home)+'|||'+normTeam(away)
-// Valor: { result: 'win'|'loss'|'void', finalScore (opcional) }
-const HIST_RESULT_OVERRIDES = {
+// Helper: normaliza nombre de equipo para comparación
+const _normHist = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+
+// Overrides manuales — dos formatos:
+// 1. Clave exacta: normTeam(home)+'|||'+normTeam(away)
+// 2. Objeto con homeIncludes/awayIncludes para coincidencia parcial (más robusto)
+const HIST_RESULT_OVERRIDES_EXACT = {
   // Sassuolo 2-1 Como (16/4) — "Gana Visitante" → fallo
   'sassuolo|||como':         { result: 'loss' },
   'sassuolo|||como1907':     { result: 'loss' },
@@ -9581,18 +9585,24 @@ const HIST_RESULT_OVERRIDES = {
   'ussassuolo|||como1907':   { result: 'loss' },
   // Union Santa Fe 2-3 Newell's (17/4) — "Local Gana" → fallo
   'unionsantafe|||newells':  { result: 'loss' },
-  // Lens vs Toulouse (17/4) — pick guardado con bvr=5/$130 pero fue apostado como Máxima (bvr=6/$170)
+  // Lens vs Toulouse (17/4) — bvr/stake corregido
   'lens|||toulouse':         { bvr: 6, bvrText: 'Máxima', stake: 170 },
-  // Athletic Bilbao vs Osasuna — pick cacheado con rec:'Ambos Marcan' por error; resultado correcto: Gana Local (WIN)
-  'athleticbilbao|||osasuna':    { result: 'win', rec: 'Gana Local' },
-  'athleticclub|||osasuna':      { result: 'win', rec: 'Gana Local' },
-  'athletic|||osasuna':          { result: 'win', rec: 'Gana Local' },
-  'athleticbilbao|||caosasuna':  { result: 'win', rec: 'Gana Local' },
-  'athleticclub|||caosasuna':    { result: 'win', rec: 'Gana Local' },
 };
 
-// Helper: normaliza nombre de equipo para comparación
-const _normHist = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+// Overrides por coincidencia parcial — homeIncludes y awayIncludes son substrings del nombre normalizado
+const HIST_RESULT_OVERRIDES_PARTIAL = [
+  // Athletic Bilbao vs Osasuna — pick cacheado con rec:'Ambos Marcan'; correcto: Gana Local (WIN)
+  { homeIncludes: 'athletic', awayIncludes: 'osasuna', override: { result: 'win', rec: 'Gana Local' } },
+];
+
+// Retorna el override que aplica a un pick dado (primero exacto, luego parcial)
+function _getHistOverride(h) {
+  const nh = _normHist(h.home), na = _normHist(h.away);
+  const exact = HIST_RESULT_OVERRIDES_EXACT[nh + '|||' + na];
+  if (exact) return exact;
+  const partial = HIST_RESULT_OVERRIDES_PARTIAL.find(r => nh.includes(r.homeIncludes) && na.includes(r.awayIncludes));
+  return partial ? partial.override : null;
+}
 
 // Retorna true si una entrada del historial debe ser bloqueada
 function _isHistBlocked(h) {
@@ -9603,12 +9613,19 @@ function _isHistBlocked(h) {
   return false;
 }
 
-// Aplica HIST_RESULT_OVERRIDES in-place a un array de picks (modifica los objetos)
+// Aplica overrides in-place a un array de picks (modifica los objetos)
 function _applyHistOverrides(arr) {
   if (!arr?.length) return arr;
   arr.forEach(h => {
-    const ov = HIST_RESULT_OVERRIDES[_normHist(h.home) + '|||' + _normHist(h.away)];
-    if (!ov) return;
+    const ov = _getHistOverride(h);
+    if (!ov) {
+      // Debug: loguear picks sin override para detectar nombres reales de API
+      if ((h.home||'').toLowerCase().includes('athletic') || (h.away||'').toLowerCase().includes('osasuna')) {
+        console.log('[Override DEBUG] No match para:', h.home, 'vs', h.away, '→ norm:', _normHist(h.home)+'|||'+_normHist(h.away));
+      }
+      return;
+    }
+    console.log('[Override] Aplicando a:', h.home, 'vs', h.away, '→', ov);
     // Corregir stake/bvr antes de calcular pl (para que pl use el stake correcto)
     if (ov.bvr   !== undefined) { h.bvr = ov.bvr; h.bvrText = ov.bvrText || h.bvrText; }
     if (ov.stake !== undefined) h.stake = ov.stake;
