@@ -15725,70 +15725,38 @@ function acCheckDaily() {
   picks.forEach(p => {
     if (p.evaluated) return;
     const age = now - (p.ts || 0);
-    if (age > 48 * 3600 * 1000) { // más de 48 horas
-      p.evaluated = true;
-      p.result = 'void';
-      p.correct = false;
+    if (age > 48 * 3600 * 1000) {
+      p.evaluated = true; p.result = 'void'; p.correct = false;
       const refund = p.betAmount || 0;
-      if (refund > 0) {
-        acAdd(refund, `🔄 Devuelto: ${p.home} vs ${p.away}`);
-      }
+      if (refund > 0) acAdd(refund, `🔄 Devuelto: ${p.home} vs ${p.away}`);
       expired = true;
     }
   });
-  if (expired) {
-    acSavePicks(picks);
-    acScheduleSync();
-  }
+  if (expired) { acSavePicks(picks); acScheduleSync(); }
 
-  const pendingPicks = picks.filter(p => !p.evaluated);
-
-  // ── Recarga de emergencia: quedó en 0 el día anterior ──────────────────
-  const bustDate = localStorage.getItem(AC_BUST);
-  if (bustDate && bustDate < today && pendingPicks.length === 0) {
-    localStorage.removeItem(AC_BUST);
-    const bal = acGet();
-    const topUp = 10000 - bal;
-    if (topUp > 0) {
-      acAdd(topUp, '💸 Recarga de emergencia');
-      localStorage.setItem(AC_DAY, today);
-      acScheduleSync();
-      setTimeout(() => {
-        acToast('💸', `+${acFmt(topUp)} ${AC_ICON} Gambeta Coins`, '¡Recarga lista! Seguí apostando 🔥');
-        _addCoinNotif('💸', `+${acFmt(topUp)} G$ Gambeta Coins`, 'Recarga de emergencia — ¡dale de nuevo!');
-      }, 1200);
-      return;
-    }
-  }
-
-  // ── Recarga retroactiva: quedó en 0 sin AC_BUST (quiebra anterior al feature) ──
-  // Si es un día nuevo y el balance es 0 sin picks pendientes → recarga directa
-  if (localStorage.getItem(AC_DAY) !== today) {
-    const bal = acGet();
-    if (bal === 0 && pendingPicks.length === 0) {
-      localStorage.removeItem(AC_BUST);
-      acAdd(10000, '💸 Recarga de emergencia');
-      localStorage.setItem(AC_DAY, today);
-      acScheduleSync();
-      setTimeout(() => {
-        acToast('💸', `+${acFmt(10000)} ${AC_ICON} Gambeta Coins`, '¡Recarga lista! Seguí apostando 🔥');
-        _addCoinNotif('💸', `+${acFmt(10000)} G$ Gambeta Coins`, 'Recarga de emergencia — ¡dale de nuevo!');
-      }, 1200);
-      return;
-    }
-  }
-
+  // ── Ya se dio el bonus hoy → salir ─────────────────────────────────────
   if (localStorage.getItem(AC_DAY) === today) return;
-  const bal = acGet();
-  // Si ya tiene saldo completo, marcar el día igualmente (no necesita recarga)
-  if (bal >= 10000) { localStorage.setItem(AC_DAY, today); return; }
-  // NO recargar mientras haya apuestas sin resolver —
-  // cuando se resuelvan, acEvaluatePicks() volverá a llamar acCheckDaily()
-  if (pendingPicks.length > 0) return; // no marcar AC_DAY → reintentará al resolver
-  const topUp = 10000 - bal;
-  acAdd(topUp, '🌅 Bonus diario');
+
+  // ── Es un día nuevo: dar bonus SIEMPRE (sin importar picks pendientes) ──
+  // Modelo: cada día se reciben G$ 10.000 frescos, acumulables hasta 500K
+  const AC_MAX = 500000;
+  const bal    = acGet();
   localStorage.setItem(AC_DAY, today);
-  setTimeout(() => { acToast('🌅', `+${acFmt(topUp)} ${AC_ICON} Gambeta Coins`, 'Bonus diario recibido'); _addCoinNotif('🌅', `+${acFmt(topUp)} G$ Gambeta Coins`, 'Bonus diario recibido'); }, 1200);
+  localStorage.removeItem(AC_BUST); // limpiar estado de quiebra si lo había
+
+  if (bal >= AC_MAX) {
+    // Ya tiene el máximo — marcar el día sin sumar nada
+    acScheduleSync();
+    return;
+  }
+
+  const bonus = 10000;
+  acAdd(bonus, '🌅 Bonus diario');
+  acScheduleSync();
+  setTimeout(() => {
+    acToast('🌅', `+${acFmt(bonus)} ${AC_ICON} Gambeta Coins`, '¡Bonus diario recibido! 🔥');
+    _addCoinNotif('🌅', `+${acFmt(bonus)} G$ Gambeta Coins`, 'Bonus diario — ¡a apostar!');
+  }, 1200);
 }
 
 /* ── Bet state ── */
@@ -17404,17 +17372,25 @@ async function loadRanking(force = false) {
     if (el) el.style.display = id === 'rkLoading' ? 'block' : 'none';
   });
 
+  // Forzar sync del balance del usuario logueado antes de cargar ranking
+  if (authUser?.email) {
+    acScheduleSync();
+    await new Promise(r => setTimeout(r, 800)); // pequeña espera para que sync llegue
+  }
+
   try {
-    // Proxy con caché 5 min — ranking no necesita ser en tiempo real
+    // Siempre ir directo a Supabase — el proxy tiene caché que desactualiza el ranking
     let data;
     try {
-      const resp = await fetch('/api/sb?type=ranking');
-      if (resp.ok) data = await resp.json();
+      const res = await sbClient.from('acoin_users').select('email, balance, nickname, avatar').order('balance', { ascending: false }).limit(50);
+      if (!res.error) data = res.data;
     } catch {}
     if (!data) {
-      const res = await sbClient.from('acoin_users').select('email, balance, nickname, avatar').order('balance', { ascending: false }).limit(50);
-      if (res.error) throw res.error;
-      data = res.data;
+      // Fallback al proxy si Supabase falla
+      try {
+        const resp = await fetch('/api/sb?type=ranking&_=' + Date.now());
+        if (resp.ok) data = await resp.json();
+      } catch {}
     }
     const error = null;
     const rows = (data || []).filter(u => (parseFloat(u.balance) || 0) > 0);
