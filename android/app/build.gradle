@@ -1,0 +1,42 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'ai.gambeta.app'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId "ai.gambeta.app"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    signingConfigs {
+        release {
+            storeFile     file(System.getenv("KEYSTORE_PATH") ?: "../../gambeta-release.keystore")
+            storePassword System.getenv("KEYSTORE_PASSWORD") ?: "gambeta2024!"
+            keyAlias      System.getenv("KEY_ALIAS")          ?: "gambeta"
+            keyPassword   System.getenv("KEY_PASSWORD")       ?: "gambeta2024!"
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+}

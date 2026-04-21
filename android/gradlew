@@ -1,0 +1,6 @@
+#!/bin/sh
+# Gradle wrapper launcher script
+set -e
+GRADLE_USER_HOME="${GRADLE_USER_HOME:-$HOME/.gradle}"
+GRADLE_WRAPPER_JAR="$(dirname "$0")/gradle/wrapper/gradle-wrapper.jar"
+exec java -jar "$GRADLE_WRAPPER_JAR" "$@"

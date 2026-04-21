@@ -1,183 +1,47 @@
-name: Build Android TWA
+name: Build Android AAB
+
 on:
-  workflow_dispatch:
   push:
-    branches: [main]
-    paths: ['.github/workflows/build-android.yml']
+    paths:
+      - 'android/**'
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-      - name: Install Bubblewrap
-        run: npm install -g @bubblewrap/cli
-      - name: Restore keystore
-        run: echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android.keystore
-      - name: Setup Android SDK components
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Decode keystore from secret
         run: |
-          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null 2>&1 || true
-          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
-            "platform-tools" \
-            "build-tools;34.0.0" \
-            "platforms;android-34" 2>&1 | tail -5
-      - name: Patch bubblewrap JS
-        run: |
-          python3 << 'PYEOF'
-          import subprocess, glob, re
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/gambeta-release.keystore
 
-          npm_root = subprocess.check_output(['npm', 'root', '-g']).decode().strip()
-          print(f"npm root: {npm_root}")
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
 
-          # === PATCH 1: validatePath — bypass SDK validation ===
-          for sdk_js in glob.glob(f"{npm_root}/@bubblewrap/**/*AndroidSdkTools.js", recursive=True):
-              with open(sdk_js) as f:
-                  c = f.read()
-              m = re.search(r'static async validatePath\s*\((\w+)\)\s*\{', c)
-              if m:
-                  p, bp = m.group(1), m.end() - 1
-                  c = c[:bp+1] + f'\n        return Result_1.Result.ok({p}); // PATCHED' + c[bp+1:]
-                  with open(sdk_js, 'w') as f: f.write(c)
-                  print(f"PATCH1 OK: validatePath({p})")
-              else:
-                  print("PATCH1 WARN: validatePath not found")
-
-          print("\nAll patches done")
-          PYEOF
-      - name: Pre-configure Bubblewrap
-        run: |
-          mkdir -p ~/.bubblewrap
-          printf '{"jdkPath":"%s","androidSdkPath":"%s"}' "$JAVA_HOME" "$ANDROID_HOME" > ~/.bubblewrap/config.json
-      - name: Create icon and twa-manifest.json
-        run: |
-          mkdir -p twa-build
-
-          # Create a 512x512 green PNG icon (#00c853)
-          python3 << 'PYEOF'
-          import struct, zlib
-          def create_png(w, h, r, g, b):
-              def chunk(t, d):
-                  c = t + d
-                  return struct.pack('>I', len(d)) + c + struct.pack('>I', zlib.crc32(c) & 0xffffffff)
-              ihdr = struct.pack('>IIBBBBB', w, h, 8, 2, 0, 0, 0)
-              row = b'\x00' + bytes([r, g, b]) * w
-              raw = row * h
-              return b'\x89PNG\r\n\x1a\n' + chunk(b'IHDR', ihdr) + chunk(b'IDAT', zlib.compress(raw)) + chunk(b'IEND', b'')
-          with open('/tmp/favicon-512.png', 'wb') as f:
-              f.write(create_png(512, 512, 0, 200, 83))
-          print("Icon PNG created: 512x512 green")
-          PYEOF
-
-          # Create a PWA web manifest JSON (bubblewrap fetches this during build)
-          printf '%s' '{"name":"gambeta.ai","short_name":"gambeta.ai","start_url":"/","display":"standalone","theme_color":"#00c853","background_color":"#0a0f0a","icons":[{"src":"/favicon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]}' > /tmp/manifest.json
-          echo "manifest.json created"
-
-          # Start local HTTP server to serve the icon AND manifest
-          python3 -m http.server 8765 --directory /tmp &
-          echo $! > /tmp/http_server.pid
-          sleep 1
-          HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8765/favicon-512.png)
-          echo "Icon server status: $HTTP_STATUS"
-          MANIFEST_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8765/manifest.json)
-          echo "Manifest server status: $MANIFEST_STATUS"
-
-          # Write twa-manifest.json with local icon URL and local manifest URL
-          printf '%s' '{"packageId":"ai.gambeta.app","host":"gambeta.ai","name":"gambeta.ai","launcherName":"gambeta.ai","display":"standalone","themeColor":"#00c853","navigationColor":"#0a0f0a","navigationColorDark":"#0a0f0a","backgroundColor":"#0a0f0a","startUrl":"/","iconUrl":"http://localhost:8765/favicon-512.png","maskableIconUrl":"http://localhost:8765/favicon-512.png","splashScreenFadeOutDuration":300,"signingKey":{"path":"../android.keystore","alias":"gambeta"},"minSdkVersion":21,"targetSdkVersion":34,"appVersion":"1.0.0","appVersionCode":1,"orientation":"portrait","enableNotifications":false,"generatorApp":"bubblewrap-cli","webManifestUrl":"http://localhost:8765/manifest.json","fallbackType":"customtabs","features":{},"alphaDependencies":{"enabled":false},"enableSiteSettingsShortcut":true,"isChromeOSOnly":false,"isMetaQuest":false,"fullScopeUrl":"https://gambeta.ai/","fingerprints":[]}' > twa-build/twa-manifest.json
-      - name: Build APK via PTY runner
-        working-directory: twa-build
+      - name: Build release AAB
+        working-directory: android
         env:
-          BUBBLEWRAP_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
-          BUBBLEWRAP_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
-        run: |
-          python3 << 'PYEOF'
-          import os
-          runner = r'''
-          import pty, os, sys, select
+          KEYSTORE_PATH:     gambeta-release.keystore
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS:         ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD:      ${{ secrets.KEY_PASSWORD }}
+        run: ./gradlew bundleRelease
 
-          def main():
-              store_pass = os.environ.get('BUBBLEWRAP_KEYSTORE_PASSWORD', '').encode()
-              key_pass = os.environ.get('BUBBLEWRAP_KEY_PASSWORD', '').encode()
-              master_fd, slave_fd = pty.openpty()
-              pid = os.fork()
-              if pid == 0:
-                  os.setsid()
-                  os.dup2(slave_fd, 0)
-                  os.dup2(slave_fd, 1)
-                  os.dup2(slave_fd, 2)
-                  os.close(master_fd)
-                  os.close(slave_fd)
-                  os.execvp('bubblewrap', ['bubblewrap', 'build', '--skipPwaValidation'])
-                  sys.exit(1)
-              os.close(slave_fd)
-              buf = b''
-              pass_count = [0]
-              yn_answered = [False]
-              while True:
-                  try:
-                      r, _, _ = select.select([master_fd], [], [], 2.0)
-                  except Exception:
-                      break
-                  if r:
-                      try:
-                          data = os.read(master_fd, 4096)
-                          if not data:
-                              break
-                          sys.stdout.buffer.write(data)
-                          sys.stdout.buffer.flush()
-                          buf += data
-                          if (b'(Y/n)' in buf or b'(y/N)' in buf or b'[Y/n]' in buf) and not yn_answered[0]:
-                              yn_answered[0] = True
-                              print('\n[PTY] Auto-answering Y to Y/n prompt')
-                              os.write(master_fd, b'y\r\n')
-                              buf = b''
-                          elif b'versionName' in buf or b'version name' in buf.lower():
-                              print('\n[PTY] Auto-answering versionName: 1.0.0')
-                              os.write(master_fd, b'1.0.0\r\n')
-                              buf = b''
-                          elif b'versionCode' in buf or b'version code' in buf.lower():
-                              print('\n[PTY] Auto-answering versionCode: 1')
-                              os.write(master_fd, b'1\r\n')
-                              buf = b''
-                          elif b'assword' in buf and b':' in buf:
-                              pass_count[0] += 1
-                              pw = store_pass if pass_count[0] == 1 else key_pass
-                              print(f'\n[PTY] Auto-answering password #{pass_count[0]}')
-                              os.write(master_fd, pw + b'\r\n')
-                              buf = b''
-                      except OSError:
-                          break
-                  try:
-                      wpid, status = os.waitpid(pid, os.WNOHANG)
-                      if wpid == pid:
-                          code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else 1
-                          print(f'\n[PTY] Exited with code {code}')
-                          sys.exit(code)
-                  except Exception:
-                      break
-              try:
-                  _, status = os.waitpid(pid, 0)
-                  code = os.WEXITSTATUS(status) if os.WIFEXITED(status) else 1
-                  sys.exit(code)
-              except Exception:
-                  pass
-
-          main()
-          '''
-          with open('/tmp/pty_runner.py', 'w') as f:
-              f.write(runner)
-          PYEOF
-          python3 /tmp/pty_runner.py
-      - name: Upload artifacts
+      - name: Upload AAB artifact
         uses: actions/upload-artifact@v4
         with:
-          name: gambeta-android-app
-          path: |
-            **/*.apk
-            **/*.aab
+          name: gambeta-release
+          path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
