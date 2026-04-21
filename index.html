@@ -9988,10 +9988,15 @@ function renderPreds() {
       return !/^Más de/.test(p.rec); // eliminar cualquier over que pudiera haber quedado cacheado
     });
 
-    // ── Regla 16 horas: no mostrar terminados después de 16h del inicio del partido ──
-    const _16H_MS = 16 * 60 * 60 * 1000;
+    // ── Ventana de display para terminados: wins 16h · losses 6h ──
+    const _WIN_MS  = 16 * 60 * 60 * 1000;   // aciertos: 16 horas
+    const _LOSS_MS =  6 * 60 * 60 * 1000;   // fallos:    6 horas
     const _nowFilter = Date.now();
-    finished = finished.filter(p => !p.commenceTs || (_nowFilter - p.commenceTs) < _16H_MS);
+    finished = finished.filter(p => {
+      if (!p.commenceTs) return true;
+      const elapsed = _nowFilter - p.commenceTs;
+      return p.result === 'loss' ? elapsed < _LOSS_MS : elapsed < _WIN_MS;
+    });
 
     // ── Filtros por liga individual ───────────────────────────────────────────
     const _leagueFilter = (keys) => {
