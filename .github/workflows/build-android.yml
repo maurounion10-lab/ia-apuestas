@@ -20,15 +20,17 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses || true
-
-      - name: Install build tools
-        run: sdkmanager "build-tools;34.0.0" "platforms;android-34"
+      - name: Accept Android SDK licenses and install build tools
+        run: |
+          yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses >/dev/null 2>&1 || true
+          $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager \
+            "platform-tools" \
+            "build-tools;34.0.0" \
+            "platforms;android-34" 2>&1 | tail -5
 
       - name: Decode keystore
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 --decode > android/gambeta-release.keystore
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/gambeta-release.keystore
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
@@ -36,7 +38,6 @@ jobs:
       - name: Build release AAB
         working-directory: android
         env:
-          ANDROID_HOME: ${{ env.ANDROID_HOME }}
           KEYSTORE_PATH:     gambeta-release.keystore
           KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           KEY_ALIAS:         ${{ secrets.ANDROID_KEY_ALIAS }}
