@@ -15715,6 +15715,10 @@ function acCheckBust() {
 }
 
 /* ── Daily bonus ── */
+// Regla: si el saldo cae por debajo de G$1.000, al día siguiente se reciben G$10.000
+const AC_REFILL_THRESHOLD = 1000;   // umbral para activar el refill
+const AC_REFILL_AMOUNT    = 10000;  // cuánto se recibe
+
 function acCheckDaily() {
   const today = new Date().toLocaleDateString('en-CA');
 
@@ -15737,25 +15741,26 @@ function acCheckDaily() {
   // ── Ya se dio el bonus hoy → salir ─────────────────────────────────────
   if (localStorage.getItem(AC_DAY) === today) return;
 
-  // ── Es un día nuevo: dar bonus SIEMPRE (sin importar picks pendientes) ──
-  // Modelo: cada día se reciben G$ 10.000 frescos, acumulables hasta 500K
-  const AC_MAX = 500000;
-  const bal    = acGet();
+  // ── Día nuevo: marcar siempre, luego evaluar si corresponde el refill ──
   localStorage.setItem(AC_DAY, today);
-  localStorage.removeItem(AC_BUST); // limpiar estado de quiebra si lo había
+  localStorage.removeItem(AC_BUST);
 
-  if (bal >= AC_MAX) {
-    // Ya tiene el máximo — marcar el día sin sumar nada
+  const bal = acGet();
+
+  // Solo dar G$10.000 si el saldo cayó por debajo del umbral de 1.000
+  if (bal >= AC_REFILL_THRESHOLD) {
+    // Saldo suficiente — no hay refill hoy, solo marcar el día
     acScheduleSync();
     return;
   }
 
-  const bonus = 10000;
-  acAdd(bonus, '🌅 Bonus diario');
+  // Saldo bajo → refill a G$10.000
+  const topUp = AC_REFILL_AMOUNT - bal;
+  acAdd(topUp, '🌅 Recarga diaria');
   acScheduleSync();
   setTimeout(() => {
-    acToast('🌅', `+${acFmt(bonus)} ${AC_ICON} Gambeta Coins`, '¡Bonus diario recibido! 🔥');
-    _addCoinNotif('🌅', `+${acFmt(bonus)} G$ Gambeta Coins`, 'Bonus diario — ¡a apostar!');
+    acToast('🌅', `+${acFmt(topUp)} ${AC_ICON} Gambeta Coins`, '¡Recarga diaria! Tu saldo volvió a G$10.000 🔥');
+    _addCoinNotif('🌅', `+${acFmt(topUp)} G$ Gambeta Coins`, 'Recarga diaria — ¡tu saldo volvió!');
   }, 1200);
 }
 
