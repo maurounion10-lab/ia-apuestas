@@ -4394,13 +4394,22 @@
   /* ── Top 3 engagement gold highlights ── */
   .fp-acc.fp-rank-1 { border: 1.5px solid rgba(255,215,0,0.7); background: linear-gradient(135deg, rgba(255,215,0,0.12) 0%, rgba(255,180,0,0.06) 100%); box-shadow: 0 0 12px rgba(255,215,0,0.18); }
   .fp-acc.fp-rank-1 .fp-acc-hdr { background: linear-gradient(90deg, rgba(255,215,0,0.10) 0%, transparent 70%); }
-  .fp-acc.fp-rank-1::before { content:'🥇'; position:absolute; top:8px; right:10px; font-size:1.1rem; z-index:1; }
   .fp-acc.fp-rank-2 { border: 1.5px solid rgba(255,215,0,0.38); background: linear-gradient(135deg, rgba(255,215,0,0.06) 0%, transparent 100%); box-shadow: 0 0 8px rgba(255,215,0,0.09); }
   .fp-acc.fp-rank-2 .fp-acc-hdr { background: linear-gradient(90deg, rgba(255,215,0,0.05) 0%, transparent 60%); }
-  .fp-acc.fp-rank-2::before { content:'🥈'; position:absolute; top:8px; right:10px; font-size:1rem; z-index:1; }
   .fp-acc.fp-rank-3 { border: 1.5px solid rgba(255,215,0,0.18); background: rgba(255,215,0,0.025); }
-  .fp-acc.fp-rank-3::before { content:'🥉'; position:absolute; top:8px; right:10px; font-size:0.95rem; z-index:1; }
   .fp-acc.fp-rank-1, .fp-acc.fp-rank-2, .fp-acc.fp-rank-3 { position: relative; }
+  /* Insignia numérica pequeña en la esquina superior-izquierda — no interfiere con stats */
+  .fp-acc.fp-rank-1::before,
+  .fp-acc.fp-rank-2::before,
+  .fp-acc.fp-rank-3::before {
+    position: absolute; top: 6px; left: 7px; z-index: 2;
+    font-size: 0.58rem; font-weight: 800; letter-spacing: 0.3px;
+    padding: 1px 5px; border-radius: 20px; line-height: 1.5;
+    pointer-events: none;
+  }
+  .fp-acc.fp-rank-1::before { content:'#1'; background: rgba(255,215,0,0.22); color: #ffd600; border: 1px solid rgba(255,215,0,0.5); }
+  .fp-acc.fp-rank-2::before { content:'#2'; background: rgba(180,180,180,0.15); color: #c0c0c0; border: 1px solid rgba(180,180,180,0.35); }
+  .fp-acc.fp-rank-3::before { content:'#3'; background: rgba(180,100,40,0.15); color: #cd7f32; border: 1px solid rgba(180,100,40,0.35); }
 
   /* ── Match banner inside accordion ── */
   .fp-match-banner {
@@ -11049,6 +11058,8 @@ const HIST_RESULT_OVERRIDES = {
   'ussassuolo|||como1907':   { result: 'loss' },
   // Union Santa Fe 2-3 Newell's (17/4) — "Local Gana" → fallo
   'unionsantafe|||newells':  { result: 'loss' },
+  // Lens vs Toulouse (17/4) — pick guardado con bvr=5/$130 pero fue apostado como Máxima (bvr=6/$170)
+  'lens|||toulouse':         { bvr: 6, bvrText: 'Máxima', stake: 170 },
 };
 
 // Helper: normaliza nombre de equipo para comparación
@@ -11069,10 +11080,17 @@ function _applyHistOverrides(arr) {
   arr.forEach(h => {
     const ov = HIST_RESULT_OVERRIDES[_normHist(h.home) + '|||' + _normHist(h.away)];
     if (!ov) return;
-    h.result = ov.result;
+    // Corregir stake/bvr antes de calcular pl (para que pl use el stake correcto)
+    if (ov.bvr   !== undefined) { h.bvr = ov.bvr; h.bvrText = ov.bvrText || h.bvrText; }
+    if (ov.stake !== undefined) h.stake = ov.stake;
+    // Corregir resultado
+    if (ov.result !== undefined) h.result = ov.result;
     if (ov.finalScore !== undefined) h.finalScore = ov.finalScore;
-    if (ov.result === 'void') h.pl = 0;
-    else if (ov.result === 'loss') h.pl = -(h.stake || 30);
+    // Recalcular pl con el stake (posiblemente corregido)
+    const st = h.stake || 30;
+    if (h.result === 'void')       h.pl = 0;
+    else if (h.result === 'loss')  h.pl = -st;
+    else if (h.result === 'win')   h.pl = parseFloat(((h.odds - 1) * st).toFixed(2));
   });
   return arr;
 }
@@ -11586,32 +11604,43 @@ async function sbSaveGlobalHistorial(arr) {
   try {
     const payload = arr.slice(-500);
     const now = new Date().toISOString();
-    // Intentar UPSERT primero (funciona si la fila fue creada por este usuario)
-    const { error: upsertErr } = await sbClient
-      .from('shared_cache')
-      .upsert({ key: GLOBAL_HIST_KEY, data: payload, fetched_at: now }, { onConflict: 'key' });
-    if (!upsertErr) {
-      console.log('[globalHistSave] ✓ upsert', arr.length, 'entradas');
-      return;
+    // Fuente primaria: acoin_users.historial_full (siempre escribible por el admin)
+    const { error: auErr } = await sbClient
+      .from('acoin_users')
+      .update({ historial_full: payload })
+      .eq('email', ADMIN_EMAIL);
+    if (!auErr) {
+      console.log('[globalHistSave] ✓ acoin_users', arr.length, 'entradas');
+      _sbSetCache('ghist', payload, _SB_TTL_GHIST); // actualizar caché local también
+    } else {
+      console.warn('[globalHistSave] acoin_users falló:', auErr.message);
     }
-    // Si UPSERT falla (RLS USING), hacer DELETE + INSERT
-    console.warn('[globalHistSave] upsert falló, intentando DELETE+INSERT:', upsertErr.message);
-    await sbClient.from('shared_cache').delete().eq('key', GLOBAL_HIST_KEY);
-    const { error: insErr } = await sbClient
+    // Intentar también shared_cache (puede fallar por RLS — no es bloqueante)
+    sbClient
       .from('shared_cache')
-      .insert({ key: GLOBAL_HIST_KEY, data: payload, fetched_at: now });
-    if (insErr) console.warn('[globalHistSave] insert también falló:', insErr.message);
-    else console.log('[globalHistSave] ✓ delete+insert', arr.length, 'entradas');
+      .upsert({ key: GLOBAL_HIST_KEY, data: payload, fetched_at: now }, { onConflict: 'key' })
+      .then(({ error }) => {
+        if (error) console.warn('[globalHistSave] shared_cache falló (RLS):', error.message);
+        else console.log('[globalHistSave] ✓ shared_cache también actualizado');
+      });
   } catch(e) { console.warn('[globalHistSave]', e.message); }
 }
 
-// Lee el historial GLOBAL — lee de shared_cache (acceso público para todos los usuarios)
+// Lee el historial GLOBAL — fuente primaria: acoin_users.historial_full (siempre actualizado)
 async function sbLoadGlobalHistorial() {
-  // 1. Caché local como backup secundario (10 min)
+  // 1. Caché local (10 min)
   const cached = _sbGetCache('ghist');
   if (cached) return Array.isArray(cached) ? cached : null;
   try {
-    // 2. Leer de shared_cache (acceso anon público)
+    // 2. Fuente primaria: acoin_users.historial_full del admin (siempre escrito correctamente)
+    const { data: auData, error: auErr } = await sbAnon
+      .from('acoin_users').select('historial_full').eq('email', ADMIN_EMAIL).maybeSingle();
+    if (!auErr && Array.isArray(auData?.historial_full)) {
+      _sbSetCache('ghist', auData.historial_full, _SB_TTL_GHIST);
+      return auData.historial_full;
+    }
+    // 3. Fallback: shared_cache (puede estar desactualizado)
+    console.warn('[globalHistLoad] acoin_users falló, usando shared_cache');
     const { data, error } = await sbAnon
       .from('shared_cache')
       .select('data')
@@ -11619,22 +11648,11 @@ async function sbLoadGlobalHistorial() {
       .maybeSingle();
     if (error) throw new Error(error.message);
     const result = Array.isArray(data?.data) ? data.data : null;
-    if (result) {
-      _sbSetCache('ghist', result, _SB_TTL_GHIST);
-      return result;
-    }
-    throw new Error('no data in shared_cache');
+    if (result) { _sbSetCache('ghist', result, _SB_TTL_GHIST); return result; }
+    throw new Error('no data');
   } catch(e) {
-    // 3. Fallback: leer historial_full del admin desde acoin_users
-    console.warn('[globalHistLoad] shared_cache falló, usando fallback:', e.message);
-    try {
-      const { data, error } = await sbAnon
-        .from('acoin_users').select('historial_full').eq('email', ADMIN_EMAIL).maybeSingle();
-      if (error || !data?.historial_full) return null;
-      const result = Array.isArray(data.historial_full) ? data.historial_full : null;
-      if (result) _sbSetCache('ghist', result, _SB_TTL_GHIST);
-      return result;
-    } catch(e2) { console.warn('[globalHistLoad]', e2.message); return null; }
+    console.warn('[globalHistLoad] error:', e.message);
+    return null;
   }
 }
 
@@ -11673,7 +11691,27 @@ async function sbLoadHistorial() {
     const _hKey = h => h.id || `${h.home}|||${h.away}|||${h.date||''}`;
     const allEntries = [...(globalHist||[]), ...dbHist, ...localHist];
     const seen = new Map();
-    allEntries.forEach(h => { const k = _hKey(h); if (!seen.has(k)) seen.set(k, h); });
+    allEntries.forEach(h => {
+      const k = _hKey(h);
+      if (!seen.has(k)) {
+        seen.set(k, h);
+      } else {
+        // Para picks pendientes: si la entrada nueva tiene mayor bvr, actualizar stake/bvr
+        // (evita que el global con bvr=5 pise al local con bvr=6 cuando el lock llegó tarde)
+        const existing = seen.get(k);
+        if (existing.result === 'pending' && (h.result === 'pending' || !h.result)) {
+          if ((h.bvr || 0) > (existing.bvr || 0)) {
+            seen.set(k, {
+              ...existing,
+              bvr:     h.bvr,
+              bvrText: h.bvrText || existing.bvrText,
+              conf:    h.conf    || existing.conf,
+              stake:   h.stake   || existing.stake,
+            });
+          }
+        }
+      }
+    });
     const merged = [...seen.values()].filter(h=>!_isHistBlocked(h)).sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0));
 
     // ── Migración global de stakes (backtesting) ──────────────────────────────
@@ -11718,9 +11756,9 @@ async function sbLoadHistorial() {
 
     // Aplicar overrides ANTES de cualquier guardado — Sassuolo/void, etc.
     // Detectar si algún override cambió algo (para forzar escritura en Supabase)
-    const _preOverrideSnapshot = JSON.stringify(merged.map(h => ({ id: h.id||'', result: h.result, pl: h.pl })));
+    const _preOverrideSnapshot = JSON.stringify(merged.map(h => ({ id: h.id||'', result: h.result, pl: h.pl, bvr: h.bvr||0, stake: h.stake||0 })));
     _applyHistOverrides(merged);
-    const _postOverrideSnapshot = JSON.stringify(merged.map(h => ({ id: h.id||'', result: h.result, pl: h.pl })));
+    const _postOverrideSnapshot = JSON.stringify(merged.map(h => ({ id: h.id||'', result: h.result, pl: h.pl, bvr: h.bvr||0, stake: h.stake||0 })));
     const overridesChanged = _preOverrideSnapshot !== _postOverrideSnapshot;
 
     // Actualizar shared_cache si el merge tiene más entradas, hubo migración de stakes, o los overrides cambiaron algo
@@ -20773,13 +20811,16 @@ function _reorderCardsByEngagement() {
     const eng      = tid && _cardLikes[tid]
       ? (_cardLikes[tid].likes || 0) + (_cardLikes[tid].comments || 0)
       : 0;
+    // Finished picks siempre van después de los upcoming
     const basePenalty = started ? -100000 : 0;
+    // Dentro de cada grupo: bvr (peso 100) + engagement capped 50 − tiempo (para desempatar rápido)
     return basePenalty + bvr * 100 + Math.min(eng, 50) - ts / 1e13;
   };
 
   cards.sort((a, b) => scoreCard(b) - scoreCard(a));
+  // Re-insertar en orden (preserva todos los demás elementos del grid)
   cards.forEach(card => grid.appendChild(card));
-  console.log('[Engagement] Grid re-ordenado por engagement');
+  console.log('[Engagement] Grid re-ordenado:', cards.map(c => `${c.dataset.threadId}(eng=${( _cardLikes[c.dataset.threadId]?.likes||0)+( _cardLikes[c.dataset.threadId]?.comments||0)})`).join(', '));
 }
 
 // Expose to global scope so renderPreds can call it
