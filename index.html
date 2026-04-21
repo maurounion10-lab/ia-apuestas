@@ -9225,7 +9225,7 @@ function buildPredsFromOdds() {
     // Bet Value Rating 3–6, alineado con confianza:
     // Alta  (≥62%) → 5-6  |  Media (52-61%) → 3-4
     let bvr;
-    if      (conf === 'high' && maxProb >= 75) bvr = 6;
+    if      (conf === 'high' && maxProb >= 80) bvr = 6;
     else if (conf === 'high')                  bvr = 5;
     else if (conf === 'med'  && maxProb >= 58) bvr = 4;
     else                                       bvr = 3;
@@ -9529,34 +9529,7 @@ function renderPreds() {
           });
         }
       }
-      // ── Garantizar al menos 1 pick 6/6 (finde o cualquier día si no hay máxima) ──
-      // IMPORTANTE: esto corre ANTES de los saves para que bvr=6 quede en historial y Supabase
-      if (realPreds && realPreds.length) {
-        const _fdow2 = new Date().getDay();
-        const _isFinde2 = _fdow2 === 5 || _fdow2 === 6 || _fdow2 === 0;
-        const _hasMax2  = realPreds.some(p => (p.bvr || 0) >= 6 && !p._started);
-        if (_isFinde2 && !_hasMax2) {
-          const _best2 = realPreds
-            .filter(p => p.conf === 'high' && !p._started)
-            .sort((a, b) => {
-              const pa = a.prob || Math.max(a.probH||0, a.probA||0);
-              const pb = b.prob || Math.max(b.probH||0, b.probA||0);
-              return pb - pa;
-            })[0];
-          if (_best2) {
-            _best2.bvr      = 6;
-            _best2.bvrText  = 'Máxima';
-            _best2._confLocked = true;
-            // Actualizar también el lock en memoria para que sbSaveLockedPicks guarde bvr=6
-            const _mk6 = _matchKeyLP(_best2.home, _best2.away);
-            if (window._sbLockedPicks[_mk6]) {
-              window._sbLockedPicks[_mk6].bvr     = 6;
-              window._sbLockedPicks[_mk6].bvrText = 'Máxima';
-              window._sbLockedPicks[_mk6].conf    = 'high';
-            }
-          }
-        }
-      }
+      // (BVR=6 solo se asigna orgánicamente — umbral ≥80% — sin force-upgrade)
       if (realPreds && realPreds.length) {
         saveDailyPredsCache(realPreds);
         // Escribir a Supabase si aún no hay picks globales (solo el primer usuario del día)
@@ -9854,15 +9827,14 @@ function renderPreds() {
     }
   } catch(e) { console.error('[renderPreds] savePredictions crash:', e); }
 
-  // ── Weekend Máxima: ya se aplica arriba (antes de saves). Noop aquí. ──
 
-  // ── Pick Estrella del Finde (viernes, sábado o domingo) — solo en sub-página picks ──
+  // ── Pick Destacado — visible todos los días en sub-página picks ──
   try {
     const estrellaEl = document.getElementById('estrellaContainer');
     const dow = new Date().getDay(); // 0=Dom,5=Vie,6=Sáb
     const isFindeWindow = dow === 5 || dow === 6 || dow === 0;
     const _isPicksForEstrella = document.body.dataset.gbpage === 'picks';
-    if (estrellaEl && isFindeWindow && _isPicksForEstrella && realPreds && realPreds.length) {
+    if (estrellaEl && _isPicksForEstrella && realPreds && realPreds.length) {
       // Respetar el filtro de deporte activo para la Estrella
       const sfE = window._predSportFilter || 'all';
       let predsForEstrella = realPreds;
@@ -9910,11 +9882,12 @@ function renderPreds() {
           `<span class="dot${i<dotsFilled?'':' empty'}">💰</span>`).join('');
         const bvrLabel = star.bvrText || (dotsFilled===6?'Máxima':dotsFilled>=5?'Alta':dotsFilled>=4?'Media-Alta':'Media');
         const stakeLabel = (star.bvr||0) >= 6 ? '$170' : ((star.bvr||0) === 5 || star.conf==='high') ? '$130' : (star.bvr||0) === 4 ? '$50' : '$30';
+        const _bannerTitle = isFindeWindow ? '⭐ Pick Estrella del Finde' : '⭐ Pick Destacado del Día';
         estrellaEl.style.display = 'block';
         estrellaEl.innerHTML = `
           <div class="estrella-card">
             <div class="estrella-glow"></div>
-            <div class="estrella-badge">⭐ Pick Estrella del Finde</div>
+            <div class="estrella-badge">${_bannerTitle}</div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
               <div style="display:flex;align-items:center;gap:10px">
                 ${sHome}
