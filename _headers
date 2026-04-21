@@ -1,9 +1,46 @@
 # Cloudflare Pages custom headers
 
-# Bloquear indexación de endpoints internos de API
+# ── HTML principal: revalidar en cada visita pero cachear en el CDN edge ──
+/
+  Cache-Control: public, max-age=0, s-maxage=300, stale-while-revalidate=60
+  X-Content-Type-Options: nosniff
+
+/*.html
+  Cache-Control: public, max-age=0, s-maxage=300, stale-while-revalidate=60
+  X-Content-Type-Options: nosniff
+
+# ── Assets estáticos: cache largo (tienen hash o no cambian) ──
+/*.png
+  Cache-Control: public, max-age=31536000, immutable
+/*.jpg
+  Cache-Control: public, max-age=31536000, immutable
+/*.jpeg
+  Cache-Control: public, max-age=31536000, immutable
+/*.svg
+  Cache-Control: public, max-age=31536000, immutable
+/*.ico
+  Cache-Control: public, max-age=31536000, immutable
+/*.webp
+  Cache-Control: public, max-age=31536000, immutable
+/favicon*
+  Cache-Control: public, max-age=31536000, immutable
+
+# ── JS estático: cache largo (team-logos.js cambia raramente) ──
+/team-logos.js
+  Cache-Control: public, max-age=604800, stale-while-revalidate=86400
+
+# ── Service Worker: nunca cachear ──
+/sw.js
+  Cache-Control: no-cache, no-store, must-revalidate
+
+# ── Manifest: cache corto ──
+/manifest.json
+  Cache-Control: public, max-age=3600
+
+# ── Bloquear indexación de endpoints internos de API ──
 /api/*
   X-Robots-Tag: noindex, nofollow
 
-# Bloquear indexación de URLs con parámetros de auth
+# ── Bloquear indexación de URLs con parámetros de auth ──
 /?openauth=*
   X-Robots-Tag: noindex, nofollow
