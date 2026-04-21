@@ -9583,6 +9583,11 @@ const HIST_RESULT_OVERRIDES = {
   'unionsantafe|||newells':  { result: 'loss' },
   // Lens vs Toulouse (17/4) — pick guardado con bvr=5/$130 pero fue apostado como Máxima (bvr=6/$170)
   'lens|||toulouse':         { bvr: 6, bvrText: 'Máxima', stake: 170 },
+  // Barcelona vs Atlético — pick cacheado con rec:'Ambos Marcan' por error; resultado correcto: Gana Local (WIN)
+  'barcelona|||atletico':    { result: 'win', rec: 'Gana Local' },
+  'barcelona|||atleticomadrid': { result: 'win', rec: 'Gana Local' },
+  'fcbarcelona|||atletico':  { result: 'win', rec: 'Gana Local' },
+  'fcbarcelona|||atleticomadrid': { result: 'win', rec: 'Gana Local' },
 };
 
 // Helper: normaliza nombre de equipo para comparación
@@ -9606,6 +9611,8 @@ function _applyHistOverrides(arr) {
     // Corregir stake/bvr antes de calcular pl (para que pl use el stake correcto)
     if (ov.bvr   !== undefined) { h.bvr = ov.bvr; h.bvrText = ov.bvrText || h.bvrText; }
     if (ov.stake !== undefined) h.stake = ov.stake;
+    // Corregir rec (tipo de apuesta mostrado en historial)
+    if (ov.rec   !== undefined) h.rec = ov.rec;
     // Corregir resultado
     if (ov.result !== undefined) h.result = ov.result;
     if (ov.finalScore !== undefined) h.finalScore = ov.finalScore;
