@@ -7716,8 +7716,10 @@ function buildPredsFromOdds() {
     const bttsIsEstimated = false;
 
     // ── Selección de la MEJOR apuesta ──
-    const MIN_ODDS = 1.40;
-    // Liga argentina: prohibido pronosticar overs (Más de X.5). Solo 1X2 + Ambos/No Marcan.
+    const MIN_ODDS      = 1.40;  // mínimo para 1X2 y totals
+    const MIN_BTTS_ODDS = 1.60;  // mínimo más alto para BTTS (mayor valor real)
+    const MIN_BTTS_PROB = 65;    // BTTS solo si mercado lo da con ≥65% de probabilidad
+    // Liga argentina: prohibido pronosticar overs (Más de X.5). Solo 1X2.
     const _isArgentina = (g.sport_key || '').includes('argentina');
     const candidates2 = [
       { rec: 'Gana Local',     prob: probH, odds: hOP },
@@ -7725,19 +7727,22 @@ function buildPredsFromOdds() {
       ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dOP }] : []),
       ...(_isArgentina ? [] : ['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
-      ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
+      // BTTS: solo si hay cuota real, odds >= 1.60 y prob >= 65%
+      ...(bttsEst && bttsEst >= MIN_BTTS_PROB && bttsOddsEst && parseFloat(bttsOddsEst) >= MIN_BTTS_ODDS
+          ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
     ]
     .filter(c => c.prob > 0)
     .filter(c => !c.odds || parseFloat(c.odds) >= MIN_ODDS);
 
+    // Ordenar por tier de prioridad, luego por probabilidad dentro del tier:
+    //   Tier 0 (mejor): picks 1X2 (Gana Local / Visitante / Empate)
+    //   Tier 1: totales (Más de X.5)
+    //   Tier 2 (peor): BTTS — NUNCA gana a un pick 1X2 o Total, sin importar la probabilidad
     candidates2.sort((a, b) => {
-      if (b.prob !== a.prob) return b.prob - a.prob;
-      // En empate de probabilidad: 1X2 > totals > btts
-      if (a.isTotals && !b.isTotals) return 1;   // totals pierden vs 1X2
-      if (!a.isTotals && b.isTotals) return -1;  // 1X2 gana vs totals
-      if (a.isBtts  && !b.isBtts)   return 1;   // btts pierde vs todo
-      if (!a.isBtts && b.isBtts)    return -1;
-      return 0;
+      const tierA = a.isBtts ? 2 : a.isTotals ? 1 : 0;
+      const tierB = b.isBtts ? 2 : b.isTotals ? 1 : 0;
+      if (tierA !== tierB) return tierA - tierB;
+      return b.prob - a.prob; // dentro del mismo tier: mayor prob gana
     });
 
     if (!candidates2.length) return null;
