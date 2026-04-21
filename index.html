@@ -6751,6 +6751,15 @@ async function loadLiveStats() {
 // ═══════════════════════════════════════════════
 //  LOGOS OFICIALES
 // ═══════════════════════════════════════════════
+// ⚠️  REGLA CRÍTICA PARA ESTE OBJETO:
+//   • NO usar IDs de media.api-sports.io menores a ~50 para clubes —
+//     esos IDs son selecciones nacionales (ej: 2=Francia, 3=Croacia,
+//     6=Brasil, 9=España, 18=Islandia, 20=Australia, 778=Albania…).
+//   • Verificar siempre la URL antes de agregar: abrirla en el navegador.
+//   • NO repetir una clave que ya existe más arriba — en JS gana el ÚLTIMO
+//     valor, lo que silenciosamente sobreescribe el correcto por uno malo.
+//   • Si dudás, usá ESPN (a.espncdn.com/i/teamlogos/soccer/500/<ID>.png)
+//     o TheSportsDB (r2.thesportsdb.com/images/media/team/badge/…).
 const teamLogos = {
   // ── ESPAÑA ──
   'Real Madrid':            'https://media.api-sports.io/football/teams/541.png',
@@ -7386,8 +7395,8 @@ const teamLogos = {
   'PAOK':                   'https://media.api-sports.io/football/teams/601.png',
   'Red Star Belgrade':      'https://media.api-sports.io/football/teams/2668.png',
   'Crvena zvezda':          'https://media.api-sports.io/football/teams/2668.png',
-  'Young Boys':             'https://media.api-sports.io/football/teams/3.png',
-  'BSC Young Boys':         'https://media.api-sports.io/football/teams/3.png',
+  'Young Boys':             'https://media.api-sports.io/football/teams/234.png',
+  'BSC Young Boys':         'https://media.api-sports.io/football/teams/234.png',
   'Ferencvaros':            'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Ferencvarosi_TC.svg/200px-Ferencvarosi_TC.svg.png',
   'Ferencváros':            'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Ferencvarosi_TC.svg/200px-Ferencvarosi_TC.svg.png',
   'Ferencváros TC':         'https://upload.wikimedia.org/wikipedia/commons/thumb/3/37/Ferencvarosi_TC.svg/200px-Ferencvarosi_TC.svg.png',
@@ -8073,8 +8082,8 @@ const teamLogos = {
   'Coventry':               'https://a.espncdn.com/i/teamlogos/soccer/500/1966.png',
   'Hull City':              'https://media.api-sports.io/football/teams/60.png',
   'Hull':                   'https://media.api-sports.io/football/teams/60.png',
-  'Middlesbrough':          'https://media.api-sports.io/football/teams/25.png',
-  'Boro':                   'https://media.api-sports.io/football/teams/25.png',
+  'Middlesbrough':          'https://a.espncdn.com/i/teamlogos/soccer/500/369.png',
+  'Boro':                   'https://a.espncdn.com/i/teamlogos/soccer/500/369.png',
   'Millwall':               'https://media.api-sports.io/football/teams/67.png',
   'Norwich City':           'https://media.api-sports.io/football/teams/71.png',
   'Norwich':                'https://media.api-sports.io/football/teams/71.png',
@@ -8089,8 +8098,8 @@ const teamLogos = {
   'Plymouth':               'https://a.espncdn.com/i/teamlogos/soccer/500/1968.png',
   'Cardiff City':           'https://a.espncdn.com/i/teamlogos/soccer/500/4524.png',
   'Cardiff':                'https://a.espncdn.com/i/teamlogos/soccer/500/4524.png',
-  'Blackburn Rovers':       'https://media.api-sports.io/football/teams/29.png',
-  'Blackburn':              'https://media.api-sports.io/football/teams/29.png',
+  'Blackburn Rovers':       'https://a.espncdn.com/i/teamlogos/soccer/500/365.png',
+  'Blackburn':              'https://a.espncdn.com/i/teamlogos/soccer/500/365.png',
   'Derby County':           'https://a.espncdn.com/i/teamlogos/soccer/500/4549.png',
   'Derby':                  'https://a.espncdn.com/i/teamlogos/soccer/500/4549.png',
   'Oxford United':          'https://media.api-sports.io/football/teams/72.png',
@@ -8136,8 +8145,7 @@ const teamLogos = {
   'Rayo':                   'https://media.api-sports.io/football/teams/728.png',
   'Osasuna':                'https://media.api-sports.io/football/teams/727.png',
   'CA Osasuna':             'https://media.api-sports.io/football/teams/727.png',
-  'Las Palmas':             'https://media.api-sports.io/football/teams/18.png',
-  'UD Las Palmas':          'https://media.api-sports.io/football/teams/18.png',
+  // Las Palmas: entries already defined above with correct ID 858
   'Mallorca':               'https://media.api-sports.io/football/teams/798.png',
   'RCD Mallorca':           'https://media.api-sports.io/football/teams/798.png',
 
@@ -8225,6 +8233,12 @@ const teamLogos = {
   'Fenerbahce':             'https://media.api-sports.io/football/teams/635.png',
   'Fenerbahçe':             'https://media.api-sports.io/football/teams/635.png',
   'Galatasaray':            'https://media.api-sports.io/football/teams/634.png',
+  // ── SÜPER LIG / equipos turcos ──
+  'Gazişehir FK':           'https://a.espncdn.com/i/teamlogos/soccer/500/20070.png',
+  'Gazisehir FK':           'https://a.espncdn.com/i/teamlogos/soccer/500/20070.png',
+  'Gazişehir Gaziantep':    'https://a.espncdn.com/i/teamlogos/soccer/500/20070.png',
+  'Gazisehir Gaziantep':    'https://a.espncdn.com/i/teamlogos/soccer/500/20070.png',
+  'Gaziantep FK':           'https://a.espncdn.com/i/teamlogos/soccer/500/20070.png',
   'Club Brugge':            'https://media.api-sports.io/football/teams/756.png',
   'Brugge':                 'https://media.api-sports.io/football/teams/756.png',
   'Anderlecht':             'https://media.api-sports.io/football/teams/755.png',
