@@ -2812,6 +2812,40 @@
   /* La tabla solo scrollea HORIZONTAL dentro del wrapper.
      overflow-y:clip (≠ hidden/auto) NO crea scroll container, por eso position:sticky
      en el thead funciona relativo al viewport de la página y no al wrapper. */
+  /* ── Calendario P/L ─────────────────────────────────────────────── */
+  .hcal-nav { display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; gap:8px; }
+  .hcal-nav-btn { background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12); color:var(--texto-sec); width:36px; height:36px; border-radius:10px; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center; transition:background .2s; flex-shrink:0; }
+  .hcal-nav-btn:hover { background:rgba(0,200,83,0.15); color:var(--verde); }
+  .hcal-month-label { font-size:1rem; font-weight:700; color:var(--texto); flex:1; text-align:center; }
+  .hcal-today-btn { background:rgba(0,200,83,0.1); border:1px solid rgba(0,200,83,0.3); color:var(--verde); padding:6px 14px; border-radius:10px; font-size:0.78rem; font-weight:700; cursor:pointer; transition:background .2s; }
+  .hcal-today-btn:hover { background:rgba(0,200,83,0.2); }
+  .hcal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+  .hcal-dow { text-align:center; font-size:0.68rem; font-weight:700; color:var(--texto-sec); text-transform:uppercase; padding:6px 0 8px; }
+  .hcal-day { border-radius:12px; min-height:58px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; padding:4px 2px; cursor:default; transition:transform .15s; position:relative; }
+  .hcal-day.has-data { cursor:pointer; }
+  .hcal-day.has-data:hover { transform:scale(1.05); z-index:2; }
+  .hcal-day.empty { background:transparent; }
+  .hcal-day.other-month { background:rgba(255,255,255,0.02); }
+  .hcal-day.today { outline:2px solid rgba(0,200,83,0.6); }
+  .hcal-day.win  { background:rgba(0,180,70,0.18); }
+  .hcal-day.loss { background:rgba(200,40,40,0.18); }
+  .hcal-day.mixed { background:rgba(255,180,0,0.12); }
+  .hcal-day.pending { background:rgba(255,255,255,0.05); }
+  .hcal-day-num { font-size:0.7rem; color:var(--texto-sec); line-height:1; }
+  .hcal-day-pl  { font-size:0.78rem; font-weight:800; line-height:1.1; }
+  .hcal-day.win  .hcal-day-pl { color:#00e676; }
+  .hcal-day.loss .hcal-day-pl { color:#ef5350; }
+  .hcal-day.mixed .hcal-day-pl { color:#ffb300; }
+  .hcal-day.pending .hcal-day-pl { color:rgba(255,255,255,0.35); font-size:0.65rem; }
+  .hcal-day-bets { font-size:0.6rem; color:rgba(255,255,255,0.35); }
+  .hcal-footer { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:16px; }
+  .hcal-stat { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:14px; padding:14px 16px; }
+  .hcal-stat-label { font-size:0.72rem; color:var(--texto-sec); margin-bottom:4px; }
+  .hcal-stat-val   { font-size:1.2rem; font-weight:800; }
+  .hcal-stat-val.pos { color:#00e676; }
+  .hcal-stat-val.neg { color:#ef5350; }
+  .hcal-stat-val.neu { color:var(--texto); }
+
   .hist-table-wrap { overflow-x:auto; overflow-y:clip; border-radius:14px; border:1px solid var(--borde); scrollbar-width:thin; scrollbar-color:rgba(0,200,83,0.3) transparent; }
   .hist-table-wrap::-webkit-scrollbar { height:5px; }
   .hist-table-wrap::-webkit-scrollbar-track { background:transparent; }
@@ -5113,6 +5147,17 @@
       </button>
     </div>
     <div class="hist-summary" id="histSummary"></div>
+
+    <!-- Toggle vista tabla / calendario -->
+    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+      <button id="histViewTable" onclick="setHistView('table')" style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:1px solid rgba(0,200,83,0.5);background:rgba(0,200,83,0.15);color:var(--verde);font-size:0.8rem;font-weight:700;cursor:pointer;transition:all .2s">📋 Lista</button>
+      <button id="histViewCal"   onclick="setHistView('cal')"   style="display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:var(--texto-sec);font-size:0.8rem;font-weight:700;cursor:pointer;transition:all .2s">📅 Calendario</button>
+    </div>
+
+    <!-- Vista calendario P/L -->
+    <div id="histCalView" style="display:none">
+      <div id="histCalWidget"></div>
+    </div>
 
     <!-- Barra de filtros desplegables -->
     <div class="hist-filter-bar">
@@ -12546,6 +12591,16 @@ function renderHistorial(filter) {
   });
 
   // Filtro por fecha
+  // Filtro desde el calendario: solo picks del día clickeado
+  if (window._calDayFilter) {
+    const _ck = window._calDayFilter;
+    data = data.filter(h => {
+      if (!h.commenceTs) return false;
+      const d = new Date(h.commenceTs);
+      return (_ck === d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'));
+    });
+  }
+
   if (histDateFilter !== 'all') {
     const now = new Date();
     const sevenDaysAgo = new Date(now); sevenDaysAgo.setDate(now.getDate() - 7);
@@ -12922,6 +12977,175 @@ function filterHist(f,btn) {
   const dateActive = histDateFilter==='today' ? 'histDateBtnHoy' : histDateFilter==='week' ? 'histDateBtnWeek' : histDateFilter==='finde' ? 'histDateBtnFinde' : 'histDateBtnAll';
   document.getElementById(dateActive)?.classList.add('active');
   btn.classList.add('active'); histFilter=f; histLeagueFilter='all'; histMercadoFilter='all'; histPage=0; renderHistorial(f);
+}
+
+// ── Vista Calendario P/L ─────────────────────────────────────────────────────
+let _histView = 'table';   // 'table' | 'cal'
+let _calYear  = new Date().getFullYear();
+let _calMonth = new Date().getMonth(); // 0-11
+
+function setHistView(v) {
+  _histView = v;
+  const tableEl  = document.querySelector('.hist-filter-bar');
+  const tableWrap = document.querySelector('.hist-table-wrap');
+  const pagNav   = document.getElementById('histPagNav');
+  const calView  = document.getElementById('histCalView');
+  const btnT     = document.getElementById('histViewTable');
+  const btnC     = document.getElementById('histViewCal');
+  const legend   = document.querySelector('.hist-legend');
+  const findeBan = document.getElementById('findeBanner');
+
+  if (v === 'cal') {
+    if (tableEl)  tableEl.style.display  = 'none';
+    if (tableWrap) tableWrap.style.display = 'none';
+    if (pagNav)   pagNav.style.display   = 'none';
+    if (legend)   legend.style.display   = 'none';
+    if (findeBan) findeBan.style.display = 'none';
+    if (calView)  calView.style.display  = 'block';
+    btnT.style.background = 'transparent'; btnT.style.color = 'var(--texto-sec)'; btnT.style.borderColor = 'rgba(255,255,255,0.12)';
+    btnC.style.background = 'rgba(0,200,83,0.15)'; btnC.style.color = 'var(--verde)'; btnC.style.borderColor = 'rgba(0,200,83,0.5)';
+    renderHistCalendar();
+  } else {
+    if (tableEl)  tableEl.style.display  = '';
+    if (tableWrap) tableWrap.style.display = '';
+    if (legend)   legend.style.display   = '';
+    if (calView)  calView.style.display  = 'none';
+    btnC.style.background = 'transparent'; btnC.style.color = 'var(--texto-sec)'; btnC.style.borderColor = 'rgba(255,255,255,0.12)';
+    btnT.style.background = 'rgba(0,200,83,0.15)'; btnT.style.color = 'var(--verde)'; btnT.style.borderColor = 'rgba(0,200,83,0.5)';
+    renderHistorial(histFilter);
+  }
+}
+
+function renderHistCalendar() {
+  const wrap = document.getElementById('histCalWidget');
+  if (!wrap) return;
+
+  // ── Agregar P/L por día desde el historial ───────────────────────────────
+  const all  = loadHistorial().filter(h => h && (h.result === 'win' || h.result === 'loss'));
+  const byDay = {}; // 'YYYY-MM-DD' → { pl, bets, wins, losses }
+  for (const h of all) {
+    const ts = h.commenceTs || (h.date ? new Date(h.date.split('/').reverse().join('-')).getTime() : null);
+    if (!ts) continue;
+    const d  = new Date(ts);
+    const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if (!byDay[key]) byDay[key] = { pl:0, bets:0, wins:0, losses:0 };
+    byDay[key].pl += (h.pl || 0);
+    byDay[key].bets++;
+    if (h.result === 'win')  byDay[key].wins++;
+    if (h.result === 'loss') byDay[key].losses++;
+  }
+
+  // ── Navegación ───────────────────────────────────────────────────────────
+  const monthNames = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const today = new Date();
+  const todayKey = today.getFullYear()+'-'+String(today.getMonth()+1).padStart(2,'0')+'-'+String(today.getDate()).padStart(2,'0');
+
+  // ── Calcular totales del mes ─────────────────────────────────────────────
+  const monthPrefix = _calYear+'-'+String(_calMonth+1).padStart(2,'0')+'-';
+  let monthPL = 0, monthBets = 0;
+  for (const [k,v] of Object.entries(byDay)) {
+    if (k.startsWith(monthPrefix)) { monthPL += v.pl; monthBets += v.bets; }
+  }
+
+  // ── Generar celdas del mes ───────────────────────────────────────────────
+  const firstDay = new Date(_calYear, _calMonth, 1);
+  const lastDay  = new Date(_calYear, _calMonth+1, 0);
+  // Ajuste: semana empieza en Lunes (0=Lun…6=Dom)
+  const startDow = (firstDay.getDay() + 6) % 7;
+  const totalCells = startDow + lastDay.getDate();
+  const rows = Math.ceil(totalCells / 7);
+
+  let cells = '';
+  for (let i = 0; i < rows * 7; i++) {
+    const dayNum = i - startDow + 1;
+    if (dayNum < 1 || dayNum > lastDay.getDate()) {
+      cells += `<div class="hcal-day empty"></div>`;
+      continue;
+    }
+    const key = _calYear+'-'+String(_calMonth+1).padStart(2,'0')+'-'+String(dayNum).padStart(2,'0');
+    const d   = byDay[key];
+    const isToday = key === todayKey;
+
+    if (!d) {
+      // Día sin picks
+      const isPast = new Date(_calYear, _calMonth, dayNum) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+      cells += `<div class="hcal-day other-month${isToday?' today':''}">
+        <span class="hcal-day-num">${dayNum}</span>
+      </div>`;
+      continue;
+    }
+
+    const pl    = d.pl;
+    const plStr = (pl >= 0 ? '+' : '') + pl.toFixed(0) + '$';
+    let cls = 'has-data';
+    if      (d.wins > 0 && d.losses === 0) cls += ' win';
+    else if (d.losses > 0 && d.wins === 0) cls += ' loss';
+    else if (d.wins > 0 && d.losses > 0)   cls += (pl >= 0 ? ' win' : ' loss');
+    if (isToday) cls += ' today';
+
+    cells += `<div class="hcal-day ${cls}" onclick="calDayClick('${key}',${dayNum})" title="${d.bets} pick(s) — ${plStr}">
+      <span class="hcal-day-num">${dayNum}</span>
+      <span class="hcal-day-pl">${plStr}</span>
+      <span class="hcal-day-bets">${d.bets} pick${d.bets>1?'s':''}</span>
+    </div>`;
+  }
+
+  const plSign = monthPL >= 0;
+  wrap.innerHTML = `
+    <div class="hcal-nav">
+      <button class="hcal-nav-btn" onclick="calMove(-1)">‹</button>
+      <span class="hcal-month-label">${monthNames[_calMonth]} ${_calYear}</span>
+      <button class="hcal-nav-btn" onclick="calMove(1)">›</button>
+      <button class="hcal-today-btn" onclick="calGoToday()">Hoy</button>
+    </div>
+    <div class="hcal-grid">
+      <div class="hcal-dow">L</div><div class="hcal-dow">M</div><div class="hcal-dow">M</div>
+      <div class="hcal-dow">J</div><div class="hcal-dow">V</div><div class="hcal-dow">S</div>
+      <div class="hcal-dow">D</div>
+      ${cells}
+    </div>
+    <div class="hcal-footer">
+      <div class="hcal-stat">
+        <div class="hcal-stat-label">Beneficio del mes</div>
+        <div class="hcal-stat-val ${plSign?'pos':'neg'}">${plSign?'+':''}${monthPL.toFixed(2)}$</div>
+      </div>
+      <div class="hcal-stat">
+        <div class="hcal-stat-label">Picks del mes</div>
+        <div class="hcal-stat-val neu">${monthBets}</div>
+      </div>
+    </div>
+  `;
+}
+
+function calMove(delta) {
+  _calMonth += delta;
+  if (_calMonth > 11) { _calMonth = 0;  _calYear++; }
+  if (_calMonth < 0)  { _calMonth = 11; _calYear--; }
+  renderHistCalendar();
+}
+function calGoToday() {
+  _calYear = new Date().getFullYear(); _calMonth = new Date().getMonth();
+  renderHistCalendar();
+}
+function calDayClick(key, dayNum) {
+  // Cambiar a vista lista filtrada por esa fecha
+  setHistView('table');
+  // Filtrar historial a esa fecha
+  const all = loadHistorial();
+  const filtered = all.filter(h => {
+    if (!h.commenceTs) return false;
+    const d = new Date(h.commenceTs);
+    const k = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    return k === key;
+  });
+  // Mostrar temporalmente solo esos picks en la tabla
+  const tbody = document.getElementById('histTableBody');
+  if (tbody && filtered.length) {
+    // Reusar renderHistorial pero con flag de dia específico
+    window._calDayFilter = key;
+    renderHistorial(histFilter);
+    window._calDayFilter = null;
+  }
 }
 
 // ── Dropdown toggle helpers ──────────────────────────────────────────────────
