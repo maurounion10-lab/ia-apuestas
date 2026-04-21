@@ -30,7 +30,7 @@ jobs:
 
       - name: Decode keystore
         run: |
-          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/gambeta-release.keystore
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > android/app/gambeta-release.keystore
 
       - name: Make gradlew executable
         run: chmod +x android/gradlew
