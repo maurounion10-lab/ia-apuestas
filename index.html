@@ -9583,11 +9583,12 @@ const HIST_RESULT_OVERRIDES = {
   'unionsantafe|||newells':  { result: 'loss' },
   // Lens vs Toulouse (17/4) — pick guardado con bvr=5/$130 pero fue apostado como Máxima (bvr=6/$170)
   'lens|||toulouse':         { bvr: 6, bvrText: 'Máxima', stake: 170 },
-  // Barcelona vs Atlético — pick cacheado con rec:'Ambos Marcan' por error; resultado correcto: Gana Local (WIN)
-  'barcelona|||atletico':    { result: 'win', rec: 'Gana Local' },
-  'barcelona|||atleticomadrid': { result: 'win', rec: 'Gana Local' },
-  'fcbarcelona|||atletico':  { result: 'win', rec: 'Gana Local' },
-  'fcbarcelona|||atleticomadrid': { result: 'win', rec: 'Gana Local' },
+  // Athletic Bilbao vs Osasuna — pick cacheado con rec:'Ambos Marcan' por error; resultado correcto: Gana Local (WIN)
+  'athleticbilbao|||osasuna':    { result: 'win', rec: 'Gana Local' },
+  'athleticclub|||osasuna':      { result: 'win', rec: 'Gana Local' },
+  'athletic|||osasuna':          { result: 'win', rec: 'Gana Local' },
+  'athleticbilbao|||caosasuna':  { result: 'win', rec: 'Gana Local' },
+  'athleticclub|||caosasuna':    { result: 'win', rec: 'Gana Local' },
 };
 
 // Helper: normaliza nombre de equipo para comparación
