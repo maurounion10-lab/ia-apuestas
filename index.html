@@ -9594,10 +9594,14 @@ const HIST_RESULT_OVERRIDES_EXACT = {
   'lens|||toulouse':         { bvr: 6, bvrText: 'Máxima', stake: 170 },
 };
 
-// Overrides por coincidencia parcial — homeIncludes y awayIncludes son substrings del nombre normalizado
+// Overrides por coincidencia parcial — matchFn recibe (normHome, normAway) → bool
 const HIST_RESULT_OVERRIDES_PARTIAL = [
-  // Athletic Bilbao vs Osasuna — pick cacheado con rec:'Ambos Marcan'; correcto: Gana Local (WIN)
-  { homeIncludes: 'athletic', awayIncludes: 'osasuna', override: { result: 'win', rec: 'Gana Local' } },
+  // Athletic Bilbao vs Osasuna — correcto: Gana Local (WIN)
+  // Cubre: "Athletic Club", "Ath. Bilbao", "Ath Bilbao", "Athletic Bilbao", etc.
+  {
+    matchFn: (nh, na) => (nh.includes('athletic') || nh.startsWith('ath')) && na.includes('osasuna'),
+    override: { result: 'win', rec: 'Gana Local' }
+  },
 ];
 
 // Retorna el override que aplica a un pick dado (primero exacto, luego parcial)
@@ -9605,7 +9609,7 @@ function _getHistOverride(h) {
   const nh = _normHist(h.home), na = _normHist(h.away);
   const exact = HIST_RESULT_OVERRIDES_EXACT[nh + '|||' + na];
   if (exact) return exact;
-  const partial = HIST_RESULT_OVERRIDES_PARTIAL.find(r => nh.includes(r.homeIncludes) && na.includes(r.awayIncludes));
+  const partial = HIST_RESULT_OVERRIDES_PARTIAL.find(r => r.matchFn(nh, na));
   return partial ? partial.override : null;
 }
 
