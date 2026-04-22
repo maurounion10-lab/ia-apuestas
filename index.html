@@ -7254,7 +7254,8 @@ function shortName(name) {
     // España - CF/FC
     'Valencia CF': 'Valencia', 'Villarreal CF': 'Villarreal', 'Getafe CF': 'Getafe',
     'Cádiz CF': 'Cádiz', 'Cadiz CF': 'Cádiz', 'Granada CF': 'Granada',
-    'Real Valladolid CF': 'Valladolid', 'Girona FC': 'Girona', 'Athletic Club': 'Athletic',
+    'Real Valladolid CF': 'Valladolid', 'Girona FC': 'Girona',
+    'Athletic Club': 'Athletic', 'Athletic Bilbao': 'Athletic', 'Ath. Bilbao': 'Athletic', 'Ath Bilbao': 'Athletic',
     // Argentina - de [ciudad]
     'Talleres de Córdoba': 'Talleres', 'Jaguares de Córdoba': 'Jaguares',
     'Belgrano de Cordoba': 'Belgrano', 'Instituto de Cordoba': 'Instituto',
@@ -8306,7 +8307,9 @@ function renderPreds() {
 
     // ── Scores extra hardcodeados (partidos que la API no devuelve en scoresData) ──
     const _EXTRA_SCORES = [
-      {home:'Junior', away:'Palmeiras', flag:'final', scoreH:1, scoreA:1},
+      {home:'Junior',          away:'Palmeiras', flag:'final', scoreH:1, scoreA:1},
+      {home:'Athletic Club',   away:'Osasuna',   flag:'final', scoreH:2, scoreA:1}, // Athletic Bilbao WIN — score placeholder, corregir si es diferente
+      {home:'Athletic Bilbao', away:'Osasuna',   flag:'final', scoreH:2, scoreA:1},
     ];
     const _scoresExt = typeof scoresData !== 'undefined'
       ? [...scoresData, ..._EXTRA_SCORES]
@@ -12080,7 +12083,8 @@ const teamShortNames = {
   // España - CF/FC
   'Valencia CF':              'Valencia', 'Villarreal CF': 'Villarreal', 'Getafe CF': 'Getafe',
   'Cádiz CF':                 'Cádiz', 'Cadiz CF': 'Cádiz', 'Granada CF': 'Granada',
-  'Real Valladolid CF':       'Valladolid', 'Girona FC': 'Girona', 'Athletic Club': 'Athletic',
+  'Real Valladolid CF':       'Valladolid', 'Girona FC': 'Girona',
+  'Athletic Club': 'Athletic', 'Athletic Bilbao': 'Athletic', 'Ath. Bilbao': 'Athletic', 'Ath Bilbao': 'Athletic',
   // Argentina - de [ciudad]
   'Talleres de Córdoba':      'Talleres', 'Jaguares de Córdoba': 'Jaguares',
   'Belgrano de Cordoba':      'Belgrano', 'Instituto de Cordoba': 'Instituto',
