@@ -7860,6 +7860,23 @@ function buildPredsFromOdds() {
   }).filter(Boolean);
 }
 
+// Cuando el historial global llega de Supabase DESPUÉS de que renderPreds ya corrió,
+// el localStorage ya tiene los picks con rec correcto.
+// Si la sección de picks está visible, volver a llamar renderPreds() para que
+// el merge de historial use los datos frescos y ficha ↔ tabla queden siempre en sync.
+function _syncPredsRecFromHist(hist) {
+  if (!hist?.length) return;
+  // Solo re-renderizar si la sección de picks está activa/visible
+  const picksSection = document.getElementById('predictions');
+  const isVisible = picksSection && picksSection.offsetParent !== null && picksSection.style.display !== 'none';
+  if (!isVisible) return;
+  // Guard: evitar loop infinito si renderPreds dispara _syncPredsRecFromHist de nuevo
+  if (window._syncPredsInProgress) return;
+  window._syncPredsInProgress = true;
+  console.log('[_syncPredsRecFromHist] Re-renderizando picks con historial de Supabase...');
+  try { renderPreds(); } finally { window._syncPredsInProgress = false; }
+}
+
 function renderPreds() {
   function formDots(arr) {
     return (arr||[]).map(r => {
@@ -10354,6 +10371,7 @@ async function sbLoadHistorial() {
 
     try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
     renderHistorial(histFilter);
+    _syncPredsRecFromHist(merged); // re-sincronizar rec de fichas con historial recién cargado
     return;
   }
 
@@ -10383,6 +10401,7 @@ async function sbLoadHistorial() {
     _applyHistOverrides(_merged);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(_merged)); } catch {}
     renderHistorial(histFilter);
+    _syncPredsRecFromHist(_merged); // re-sincronizar rec de fichas con historial recién cargado
     // Re-trigger score resolution after merge (guard might have expired)
     window._loadHistScoresRunning = false;
     return;
