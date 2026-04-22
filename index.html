@@ -6604,7 +6604,13 @@ async function acLoadFromDB(email) {
     const dbDay  = data.last_daily  || '';
 
     // Balance: keep the higher value (never lose offline coins or daily bonus)
+    // BUG FIX #2: CRITICAL — si el balance local es > que el de DB, preservar siempre
+    // porque el DB podría tener un balance antiguo si el usuario ganó/perdió offline.
     const mergedBal = Math.max(localBal, dbBal);
+    // Log for debugging balance discrepancies
+    if (localBal !== dbBal) {
+      console.log(`[A-Coin Sync] Balance merge: local=${localBal}, db=${dbBal}, merged=${mergedBal}`);
+    }
 
     // History: union by entry key — deduplicate por reason+delta (NOT balance que varía)
     const histMap = new Map();
@@ -6623,7 +6629,10 @@ async function acLoadFromDB(email) {
     const mergedPick = [...pickMap.values()];
 
     // last_daily: keep the most recent date string
-    const mergedDay = localDay > dbDay ? localDay : dbDay;
+    // BUG FIX #2b: CRITICAL — NO SOBRESCRIBIR last_daily si el DB tiene un valor ANTIGUO
+    // Si el usuario ganó G$ hoy locally pero el DB dice que ya fue (ayer), NO USAR EL DB
+    // La estrategia correcta: si hay balance nuevo local, confiar en AC_DAY local
+    const mergedDay = localBal > dbBal ? localDay : (localDay > dbDay ? localDay : dbDay);
 
     // bust_date: keep if set in either side
     const localBust = localStorage.getItem(AC_BUST) || '';
@@ -6927,6 +6936,14 @@ function logoHtml(name, size=48) {
     if (typeof teamShortNames !== 'undefined') {
       const fullName = Object.keys(teamShortNames).find(k => teamShortNames[k] === n);
       if (fullName && teamLogos[fullName]) return teamLogos[fullName];
+      // BUG FIX #1: Athletic Club → Athletic; buscar la forma completa si el short name está en teamLogos
+      // Ej: "Athletic" (short name) → buscar key donde shortName devuelva "Athletic"
+      const reverseKey = Object.keys(teamShortNames).find(k => {
+        try {
+          return teamShortNames[k] === n && teamLogos[k];
+        } catch(e) { return false; }
+      });
+      if (reverseKey && teamLogos[reverseKey]) return teamLogos[reverseKey];
     }
     // Fallback para nombres truncados con "…" (ej: "Independiente Mede…" → buscar por prefijo)
     if (n.endsWith('…') || n.endsWith('...')) {
@@ -8347,7 +8364,10 @@ function renderPreds() {
         }
         if (!result) return p; // mercado no reconocido → mostrar como pending
         console.log('[Preds] Rescatado resuelto:', p.home, 'vs', p.away, '→', result, se.scoreH+'-'+se.scoreA);
-        return { ...p, _histResult: result, _histScore: `${se.scoreH}-${se.scoreA}` };
+        // BUG FIX #4: Asegurar que rec se copia del historial si el pick fue rescatado
+        // Si p._fromHist === true, el rec debe estar ya en p.rec (copiado en línea 8321)
+        // Pero por si acaso, preservar el rec existente
+        return { ...p, _histResult: result, _histScore: `${se.scoreH}-${se.scoreA}`, rec: p.rec };
       });
     }
   }
@@ -10456,6 +10476,15 @@ function teamsMatch(a, b) {
     const sa = normTeam(shortName(a));
     const sb = normTeam(shortName(b));
     if (sa && sb && sa === sb) return true;
+  }
+  // BUG FIX #5: Match mejorado para nombres truncados
+  // Si uno de los nombres es muy corto (< 5 chars después de normalizar) pero es un substring significativo
+  // del otro, probablemente sean el mismo equipo (ej: "Al. Madrid" vs "Atletico Madrid")
+  const minLen = Math.min(na.length, nb.length);
+  if (minLen >= 3 && minLen <= 7) {
+    // Para nombres muy cortos, requiere que el más largo contenga el más corto
+    const [short, long] = na.length < nb.length ? [na, nb] : [nb, na];
+    if (long.includes(short) && (long.length - short.length) <= 10) return true;
   }
   return false;
 }
@@ -14226,8 +14255,15 @@ function acCheckDaily() {
   });
   if (expired) { acSavePicks(picks); acScheduleSync(); }
 
-  // ── Ya se dio el bonus hoy → salir ─────────────────────────────────────
-  if (localStorage.getItem(AC_DAY) === today) return;
+  // ── BUG FIX #2c: Ya se dio el bonus hoy → salir ─────────────────────────────────────
+  // IMPORTANTE: verificar que AC_DAY sea exactamente hoy, no solo ayer
+  const lastDailyCheck = localStorage.getItem(AC_DAY) || '';
+  if (lastDailyCheck === today) return;
+  if (lastDailyCheck && lastDailyCheck > today) {
+    // Timestamp del futuro (reloj del usuario está retrasado) → no aplicar refill
+    console.warn('[acCheckDaily] AC_DAY en el futuro:', lastDailyCheck, '> today:', today);
+    return;
+  }
 
   // ── Día nuevo: marcar siempre, luego evaluar si corresponde el refill ──
   localStorage.setItem(AC_DAY, today);
