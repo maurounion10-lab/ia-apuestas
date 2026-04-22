@@ -8294,8 +8294,13 @@ function renderPreds() {
       return {
         ...p,
         _started:    true,
-        _histResult: entry?.result  || 'pending',
+        _histResult: entry?.result     || 'pending',
         _histScore:  entry?.finalScore || null,
+        // Si el partido ya tiene entrada en historial, usar su rec para garantizar
+        // consistencia entre la ficha y la tabla de resultados.
+        // Sin esto, la API puede recalcular un rec diferente y mostrar predicciones
+        // contradictorias en la misma pantalla.
+        rec:         entry?.rec        || p.rec,
       };
     });
 
