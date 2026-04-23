@@ -8912,6 +8912,42 @@ function renderPreds() {
 
     // ── Variables para apuesta G$ en cuotas ──
     const _cardMatchId = (p.homeRaw||p.home) + '__' + (p.awayRaw||p.away);
+
+    // ── Panel de resultado (reemplaza cuotas cuando el pick está resuelto) ──
+    const _showResultPanel = (isFinishedWin || isFinishedLoss);
+    const _rpColor  = isFinishedWin ? '#00e676' : '#ef5350';
+    const _rpBorder = isFinishedWin ? 'rgba(0,200,83,0.25)' : 'rgba(239,83,80,0.25)';
+    const _rpBg     = isFinishedWin ? 'rgba(0,200,83,0.07)' : 'rgba(239,83,80,0.07)';
+    const _rpIcon   = isFinishedWin ? '✅' : '❌';
+    const _rpLabel  = isFinishedWin ? 'Acertado' : 'Fallado';
+    const _rpRec    = (p.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'');
+    const _rpOdds   = p._bestOdds ? parseFloat(p._bestOdds).toFixed(2)
+                    : p.rec==='Gana Local'     && p._hO ? parseFloat(p._hO).toFixed(2)
+                    : p.rec==='Gana Visitante' && p._aO ? parseFloat(p._aO).toFixed(2)
+                    : p.rec==='Empate'         && p._dO ? parseFloat(p._dO).toFixed(2)
+                    : null;
+    const _resultPanel = _showResultPanel ? (
+      '<div style="margin:10px 0 4px;border-radius:10px;padding:11px 10px;background:' + _rpBg + ';border:1px solid ' + _rpBorder + '">' +
+        '<div style="display:flex;align-items:center">' +
+          '<div style="flex:1.2;text-align:center">' +
+            '<div style="font-size:0.56rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Marcador</div>' +
+            '<div style="font-size:1.45rem;font-weight:900;letter-spacing:2px;color:#fff;font-family:Arial Black,Arial,sans-serif">' + (finalScore || '—') + '</div>' +
+          '</div>' +
+          '<div style="width:1px;background:rgba(255,255,255,0.08);align-self:stretch;margin:0 6px"></div>' +
+          '<div style="flex:1.4;text-align:center">' +
+            '<div style="font-size:0.56rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Pronóstico</div>' +
+            '<div style="font-size:0.8rem;font-weight:800;color:' + _rpColor + '">' + _rpIcon + ' ' + _rpLabel + '</div>' +
+            '<div style="font-size:0.62rem;color:rgba(255,255,255,0.4);margin-top:1px">' + _rpRec + '</div>' +
+          '</div>' +
+          '<div style="width:1px;background:rgba(255,255,255,0.08);align-self:stretch;margin:0 6px"></div>' +
+          '<div style="flex:0.8;text-align:center">' +
+            '<div style="font-size:0.56rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Cuota</div>' +
+            '<div style="font-size:1.05rem;font-weight:800;color:' + _rpColor + '">' + (_rpOdds || '—') + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>'
+    ) : '';
+
     const _cardOddsH = p._hO ? parseFloat(p._hO) : (p.probH > 0 ? parseFloat((100/p.probH).toFixed(2)) : 2);
     const _cardOddsD = p._dO ? parseFloat(p._dO) : (p.probD > 0 ? parseFloat((100/p.probD).toFixed(2)) : 0);
     const _cardOddsA = p._aO ? parseFloat(p._aO) : (p.probA > 0 ? parseFloat((100/p.probA).toFixed(2)) : 2);
@@ -9080,7 +9116,7 @@ function renderPreds() {
             <div style="font-size:1rem;font-weight:800;color:var(--azul)">${parseFloat(p._bestOdds).toFixed(2)}</div>
           </div>
         </div>
-      </div>` : ''))}
+      </div>` : ''))})
       <!-- Step2: monto de apuesta G$ — aparece al tocar una cuota -->
       ${!isStarted ? `<div id="acbet-s2-${_cardMatchId}" style="display:none" class="acoin-bet-step2">
         <div class="acoin-amount-chips">
