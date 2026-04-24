@@ -2173,21 +2173,44 @@
     font-size: 0.78rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all .15s;
+    transition: all .2s;
+    position: relative;
+    overflow: visible;
   }
   .card-like-btn:hover {
     background: rgba(0,229,160,0.08);
     border-color: rgba(0,229,160,0.3);
     color: #00e5a0;
+    transform: scale(1.04);
   }
-  .card-like-btn:active { transform: scale(0.98); }
+  .card-like-btn:active { transform: scale(0.94); }
   .card-like-btn.card-liked {
-    background: rgba(0,229,160,0.12);
-    border-color: rgba(0,229,160,0.4);
+    background: rgba(0,229,160,0.15);
+    border-color: rgba(0,229,160,0.5);
     color: #00e5a0;
     cursor: default;
-    opacity: 0.8;
+    box-shadow: 0 0 12px rgba(0,229,160,0.25);
   }
+  /* Animación de corazón flotante al dar like */
+  @keyframes likeFloat {
+    0%   { opacity:1; transform: translateY(0) scale(1); }
+    50%  { opacity:1; transform: translateY(-28px) scale(1.4); }
+    100% { opacity:0; transform: translateY(-52px) scale(0.8); }
+  }
+  .like-float-emoji {
+    position: absolute;
+    pointer-events: none;
+    font-size: 1.3rem;
+    animation: likeFloat 0.7s ease-out forwards;
+    top: 0; left: 50%; transform: translateX(-50%);
+    z-index: 9999;
+  }
+  @keyframes likeCountBump {
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.6); color: #00e5a0; }
+    100% { transform: scale(1); }
+  }
+  .like-count-bump { animation: likeCountBump 0.35s ease-out; }
   .card-like-num {
     font-size: 0.7rem;
     margin-left: 2px;
@@ -9473,7 +9496,7 @@ function renderPreds() {
           👍 <span class="card-like-num">0</span>
         </button>
       </div>
-      <!-- Botón expandir análisis — al final de la ficha -->
+      <!-- Análisis expandible + banner CTA sub-página -->
       ${p.insight ? `
       <button class="pred-expand-btn" onclick="togglePredExpand(${idx})">
         <span>🔍 Ver análisis de la IA</span>
@@ -9484,9 +9507,16 @@ function renderPreds() {
         ${h2hHtml ? `<div style="margin-top:4px">${h2hHtml}</div>` : ''}
         ${md ? `<button class="pred-full-btn" onclick="openMatchAnalysis('${p.home}','${p.away}')">Ver análisis estadístico completo →</button>` : ''}
       </div>` : `
-      <a href="https://bot-alertas.pronosticosargentinos.net/ar/" target="_blank" rel="noopener" class="pred-expand-btn" style="text-decoration:none;justify-content:center;gap:8px">
-        <span>⚽ Contratar el Bot de Córners sobre la hora</span>
-        <span style="font-size:0.75rem;opacity:0.6">→</span>
+      <!-- Banner CTA: Bot de Córners -->
+      <a href="https://bot-alertas.pronosticosargentinos.net/ar/" target="_blank" rel="noopener" style="text-decoration:none;display:block;margin-top:4px">
+        <div style="background:linear-gradient(135deg,rgba(0,150,80,0.18) 0%,rgba(0,100,50,0.10) 100%);border:1px solid rgba(0,200,83,0.25);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;transition:all .2s" onmouseenter="this.style.borderColor='rgba(0,200,83,0.5)';this.style.background='linear-gradient(135deg,rgba(0,150,80,0.28) 0%,rgba(0,100,50,0.18) 100%)'" onmouseleave="this.style.borderColor='rgba(0,200,83,0.25)';this.style.background='linear-gradient(135deg,rgba(0,150,80,0.18) 0%,rgba(0,100,50,0.10) 100%)'">
+          <span style="font-size:1.8rem;line-height:1">⚽</span>
+          <div style="flex:1">
+            <div style="font-size:0.78rem;font-weight:800;color:#fff;margin-bottom:2px">Bot de Alertas en Vivo</div>
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);line-height:1.4">Recibí avisos de córners sobre la hora en tiempo real</div>
+          </div>
+          <span style="font-size:0.7rem;color:rgba(0,200,83,0.8);font-weight:700;white-space:nowrap">Ver más →</span>
+        </div>
       </a>`}
     </div>
   `}).join('');
@@ -19972,12 +20002,27 @@ window.cardLikeThread = async function(threadId, btn) {
 
     if (_fpIsLoggedIn()) { _fpMyReacts[postId] = 'like'; } else { _fpMarkLiked(postId); }
 
-    // Update local count + UI
+    // Update local count + UI con animación
     info.likes = (info.likes || 0) + 1;
     if (btn) {
       btn.classList.add('card-liked');
       const num = btn.querySelector('.card-like-num');
-      if (num) num.textContent = info.likes;
+      if (num) {
+        num.textContent = info.likes;
+        num.classList.remove('like-count-bump');
+        void num.offsetWidth; // reflow para reiniciar animación
+        num.classList.add('like-count-bump');
+      }
+      // Emoji flotante
+      const emojis = ['❤️','🔥','⚡','✨','💚'];
+      const emoji = document.createElement('span');
+      emoji.className = 'like-float-emoji';
+      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      btn.style.position = 'relative';
+      btn.appendChild(emoji);
+      setTimeout(() => emoji.remove(), 750);
+      // Re-ordenar por engagement
+      setTimeout(() => { if (typeof _reorderCardsByEngagement === 'function') _reorderCardsByEngagement(); }, 300);
     }
   } catch(e) { console.error('cardLikeThread error', e); }
 };
