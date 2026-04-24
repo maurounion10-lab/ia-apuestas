@@ -19747,14 +19747,37 @@ async function _fpRenderList() {
     if (allItems.length === 0) {
       body.innerHTML = '<div class="fp-empty">Sin partidos para mostrar 🏜️</div>';
     } else {
-      allItems.forEach((t, idx) => {
-        const card = _fpThreadCard(t);
-        // Top 3 gold highlights
-        if (idx === 0 && t._score > 0) card.classList.add('fp-rank-1');
-        else if (idx === 1 && t._score > 0) card.classList.add('fp-rank-2');
-        else if (idx === 2 && t._score > 0) card.classList.add('fp-rank-3');
-        body.appendChild(card);
-      });
+      const FP_PAGE = 10;
+      let _fpShown = 0;
+
+      const renderBatch = (from, to) => {
+        allItems.slice(from, to).forEach((t, i) => {
+          const idx = from + i;
+          const card = _fpThreadCard(t);
+          if (idx === 0 && t._score > 0) card.classList.add('fp-rank-1');
+          else if (idx === 1 && t._score > 0) card.classList.add('fp-rank-2');
+          else if (idx === 2 && t._score > 0) card.classList.add('fp-rank-3');
+          body.appendChild(card);
+        });
+        _fpShown = to;
+      };
+
+      renderBatch(0, Math.min(FP_PAGE, allItems.length));
+
+      // Botón Ver más
+      if (allItems.length > FP_PAGE) {
+        const verMasBtn = document.createElement('button');
+        verMasBtn.id = 'fpVerMasBtn';
+        verMasBtn.textContent = `Ver más (${allItems.length - FP_PAGE} restantes)`;
+        verMasBtn.style.cssText = 'display:block;width:100%;margin:12px 0 4px;padding:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:10px;color:rgba(255,255,255,0.65);font-size:0.82rem;font-weight:700;cursor:pointer;transition:background .2s';
+        verMasBtn.onmouseenter = () => verMasBtn.style.background = 'rgba(255,255,255,0.09)';
+        verMasBtn.onmouseleave = () => verMasBtn.style.background = 'rgba(255,255,255,0.05)';
+        verMasBtn.onclick = () => {
+          verMasBtn.remove();
+          renderBatch(_fpShown, allItems.length);
+        };
+        body.appendChild(verMasBtn);
+      }
     }
 
     const oc = $('fpOnlineCount');
