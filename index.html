@@ -8000,7 +8000,136 @@ async function brainValidate(preds) {
       }
       // badge '⚡' = solo IA, label queda como está
     });
+
+    // ── Generar picks independientes del 🧠 Algoritmo ────────────────────────
+    // Busca en todos los partidos disponibles (no solo los que la IA eligió)
+    // Solo genera si hay señal muy fuerte. Máximo 2 picks por día.
+    await brainGenerateIndependent(preds);
   }
+}
+
+async function brainGenerateIndependent(iaPreds) {
+  const WORKER   = 'https://apuestas-api.mauro-union10.workers.dev';
+  const MAX_PICKS = 2;
+  const container = document.getElementById('predsContainer') || document.querySelector('.pred-list') || document.querySelector('#predictions > div');
+  if (!container) return;
+
+  // Partidos disponibles de la API que NO tienen pick de la IA
+  const allGames = window._rawOddsGames || [];
+  const iaFixtureIds = new Set(iaPreds.map(p => p._apf_fixture_id).filter(Boolean));
+  const candidates = allGames.filter(g =>
+    g._apf_fixture_id &&
+    !iaFixtureIds.has(g._apf_fixture_id) &&
+    g._apf_home_id && g._apf_league_id &&
+    !g._apf_status?.match(/FT|AET|PEN|WO/) // no finalizados
+  );
+
+  if (!candidates.length) return;
+
+  // Fetch stats+H2H en paralelo para los primeros 20 candidatos
+  const toCheck = candidates.slice(0, 20);
+  const results = await Promise.all(
+    toCheck.map(g => Promise.all([
+      fetch(`${WORKER}/stats?team=${g._apf_home_id}&league=${g._apf_league_id}`).then(r=>r.json()).then(d=>d.data).catch(()=>null),
+      fetch(`${WORKER}/stats?team=${g._apf_away_id}&league=${g._apf_league_id}`).then(r=>r.json()).then(d=>d.data).catch(()=>null),
+      fetch(`${WORKER}/h2h?h2h=${g._apf_home_id}-${g._apf_away_id}`).then(r=>r.json()).then(d=>d.data).catch(()=>null),
+    ]))
+  );
+
+  const brainPicks = [];
+
+  toCheck.forEach((g, i) => {
+    if (brainPicks.length >= MAX_PICKS) return;
+    const [hStats, aStats, h2h] = results[i];
+    if (!hStats || !aStats) return;
+
+    // ── Criterios ESTRICTOS para pick del algoritmo ──
+    // Necesita señal clara en forma Y H2H
+    const analyzeTeam = (stats, teamId, h2hData, side) => {
+      if (!stats?.form) return null;
+      const last5 = stats.form.split('').slice(-5);
+      const wins = last5.filter(r => r === 'W').length;
+      const losses = last5.filter(r => r === 'L').length;
+
+      // Forma muy fuerte: mínimo 4 de 5
+      if (wins < 4) return null;
+
+      // H2H favorable: mínimo 3 de 5
+      if (h2hData?.length >= 3) {
+        const last5h2h = h2hData.slice(0, 5);
+        let h2hWins = 0, h2hLosses = 0;
+        last5h2h.forEach(m => {
+          const isHome = m.teams?.home?.id === teamId;
+          const myG = isHome ? (m.goals?.home||0) : (m.goals?.away||0);
+          const oppG = isHome ? (m.goals?.away||0) : (m.goals?.home||0);
+          if (myG > oppG) h2hWins++; else if (myG < oppG) h2hLosses++;
+        });
+        if (h2hWins < 3 || h2hLosses >= 2) return null;
+      }
+
+      return { wins, losses, rec: side === 'home' ? 'Gana Local' : 'Gana Visitante' };
+    };
+
+    const homeSignal = analyzeTeam(hStats, g._apf_home_id, h2h, 'home');
+    const awaySignal = analyzeTeam(aStats, g._apf_away_id, h2h, 'away');
+    const signal = homeSignal || awaySignal;
+    if (!signal) return;
+
+    // Verificar que haya cuota razonable (1.40 - 2.50)
+    const rec = signal.rec;
+    const bookmaker = g.bookmakers?.[0];
+    const market = bookmaker?.markets?.find(m => m.key === 'h2h');
+    const outcome = market?.outcomes?.find(o =>
+      rec === 'Gana Local' ? o.name === g.home_team : o.name === g.away_team
+    );
+    const odds = outcome ? parseFloat(outcome.price) : null;
+    if (!odds || odds < 1.40 || odds > 2.50) return;
+
+    brainPicks.push({ game: g, rec, odds, signal });
+    console.log(`[🧠 PICK PROPIO] ${g.home_team} vs ${g.away_team} | ${rec} @ ${odds} | forma: ${signal.wins}/5`);
+  });
+
+  if (!brainPicks.length) return;
+
+  // ── Renderizar cards del algoritmo ──────────────────────────────────────────
+  brainPicks.forEach(({ game: g, rec, odds, signal }) => {
+    const recShort = rec.replace(/^Gana\s+/, '').replace(/\s+Gana$/, '');
+    const homeLogoFn = typeof logoHtml === 'function' ? logoHtml(g.home_team, 36) : `<span>${g.home_team}</span>`;
+    const awayLogoFn = typeof logoHtml === 'function' ? logoHtml(g.away_team, 36) : `<span>${g.away_team}</span>`;
+    const matchDate  = g.commence_time ? new Date(g.commence_time).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'}) : '';
+
+    const card = document.createElement('div');
+    card.className = 'pred-card brain-only-card';
+    card.dataset.brainPick = '1';
+    card.style.cssText = 'border-color:rgba(100,180,255,0.4);background:linear-gradient(180deg,rgba(41,182,246,0.07) 0%,var(--gris-card) 60%)';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+        ${homeLogoFn}
+        <div style="flex:1;text-align:center">
+          <div style="font-size:0.7rem;color:rgba(255,255,255,0.45);margin-bottom:2px">${g.sport_key?.includes('champs') ? '⭐' : g.sport_key?.includes('la_liga') ? '🇪🇸' : g.sport_key?.includes('epl') ? '🏴󠁧󠁢󠁥󠁮󠁧󠁿' : '⚽'} ${matchDate ? 'Hoy ' + matchDate : ''}</div>
+          <div style="font-size:0.8rem;font-weight:700;color:#fff">${g.home_team}</div>
+          <div style="font-size:0.65rem;color:rgba(255,255,255,0.35);margin:2px 0">vs</div>
+          <div style="font-size:0.8rem;font-weight:700;color:#fff">${g.away_team}</div>
+        </div>
+        ${awayLogoFn}
+      </div>
+      <div class="pred-recommendation" style="background:rgba(41,182,246,0.08);border:1px solid rgba(41,182,246,0.2);border-radius:10px;padding:10px 12px">
+        <div class="pred-rec-left">
+          <div class="pred-rec-label" style="color:rgba(41,182,246,0.8)">🧠 Recomendación Algoritmo</div>
+          <div class="pred-rec-value" style="color:#29b6f6;font-size:1rem">🧠 ${recShort}</div>
+        </div>
+        <div class="pred-rec-right">
+          <div class="pred-rec-odds" style="color:#29b6f6">${odds.toFixed(2)}</div>
+        </div>
+      </div>
+      <div style="margin-top:8px;font-size:0.68rem;color:rgba(255,255,255,0.4);text-align:center">
+        Forma: ${signal.wins}/5 victorias · Análisis estadístico independiente
+      </div>
+    `;
+
+    // Insertar al principio del contenedor de picks
+    container.insertBefore(card, container.firstChild);
+  });
 }
 
 // Cuando el historial global llega de Supabase DESPUÉS de que renderPreds ya corrió,
