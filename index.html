@@ -8915,37 +8915,30 @@ function renderPreds() {
 
     // ── Panel de resultado (reemplaza cuotas cuando el pick está resuelto) ──
     const _showResultPanel = (isFinishedWin || isFinishedLoss);
-    const _rpColor  = isFinishedWin ? '#00e676' : '#ef5350';
-    const _rpBorder = isFinishedWin ? 'rgba(0,200,83,0.25)' : 'rgba(239,83,80,0.25)';
-    const _rpBg     = isFinishedWin ? 'rgba(0,200,83,0.07)' : 'rgba(239,83,80,0.07)';
-    const _rpIcon   = isFinishedWin ? '✅' : '❌';
-    const _rpLabel  = isFinishedWin ? 'Acertado' : 'Fallado';
-    const _rpRec    = (p.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'');
-    const _rpOdds   = p._bestOdds ? parseFloat(p._bestOdds).toFixed(2)
-                    : p.rec==='Gana Local'     && p._hO ? parseFloat(p._hO).toFixed(2)
-                    : p.rec==='Gana Visitante' && p._aO ? parseFloat(p._aO).toFixed(2)
-                    : p.rec==='Empate'         && p._dO ? parseFloat(p._dO).toFixed(2)
-                    : null;
+    const _tweetHome = encodeURIComponent(p.home||'');
+    const _tweetAway = encodeURIComponent(p.away||'');
+    const _tweetText = encodeURIComponent('🎯 ¡Acertamos con ' + (p.home||'') + ' vs ' + (p.away||'') + '! La IA de @gambetaia lo vio venir 🔥 #gambetaai #picks');
+    const _tweetUrl  = 'https://twitter.com/intent/tweet?text=' + _tweetText + '&url=' + encodeURIComponent('https://gambeta.ai');
     const _resultPanel = _showResultPanel ? (
-      '<div style="margin:10px 0 4px;border-radius:10px;padding:11px 10px;background:' + _rpBg + ';border:1px solid ' + _rpBorder + '">' +
-        '<div style="display:flex;align-items:center">' +
-          '<div style="flex:1.2;text-align:center">' +
-            '<div style="font-size:0.56rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Marcador</div>' +
-            '<div style="font-size:1.45rem;font-weight:900;letter-spacing:2px;color:#fff;font-family:Arial Black,Arial,sans-serif">' + (finalScore || '—') + '</div>' +
+      isFinishedWin ? (
+        '<div style="margin:10px 0 4px;border-radius:12px;padding:13px 14px;background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.25);text-align:center">' +
+          '<div style="font-size:0.95rem;font-weight:900;color:#00e676;margin-bottom:4px">🎉 ¡Corre a festejarlo con nosotros!</div>' +
+          '<div style="font-size:0.72rem;color:rgba(255,255,255,0.55);margin-bottom:10px">Contale a la comunidad que lo viste venir 👇</div>' +
+          '<a href="' + _tweetUrl + '" target="_blank" rel="noopener" onclick="trackEvent && trackEvent(\'tweet_win\',{home:\'' + (p.home||'').replace(/'/g,"\\'") + '\'})" ' +
+            'style="display:inline-flex;align-items:center;gap:7px;background:#000;color:#fff;font-weight:800;font-size:0.78rem;padding:8px 18px;border-radius:20px;text-decoration:none;border:1px solid rgba(255,255,255,0.15)">' +
+            '<svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>' +
+            'Compartir en X' +
+          '</a>' +
+        '</div>'
+      ) : (
+        '<div style="margin:10px 0 4px;border-radius:12px;padding:13px 14px;background:rgba(239,83,80,0.07);border:1px solid rgba(239,83,80,0.22)">' +
+          '<div style="font-size:0.88rem;font-weight:800;color:#ef5350;margin-bottom:5px">😔 Esta no salió — lo sentimos</div>' +
+          '<div style="font-size:0.72rem;color:rgba(255,255,255,0.5);line-height:1.55">' +
+            'En las apuestas no existe el all-in. Nadie lee el futuro — ni la IA, ni los mejores analistas del mundo. ' +
+            'El edge se construye en series largas, no en picks individuales. Apostá solo lo que podés permitirte perder.' +
           '</div>' +
-          '<div style="width:1px;background:rgba(255,255,255,0.08);align-self:stretch;margin:0 6px"></div>' +
-          '<div style="flex:1.4;text-align:center">' +
-            '<div style="font-size:0.56rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Pronóstico</div>' +
-            '<div style="font-size:0.8rem;font-weight:800;color:' + _rpColor + '">' + _rpIcon + ' ' + _rpLabel + '</div>' +
-            '<div style="font-size:0.62rem;color:rgba(255,255,255,0.4);margin-top:1px">' + _rpRec + '</div>' +
-          '</div>' +
-          '<div style="width:1px;background:rgba(255,255,255,0.08);align-self:stretch;margin:0 6px"></div>' +
-          '<div style="flex:0.8;text-align:center">' +
-            '<div style="font-size:0.56rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px">Cuota</div>' +
-            '<div style="font-size:1.05rem;font-weight:800;color:' + _rpColor + '">' + (_rpOdds || '—') + '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>'
+        '</div>'
+      )
     ) : '';
 
     const _cardOddsH = p._hO ? parseFloat(p._hO) : (p.probH > 0 ? parseFloat((100/p.probH).toFixed(2)) : 2);
