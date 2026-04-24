@@ -7985,16 +7985,20 @@ async function brainValidate(preds) {
         }
       }
     });
-    // Actualizar badges ⚡🧠 directamente por data-apf-fixture
+    // Actualizar label + badge según resultado del algoritmo
     window._brainBadges.forEach((badge, fid) => {
+      const recEl   = document.querySelector(`.pred-rec-value[data-apf-fixture="${fid}"]`);
+      const labelEl = document.querySelector(`[data-apf-fixture-label="${fid}"]`);
+      if (!recEl || recEl.dataset.brainUpdated) return;
+
       if (badge === '⚡🧠') {
-        const recEl = document.querySelector(`.pred-rec-value[data-apf-fixture="${fid}"]`);
-        if (recEl && !recEl.dataset.brainUpdated) {
-          recEl.textContent = recEl.textContent.replace(/^⚡/, badge);
-          recEl.dataset.brainUpdated = '1';
-          console.log(`[🧠 ⚡🧠] Badge actualizado fixture ${fid}`);
-        }
+        // Confluencia: ambos sistemas coinciden
+        recEl.textContent   = recEl.textContent.replace(/^⚡/, '⚡🧠');
+        if (labelEl) labelEl.innerHTML = '🤖🧠 IA + Algoritmo';
+        recEl.dataset.brainUpdated = '1';
+        console.log(`[🧠 ⚡🧠] Confluencia fixture ${fid}`);
       }
+      // badge '⚡' = solo IA, label queda como está
     });
   }
 }
@@ -9184,7 +9188,7 @@ function renderPreds() {
       ${formRow}
       <div class="pred-recommendation">
         <div class="pred-rec-left">
-          <div class="pred-rec-label">🤖 Recomendación IA</div>
+          <div class="pred-rec-label" data-apf-fixture-label="${p._apf_fixture_id||''}">🤖 Recomendación IA</div>
           <div class="pred-rec-value" data-apf-fixture="${p._apf_fixture_id||''}">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '⚡'} ${(p.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'').replace(/^(Más de \d+\.\d+)$/,'$1 goles')}</div>
         </div>
         <div class="pred-rec-right">
