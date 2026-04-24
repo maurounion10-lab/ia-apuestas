@@ -19999,8 +19999,9 @@ function _reorderCardsByEngagement() {
       : 0;
     // Finished picks siempre van después de los upcoming
     const basePenalty = started ? -100000 : 0;
-    // Dentro de cada grupo: bvr (peso 100) + engagement capped 50 − tiempo (para desempatar rápido)
-    return basePenalty + bvr * 100 + Math.min(eng, 50) - ts / 1e13;
+    // Orden: BVR primario (×100) + engagement (×25 por interacción, sin cap) − tiempo
+    // Con peso 25: 4 likes superan 1 nivel de BVR (ej: BVR4 con 5 likes > BVR5 sin likes)
+    return basePenalty + bvr * 100 + eng * 25 - ts / 1e13;
   };
 
   cards.sort((a, b) => scoreCard(b) - scoreCard(a));
