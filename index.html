@@ -5196,6 +5196,13 @@
         </button>
         <div class="hfb-panel" id="hfbPanel_mercado"></div>
       </div>
+      <!-- Fuente del pick -->
+      <div class="hfb-drop">
+        <button class="hfb-btn" onclick="hfbToggle('fuente')">
+          <span class="hfb-prefix">⚡</span><span id="hfbVal_fuente">Fuente</span><span class="hfb-arrow">▾</span>
+        </button>
+        <div class="hfb-panel" id="hfbPanel_fuente"></div>
+      </div>
     </div>
 
     <!-- Banner resumen finde (se muestra sólo cuando el filtro es 'finde') -->
@@ -7997,6 +8004,13 @@ async function brainValidate(preds) {
         if (labelEl) labelEl.innerHTML = '🤖🧠 IA + Algoritmo';
         recEl.dataset.brainUpdated = '1';
         console.log(`[🧠 ⚡🧠] Confluencia fixture ${fid}`);
+        // Actualizar _source en historial
+        try {
+          const hist = loadHistorial();
+          const entry = hist.find(h => h.id?.includes(String(fid)) ||
+            (preds.find(p => p._apf_fixture_id === fid && teamsMatch(h.home, p.home) && teamsMatch(h.away, p.away))));
+          if (entry && entry._source === 'ia') { entry._source = 'confluence'; saveHistorial(hist); }
+        } catch {}
       }
       // badge '⚡' = solo IA, label queda como está
     });
@@ -8129,6 +8143,34 @@ async function brainGenerateIndependent(iaPreds) {
 
     // Insertar al principio del contenedor de picks
     container.insertBefore(card, container.firstChild);
+
+    // Guardar en historial con _source: 'brain'
+    try {
+      const today = new Date().toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
+      const todayKey = new Date().toISOString().slice(0,10);
+      const hist = loadHistorial();
+      const matchKey = `${normTeam(g.home_team)}_${normTeam(g.away_team)}`;
+      const exists = hist.some(h => teamsMatch(h.home, g.home_team) && teamsMatch(h.away, g.away_team));
+      if (!exists) {
+        hist.unshift({
+          id: `${matchKey}_${todayKey}_brain`,
+          date: today, sport: 'futbol',
+          _sportKey: g.sport_key || null,
+          home: g.home_team, away: g.away_team,
+          league: null, rec, odds,
+          stake: 30,  // stake conservador para picks del algoritmo
+          result: 'pending', pl: 0,
+          conf: 'med', bvr: 3, bvrText: 'Algoritmo',
+          commenceTs: g.commence_time ? new Date(g.commence_time).getTime() : null,
+          probH: 0, probD: 0, probA: 0,
+          _hO: null, _aO: null, _dO: null,
+          _bestOdds: odds,
+          _source: 'brain',
+        });
+        saveHistorial(hist);
+        console.log(`[🧠 SAVE] Guardado pick de algoritmo: ${g.home_team} vs ${g.away_team}`);
+      }
+    } catch(e) { console.error('[🧠 SAVE error]', e); }
   });
 }
 
@@ -9888,7 +9930,8 @@ function _arTodayDDMM() {
 }
 // ─────────────────────────────────────────────────────────────────────────────
 let histMercadoFilter = 'all';
-let histConfFilter = 'all';
+let histConfFilter    = 'all';
+let histSourceFilter  = 'all'; // 'all' | 'ia' | 'brain' | 'confluence'
 // Fecha de lanzamiento del sitio — fija para todos los usuarios
 const PAGE_LAUNCH_DATE = new Date('2025-03-01');
 
@@ -10894,7 +10937,7 @@ function savePredictions(preds) {
     const _normAway = (n, sk) => (n === 'Barcelona' && sk?.includes('conmebol')) ? 'Barcelona SC' : n;
     hist.unshift({
       id, date: today, sport: p._sportKey?.includes('tennis') ? 'tenis' : (p.sport || 'futbol'),
-      _sportKey: p._sportKey || null,   // guarda el API key real para resolver scores después
+      _sportKey: p._sportKey || null,
       home: _normHome(p.home, p._sportKey), away: _normAway(p.away, p._sportKey),
       league: p.league || null,
       rec: p.rec, odds: impliedOdds, stake,
@@ -10904,6 +10947,7 @@ function savePredictions(preds) {
       probH: p.probH || 0, probD: p.probD || 0, probA: p.probA || 0,
       _hO: p._hO || null, _aO: p._aO || null, _dO: p._dO || null,
       _bestOdds: p._bestOdds || impliedOdds || null,
+      _source: p._source || 'ia',  // 'ia' | 'brain' | 'confluence'
     });
     added++;
   });
@@ -11585,6 +11629,38 @@ function renderHistorial(filter) {
     }
   }
 
+  // ── Fuente sub-filter: IA / Algoritmo / Confluencia ──────────────────────
+  const fuentePanel = document.getElementById('hfbPanel_fuente');
+  if (fuentePanel) {
+    const srcMap = { ia: {total:0,comp:0,wins:0,pl:0}, brain: {total:0,comp:0,wins:0,pl:0}, confluence: {total:0,comp:0,wins:0,pl:0} };
+    const srcLabels = { ia: '⚡ IA', brain: '🧠 Algoritmo', confluence: '⚡🧠 Confluencia' };
+    data.forEach(h => {
+      const src = h._source || 'ia';
+      if (!srcMap[src]) srcMap[src] = {total:0,comp:0,wins:0,pl:0};
+      srcMap[src].total++;
+      if (h.result !== 'pending' && h.result !== 'void') {
+        srcMap[src].comp++;
+        if (h.result === 'win') srcMap[src].wins++;
+      }
+      srcMap[src].pl += (h.pl || 0);
+    });
+    const allActiveSrc = histSourceFilter === 'all' ? 'active' : '';
+    const totalAll = data.length;
+    fuentePanel.innerHTML =
+      `<button class="hfb-opt ${allActiveSrc}" onclick="filterHistSource('all',this)">🌐 Todos <span class="hfb-opt-pl">(${totalAll})</span></button>` +
+      ['ia','brain','confluence'].map(src => {
+        const s = srcMap[src]; if (!s || s.total === 0) return '';
+        const plStr = s.pl >= 0 ? `+$${s.pl.toFixed(0)}` : `-$${Math.abs(s.pl).toFixed(0)}`;
+        const plColor = s.pl >= 0 ? 'rgba(0,200,83,0.9)' : 'rgba(229,57,53,0.9)';
+        const roiStr = s.comp > 0 ? ` · ROI ${((s.pl/(s.comp*30))*100).toFixed(0)}%` : '';
+        const isA = histSourceFilter === src ? 'active' : '';
+        return `<button class="hfb-opt ${isA}" onclick="filterHistSource('${src}',this)">${srcLabels[src]} <span class="hfb-opt-pl">(${s.total} · <span style="color:${plColor}">${plStr}${roiStr}</span>)</span></button>`;
+      }).join('');
+    if (histSourceFilter !== 'all') {
+      data = data.filter(h => (h._source || 'ia') === histSourceFilter);
+    }
+  }
+
   // ── Banner resumen finde ──
   const findeBannerEl = document.getElementById('findeBanner');
   if (histDateFilter === 'finde' && findeBannerEl) {
@@ -11649,7 +11725,8 @@ function renderHistorial(filter) {
           ? '<span style="color:#555">—</span>'
           : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
         const icon = h.sport==='tenis'?'🎾':'⚽';
-        const recDisplay = (h.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'').replace(/^(Más de \d+\.\d+)$/,'$1 goles');
+        const _srcEmoji = h._source === 'brain' ? '🧠' : h._source === 'confluence' ? '⚡🧠' : '⚡';
+        const recDisplay = _srcEmoji + ' ' + (h.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'').replace(/^(Más de \d+\.\d+)$/,'$1 goles');
         const isMax  = h.stake >= 150;
         const isHigh = h.stake >= 130;
         // Fecha real del partido: usar commenceTs si existe, si no h.date
@@ -11822,7 +11899,7 @@ function filterHist(f,btn) {
   // Restaurar el activo del filtro de fecha
   const dateActive = histDateFilter==='today' ? 'histDateBtnHoy' : histDateFilter==='week' ? 'histDateBtnWeek' : histDateFilter==='finde' ? 'histDateBtnFinde' : 'histDateBtnAll';
   document.getElementById(dateActive)?.classList.add('active');
-  btn.classList.add('active'); histFilter=f; histLeagueFilter='all'; histMercadoFilter='all'; histPage=0; renderHistorial(f);
+  btn.classList.add('active'); histFilter=f; histLeagueFilter='all'; histMercadoFilter='all'; histSourceFilter='all'; histPage=0; renderHistorial(f);
 }
 
 // ── Vista Calendario P/L ─────────────────────────────────────────────────────
@@ -12038,7 +12115,7 @@ function filterHistDate(f, btn) {
   const labels = { all:'Todo', today:'Hoy', finde:'Finde', week:'Semana' };
   hfbSetLabel('fecha', labels[f] || 'Todo');
   hfbClose('fecha');
-  histDateFilter = f; histLeagueFilter='all'; histMercadoFilter='all'; histPage=0;
+  histDateFilter = f; histLeagueFilter='all'; histMercadoFilter='all'; histSourceFilter='all'; histPage=0;
   renderHistorial(histFilter);
 }
 
@@ -12048,7 +12125,7 @@ function filterHistConf(f, btn) {
   const labels = { all:'Confianza', max:'Máxima', high:'Alta', med:'Media' };
   hfbSetLabel('conf', labels[f] || 'Confianza');
   hfbClose('conf');
-  histConfFilter = f; histLeagueFilter='all'; histMercadoFilter='all'; histPage=0;
+  histConfFilter = f; histLeagueFilter='all'; histMercadoFilter='all'; histSourceFilter='all'; histPage=0;
   renderHistorial(histFilter);
 }
 
@@ -12069,6 +12146,17 @@ function filterHistMercado(mercado, btn) {
   histMercadoFilter = mercado;
   hfbSetLabel('mercado', mercado === 'all' ? 'Mercado' : mercado);
   hfbClose('mercado');
+  histPage = 0;
+  renderHistorial(histFilter);
+}
+
+function filterHistSource(source, btn) {
+  document.querySelectorAll('#hfbPanel_fuente .hfb-opt').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  histSourceFilter = source;
+  const labels = { all: 'Fuente', ia: '⚡ IA', brain: '🧠 Algoritmo', confluence: '⚡🧠 Confluencia' };
+  hfbSetLabel('fuente', labels[source] || 'Fuente');
+  hfbClose('fuente');
   histPage = 0;
   renderHistorial(histFilter);
 }
