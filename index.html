@@ -2192,25 +2192,40 @@
     box-shadow: 0 0 12px rgba(0,229,160,0.25);
   }
   /* Animación de corazón flotante al dar like */
-  @keyframes likeFloat {
-    0%   { opacity:1; transform: translateY(0) scale(1); }
-    50%  { opacity:1; transform: translateY(-28px) scale(1.4); }
-    100% { opacity:0; transform: translateY(-52px) scale(0.8); }
+  /* ── Like burst particles ── */
+  @keyframes likeBurst {
+    0%   { transform: translate(-50%,-50%) scale(0); opacity: 1; }
+    60%  { opacity: 1; }
+    100% { transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1); opacity: 0; }
   }
-  .like-float-emoji {
+  @keyframes likeRipple {
+    0%   { transform: scale(0.6); opacity: 0.6; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+  .like-burst-particle {
     position: absolute;
+    width: 7px; height: 7px;
+    border-radius: 50%;
     pointer-events: none;
-    font-size: 1.3rem;
-    animation: likeFloat 0.7s ease-out forwards;
-    top: 0; left: 50%; transform: translateX(-50%);
+    top: 50%; left: 50%;
+    animation: likeBurst 0.55s cubic-bezier(.2,.6,.3,1) forwards;
     z-index: 9999;
   }
-  @keyframes likeCountBump {
-    0%   { transform: scale(1); }
-    40%  { transform: scale(1.6); color: #00e5a0; }
-    100% { transform: scale(1); }
+  .like-ripple {
+    position: absolute; inset: 0;
+    border-radius: inherit;
+    border: 2px solid rgba(0,229,160,0.6);
+    pointer-events: none;
+    animation: likeRipple 0.5s ease-out forwards;
+    z-index: 1;
   }
-  .like-count-bump { animation: likeCountBump 0.35s ease-out; }
+  @keyframes likeCountBump {
+    0%   { transform: scale(1)   translateY(0); }
+    30%  { transform: scale(1.5) translateY(-3px); color: #00e5a0; }
+    60%  { transform: scale(0.9) translateY(1px); }
+    100% { transform: scale(1)   translateY(0); }
+  }
+  .like-count-bump { animation: likeCountBump 0.4s cubic-bezier(.3,1.4,.5,1); }
   .card-like-num {
     font-size: 0.7rem;
     margin-left: 2px;
@@ -20041,14 +20056,29 @@ window.cardLikeThread = async function(threadId, btn) {
         void num.offsetWidth; // reflow para reiniciar animación
         num.classList.add('like-count-bump');
       }
-      // Emoji flotante
-      const emojis = ['❤️','🔥','⚡','✨','💚'];
-      const emoji = document.createElement('span');
-      emoji.className = 'like-float-emoji';
-      emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      // Ripple ring
+      const ripple = document.createElement('span');
+      ripple.className = 'like-ripple';
       btn.style.position = 'relative';
-      btn.appendChild(emoji);
-      setTimeout(() => emoji.remove(), 750);
+      btn.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 520);
+
+      // Burst particles — 8 puntos en círculo
+      const colors = ['#00e676','#69f0ae','#00bcd4','#fff59d','#00e5a0','#b2ff59','#40c4ff','#ffffff'];
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        const dist = 28 + Math.random() * 14;
+        const tx = Math.cos(angle) * dist;
+        const ty = Math.sin(angle) * dist;
+        const dot = document.createElement('span');
+        dot.className = 'like-burst-particle';
+        dot.style.background = colors[i];
+        dot.style.setProperty('--tx', tx + 'px');
+        dot.style.setProperty('--ty', ty + 'px');
+        dot.style.animationDelay = (i * 18) + 'ms';
+        btn.appendChild(dot);
+        setTimeout(() => dot.remove(), 600 + i * 18);
+      }
       // Re-ordenar por engagement
       setTimeout(() => { if (typeof _reorderCardsByEngagement === 'function') _reorderCardsByEngagement(); }, 300);
     }
