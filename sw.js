@@ -1,5 +1,5 @@
-// gambeta.ai — Service Worker v1.5
-const CACHE_NAME = 'gambeta-v6';
+// gambeta.ai — Service Worker v1.6
+const CACHE_NAME = 'gambeta-v7';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -16,14 +16,18 @@ self.addEventListener('install', event => {
   );
 });
 
-// ─── Activate: limpiar caches viejos ────────────────────────────────────────
+// ─── Activate: limpiar TODOS los caches viejos y tomar control inmediato ─────
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
+      Promise.all(keys.map(k => caches.delete(k))) // borra TODO, no solo los viejos
     ).then(() => self.clients.claim())
+     .then(() => {
+       // Forzar recarga de todos los clientes para que carguen el HTML fresco
+       return self.clients.matchAll({ type: 'window' }).then(clients => {
+         clients.forEach(client => client.navigate(client.url));
+       });
+     })
   );
 });
 
