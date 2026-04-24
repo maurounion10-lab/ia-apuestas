@@ -7874,139 +7874,6 @@ function _syncPredsRecFromHist(hist) {
   try { renderPreds(); } finally { window._syncPredsInProgress = false; }
 }
 
-// ═══════════════════════════════════════════════
-//  🧠 BRAIN ALGORITHM — Validación por forma y H2H
-// ═══════════════════════════════════════════════
-
-async function brainValidate(preds) {
-  const WORKER_URL = 'https://apuestas-api.mauro-union10.workers.dev';
-
-  const withApf = preds.filter(p => p._apf_home_id && p._apf_league_id && !p._started);
-  if (!withApf.length) return preds;
-
-  // Batch fetch en paralelo — el Worker cachea 24h así que no gasta requests
-  const fetchStats = (teamId, leagueId) =>
-    fetch(`${WORKER_URL}/stats?team=${teamId}&league=${leagueId}`)
-      .then(r => r.json()).then(d => d.data).catch(() => null);
-
-  const fetchH2H = (homeId, awayId) =>
-    fetch(`${WORKER_URL}/h2h?h2h=${homeId}-${awayId}`)
-      .then(r => r.json()).then(d => d.data).catch(() => null);
-
-  const allFetches = withApf.map(p => Promise.all([
-    fetchStats(p._apf_home_id, p._apf_league_id),
-    fetchStats(p._apf_away_id, p._apf_league_id),
-    fetchH2H(p._apf_home_id, p._apf_away_id),
-  ]));
-
-  const results = await Promise.all(allFetches);
-
-  // Crear mapa de resultados
-  const apfMap = {};
-  withApf.forEach((p, i) => {
-    apfMap[p._apf_fixture_id] = {
-      homeStats: results[i][0],
-      awayStats: results[i][1],
-      h2h: results[i][2],
-    };
-  });
-
-  return preds.map(p => {
-    if (!p._apf_fixture_id || !apfMap[p._apf_fixture_id] || p._started) {
-      return { ...p, _brain: 'neutral', _brainBadge: '⚡' };
-    }
-
-    const { homeStats, awayStats, h2h } = apfMap[p._apf_fixture_id];
-    const rec = p.rec || '';
-
-    // Determinar qué equipo se predice ganador
-    const isHomePick = rec === 'Gana Local';
-    const isAwayPick = rec === 'Gana Visitante';
-    const isTotalPick = rec.startsWith('Más de') || rec.startsWith('Menos de');
-
-    // ── Análisis de forma ──
-    const getFormScore = (stats) => {
-      if (!stats?.form) return null;
-      const last5 = stats.form.split('').slice(-5);
-      const wins = last5.filter(r => r === 'W').length;
-      const losses = last5.filter(r => r === 'L').length;
-      const streak = (() => {
-        const arr = stats.form.split('').reverse();
-        let s = 0;
-        const first = arr[0];
-        for (const r of arr) { if (r === first) s++; else break; }
-        return { type: first, count: s };
-      })();
-      return { wins, losses, streak, last5 };
-    };
-
-    const homeForm = getFormScore(homeStats);
-    const awayForm = getFormScore(awayStats);
-    const pickedForm = isHomePick ? homeForm : isAwayPick ? awayForm : null;
-
-    // ── Análisis H2H ──
-    const getH2HScore = (h2hData, homeTeamId) => {
-      if (!h2hData?.length) return null;
-      const last5 = h2hData.slice(0, 5);
-      let wins = 0, losses = 0;
-      last5.forEach(m => {
-        const isHome = m.teams?.home?.id === homeTeamId;
-        const hg = m.goals?.home || 0, ag = m.goals?.away || 0;
-        if (isHome) { if (hg > ag) wins++; else if (hg < ag) losses++; }
-        else { if (ag > hg) wins++; else if (ag < hg) losses++; }
-      });
-      return { wins, losses, total: last5.length };
-    };
-
-    const h2hScore = isHomePick ? getH2HScore(h2h, p._apf_home_id) :
-                     isAwayPick ? getH2HScore(h2h, p._apf_away_id) : null;
-
-    // ── Lógica de VETO ──
-    let vetoReason = null;
-
-    if (isHomePick || isAwayPick) {
-      // Veto: forma muy mala (≥3 derrotas en últimos 5)
-      if (pickedForm && pickedForm.losses >= 3 && pickedForm.wins <= 1) {
-        vetoReason = `Mala racha: ${pickedForm.losses}P en últimos 5`;
-      }
-      // Veto: racha activa de derrotas (3+ consecutivas)
-      if (!vetoReason && pickedForm?.streak?.type === 'L' && pickedForm.streak.count >= 3) {
-        vetoReason = `${pickedForm.streak.count} derrotas consecutivas`;
-      }
-      // Veto: H2H muy desfavorable (≥3 derrotas en 5)
-      if (!vetoReason && h2hScore && h2hScore.total >= 3 && h2hScore.losses >= 3) {
-        vetoReason = `H2H desfavorable: ${h2hScore.losses} derrotas en ${h2hScore.total}`;
-      }
-    }
-
-    // Veto totales: ambos equipos anotan poco
-    if (isTotalPick && rec.includes('2.5')) {
-      const homeGoalsAvg = (homeStats?.goals?.for?.total?.total || 0) / Math.max(homeStats?.fixtures?.played?.total || 1, 1);
-      const awayGoalsAvg = (awayStats?.goals?.for?.total?.total || 0) / Math.max(awayStats?.fixtures?.played?.total || 1, 1);
-      if (homeGoalsAvg < 1.2 && awayGoalsAvg < 1.2) {
-        vetoReason = `Equipos de bajo scoring (${homeGoalsAvg.toFixed(1)} y ${awayGoalsAvg.toFixed(1)} goles/partido)`;
-      }
-    }
-
-    if (vetoReason) {
-      console.log(`[🧠 VETO] ${p.home} vs ${p.away} → ${vetoReason}`);
-      return { ...p, _brain: 'veto', _brainReason: vetoReason, _brainBadge: '⚡' };
-    }
-
-    // ── Lógica de CONFLUENCIA ⚡🧠 ──
-    let isConfluence = false;
-    if ((isHomePick || isAwayPick) && pickedForm && h2hScore) {
-      const strongForm = pickedForm.wins >= 4;
-      const favorableH2H = h2hScore.wins >= 3 && h2hScore.losses <= 1;
-      if (strongForm && favorableH2H) isConfluence = true;
-    }
-
-    const badge = isConfluence ? '⚡🧠' : '⚡';
-    console.log(`[🧠 ${isConfluence ? 'CONFLUENCIA' : 'OK'}] ${p.home} vs ${p.away} | rec: ${rec} | badge: ${badge}`);
-    return { ...p, _brain: isConfluence ? 'confluence' : 'confirm', _brainBadge: badge };
-  });
-}
-
 function renderPreds() {
   function formDots(arr) {
     return (arr||[]).map(r => {
@@ -8522,23 +8389,6 @@ function renderPreds() {
   // Array vacío también cuenta como sin datos
   if (realPreds && realPreds.length === 0) realPreds = null;
   const isLive = !!realPreds;
-
-  // 🧠 Brain Algorithm — validación asíncrona en segundo plano
-  // No bloquea el render inicial, re-renderiza cuando termina
-  if (realPreds?.length && !window._brainRunning) {
-    window._brainRunning = true;
-    brainValidate(realPreds).then(validated => {
-      window._brainRunning = false;
-      // Filtrar vetados y re-renderizar si hay cambios
-      const before = realPreds.length;
-      realPreds = validated.filter(p => p._brain !== 'veto');
-      if (realPreds.length !== before) {
-        console.log('[🧠] Vetados', before - realPreds.length, 'picks. Quedan:', realPreds.length);
-        renderPreds();
-      }
-    }).catch(e => { window._brainRunning = false; console.error('[🧠]', e); });
-  }
-
   // Guardar al historial solo los picks pre-partido (no los ya iniciados)
   try {
     if (realPreds) {
@@ -9183,7 +9033,7 @@ function renderPreds() {
       <div class="pred-recommendation">
         <div class="pred-rec-left">
           <div class="pred-rec-label">🤖 Recomendación IA</div>
-          <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : (p._brainBadge || '⚡')} ${(p.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'').replace(/^(Más de \d+\.\d+)$/,'$1 goles')}</div>
+          <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '🎯'} ${(p.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'').replace(/^(Más de \d+\.\d+)$/,'$1 goles')}</div>
         </div>
         <div class="pred-rec-right">
           ${(()=>{ const ro = p.rec==='Gana Local' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null) : p.rec==='Gana Visitante' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null) : p.rec==='Empate' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
