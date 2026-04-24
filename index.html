@@ -9392,7 +9392,7 @@ function renderPreds() {
       </div>
       <!-- Cuotas desde probabilidades -->
       <div style="margin:10px 0 4px">
-        <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">📊 Apuesta${isStarted ? '' : ' &nbsp;<span style="font-size:0.6rem;color:rgba(255,214,0,0.65);font-weight:700;text-transform:none;letter-spacing:0">Usá tus G$ coins aquí</span>'}</div>
+        <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">📊 Cuotas${isStarted ? '' : ' &nbsp;<span style="font-size:0.6rem;color:rgba(255,214,0,0.65);font-weight:700;text-transform:none;letter-spacing:0">Usá tus G$ coins aquí</span>'}</div>
         <div style="display:flex;gap:6px">
           <button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="home" onclick="acSelectOutcome('${_cardMatchId}','home',${_cardOddsH})" style="flex:1;text-align:center;background:rgba(41,182,246,0.08);border:1px solid rgba(41,182,246,0.2);border-radius:8px;padding:6px 4px">
             <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Local</div>
@@ -9410,7 +9410,7 @@ function renderPreds() {
       </div>` : ((p._hO || p._aO) ? `
       <!-- Cuotas desde API directa (sin probabilidades) -->
       <div style="margin:10px 0 4px">
-        <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">📊 Apuesta${isStarted ? '' : ' &nbsp;<span style="font-size:0.6rem;color:rgba(255,214,0,0.65);font-weight:700;text-transform:none;letter-spacing:0">Usá tus G$ coins aquí</span>'}</div>
+        <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">📊 Cuotas${isStarted ? '' : ' &nbsp;<span style="font-size:0.6rem;color:rgba(255,214,0,0.65);font-weight:700;text-transform:none;letter-spacing:0">Usá tus G$ coins aquí</span>'}</div>
         <div style="display:flex;gap:6px">
           <button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="home" onclick="acSelectOutcome('${_cardMatchId}','home',${_cardOddsH})" style="flex:1;text-align:center;background:rgba(41,182,246,0.08);border:1px solid rgba(41,182,246,0.2);border-radius:8px;padding:6px 4px">
             <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Local</div>
