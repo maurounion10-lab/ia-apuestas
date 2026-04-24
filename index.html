@@ -4183,27 +4183,37 @@
 
   /* CTA "Ver página completa" al final de cada sección */
   .section-page-cta {
-    display: flex;
-    justify-content: center;
-    padding: 8px 20px 28px;
+    padding: 4px 0 28px;
   }
   /* Ocultar el CTA cuando ya estás en esa página */
   body[data-gbpage] .section-page-cta { display: none !important; }
 
   .section-page-cta-btn {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(0,200,83,0.08);
-    border: 1px solid rgba(0,200,83,0.28);
-    color: var(--verde); font-weight: 700; font-size: 0.85rem;
-    padding: 10px 22px; border-radius: 10px; text-decoration: none;
-    transition: background .18s, border-color .18s;
+    display: flex; align-items: center; gap: 14px;
+    background: linear-gradient(135deg, rgba(0,200,83,0.10) 0%, rgba(0,150,60,0.06) 100%);
+    border: 1px solid rgba(0,200,83,0.22);
+    border-radius: 16px;
+    padding: 16px 20px;
+    text-decoration: none;
+    transition: all .2s;
     cursor: pointer;
+    position: relative;
+    overflow: hidden;
   }
-  .section-page-cta-btn:hover {
-    background: rgba(0,200,83,0.16);
-    border-color: rgba(0,200,83,0.5);
-    color: var(--verde);
+  .section-page-cta-btn::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, rgba(0,200,83,0.04) 0%, transparent 100%);
+    opacity: 0; transition: opacity .2s;
   }
+  .section-page-cta-btn:hover { border-color: rgba(0,200,83,0.45); transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,200,83,0.12); }
+  .section-page-cta-btn:hover::before { opacity: 1; }
+  .section-page-cta-icon { font-size: 2rem; line-height: 1; flex-shrink: 0; }
+  .section-page-cta-text { flex: 1; }
+  .section-page-cta-title { font-size: 0.9rem; font-weight: 800; color: #fff; margin-bottom: 3px; }
+  .section-page-cta-desc  { font-size: 0.72rem; color: rgba(255,255,255,0.45); line-height: 1.4; }
+  .section-page-cta-arrow { font-size: 1.1rem; color: rgba(0,200,83,0.7); font-weight: 700; flex-shrink: 0; transition: transform .2s; }
+  .section-page-cta-btn:hover .section-page-cta-arrow { transform: translateX(4px); color: #00e676; }
 
   /* ── Cross-navigation cards (solo en sub-páginas) ── */
   body:not([data-gbpage]) .gb-cross-nav { display: none !important; }
@@ -5125,7 +5135,14 @@
 
     <!-- CTA página completa de Picks — solo en home -->
     <div class="section-page-cta">
-      <a class="section-page-cta-btn" href="#picks">🔮 Página completa de Picks →</a>
+      <a class="section-page-cta-btn" href="#picks">
+        <span class="section-page-cta-icon">🔮</span>
+        <span class="section-page-cta-text">
+          <div class="section-page-cta-title">Ver todos los pronósticos del día</div>
+          <div class="section-page-cta-desc">Accedé a la lista completa de picks con filtros por liga, confianza y mercado</div>
+        </span>
+        <span class="section-page-cta-arrow">→</span>
+      </a>
     </div>
 
     <!-- Cross-navigation -->
@@ -5256,7 +5273,14 @@
 
     <!-- CTA página dedicada de Historial -->
     <div class="section-page-cta">
-      <a class="section-page-cta-btn" href="#historial">📋 Página completa de Resultados →</a>
+      <a class="section-page-cta-btn" href="#historial">
+        <span class="section-page-cta-icon">📋</span>
+        <span class="section-page-cta-text">
+          <div class="section-page-cta-title">Historial completo de resultados</div>
+          <div class="section-page-cta-desc">ROI, racha, filtros por fecha y liga — toda la estadística de la IA</div>
+        </span>
+        <span class="section-page-cta-arrow">→</span>
+      </a>
     </div>
 
     <!-- Cross-navigation -->
@@ -5481,7 +5505,14 @@
 
     <!-- CTA ranking completo -->
     <div class="section-page-cta">
-      <a class="section-page-cta-btn" href="/ranking/">🏆 Ver historial y ranking anual →</a>
+      <a class="section-page-cta-btn" href="/ranking/">
+        <span class="section-page-cta-icon">🏆</span>
+        <span class="section-page-cta-text">
+          <div class="section-page-cta-title">Ranking completo y historial anual</div>
+          <div class="section-page-cta-desc">Clasificación mensual de los mejores jugadores de G$ coins</div>
+        </span>
+        <span class="section-page-cta-arrow">→</span>
+      </a>
     </div>
 
     <!-- Cross-navigation -->
@@ -9507,16 +9538,9 @@ function renderPreds() {
         ${h2hHtml ? `<div style="margin-top:4px">${h2hHtml}</div>` : ''}
         ${md ? `<button class="pred-full-btn" onclick="openMatchAnalysis('${p.home}','${p.away}')">Ver análisis estadístico completo →</button>` : ''}
       </div>` : `
-      <!-- Banner CTA: Bot de Córners -->
-      <a href="https://bot-alertas.pronosticosargentinos.net/ar/" target="_blank" rel="noopener" style="text-decoration:none;display:block;margin-top:4px">
-        <div style="background:linear-gradient(135deg,rgba(0,150,80,0.18) 0%,rgba(0,100,50,0.10) 100%);border:1px solid rgba(0,200,83,0.25);border-radius:12px;padding:12px 14px;display:flex;align-items:center;gap:12px;transition:all .2s" onmouseenter="this.style.borderColor='rgba(0,200,83,0.5)';this.style.background='linear-gradient(135deg,rgba(0,150,80,0.28) 0%,rgba(0,100,50,0.18) 100%)'" onmouseleave="this.style.borderColor='rgba(0,200,83,0.25)';this.style.background='linear-gradient(135deg,rgba(0,150,80,0.18) 0%,rgba(0,100,50,0.10) 100%)'">
-          <span style="font-size:1.8rem;line-height:1">⚽</span>
-          <div style="flex:1">
-            <div style="font-size:0.78rem;font-weight:800;color:#fff;margin-bottom:2px">Bot de Alertas en Vivo</div>
-            <div style="font-size:0.68rem;color:rgba(255,255,255,0.5);line-height:1.4">Recibí avisos de córners sobre la hora en tiempo real</div>
-          </div>
-          <span style="font-size:0.7rem;color:rgba(0,200,83,0.8);font-weight:700;white-space:nowrap">Ver más →</span>
-        </div>
+      <a href="https://bot-alertas.pronosticosargentinos.net/ar/" target="_blank" rel="noopener" class="pred-expand-btn" style="text-decoration:none;justify-content:center;gap:8px">
+        <span>⚽ Contratar el Bot de Córners sobre la hora</span>
+        <span style="font-size:0.75rem;opacity:0.6">→</span>
       </a>`}
     </div>
   `}).join('');
