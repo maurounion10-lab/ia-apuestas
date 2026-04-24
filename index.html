@@ -8339,8 +8339,8 @@ function renderPreds() {
     // ── Scores extra hardcodeados (partidos que la API no devuelve en scoresData) ──
     const _EXTRA_SCORES = [
       {home:'Junior',          away:'Palmeiras', flag:'final', scoreH:1, scoreA:1},
-      {home:'Athletic Club',   away:'Osasuna',   flag:'final', scoreH:2, scoreA:1}, // Athletic Bilbao WIN — score placeholder, corregir si es diferente
-      {home:'Athletic Bilbao', away:'Osasuna',   flag:'final', scoreH:2, scoreA:1},
+      {home:'Athletic Club',   away:'Osasuna',   flag:'final', scoreH:1, scoreA:0},
+      {home:'Athletic Bilbao', away:'Osasuna',   flag:'final', scoreH:1, scoreA:0},
     ];
     const _scoresExt = typeof scoresData !== 'undefined'
       ? [...scoresData, ..._EXTRA_SCORES]
@@ -9671,7 +9671,7 @@ const HIST_RESULT_OVERRIDES_PARTIAL = [
   // Cubre: "Athletic Club", "Ath. Bilbao", "Ath Bilbao", "Athletic Bilbao", etc.
   {
     matchFn: (nh, na) => (nh.includes('athletic') || nh.startsWith('ath')) && na.includes('osasuna'),
-    override: { result: 'win', rec: 'Gana Local' }
+    override: { result: 'win', rec: 'Gana Local', finalScore: '1-0' }
   },
 ];
 
