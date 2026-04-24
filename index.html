@@ -4183,22 +4183,26 @@
 
   /* CTA "Ver página completa" al final de cada sección */
   .section-page-cta {
-    padding: 4px 0 28px;
+    padding: 32px 0 40px;
+    margin-top: 16px;
+    border-top: 1px solid rgba(255,255,255,0.05);
   }
   /* Ocultar el CTA cuando ya estás en esa página */
   body[data-gbpage] .section-page-cta { display: none !important; }
 
   .section-page-cta-btn {
     display: flex; align-items: center; gap: 14px;
+    width: 100%;
     background: linear-gradient(135deg, rgba(0,200,83,0.10) 0%, rgba(0,150,60,0.06) 100%);
     border: 1px solid rgba(0,200,83,0.22);
     border-radius: 16px;
-    padding: 16px 20px;
+    padding: 18px 22px;
     text-decoration: none;
     transition: all .2s;
     cursor: pointer;
     position: relative;
     overflow: hidden;
+    box-sizing: border-box;
   }
   .section-page-cta-btn::before {
     content: '';
