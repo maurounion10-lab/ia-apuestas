@@ -10829,7 +10829,12 @@ function migrateHistStakes() {
 function normTeam(s) {
   return (s||'').toLowerCase()
     .replace(/[\u2026\.]{1,3}$/, '')               // quita "…" o "..." al final (nombres truncados)
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // quita acentos: é→e, ó→o, ú→u, ñ→n, etc.
+    // Caracteres especiales que no se descomponen con NFD — mapeo explícito
+    .replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ş/g,'s')  // turco
+    .replace(/İ/g,'i').replace(/Ğ/g,'g').replace(/Ş/g,'s')  // turco mayúsculas
+    .replace(/ø/g,'o').replace(/æ/g,'ae').replace(/å/g,'a')  // nórdico
+    .replace(/ł/g,'l').replace(/ß/g,'ss')                    // polaco, alemán
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')         // quita acentos: é→e, ó→o, etc.
     .replace(/[^a-z0-9]/g,'');
 }
 function teamsMatch(a, b) {
