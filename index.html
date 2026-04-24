@@ -20138,8 +20138,8 @@ window.cardLikeThread = async function(threadId, btn) {
         btn.appendChild(s);
         setTimeout(() => s.remove(), 700 + i * 15);
       }
-      // Re-ordenar por engagement
-      setTimeout(() => { if (typeof _reorderCardsByEngagement === 'function') _reorderCardsByEngagement(); }, 300);
+      // No re-ordenar al dar like — evita que la card se mueva mientras el usuario interactúa
+      // El orden por engagement se aplica solo al cargar la página
     }
   } catch(e) { console.error('cardLikeThread error', e); }
 };
