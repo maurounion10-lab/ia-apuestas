@@ -7857,6 +7857,148 @@ function buildPredsFromOdds() {
   }).filter(Boolean);
 }
 
+// ══════════════════════════════════════════════════════════════
+// 🧠 BRAIN ALGORITHM — Validación de picks por forma y H2H
+// ══════════════════════════════════════════════════════════════
+// Arquitectura: los resultados se guardan en window._brainVetoed (Set de fixture IDs)
+// y window._brainBadges (Map de fixture ID → badge string).
+// renderPreds los lee directamente — sin re-renders, sin loops.
+
+window._brainVetoed  = window._brainVetoed  || new Set();  // fixture IDs vetados
+window._brainBadges  = window._brainBadges  || new Map();  // fixture ID → '⚡' | '⚡🧠'
+window._brainRunning = false;
+
+async function brainValidate(preds) {
+  const WORKER = 'https://apuestas-api.mauro-union10.workers.dev';
+  const toCheck = preds.filter(p => p._apf_home_id && p._apf_league_id && !p._started);
+  if (!toCheck.length) return;
+
+  const fetchStats = (tid, lid) =>
+    fetch(`${WORKER}/stats?team=${tid}&league=${lid}`)
+      .then(r => r.json()).then(d => d.data).catch(() => null);
+  const fetchH2H = (hid, aid) =>
+    fetch(`${WORKER}/h2h?h2h=${hid}-${aid}`)
+      .then(r => r.json()).then(d => d.data).catch(() => null);
+
+  // Batch en paralelo — Worker cachea 24h, no gasta requests
+  const results = await Promise.all(
+    toCheck.map(p => Promise.all([
+      fetchStats(p._apf_home_id, p._apf_league_id),
+      fetchStats(p._apf_away_id, p._apf_league_id),
+      fetchH2H(p._apf_home_id, p._apf_away_id),
+    ]))
+  );
+
+  let changed = false;
+  toCheck.forEach((p, i) => {
+    const [hStats, aStats, h2h] = results[i];
+    const fid = p._apf_fixture_id;
+    if (!fid) return;
+
+    const rec = p.rec || '';
+    const isHome = rec === 'Gana Local';
+    const isAway = rec === 'Gana Visitante';
+    const isTotal25 = /Más de 2\.5/.test(rec);
+
+    // ── Helper: forma ──
+    const formAnalysis = (stats) => {
+      if (!stats?.form) return null;
+      const last5 = stats.form.split('').slice(-5);
+      const wins   = last5.filter(r => r === 'W').length;
+      const losses = last5.filter(r => r === 'L').length;
+      // Racha final
+      const rev = [...stats.form].reverse();
+      let streak = 0;
+      const sType = rev[0];
+      for (const r of rev) { if (r === sType) streak++; else break; }
+      return { wins, losses, streak, streakType: sType };
+    };
+
+    // ── Helper: H2H ──
+    const h2hAnalysis = (h2hData, myId) => {
+      if (!h2hData?.length) return null;
+      const last5 = h2hData.slice(0, 5);
+      let wins = 0, losses = 0;
+      last5.forEach(m => {
+        const isH = m.teams?.home?.id === myId;
+        const hg = m.goals?.home || 0, ag = m.goals?.away || 0;
+        const myG = isH ? hg : ag, oppG = isH ? ag : hg;
+        if (myG > oppG) wins++; else if (myG < oppG) losses++;
+      });
+      return { wins, losses, total: last5.length };
+    };
+
+    const pickedStats = isHome ? hStats : isAway ? aStats : null;
+    const pickedId    = isHome ? p._apf_home_id : isAway ? p._apf_away_id : null;
+    const form        = formAnalysis(pickedStats);
+    const h2hScore    = h2hAnalysis(h2h, pickedId);
+
+    let vetoReason = null;
+
+    if ((isHome || isAway) && form) {
+      if (form.losses >= 3 && form.wins <= 1)
+        vetoReason = `Mala racha: ${form.losses}P en últimos 5`;
+      else if (form.streakType === 'L' && form.streak >= 3)
+        vetoReason = `${form.streak} derrotas consecutivas`;
+      else if (h2hScore && h2hScore.total >= 3 && h2hScore.losses >= 3)
+        vetoReason = `H2H desfavorable: ${h2hScore.losses} derrotas en ${h2hScore.total}`;
+    }
+
+    if (isTotal25 && hStats && aStats) {
+      const hPlayed = hStats.fixtures?.played?.total || 1;
+      const aPlayed = aStats.fixtures?.played?.total || 1;
+      const hAvg = (hStats.goals?.for?.total?.total || 0) / hPlayed;
+      const aAvg = (aStats.goals?.for?.total?.total || 0) / aPlayed;
+      if (hAvg < 1.2 && aAvg < 1.2)
+        vetoReason = `Bajo scoring (${hAvg.toFixed(1)} y ${aAvg.toFixed(1)} goles/partido)`;
+    }
+
+    if (vetoReason) {
+      console.log(`[🧠 VETO] ${p.home} vs ${p.away} | ${rec} → ${vetoReason}`);
+      window._brainVetoed.add(fid);
+      window._brainBadges.set(fid, '⚡');
+      changed = true;
+      return;
+    }
+
+    // Confluencia: forma fuerte + H2H favorable
+    const confluence = (isHome || isAway) && form && h2hScore &&
+      form.wins >= 4 && h2hScore.wins >= 3 && h2hScore.losses <= 1;
+
+    const badge = confluence ? '⚡🧠' : '⚡';
+    if (confluence) console.log(`[🧠 ⚡🧠] ${p.home} vs ${p.away} → CONFLUENCIA`);
+    window._brainBadges.set(fid, badge);
+    if (confluence) changed = true;
+  });
+
+  // Si cambió algo, actualizar el DOM directamente sin re-renderizar
+  if (changed) {
+    // Ocultar cards de picks vetados — buscar por data-apf-fixture dentro de la card
+    window._brainVetoed.forEach(fid => {
+      const recEl = document.querySelector(`.pred-rec-value[data-apf-fixture="${fid}"]`);
+      if (recEl) {
+        const card = recEl.closest('.pred-card, .pred-golden-win, [class*="pred-card"]');
+        if (card && !card.dataset.brainVetoed) {
+          card.style.display = 'none';
+          card.dataset.brainVetoed = '1';
+          console.log(`[🧠 VETO] Card ocultada fixture ${fid}`);
+        }
+      }
+    });
+    // Actualizar badges ⚡🧠 directamente por data-apf-fixture
+    window._brainBadges.forEach((badge, fid) => {
+      if (badge === '⚡🧠') {
+        const recEl = document.querySelector(`.pred-rec-value[data-apf-fixture="${fid}"]`);
+        if (recEl && !recEl.dataset.brainUpdated) {
+          recEl.textContent = recEl.textContent.replace(/^⚡/, badge);
+          recEl.dataset.brainUpdated = '1';
+          console.log(`[🧠 ⚡🧠] Badge actualizado fixture ${fid}`);
+        }
+      }
+    });
+  }
+}
+
 // Cuando el historial global llega de Supabase DESPUÉS de que renderPreds ya corrió,
 // el localStorage ya tiene los picks con rec correcto.
 // Si la sección de picks está visible, volver a llamar renderPreds() para que
@@ -8403,6 +8545,16 @@ function renderPreds() {
     }
   } catch(e) { console.error('[renderPreds] savePredictions crash:', e); }
 
+  // 🧠 Brain Algorithm — corre en background, modifica DOM directamente, sin re-render
+  if (realPreds?.length && !window._brainRunning) {
+    window._brainRunning = true;
+    // Reset vetoed/badges en cada render fresco (datos nuevos del día)
+    window._brainVetoed = new Set();
+    window._brainBadges = new Map();
+    brainValidate(realPreds)
+      .catch(e => console.error('[🧠]', e))
+      .finally(() => { window._brainRunning = false; });
+  }
 
   // ── Pick Destacado — visible todos los días en sub-página picks ──
   try {
@@ -9033,7 +9185,7 @@ function renderPreds() {
       <div class="pred-recommendation">
         <div class="pred-rec-left">
           <div class="pred-rec-label">🤖 Recomendación IA</div>
-          <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '🎯'} ${(p.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'').replace(/^(Más de \d+\.\d+)$/,'$1 goles')}</div>
+          <div class="pred-rec-value" data-apf-fixture="${p._apf_fixture_id||''}">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '⚡'} ${(p.rec||'').replace(/^Gana\s+/,'').replace(/\s+Gana$/,'').replace(/^(Más de \d+\.\d+)$/,'$1 goles')}</div>
         </div>
         <div class="pred-rec-right">
           ${(()=>{ const ro = p.rec==='Gana Local' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null) : p.rec==='Gana Visitante' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null) : p.rec==='Empate' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
