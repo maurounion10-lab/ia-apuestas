@@ -9061,8 +9061,9 @@ function renderPreds() {
           <div class="pred-bar-pct">${p.probA}%</div>
         </div>
       </div>
-      <!-- Cuotas desde probabilidades -->
-      <div style="margin:10px 0 4px">
+      ${_resultPanel}
+      <!-- Cuotas — ocultas cuando el pick está resuelto -->
+      <div style="margin:10px 0 4px;${_showResultPanel?'display:none':''}"
         <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">📊 Apuesta${isStarted ? '' : ' &nbsp;<span style="font-size:0.6rem;color:rgba(255,214,0,0.65);font-weight:700;text-transform:none;letter-spacing:0">G$ aquí</span>'}</div>
         <div style="display:flex;gap:6px">
           <button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="home" onclick="acSelectOutcome('${_cardMatchId}','home',${_cardOddsH})" style="flex:1;text-align:center;background:rgba(41,182,246,0.08);border:1px solid rgba(41,182,246,0.2);border-radius:8px;padding:6px 4px">
@@ -9080,7 +9081,7 @@ function renderPreds() {
         </div>
       </div>` : ((p._hO || p._aO) ? `
       <!-- Cuotas desde API directa (sin probabilidades) -->
-      <div style="margin:10px 0 4px">
+      <div style="margin:10px 0 4px;${_showResultPanel?'display:none':''}"
         <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">📊 Apuesta${isStarted ? '' : ' &nbsp;<span style="font-size:0.6rem;color:rgba(255,214,0,0.65);font-weight:700;text-transform:none;letter-spacing:0">G$ aquí</span>'}</div>
         <div style="display:flex;gap:6px">
           <button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="home" onclick="acSelectOutcome('${_cardMatchId}','home',${_cardOddsH})" style="flex:1;text-align:center;background:rgba(41,182,246,0.08);border:1px solid rgba(41,182,246,0.2);border-radius:8px;padding:6px 4px">
@@ -9098,7 +9099,7 @@ function renderPreds() {
         </div>
       </div>` : (parseFloat(p._bestOdds) > 0 ? `
       <!-- Cuota del pronóstico desde historial (fallback cuando no hay probs ni raw odds) -->
-      <div style="margin:10px 0 4px">
+      <div style="margin:10px 0 4px;${_showResultPanel?'display:none':''}"
         <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">📊 Cuota del pronóstico</div>
         <div style="display:flex;justify-content:center">
           <div style="min-width:80px;text-align:center;background:rgba(41,182,246,0.08);border:1px solid rgba(41,182,246,0.2);border-radius:8px;padding:8px 20px">
