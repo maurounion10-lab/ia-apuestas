@@ -20160,8 +20160,12 @@ function _reorderCardsByEngagement() {
   };
 
   cards.sort((a, b) => scoreCard(b) - scoreCard(a));
+  // Guardar posición de scroll antes de mover DOM
+  const scrollY = window.scrollY;
   // Re-insertar en orden (preserva todos los demás elementos del grid)
   cards.forEach(card => grid.appendChild(card));
+  // Restaurar scroll exacto para que la página no salte
+  window.scrollTo({ top: scrollY, behavior: 'instant' });
   console.log('[Engagement] Grid re-ordenado:', cards.map(c => `${c.dataset.threadId}(eng=${( _cardLikes[c.dataset.threadId]?.likes||0)+( _cardLikes[c.dataset.threadId]?.comments||0)})`).join(', '));
 }
 
