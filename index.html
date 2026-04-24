@@ -14718,15 +14718,27 @@ window._acBetState = {};  // matchId -> { choice, odds, amount }
 
 function acSelectOutcome(matchId, choice, odds) {
   window._acBetState[matchId] = window._acBetState[matchId] || {};
-  window._acBetState[matchId].choice = choice;
-  window._acBetState[matchId].odds   = odds;
-  window._acBetState[matchId].amount = null;
+  const state = window._acBetState[matchId];
+  const step2 = document.getElementById('acbet-s2-' + matchId);
+
+  // Toggle: si ya está seleccionado el mismo, cerrar
+  if (state.choice === choice && step2?.style.display !== 'none') {
+    state.choice = null;
+    state.odds   = null;
+    state.amount = null;
+    document.querySelectorAll(`[data-pick-match="${matchId}"]`).forEach(btn => btn.classList.remove('selected'));
+    if (step2) step2.style.display = 'none';
+    return;
+  }
+
+  state.choice = choice;
+  state.odds   = odds;
+  state.amount = null;
   // Highlight chosen outcome button
   document.querySelectorAll(`[data-pick-match="${matchId}"]`).forEach(btn => {
     btn.classList.toggle('selected', btn.dataset.pickChoice === choice);
   });
   // Show step 2
-  const step2 = document.getElementById('acbet-s2-' + matchId);
   if (step2) step2.style.display = 'block';
   // Reset chips + confirm
   document.querySelectorAll(`[data-bet-match="${matchId}"]`).forEach(c => c.classList.remove('active'));
