@@ -6884,7 +6884,9 @@ function _getNormLogoCache() {
   _normLogoCache = {};
   const _sfx = /\s+(FC|SC|TC|CF|AC|AS|CD|SD|RCD|FK|SK|BK|IF|IFK|RC|RFC|SFC|UD|CA|CE|SV|VfB|VfL|TSG|RB|BSC|GNK|NK|AFC|FBC|HFC|United|City|Town|Athletic|Rovers|Rangers|Wanderers|Albion)\s*$/i;
   const _pfx = /^(FC|SC|AC|AS|CD|SD|RCD|FK|SK|NK|GNK|RB|AFC|SFC)\s+/i;
-  const _norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').trim();
+  const _norm = s => s.toLowerCase()
+    .replace(/ı/g,'i').replace(/ğ/g,'g').replace(/ş/g,'s').replace(/ø/g,'o').replace(/æ/g,'ae').replace(/å/g,'a').replace(/ł/g,'l').replace(/ß/g,'ss')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').trim();
   Object.keys(teamLogos).forEach(k => {
     const n = _norm(k);
     if (!_normLogoCache[n]) _normLogoCache[n] = teamLogos[k];
