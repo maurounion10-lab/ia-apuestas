@@ -1,0 +1,12 @@
+name = "apuestas-api"
+main = "index.js"
+compatibility_date = "2025-09-27"
+
+[vars]
+# API_FOOTBALL_KEY se setea como Secret en el dashboard de Cloudflare
+# No hardcodear aquí — usar: wrangler secret put API_FOOTBALL_KEY
+
+[[kv_namespaces]]
+binding = "CACHE_KV"
+# id se completa después de crear el namespace con: wrangler kv:namespace create CACHE_KV
+id = ""
