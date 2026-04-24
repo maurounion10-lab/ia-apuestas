@@ -1062,7 +1062,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 16px;
-    align-items: start;
+    align-items: stretch;
   }
 
   .pred-card {
@@ -1074,6 +1074,14 @@
     transition: all 0.2s;
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* El engage row (comentar + like) siempre al final */
+  .pred-card .card-engage-row {
+    margin-top: auto;
+    padding-top: 10px;
   }
   .pred-card:hover {
     border-color: rgba(0,200,83,0.5);
