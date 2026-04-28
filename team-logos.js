@@ -315,7 +315,7 @@ const teamLogos = {
   'Libertad Asunción':      'https://a.espncdn.com/i/teamlogos/soccer/500/2670.png',
   'Olimpia Asunción':       'https://r2.thesportsdb.com/images/media/team/badge/tyfnp11765859175.png',
   'Olimpia Asuncion':       'https://r2.thesportsdb.com/images/media/team/badge/tyfnp11765859175.png',
-  'UCV FC':                 'https://a.espncdn.com/i/teamlogos/soccer/500/3380.png',
+  'UCV FC':                 'https://a.espncdn.com/i/teamlogos/soccer/500/10094.png', // Universidad Central de Venezuela — ESPN /id/10094/ven.ucv
   'CA Juventud':            'https://a.espncdn.com/i/teamlogos/soccer/500/8416.png',
   'CA Boston River':        'https://r2.thesportsdb.com/images/media/team/badge/8zq9n91736218442.png',
   'C.D. Cuenca':            'https://a.espncdn.com/i/teamlogos/soccer/500/4812.png',
