@@ -12621,9 +12621,19 @@ async function supplementMissingLeagues(existingGames) {
   const missing = REQUIRED_SPORT_KEYS.filter(k => !workerKeys.has(k));
   if (!missing.length) return [];
   console.log(`[Odds] Ligas faltantes, pidiendo directo a Odds API: ${missing.join(', ')}`);
+  const fetchWithTimeout = (url, ms) => {
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), ms);
+    return fetch(url, { signal: ctrl.signal, cache: 'no-store' })
+      .then(r => r.ok ? r.json() : [])
+      .catch(() => [])
+      .finally(() => clearTimeout(tid));
+  };
   const fetches = missing.map(sk =>
-    fetch(`https://api.the-odds-api.com/v4/sports/${sk}/odds/?apiKey=${ODDS_API_KEY}&regions=eu,uk&markets=h2h,totals&oddsFormat=decimal&dateFormat=iso`, { cache: 'no-store' })
-      .then(r => r.ok ? r.json() : []).catch(() => [])
+    fetchWithTimeout(
+      `https://api.the-odds-api.com/v4/sports/${sk}/odds/?apiKey=${ODDS_API_KEY}&regions=eu,uk&markets=h2h,totals&oddsFormat=decimal&dateFormat=iso`,
+      8000
+    )
   );
   const results = await Promise.all(fetches);
   const extra = [];
@@ -13225,7 +13235,7 @@ async function loadRealOdds() {
     } catch(_) {}
   }
 
-  // Safety net: si en 12s el Worker no responde, salir del skeleton con stale data
+  // Safety net: si en 20s no responde (Worker 9s + suplemento Odds API ~8s + margen), salir con stale data
   const _safetyTimer = setTimeout(() => {
     if (_oddsLoading) {
       console.warn('[Odds] Safety timeout — mostrando datos stale');
@@ -13233,7 +13243,7 @@ async function loadRealOdds() {
       useStale();
       renderPreds();
     }
-  }, 12000);
+  }, 20000);
 
   try {
     // 2) Worker API directo — datos frescos con BTTS real (timeout 9s)
