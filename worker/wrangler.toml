@@ -5,8 +5,8 @@ compatibility_date = "2025-09-27"
 [vars]
 # API_FOOTBALL_KEY se setea como Secret en el dashboard de Cloudflare
 # No hardcodear aquí — usar: wrangler secret put API_FOOTBALL_KEY
+# ODDS_API_KEY también se setea como Secret
 
 [[kv_namespaces]]
 binding = "CACHE_KV"
-# id se completa después de crear el namespace con: wrangler kv:namespace create CACHE_KV
-id = ""
+id = "1d4b161e78db4de9a9b806f369c73ceb"

@@ -12572,6 +12572,65 @@ document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); }
 //  WORKER — DATOS REALES
 // ═══════════════════════════════════════════════
 const WORKER_URL = 'https://apuestas-api.mauro-union10.workers.dev';
+const ODDS_API_KEY = 'f9dc7cd51c5b92453e8c658b9d72a3e5';
+
+// Ligas que siempre debemos tener — si el Worker no las trae, las pedimos directo a The Odds API
+const REQUIRED_SPORT_KEYS = [
+  'soccer_argentina_primera_division',
+  'soccer_conmebol_copa_libertadores',
+  'soccer_epl',
+  'soccer_spain_la_liga',
+  'soccer_germany_bundesliga',
+  'soccer_italy_serie_a',
+  'soccer_france_ligue_one',
+  'soccer_uefa_champs_league',
+  'soccer_mexico_ligamx',
+  'soccer_turkey_super_league',
+  'soccer_portugal_primeira_liga',
+  'soccer_argentina_primera_nacional',
+  'soccer_colombia_primera_a',
+];
+
+// Transforma un juego de The Odds API al formato interno del frontend
+function transformOddsAPIGame(g) {
+  return {
+    id:            g.id || String(Math.random()),
+    sport_key:     g.sport_key,
+    sport_title:   g.sport_title || g.sport_key,
+    commence_time: g.commence_time,
+    home_team:     g.home_team,
+    away_team:     g.away_team,
+    bookmakers:    (g.bookmakers || []).map(bm => ({
+      key:   bm.key,
+      title: bm.title,
+      markets: (bm.markets || []).map(m => ({
+        key:      m.key,
+        outcomes: (m.outcomes || []).map(o => ({
+          name:  o.name,
+          price: o.price,
+          ...(o.point !== undefined ? { point: o.point } : {})
+        }))
+      }))
+    }))
+  };
+}
+
+// Busca ligas faltantes en The Odds API directamente (fallback cuando el Worker no las incluye)
+async function supplementMissingLeagues(existingGames) {
+  const workerKeys = new Set(existingGames.map(g => g.sport_key));
+  const missing = REQUIRED_SPORT_KEYS.filter(k => !workerKeys.has(k));
+  if (!missing.length) return [];
+  console.log(`[Odds] Ligas faltantes, pidiendo directo a Odds API: ${missing.join(', ')}`);
+  const fetches = missing.map(sk =>
+    fetch(`https://api.the-odds-api.com/v4/sports/${sk}/odds/?apiKey=${ODDS_API_KEY}&regions=eu,uk&markets=h2h,totals&oddsFormat=decimal&dateFormat=iso`, { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : []).catch(() => [])
+  );
+  const results = await Promise.all(fetches);
+  const extra = [];
+  results.forEach(arr => (arr || []).forEach(g => extra.push(transformOddsAPIGame(g))));
+  console.log(`[Odds] Suplemento: ${extra.length} juegos extra de Odds API`);
+  return extra;
+}
 
 const teamShortNames = {
   'Brighton and Hove Albion': 'Brighton',
@@ -13187,7 +13246,12 @@ async function loadRealOdds() {
     ]);
     clearTimeout(_fetchTimer);
     // Dedup por game ID: Libertadores/Sudamericana pueden aparecer en ambos endpoints
-    const _rawCombined = [...(resMain.data || []), ...(resEur.data || [])];
+    const _rawFromWorker = [...(resMain.data || []), ...(resEur.data || [])];
+
+    // Si el Worker no trae las ligas principales, las buscamos directo en Odds API
+    const _supplement = await supplementMissingLeagues(_rawFromWorker).catch(() => []);
+    const _rawCombined = [..._rawFromWorker, ..._supplement];
+
     const _seenIds = new Set();
     const combined = _rawCombined.filter(g => {
       if (!g.id) return true; // sin ID → conservar
@@ -13196,6 +13260,7 @@ async function loadRealOdds() {
       return true;
     });
     if (_rawCombined.length !== combined.length) console.log(`[Odds] Dedup: ${_rawCombined.length} → ${combined.length} (${_rawCombined.length - combined.length} duplicados removidos)`);
+    console.log(`[Odds] Total combinado: ${combined.length} juegos (Worker: ${_rawFromWorker.length}, suplemento: ${_supplement.length})`);
 
     if (combined.length > 0) {
       useData(combined);
