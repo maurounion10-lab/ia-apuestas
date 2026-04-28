@@ -8847,6 +8847,15 @@ function renderPreds() {
     }
   } catch(e) { console.error('[renderPreds] savePredictions crash:', e); }
 
+  // ── Resolución automática: si hay picks ya iniciados con resultado pendiente, disparar ESPN fetch ──
+  if (realPreds?.length) {
+    const _startedPending = realPreds.filter(p => p._started && p._histResult === 'pending');
+    if (_startedPending.length && typeof loadHistoricalScores === 'function' && !window._loadHistScoresRunning) {
+      console.log(`[renderPreds] ${_startedPending.length} pick(s) iniciados sin resolver → lanzando loadHistoricalScores`);
+      loadHistoricalScores();
+    }
+  }
+
   // 🧠 Brain Algorithm — corre en background, modifica DOM directamente, sin re-render
   if (realPreds?.length && !window._brainRunning) {
     window._brainRunning = true;
@@ -11263,12 +11272,12 @@ async function loadHistoricalScores() {
   window._loadHistScoresRunning = true;
   const hist = loadHistorial();
   const now = Date.now();
-  const sevenDaysMs = 7 * 24 * 3600 * 1000;
-  // Resolver tanto 'pending' como 'void' recientes (< 7 días)
+  const pendingWindowMs = 14 * 24 * 3600 * 1000; // Buscar hasta 14 días atrás para picks pendientes
+  // Resolver tanto 'pending' como 'void' recientes (< 14 días)
   const needsResolve = hist.filter(h => {
     if (h.result === 'win' || h.result === 'loss') return false;
     const ts = h.commenceTs || (h.id && (() => { const m = h.id.match(/(\d{4}-\d{2}-\d{2})T/); return m ? new Date(m[1]).getTime() : null; })());
-    if (ts && (now - ts) > sevenDaysMs) return false;
+    if (ts && (now - ts) > pendingWindowMs) return false;
     return true;
   });
 
@@ -11314,14 +11323,14 @@ async function loadHistoricalScores() {
 
   // Calcular daysFrom dinámicamente: el más antiguo de todos los picks pendientes
   // G$ picks usan cap de 21 días (pueden quedar sin resolver si el usuario no entra varios días)
-  // Historial global usa cap de 7 días
+  // Historial global usa cap de 14 días
   let daysFrom = 3;
   const histPendingTs  = needsResolve.map(h => h.commenceTs || null).filter(Boolean);
   const gPickPendingTs = pendingGPicks.map(p => p.ts || null).filter(Boolean);
   if (histPendingTs.length) {
     const oldestMs   = now - Math.min(...histPendingTs);
     const daysElapsed = Math.ceil(oldestMs / (24 * 3600 * 1000));
-    daysFrom = Math.min(7, Math.max(3, daysElapsed + 1));
+    daysFrom = Math.min(14, Math.max(3, daysElapsed + 1));
   }
   if (gPickPendingTs.length) {
     const oldestMs    = now - Math.min(...gPickPendingTs);
@@ -13902,6 +13911,17 @@ setInterval(fetchGFeed, 15 * 60 * 1000); // refrescar feed cada 15 min (era 5)
 setInterval(() => { delete realStatsCache[currentStatFilter]; loadRealStats(currentStatFilter); }, 60 * 60 * 1000);
 setInterval(() => loadRealOdds(), 60 * 60 * 1000); // refrescar cuotas/fichas cada hora
 
+// ── Resolución automática de picks pendientes al cargar la página ──
+// Diferido 5s para no bloquear el render inicial; corre aunque el usuario no abra el historial.
+setTimeout(() => {
+  const _hist = (typeof loadHistorial === 'function') ? loadHistorial() : [];
+  const _hasPending = _hist.some(h => h.result === 'pending');
+  if (_hasPending && typeof loadHistoricalScores === 'function' && !window._loadHistScoresRunning) {
+    console.log('[Auto] Resolviendo picks pendientes al cargar...');
+    loadHistoricalScores();
+  }
+}, 5000);
+
 // Al volver a la pestaña — refrescar solo si la caché expiró Y pasaron al menos 10 min desde el último check
 let _lastVisCheck = 0;
 document.addEventListener('visibilitychange', () => {
@@ -13911,6 +13931,9 @@ document.addEventListener('visibilitychange', () => {
     _lastVisCheck = now;
     if (!cacheGet('cache_scores', CACHE_SCORES_TTL)) loadRealScores();
     if (!cacheGet('cache_odds_v9',  CACHE_ODDS_TTL))  loadRealOdds();
+    // También intentar resolver pendientes al volver a la pestaña
+    const _hv = (typeof loadHistorial === 'function') ? loadHistorial() : [];
+    if (_hv.some(h => h.result === 'pending') && !window._loadHistScoresRunning) loadHistoricalScores();
   }
 });
 
