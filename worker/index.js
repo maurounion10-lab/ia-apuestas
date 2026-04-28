@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v2.1
+ * gambeta.ai — Cloudflare Worker: apuestas-api v2.2
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -294,22 +294,37 @@ async function getLeagueData(env, leagueEntries) {
     return { data, source: 'odds-api' };
   }
 
-  // Fallback por liga: detectar sport_keys sin datos en APF y pedirlos a Odds API
-  const apfKeys = new Set(apfData.map(g => g.sport_key));
-  const missingEntries = leagueEntries.filter(([sk]) => !apfKeys.has(sk));
+  // Fallback por liga — dos casos:
+  //   1. sport_key sin ningún juego de APF → suplementar desde Odds API
+  //   2. sport_key con juegos APF pero SIN cuotas h2h → reemplazar con Odds API
+  //      (APF devuelve fixtures antes de que los bookmakers publiquen odds)
+  const apfKeyStats = {};
+  apfData.forEach(g => {
+    const sk = g.sport_key;
+    if (!apfKeyStats[sk]) apfKeyStats[sk] = { total: 0, withOdds: 0 };
+    apfKeyStats[sk].total++;
+    if (g.bookmakers && g.bookmakers.length > 0) apfKeyStats[sk].withOdds++;
+  });
 
-  if (missingEntries.length === 0) {
+  const needsOddsAPI = leagueEntries.filter(([sk]) => {
+    if (!apfKeyStats[sk]) return true;                           // caso 1: sin juegos
+    const { total, withOdds } = apfKeyStats[sk];
+    return total > 0 && withOdds === 0;                         // caso 2: juegos sin odds
+  });
+
+  if (needsOddsAPI.length === 0) {
     return { data: apfData, source: 'api-football' };
   }
 
-  // Supplementar ligas faltantes desde Odds API
-  console.log(`[Worker] APF missing: ${missingEntries.map(([sk]) => sk).join(', ')} — fallback a Odds API`);
-  const missingSportKeys = missingEntries.map(([sk]) => sk);
-  const supplementData = await buildOddsAPIData(env, missingSportKeys);
-  console.log(`[Worker] OddsAPI supplement: ${supplementData.length} juegos (${missingEntries.length} ligas)`);
+  const needsSet = new Set(needsOddsAPI.map(([sk]) => sk));
+  console.log(`[Worker] APF sin odds: ${[...needsSet].join(', ')} — fallback a Odds API`);
+  const supplementData = await buildOddsAPIData(env, [...needsSet]);
+  console.log(`[Worker] OddsAPI supplement: ${supplementData.length} juegos (${needsSet.size} ligas)`);
 
-  const combined = [...apfData, ...supplementData];
-  const source = apfData.length > 0 ? 'api-football+odds-api' : 'odds-api';
+  // Descartar juegos APF sin odds y reemplazar con Odds API para esas ligas
+  const filteredApf = apfData.filter(g => !needsSet.has(g.sport_key));
+  const combined = [...filteredApf, ...supplementData];
+  const source = filteredApf.length > 0 ? 'api-football+odds-api' : 'odds-api';
   return { data: combined, source };
 }
 
@@ -361,7 +376,7 @@ export default {
     if (path === '/odds') {
       const category = url.searchParams.get('category') || 'main';
       const hourKey  = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
-      const cacheKey = `odds3_${category}_${hourKey}`;
+      const cacheKey = `odds4_${category}_${hourKey}`;
 
       const leagues = category === 'europe' ? LEAGUES_EUROPE : LEAGUES_MAIN;
 
@@ -424,7 +439,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v2.1',
+        worker: 'apuestas-api v2.2',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
