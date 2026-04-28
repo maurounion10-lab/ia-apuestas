@@ -9128,7 +9128,7 @@ function renderPreds() {
           <div style="font-size:0.72rem;color:var(--texto-sec);opacity:0.45;margin-top:6px">La IA está analizando los partidos de hoy</div>
         </div>
         <div style="grid-column:1/-1;text-align:center;padding:0 0 8px;opacity:0;animation:fadeInSlow 1s 10s forwards">
-          <button onclick="if(window._oddsLoading){return;}cacheSet('cache_odds_v8',null);loadRealOdds();" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--texto-sec);padding:8px 20px;border-radius:20px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(0,200,83,0.4)';this.style.color='var(--verde)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='var(--texto-sec)'">🔄 Reintentar</button>
+          <button onclick="if(window._oddsLoading){return;}cacheSet('cache_odds_v9',null);loadRealOdds();" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--texto-sec);padding:8px 20px;border-radius:20px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(0,200,83,0.4)';this.style.color='var(--verde)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='var(--texto-sec)'">🔄 Reintentar</button>
           <div style="font-size:0.65rem;color:var(--texto-sec);opacity:0.5;margin-top:6px">La carga está tardando más de lo normal</div>
         </div>`;
     } else {
@@ -10367,7 +10367,7 @@ async function adminResetLockedPicks() {
     // 2. Limpiar memoria local
     window._sbLockedPicks = {};
     // 3. Limpiar caché de odds para forzar re-fetch
-    localStorage.removeItem('cache_odds_v8');
+    localStorage.removeItem('cache_odds_v9');
     localStorage.removeItem(DAILY_PREDS_KEY || 'gambeta_daily_preds_v10');
     // 4. Recargar odds y re-renderizar (el flujo normal guardará el nuevo lock)
     if (btn) { btn.textContent = '🔄 Recargando cuotas…'; }
@@ -13185,8 +13185,8 @@ function processOddsIntoComparador(data) {
 
 function forceRefreshOdds() {
   // Limpiar caché (fresca y stale) y recargar desde el Worker
-  localStorage.removeItem('cache_odds_v8');
-  localStorage.removeItem('cache_odds_stale_v8');
+  localStorage.removeItem('cache_odds_v9');
+  localStorage.removeItem('cache_odds_stale_v9');
   window._rawOddsGames = null;
   _oddsLoading = false;
   const statusBar = document.getElementById('predsStatusBar');
@@ -13204,7 +13204,7 @@ async function loadRealOdds() {
   if (_oddsLoading) return;
 
   // 1) localStorage fresco → esperar lock global antes de renderizar (máx 4s)
-  const localCached = cacheGet('cache_odds_v8', CACHE_ODDS_TTL);
+  const localCached = cacheGet('cache_odds_v9', CACHE_ODDS_TTL);
   if (localCached && Array.isArray(localCached) && localCached.length > 0) {
     window._rawOddsGames = localCached;
     processOddsIntoComparador(localCached);
@@ -13222,15 +13222,15 @@ async function loadRealOdds() {
 
   function useData(combined) {
     window._rawOddsGames = combined;
-    cacheSet('cache_odds_v8', combined);
-    try { localStorage.setItem('cache_odds_stale_v8', JSON.stringify({ ts: Date.now(), data: combined })); } catch(_) {}
+    cacheSet('cache_odds_v9', combined);
+    try { localStorage.setItem('cache_odds_stale_v9', JSON.stringify({ ts: Date.now(), data: combined })); } catch(_) {}
     processOddsIntoComparador(combined);
     fixPendingHistCommenceTs();
   }
 
   function useStale() {
     try {
-      const raw = localStorage.getItem('cache_odds_stale_v8');
+      const raw = localStorage.getItem('cache_odds_stale_v9');
       if (raw) { const { data } = JSON.parse(raw); if (data?.length) { window._rawOddsGames = data; processOddsIntoComparador(data); } }
     } catch(_) {}
   }
@@ -13877,7 +13877,7 @@ window._availableSports = null;
 
 // ── Limpiar claves de caché obsoletas (versiones anteriores) ──
 try {
-  ['cache_odds_v6', 'cache_odds_stale_v6', 'cache_odds_v5', 'cache_odds_stale_v5', 'cache_odds_v4', 'cache_odds_v3', 'cache_odds_stale',
+  ['cache_odds_v8', 'cache_odds_stale_v8', 'cache_odds_v6', 'cache_odds_stale_v6', 'cache_odds_v5', 'cache_odds_stale_v5', 'cache_odds_v4', 'cache_odds_v3', 'cache_odds_stale',
    'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
     .forEach(k => localStorage.removeItem(k));
 } catch(_) {}
@@ -13903,7 +13903,7 @@ document.addEventListener('visibilitychange', () => {
     if (now - _lastVisCheck < 10 * 60 * 1000) return; // throttle: máx 1 vez cada 10 min
     _lastVisCheck = now;
     if (!cacheGet('cache_scores', CACHE_SCORES_TTL)) loadRealScores();
-    if (!cacheGet('cache_odds_v8',  CACHE_ODDS_TTL))  loadRealOdds();
+    if (!cacheGet('cache_odds_v9',  CACHE_ODDS_TTL))  loadRealOdds();
   }
 });
 
@@ -17535,9 +17535,9 @@ async function admDiagWorker() {
   await testUrl('/odds?category=main', `${WORKER_URL}/odds?category=main`);
   await testUrl('/odds?category=europe', `${WORKER_URL}/odds?category=europe`);
   await testUrl('/available', `${WORKER_URL}/available`);
-  const stale = localStorage.getItem('cache_odds_stale_v8');
+  const stale = localStorage.getItem('cache_odds_stale_v9');
   log(`\n💾 Stale cache: ${stale ? JSON.parse(stale).length + ' partidos guardados' : 'vacía (nunca hubo conexión exitosa)'}`);
-  const fresh = localStorage.getItem('cache_odds_v8');
+  const fresh = localStorage.getItem('cache_odds_v9');
   log(`💾 Fresh cache: ${fresh ? 'activa' : 'expirada/vacía'}`);
   const raw = window._rawOddsGames || [];
   log(`\n🔍 _rawOddsGames en memoria: ${raw.length} partidos`);
