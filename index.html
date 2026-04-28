@@ -7895,10 +7895,17 @@ function buildPredsFromOdds() {
     const maxProb  = best.prob || probH;
     const bestOdds = best.odds;
 
+    // Para ligas de altísima prioridad (UCL, Copa Libertadores, Copa Sudamericana),
+    // los partidos son inherentemente más equilibrados — umbral reducido a 45%.
+    const _isTopLeague = ['soccer_uefa_champs_league','soccer_conmebol_copa_libertadores',
+                          'soccer_conmebol_copa_sudamericana'].includes(g.sport_key);
+    const MIN_PROB_FOR_PICK = _isTopLeague ? 45 : 52;
+
     let conf, confLabel;
-    if (maxProb >= 62)      { conf = 'high'; confLabel = 'Alta'; }
-    else if (maxProb >= 52) { conf = 'med';  confLabel = 'Media'; }
-    else                    { return null; } // Confianza baja — no generar pick
+    if (maxProb >= 62)                    { conf = 'high'; confLabel = 'Alta'; }
+    else if (maxProb >= 52)               { conf = 'med';  confLabel = 'Media'; }
+    else if (maxProb >= MIN_PROB_FOR_PICK) { conf = 'med';  confLabel = 'Media'; } // top league allowance
+    else                                  { return null; } // Confianza baja — no generar pick
 
     // Bet Value Rating 3–6, alineado con confianza:
     // Alta  (≥62%) → 5-6  |  Media (52-61%) → 3-4
@@ -12578,6 +12585,7 @@ const ODDS_API_KEY = 'f9dc7cd51c5b92453e8c658b9d72a3e5';
 const REQUIRED_SPORT_KEYS = [
   'soccer_argentina_primera_division',
   'soccer_conmebol_copa_libertadores',
+  'soccer_conmebol_copa_sudamericana',
   'soccer_epl',
   'soccer_spain_la_liga',
   'soccer_germany_bundesliga',
@@ -13877,8 +13885,9 @@ window._availableSports = null;
 
 // ── Limpiar claves de caché obsoletas (versiones anteriores) ──
 try {
-  ['cache_odds_v8', 'cache_odds_stale_v8', 'cache_odds_v6', 'cache_odds_stale_v6', 'cache_odds_v5', 'cache_odds_stale_v5', 'cache_odds_v4', 'cache_odds_v3', 'cache_odds_stale',
-   'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
+  ['cache_odds_v8', 'cache_odds_stale_v8', 'cache_odds_v7', 'cache_odds_stale_v7',
+   'cache_odds_v6', 'cache_odds_stale_v6', 'cache_odds_v5', 'cache_odds_stale_v5', 'cache_odds_v4', 'cache_odds_v3', 'cache_odds_stale',
+   'gambeta_daily_preds_v9', 'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
     .forEach(k => localStorage.removeItem(k));
 } catch(_) {}
 

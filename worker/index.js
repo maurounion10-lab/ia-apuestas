@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v2.0
+ * gambeta.ai — Cloudflare Worker: apuestas-api v2.1
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -272,24 +272,45 @@ async function buildOddsAPIData(env, sportKeys) {
   return games;
 }
 
-// ── Obtener datos con fallback APF → Odds API ────────────────────────────────
+// ── Obtener datos con fallback APF → Odds API (por liga) ─────────────────────
 async function getLeagueData(env, leagueEntries) {
+  let apfData = [];
+  let apfError = false;
+
   // Intentar API-Football primero
   try {
-    const data = await buildAPFData(env, leagueEntries);
-    if (data.length > 0) {
-      console.log(`[Worker] APF: ${data.length} juegos`);
-      return { data, source: 'api-football' };
-    }
+    apfData = await buildAPFData(env, leagueEntries);
+    console.log(`[Worker] APF: ${apfData.length} juegos`);
   } catch (e) {
-    console.warn('[Worker] APF error, usando Odds API fallback:', e.message);
+    console.warn('[Worker] APF error total, usando Odds API fallback completo:', e.message);
+    apfError = true;
   }
 
-  // Fallback: The Odds API
-  const sportKeys = leagueEntries.map(([sk]) => sk);
-  const data = await buildOddsAPIData(env, sportKeys);
-  console.log(`[Worker] OddsAPI fallback: ${data.length} juegos`);
-  return { data, source: 'odds-api' };
+  if (apfError) {
+    // Error total → fallback completo a Odds API
+    const sportKeys = leagueEntries.map(([sk]) => sk);
+    const data = await buildOddsAPIData(env, sportKeys);
+    console.log(`[Worker] OddsAPI fallback total: ${data.length} juegos`);
+    return { data, source: 'odds-api' };
+  }
+
+  // Fallback por liga: detectar sport_keys sin datos en APF y pedirlos a Odds API
+  const apfKeys = new Set(apfData.map(g => g.sport_key));
+  const missingEntries = leagueEntries.filter(([sk]) => !apfKeys.has(sk));
+
+  if (missingEntries.length === 0) {
+    return { data: apfData, source: 'api-football' };
+  }
+
+  // Supplementar ligas faltantes desde Odds API
+  console.log(`[Worker] APF missing: ${missingEntries.map(([sk]) => sk).join(', ')} — fallback a Odds API`);
+  const missingSportKeys = missingEntries.map(([sk]) => sk);
+  const supplementData = await buildOddsAPIData(env, missingSportKeys);
+  console.log(`[Worker] OddsAPI supplement: ${supplementData.length} juegos (${missingEntries.length} ligas)`);
+
+  const combined = [...apfData, ...supplementData];
+  const source = apfData.length > 0 ? 'api-football+odds-api' : 'odds-api';
+  return { data: combined, source };
 }
 
 // ── Definición de categorías de ligas ────────────────────────────────────────
@@ -403,7 +424,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v2.0',
+        worker: 'apuestas-api v2.1',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
