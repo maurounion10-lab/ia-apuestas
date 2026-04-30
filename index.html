@@ -8151,30 +8151,10 @@ function logoHtml(name, size=48) {
 
 const scoresData = [];
 
-const predsData = [
-  { league:'🏆 Champions League', home:'Real Madrid', away:'Man City',   rec:'Local Gana',       conf:'high', confLabel:'Alta',  probH:48, probD:22, probA:30, odds:['L:1.80','E:3.40','V:4.20'], time:'Hoy 21:00',    insight:'Real Madrid llega en gran momento con 4 victorias seguidas. City sin Rodri pierde control del juego. El Bernabéu y la presión de los aficionados pueden ser factores decisivos. Apuesta recomendada con stake moderado.',    formH:['G','G','E','G','G'], formA:['G','P','G','G','E'] },
-  { league:'🇪🇸 La Liga',         home:'Barcelona',  away:'Atlético',   rec:'Ambos Marcan',     conf:'high', confLabel:'Alta',  probH:42, probD:28, probA:30, odds:['Sí:1.49','No:2.50'],       time:'Hoy 21:00',    insight:'Ambos equipos llevan más de 5 partidos seguidos convirtiendo como locales y visitantes. Barça domina con la pelota (62% posesión), Atleti es efectivo en contragolpe. Tendencia clara hacia partido con goles de ambos bandos.',          formH:['G','G','P','G','G'], formA:['G','G','P','E','G'] },
-  { league:'🎾 ATP Miami',        home:'Alcaraz',    away:'Djokovic',   rec:'Alcaraz Gana',     conf:'med',  confLabel:'Media', probH:55, probD:0,  probA:45, odds:['A:1.85','D:1.95'],         time:'Hoy 18:00',    insight:'Alcaraz es brillante en pista dura bajo el sol de Miami y llega con confianza tras dos torneos seguidos. Djokovic con pocos torneos en 2025 y no ha mostrado su mejor nivel. El español tiene ligera ventaja estadística en duro.',   formH:['G','G','G','P','G'], formA:['G','P','G','G','E'] },
-  { league:'🇩🇪 Bundesliga',      home:'Bayern',     away:'Dortmund',   rec:'Más de 2.5 goles', conf:'high', confLabel:'Alta',  probH:55, probD:20, probA:25, odds:['+2.5:1.60','-2.5:2.20'],   time:'Hoy 20:30',    insight:'Der Klassiker promedia 3.4 goles en los últimos 8 enfrentamientos. Bayern convierte en el 89% de sus partidos en casa. Dortmund anota en el 87% de sus partidos de visita. Alta probabilidad de partido con más de 2.5 goles.',      formH:['G','G','G','E','G'], formA:['G','P','G','G','P'] },
-  { league:'🇦🇷 Liga Prof.',       home:'River',      away:'Boca',       rec:'Local o Empate',   conf:'low',  confLabel:'Baja',  probH:40, probD:30, probA:30, odds:['L:2.20','E:3.00','V:3.10'], time:'Mañana 17:00', insight:'Superclásico históricamente parejo — River gana el 38%, Boca el 30%, empate 32%. Ventaja leve de River como local en el Monumental pero el resultado es altamente impredecible. Apuesta solo con stake bajo o evitar.',            formH:['G','E','G','G','P'], formA:['E','G','P','G','E'] },
-];
+// predsData eliminado — no mostrar picks de demo
 
-const statsData = {
-  futbol: [
-    { name:'Real Madrid',       league:'La Liga',          form:['G','G','E','G','G'], gf:68, ga:22, pts:71, pos:'1°' },
-    { name:'Barcelona',         league:'La Liga',          form:['G','P','G','G','E'], gf:62, ga:34, pts:65, pos:'2°' },
-    { name:'Bayern Munich',     league:'Bundesliga',       form:['G','G','G','E','G'], gf:74, ga:30, pts:68, pos:'1°' },
-    { name:'Man City',          league:'Premier League',   form:['G','G','P','G','G'], gf:60, ga:29, pts:63, pos:'3°' },
-    { name:'River Plate',       league:'Liga Profesional', form:['G','E','G','G','P'], gf:42, ga:18, pts:58, pos:'1°' },
-    { name:'Boca Juniors',      league:'Liga Profesional', form:['E','G','P','G','E'], gf:35, ga:22, pts:52, pos:'3°' },
-  ],
-  tenis: [
-    { name:'Carlos Alcaraz',  league:'ATP Ranking', form:['G','G','G','P','G'], gf:84, ga:38, pts:9800,  pos:'#2 Mundo' },
-    { name:'Novak Djokovic',  league:'ATP Ranking', form:['G','P','G','G','P'], gf:80, ga:42, pts:9200,  pos:'#3 Mundo' },
-    { name:'Iga Swiatek',     league:'WTA Ranking', form:['G','G','G','G','P'], gf:88, ga:30, pts:10500, pos:'#1 Mundo' },
-    { name:'Aryna Sabalenka', league:'WTA Ranking', form:['G','G','P','G','G'], gf:82, ga:36, pts:9100,  pos:'#2 Mundo' },
-  ]
-};
+// statsData: sin datos de demo — solo se muestran stats reales de la API
+const statsData = { futbol: [], tenis: [] };
 
 // ═══════════════════════════════════════════════
 //  SKELETON SCORES
@@ -8656,8 +8636,7 @@ function buildPredsFromOdds() {
     soccer_uruguay_primera_division:        50,
     soccer_saudi_professional_league:       46,
     soccer_japan_j_league:                  44,
-    soccer_uefa_europa_league:              85,
-    soccer_uefa_europa_conference_league:   75,
+    soccer_uefa_europa_conference_league:   70,
     soccer_argentina_primera_nacional:      65,
     soccer_mexico_ligamx:                   62,
     soccer_usa_mls:                         55,
@@ -9608,12 +9587,9 @@ function renderPreds() {
           `<span class="dot${i<dotsFilled?'':' empty'}">💰</span>`).join('');
         const bvrLabel = star.bvrText || (dotsFilled===6?'Máxima':dotsFilled>=5?'Alta':dotsFilled>=4?'Media-Alta':'Media');
         const stakeLabel = (star.bvr||0) >= 6 ? '$170' : ((star.bvr||0) === 5 || star.conf==='high') ? '$130' : (star.bvr||0) === 4 ? '$50' : '$30';
-        // Guardar home/away del estrella para poder navegar al pick
-        window._estrellaHome = star.home;
-        window._estrellaAway = star.away;
         estrellaEl.style.display = 'block';
         estrellaEl.innerHTML = `
-          <div class="estrella-card" style="cursor:pointer" onclick="openEstrellaPick()">
+          <div class="estrella-card">
             <div class="estrella-glow"></div>
             <div class="estrella-badge">⭐ Pick Estrella del Finde</div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
@@ -9632,11 +9608,10 @@ function renderPreds() {
                 <div style="font-size:0.62rem;color:${dotsFilled>=6?'#ffd600':dotsFilled>=5?'#66bb6a':dotsFilled>=3?'#e64a19':'#d32f2f'};margin-top:3px">${dotsFilled}/6 · ${bvrLabel}</div>
               </div>
             </div>
-            <div style="display:flex;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,214,0,0.12);flex-wrap:wrap;align-items:center">
+            <div style="display:flex;gap:14px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,214,0,0.12);flex-wrap:wrap">
               <div><span style="font-size:0.65rem;color:var(--texto-sec)">CUOTA</span><div style="font-weight:800;color:var(--amarillo)">${cuotaDisplay}</div></div>
               <div><span style="font-size:0.65rem;color:var(--texto-sec)">STAKE</span><div style="font-weight:800;color:#fff">${stakeLabel}</div></div>
               <div><span style="font-size:0.65rem;color:var(--texto-sec)">HORARIO</span><div style="font-weight:700;color:var(--texto-sec);font-size:0.85rem">${star.time||'—'}</div></div>
-              <div style="margin-left:auto;font-size:0.75rem;color:var(--verde);font-weight:700;white-space:nowrap">Ver análisis completo →</div>
             </div>
           </div>`;
       } else {
@@ -11033,10 +11008,7 @@ _sbLockedPicksReady.then(() => sbLoadAdminOverrides());
 
 // ── Overrides hardcodeados por fecha — no dependen de Supabase ──
 // Se aplican en memoria para TODOS los usuarios. Agregar cuando sea necesario.
-const _HARDCODED_MAXIMA = {
-  '2026-04-03': ['mallorca_vs_realmadrid', 'coquimbo_vs_cobresal'],
-  '2026-04-15': ['bocajuniors_vs_barcelona'],
-};
+const _HARDCODED_MAXIMA = {}; // fechas pasadas eliminadas
 (function _applyHardcodedMaxima() {
   const today = new Date().toISOString().slice(0, 10);
   const keys  = _HARDCODED_MAXIMA[today] || [];
@@ -11061,9 +11033,7 @@ const _HARDCODED_MAXIMA = {
 })();
 
 // ── Estrella del Finde hardcodeada por fecha (independiente de Supabase) ──
-const _HARDCODED_ESTRELLA = {
-  '2026-04-03': { home: 'Mallorca', away: 'Real Madrid' },
-};
+const _HARDCODED_ESTRELLA = {}; // fechas pasadas eliminadas
 (function _applyHardcodedEstrella() {
   const today = new Date().toISOString().slice(0, 10);
   const estrella = _HARDCODED_ESTRELLA[today];
@@ -11883,19 +11853,7 @@ function calcRacha(data) {
 // ── Picks Copa Libertadores/Sudamericana 8-abr-2026 ──────────────────────────
 // Estos picks no se guardaron via savePredictions (partidos nocturnos sin historial API).
 // Se inyectan directamente al historial local si no existen.
-function _injectCopaAbr8Historial() {
-  const copaEntries = [
-    { id:'indmedellin_estudianteslp_2026-04-08', home:'Ind. Medellín',    away:'Estudiantes LP', rec:'Más de 1.5',   result:'win',  odds:1.55, _bestOdds:1.55, stake:130, pl:71.5,  date:'8/4', league:'🌎 Copa Sud.',   _sportKey:'soccer_conmebol_copa_sudamericana', commenceTs:1775692800000, finalScore:'1-1', conf:'high', bvr:5, bvrText:'Alta',  _resolvedLeague:'🌎 Copa Sud.'   },
-    { id:'cusco_flamengo_2026-04-08',             home:'Cusco',            away:'Flamengo',       rec:'Visitante Gana',result:'win', odds:1.85, _bestOdds:1.85, stake:30,  pl:25.5,  date:'8/4', league:'🌎 Libertadores',_sportKey:'soccer_conmebol_copa_libertadores',  commenceTs:1775692800000, finalScore:'0-2', conf:'med',  bvr:3, bvrText:'Media', _resolvedLeague:'🌎 Libertadores' },
-    { id:'junior_palmeiras_2026-04-08',           home:'Junior',           away:'Palmeiras',      rec:'Ambos Marcan', result:'win', odds:1.91, _bestOdds:1.91, stake:30,  pl:27.3,  date:'8/4', league:'🌎 Libertadores',_sportKey:'soccer_conmebol_copa_libertadores',  commenceTs:1775692800000, finalScore:'1-1', conf:'med',  bvr:3, bvrText:'Media', _resolvedLeague:'🌎 Libertadores' },
-    { id:'sportingcristal_cerroporteno_2026-04-08',home:'Sporting Cristal',away:'Cerro Porteño', rec:'Ambos Marcan', result:'loss',odds:1.91, _bestOdds:1.91, stake:30,  pl:-30,   date:'8/4', league:'🌎 Libertadores',_sportKey:'soccer_conmebol_copa_libertadores',  commenceTs:1775685600000, finalScore:'1-0', conf:'med',  bvr:3, bvrText:'Media', _resolvedLeague:'🌎 Libertadores' },
-  ];
-  const hist = loadHistorial();
-  const existIds = new Set(hist.map(h => h.id));
-  let added = 0;
-  copaEntries.forEach(e => { if (!existIds.has(e.id)) { hist.push(e); added++; } });
-  if (added) { saveHistorial(hist); console.log('[Copa] Inyectados', added, 'picks 8-abr al historial'); }
-}
+// _injectCopaAbr8Historial eliminado — los picks del 8-abr deben cargarse de Supabase
 
 function renderHistorial(filter) {
   // Guard: si los elementos del DOM aún no existen, reprogramar
@@ -11908,11 +11866,9 @@ function renderHistorial(filter) {
   try {
   const _rawCount = loadHistorial().length;
   console.log('[renderHistorial] storage:', _rawCount, 'picks | filtros: fecha='+histDateFilter+' conf='+histConfFilter+' liga='+histLeagueFilter+' mercado='+histMercadoFilter+' deporte='+histFilter);
-  _injectCopaAbr8Historial();   // inyectar picks Copa si no están
   migrateHistStakes();          // corrige stakes/P&L de entradas antiguas
   // Resolver con scores en memoria (sincrónico, sin loop)
-  const _extraScores = [{home:'Junior',away:'Palmeiras',flag:'final',scoreH:1,scoreA:1,commenceTs:1775692800000}];
-  resolveCompletedGames([...(scoresData||[]), ..._extraScores], true);
+  resolveCompletedGames(scoresData||[], true);
   // Buscar scores históricos del servidor para pendientes sin resolver (rate-limited: máx 1 request cada 30s)
   if (!window._loadHistScoresRunning) loadHistoricalScores();
   // ── Ligas bloqueadas: remover del storage y no mostrar ──
@@ -12305,45 +12261,6 @@ function clearHistorial() {
   if (!confirm('¿Limpiar todo el historial? Esta acción no se puede deshacer.')) return;
   saveHistorial([]);
   renderHistorial(histFilter);
-}
-
-// ── Ficha de Pick Estrella: navega al pick completo en el grid ──
-function openEstrellaPick() {
-  const home = window._estrellaHome;
-  const away = window._estrellaAway;
-  if (!home || !away) return;
-  // Si no estamos en la sub-página de picks, cambiar el filtro a "todos"
-  if (document.body.dataset.gbpage !== 'picks') {
-    const todosBtn = document.querySelector('#predSportTabs [data-league="todos"]');
-    if (todosBtn) {
-      filterPredSport('todos', todosBtn);
-      // Esperar a que renderice y luego hacer scroll + expand
-      setTimeout(() => _scrollAndExpandEstrellaPick(home, away), 150);
-      return;
-    }
-  }
-  _scrollAndExpandEstrellaPick(home, away);
-}
-function _scrollAndExpandEstrellaPick(home, away) {
-  const hNorm = s => (s||'').toLowerCase().replace(/[^a-z0-9]/g,'');
-  const cards = document.querySelectorAll('.pred-card');
-  for (const card of cards) {
-    const txt = card.textContent;
-    if (txt.toLowerCase().includes(hNorm(home).slice(0,5)) && txt.toLowerCase().includes(hNorm(away).slice(0,5))) {
-      card.scrollIntoView({behavior: 'smooth', block: 'center'});
-      // Abrir el análisis si está cerrado
-      const expandBody = card.querySelector('[id^="pred-expand-"]');
-      if (expandBody && !expandBody.classList.contains('open')) {
-        const expandBtn = card.querySelector('.pred-expand-btn');
-        if (expandBtn) expandBtn.click();
-      }
-      // Highlight breve
-      card.style.outline = '2px solid var(--amarillo)';
-      card.style.outlineOffset = '3px';
-      setTimeout(() => { card.style.outline=''; card.style.outlineOffset=''; }, 1800);
-      return;
-    }
-  }
 }
 
 // ── Filtro de deporte en pronósticos ──
