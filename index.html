@@ -8879,7 +8879,7 @@ function buildPredsFromOdds() {
     // Liga argentina: prohibido pronosticar overs (Más de X.5). Solo 1X2 + Ambos/No Marcan.
     const _isArgentina = (g.sport_key || '').includes('argentina');
     const candidates2 = [
-      { rec: 'Local Gana',     prob: probH, odds: hOP },
+      { rec: 'Gana Local',     prob: probH, odds: hOP },
       { rec: 'Visitante Gana', prob: probA, odds: aOP },
       ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dOP }] : []),
       ...(_isArgentina ? [] : ['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
@@ -8931,7 +8931,7 @@ function buildPredsFromOdds() {
     // Insight generado por probabilidades
     const hN = shortName(g.home_team), aN = shortName(g.away_team);
     let insight;
-    if (rec === 'Local Gana')
+    if (rec === 'Gana Local')
       insight = `${hN} parte como favorito con ${probH}% de probabilidad implícita según el mercado${fmtO(hO)}. ${aN} tiene ${probA}% de chances como visitante. Las cuotas reflejan ventaja clara del local — apuesta con valor en línea de 1X.`;
     else if (rec === 'Visitante Gana')
       insight = `${aN} es favorito visitante con ${probA}% de probabilidad implícita${fmtO(aO)}. El mercado descuenta a ${hN} que solo tiene ${probH}% de chances. Valor en apostar al visitante directo.`;
@@ -9499,7 +9499,7 @@ function renderPreds() {
         const bttsMet = se.scoreH > 0 && se.scoreA > 0;
         const rec = p.rec || '';
         let result = 'void';
-        if      (rec === 'Local Gana')     result = homeWin  ? 'win' : 'loss';
+        if      (rec === 'Gana Local')     result = homeWin  ? 'win' : 'loss';
         else if (rec === 'Visitante Gana') result = awayWin  ? 'win' : 'loss';
         else if (rec === 'Empate')         result = draw     ? 'win' : 'loss';
         else if (rec === 'Ambos Marcan')   result = bttsMet  ? 'win' : 'loss';
@@ -9574,7 +9574,7 @@ function renderPreds() {
         const sAway = logoHtml(star.away, 42);
         const rec = (star.rec||'').replace(' Gana','');
         // Cuota: misma lógica que la ficha — basada en rec para evitar cuotas distintas
-        const _recOdds = star.rec === 'Local Gana'     ? star._hO
+        const _recOdds = star.rec === 'Gana Local'     ? star._hO
                        : star.rec === 'Visitante Gana' ? star._aO
                        : star.rec === 'Empate'         ? star._dO
                        : null;
@@ -10120,7 +10120,7 @@ function renderPreds() {
           <div class="pred-rec-value">${isFinishedLoss ? '❌' : '✅'} ${p.rec}</div>
         </div>
         <div class="pred-rec-right">
-          ${(()=>{ const ro = p.rec==='Local Gana' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null) : p.rec==='Visitante Gana' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null) : p.rec==='Empate' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
+          ${(()=>{ const ro = p.rec==='Gana Local' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null) : p.rec==='Visitante Gana' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null) : p.rec==='Empate' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
           ${p._bookKey ? `<a class="pred-rec-book" href="${getBookLink(p._bookKey)}" target="_blank" rel="noopener" title="Apostar en ${p._bookLabel||p._bookKey}" onclick="trackEvent('promo_click',{promo:'${p._bookKey}',type:'bookmaker_rec'})">
             <img src="${getBookLogo(p._bookKey)}" alt="${p._bookLabel||p._bookKey}" onerror="this.style.display='none'">
             <span class="pred-rec-bonus">🎁 Bono</span>
@@ -11236,7 +11236,7 @@ async function sbLoadHistorial() {
 
       // Corregir cuota: usar cuota real del bookmaker si está disponible
       let correctOdds = odds;
-      if      (p.rec === 'Local Gana'     && p._hO)  correctOdds = parseFloat(parseFloat(p._hO).toFixed(2));
+      if      (p.rec === 'Gana Local'     && p._hO)  correctOdds = parseFloat(parseFloat(p._hO).toFixed(2));
       else if (p.rec === 'Visitante Gana' && p._aO)  correctOdds = parseFloat(parseFloat(p._aO).toFixed(2));
       else if (p.rec === 'Empate'         && p._dO)  correctOdds = parseFloat(parseFloat(p._dO).toFixed(2));
       else if (p._bestOdds)                           correctOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
@@ -11323,7 +11323,7 @@ function migrateHistStakes() {
 
     // Corregir cuota: usar cuota real del bookmaker si está disponible
     let correctOdds = odds;
-    if      (p.rec === 'Local Gana'     && p._hO)  correctOdds = parseFloat(parseFloat(p._hO).toFixed(2));
+    if      (p.rec === 'Gana Local'     && p._hO)  correctOdds = parseFloat(parseFloat(p._hO).toFixed(2));
     else if (p.rec === 'Visitante Gana' && p._aO)  correctOdds = parseFloat(parseFloat(p._aO).toFixed(2));
     else if (p.rec === 'Empate'         && p._dO)  correctOdds = parseFloat(parseFloat(p._dO).toFixed(2));
     else if (p._bestOdds)                           correctOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
@@ -11430,12 +11430,12 @@ function savePredictions(preds) {
 
     // Cuota real del bookmaker — priorizar siempre la cuota real sobre la implícita
     let impliedOdds = 2.0;
-    if      (p.rec === 'Local Gana'     && p._hO)  impliedOdds = parseFloat(parseFloat(p._hO).toFixed(2));
+    if      (p.rec === 'Gana Local'     && p._hO)  impliedOdds = parseFloat(parseFloat(p._hO).toFixed(2));
     else if (p.rec === 'Visitante Gana' && p._aO)  impliedOdds = parseFloat(parseFloat(p._aO).toFixed(2));
     else if (p.rec === 'Empate'         && p._dO)  impliedOdds = parseFloat(parseFloat(p._dO).toFixed(2));
     else if (p._bestOdds)                           impliedOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
     // Fallback: cuota implícita de probabilidades si no hay cuota real
-    else if (p.rec === 'Local Gana'     && p.probH > 0) impliedOdds = parseFloat((100/p.probH).toFixed(2));
+    else if (p.rec === 'Gana Local'     && p.probH > 0) impliedOdds = parseFloat((100/p.probH).toFixed(2));
     else if (p.rec === 'Visitante Gana' && p.probA > 0) impliedOdds = parseFloat((100/p.probA).toFixed(2));
     else if (p.rec === 'Empate'         && p.probD > 0) impliedOdds = parseFloat((100/p.probD).toFixed(2));
 
@@ -11499,7 +11499,7 @@ function resolveCompletedGames(scores, skipRender) {
       const bttsMet    = s.scoreH > 0 && s.scoreA > 0;
 
       let result = 'void';
-      if      (p.rec === 'Local Gana')     result = homeWin    ? 'win' : 'loss';
+      if      (p.rec === 'Gana Local')     result = homeWin    ? 'win' : 'loss';
       else if (p.rec === 'Visitante Gana') result = awayWin    ? 'win' : 'loss';
       else if (p.rec === 'Empate')         result = draw       ? 'win' : 'loss';
       else if (p.rec === 'Ambos Marcan')   result = bttsMet    ? 'win' : 'loss';
@@ -11811,7 +11811,7 @@ function resolveAllGames(scores) {
       const totalGoals = s.scoreH + s.scoreA;
       const bttsMet    = s.scoreH > 0 && s.scoreA > 0;
       let result = 'void';
-      if      (p.rec === 'Local Gana')     result = homeWin       ? 'win' : 'loss';
+      if      (p.rec === 'Gana Local')     result = homeWin       ? 'win' : 'loss';
       else if (p.rec === 'Visitante Gana') result = awayWin       ? 'win' : 'loss';
       else if (p.rec === 'Empate')         result = draw          ? 'win' : 'loss';
       else if (p.rec === 'Ambos Marcan')   result = bttsMet       ? 'win' : 'loss';
@@ -16288,7 +16288,7 @@ function _rkupRenderPicks() {
       type: 'gpick',
       result: !p.evaluated ? 'pending' : p.correct ? 'win' : 'loss',
       match: (p.home && p.away) ? `${p.home} vs ${p.away}` : '—',
-      rec: p.pick === 'home' ? 'Local Gana' : p.pick === 'away' ? 'Visitante Gana' : p.pick === 'draw' ? 'Empate' : (p.pick || '—'),
+      rec: p.pick === 'home' ? 'Gana Local' : p.pick === 'away' ? 'Visitante Gana' : p.pick === 'draw' ? 'Empate' : (p.pick || '—'),
       betAmount: p.betAmount || null,
       coinsChange: p.coinsChange || null,
       ts: p.ts || 0,
