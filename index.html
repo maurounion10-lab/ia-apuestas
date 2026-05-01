@@ -127,48 +127,48 @@
     padding-top: 110px;
   }
 
-  /* ── SPONSOR BANNER (DBbet) ── */
-  #dbbet-sponsor-bar {
+  /* ── SPONSOR BANNER (SapphireBet) ── */
+  #sapphire-sponsor-bar {
     position: fixed;
     top: 66px;
     left: 0;
     right: 0;
     z-index: 9999;
     height: 44px;
-    background: linear-gradient(90deg, #0d0d0d 0%, #1a0508 40%, #200008 60%, #0d0d0d 100%);
-    border-bottom: 1px solid rgba(227,28,61,0.45);
+    background: linear-gradient(90deg, #0d0d0d 0%, #061225 40%, #071428 60%, #0d0d0d 100%);
+    border-bottom: 1px solid rgba(21,101,192,0.45);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     padding: 0 16px;
-    box-shadow: 0 2px 12px rgba(227,28,61,0.15);
+    box-shadow: 0 2px 12px rgba(21,101,192,0.15);
     overflow: hidden;
     cursor: pointer;
     text-decoration: none;
     -webkit-transform: translateZ(0);
     transform: translateZ(0);
   }
-  #dbbet-sponsor-bar::before {
+  #sapphire-sponsor-bar::before {
     content: '';
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent 0%, rgba(227,28,61,0.6) 30%, rgba(255,60,90,0.9) 50%, rgba(227,28,61,0.6) 70%, transparent 100%);
+    background: linear-gradient(90deg, transparent 0%, rgba(21,101,192,0.6) 30%, rgba(255,215,0,0.9) 50%, rgba(21,101,192,0.6) 70%, transparent 100%);
   }
-  .dbbet-bar-logo {
+  .sapphire-bar-logo {
     height: 24px;
     object-fit: contain;
     flex-shrink: 0;
     filter: brightness(1.1);
   }
-  .dbbet-bar-sep {
+  .sapphire-bar-sep {
     width: 1px;
     height: 20px;
-    background: rgba(227,28,61,0.4);
+    background: rgba(255,215,0,0.5);
     flex-shrink: 0;
   }
-  .dbbet-bar-msg {
+  .sapphire-bar-msg {
     font-size: 0.72rem;
     font-weight: 700;
     color: rgba(255,255,255,0.9);
@@ -177,10 +177,10 @@
     text-overflow: ellipsis;
     letter-spacing: 0.1px;
   }
-  .dbbet-bar-msg strong { color: #ff4d6d; }
-  .dbbet-bar-cta {
+  .sapphire-bar-msg strong { color: #FFD700; }
+  .sapphire-bar-cta {
     flex-shrink: 0;
-    background: linear-gradient(135deg, #e31c3d, #c0112e);
+    background: linear-gradient(135deg, #1565C0, #0d47a1);
     color: #fff;
     font-size: 0.62rem;
     font-weight: 800;
@@ -193,11 +193,11 @@
     transition: filter 0.15s;
     text-decoration: none;
   }
-  .dbbet-bar-cta:hover { filter: brightness(1.15); }
-  .dbbet-txt-short { display: none; }
-  .dbbet-txt-xs    { display: none; }
+  .sapphire-bar-cta:hover { filter: brightness(1.15); }
+  .sapphire-txt-short { display: none; }
+  .sapphire-txt-xs    { display: none; }
   /* logo inline dentro del texto mobile */
-  .dbbet-inline-logo {
+  .sapphire-inline-logo {
     height: 15px;
     vertical-align: middle;
     display: inline;
@@ -205,18 +205,18 @@
     filter: brightness(1.15);
   }
   @media (max-width: 600px) {
-    #dbbet-sponsor-bar { gap: 8px; padding: 0 10px; }
-    .dbbet-bar-logo  { display: none; }
-    .dbbet-bar-sep   { display: none; }
-    .dbbet-bar-msg   { font-size: 0.70rem; white-space: nowrap; overflow: visible; text-overflow: unset; flex: 1; }
-    .dbbet-txt-full  { display: none; }
-    .dbbet-txt-short { display: inline; }
-    .dbbet-bar-cta   { font-size: 0.64rem; padding: 5px 10px; flex-shrink: 0; }
+    #sapphire-sponsor-bar { gap: 8px; padding: 0 10px; }
+    .sapphire-bar-logo  { display: none; }
+    .sapphire-bar-sep   { display: none; }
+    .sapphire-bar-msg   { font-size: 0.70rem; white-space: nowrap; overflow: visible; text-overflow: unset; flex: 1; }
+    .sapphire-txt-full  { display: none; }
+    .sapphire-txt-short { display: inline; }
+    .sapphire-bar-cta   { font-size: 0.64rem; padding: 5px 10px; flex-shrink: 0; }
   }
   @media (max-width: 380px) {
-    .dbbet-txt-short { display: none; }
-    .dbbet-txt-xs    { display: inline; }
-    .dbbet-bar-cta   { display: none; }
+    .sapphire-txt-short { display: none; }
+    .sapphire-txt-xs    { display: inline; }
+    .sapphire-bar-cta   { display: none; }
   }
 
   /* ── SCROLLBAR ── */
@@ -566,7 +566,7 @@
     width: 100%;
   }
 
-  /* ── Scroll-margin: compensa los 2 headers fijos (nav 66px + DBbet 44px = 110px) ── */
+  /* ── Scroll-margin: compensa los 2 headers fijos (nav 66px + SapphireBet 44px = 110px) ── */
   #predictions, #historial, #ranking, #bankroll, #calculator,
   #mipanel, #myPicksPanel, #telegram, #blog, #scores, #promos {
     scroll-margin-top: 120px; /* 110px headers + 10px breathing room */
@@ -2210,22 +2210,22 @@
   .stat-mini .s-val { font-size: 1.1rem; font-weight: 700; color: var(--verde); display: block; }
   .stat-mini .s-lbl { font-size: 0.65rem; color: var(--texto-sec); text-transform: uppercase; }
 
-  /* ── DBBET BANNERS RESPONSIVE ── */
-  .dbbet-mid-banner {
+  /* ── SAPPHIRE BANNERS RESPONSIVE ── */
+  .sapphire-mid-banner {
     display: flex; align-items: center; gap: 16px;
     padding: 16px 24px;
     background: linear-gradient(135deg,#150306 0%,#220810 50%,#150306 100%);
-    border: 1px solid rgba(227,28,61,0.5);
+    border: 1px solid rgba(21,101,192,0.5);
     border-radius: 14px; text-decoration: none;
     position: relative; overflow: hidden;
     transition: border-color .2s; width: 100%; box-sizing: border-box;
   }
-  .dbbet-mid-banner:hover { border-color: rgba(227,28,61,0.85); }
-  .dbbet-mid-logo { height: 38px; object-fit: contain; flex-shrink: 0; filter: brightness(1.15); }
-  .dbbet-mid-text { flex: 1; min-width: 0; }
-  .dbbet-mid-title { font-size: 0.9rem; font-weight: 900; color: #fff; letter-spacing: .1px; }
-  .dbbet-mid-sub { font-size: 0.74rem; color: rgba(255,255,255,0.55); margin-top: 3px; }
-  .dbbet-mid-cta {
+  .sapphire-mid-banner:hover { border-color: rgba(21,101,192,0.85); }
+  .sapphire-mid-logo { height: 38px; object-fit: contain; flex-shrink: 0; filter: brightness(1.15); }
+  .sapphire-mid-text { flex: 1; min-width: 0; }
+  .sapphire-mid-title { font-size: 0.9rem; font-weight: 900; color: #fff; letter-spacing: .1px; }
+  .sapphire-mid-sub { font-size: 0.74rem; color: rgba(255,255,255,0.55); margin-top: 3px; }
+  .sapphire-mid-cta {
     flex-shrink: 0;
     background: linear-gradient(135deg,#e31c3d,#c0112e);
     color: #fff; font-size: 0.78rem; font-weight: 900;
@@ -2233,28 +2233,28 @@
     white-space: nowrap; letter-spacing: .2px;
   }
   @media (max-width: 520px) {
-    .dbbet-mid-banner { flex-wrap: wrap; padding: 14px 16px; gap: 8px; }
-    .dbbet-mid-logo { order: 1; height: 30px; }
-    .dbbet-mid-text { order: 2; flex-basis: 100%; }
-    .dbbet-mid-cta { order: 3; width: 100%; text-align: center; padding: 10px; }
+    .sapphire-mid-banner { flex-wrap: wrap; padding: 14px 16px; gap: 8px; }
+    .sapphire-mid-logo { order: 1; height: 30px; }
+    .sapphire-mid-text { order: 2; flex-basis: 100%; }
+    .sapphire-mid-cta { order: 3; width: 100%; text-align: center; padding: 10px; }
   }
   /* pred-card banner — 2 columnas: logo | [título + botón / subtítulo] */
-  .dbbet-pred-banner {
+  .sapphire-pred-banner {
     display: flex; align-items: center; gap: 12px;
     padding: 11px 14px;
-    background: linear-gradient(135deg,#1a0508,#250a10);
-    border: 1px solid rgba(227,28,61,0.55);
+    background: linear-gradient(135deg,#061225,#0d1f3c);
+    border: 1px solid rgba(21,101,192,0.55);
     border-radius: 10px; text-decoration: none;
     position: relative; overflow: hidden;
     transition: border-color .15s;
   }
-  .dbbet-pred-banner:hover { border-color: rgba(227,28,61,0.9); }
-  .dbbet-pred-logo { height: 28px; width: 68px; object-fit: contain; flex-shrink: 0; filter: brightness(1.1); }
-  .dbbet-pred-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-  .dbbet-pred-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .dbbet-pred-title { font-size: 0.74rem; font-weight: 900; color: #fff; letter-spacing: .1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .dbbet-pred-sub { font-size: 0.61rem; color: rgba(255,255,255,0.48); line-height: 1.3; }
-  .dbbet-pred-cta {
+  .sapphire-pred-banner:hover { border-color: rgba(21,101,192,0.9); }
+  .sapphire-pred-logo { height: 28px; width: 68px; object-fit: contain; flex-shrink: 0; filter: brightness(1.1); }
+  .sapphire-pred-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .sapphire-pred-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .sapphire-pred-title { font-size: 0.74rem; font-weight: 900; color: #fff; letter-spacing: .1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sapphire-pred-sub { font-size: 0.61rem; color: rgba(255,255,255,0.48); line-height: 1.3; }
+  .sapphire-pred-cta {
     background: linear-gradient(135deg,#e31c3d,#c0112e);
     color: #fff; font-size: 0.65rem; font-weight: 900;
     padding: 5px 11px; border-radius: 6px;
@@ -2266,7 +2266,7 @@
     position: fixed;
     bottom: 24px;
     right: 24px;
-    z-index: 10001; /* por encima del nav (10000) y del banner DBbet (9999) */
+    z-index: 10001; /* por encima del nav (10000) y del banner SapphireBet (9999) */
   }
 
   .chat-bubble {
@@ -2361,7 +2361,7 @@
     bottom: 70px;
     right: 0;
     width: 360px;
-    max-height: min(480px, calc(100vh - 240px)); /* no superar viewport - nav(66) - dbbet(44) - bottom(24) - burbuja(70) - margen(36) */
+    max-height: min(480px, calc(100vh - 240px)); /* no superar viewport - nav(66) - sapphire(44) - bottom(24) - burbuja(70) - margen(36) */
     background: var(--gris-card);
     border: 1px solid var(--borde);
     border-radius: 20px;
@@ -3485,11 +3485,11 @@
     .nav-links { display: none; }
     .hamburger { display: flex; }
     nav { height: 60px; padding: 0 20px; }
-    body { padding-top: 110px; } /* nav 60px + gap 6px + dbbet 44px = 110px */
-    #dbbet-sponsor-bar { top: 60px; } /* pegar el banner debajo del nav en móvil */
+    body { padding-top: 110px; } /* nav 60px + gap 6px + sapphire 44px = 110px */
+    #sapphire-sponsor-bar { top: 60px; } /* pegar el banner debajo del nav en móvil */
     #gbPageBar { top: 60px; } /* ajustar al nav de 60px en mobile */
     body[data-gbpage] { padding-top: 101px; } /* 60 nav + 40 page bar + 1 border */
-    /* Scroll-margin y sticky thead ajustados a mobile (nav 60px + dbbet 44px = 104px) */
+    /* Scroll-margin y sticky thead ajustados a mobile (nav 60px + sapphire 44px = 104px) */
     #predictions, #historial, #ranking, #bankroll, #calculator,
     #mipanel, #myPicksPanel, #telegram, #blog, #scores, #promos {
       scroll-margin-top: 114px;
@@ -3502,7 +3502,7 @@
     .logo { gap: 10px; }
     /* Paneles / modales: arrancan desde abajo de los headers fijos */
     .acoin-panel {
-      top: 104px !important;   /* nav 60px + dbbet 44px */
+      top: 104px !important;   /* nav 60px + sapphire 44px */
       padding-top: 0 !important;
       align-items: flex-start !important;
     }
@@ -3668,17 +3668,17 @@
     color: var(--verde); font-size: 0.75rem; font-weight: 800;
     display: flex; align-items: center; justify-content: center;
   }
-  .welcome-dbbet-btn {
+  .welcome-sapphire-btn {
     display: block; width: 100%; padding: 14px 20px; box-sizing: border-box;
     background: linear-gradient(135deg, #e31c3d 0%, #c0152f 100%);
     color: #fff; font-size: 0.95rem; font-weight: 800; text-align: center;
     border-radius: 14px; text-decoration: none; letter-spacing: 0.3px;
-    box-shadow: 0 6px 20px rgba(227,28,61,0.35);
+    box-shadow: 0 6px 20px rgba(21,101,192,0.35);
     transition: all .2s; border: none; cursor: pointer; font-family: inherit;
     margin-bottom: 10px;
   }
-  .welcome-dbbet-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(227,28,61,0.45); }
-  .welcome-dbbet-sub { font-size: 0.7rem; color: rgba(255,255,255,0.3); text-align: center; }
+  .welcome-sapphire-btn:hover { transform: translateY(-1px); box-shadow: 0 10px 28px rgba(227,28,61,0.45); }
+  .welcome-sapphire-sub { font-size: 0.7rem; color: rgba(255,255,255,0.3); text-align: center; }
 
   /* ── NAV AUTH BUTTON ── */
   .nav-auth-btn {
@@ -3827,7 +3827,7 @@
   }
 
   /* En modo página: ocultar sponsor bar y ajustar padding */
-  body[data-gbpage] #dbbet-sponsor-bar { display: none !important; }
+  body[data-gbpage] #sapphire-sponsor-bar { display: none !important; }
   body[data-gbpage] { padding-top: 107px; } /* 66 nav + 40 page bar + 1 border */
 
   .gb-page-back-btn {
@@ -3848,7 +3848,7 @@
   /* Ocultar elementos en modo picks */
   body[data-gbpage="picks"] #gbHero,
   body[data-gbpage="picks"] #gFeedWrap,
-  body[data-gbpage="picks"] #gbDbbetMid,
+  body[data-gbpage="picks"] #gbSapphireMid,
 
   body[data-gbpage="picks"] #myPicksPanel,
   body[data-gbpage="picks"] #myPicksDivider,
@@ -3866,7 +3866,7 @@
   body[data-gbpage="historial"] #gbHero,
   body[data-gbpage="historial"] #predictions,
   body[data-gbpage="historial"] #gFeedWrap,
-  body[data-gbpage="historial"] #gbDbbetMid,
+  body[data-gbpage="historial"] #gbSapphireMid,
 
   body[data-gbpage="historial"] #myPicksPanel,
   body[data-gbpage="historial"] #myPicksDivider,
@@ -3883,7 +3883,7 @@
   body[data-gbpage="stats"] #gbHero,
   body[data-gbpage="stats"] #predictions,
   body[data-gbpage="stats"] #gFeedWrap,
-  body[data-gbpage="stats"] #gbDbbetMid,
+  body[data-gbpage="stats"] #gbSapphireMid,
 
   body[data-gbpage="stats"] #historial,
   body[data-gbpage="stats"] #ranking,
@@ -4542,7 +4542,7 @@
   .bono-featured-cta { flex-shrink:0; }
   .bono-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:10px; margin-bottom:24px; }
   @media (max-width:640px) {
-    /* DBbet card: columna en mobile */
+    /* SapphireBet card: columna en mobile */
     .bono-featured { flex-direction:column !important; align-items:stretch !important; padding:16px !important; }
     .bono-featured-cta { width:100% !important; text-align:center !important; padding:12px !important; font-size:.9rem !important; border-radius:10px !important; }
     /* Grid 2 col en mobile */
@@ -4662,17 +4662,17 @@
   </div>
 </nav>
 
-<!-- SPONSOR BAR — DBbet -->
-<a id="dbbet-sponsor-bar" href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213" target="_blank" rel="noopener" onclick="trackEvent('promo_click',{promo:'dbbet',type:'sponsor_bar'})">
-  <img class="dbbet-bar-logo" src="https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg" alt="DBbet" onerror="this.outerHTML='<span style=\'font-weight:900;font-size:1rem;color:#ff4d6d;letter-spacing:-1px\'>DB<span style=\'color:#fff\'>bet</span></span>'">
-  <div class="dbbet-bar-sep"></div>
-  <div class="dbbet-bar-msg">
-    <span class="dbbet-txt-full">gambeta.ai es <strong>100% GRATIS</strong> gracias a DBbet · Registrate y apoyá este proyecto</span>
-    <span class="dbbet-txt-short">IA <strong>100% GRATIS</strong> gracias a <img class="dbbet-inline-logo" src="https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg" alt="DBbet"> <span style="color:rgba(255,255,255,0.45)">Sponsor</span></span>
-    <span class="dbbet-txt-xs">IA <strong>100% GRATIS</strong> · <img class="dbbet-inline-logo" src="https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg" alt="DBbet"> <span style="color:rgba(255,255,255,0.45)">Sponsor</span></span>
+<!-- SPONSOR BAR — SapphireBet -->
+<a id="sapphire-sponsor-bar" href="https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836" target="_blank" rel="noopener" onclick="trackEvent('promo_click',{promo:'sapphire',type:'sponsor_bar'})">
+  <img class="sapphire-bar-logo" src="https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg" alt="SapphireBet" onerror="this.outerHTML='<span style=\'font-weight:900;font-size:1rem;color:#FFD700;letter-spacing:-1px\'>Sapphire<span style=\'color:#FFD700\'>Bet</span></span>'">
+  <div class="sapphire-bar-sep"></div>
+  <div class="sapphire-bar-msg">
+    <span class="sapphire-txt-full">gambeta.ai es <strong>100% GRATIS</strong> gracias a SapphireBet · Registrate y apoyá este proyecto</span>
+    <span class="sapphire-txt-short">IA <strong>100% GRATIS</strong> gracias a <img class="sapphire-inline-logo" src="https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg" alt="SapphireBet"> <span style="color:rgba(255,255,255,0.45)">Sponsor</span></span>
+    <span class="sapphire-txt-xs">IA <strong>100% GRATIS</strong> · <img class="sapphire-inline-logo" src="https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg" alt="SapphireBet"> <span style="color:rgba(255,255,255,0.45)">Sponsor</span></span>
   </div>
-  <div class="dbbet-bar-sep"></div>
-  <span class="dbbet-bar-cta">Registrarme →</span>
+  <div class="sapphire-bar-sep"></div>
+  <span class="sapphire-bar-cta">Registrarme →</span>
 </a>
 
 <!-- Overlay y drawer mobile -->
@@ -4951,20 +4951,20 @@
     </div>
   </section>
 
-  <!-- BANNER DBBET SPONSOR -->
-  <section id="gbDbbetMid" style="padding:0 20px">
-    <a href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213" target="_blank" rel="noopener"
-       class="dbbet-mid-banner"
-       onclick="trackEvent('promo_click',{promo:'dbbet',type:'mid_banner'})">
-      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 50%,rgba(227,28,61,0.1),transparent 70%);pointer-events:none"></div>
-      <img src="https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg"
-           class="dbbet-mid-logo"
-           onerror="this.outerHTML='<span style=\'font-weight:900;font-size:1.4rem;color:#ff4d6d;letter-spacing:-1px\'>DB<span style=\'color:#fff\'>bet</span></span>'">
-      <div class="dbbet-mid-text">
-        <div class="dbbet-mid-title">🏆 gambeta.ai existe gracias a DBbet</div>
-        <div class="dbbet-mid-sub">Registrate y <strong style="color:#ff4d6d">duplicá 100%</strong> tu primer depósito · ¡Apoyá el proyecto!</div>
+  <!-- BANNER SAPPHIRE SPONSOR -->
+  <section id="gbSapphireMid" style="padding:0 20px">
+    <a href="https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836" target="_blank" rel="noopener"
+       class="sapphire-mid-banner"
+       onclick="trackEvent('promo_click',{promo:'sapphire',type:'mid_banner'})">
+      <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 60% 50%,rgba(21,101,192,0.1),transparent 70%);pointer-events:none"></div>
+      <img src="https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg"
+           class="sapphire-mid-logo"
+           onerror="this.outerHTML='<span style=\'font-weight:900;font-size:1.4rem;color:#FFD700;letter-spacing:-1px\'>Sapphire<span style=\'color:#FFD700\'>Bet</span></span>'">
+      <div class="sapphire-mid-text">
+        <div class="sapphire-mid-title">🏆 gambeta.ai existe gracias a SapphireBet</div>
+        <div class="sapphire-mid-sub">Registrate y <strong style="color:#FFD700">duplicá 100%</strong> tu primer depósito · ¡Apoyá el proyecto!</div>
       </div>
-      <span class="dbbet-mid-cta">Registrarme →</span>
+      <span class="sapphire-mid-cta">Registrarme →</span>
     </a>
   </section>
 
@@ -5322,18 +5322,18 @@
       🎁 Duplican tu <span style="color:#ffd600">primer depósito</span>
     </div>
 
-    <!-- DBbet destacado -->
-    <a href="https://db-bet.co/4bCBGQp" target="_blank" rel="noopener nofollow"
+    <!-- SapphireBet destacado -->
+    <a href="https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836" target="_blank" rel="noopener nofollow"
        class="bono-featured"
        style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(255,214,0,0.12),rgba(255,180,0,0.05));border:2px solid rgba(255,214,0,0.45);border-radius:16px;padding:22px 28px;margin-bottom:16px;transition:border-color .2s,background .2s"
        onmouseover="this.style.borderColor='rgba(255,214,0,.75)';this.style.background='linear-gradient(135deg,rgba(255,214,0,0.18),rgba(255,180,0,0.08))'"
        onmouseout="this.style.borderColor='rgba(255,214,0,0.45)';this.style.background='linear-gradient(135deg,rgba(255,214,0,0.12),rgba(255,180,0,0.05))'">
       <div style="display:flex;align-items:center;gap:14px">
         <div style="background:#0f0f1a;border-radius:10px;padding:5px 10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,0.1)">
-          <img src="https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg" style="height:32px;width:auto;display:block" alt="DBbet">
+          <img src="https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg" style="height:32px;width:auto;display:block" alt="SapphireBet">
         </div>
         <div style="text-align:left">
-          <div style="font-size:1.05rem;font-weight:900;color:#fff">DBbet <span style="font-size:.7rem;background:#ffd600;color:#000;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle">⭐ SPONSOR</span></div>
+          <div style="font-size:1.05rem;font-weight:900;color:#fff">SapphireBet <span style="font-size:.7rem;background:#FFD700;color:#000;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle">⭐ SPONSOR</span></div>
           <div style="font-size:.82rem;color:#ffd600;font-weight:700;margin-top:2px">100% hasta $100 USD en tu primer depósito</div>
         </div>
       </div>
@@ -9910,18 +9910,18 @@ function renderPreds() {
   // Exponer predicciones al chat IA
   window._aiPreds = source;
 
-  // CTA fija — solo DBbet como único sponsor en las fichas
+  // CTA fija — solo SapphireBet como único sponsor en las fichas
   const affCtaHtml = `
     <div style="margin:10px 0 6px">
-      <a href="${getBookLink('dbbet')}" target="_blank" rel="noopener" class="dbbet-pred-banner" onclick="trackEvent('promo_click',{promo:'dbbet',type:'pred_card'})">
-        <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(227,28,61,0.07),transparent);pointer-events:none"></div>
-        <img src="${getBookLogo('dbbet')}" class="dbbet-pred-logo" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:0.95rem;color:#ff4d6d\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">
-        <div class="dbbet-pred-body">
-          <div class="dbbet-pred-top">
-            <span class="dbbet-pred-title">🏆 Apostá en DBbet</span>
-            <span class="dbbet-pred-cta">Registrarme →</span>
+      <a href="${getBookLink('dbbet')}" target="_blank" rel="noopener" class="sapphire-pred-banner" onclick="trackEvent('promo_click',{promo:'sapphire',type:'pred_card'})">
+        <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(21,101,192,0.07),transparent);pointer-events:none"></div>
+        <img src="${getBookLogo('dbbet')}" class="sapphire-pred-logo" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:0.95rem;color:#FFD700\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">
+        <div class="sapphire-pred-body">
+          <div class="sapphire-pred-top">
+            <span class="sapphire-pred-title">💎 Apostá en SapphireBet</span>
+            <span class="sapphire-pred-cta">Registrarme →</span>
           </div>
-          <div class="dbbet-pred-sub">Main Sponsor · Duplicá 100% tu primer depósito</div>
+          <div class="sapphire-pred-sub">Main Sponsor · Duplicá 100% tu primer depósito</div>
         </div>
       </a>
     </div>`;
@@ -10576,8 +10576,8 @@ function navTo(id) {
   if (el.style.display === 'none') el.style.display = '';
   const navH    = document.querySelector('nav')?.offsetHeight || 66;
   const pageBarH = document.body.dataset.gbpage ? 40 : 0;
-  const dbbetH  = document.body.dataset.gbpage ? 0 : (document.getElementById('dbbet-sponsor-bar')?.offsetHeight || 0);
-  const top     = el.getBoundingClientRect().top + window.scrollY - navH - dbbetH - pageBarH - 10;
+  const sapphireH  = document.body.dataset.gbpage ? 0 : (document.getElementById('sapphire-sponsor-bar')?.offsetHeight || 0);
+  const top     = el.getBoundingClientRect().top + window.scrollY - navH - sapphireH - pageBarH - 10;
   window.scrollTo({ top, behavior: 'smooth' });
   document.querySelectorAll('.nav-links a, .nav-drawer a').forEach(a => a.classList.remove('active'));
 }
@@ -12375,7 +12375,7 @@ const BOOK_AFFILIATE = {
   megapari:  'https://proarg.megapari-003572.in/',
   melbet:    'https://refpa3665.com/L?tag=d_5377076m_2170c_&site=5377076&ad=2170&r=registration',
   betwinner: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM',
-  dbbet:     'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213',
+  sapphire_aff:  'https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836',
   sapphire:  'https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836&r=email',
 };
 function getBookLink(key) {
@@ -12391,7 +12391,7 @@ const BOOK_LOGOS = {
   megapari:   'https://www.google.com/s2/favicons?domain=megapari.com&sz=64',
   melbet:     'https://www.google.com/s2/favicons?domain=melbet.com&sz=64',
   betwinner:  'https://www.google.com/s2/favicons?domain=betwinner.com&sz=64',
-  dbbet:      'https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg',
+  sapphire_aff:   'https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg',
   sapphire:   'https://www.google.com/s2/favicons?domain=sapphirebet.com&sz=64',
   // Fallbacks para keys que pueden venir de la API
   bet365:     'https://www.google.com/s2/favicons?domain=bet365.com&sz=64',
@@ -12419,7 +12419,7 @@ const FIXED_BOOKS = [
   { key:'megapari',  label:'Megapari',    feat:true  },
   { key:'melbet',    label:'Melbet',      feat:true  },
   { key:'betwinner', label:'BetWinner',   feat:false },
-  { key:'dbbet',     label:'DBBet',       feat:false },
+  { key:'sapphire',  label:'SapphireBet', feat:false },
   { key:'sapphire',  label:'SapphireBet', feat:false },
 ];
 
@@ -14482,20 +14482,20 @@ function renderMyPanel() {
 //  PREMIOS — Gambeta Coins rewards catalog
 // ═══════════════════════════════════════════
 const PREMIOS_DATA = [
-  // Tier 1 — $20 USD  (DBbet es el más barato)
-  { tier:1, casa:'DBbet',       logo:'https://www.google.com/s2/favicons?domain=db-bet.com&sz=64',       usd:20,  cost:100000, sponsor:true },
+  // Tier 1 — $20 USD  (SapphireBet es el más barato)
+  { tier:1, casa:'SapphireBet',       logo:'https://www.google.com/s2/favicons?domain=sapphirebet.com&sz=64',       usd:20,  cost:100000, sponsor:true },
   { tier:1, casa:'Melbet',      logo:'https://www.google.com/s2/favicons?domain=melbet.com&sz=64',       usd:20,  cost:120000 },
   { tier:1, casa:'Megapari',    logo:'https://www.google.com/s2/favicons?domain=megapari.com&sz=64',     usd:20,  cost:140000 },
   { tier:1, casa:'BetWinner',   logo:'https://www.google.com/s2/favicons?domain=betwinner.com&sz=64',    usd:20,  cost:140000 },
   { tier:1, casa:'SapphireBet', logo:'https://www.google.com/s2/favicons?domain=sapphirebet.com&sz=64',  usd:20,  cost:140000 },
-  // Tier 2 — $70 USD  (DBbet más barato)
-  { tier:2, casa:'DBbet',       logo:'https://www.google.com/s2/favicons?domain=db-bet.com&sz=64',       usd:70,  cost:330000, sponsor:true },
+  // Tier 2 — $70 USD  (SapphireBet más barato)
+  { tier:2, casa:'SapphireBet',       logo:'https://www.google.com/s2/favicons?domain=sapphirebet.com&sz=64',       usd:70,  cost:330000, sponsor:true },
   { tier:2, casa:'Melbet',      logo:'https://www.google.com/s2/favicons?domain=melbet.com&sz=64',       usd:70,  cost:320000 },
   { tier:2, casa:'Megapari',    logo:'https://www.google.com/s2/favicons?domain=megapari.com&sz=64',     usd:70,  cost:370000 },
   { tier:2, casa:'BetWinner',   logo:'https://www.google.com/s2/favicons?domain=betwinner.com&sz=64',    usd:70,  cost:370000 },
   { tier:2, casa:'SapphireBet', logo:'https://www.google.com/s2/favicons?domain=sapphirebet.com&sz=64',  usd:70,  cost:370000 },
-  // Tier 3 — $230 USD  (DBbet más barato)
-  { tier:3, casa:'DBbet',       logo:'https://www.google.com/s2/favicons?domain=db-bet.com&sz=64',       usd:230, cost:980000,  sponsor:true },
+  // Tier 3 — $230 USD  (SapphireBet más barato)
+  { tier:3, casa:'SapphireBet',       logo:'https://www.google.com/s2/favicons?domain=sapphirebet.com&sz=64',       usd:230, cost:980000,  sponsor:true },
   { tier:3, casa:'Melbet',      logo:'https://www.google.com/s2/favicons?domain=melbet.com&sz=64',       usd:230, cost:1020000 },
   { tier:3, casa:'Megapari',    logo:'https://www.google.com/s2/favicons?domain=megapari.com&sz=64',     usd:230, cost:1020000 },
   { tier:3, casa:'BetWinner',   logo:'https://www.google.com/s2/favicons?domain=betwinner.com&sz=64',    usd:230, cost:1020000 },
@@ -14524,18 +14524,18 @@ function renderPremios() {
       : (p.cost / 1000).toFixed(0) + 'K';
     const label    = p.desc || (p.usd ? `$${p.usd} USD` : '');
     const card = document.createElement('div');
-    card.className = 'premio-card' + (unlocked ? ' unlocked' : '') + (p.sponsor ? ' dbbet-sponsor' : '');
+    card.className = 'premio-card' + (unlocked ? ' unlocked' : '') + (p.sponsor ? ' sapphire-sponsor' : '');
     if (p.sponsor) {
-      card.style.cssText = (card.style.cssText || '') + ';border-color:rgba(227,28,61,0.6);background:linear-gradient(160deg,#1a0508,#120308);';
+      card.style.cssText = (card.style.cssText || '') + ';border-color:rgba(21,101,192,0.6);background:linear-gradient(160deg,#061225,#03091a);';
     }
     card.innerHTML = `
-      ${p.sponsor ? '<div style="font-size:0.55rem;font-weight:900;color:#e31c3d;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">🏆 Sponsor</div>' : ''}
+      ${p.sponsor ? '<div style="font-size:0.55rem;font-weight:900;color:#1565C0;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">🏆 Sponsor</div>' : ''}
       <span class="premio-lock">🔒</span>
-      <img class="premio-logo" src="${p.sponsor ? 'https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg' : p.logo}" alt="${p.casa}" onerror="this.src='https://www.google.com/s2/favicons?domain=${p.casa.toLowerCase().replace(/ /g,'')}.com&sz=64'" style="${p.sponsor ? 'filter:brightness(1.1)' : ''}">
+      <img class="premio-logo" src="${p.sponsor ? 'https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg' : p.logo}" alt="${p.casa}" onerror="this.src='https://www.google.com/s2/favicons?domain=${p.casa.toLowerCase().replace(/ /g,'')}.com&sz=64'" style="${p.sponsor ? 'filter:brightness(1.1)' : ''}">
       <div class="premio-name">${p.casa}</div>
       <div class="premio-usd">${p.usd ? `$${p.usd} USD` : p.desc}</div>
-      <div class="premio-cost"><span class="acico" style="font-size:0.55rem;width:1.5em;height:1.5em">G$</span> ${costFmt}${p.sponsor ? ' <span style="font-size:0.55rem;color:#e31c3d;font-weight:900">★</span>' : ''}</div>
-      <div class="premio-prog"><div class="premio-prog-fill" style="width:${pct}%;${p.sponsor ? 'background:linear-gradient(90deg,#e31c3d,#ff4d6d)' : ''}"></div></div>
+      <div class="premio-cost"><span class="acico" style="font-size:0.55rem;width:1.5em;height:1.5em">G$</span> ${costFmt}${p.sponsor ? ' <span style="font-size:0.55rem;color:#1565C0;font-weight:900">★</span>' : ''}</div>
+      <div class="premio-prog"><div class="premio-prog-fill" style="width:${pct}%;${p.sponsor ? 'background:linear-gradient(90deg,#1565C0,#FFD700)' : ''}"></div></div>
       <div class="premio-pct">${unlocked ? '✅ ¡Podés canjear!' : pct + '% completado'}</div>
     `;
     if (unlocked) {
@@ -15205,13 +15205,13 @@ function _purgeNbaPicks() {
       </div>
     </div>
 
-    <a href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213"
+    <a href="https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836"
        target="_blank" rel="noopener"
-       class="welcome-dbbet-btn"
-       onclick="trackEvent('promo_click',{promo:'dbbet',type:'welcome_modal'})">
-      🎁 Creá tu cuenta en DBbet y recibí tu bono de bienvenida →
+       class="welcome-sapphire-btn"
+       onclick="trackEvent('promo_click',{promo:'sapphire',type:'welcome_modal'})">
+      💎 Creá tu cuenta en SapphireBet y recibí tu bono de bienvenida →
     </a>
-    <div class="welcome-dbbet-sub">Nuestro sponsor oficial · Duplicá tu primer depósito hasta $100 USD</div>
+    <div class="welcome-sapphire-sub">Nuestro sponsor oficial · Duplicá tu primer depósito hasta $100 USD</div>
   </div>
 </div>
 
@@ -18734,7 +18734,7 @@ function getDailyPromoCta() {
   const promos = {
     0: { texto: '🎁 Mañana <strong>Melbet duplica tu depósito</strong> — aprovechalo antes de las 23:59.',  casa: 'Melbet',      link: 'https://refpa3665.com/L?tag=d_5377076m_2170c_&site=5377076&ad=2170&r=registration' },
     1: { texto: '🎁 Hoy <strong>Melbet duplica tu depósito</strong> — el bono se activa solo los lunes.',   casa: 'Melbet',      link: 'https://refpa3665.com/L?tag=d_5377076m_2170c_&site=5377076&ad=2170&r=registration' },
-    2: { texto: '🎁 Hoy <strong>DBbet y Sapphirebet duplican tu primer depósito</strong> — bonos de bienvenida activos.', casa: 'DBbet',  link: 'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213', link2: 'https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836&r=email', casa2: 'SapphireBet' },
+    2: { texto: '🎁 Hoy <strong>SapphireBet duplica tu primer depósito</strong> — bonos de bienvenida activos.', casa: 'SapphireBet',  link: 'https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836', link2: 'https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836&r=email', casa2: 'SapphireBet' },
     3: { texto: '🎁 Mañana <strong>BetWinner duplica tu depósito</strong> — preparate hoy para el bono del jueves.', casa: 'BetWinner', link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
     4: { texto: '🎁 Hoy <strong>BetWinner duplica tu depósito</strong> — el bono del jueves está activo ahora.', casa: 'BetWinner',   link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
     5: { texto: '🎁 Mañana <strong>Megapari duplica tu depósito</strong> — depositá hoy para tenerlo listo.',  casa: 'Megapari',   link: 'https://proarg.megapari-003572.in/' },
@@ -18744,7 +18744,7 @@ function getDailyPromoCta() {
     'Melbet':      'https://www.google.com/s2/favicons?domain=melbet.com&sz=64',
     'BetWinner':   'https://www.google.com/s2/favicons?domain=betwinner.com&sz=64',
     'Megapari':    'https://www.google.com/s2/favicons?domain=megapari.com&sz=64',
-    'DBbet':       'https://www.google.com/s2/favicons?domain=db-bet.com&sz=64',
+    'SapphireBet':       'https://www.google.com/s2/favicons?domain=sapphirebet.com&sz=64',
     'SapphireBet': 'https://www.google.com/s2/favicons?domain=sapphirebet.com&sz=64',
   };
   const faviconImg = (nombre) => {
@@ -18916,25 +18916,25 @@ function _showPromoDirecta() {
 
   const day = new Date().getDay();
   const dailyPromo = {
-    0: '🔴 <strong>DBbet</strong>, nuestro Main Sponsor, te da el <strong>100% de bono en tu primer depósito</strong> — registrate hoy y empezá con el doble. Gracias a ellos gambeta.ai es gratis.',
-    1: '🔴 HOY <strong>DBbet duplica tu primer depósito al 100%</strong> — depositás $50 y apostás con $100. Activalo en "Mis Bonos" antes de apostar. Son nuestros sponsors, apoyalos.',
-    2: '🔴 <strong>DBbet</strong> te está esperando: <strong>100% de bono en tu primer depósito</strong>, plataforma moderna y cuotas competitivas. Registrate ahora y bancarlos — hacen posible este proyecto.',
-    3: '🔴 ¿Todavía no te registraste en <strong>DBbet</strong>? Es nuestro Main Sponsor: te dan el <strong>doble de tu primer depósito</strong> y vos bancás que gambeta.ai siga siendo gratis.',
-    4: '🔴 <strong>DBbet</strong> — nuestro sponsor — duplica tu primer depósito. <strong>Creá tu cuenta hoy</strong> y apostá con más plata. Sin DBbet no hay gambeta.ai.',
-    5: '🔴 Finde de fútbol y <strong>DBbet con el 100% de bono activo</strong> — la combinación perfecta. Registrate, depositá y doblá tu saldo antes de los partidos de hoy.',
-    6: '🔴 Último día del finde: <strong>DBbet sigue con el bono del 100%</strong> para nuevos usuarios. Registrate ahora y apostá con el doble en los cierres de jornada.'
+    0: '🔴 <strong>SapphireBet</strong>, nuestro Main Sponsor, te da el <strong>100% de bono en tu primer depósito</strong> — registrate hoy y empezá con el doble. Gracias a ellos gambeta.ai es gratis.',
+    1: '💎 HOY <strong>SapphireBet duplica tu primer depósito al 100%</strong> — depositás $50 y apostás con $100. Activalo en "Mis Bonos" antes de apostar. Son nuestros sponsors, apoyalos.',
+    2: '🔴 <strong>SapphireBet</strong> te está esperando: <strong>100% de bono en tu primer depósito</strong>, plataforma moderna y cuotas competitivas. Registrate ahora y bancarlos — hacen posible este proyecto.',
+    3: '🔴 ¿Todavía no te registraste en <strong>SapphireBet</strong>? Es nuestro Main Sponsor: te dan el <strong>doble de tu primer depósito</strong> y vos bancás que gambeta.ai siga siendo gratis.',
+    4: '🔴 <strong>SapphireBet</strong> — nuestro sponsor — duplica tu primer depósito. <strong>Creá tu cuenta hoy</strong> y apostá con más plata. Sin SapphireBet no hay gambeta.ai.',
+    5: '💎 Finde de fútbol y <strong>SapphireBet con el 100% de bono activo</strong> — la combinación perfecta. Registrate, depositá y doblá tu saldo antes de los partidos de hoy.',
+    6: '💎 Último día del finde: <strong>SapphireBet sigue con el bono del 100%</strong> para nuevos usuarios. Registrate ahora y apostá con el doble en los cierres de jornada.'
   };
 
-  // DBbet hero banner
-  const dbbetHero =
-    `<a href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213" target="_blank" rel="noopener" onclick="trackEvent('promo_click',{promo:'dbbet',type:'ai_promo'})" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg,#1a0508,#2a0a12);border:1px solid rgba(227,28,61,0.5);border-radius:12px;text-decoration:none;margin-bottom:10px;position:relative;overflow:hidden">` +
-    `<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(227,28,61,0.08),transparent);pointer-events:none"></div>` +
-    `<img src="https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg" style="height:32px;object-fit:contain;flex-shrink:0;filter:brightness(1.1)" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:1.1rem;color:#ff4d6d\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">` +
+  // SapphireBet hero banner
+  const sapphireHero =
+    `<a href="https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836" target="_blank" rel="noopener" onclick="trackEvent('promo_click',{promo:'sapphire',type:'ai_promo'})" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg,#061225,#0d2147);border:1px solid rgba(21,101,192,0.5);border-radius:12px;text-decoration:none;margin-bottom:10px;position:relative;overflow:hidden">` +
+    `<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(21,101,192,0.08),transparent);pointer-events:none"></div>` +
+    `<img src="https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg" style="height:32px;object-fit:contain;flex-shrink:0;filter:brightness(1.1)" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:1.1rem;color:#FFD700\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">` +
     `<div style="flex:1;min-width:0">` +
     `<div style="font-size:0.85rem;font-weight:900;color:#fff;margin-bottom:2px">Main Sponsor de gambeta.ai</div>` +
     `<div style="font-size:0.7rem;color:rgba(255,255,255,0.6)">100% bono en tu primer depósito · Hacés posible que esto sea gratis</div>` +
     `</div>` +
-    `<span style="background:linear-gradient(135deg,#e31c3d,#c0112e);color:#fff;font-size:0.68rem;font-weight:900;padding:8px 13px;border-radius:8px;white-space:nowrap;flex-shrink:0">Registrarme →</span>` +
+    `<span style="background:linear-gradient(135deg,#1565C0,#0d47a1);color:#fff;font-size:0.68rem;font-weight:900;padding:8px 13px;border-radius:8px;white-space:nowrap;flex-shrink:0">Registrarme →</span>` +
     `</a>`;
 
   const otrosCasas = [
@@ -18954,7 +18954,7 @@ function _showPromoDirecta() {
 
   const html =
     `<div style="font-size:0.88rem;line-height:1.55;margin-bottom:12px">${dailyPromo[day]}</div>` +
-    dbbetHero +
+    sapphireHero +
     `<div style="font-size:0.68rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.7px;margin-bottom:7px;margin-top:4px">Otros sponsors</div>` +
     `<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:12px">${otrosCasasHtml}</div>` +
     `<div style="background:rgba(227,28,61,0.07);border:1px solid rgba(227,28,61,0.2);border-radius:10px;padding:10px 13px;font-size:0.75rem;color:rgba(255,255,255,0.7);line-height:1.55">` +
@@ -19103,21 +19103,21 @@ async function aiSend() {
       badge.innerHTML = '🌐 Información en tiempo real';
       msgEl.appendChild(badge);
     }
-    // Mini-publicidad DBbet cuando la respuesta menciona cuotas / odds
+    // Mini-publicidad SapphireBet cuando la respuesta menciona cuotas / odds
     if (aiReplyMentionsOdds(reply)) {
       const ad = document.createElement('div');
-      ad.style.cssText = 'margin-top:9px;background:linear-gradient(135deg,rgba(227,28,61,0.13),rgba(180,10,40,0.07));border:1px solid rgba(227,28,61,0.4);border-radius:10px;padding:8px 11px;display:flex;align-items:center;gap:9px;';
+      ad.style.cssText = 'margin-top:9px;background:linear-gradient(135deg,rgba(21,101,192,0.13),rgba(10,50,120,0.07));border:1px solid rgba(21,101,192,0.4);border-radius:10px;padding:8px 11px;display:flex;align-items:center;gap:9px;';
       ad.innerHTML = `
-        <img src="https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg"
+        <img src="https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg"
              style="height:22px;object-fit:contain;flex-shrink:0;filter:brightness(1.1)"
-             onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:1rem;color:#ff4d6d;letter-spacing:-0.5px\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">
+             onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:1rem;color:#FFD700;letter-spacing:-0.5px\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">
         <div style="flex:1;min-width:0">
-          <div style="font-size:0.7rem;font-weight:900;color:#ff4d6d;letter-spacing:0.5px;line-height:1.2">🏆 MAIN SPONSOR</div>
-          <div style="font-size:0.65rem;color:rgba(255,255,255,0.65);line-height:1.3">Apostá estas cuotas en DBbet y bancá el proyecto</div>
+          <div style="font-size:0.7rem;font-weight:900;color:#FFD700;letter-spacing:0.5px;line-height:1.2">💎 MAIN SPONSOR</div>
+          <div style="font-size:0.65rem;color:rgba(255,255,255,0.65);line-height:1.3">Apostá estas cuotas en SapphireBet y bancá el proyecto</div>
         </div>
-        <a href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213" target="_blank" rel="noopener"
-           onclick="trackEvent('promo_click',{promo:'dbbet',type:'ai_odds_ad'})"
-           style="background:linear-gradient(135deg,#e31c3d,#c0112e);color:#fff;font-size:0.63rem;font-weight:800;padding:5px 10px;border-radius:7px;text-decoration:none;white-space:nowrap;letter-spacing:0.3px;flex-shrink:0">
+        <a href="https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836" target="_blank" rel="noopener"
+           onclick="trackEvent('promo_click',{promo:'sapphire',type:'ai_odds_ad'})"
+           style="background:linear-gradient(135deg,#1565C0,#0d47a1);color:#fff;font-size:0.63rem;font-weight:800;padding:5px 10px;border-radius:7px;text-decoration:none;white-space:nowrap;letter-spacing:0.3px;flex-shrink:0">
           APOSTAR →
         </a>`;
       msgEl.appendChild(ad);
