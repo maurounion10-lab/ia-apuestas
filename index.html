@@ -2240,8 +2240,8 @@
   }
   /* pred-card banner — 2 columnas: logo | [título + botón / subtítulo] */
   .sapphire-pred-banner {
-    display: flex; align-items: center; gap: 12px;
-    padding: 11px 14px;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 13px;
     background: linear-gradient(135deg,#061225,#0d1f3c);
     border: 1px solid rgba(21,101,192,0.55);
     border-radius: 10px; text-decoration: none;
@@ -2249,16 +2249,16 @@
     transition: border-color .15s;
   }
   .sapphire-pred-banner:hover { border-color: rgba(21,101,192,0.9); }
-  .sapphire-pred-logo { height: 28px; width: 68px; object-fit: contain; flex-shrink: 0; filter: brightness(1.1); }
-  .sapphire-pred-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-  .sapphire-pred-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .sapphire-pred-title { font-size: 0.74rem; font-weight: 900; color: #fff; letter-spacing: .1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .sapphire-pred-sub { font-size: 0.61rem; color: rgba(255,255,255,0.48); line-height: 1.3; }
+  .sapphire-pred-logo { height: 34px; width: 34px; object-fit: contain; flex-shrink: 0; border-radius: 6px; }
+  .sapphire-pred-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+  .sapphire-pred-top { display: flex; align-items: center; gap: 6px; }
+  .sapphire-pred-title { font-size: 0.78rem; font-weight: 900; color: #fff; letter-spacing: .1px; white-space: nowrap; }
+  .sapphire-pred-sub { font-size: 0.60rem; color: rgba(255,255,255,0.45); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sapphire-pred-cta {
-    background: linear-gradient(135deg,#e31c3d,#c0112e);
+    background: linear-gradient(135deg,#1565C0,#0d47a1);
     color: #fff; font-size: 0.65rem; font-weight: 900;
-    padding: 5px 11px; border-radius: 6px;
-    white-space: nowrap; flex-shrink: 0;
+    padding: 7px 13px; border-radius: 7px;
+    white-space: nowrap; flex-shrink: 0; letter-spacing: .2px;
   }
 
   /* ── CHAT ── */
@@ -9913,16 +9913,14 @@ function renderPreds() {
   // CTA fija — solo SapphireBet como único sponsor en las fichas
   const affCtaHtml = `
     <div style="margin:10px 0 6px">
-      <a href="${getBookLink('dbbet')}" target="_blank" rel="noopener" class="sapphire-pred-banner" onclick="trackEvent('promo_click',{promo:'sapphire',type:'pred_card'})">
+      <a href="${'https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836'}" target="_blank" rel="noopener" class="sapphire-pred-banner" onclick="trackEvent('promo_click',{promo:'sapphire',type:'pred_card'})">
         <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(21,101,192,0.07),transparent);pointer-events:none"></div>
-        <img src="${getBookLogo('dbbet')}" class="sapphire-pred-logo" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:0.95rem;color:#FFD700\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">
+        <img src="https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg" class="sapphire-pred-logo" onerror="this.style.display='none'">
         <div class="sapphire-pred-body">
-          <div class="sapphire-pred-top">
-            <span class="sapphire-pred-title">💎 SapphireBet</span>
-            <span class="sapphire-pred-cta">Apostar aquí →</span>
-          </div>
+          <span class="sapphire-pred-title">💎 SapphireBet</span>
           <div class="sapphire-pred-sub">Main Sponsor · Duplicá 100% tu primer depósito</div>
         </div>
+        <span class="sapphire-pred-cta">Apostar aquí →</span>
       </a>
     </div>`;
 
