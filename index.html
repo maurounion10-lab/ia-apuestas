@@ -10058,6 +10058,9 @@ function renderPreds() {
       p.conf === 'high' || p.conf === 'med' ||        // alta y media: siempre
       parseFloat(p._bestOdds || 0) >= 3.00;           // baja: solo si cuota >= 3.00
     if (sf === 'all') realPreds = realPreds.filter(_bajaFilter);
+    // ── Piso mínimo de confianza: descartar bvr≤3 (Media) sin importar el origen ──
+    // Cubre picks viejos rescatados de _sbLockedPicks antes del cambio de umbral
+    realPreds = realPreds.filter(p => p._started || !p.bvr || p.bvr >= 4);
     // Separar upcoming y terminados — ambos ya ordenados por confianza
     let upcoming  = realPreds.filter(p => !p._started).sort(sortByConf);
     let finished  = realPreds.filter(p =>  p._started).sort(sortByConf);
