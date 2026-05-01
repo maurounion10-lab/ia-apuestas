@@ -9302,17 +9302,35 @@ function buildPredsFromOdds() {
     const maxProb  = best.prob || probH;
     const bestOdds = best.odds;
 
-    let conf, confLabel;
-    if      (maxProb >= 62) { conf = 'high'; confLabel = 'Alta'; }
-    else if (maxProb >= 58) { conf = 'med';  confLabel = 'Media-Alta'; }
-    else                    { return null; } // Por debajo de Media-Alta — no generar pick
+    // Ligas "nuevas/desconocidas": piso mínimo Alta (62%) — Media-Alta no aplica
+    const STRICT_CONF_LEAGUES = new Set([
+      'soccer_england_championship', 'soccer_belgium_first_div',
+      'soccer_germany_bundesliga2',  'soccer_spain_segunda_division',
+      'soccer_italy_serie_b',        'soccer_france_ligue_two',
+      'soccer_austria_bundesliga',   'soccer_switzerland_superleague',
+      'soccer_denmark_superliga',    'soccer_sweden_allsvenskan',
+      'soccer_norway_eliteserien',   'soccer_poland_ekstraklasa',
+      'soccer_czech_liga',           'soccer_romania_liga1',
+      'soccer_russia_premier_league','soccer_colombia_primera_a',
+      'soccer_ecuador_primera_a',    'soccer_peru_primera_division',
+      'soccer_venezuela_primera',    'soccer_bolivia_primera_division',
+      'soccer_paraguay_primera_division', 'soccer_south_korea_kleague1',
+      'soccer_australia_a_league',
+    ]);
+    const _isStrictLeague = STRICT_CONF_LEAGUES.has(g.sport_key || '');
+    const _minProb = _isStrictLeague ? 62 : 58;
 
-    // Bet Value Rating 4–6 (bvr=3 eliminado — piso mínimo: Media-Alta)
-    // Máxima (≥75%) → 6  |  Alta (62-74%) → 5  |  Media-Alta (58-61%) → 4
+    let conf, confLabel;
+    if      (maxProb >= 62)        { conf = 'high'; confLabel = 'Alta'; }
+    else if (maxProb >= _minProb)  { conf = 'med';  confLabel = 'Media-Alta'; }
+    else                           { return null; } // Debajo del umbral mínimo para esta liga
+
+    // Bet Value Rating 4–6 (bvr=3 eliminado — piso mínimo: Media-Alta o Alta según liga)
+    // Máxima (≥75%) → 6  |  Alta (62-74%) → 5  |  Media-Alta (58-61%, solo ligas conocidas) → 4
     let bvr;
     if      (conf === 'high' && maxProb >= 75) bvr = 6;
     else if (conf === 'high')                  bvr = 5;
-    else                                       bvr = 4; // conf='med', 58-61%
+    else                                       bvr = 4;
     const bvrText = bvr === 6 ? 'Máxima' : bvr === 5 ? 'Alta' : 'Media-Alta';
 
     // Cuotas formateadas
