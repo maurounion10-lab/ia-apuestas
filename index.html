@@ -3350,6 +3350,45 @@
   .acoin-pick-btn.result-fail .apb-coins { color: #ff6b6b; }
   .acoin-pick-btn:disabled { cursor: default; opacity: 0.6; }
 
+  /* ── In-page push toast (reemplaza la notificación nativa cuando la app está abierta) ── */
+  #inPagePushToast {
+    position: fixed;
+    top: 122px; /* nav 66px + sponsor 50px + 6px gap */
+    left: 50%;
+    transform: translateX(-50%) translateY(-16px);
+    z-index: 10003;
+    background: linear-gradient(135deg, #0c1a0c, #091209);
+    border: 1.5px solid rgba(0,200,83,0.45);
+    border-radius: 14px;
+    padding: 13px 16px 13px 18px;
+    display: flex; align-items: center; gap: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.7), 0 0 20px rgba(0,200,83,0.12);
+    min-width: 260px; max-width: min(400px, 92vw);
+    opacity: 0; pointer-events: none;
+    transition: transform .3s cubic-bezier(0.22,1,0.36,1), opacity .25s;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  #inPagePushToast.ippt-show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1; pointer-events: all;
+  }
+  @media (max-width: 700px) {
+    #inPagePushToast { top: 116px; } /* nav 60px + sponsor 50px + 6px */
+  }
+  .ippt-icon { font-size: 1.5rem; flex-shrink: 0; }
+  .ippt-title { font-size: 0.78rem; font-weight: 800; color: #00e664; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .ippt-body  { font-size: 0.82rem; color: rgba(255,255,255,0.8); line-height: 1.4; }
+  .ippt-close {
+    flex-shrink: 0; align-self: flex-start;
+    background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.45); font-size: 0.8rem; cursor: pointer;
+    width: 26px; height: 26px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: color .15s, background .15s;
+  }
+  .ippt-close:hover { color: #fff; background: rgba(255,255,255,0.14); }
+
   /* Floating toast notification — entra por izquierda, pausa centro, sale por derecha */
   .acoin-toast {
     position: fixed;
@@ -19839,6 +19878,16 @@ function aiGetMatchContext() {
 }
 </script>
 
+<!-- IN-PAGE PUSH TOAST (visible cuando la app está abierta y llega un push) -->
+<div id="inPagePushToast" role="alert" aria-live="polite">
+  <span class="ippt-icon">📣</span>
+  <div style="flex:1;min-width:0">
+    <div class="ippt-title" id="ipptTitle">gambeta.ai</div>
+    <div class="ippt-body" id="ipptBody"></div>
+  </div>
+  <button class="ippt-close" onclick="event.stopPropagation();document.getElementById('inPagePushToast').classList.remove('ippt-show')" title="Cerrar">✕</button>
+</div>
+
 <!-- $A-COIN TOAST -->
 <div class="acoin-toast" id="acoinToast">
   <span class="acoin-toast-icon" id="acoinToastIcon"><span class="acico">G$</span></span>
@@ -20170,7 +20219,30 @@ if ('serviceWorker' in navigator) {
         reg.update(); // forzar chequeo de actualización en cada carga
       })
       .catch(err => console.warn('[SW] Error:', err));
+
+    // Recibir mensajes del SW (push in-page cuando la app está abierta)
+    navigator.serviceWorker.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'push-in-page') {
+        _showInPagePushToast(e.data.data || {});
+      }
+    });
   });
+}
+
+function _showInPagePushToast(data) {
+  const toast = document.getElementById('inPagePushToast');
+  if (!toast) return;
+  document.getElementById('ipptTitle').textContent = data.title || 'gambeta.ai';
+  document.getElementById('ipptBody').textContent  = data.body  || '';
+  const url = data.url || '/';
+  toast.onclick = function(e) {
+    if (e.target.classList.contains('ippt-close')) return;
+    window.location.href = url;
+  };
+  toast.classList.add('ippt-show');
+  // Auto-ocultar a los 6 segundos
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => toast.classList.remove('ippt-show'), 6000);
 }
 
 /// ═══ ADMIN: VER PICKS DE USUARIO ═══

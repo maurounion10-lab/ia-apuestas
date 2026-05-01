@@ -85,16 +85,26 @@ self.addEventListener('push', event => {
   try { data = { ...data, ...event.data.json() }; } catch(e) {}
 
   event.waitUntil(
-    self.registration.showNotification(data.title, {
-      body: data.body,
-      icon: '/og-image.png',
-      badge: '/og-image.png',
-      vibrate: [200, 100, 200],
-      data: { url: data.url },
-      actions: [
-        { action: 'open', title: 'Ver picks' },
-        { action: 'dismiss', title: 'Cerrar' }
-      ]
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
+      // Si hay alguna pestaña visible con la app abierta, enviamos mensaje
+      // para mostrar notificación in-page (no se superpone con el sponsor bar)
+      const visible = clientList.filter(c => c.visibilityState === 'visible');
+      if (visible.length > 0) {
+        visible.forEach(c => c.postMessage({ type: 'push-in-page', data }));
+        return Promise.resolve(); // no mostrar notificación nativa del browser
+      }
+      // Sin pestaña abierta → notificación nativa del OS
+      return self.registration.showNotification(data.title, {
+        body: data.body,
+        icon: '/og-image.png',
+        badge: '/og-image.png',
+        vibrate: [200, 100, 200],
+        data: { url: data.url },
+        actions: [
+          { action: 'open', title: 'Ver picks' },
+          { action: 'dismiss', title: 'Cerrar' }
+        ]
+      });
     })
   );
 });
