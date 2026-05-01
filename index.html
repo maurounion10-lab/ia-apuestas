@@ -467,32 +467,61 @@
   }
   .hero-bubble {
     display: none;
-    position: relative;
-    margin: 10px 0 4px;
-    background: rgba(15,30,20,0.97);
-    border: 1px solid rgba(0,200,83,0.35);
+    background: rgba(12,26,18,0.97);
+    border: 1px solid rgba(0,200,83,0.4);
     border-radius: 14px;
-    padding: 12px 16px;
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.9);
+    padding: 12px 15px;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.92);
     line-height: 1.5;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    animation: herobubblein 0.22s cubic-bezier(0.34,1.56,0.64,1) both;
-    max-width: 380px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.55);
+    animation: herobubblein 0.24s cubic-bezier(0.34,1.56,0.64,1) both;
   }
-  .hero-bubble::before {
+  /* Bubble anclada a la mascota — flota a la izquierda en desktop,
+     arriba en mobile */
+  .hero-bubble--mascot {
+    position: absolute;
+    right: calc(100% + 14px); /* sale hacia la izquierda de la imagen */
+    top: 10px;
+    width: 210px;
+    z-index: 20;
+  }
+  /* Flechita que apunta hacia la imagen (derecha) */
+  .hero-bubble--mascot::after {
     content: '';
     position: absolute;
-    top: -7px; left: 22px;
+    right: -7px; top: 18px;
     width: 12px; height: 12px;
-    background: rgba(15,30,20,0.97);
-    border-left: 1px solid rgba(0,200,83,0.35);
-    border-top:  1px solid rgba(0,200,83,0.35);
+    background: rgba(12,26,18,0.97);
+    border-right: 1px solid rgba(0,200,83,0.4);
+    border-top:   1px solid rgba(0,200,83,0.4);
     transform: rotate(45deg);
   }
+  @media (max-width: 768px) {
+    .hero-bubble--mascot {
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      top: auto;
+      bottom: calc(100% + 12px);
+      width: min(78vw, 280px);
+    }
+    /* Flechita apunta hacia abajo en mobile */
+    .hero-bubble--mascot::after {
+      right: auto; top: auto;
+      left: 50%; bottom: -7px;
+      transform: translateX(-50%) rotate(135deg);
+    }
+  }
   @keyframes herobubblein {
-    from { opacity:0; transform: scale(0.88) translateY(6px); }
-    to   { opacity:1; transform: scale(1)    translateY(0);   }
+    from { opacity:0; transform: scale(0.88) translateX(6px); }
+    to   { opacity:1; transform: scale(1)    translateX(0);   }
+  }
+  @media (max-width: 768px) {
+    @keyframes herobubblein {
+      from { opacity:0; transform: translateX(-50%) scale(0.88) translateY(6px); }
+      to   { opacity:1; transform: translateX(-50%) scale(1)    translateY(0);   }
+    }
   }
   /* ── */
   .hero-tag {
@@ -4956,8 +4985,6 @@ window.toggleHeroBubble = function(n) {
     <div class="hero-tag">⚡ IA Actualizada en Tiempo Real<span class="live-dot" style="margin-left:7px;margin-right:0"></span></div>
     <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apuestas de Fútbol <span class="hero-emoji-btn" id="heroEmoji1" onclick="toggleHeroBubble(1)" title="Más info">🌎<sup class="hero-emoji-hint">✦</sup></span></span></h1>
     <p>Soy una IA que pronostica Fútbol automáticamente, configurada por un experto y gratis para todo mundo <span class="hero-emoji-btn" id="heroEmoji2" onclick="toggleHeroBubble(2)" title="Más info">💚<sup class="hero-emoji-hint">✦</sup></span></p>
-    <div class="hero-bubble" id="heroBubble1">Somos de Argentina pero ya recibimos visitas de todo el mundo 🌍</div>
-    <div class="hero-bubble" id="heroBubble2">Para que siga siendo gratis compártela por redes, a tus amigos o en los grupos 🙌 ¡Que todo mundo aproveche esta nueva IA GRATIS!</div>
     <div class="hero-stats">
       <div class="hero-stat"><span class="num" id="heroStatPrecision">–</span><span class="lbl">ROI</span></div>
       <div class="hero-stat"><span class="num" id="heroStatPicks">–</span><span class="lbl">Picks realizados</span></div>
@@ -4969,7 +4996,9 @@ window.toggleHeroBubble = function(n) {
       </a>
     </div>
   </div>
-  <div class="hero-mascot-wrap" style="flex-shrink:0">
+  <div class="hero-mascot-wrap" style="flex-shrink:0;position:relative">
+    <div class="hero-bubble hero-bubble--mascot" id="heroBubble1">Somos de Argentina pero ya recibimos visitas de todo el mundo 🌍</div>
+    <div class="hero-bubble hero-bubble--mascot" id="heroBubble2">Para que siga siendo gratis compártela por redes, a tus amigos o en los grupos 🙌 ¡Que todo mundo aproveche esta nueva IA GRATIS!</div>
     <div class="hero-mascot">
       <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="gambeta.ai Bot">
     </div>
