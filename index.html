@@ -8410,7 +8410,8 @@ function logoHtml(name, size=48) {
   const isTennis = tennisWikiMap[name] ||
     /^[A-ZÁÉÍÓÚÜÑÀÈÌÒÙÂÊÎÔÛÄËÏÖÜÇ][a-záéíóúüñàèìòùâêîôûäëïöüç'\-]+ [A-ZÁÉÍÓÚÜÑÀÈÌÒÙÂÊÎÔÛÄËÏÖÜÇ][a-záéíóúüñàèìòùâêîôûäëïöüç'\-]+$/.test(name);
   if (!isTennis) {
-    // Equipo sin logo → badge de iniciales
+    // Equipo sin logo → badge de iniciales; registrar para chequeo admin
+    if (window._logoMisses) window._logoMisses.add(name);
     return teamInitialsBadge(name, size);
   }
   const initials = name.split(' ').map(w=>w[0]).slice(0,2).join('');
@@ -9273,6 +9274,9 @@ function buildPredsFromOdds() {
 }
 
 function renderPreds() {
+  // Reset logo miss tracker para este render
+  window._logoMisses = new Set();
+
   function formDots(arr) {
     return (arr||[]).map(r => {
       const cls = r==='G'||r==='W' ? 'g' : r==='E'||r==='D' ? 'e' : 'p';
@@ -10515,6 +10519,46 @@ function renderPreds() {
     </div>
   `}).join('');
 
+  // ── Chequeo automático de escudos (solo admin) ──
+  _adminCheckLogos();
+
+}
+
+// Muestra un banner admin con los equipos sin escudo detectados en el último render
+function _adminCheckLogos() {
+  const isAdmin = window._isAdmin || (authUser && authUser.email === 'pronosticosarg@gmail.com');
+  if (!isAdmin) return;
+  const misses = window._logoMisses ? [...window._logoMisses] : [];
+  // Filtrar nombres que son tenistas / personas (tienen formato "Nombre Apellido" de 2 palabras capitalizadas)
+  const soccerMisses = misses.filter(n => {
+    if (!n) return false;
+    // Excluir si parece un tenista (2 palabras, ambas capitalizadas, sin números)
+    if (/^[A-ZÁÉÍÓÚ][a-záéíóú'\-]+ [A-ZÁÉÍÓÚ][a-záéíóú'\-]+$/.test(n)) return false;
+    return true;
+  });
+  const prevEl = document.getElementById('_adminLogoAlert');
+  if (prevEl) prevEl.remove();
+  if (!soccerMisses.length) return;
+
+  const el = document.createElement('div');
+  el.id = '_adminLogoAlert';
+  el.style.cssText = `
+    position:fixed;bottom:80px;right:16px;z-index:999999;
+    background:#1a1200;border:1.5px solid rgba(255,200,0,0.7);border-radius:12px;
+    padding:12px 14px;max-width:320px;font-size:0.72rem;font-family:inherit;
+    box-shadow:0 4px 20px rgba(0,0,0,0.6);color:#fff;line-height:1.5;
+  `;
+  el.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span style="font-weight:800;color:#ffd600;font-size:0.75rem">⚠️ Equipos sin escudo (${soccerMisses.length})</span>
+      <button onclick="document.getElementById('_adminLogoAlert').remove()" style="background:rgba(255,255,255,0.08);border:none;color:#aaa;width:22px;height:22px;border-radius:50%;cursor:pointer;font-size:0.75rem;line-height:1">✕</button>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:3px">
+      ${soccerMisses.map(n => `<span style="background:rgba(255,255,255,0.06);border-radius:6px;padding:3px 8px;font-family:monospace;font-size:0.68rem;color:#ffd600">${n}</span>`).join('')}
+    </div>
+    <div style="margin-top:8px;font-size:0.63rem;color:rgba(255,255,255,0.45)">Solo visible para el admin · Cerrar cuando lo corrijas</div>
+  `;
+  document.body.appendChild(el);
 }
 
 // ═══════════════════════════════════════════════
