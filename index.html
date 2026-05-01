@@ -9853,7 +9853,7 @@ function renderPreds() {
         const stakeLabel = (star.bvr||0) >= 6 ? '$170' : ((star.bvr||0) === 5 || star.conf==='high') ? '$130' : (star.bvr||0) === 4 ? '$50' : '$30';
         estrellaEl.style.display = 'block';
         estrellaEl.innerHTML = `
-          <div class="estrella-card">
+          <div class="estrella-card" style="cursor:pointer" onclick="scrollToPickCard('${star.home}','${star.away}')" title="Ver ficha completa del pronóstico">
             <div class="estrella-glow"></div>
             <div class="estrella-badge">⭐ Pick Estrella del Finde</div>
             <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
@@ -10290,8 +10290,9 @@ function renderPreds() {
     const _cardOddsD = p._dO ? parseFloat(p._dO) : (p.probD > 0 ? parseFloat((100/p.probD).toFixed(2)) : 0);
     const _cardOddsA = p._aO ? parseFloat(p._aO) : (p.probA > 0 ? parseFloat((100/p.probA).toFixed(2)) : 2);
 
+    const _cardId = 'predcard-' + (p.home+'-'+p.away).toLowerCase().replace(/[^a-z0-9]+/g,'-');
     return `
-    <div class="pred-card ${cardClass}" style="${
+    <div id="${_cardId}" class="pred-card ${cardClass}" style="${
       isGameLive
         ? 'border-color:rgba(229,57,53,0.4)'
         : (!isStarted && !isMaxConf && p.conf==='high')
@@ -12907,6 +12908,32 @@ function openMatchAnalysis(home, away) {
 }
 function closeModal() { document.getElementById('analysisModal').classList.remove('active'); }
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
+
+// ── Scroll al pred-card de la estrella del finde ──
+function scrollToPickCard(home, away) {
+  // Si estamos en home, navegar primero a la página de picks
+  if (document.body.dataset.gbpage !== 'picks') {
+    gbSetPage('picks');
+    setTimeout(function() { _doScrollToPickCard(home, away); }, 180);
+  } else {
+    _doScrollToPickCard(home, away);
+  }
+}
+function _doScrollToPickCard(home, away) {
+  const id = 'predcard-' + (home + '-' + away).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  // Flash dorado para resaltar la card
+  const prev = el.style.outline;
+  el.style.transition = 'outline 0.1s, box-shadow 0.1s';
+  el.style.outline = '2px solid rgba(255,214,0,0.9)';
+  el.style.boxShadow = '0 0 32px rgba(255,214,0,0.4), 0 4px 24px rgba(0,0,0,0.5)';
+  setTimeout(function() {
+    el.style.outline = prev;
+    el.style.boxShadow = '';
+  }, 1600);
+}
 
 // ═══════════════════════════════════════════════
 //  WORKER — DATOS REALES
