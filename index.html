@@ -10548,8 +10548,8 @@ function renderPreds() {
 
   // ── Chequeo automático de escudos (solo admin) ──
   _adminCheckLogos();
-  // ── Actualizar contadores de likes en action rows ──
-  setTimeout(_updatePickLikeCounts, 300);
+  // ── Actualizar contadores de likes en action rows (sincrónico, source ya en DOM) ──
+  _updatePickLikeCounts(source);
 
 }
 
@@ -13063,8 +13063,8 @@ function _getFakeLikes(idx, total) {
 }
 
 // ── Actualizar contadores de likes en las action rows tras render ──
-function _updatePickLikeCounts() {
-  const source = window._aiPreds || [];
+function _updatePickLikeCounts(source) {
+  source = source || window._aiPreds || [];
   const total  = source.length;
   source.forEach((p, idx) => {
     const el = document.getElementById('plikes-' + idx);
