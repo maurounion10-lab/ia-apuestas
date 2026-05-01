@@ -1562,4 +1562,30 @@ const teamLogos = {
   'Hellas Verona':          'https://media.api-sports.io/football/teams/504.png',
   'Monza':                  'https://media.api-sports.io/football/teams/1579.png',
   'AC Monza':               'https://media.api-sports.io/football/teams/1579.png',
+
+  // ── Aliases exactos del historial (nombres cortos/truncados que usa la API) ──
+  "Nott'm Forest":          'https://media.api-sports.io/football/teams/65.png',
+  "Newell's":               'https://a.espncdn.com/i/teamlogos/soccer/500/14.png',
+  'Riestra':                'https://a.espncdn.com/i/teamlogos/soccer/500/17702.png',
+  'Montreal':               'https://r2.thesportsdb.com/images/media/team/badge/livdl31679344925.png',
+  'Sporting Lisboa':        'https://a.espncdn.com/i/teamlogos/soccer/500/2250.png',
+  'Leipzig':                'https://media.api-sports.io/football/teams/173.png',
+  'Alianza Atl.':           'https://a.espncdn.com/i/teamlogos/soccer/500/5267.png',
+  'Coquimbo':               'https://a.espncdn.com/i/teamlogos/soccer/500/8186.png',
+  'City Torque':            'https://a.espncdn.com/i/teamlogos/soccer/500/19002.png',
+  'Paris':                  'https://a.espncdn.com/i/teamlogos/soccer/500/160.png',   // PSG (override Paris FC)
+  'Ind. del Valle':         'https://a.espncdn.com/i/teamlogos/soccer/500/17086.png',
+  'Cuenca':                 'https://a.espncdn.com/i/teamlogos/soccer/500/4812.png',
+  'C. Córdoba':             'https://a.espncdn.com/i/teamlogos/soccer/500/20543.png',
+  'Atl. Mineiro':           'https://r2.thesportsdb.com/images/media/team/badge/x5lixs1743742872.png',
+  'Independiente Sa…': 'https://a.espncdn.com/i/teamlogos/soccer/500/5488.png',
+  'Newells Old Boys':       'https://a.espncdn.com/i/teamlogos/soccer/500/14.png',
+
+  // ── Fix Valencia: URL anterior devolvía imagen 240×150 no cuadrada ──
+  'Valencia':               'https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/Valenciacf.svg/250px-Valenciacf.svg.png',
+  'Valencia CF':            'https://upload.wikimedia.org/wikipedia/en/thumb/c/ce/Valenciacf.svg/250px-Valenciacf.svg.png',
+
+  // ── Auxerre: la URL de thesportsdb funciona; si el browser muestra bandera errónea, es caché ──
+  'Auxerre':                'https://r2.thesportsdb.com/images/media/team/badge/lzdtbf1658753355.png',
+  'AJ Auxerre':             'https://r2.thesportsdb.com/images/media/team/badge/lzdtbf1658753355.png',
 };
