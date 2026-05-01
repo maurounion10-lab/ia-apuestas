@@ -156,22 +156,15 @@
     height: 1px;
     background: linear-gradient(90deg, transparent 0%, rgba(21,101,192,0.6) 30%, rgba(255,215,0,0.9) 50%, rgba(21,101,192,0.6) 70%, transparent 100%);
   }
-  .sapphire-bar-logo {
-    height: 20px;
-    width: auto;
-    object-fit: contain;
-    object-position: center 35%;
+  .sapphire-bar-wordmark {
+    font-size: 0.82rem;
+    font-weight: 900;
+    color: #F0CC5A;
+    letter-spacing: 1.2px;
     flex-shrink: 0;
-    align-self: center;
-    display: block;
-    margin-top: -3px;
-  }
-  .sapphire-bar-logo-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 28px;
-    flex-shrink: 0;
+    line-height: 1;
+    font-family: sans-serif;
+    white-space: nowrap;
   }
   .sapphire-bar-sep {
     width: 1px;
@@ -222,7 +215,7 @@
   }
   @media (max-width: 600px) {
     #sapphire-sponsor-bar { gap: 8px; padding: 0 10px; }
-    .sapphire-bar-logo-wrap { display: none; }
+    .sapphire-bar-wordmark { display: none; }
     .sapphire-bar-sep   { display: none; }
     .sapphire-bar-msg   { font-size: 0.70rem; white-space: nowrap; overflow: visible; text-overflow: unset; flex: 1; }
     .sapphire-txt-full  { display: none; }
@@ -4682,9 +4675,7 @@
 
 <!-- SPONSOR BAR — SapphireBet -->
 <a id="sapphire-sponsor-bar" href="https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836" target="_blank" rel="noopener" onclick="trackEvent('promo_click',{promo:'sapphire',type:'sponsor_bar'})">
-  <div class="sapphire-bar-logo-wrap">
-    <img class="sapphire-bar-logo" src="https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg" alt="SapphireBet" onerror="this.outerHTML='<span style=\'font-weight:900;font-size:0.92rem;color:#F0CC5A;font-weight:900;letter-spacing:0.5px;font-family:sans-serif\'>SAPPHIREBET</span>'">
-  </div>
+  <span class="sapphire-bar-wordmark">✦ SAPPHIRE<span style="color:#fff;font-weight:400">BET</span></span>
   <div class="sapphire-bar-sep"></div>
   <div class="sapphire-bar-msg">
     <span class="sapphire-txt-full">gambeta.ai es <strong>100% GRATIS</strong> gracias a SapphireBet · Registrate y apoyá este proyecto</span>
