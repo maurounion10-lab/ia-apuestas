@@ -1,8 +1,7 @@
-// gambeta.ai — Service Worker v1.7
-const CACHE_NAME = 'gambeta-v8';
+// gambeta.ai — Service Worker v1.8
+const CACHE_NAME = 'gambeta-v9';
+// NO cacheamos HTML — siempre se pide a la red para que los deploys sean inmediatos
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/og-image.png'
 ];
@@ -48,18 +47,9 @@ self.addEventListener('fetch', event => {
     return; // deja que el navegador lo maneje normalmente
   }
 
-  // Para navegación (HTML pages): siempre network-first — nunca servir HTML cacheado viejo
+  // Para navegación (HTML): NUNCA cachear — siempre red para que deploys sean instantáneos
   if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // Guardar copia fresca en caché
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then(cache => cache.put(event.request, clone));
-          return response;
-        })
-        .catch(() => caches.match(event.request).then(r => r || caches.match('/index.html')))
-    );
+    event.respondWith(fetch(event.request));
     return;
   }
 
