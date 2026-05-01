@@ -4245,7 +4245,47 @@
       transform: translateY(0) !important;
       -webkit-transform: translateY(0) !important;
     }
+    /* Barra de navegación móvil — siempre visible en la parte inferior del panel */
+    .fp-mobile-bar {
+      display: flex !important;
+    }
   }
+
+  /* Barra inferior del foro — sólo mobile */
+  .fp-mobile-bar {
+    display: none;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    background: rgba(6,12,10,0.98);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+  }
+  .fp-mb-back {
+    flex: 1;
+    background: rgba(41,182,246,0.10);
+    border: 1px solid rgba(41,182,246,0.28);
+    color: rgba(41,182,246,0.9);
+    font-size: 0.88rem; font-weight: 800;
+    padding: 11px 14px; border-radius: 10px;
+    cursor: pointer; font-family: inherit; text-align: center;
+    transition: background .15s;
+  }
+  .fp-mb-back:active { background: rgba(41,182,246,0.2); }
+  .fp-mb-close {
+    flex-shrink: 0;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.65);
+    font-size: 0.88rem; font-weight: 800;
+    padding: 11px 16px; border-radius: 10px;
+    cursor: pointer; font-family: inherit;
+    transition: background .15s;
+  }
+  .fp-mb-close:active { background: rgba(255,255,255,0.14); }
 
   /* Header del panel */
   .fp-hdr {
@@ -6271,6 +6311,12 @@ window.toggleHeroBubble = function(n) {
     <div class="fp-body" id="fpBody">
       <div class="fp-loading">⏳ Cargando hilos...</div>
     </div>
+    <!-- Barra de navegación mobile (oculta en desktop) -->
+    <div class="fp-mobile-bar" id="fpMobileBar">
+      <button class="fp-mb-back" id="fpMobileBack" onclick="_fpMobileBack()" style="display:none">← Lista de hilos</button>
+      <button class="fp-mb-close" onclick="closeForum()">✕ Cerrar foro</button>
+    </div>
+
     <a class="fp-sapphire-footer" href="https://subjectprof.com/L?tag=d_5550638m_127836c_&site=5550638&ad=127836" target="_blank" rel="noopener noreferrer">
       <span class="fp-sapphire-footer-logo">✦ SAPPHIRE<span>BET</span></span>
       <div class="fp-sapphire-footer-sep"></div>
@@ -20580,6 +20626,9 @@ window.toggleForum = function() {
     // Lock body scroll when modal is open
     document.body.style.overflow = 'hidden';
     if (_fpView === 'list') _fpRenderList();
+    // Botón atrás de Android/iOS
+    history.pushState({ fp: 'forum' }, '');
+    _fpUpdateMobileBar();
   } else {
     panel.classList.remove('fp-open');
     if (backdrop) backdrop.classList.remove('fp-open');
@@ -20596,7 +20645,35 @@ window.closeForum = function() {
   if (backdrop) backdrop.classList.remove('fp-open');
   document.body.style.overflow = '';
   _fpUnsubscribe();
+  _fpView = 'list';
+  _fpThreadId = null;
 };
+
+/* ── Helpers barra mobile ── */
+function _fpUpdateMobileBar() {
+  const backBtn = $('fpMobileBack');
+  if (!backBtn) return;
+  backBtn.style.display = (_fpView === 'thread') ? '' : 'none';
+}
+window._fpMobileBack = function() {
+  if (_fpView === 'thread') {
+    fpBackToList();
+  } else {
+    closeForum();
+  }
+};
+
+/* ── Botón atrás Android/iOS (popstate) ── */
+window.addEventListener('popstate', function(e) {
+  if (_fpOpen) {
+    if (_fpView === 'thread') {
+      fpBackToList();
+      history.pushState({ fp: 'forum' }, ''); // mantiene el state para próximo back
+    } else {
+      closeForum();
+    }
+  }
+});
 
 /* ── Tab switch ── */
 window.fpSetTab = function(tab, btn) {
@@ -20606,6 +20683,7 @@ window.fpSetTab = function(tab, btn) {
   document.querySelectorAll('.fp-tab').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   _fpRenderList();
+  _fpUpdateMobileBar();
 };
 
 /* ── Render thread list ── */
@@ -20908,6 +20986,7 @@ async function _fpOpenThread(t) {
     }
   `;
 
+  _fpUpdateMobileBar();
   await _fpLoadPosts();
   _fpSubscribeToThread(t.id);
 }
@@ -20921,6 +21000,8 @@ window.fpBackToList = function() {
   _fpView = 'list';
   _fpThreadId = null;
   _fpUnsubscribe();
+  _fpRenderList();
+  _fpUpdateMobileBar();
 };
 
 /* ── Load posts ── */
