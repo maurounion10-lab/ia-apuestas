@@ -4731,7 +4731,7 @@
 <script>
 /* ── SapphireBet gold particle emitter ── */
 (function(){
-  var CHARS = ['$','$','$','$','$','¢','🪙','💰'];
+  var CHARS = ['$','$','$','¢','🪙'];
   var wrap;
 
   function init() {
@@ -4741,7 +4741,7 @@
     wrap.id = 'sb-particles';
     wrap.style.cssText = 'position:fixed;inset:0;pointer-events:none;z-index:10002;overflow:hidden';
     document.body.appendChild(wrap);
-    setInterval(spawn, 170);
+    setInterval(spawn, 500);
   }
 
   function spawn() {
@@ -4752,11 +4752,11 @@
     var ch   = CHARS[Math.floor(Math.random() * CHARS.length)];
     var x0   = rect.left + Math.random() * rect.width;
     var y0   = rect.top  + Math.random() * rect.height;
-    var sz   = 11 + Math.random() * 13;
-    var dur  = 1300 + Math.random() * 1000;
-    var dx   = (Math.random() - 0.5) * 110;
-    var dy   = -(55 + Math.random() * 100);
-    var rot  = (Math.random() - 0.5) * 90;
+    var sz   = 8 + Math.random() * 7;
+    var dur  = 1800 + Math.random() * 1000;
+    var dx   = (Math.random() - 0.5) * 50;
+    var dy   = -(30 + Math.random() * 55);
+    var rot  = (Math.random() - 0.5) * 40;
 
     el.textContent = ch;
     el.style.cssText = [
@@ -4764,8 +4764,8 @@
       'left:' + x0 + 'px',
       'top:'  + y0 + 'px',
       'font-size:' + sz + 'px',
-      'color:#F0CC5A',
-      'text-shadow:0 0 8px rgba(240,204,90,0.9),0 0 16px rgba(240,204,90,0.4)',
+      'color:rgba(240,204,90,0.7)',
+      'text-shadow:0 0 5px rgba(240,204,90,0.4)',
       'font-weight:900',
       'font-style:normal',
       'line-height:1',
