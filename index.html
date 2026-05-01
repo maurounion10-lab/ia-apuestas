@@ -12911,10 +12911,10 @@ document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); }
 
 // ── Scroll al pred-card de la estrella del finde ──
 function scrollToPickCard(home, away) {
-  // Si estamos en home, navegar primero a la página de picks
+  // Si estamos en home, navegar vía hash a picks (así gbGoHome siempre funciona)
   if (document.body.dataset.gbpage !== 'picks') {
-    gbSetPage('picks');
-    setTimeout(function() { _doScrollToPickCard(home, away); }, 180);
+    window.location.hash = 'picks'; // dispara hashchange → gbSetPage('picks')
+    setTimeout(function() { _doScrollToPickCard(home, away); }, 250);
   } else {
     _doScrollToPickCard(home, away);
   }
@@ -14048,7 +14048,16 @@ function gbGoHome() {
   setTimeout(() => {
     document.body.classList.remove('gb-page-closing');
     _gbTransitioning = false;
-    window.location.hash = '';
+    // Si el hash ya es '' o '#', hashchange NO se dispara → llamar gbSetPage(null) directo
+    const h = window.location.hash.replace('#','');
+    if (h && _GB_PAGE_CFG[h]) {
+      // hash tiene una sub-página → limpiarlo dispara hashchange → _gbHandleHash → gbSetPage(null)
+      window.location.hash = '';
+    } else {
+      // hash ya estaba vacío (sub-página abierta sin hash): ir a home directamente
+      if (window.location.hash) history.replaceState(null, '', location.pathname);
+      gbSetPage(null);
+    }
   }, 210);
 }
 
