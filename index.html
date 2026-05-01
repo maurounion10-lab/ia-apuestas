@@ -20250,7 +20250,7 @@ function urlBase64ToUint8Array(base64String) {
 /* ── SERVICE WORKER ─────────────────────────────────────────────────────── */
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' })
+    navigator.serviceWorker.register('/sw2.js', { updateViaCache: 'none' })
       .then(reg => {
         console.log('[SW] Registrado:', reg.scope);
         reg.update(); // forzar chequeo de actualización en cada carga

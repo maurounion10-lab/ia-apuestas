@@ -32,6 +32,8 @@
 # ── Service Worker: nunca cachear ──
 /sw.js
   Cache-Control: no-cache, no-store, must-revalidate
+/sw2.js
+  Cache-Control: no-cache, no-store, must-revalidate
 
 # ── Manifest: cache corto ──
 /manifest.json
