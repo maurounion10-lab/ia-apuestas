@@ -2228,8 +2228,8 @@
   .sapphire-mid-sub { font-size: 0.74rem; color: rgba(255,255,255,0.55); margin-top: 3px; }
   .sapphire-mid-cta {
     flex-shrink: 0;
-    background: linear-gradient(135deg,#e31c3d,#c0112e);
-    color: #fff; font-size: 0.78rem; font-weight: 900;
+    background: linear-gradient(135deg,#FFD700,#f0c000);
+    color: #0d47a1; font-size: 0.78rem; font-weight: 900;
     padding: 11px 22px; border-radius: 9px;
     white-space: nowrap; letter-spacing: .2px;
   }
@@ -2256,8 +2256,8 @@
   .sapphire-pred-title { font-size: 0.78rem; font-weight: 900; color: #fff; letter-spacing: .1px; white-space: nowrap; }
   .sapphire-pred-sub { font-size: 0.60rem; color: rgba(255,255,255,0.45); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .sapphire-pred-cta {
-    background: linear-gradient(135deg,#1565C0,#0d47a1);
-    color: #fff; font-size: 0.65rem; font-weight: 900;
+    background: linear-gradient(135deg,#FFD700,#f0c000);
+    color: #0d47a1; font-size: 0.65rem; font-weight: 900;
     padding: 7px 13px; border-radius: 7px;
     white-space: nowrap; flex-shrink: 0; letter-spacing: .2px;
   }
@@ -3672,7 +3672,7 @@
   .welcome-sapphire-btn {
     display: block; width: 100%; padding: 14px 20px; box-sizing: border-box;
     background: linear-gradient(135deg, #e31c3d 0%, #c0152f 100%);
-    color: #fff; font-size: 0.95rem; font-weight: 800; text-align: center;
+    color: #0d47a1; font-size: 0.95rem; font-weight: 800; text-align: center;
     border-radius: 14px; text-decoration: none; letter-spacing: 0.3px;
     box-shadow: 0 6px 20px rgba(21,101,192,0.35);
     transition: all .2s; border: none; cursor: pointer; font-family: inherit;
@@ -14528,12 +14528,12 @@ function renderPremios() {
       card.style.cssText = (card.style.cssText || '') + ';border-color:rgba(21,101,192,0.6);background:linear-gradient(160deg,#061225,#03091a);';
     }
     card.innerHTML = `
-      ${p.sponsor ? '<div style="font-size:0.55rem;font-weight:900;color:#1565C0;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">🏆 Sponsor</div>' : ''}
+      ${p.sponsor ? '<div style="font-size:0.55rem;font-weight:900;color:#FFD700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:2px">🏆 Sponsor</div>' : ''}
       <span class="premio-lock">🔒</span>
       <img class="premio-logo" src="${p.sponsor ? 'https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg' : p.logo}" alt="${p.casa}" onerror="this.src='https://www.google.com/s2/favicons?domain=${p.casa.toLowerCase().replace(/ /g,'')}.com&sz=64'" style="${p.sponsor ? 'filter:brightness(1.1)' : ''}">
       <div class="premio-name">${p.casa}</div>
       <div class="premio-usd">${p.usd ? `$${p.usd} USD` : p.desc}</div>
-      <div class="premio-cost"><span class="acico" style="font-size:0.55rem;width:1.5em;height:1.5em">G$</span> ${costFmt}${p.sponsor ? ' <span style="font-size:0.55rem;color:#1565C0;font-weight:900">★</span>' : ''}</div>
+      <div class="premio-cost"><span class="acico" style="font-size:0.55rem;width:1.5em;height:1.5em">G$</span> ${costFmt}${p.sponsor ? ' <span style="font-size:0.55rem;color:#FFD700;font-weight:900">★</span>' : ''}</div>
       <div class="premio-prog"><div class="premio-prog-fill" style="width:${pct}%;${p.sponsor ? 'background:linear-gradient(90deg,#1565C0,#FFD700)' : ''}"></div></div>
       <div class="premio-pct">${unlocked ? '✅ ¡Podés canjear!' : pct + '% completado'}</div>
     `;
@@ -18933,7 +18933,7 @@ function _showPromoDirecta() {
     `<div style="font-size:0.85rem;font-weight:900;color:#fff;margin-bottom:2px">Main Sponsor de gambeta.ai</div>` +
     `<div style="font-size:0.7rem;color:rgba(255,255,255,0.6)">100% bono en tu primer depósito · Hacés posible que esto sea gratis</div>` +
     `</div>` +
-    `<span style="background:linear-gradient(135deg,#1565C0,#0d47a1);color:#fff;font-size:0.68rem;font-weight:900;padding:8px 13px;border-radius:8px;white-space:nowrap;flex-shrink:0">Registrarme →</span>` +
+    `<span style="background:linear-gradient(135deg,#FFD700,#f0c000);color:#0d47a1;font-size:0.68rem;font-weight:900;padding:8px 13px;border-radius:8px;white-space:nowrap;flex-shrink:0">Registrarme →</span>` +
     `</a>`;
 
   const otrosCasas = [
@@ -19116,7 +19116,7 @@ async function aiSend() {
         </div>
         <a href="https://subjectprof.com/L?tag=d_2924935m_127836c_&site=2924935&ad=127836" target="_blank" rel="noopener"
            onclick="trackEvent('promo_click',{promo:'sapphire',type:'ai_odds_ad'})"
-           style="background:linear-gradient(135deg,#1565C0,#0d47a1);color:#fff;font-size:0.63rem;font-weight:800;padding:5px 10px;border-radius:7px;text-decoration:none;white-space:nowrap;letter-spacing:0.3px;flex-shrink:0">
+           style="background:linear-gradient(135deg,#FFD700,#f0c000);color:#0d47a1;font-size:0.63rem;font-weight:800;padding:5px 10px;border-radius:7px;text-decoration:none;white-space:nowrap;letter-spacing:0.3px;flex-shrink:0">
           APOSTAR →
         </a>`;
       msgEl.appendChild(ad);
