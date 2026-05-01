@@ -13044,23 +13044,44 @@ window.openPickForum = async function(home, away, pickData) {
   }
 };
 
+// ── Likes simulados: base 1 + 3 cards aleatorias cada 6hs ──
+function _getFakeLikes(idx, total) {
+  if (total <= 0) return 1;
+  let count = 1; // todas nacen con 1 like
+  // Períodos de 6hs transcurridos desde medianoche de hoy
+  const now = Date.now();
+  const midnight = new Date(); midnight.setHours(0,0,0,0);
+  const periods = Math.floor((now - midnight.getTime()) / (6 * 3600 * 1000));
+  for (let p = 0; p < periods; p++) {
+    // 3 índices determinísticos por período (distintos primos para dispersión)
+    const a = (p * 97  + 3)  % total;
+    const b = (p * 131 + 11) % total;
+    const c = (p * 173 + 17) % total;
+    if (idx === a || idx === b || idx === c) count++;
+  }
+  return count;
+}
+
 // ── Actualizar contadores de likes en las action rows tras render ──
 function _updatePickLikeCounts() {
   const source = window._aiPreds || [];
+  const total  = source.length;
   source.forEach((p, idx) => {
     const el = document.getElementById('plikes-' + idx);
     if (!el) return;
-    // Buscar thread que coincida con home/away
+    // Likes reales del foro (si los hay)
     const thread = (_fpAllThreads || []).find(t =>
-      (typeof teamsMatch === 'function' ? teamsMatch(t.home, p.home) && teamsMatch(t.away, p.away)
+      (typeof teamsMatch === 'function'
+        ? teamsMatch(t.home, p.home) && teamsMatch(t.away, p.away)
         : t.home === p.home && t.away === p.away)
     );
-    if (!thread) { el.textContent = '0'; return; }
-    // Contar likes en reacciones cargadas
-    const likes = Object.values(window._fpReactions || {}).filter(r =>
-      r && r.thread_id === thread.id && r.reaction_type === 'like'
-    ).length;
-    el.textContent = String(likes || 0);
+    const realLikes = thread
+      ? Object.values(window._fpReactions || {}).filter(r =>
+          r && r.thread_id === thread.id && r.reaction_type === 'like'
+        ).length
+      : 0;
+    // Total: simulados + reales
+    el.textContent = String(_getFakeLikes(idx, total) + realLikes);
   });
 }
 
