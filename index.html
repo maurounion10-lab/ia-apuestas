@@ -4165,6 +4165,45 @@
     scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent;
     padding-bottom: 8px;
   }
+
+  /* ── SapphireBet footer banner del foro ── */
+  .fp-sapphire-footer {
+    flex-shrink: 0;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: linear-gradient(90deg, #03082a 0%, #050d3a 50%, #03082a 100%);
+    border-top: 1px solid rgba(192,162,39,0.25);
+    text-decoration: none;
+    position: relative; overflow: hidden;
+  }
+  .fp-sapphire-footer::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(90deg, transparent 0%, rgba(192,162,39,0.06) 50%, transparent 100%);
+    pointer-events: none;
+  }
+  .fp-sapphire-footer-logo {
+    font-size: 0.72rem; font-weight: 900; letter-spacing: 1px;
+    color: #F0CC5A; white-space: nowrap; flex-shrink: 0; line-height: 1;
+    font-family: sans-serif;
+  }
+  .fp-sapphire-footer-logo span { color: rgba(255,255,255,0.75); font-weight: 400; }
+  .fp-sapphire-footer-sep {
+    width: 1px; height: 28px; background: rgba(192,162,39,0.25); flex-shrink: 0;
+  }
+  .fp-sapphire-footer-txt {
+    flex: 1; font-size: 0.75rem; color: rgba(255,255,255,0.8); line-height: 1.35;
+  }
+  .fp-sapphire-footer-txt strong { color: #F0CC5A; }
+  .fp-sapphire-footer-txt em { color: rgba(255,255,255,0.45); font-style: normal; font-size: 0.68rem; }
+  .fp-sapphire-footer-btn {
+    flex-shrink: 0;
+    background: linear-gradient(135deg,#C9A227,#F0CC5A 45%,#B8860B);
+    color: #0a1a3e; font-size: 0.72rem; font-weight: 900;
+    border: none; border-radius: 20px; padding: 7px 13px;
+    cursor: pointer; font-family: inherit; white-space: nowrap;
+    animation: goldglow 2.5s ease-in-out infinite;
+  }
   .fp-body::-webkit-scrollbar { width: 4px; }
   .fp-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
 
@@ -6008,6 +6047,15 @@
     <div class="fp-body" id="fpBody">
       <div class="fp-loading">⏳ Cargando hilos...</div>
     </div>
+    <a class="fp-sapphire-footer" href="https://subjectprof.com/BKJZD8" target="_blank" rel="noopener noreferrer">
+      <span class="fp-sapphire-footer-logo">✦ SAPPHIRE<span>BET</span></span>
+      <div class="fp-sapphire-footer-sep"></div>
+      <div class="fp-sapphire-footer-txt">
+        <strong>+$179.000 GRATIS</strong> de bono en tu primer depósito
+        <br><em>Son 100 euros o dólares · Apoyan este proyecto 💎</em>
+      </div>
+      <span class="fp-sapphire-footer-btn">🎁 Recibir Bono</span>
+    </a>
   </div>
 
   <!-- forum bubble button -->
@@ -14344,6 +14392,17 @@ async function _handleAuthSession(u) {
   const rawName = u.user_metadata?.full_name || u.user_metadata?.name || u.email.split('@')[0];
   const name = rawName.replace(/[._-]/g,' ').replace(/\b\w/g, c => c.toUpperCase());
   authUser = { name, email: u.email, provider: u.app_metadata?.provider || 'email', joined: new Date(u.created_at).toLocaleDateString('es') };
+  window._currentUser = { name, email: u.email }; // expuesto globalmente para módulos como el foro
+  // Si el foro está abierto con el CTA de registro, reemplazarlo por el formulario
+  setTimeout(() => {
+    const joinCta = document.querySelector('.fp-join-cta');
+    if (joinCta) {
+      const form = document.createElement('div');
+      form.className = 'fp-form'; form.id = 'fpForm';
+      if (typeof _fpFormHtml === 'function') form.innerHTML = _fpFormHtml();
+      joinCta.replaceWith(form);
+    }
+  }, 200);
   updateNavAuth();
   loadBankrollData();
   await acLoadFromDB(u.email);
@@ -14406,6 +14465,7 @@ sbClient.auth.onAuthStateChange(async (event, session) => {
       if (authUser) {
         clearBankrollData();
         authUser = null;
+        window._currentUser = null;
         pendingSocial = null;
         document.getElementById('navUserWrap').classList.remove('visible');
         document.getElementById('navAuthBtn').style.display = '';
