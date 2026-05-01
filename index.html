@@ -13216,7 +13216,8 @@ function _updatePickLikeCounts(source) {
     const el = document.getElementById('plikes-' + idx);
     if (!el) return;
     // Likes reales del foro (si los hay)
-    const thread = (_fpAllThreads || []).find(t =>
+    const _fpt = (typeof _fpAllThreads !== 'undefined' ? _fpAllThreads : []);
+    const thread = _fpt.find(t =>
       (typeof teamsMatch === 'function'
         ? teamsMatch(t.home, p.home) && teamsMatch(t.away, p.away)
         : t.home === p.home && t.away === p.away)
