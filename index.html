@@ -10533,7 +10533,7 @@ function renderPreds() {
           💬 <span>Comentar</span>
         </button>
         <button class="pred-action-btn btn-like" id="plbtn-${idx}" onclick="openPickForum('${p.home.replace(/'/g,"\\'")}','${p.away.replace(/'/g,"\\'")}',null)" title="Likes del pick">
-          👍 <span id="plikes-${idx}">—</span>
+          👍 <span id="plikes-${idx}">${_getFakeLikes(idx, source.length)}</span>
         </button>
       </div>
       <!-- Cuerpo expandible del análisis -->
