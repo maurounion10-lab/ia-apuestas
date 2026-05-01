@@ -14143,6 +14143,10 @@ setTimeout(drawBankrollChart, 100);
 // ── Carga inmediata del historial GLOBAL (visible para todos, incluso sin login) ──
 // IMPORTANTE: fusionar con local en vez de reemplazar para no perder picks guardados
 (async () => {
+  // Render inmediato desde localStorage para que la tabla nunca empiece vacía
+  const _localImmediate = loadHistorial();
+  if (_localImmediate.length > 0) renderHistorial(histFilter);
+
   const g = await sbLoadGlobalHistorial();
   if (g && g.length > 0) {
     const _localH = loadHistorial();
@@ -14153,6 +14157,10 @@ setTimeout(drawBankrollChart, 100);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(_mergedG)); } catch {}
     renderHistorial(histFilter);
     console.log('[globalHist] ✓ Cargado desde Supabase:', g.length, 'globales +', _localOnlyG.length, 'locales =', _mergedG.length, 'total');
+  } else if (_localImmediate.length === 0) {
+    // Proxy falló y localStorage vacío: re-renderizar igual para limpiar el estado de carga
+    renderHistorial(histFilter);
+    console.warn('[globalHist] Proxy falló y sin datos locales — tabla vacía esperada');
   }
 })();
 window.addEventListener('resize', () => { clearTimeout(window._chartTimer); window._chartTimer = setTimeout(drawBankrollChart, 120); });
