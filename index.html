@@ -2108,28 +2108,46 @@
   }
 
   /* ── SHARE PICK BUTTON ── */
-  .share-pick-btn {
-    width: 100%;
+  /* ── Fila de acciones al pie de la pred-card ── */
+  .pred-action-row {
+    display: flex;
+    gap: 6px;
     margin-top: 10px;
-    padding: 10px 0;
+  }
+  .pred-action-btn {
+    flex: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 10px;
-    color: rgba(255,255,255,0.6);
-    font-size: 0.78rem;
-    font-weight: 600;
+    border-radius: 8px;
+    padding: 7px 4px;
+    font-size: 0.63rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.65);
     cursor: pointer;
-    transition: all .15s;
-    letter-spacing: .3px;
+    font-family: inherit;
+    text-decoration: none;
+    transition: background .15s, border-color .15s, color .15s;
+    white-space: nowrap;
+    min-width: 0;
   }
-  .share-pick-btn:hover {
-    background: rgba(0,229,160,0.08);
-    border-color: rgba(0,229,160,0.3);
-    color: #00e5a0;
-  }
-  .share-pick-btn:active {
-    transform: scale(0.98);
-  }
+  .pred-action-btn:active { transform: scale(0.97); }
+  .pred-action-btn.btn-share  { border-color: rgba(0,200,83,0.25); color: rgba(0,210,100,0.9); }
+  .pred-action-btn.btn-share:hover  { background: rgba(0,200,83,0.09); border-color: rgba(0,200,83,0.45); color: var(--verde); }
+  .pred-action-btn.btn-analysis { border-color: rgba(255,214,0,0.2); color: rgba(255,214,0,0.8); }
+  .pred-action-btn.btn-analysis:hover { background: rgba(255,214,0,0.07); border-color: rgba(255,214,0,0.4); color: #ffd600; }
+  .pred-action-btn.btn-forum { border-color: rgba(41,182,246,0.2); color: rgba(41,182,246,0.85); }
+  .pred-action-btn.btn-forum:hover { background: rgba(41,182,246,0.08); border-color: rgba(41,182,246,0.4); color: #29b6f6; }
+  .pred-action-btn.btn-like  { border-color: rgba(255,100,100,0.2); color: rgba(255,130,130,0.85); }
+  .pred-action-btn.btn-like:hover  { background: rgba(255,80,80,0.08); border-color: rgba(255,80,80,0.4); color: #ff8a80; }
+  .pred-action-btn.btn-like.liked  { background: rgba(255,80,80,0.1); border-color: rgba(255,80,80,0.45); color: #ff5252; }
+  .pred-action-arrow { font-size: 0.55rem; margin-left: 2px; transition: transform .2s; }
+  .pred-action-arrow.open { transform: rotate(180deg); }
+  /* mantener .share-pick-btn como alias por si se usa en otro lado */
+  .share-pick-btn { display: none; }
 
   /* ── CALCULATOR ── */
   #calculator .calc-container {
@@ -10497,30 +10515,41 @@ function renderPreds() {
       </div>` : ''}
       <!-- CTA casas afiliadas — solo para partidos no iniciados -->
       ${!isStarted ? oddsHtml : ''}
-      <!-- Botón compartir -->
-      <button class="share-pick-btn" onclick="sharePick('${p.home}','${p.away}','${p.rec}',${_bvr},'${p.league}')" title="Compartir este pick">
-        📤 Compartir pick
-      </button>
-      <!-- Botón expandir análisis — al final de la ficha -->
+      <!-- ── Fila de acciones: Compartir · Análisis · Comentar · Likes ── -->
+      <div class="pred-action-row">
+        <button class="pred-action-btn btn-share" onclick="sharePick('${p.home}','${p.away}','${p.rec}',${_bvr},'${p.league}')" title="Compartir este pick">
+          📤 <span>Compartir</span>
+        </button>
+        ${p.insight
+          ? `<button class="pred-action-btn btn-analysis" onclick="togglePredExpand(${idx})" id="pred-analysis-btn-${idx}" title="Ver análisis de la IA">
+              🔍 <span>Análisis</span>
+              <span class="pred-action-arrow" id="pred-arrow-${idx}">▼</span>
+            </button>`
+          : `<a class="pred-action-btn btn-analysis" href="https://bot-alertas.pronosticosargentinos.net/ar/" target="_blank" rel="noopener" title="Bot de Córners">
+              ⚽ <span>Bot Córners</span>
+            </a>`
+        }
+        <button class="pred-action-btn btn-forum" onclick="openPickForum('${p.home.replace(/'/g,"\\'")}','${p.away.replace(/'/g,"\\'")}',{home:'${p.home.replace(/'/g,"\\'")}',away:'${p.away.replace(/'/g,"\\'")}',league:'${(p.league||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',bvrText:'${(_bvrText||'').replace(/'/g,"\\'")}'})" title="Ver comentarios">
+          💬 <span>Comentar</span>
+        </button>
+        <button class="pred-action-btn btn-like" id="plbtn-${idx}" onclick="openPickForum('${p.home.replace(/'/g,"\\'")}','${p.away.replace(/'/g,"\\'")}',null)" title="Likes del pick">
+          👍 <span id="plikes-${idx}">—</span>
+        </button>
+      </div>
+      <!-- Cuerpo expandible del análisis -->
       ${p.insight ? `
-      <button class="pred-expand-btn" onclick="togglePredExpand(${idx})">
-        <span>🔍 Ver análisis de la IA</span>
-        <span class="pred-expand-arrow" id="pred-arrow-${idx}">▼</span>
-      </button>
       <div class="pred-expand-body" id="pred-expand-${idx}">
         <div class="pred-insight-text">💡 ${p.insight}</div>
         ${h2hHtml ? `<div style="margin-top:4px">${h2hHtml}</div>` : ''}
         ${md ? `<button class="pred-full-btn" onclick="openMatchAnalysis('${p.home}','${p.away}')">Ver análisis estadístico completo →</button>` : ''}
-      </div>` : `
-      <a href="https://bot-alertas.pronosticosargentinos.net/ar/" target="_blank" rel="noopener" class="pred-expand-btn" style="text-decoration:none;justify-content:center;gap:8px">
-        <span>⚽ Contratar el Bot de Córners sobre la hora</span>
-        <span style="font-size:0.75rem;opacity:0.6">→</span>
-      </a>`}
+      </div>` : ''}
     </div>
   `}).join('');
 
   // ── Chequeo automático de escudos (solo admin) ──
   _adminCheckLogos();
+  // ── Actualizar contadores de likes en action rows ──
+  setTimeout(_updatePickLikeCounts, 300);
 
 }
 
@@ -12989,6 +13018,50 @@ function _doScrollToPickCard(home, away) {
     el.style.outline = prev;
     el.style.boxShadow = '';
   }, 1600);
+}
+
+// ── Abrir foro en el hilo del pick ──
+window.openPickForum = async function(home, away, pickData) {
+  // Abrir panel del foro
+  if (typeof toggleForum === 'function' && !_fpOpen) toggleForum();
+  // Buscar thread existente en lista cargada
+  const find = () => (_fpAllThreads || []).find(t =>
+    (typeof teamsMatch === 'function' ? teamsMatch(t.home, home) && teamsMatch(t.away, away)
+      : t.home === home && t.away === away)
+  );
+  let thread = find();
+  if (thread) {
+    setTimeout(() => _fpOpenThread(thread), 150);
+    return;
+  }
+  // Si viene pickData, crear hilo y abrirlo
+  if (pickData && typeof forumEnsureThread === 'function') {
+    await forumEnsureThread(pickData);
+    // Refrescar lista de threads
+    if (typeof _fpFetchThreads === 'function') await _fpFetchThreads();
+    thread = find();
+    if (thread) setTimeout(() => _fpOpenThread(thread), 150);
+  }
+};
+
+// ── Actualizar contadores de likes en las action rows tras render ──
+function _updatePickLikeCounts() {
+  const source = window._aiPreds || [];
+  source.forEach((p, idx) => {
+    const el = document.getElementById('plikes-' + idx);
+    if (!el) return;
+    // Buscar thread que coincida con home/away
+    const thread = (_fpAllThreads || []).find(t =>
+      (typeof teamsMatch === 'function' ? teamsMatch(t.home, p.home) && teamsMatch(t.away, p.away)
+        : t.home === p.home && t.away === p.away)
+    );
+    if (!thread) { el.textContent = '0'; return; }
+    // Contar likes en reacciones cargadas
+    const likes = Object.values(window._fpReactions || {}).filter(r =>
+      r && r.thread_id === thread.id && r.reaction_type === 'like'
+    ).length;
+    el.textContent = String(likes || 0);
+  });
 }
 
 // ═══════════════════════════════════════════════
