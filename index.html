@@ -3390,7 +3390,7 @@
   /* ── In-page push toast (reemplaza la notificación nativa cuando la app está abierta) ── */
   #inPagePushToast {
     position: fixed;
-    top: 132px; /* nav 66px + sponsor 50px + 16px gap */
+    top: 124px; /* nav 66px + sponsor 50px + 8px gap */
     left: 50%;
     transform: translateX(-50%) translateY(-16px);
     z-index: 10003;
@@ -3411,7 +3411,7 @@
     opacity: 1; pointer-events: all;
   }
   @media (max-width: 700px) {
-    #inPagePushToast { top: 126px; } /* nav 60px + sponsor 50px + 16px */
+    #inPagePushToast { top: 118px; } /* nav 60px + sponsor 50px + 8px */
   }
   .ippt-icon { font-size: 1.5rem; flex-shrink: 0; }
   .ippt-title { font-size: 0.78rem; font-weight: 800; color: #00e664; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
@@ -20249,11 +20249,24 @@ function urlBase64ToUint8Array(base64String) {
 
 /* ── SERVICE WORKER ─────────────────────────────────────────────────────── */
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
+  window.addEventListener('load', async () => {
+    // Desregistrar el SW viejo (sw.js) si sigue activo — fue reemplazado por sw2.js
+    try {
+      const regs = await navigator.serviceWorker.getRegistrations();
+      for (const reg of regs) {
+        const swUrl = (reg.active || reg.installing || reg.waiting)?.scriptURL || '';
+        if (swUrl.includes('/sw.js') && !swUrl.includes('/sw2.js')) {
+          await reg.unregister();
+          console.log('[SW] Desregistrado SW viejo:', swUrl);
+        }
+      }
+    } catch(e) { console.warn('[SW] Error desregistrando viejo:', e); }
+
+    // Registrar SW nuevo
     navigator.serviceWorker.register('/sw2.js', { updateViaCache: 'none' })
       .then(reg => {
         console.log('[SW] Registrado:', reg.scope);
-        reg.update(); // forzar chequeo de actualización en cada carga
+        reg.update();
       })
       .catch(err => console.warn('[SW] Error:', err));
 
