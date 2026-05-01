@@ -156,6 +156,23 @@
     height: 1px;
     background: linear-gradient(90deg, transparent 0%, rgba(21,101,192,0.6) 30%, rgba(255,215,0,0.9) 50%, rgba(21,101,192,0.6) 70%, transparent 100%);
   }
+  .sapphire-new-badge {
+    flex-shrink: 0;
+    background: #e8192c;
+    color: #fff;
+    font-size: 0.52rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    padding: 3px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    animation: newbadgepulse 1.8s ease-in-out infinite;
+    font-family: sans-serif;
+  }
+  @keyframes newbadgepulse {
+    0%,100% { box-shadow: 0 0 6px rgba(232,25,44,0.5); }
+    50%      { box-shadow: 0 0 14px rgba(232,25,44,0.9), 0 0 22px rgba(232,25,44,0.3); }
+  }
   .sapphire-bar-wordmark {
     font-size: 0.82rem;
     font-weight: 900;
@@ -4717,6 +4734,7 @@
 
 <!-- SPONSOR BAR — SapphireBet -->
 <a id="sapphire-sponsor-bar" href="https://subjectprof.com/L?tag=d_5550638m_127836c_&site=5550638&ad=127836" target="_blank" rel="noopener" onclick="trackEvent('promo_click',{promo:'sapphire',type:'sponsor_bar'})">
+  <span id="sapphire-new-badge" class="sapphire-new-badge">NEW</span>
   <span class="sapphire-bar-wordmark">✦ SAPPHIRE<span style="color:#fff;font-weight:400">BET</span></span>
   <div class="sapphire-bar-sep"></div>
   <div class="sapphire-bar-msg">
@@ -4729,6 +4747,13 @@
 </a>
 
 <script>
+/* ── Badge NEW SapphireBet: visible hasta el 11-may-2026 ── */
+(function(){
+  var EXPIRY = new Date('2026-05-11T23:59:59');
+  var badge  = document.getElementById('sapphire-new-badge');
+  if (badge && Date.now() > EXPIRY.getTime()) badge.style.display = 'none';
+})();
+
 /* ── SapphireBet gold particle emitter ── */
 (function(){
   var CHARS = ['$','$','$','¢','🪙'];
