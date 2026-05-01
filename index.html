@@ -201,8 +201,13 @@
     cursor: pointer;
     transition: filter 0.15s;
     text-decoration: none;
+    animation: goldglow 2.5s ease-in-out infinite;
   }
-  .sapphire-bar-cta:hover { filter: brightness(1.08); }
+  .sapphire-bar-cta:hover { filter: brightness(1.12); }
+  @keyframes goldglow {
+    0%,100% { box-shadow: 0 0 6px rgba(232,200,74,0.3), 0 0 0px rgba(232,200,74,0); }
+    50%      { box-shadow: 0 0 18px rgba(232,200,74,0.8), 0 0 32px rgba(232,200,74,0.3); }
+  }
   .sapphire-txt-short { display: none; }
   .sapphire-txt-xs    { display: none; }
   /* logo inline dentro del texto mobile */
@@ -2240,6 +2245,7 @@
     color: #0a1a3e; font-size: 0.78rem; font-weight: 900;
     padding: 11px 22px; border-radius: 9px;
     white-space: nowrap; letter-spacing: .2px;
+    animation: goldglow 2.5s ease-in-out infinite;
   }
   @media (max-width: 520px) {
     .sapphire-mid-banner { flex-wrap: wrap; padding: 14px 16px; gap: 8px; }
@@ -2266,6 +2272,7 @@
   .sapphire-pred-cta {
     background: linear-gradient(135deg,#C9A227,#F0CC5A 45%,#B8860B);
     color: #0a1a3e; font-size: 0.65rem; font-weight: 900;
+    animation: goldglow 2.5s ease-in-out infinite;
     padding: 7px 13px; border-radius: 7px;
     white-space: nowrap; flex-shrink: 0; letter-spacing: .2px;
   }
