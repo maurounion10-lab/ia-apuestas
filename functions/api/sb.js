@@ -46,38 +46,31 @@ export async function onRequest(context) {
 
   if (type === 'historial') {
     try {
-      // 1. Intentar desde shared_cache (tabla pública, sin RLS restrictiva)
-      const r1 = await sbFetch(
-        `shared_cache?key=eq.global_historial_v1&select=data&limit=1`
-      );
-      if (r1.ok) {
-        const rows = await r1.json();
-        const data = rows?.[0]?.data;
-        if (Array.isArray(data) && data.length > 0) {
-          return new Response(
-            JSON.stringify([{ historial_full: data }]),
-            { headers: CACHE_HEADERS }
-          );
-        }
+      // Leer ambas fuentes en paralelo y usar la que tenga MÁS picks
+      const [r1, r2] = await Promise.allSettled([
+        sbFetch(`shared_cache?key=eq.global_historial_v1&select=data&limit=1`),
+        sbFetch(`acoin_users?email=eq.${encodeURIComponent(ADMIN_EMAIL)}&select=historial_full&limit=1`),
+      ]);
+
+      let fromCache = [];
+      let fromUsers = [];
+
+      if (r1.status === 'fulfilled' && r1.value.ok) {
+        const rows = await r1.value.json();
+        const d = rows?.[0]?.data;
+        if (Array.isArray(d)) fromCache = d;
+      }
+      if (r2.status === 'fulfilled' && r2.value.ok) {
+        const rows = await r2.value.json();
+        const d = rows?.[0]?.historial_full;
+        if (Array.isArray(d)) fromUsers = d;
       }
 
-      // 2. Fallback: acoin_users.historial_full del admin
-      const r2 = await sbFetch(
-        `acoin_users?email=eq.${encodeURIComponent(ADMIN_EMAIL)}&select=historial_full&limit=1`
-      );
-      if (!r2.ok) throw new Error(`acoin_users ${r2.status}`);
-      const rows2 = await r2.json();
-      const hist2 = rows2?.[0]?.historial_full;
-      if (Array.isArray(hist2) && hist2.length > 0) {
-        return new Response(
-          JSON.stringify([{ historial_full: hist2 }]),
-          { headers: CACHE_HEADERS }
-        );
-      }
+      // Usar la fuente con más picks
+      const best = fromCache.length >= fromUsers.length ? fromCache : fromUsers;
 
-      // Sin datos
       return new Response(
-        JSON.stringify([]),
+        JSON.stringify(best.length > 0 ? [{ historial_full: best }] : []),
         { headers: CACHE_HEADERS }
       );
 
