@@ -10532,8 +10532,8 @@ function renderPreds() {
         <button class="pred-action-btn btn-forum" onclick="openPickForum('${p.home.replace(/'/g,"\\'")}','${p.away.replace(/'/g,"\\'")}',{home:'${p.home.replace(/'/g,"\\'")}',away:'${p.away.replace(/'/g,"\\'")}',league:'${(p.league||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',bvrText:'${(_bvrText||'').replace(/'/g,"\\'")}'})" title="Ver comentarios">
           💬 <span>Comentar</span>
         </button>
-        <button class="pred-action-btn btn-like" id="plbtn-${idx}" onclick="openPickForum('${p.home.replace(/'/g,"\\'")}','${p.away.replace(/'/g,"\\'")}',null)" title="Likes del pick">
-          👍 <span id="plikes-${idx}">${_getFakeLikes(idx, source.length)}</span>
+        <button class="pred-action-btn btn-like${_isPickLiked(idx) ? ' liked' : ''}" id="plbtn-${idx}" onclick="togglePickLike(${idx}, ${source.length})" title="Me gusta este pick">
+          👍 <span id="plikes-${idx}">${_getFakeLikes(idx, source.length) + (_isPickLiked(idx) ? 1 : 0)}</span>
         </button>
       </div>
       <!-- Cuerpo expandible del análisis -->
@@ -13043,6 +13043,33 @@ window.openPickForum = async function(home, away, pickData) {
     if (thread) setTimeout(() => _fpOpenThread(thread), 150);
   }
 };
+
+// ── Like de usuario: localStorage con clave diaria ──
+function _pickLikeKey() {
+  return 'gb_plikes_' + new Date().toISOString().slice(0, 10);
+}
+function _isPickLiked(idx) {
+  try { return !!(JSON.parse(localStorage.getItem(_pickLikeKey()) || '{}')[idx]); } catch(e) { return false; }
+}
+function togglePickLike(idx, total) {
+  const key = _pickLikeKey();
+  let liked;
+  try { liked = JSON.parse(localStorage.getItem(key) || '{}'); } catch(e) { liked = {}; }
+  const wasLiked = !!liked[idx];
+  if (wasLiked) {
+    delete liked[idx];
+  } else {
+    liked[idx] = 1;
+  }
+  try { localStorage.setItem(key, JSON.stringify(liked)); } catch(e) {}
+  // Actualizar UI
+  const btn = document.getElementById('plbtn-' + idx);
+  const cnt = document.getElementById('plikes-' + idx);
+  const base = _getFakeLikes(idx, total);
+  const nowLiked = !wasLiked;
+  if (btn) btn.classList.toggle('liked', nowLiked);
+  if (cnt) cnt.textContent = String(base + (nowLiked ? 1 : 0));
+}
 
 // ── Likes simulados: base 1 + 3 cards aleatorias cada 6hs ──
 function _getFakeLikes(idx, total) {
