@@ -223,31 +223,41 @@
   }
   .sapphire-txt-short { display: none; }
   .sapphire-txt-xs    { display: none; }
-  /* ── 480-600px: ocultar wordmark y sep, texto corto ── */
+  /* ── ≤600px: mobile ── */
   @media (max-width: 600px) {
-    #sapphire-sponsor-bar { gap: 8px; padding: 0 10px; }
+    #sapphire-sponsor-bar {
+      gap: 10px;
+      padding: 0 12px;
+      justify-content: space-between;
+    }
     .sapphire-bar-wordmark { display: none; }
-    .sapphire-bar-sep   { display: none; }
-    .sapphire-bar-msg   {
-      font-size: 0.68rem;
+    .sapphire-bar-sep      { display: none; }
+    .sapphire-bar-msg {
+      font-size: 0.70rem;
+      flex: 1;
+      min-width: 0;
+      text-align: center;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      flex: 1;
-      min-width: 0;
     }
-    .sapphire-txt-full  { display: none; }
-    .sapphire-txt-short { display: inline; }
-    .sapphire-bar-cta   { font-size: 0.66rem; padding: 6px 11px; flex-shrink: 0; }
-    .sapphire-new-badge { font-size: 0.48rem; padding: 2px 5px; flex-shrink: 0; }
+    .sapphire-txt-full  { display: inline; }
+    .sapphire-txt-short { display: none; }
+    .sapphire-new-badge { font-size: 0.50rem; padding: 3px 6px; flex-shrink: 0; }
+    .sapphire-bar-cta   { font-size: 0.68rem; padding: 7px 13px; flex-shrink: 0; }
   }
-  /* ── hasta 380px: texto mínimo, botón pequeño ── */
+  /* ── ≤430px: teléfonos pequeños ── */
+  @media (max-width: 430px) {
+    #sapphire-sponsor-bar { gap: 8px; padding: 0 10px; }
+    .sapphire-bar-msg   { font-size: 0.66rem; }
+    .sapphire-bar-cta   { font-size: 0.64rem; padding: 6px 11px; }
+  }
+  /* ── ≤380px: muy pequeño, sin badge ── */
   @media (max-width: 380px) {
     #sapphire-sponsor-bar { gap: 6px; padding: 0 8px; }
-    .sapphire-txt-short { display: none; }
-    .sapphire-txt-xs    { display: inline; }
-    .sapphire-bar-cta   { font-size: 0.60rem; padding: 5px 9px; }
     .sapphire-new-badge { display: none; }
+    .sapphire-bar-msg   { font-size: 0.63rem; }
+    .sapphire-bar-cta   { font-size: 0.60rem; padding: 5px 9px; }
   }
 
   /* ── SCROLLBAR ── */
