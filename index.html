@@ -9521,9 +9521,9 @@ function buildPredsFromOdds() {
     // Liga argentina: prohibido pronosticar overs (Más de X.5). Solo 1X2 + Ambos/No Marcan.
     const _isArgentina = (g.sport_key || '').includes('argentina');
     const candidates2 = [
-      { rec: 'Gana Local',     prob: probH, odds: hOP },
-      { rec: 'Gana Visitante', prob: probA, odds: aOP },
-      ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dOP }] : []),
+      { rec: 'Gana ' + hN, prob: probH, odds: hOP, _recSide: 'home' },
+      { rec: 'Gana ' + aN, prob: probA, odds: aOP, _recSide: 'away' },
+      ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dOP, _recSide: 'draw' }] : []),
       ...(_isArgentina ? [] : ['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
       ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
@@ -9594,11 +9594,11 @@ function buildPredsFromOdds() {
     // Insight generado por probabilidades
     const hN = shortName(g.home_team), aN = shortName(g.away_team);
     let insight;
-    if (rec === 'Gana Local')
+    if (best._recSide === 'home')
       insight = `${hN} parte como favorito con ${probH}% de probabilidad implícita según el mercado${fmtO(hO)}. ${aN} tiene ${probA}% de chances como visitante. Las cuotas reflejan ventaja clara del local — apuesta con valor en línea de 1X.`;
-    else if (rec === 'Gana Visitante')
+    else if (best._recSide === 'away')
       insight = `${aN} es favorito visitante con ${probA}% de probabilidad implícita${fmtO(aO)}. El mercado descuenta a ${hN} que solo tiene ${probH}% de chances. Valor en apostar al visitante directo.`;
-    else if (rec === 'Empate')
+    else if (best._recSide === 'draw' || rec === 'Empate')
       insight = `Partido muy equilibrado — el mercado da ${probH}% local, ${probD}% empate, ${probA}% visitante. El empate ofrece la cuota más atractiva${fmtO(dO ?? dOP)}. Partido difícil de predecir; stake bajo recomendado.`;
     else if (rec === 'Ambos Marcan')
       insight = `Estimación: ${bttsEst}% de probabilidad de que ambos equipos conviertan${fmtO(bttsOddsEst)}. El mercado de goles refleja un partido abierto — ${hN} (${probH}%) vs ${aN} (${probA}%). Buena apuesta de goles de doble vía.`;
@@ -9616,6 +9616,7 @@ function buildPredsFromOdds() {
       homeRaw: g.home_team,
       awayRaw: g.away_team,
       rec,
+      _recSide: best._recSide || null,
       conf,
       confLabel,
       probH,
@@ -9673,7 +9674,7 @@ function renderPreds() {
 
   // ── Caché diaria de picks ──
   // Una vez generados los picks del día, no cambian hasta las 6am del día siguiente
-  const DAILY_PREDS_KEY = 'gambeta_daily_preds_v10';
+  const DAILY_PREDS_KEY = 'gambeta_daily_preds_v11';
   const DAILY_PREDS_RESET_HOUR = 6; // 6am
 
   function getDailyPredsCacheDate() {
@@ -9733,7 +9734,7 @@ function renderPreds() {
   if (realPreds) {
     const hasBasket = realPreds.some(p => (p._sportKey || '').includes('basketball') || p.sport === 'basket');
     if (hasBasket) {
-      localStorage.removeItem('gambeta_daily_preds_v10');
+      localStorage.removeItem('gambeta_daily_preds_v11');
       realPreds = null;
     }
   }
@@ -10164,10 +10165,11 @@ function renderPreds() {
         const homeWin = se.scoreH > se.scoreA, awayWin = se.scoreA > se.scoreH, draw = se.scoreH === se.scoreA;
         const bttsMet = se.scoreH > 0 && se.scoreA > 0;
         const rec = p.rec || '';
+        const _side = _recSideOf(p);
         let result = 'void';
-        if      (rec === 'Gana Local')     result = homeWin  ? 'win' : 'loss';
-        else if (rec === 'Gana Visitante') result = awayWin  ? 'win' : 'loss';
-        else if (rec === 'Empate')         result = draw     ? 'win' : 'loss';
+        if      (_side === 'home')         result = homeWin  ? 'win' : 'loss';
+        else if (_side === 'away')         result = awayWin  ? 'win' : 'loss';
+        else if (_side === 'draw')         result = draw     ? 'win' : 'loss';
         else if (rec === 'Ambos Marcan')   result = bttsMet  ? 'win' : 'loss';
         else if (rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
         else if (rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
@@ -10239,11 +10241,12 @@ function renderPreds() {
       if (star) {
         const sHome = logoHtml(star.home, 42);
         const sAway = logoHtml(star.away, 42);
-        const rec = (star.rec||'').replace(' Gana','');
-        // Cuota: misma lógica que la ficha — basada en rec para evitar cuotas distintas
-        const _recOdds = star.rec === 'Gana Local'     ? star._hO
-                       : star.rec === 'Gana Visitante' ? star._aO
-                       : star.rec === 'Empate'         ? star._dO
+        const rec = _recLabel(star.rec, star.home, star.away);
+        // Cuota: basada en _recSide para retrocompat con picks viejos
+        const _starSide = _recSideOf(star);
+        const _recOdds = _starSide === 'home' ? star._hO
+                       : _starSide === 'away' ? star._aO
+                       : _starSide === 'draw' ? star._dO
                        : null;
         const oddsNum = parseFloat(_recOdds || star._bestOdds || star._hO || star._aO || star._dO || 0);
         const cuotaDisplay = oddsNum > 0 ? oddsNum.toFixed(2) : '—';
@@ -10829,10 +10832,10 @@ function renderPreds() {
       <div class="pred-recommendation">
         <div class="pred-rec-left">
           <div class="pred-rec-label">🤖 Recomendación IA</div>
-          <div class="pred-rec-value">${isFinishedLoss ? '❌' : '✅'} ${_normRec(p.rec)}</div>
+          <div class="pred-rec-value">${isFinishedLoss ? '❌' : '✅'} ${_recLabel(p.rec, p.home, p.away)}</div>
         </div>
         <div class="pred-rec-right">
-          ${(()=>{ const ro = p.rec==='Gana Local' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null) : p.rec==='Gana Visitante' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null) : p.rec==='Empate' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
+          ${(()=>{ const _s=_recSideOf(p); const ro = _s==='home' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null) : _s==='away' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null) : _s==='draw' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
           ${p._bookKey ? `<a class="pred-rec-book" href="${getBookLink(p._bookKey)}" target="_blank" rel="noopener" title="Apostar en ${p._bookLabel||p._bookKey}" onclick="trackEvent('promo_click',{promo:'${p._bookKey}',type:'bookmaker_rec'})">
             <img src="${getBookLogo(p._bookKey)}" alt="${p._bookLabel||p._bookKey}" onerror="this.style.display='none'">
             <span class="pred-rec-bonus">🎁 Bono</span>
@@ -11383,6 +11386,28 @@ let histConfFilter = 'all';
 const PAGE_LAUNCH_DATE = new Date('2025-03-01');
 
 function _normRec(r) { return (r||'').replace('Visitante Gana','Gana Visitante').replace('Local Gana','Gana Local'); }
+
+// Determina el lado del pick ('home'|'away'|'draw'|null) con retrocompat para picks viejos
+function _recSideOf(p) {
+  if (!p) return null;
+  if (p._recSide) return p._recSide;
+  const r = _normRec(p.rec || '');
+  if (r === 'Gana Local')     return 'home';
+  if (r === 'Gana Visitante') return 'away';
+  if (r === 'Empate')         return 'draw';
+  // Formato nuevo guardado sin _recSide (picks intermedios)
+  if (r.startsWith('Gana ') && p.home && r === 'Gana ' + p.home) return 'home';
+  if (r.startsWith('Gana ') && p.away && r === 'Gana ' + p.away) return 'away';
+  return null;
+}
+
+// Muestra la recomendación con nombre de equipo en lugar de Local/Visitante
+function _recLabel(rec, home, away) {
+  const r = _normRec(rec || '');
+  if (r === 'Gana Local')     return 'Gana ' + (home || 'Local');
+  if (r === 'Gana Visitante') return 'Gana ' + (away || 'Visitante');
+  return r;
+}
 function loadHistorial()   {
   try {
     const raw = JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
@@ -12927,7 +12952,7 @@ function renderHistorial(filter) {
           ? '<span style="color:#555">—</span>'
           : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
         const icon = h.sport==='tenis'?'🎾':'⚽';
-        const recDisplay = (h.rec||'').replace(' Gana','');
+        const recDisplay = _recLabel(h.rec, h.home, h.away);
         const isMax  = h.stake >= 150;
         const isHigh = h.stake >= 130;
         // Fecha real del partido: usar commenceTs si existe, si no h.date
@@ -14940,7 +14965,7 @@ window._availableSports = null;
 // ── Limpiar claves de caché obsoletas (versiones anteriores) ──
 try {
   ['cache_odds_v6', 'cache_odds_stale_v6', 'cache_odds_v5', 'cache_odds_stale_v5', 'cache_odds_v4', 'cache_odds_v3', 'cache_odds_stale',
-   'gambeta_daily_preds_v9', 'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
+   'gambeta_daily_preds_v10', 'gambeta_daily_preds_v9', 'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
     .forEach(k => localStorage.removeItem(k));
 } catch(_) {}
 
@@ -17425,7 +17450,7 @@ function _rkupRenderPicks() {
       <div class="rkup-pick-icon">${icon}</div>
       <div class="rkup-pick-info">
         <div class="rkup-pick-match">${p.match}${typeTag}</div>
-        <div class="rkup-pick-rec">${p.rec}</div>
+        <div class="rkup-pick-rec">${_recLabel(p.rec, p.home, p.away)}</div>
       </div>
       ${coinsHtml}
     </div>`;
@@ -18463,7 +18488,7 @@ function admRenderHistTable() {
       <tr style="border-top:1px solid rgba(255,255,255,0.04)">
         <td style="padding:8px 12px;color:var(--texto-sec)">${h.date||'—'}</td>
         <td style="padding:8px 12px;color:#fff;font-weight:600">${h.home} vs ${h.away}</td>
-        <td style="padding:8px 12px;color:var(--verde)">${(h.rec||'').replace(' Gana','')}</td>
+        <td style="padding:8px 12px;color:var(--verde)">${_recLabel(h.rec, h.home, h.away)}</td>
         <td style="padding:8px 12px">$${h.stake||0}</td>
         <td style="padding:8px 12px">
           <select onchange="admSetResult(${i},this.value)" style="background:#1a2a1a;border:1px solid rgba(255,255,255,0.15);color:#fff;padding:3px 6px;border-radius:6px;font-size:0.75rem">
@@ -18600,7 +18625,7 @@ async function admDiagWorker() {
 function admRefreshScores() { loadRealScores(); document.getElementById('admDatosMsg').textContent='🔄 Recargando marcadores...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Marcadores recargados'; },3000); }
 function admRefreshPreds()  {
   // Borrar caché diaria para forzar regeneración desde la API
-  try { localStorage.removeItem('gambeta_daily_preds_v10'); } catch(_) {}
+  try { localStorage.removeItem('gambeta_daily_preds_v11'); } catch(_) {}
   renderPreds();
   document.getElementById('admDatosMsg').textContent='✓ Pronósticos regenerados (caché limpiada)';
   setTimeout(()=>document.getElementById('admDatosMsg').textContent='',3000);
