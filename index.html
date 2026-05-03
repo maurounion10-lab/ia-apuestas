@@ -7087,8 +7087,8 @@ const teamLogos = {
   'Brest':                  'https://media.api-sports.io/football/teams/106.png',
   'Stade Brestois':         'https://media.api-sports.io/football/teams/106.png',
   'Stade Brestois 29':      'https://media.api-sports.io/football/teams/106.png',
-  'Auxerre':                'https://media.api-sports.io/football/teams/778.png',
-  'AJ Auxerre':             'https://media.api-sports.io/football/teams/778.png',
+  'Auxerre':                'https://r2.thesportsdb.com/images/media/team/badge/lzdtbf1658753355.png',
+  'AJ Auxerre':             'https://r2.thesportsdb.com/images/media/team/badge/lzdtbf1658753355.png',
   'Metz':                   'https://media.api-sports.io/football/teams/112.png',
   'FC Metz':                'https://media.api-sports.io/football/teams/112.png',
   'Clermont':               'https://media.api-sports.io/football/teams/523.png',
@@ -10681,7 +10681,8 @@ function renderPreds() {
         }` : ''}
       <div class="pred-header">
         <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${(() => {
-          const lg = (p.league && p.league !== 'Fútbol' && p.league !== 'Tenis' && p.league !== 'Liga') ? leagueShort(p.league) : '';
+          const _lgRaw = (p._sportKey ? (sportKeyToLeague(p._sportKey, p.home, p.away) || p.league) : p.league) || '';
+          const lg = (_lgRaw && _lgRaw !== 'Fútbol' && _lgRaw !== 'Tenis' && _lgRaw !== 'Liga') ? leagueShort(_lgRaw) : '';
           const t  = isGameLive ? '🔴 EN VIVO'
                    : isStarted  ? (() => {
                        if (!p.commenceTs) return '';                       const _md = new Date(p.commenceTs);
