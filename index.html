@@ -14077,8 +14077,6 @@ async function loadRealOdds() {
   if (localCached && Array.isArray(localCached) && localCached.length > 0) {
     window._rawOddsGames = localCached;
     processOddsIntoComparador(localCached);
-    // Esperar a que sbLoadLockedPicks termine antes del primer render
-    // Garantiza que todos los dispositivos aplican el mismo lock global
     const lockWait = _sbLockedPicksReady
       ? Promise.race([_sbLockedPicksReady, new Promise(r => setTimeout(r, 4000))])
       : Promise.resolve();
@@ -14092,7 +14090,7 @@ async function loadRealOdds() {
   function useData(combined) {
     window._rawOddsGames = combined;
     _loadFailed = false;
-    _autoRetryCount = 0; // éxito → resetear contador de reintentos
+    _autoRetryCount = 0;
     clearTimeout(_autoRetryTimer); _autoRetryTimer = null;
     if (window._retryCountdownTick) { clearInterval(window._retryCountdownTick); window._retryCountdownTick = null; }
     cacheSet('cache_odds_v7', combined);
@@ -14107,7 +14105,6 @@ async function loadRealOdds() {
       if (raw) {
         const { data } = JSON.parse(raw);
         if (data?.length) {
-          // Filtrar ligas bloqueadas antes de usar datos del caché
           const cleanData = data.filter(g =>
             !g.sport_key?.includes('albania') && !g.sport_key?.includes('faroe') &&
             !g.sport_key?.includes('gibraltar') && !g.sport_key?.includes('san_marino') &&
@@ -14121,45 +14118,54 @@ async function loadRealOdds() {
         }
       }
     } catch(_) {}
-    // Sin datos en caché ni API → carga fallida
     _loadFailed = true;
     return false;
   }
 
-  // Safety net: si en 12s el Worker no responde, salir del skeleton con stale data.
-  // Si tampoco hay stale → marcar como fallido y programar auto-retry.
-  const _safetyTimer = setTimeout(() => {
-    if (_oddsLoading) {
-      console.warn('[Odds] Safety timeout — intentando stale data');
-      _oddsLoading = false;
-      const gotStale = useStale();
-      renderPreds();
-      if (!gotStale && _autoRetryCount < _MAX_AUTO_RETRY) {
-        _scheduleAutoRetry();
-      }
+  // Helper: ejecuta los 3 fetch con un timeout propio
+  async function fetchWorker(timeoutMs) {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const [rM, rE, rS] = await Promise.all([
+        fetch(`${WORKER_URL}/odds?category=main`,      { signal: ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch(`${WORKER_URL}/odds?category=europe`,    { signal: ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch(`${WORKER_URL}/odds?category=secondary`, { signal: ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+      ]);
+      return [...(rM.data || []), ...(rE.data || []), ...(rS.data || [])];
+    } finally {
+      clearTimeout(timer);
     }
-  }, 12000);
+  }
 
   try {
-    // 2) Worker API directo — datos frescos con BTTS real (timeout 15s incluye secondary)
-    console.log('[Odds] Fetching desde Worker API (main + europe + secondary)...');
-    const _ctrl = new AbortController();
-    const _fetchTimer = setTimeout(() => _ctrl.abort(), 15000);
-    const [resMain, resEur, resSec] = await Promise.all([
-      fetch(`${WORKER_URL}/odds?category=main`,      { signal: _ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
-      fetch(`${WORKER_URL}/odds?category=europe`,    { signal: _ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
-      fetch(`${WORKER_URL}/odds?category=secondary`, { signal: _ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
-    ]);
-    clearTimeout(_fetchTimer);
-    const combined = [...(resMain.data || []), ...(resEur.data || []), ...(resSec.data || [])];
+    // Intento 1: timeout 10s
+    console.log('[Odds] Fetch #1 (Worker)...');
+    let combined = await fetchWorker(10000);
+
+    // Si vacío: intento 2 inmediato con 3s de espera (cold start del Worker)
+    if (!combined.length) {
+      console.warn('[Odds] Respuesta vacía → reintento en 3s...');
+      _oddsLoading = true; // mantener skeleton
+      await new Promise(r => setTimeout(r, 3000));
+      if (!_oddsLoading) return; // otro proceso tomó el control
+      combined = await fetchWorker(10000);
+    }
+
+    // Si sigue vacío: intento 3 final con 3s más
+    if (!combined.length) {
+      console.warn('[Odds] Sigue vacío → último intento...');
+      await new Promise(r => setTimeout(r, 3000));
+      if (!_oddsLoading) return;
+      combined = await fetchWorker(8000);
+    }
 
     if (combined.length > 0) {
       useData(combined);
     } else {
+      // 3 intentos fallidos → stale o error
       const gotStale = useStale();
       if (!gotStale && _autoRetryCount < _MAX_AUTO_RETRY) {
-        // API devolvió vacío y no hay stale → auto-retry
-        clearTimeout(_safetyTimer);
         _oddsLoading = false;
         renderPreds();
         _scheduleAutoRetry();
@@ -14167,17 +14173,15 @@ async function loadRealOdds() {
       }
     }
   } catch(e) {
-    console.warn('[Odds] Error:', e);
+    console.warn('[Odds] Error fatal:', e.message);
     const gotStale = useStale();
     if (!gotStale && _autoRetryCount < _MAX_AUTO_RETRY) {
-      clearTimeout(_safetyTimer);
       _oddsLoading = false;
       renderPreds();
       _scheduleAutoRetry();
       return;
     }
   } finally {
-    clearTimeout(_safetyTimer);
     _oddsLoading = false;
     renderPreds();
   }
@@ -14187,7 +14191,7 @@ async function loadRealOdds() {
 let _autoRetryTimer = null;
 function _scheduleAutoRetry() {
   _autoRetryCount++;
-  const delay = _autoRetryCount <= 2 ? 20000 : 40000; // 20s los primeros 2, 40s los últimos
+  const delay = _autoRetryCount <= 2 ? 8000 : 20000; // 8s los primeros 2, 20s los siguientes
   console.log(`[Odds] Auto-retry #${_autoRetryCount} en ${delay/1000}s`);
   // Actualizar la UI con contador regresivo
   _startRetryCountdown(delay);
