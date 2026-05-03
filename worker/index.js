@@ -1,11 +1,12 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v2.4
+ * gambeta.ai — Cloudflare Worker: apuestas-api v2.5
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
  *   GET /available           → lista de sport_keys soportados
- *   GET /odds?category=main  → fixtures + cuotas (formato compatible con frontend)
+ *   GET /odds?category=main       → fixtures + cuotas (formato compatible con frontend)
  *   GET /odds?category=europe
+ *   GET /odds?category=secondary  → 21 ligas secundarias (2ª divisiones, ligas regionales)
  *   GET /stats?team=ID&league=ID → estadísticas de equipo (🧠 Algorithm)
  *   GET /h2h?h2h=ID1-ID2     → historial H2H (🧠 Algorithm)
  *   GET /predictions?fixture=ID → predicciones de API-Football
@@ -480,7 +481,7 @@ export default {
     if (path === '/odds') {
       const category = url.searchParams.get('category') || 'main';
       const hourKey  = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
-      const cacheKey = `odds6_${category}_${hourKey}`;
+      const cacheKey = `odds7_${category}_${hourKey}`;  // v7: secondary leagues added
 
       const leagues = category === 'europe'    ? LEAGUES_EUROPE
                     : category === 'secondary' ? LEAGUES_SECONDARY
