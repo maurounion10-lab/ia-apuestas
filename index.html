@@ -10334,9 +10334,14 @@ function renderPreds() {
     if (!realPreds.length) realPreds = null;
   }
 
-  // Sin datos reales: skeleton si está cargando, empty state si ya cargó y el filtro no tiene picks
+  // Sin datos reales: skeleton si está cargando, error si falló, empty state si genuinamente sin picks
   if (!realPreds) {
     const isLoading = _oddsLoading || !window._rawOddsGames;
+    // Si hay auto-retry en curso, no pisar la UI del countdown
+    if (_autoRetryTimer && _loadFailed) {
+      window._aiPreds = [];
+      return;
+    }
     if (isLoading) {
       document.getElementById('predGrid').innerHTML = [1,2,3].map(() => `
         <div class="pred-card-skeleton">
@@ -10366,6 +10371,25 @@ function renderPreds() {
         <button onclick="if(window._oddsLoading){return;}cacheSet('cache_odds_v7',null);loadRealOdds();" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--texto-sec);padding:8px 20px;border-radius:20px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(0,200,83,0.4)';this.style.color='var(--verde)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='var(--texto-sec)'">🔄 Reintentar</button>
         <div style="font-size:0.65rem;color:var(--texto-sec);opacity:0.5;margin-top:6px">La carga está tardando más de lo normal</div>
       </div>`;
+    } else if (_loadFailed) {
+      // Carga fallida sin datos stale — mostrar error con opción de recargar
+      // (no mostramos "Sin pronósticos" porque no sabemos si los hay o no)
+      if (!_autoRetryTimer) {
+        document.getElementById('predGrid').innerHTML = `
+          <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 20px 60px;gap:16px;text-align:center">
+            <div style="font-size:2.2rem">📡</div>
+            <div style="font-size:1.05rem;font-weight:700;color:var(--texto-pri)">Error al cargar los pronósticos</div>
+            <div style="font-size:0.82rem;color:var(--texto-sec);max-width:320px;line-height:1.5">No se pudo conectar con el servidor. Revisá tu conexión o recargá la página.</div>
+            <button onclick="clearTimeout(_autoRetryTimer);_autoRetryCount=0;_loadFailed=false;cacheSet('cache_odds_v7',null);localStorage.removeItem('cache_odds_stale_v7');loadRealOdds();"
+              style="background:var(--verde);color:#000;border:none;border-radius:30px;padding:10px 26px;font-size:0.84rem;font-weight:700;cursor:pointer;font-family:inherit">
+              🔄 Reintentar
+            </button>
+            <button onclick="location.reload()"
+              style="background:transparent;border:1px solid rgba(255,255,255,0.18);color:var(--texto-sec);border-radius:30px;padding:8px 22px;font-size:0.76rem;font-weight:600;cursor:pointer;font-family:inherit">
+              ↺ Recargar página
+            </button>
+          </div>`;
+      }
     } else {
       document.getElementById('predGrid').innerHTML = (() => {
         const _isLogged = !!authUser;
@@ -11799,9 +11823,21 @@ async function sbSaveHistorial(arr) {
   } catch(e) { console.warn('[histSave]', e.message); }
 }
 
+let _histLoading     = false;
+let _histLoadFailed  = false;
+let _histLoadedOnce  = false;
+
 async function sbLoadHistorial() {
+  _histLoading = true;
+  _histLoadFailed = false;
   // 1. Cargar historial global (para todos, incluso anónimos)
-  const globalHist = await sbLoadGlobalHistorial();
+  let globalHist;
+  try {
+    globalHist = await sbLoadGlobalHistorial();
+  } catch(e) {
+    console.warn('[sbLoadHistorial] Error cargando global:', e.message);
+    globalHist = null;
+  }
 
   if (authUser?.email === ADMIN_EMAIL) {
     // Admin: merge global + historial_full DB + local → fuente de verdad completa
@@ -11874,6 +11910,7 @@ async function sbLoadHistorial() {
     }
 
     try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
+    _markHistLoaded();
     renderHistorial(histFilter);
     return;
   }
@@ -11887,9 +11924,16 @@ async function sbLoadHistorial() {
     const _localOnly = _localHist.filter(h => !_globalKeys.has(_hKeyM(h)));
     const _merged = [..._fg, ..._localOnly].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,500);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(_merged)); } catch {}
+    _markHistLoaded();
     renderHistorial(histFilter);
     return;
   }
+
+  // Sin historial global ni local → marcar fallo para mostrar retry
+  _histLoading = false;
+  _histLoadedOnce = true;
+  _histLoadFailed = loadHistorial().length === 0;
+  renderHistorial(histFilter);
 
   // Fallback legacy: historial personal en acoin_users
   if (!authUser?.email) return;
@@ -11906,9 +11950,19 @@ async function sbLoadHistorial() {
     const localOnly = localHist.filter(h => !dbKeys.has(_hKey2(h)));
     const merged = [...data.historial_full, ...localOnly].slice(-500);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
+    _histLoading = false; _histLoadedOnce = true;
     renderHistorial(histFilter);
-  } catch(e) { console.warn('[histLoad]', e.message); }
+  } catch(e) {
+    console.warn('[histLoad]', e.message);
+    _histLoading = false;
+    _histLoadFailed = loadHistorial().length === 0;
+    _histLoadedOnce = true;
+    renderHistorial(histFilter);
+  }
 }
+
+// Helper: marca fin exitoso de carga del historial (llamado desde los return tempranos)
+function _markHistLoaded() { _histLoading = false; _histLoadedOnce = true; _histLoadFailed = false; }
 
 // Migración: recalcula stake y P/L según nuevo esquema bvr
 // Máxima(6)=$170 | Alta(5)=$130 | Media-Alta(4)=$50 | Media(3)=$30 | Baja=$15
@@ -12778,7 +12832,29 @@ function renderHistorial(filter) {
         const dateCell = `<td style="${dateCellStyle}">${dateLabel}</td>`;
         return `<tr class="${rowClass}" style="${rowStyle}">${dateCell}${matchCell}<td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
       }).join('')
-    : `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--texto-sec)">📋 El historial se llenará automáticamente con los pronósticos de cada día.</td></tr>`;
+    : (() => {
+        // Diferenciar estado de carga vs error vs genuinamente vacío
+        if (_histLoading || !_histLoadedOnce) {
+          // Aún cargando desde Supabase → skeleton animado (3 filas)
+          const sk = () => `<tr style="opacity:0.4;animation:pulse 1.5s infinite">`
+            + `<td><div style="height:11px;background:rgba(255,255,255,0.12);border-radius:4px;width:60%"></div></td>`.repeat(8)
+            + `</tr>`;
+          return sk() + sk() + sk();
+        }
+        if (_histLoadFailed) {
+          // Carga fallida: proponer recargar
+          return `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--texto-sec)">
+            <div style="font-size:1.3rem;margin-bottom:8px">📡</div>
+            <div style="font-size:0.9rem;font-weight:700;color:var(--texto-pri);margin-bottom:6px">No se pudo cargar el historial</div>
+            <div style="font-size:0.78rem;margin-bottom:14px">Revisá tu conexión o recargá la página.</div>
+            <button onclick="_histLoadFailed=false;_histLoadedOnce=false;sbLoadHistorial();" style="background:var(--verde);color:#000;border:none;border-radius:20px;padding:8px 22px;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:inherit;margin-right:8px">🔄 Reintentar</button>
+            <button onclick="location.reload()" style="background:transparent;border:1px solid rgba(255,255,255,0.18);color:var(--texto-sec);border-radius:20px;padding:7px 18px;font-size:0.76rem;font-weight:600;cursor:pointer;font-family:inherit">↺ Recargar</button>
+          </td></tr>`;
+        }
+        // Genuinamente sin picks con el filtro activo
+        const _filterMsg = histDateFilter !== 'all' ? 'No hay picks en el período seleccionado.' : 'No hay picks registrados aún.';
+        return `<tr><td colspan="8" style="text-align:center;padding:30px;color:var(--texto-sec);font-size:0.85rem">${_filterMsg}</td></tr>`;
+      })();
 
   // Barra de navegación de páginas — oculta siempre en sub-página (lista infinita)
   const navEl = document.getElementById('histPagNav');
@@ -13795,6 +13871,9 @@ function fixPendingHistCommenceTs() {
 }
 
 let _oddsLoading = false;
+let _loadFailed  = false;  // true cuando la API falló Y no hay stale data
+let _autoRetryCount = 0;
+const _MAX_AUTO_RETRY = 4;
 function processOddsIntoComparador(data) {
   // Collect all bookmakers present in the response
   const bookMap = {};
@@ -13950,6 +14029,10 @@ async function loadRealOdds() {
 
   function useData(combined) {
     window._rawOddsGames = combined;
+    _loadFailed = false;
+    _autoRetryCount = 0; // éxito → resetear contador de reintentos
+    clearTimeout(_autoRetryTimer); _autoRetryTimer = null;
+    if (window._retryCountdownTick) { clearInterval(window._retryCountdownTick); window._retryCountdownTick = null; }
     cacheSet('cache_odds_v7', combined);
     try { localStorage.setItem('cache_odds_stale_v7', JSON.stringify({ ts: Date.now(), data: combined })); } catch(_) {}
     processOddsIntoComparador(combined);
@@ -13959,17 +14042,32 @@ async function loadRealOdds() {
   function useStale() {
     try {
       const raw = localStorage.getItem('cache_odds_stale_v7');
-      if (raw) { const { data } = JSON.parse(raw); if (data?.length) { window._rawOddsGames = data; processOddsIntoComparador(data); } }
+      if (raw) {
+        const { data } = JSON.parse(raw);
+        if (data?.length) {
+          window._rawOddsGames = data;
+          processOddsIntoComparador(data);
+          _loadFailed = false;
+          return true;
+        }
+      }
     } catch(_) {}
+    // Sin datos en caché ni API → carga fallida
+    _loadFailed = true;
+    return false;
   }
 
-  // Safety net: si en 12s el Worker no responde, salir del skeleton con stale data
+  // Safety net: si en 12s el Worker no responde, salir del skeleton con stale data.
+  // Si tampoco hay stale → marcar como fallido y programar auto-retry.
   const _safetyTimer = setTimeout(() => {
     if (_oddsLoading) {
-      console.warn('[Odds] Safety timeout — mostrando datos stale');
+      console.warn('[Odds] Safety timeout — intentando stale data');
       _oddsLoading = false;
-      useStale();
+      const gotStale = useStale();
       renderPreds();
+      if (!gotStale && _autoRetryCount < _MAX_AUTO_RETRY) {
+        _scheduleAutoRetry();
+      }
     }
   }, 12000);
 
@@ -13988,17 +14086,84 @@ async function loadRealOdds() {
     if (combined.length > 0) {
       useData(combined);
     } else {
-      useStale();
+      const gotStale = useStale();
+      if (!gotStale && _autoRetryCount < _MAX_AUTO_RETRY) {
+        // API devolvió vacío y no hay stale → auto-retry
+        clearTimeout(_safetyTimer);
+        _oddsLoading = false;
+        renderPreds();
+        _scheduleAutoRetry();
+        return;
+      }
     }
   } catch(e) {
     console.warn('[Odds] Error:', e);
-    useStale();
+    const gotStale = useStale();
+    if (!gotStale && _autoRetryCount < _MAX_AUTO_RETRY) {
+      clearTimeout(_safetyTimer);
+      _oddsLoading = false;
+      renderPreds();
+      _scheduleAutoRetry();
+      return;
+    }
   } finally {
     clearTimeout(_safetyTimer);
     _oddsLoading = false;
     renderPreds();
   }
 }
+
+// ── Auto-retry con countdown visible ────────────────────────────────────────
+let _autoRetryTimer = null;
+function _scheduleAutoRetry() {
+  _autoRetryCount++;
+  const delay = _autoRetryCount <= 2 ? 20000 : 40000; // 20s los primeros 2, 40s los últimos
+  console.log(`[Odds] Auto-retry #${_autoRetryCount} en ${delay/1000}s`);
+  // Actualizar la UI con contador regresivo
+  _startRetryCountdown(delay);
+  _autoRetryTimer = setTimeout(() => {
+    console.log(`[Odds] Ejecutando auto-retry #${_autoRetryCount}`);
+    cacheSet('cache_odds_v7', null);
+    loadRealOdds();
+  }, delay);
+}
+
+function _startRetryCountdown(ms) {
+  const grid = document.getElementById('predGrid');
+  if (!grid) return;
+  let remaining = Math.round(ms / 1000);
+  const render = () => {
+    grid.innerHTML = `
+      <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 20px 60px;gap:16px;text-align:center">
+        <div style="font-size:2.2rem">📡</div>
+        <div style="font-size:1.05rem;font-weight:700;color:var(--texto-pri)">Conectando con el servidor…</div>
+        <div style="font-size:0.82rem;color:var(--texto-sec);max-width:320px;line-height:1.5">
+          La carga está tardando. Reintentando en <span id="_retryCountEl" style="color:var(--verde);font-weight:700">${remaining}s</span>
+          ${_autoRetryCount >= _MAX_AUTO_RETRY ? '<br><span style="font-size:0.75rem;opacity:0.7">(último intento)</span>' : ''}
+        </div>
+        <button onclick="clearTimeout(_autoRetryTimer);_autoRetryCount=0;cacheSet('cache_odds_v7',null);localStorage.removeItem('cache_odds_stale_v7');loadRealOdds();"
+          style="background:var(--verde);color:#000;border:none;border-radius:30px;padding:10px 26px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px">
+          🔄 Reintentar ahora
+        </button>
+        <button onclick="location.reload()"
+          style="background:transparent;border:1px solid rgba(255,255,255,0.18);color:var(--texto-sec);border-radius:30px;padding:8px 22px;font-size:0.76rem;font-weight:600;cursor:pointer;font-family:inherit">
+          ↺ Recargar página
+        </button>
+      </div>`;
+  };
+  render();
+  const tick = setInterval(() => {
+    remaining--;
+    const el = document.getElementById('_retryCountEl');
+    if (el) el.textContent = remaining + 's';
+    if (remaining <= 0) clearInterval(tick);
+  }, 1000);
+  // Guardar tick para limpiarlo si llegan datos antes
+  window._retryCountdownTick = tick;
+}
+
+// Limpiar countdown si los datos llegan
+const _origUseData = null; // ya capturado arriba inline
 
 
 let _scoresLoading = false;
