@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v2.2
+ * gambeta.ai — Cloudflare Worker: apuestas-api v2.4
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -9,10 +9,12 @@
  *   GET /stats?team=ID&league=ID → estadísticas de equipo (🧠 Algorithm)
  *   GET /h2h?h2h=ID1-ID2     → historial H2H (🧠 Algorithm)
  *   GET /predictions?fixture=ID → predicciones de API-Football
+ *   POST /notify-redeem         → notifica canje G$ al admin (vía Resend)
  *
  * Variables de entorno requeridas:
  *   API_FOOTBALL_KEY  → api-football.com key
  *   ODDS_API_KEY      → the-odds-api.com key (fallback)
+ *   RESEND_API_KEY    → resend.com key (notificaciones de canje)
  *
  * KV Namespace:
  *   CACHE_KV → gambeta-cache (ID: 1d4b161e78db4de9a9b806f369c73ceb)
@@ -321,6 +323,77 @@ async function getLeagueData(env, leagueEntries) {
   const supplementData = await buildOddsAPIData(env, [...needsSet]);
   console.log(`[Worker] OddsAPI supplement: ${supplementData.length} juegos (${needsSet.size} ligas)`);
 
+  // ── Enriquecer Odds API games con _apf_ IDs (para brain algorithm) ──────────
+  // APF devuelve fixtures sin odds pero CON IDs de equipos/fixture.
+  // Los cruzamos por nombre de equipo (normalizado) para que el brain algorithm
+  // pueda luego pedir stats/H2H usando los IDs de API-Football.
+  const apfFallbackGames = apfData.filter(g => needsSet.has(g.sport_key));
+  if (apfFallbackGames.length > 0) {
+    const normName = s => (s || '').toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '')    // quitar acentos
+      .replace(/\(.*?\)/g, ' ')                             // quitar "(CHI)", "(ARG)" etc.
+      .replace(/[-_\/]/g, ' ')                              // guiones → espacio
+      // quitar prefijos comunes
+      .replace(/\b(club|ca|cr|cf|as|sd|rcd|red bull|atletico|deportivo|sp|bsc)\b/g, '')
+      // quitar sufijos de ciudad/país
+      .replace(/\b(fc|sc|cf|ac|cd|rj|ba|chi|uru|arg|bol|per|ecu|ven|col|bra|par|sa)\b/g, '')
+      // quitar "de montevideo", "de cali", "de deportes" etc.
+      .replace(/\bde\s+(montevideo|cali|deportes|quito|asuncion|lima)\b/g, '')
+      .replace(/\b(montevideo|asuncion)\b/g, '')           // ciudad suelta al final
+      .replace(/[^a-z0-9 ]/g, ' ')
+      .replace(/\s+/g, ' ').trim();
+
+    const apfMap = {};
+    apfFallbackGames.forEach(g => {
+      const key = normName(g.home_team) + '||' + normName(g.away_team);
+      apfMap[key] = g;
+    });
+
+    // Índice por home+away para match exacto, y por home solo para fallback parcial
+    const apfMapByHome = {};
+    apfFallbackGames.forEach(g => {
+      const hk = normName(g.home_team);
+      if (!apfMapByHome[hk]) apfMapByHome[hk] = [];
+      apfMapByHome[hk].push(g);
+    });
+
+    const applyApf = (g, src) => {
+      g._apf_fixture_id = src._apf_fixture_id;
+      g._apf_home_id    = src._apf_home_id;
+      g._apf_away_id    = src._apf_away_id;
+      g._apf_league_id  = src._apf_league_id;
+      g._apf_status     = src._apf_status;
+    };
+
+    // Fuzzy match por substring: "bragantino" ⊂ "red bull bragantino"
+    const fuzzyMatch = (a, b) => {
+      if (!a || !b) return false;
+      const [s, l] = a.length <= b.length ? [a, b] : [b, a];
+      return s.length >= 4 && l.includes(s);
+    };
+
+    let enriched = 0;
+    supplementData.forEach(g => {
+      if (g._apf_fixture_id) return; // ya enriquecido
+      const key = normName(g.home_team) + '||' + normName(g.away_team);
+      let apfGame = apfMap[key];
+
+      // Fallback: match parcial — buscar partido cuyo equipo local tenga substring overlap
+      if (!apfGame) {
+        const nh = normName(g.home_team);
+        const na = normName(g.away_team);
+        const candidates = apfFallbackGames.filter(af =>
+          fuzzyMatch(nh, normName(af.home_team)) &&
+          fuzzyMatch(na, normName(af.away_team))
+        );
+        if (candidates.length === 1) apfGame = candidates[0];
+      }
+
+      if (apfGame) { applyApf(g, apfGame); enriched++; }
+    });
+    if (enriched) console.log(`[Worker] _apf_ enriched: ${enriched}/${supplementData.length} Odds API games`);
+  }
+
   // Descartar juegos APF sin odds y reemplazar con Odds API para esas ligas
   const filteredApf = apfData.filter(g => !needsSet.has(g.sport_key));
   const combined = [...filteredApf, ...supplementData];
@@ -376,7 +449,7 @@ export default {
     if (path === '/odds') {
       const category = url.searchParams.get('category') || 'main';
       const hourKey  = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
-      const cacheKey = `odds4_${category}_${hourKey}`;
+      const cacheKey = `odds6_${category}_${hourKey}`;
 
       const leagues = category === 'europe' ? LEAGUES_EUROPE : LEAGUES_MAIN;
 
@@ -436,13 +509,74 @@ export default {
       return new Response(JSON.stringify({ data }), { headers: CORS });
     }
 
+    // ── /notify-redeem (POST) ────────────────────────────────────────────────
+    if (path === '/notify-redeem' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const { casa, usd, costFmt, telegramUser, bettingId, userEmail } = body;
+
+        if (!casa || !telegramUser || !bettingId) {
+          return new Response(JSON.stringify({ ok: false, error: 'Faltan campos requeridos' }), { status: 400, headers: CORS });
+        }
+
+        const resendKey = env.RESEND_API_KEY;
+        if (!resendKey) {
+          return new Response(JSON.stringify({ ok: false, error: 'RESEND_API_KEY no configurada' }), { status: 500, headers: CORS });
+        }
+
+        const now = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+
+        const htmlBody = `
+          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0f0f1a;color:#f0f0f0;border-radius:12px;">
+            <h2 style="color:#facc15;margin-top:0;">🎁 Nuevo Canje G$ — gambeta.ai</h2>
+            <table style="width:100%;border-collapse:collapse;margin:16px 0;">
+              <tr><td style="padding:8px 12px;color:#aaa;width:40%;">Casa</td><td style="padding:8px 12px;font-weight:bold;">${casa}</td></tr>
+              <tr style="background:#1a1a2e;"><td style="padding:8px 12px;color:#aaa;">Premio</td><td style="padding:8px 12px;font-weight:bold;color:#4ade80;">$${usd} USD</td></tr>
+              <tr><td style="padding:8px 12px;color:#aaa;">Costo G$</td><td style="padding:8px 12px;">${costFmt} G$</td></tr>
+              <tr style="background:#1a1a2e;"><td style="padding:8px 12px;color:#aaa;">Telegram</td><td style="padding:8px 12px;color:#38bdf8;">@${telegramUser}</td></tr>
+              <tr><td style="padding:8px 12px;color:#aaa;">ID en ${casa}</td><td style="padding:8px 12px;font-family:monospace;font-size:15px;color:#facc15;">${bettingId}</td></tr>
+              <tr style="background:#1a1a2e;"><td style="padding:8px 12px;color:#aaa;">Email usuario</td><td style="padding:8px 12px;">${userEmail || '—'}</td></tr>
+              <tr><td style="padding:8px 12px;color:#aaa;">Fecha</td><td style="padding:8px 12px;">${now}</td></tr>
+            </table>
+            <p style="font-size:13px;color:#666;margin-top:20px;">Este canje fue procesado automáticamente por gambeta.ai. El usuario ya fue debitado sus G$.</p>
+          </div>
+        `;
+
+        const emailRes = await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${resendKey}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            from: 'gambeta.ai <no-reply@gambeta.ai>',
+            to: ['pronosticosarg@gmail.com'],
+            subject: `🎁 Canje G$ — ${casa} $${usd} USD — @${telegramUser}`,
+            html: htmlBody
+          })
+        });
+
+        if (!emailRes.ok) {
+          const errText = await emailRes.text();
+          console.error('Resend error:', errText);
+          return new Response(JSON.stringify({ ok: false, error: `Resend: ${emailRes.status}` }), { status: 502, headers: CORS });
+        }
+
+        return new Response(JSON.stringify({ ok: true }), { headers: CORS });
+      } catch (e) {
+        console.error('notify-redeem error:', e);
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v2.2',
+        worker: 'apuestas-api v2.4',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
+        resend_key: env.RESEND_API_KEY ? 'configured' : 'MISSING',
         kv: env.CACHE_KV ? 'connected' : 'NOT connected'
       }), { headers: CORS });
     }
