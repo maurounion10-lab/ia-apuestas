@@ -10066,10 +10066,11 @@ function renderPreds() {
   // Array vacío también cuenta como sin datos
   if (realPreds && realPreds.length === 0) realPreds = null;
   const isLive = !!realPreds;
-  // Guardar al historial solo los picks pre-partido (no los ya iniciados)
+  // Guardar al historial TODOS los picks — incluyendo ya iniciados con resultado pendiente.
+  // Esto garantiza que ningún pick desaparezca por un reload durante el partido.
   try {
     if (realPreds) {
-      const _savedChanges = savePredictions(realPreds.filter(p => !p._started));
+      const _savedChanges = savePredictions(realPreds);
       // Si se corrigieron commenceTs, refrescar la tabla de historial si está visible
       if (_savedChanges && typeof renderHistorial === 'function') {
         const _histEl = document.getElementById('historial');
@@ -11990,9 +11991,9 @@ function savePredictions(preds) {
     // Excluir también por nombre de equipo (por si sportKey viene vacío)
     const _nh = _normBSave(p.home), _na = _normBSave(p.away);
     if (_BLOCKED_TEAMS_SAVE.some(t => _nh.includes(t) || _na.includes(t))) return;
-    // Excluir partidos que comenzaron hace más de 4 horas (partido ya terminado = no tiene sentido guardar)
-    // Pero SÍ guardar partidos en vivo o que acaban de comenzar (window de 4h para cubrir live + resultado)
-    if (p.commenceTs && p.commenceTs <= Date.now() - 4 * 3600 * 1000) return;
+    // Excluir partidos que comenzaron hace más de 20 horas (cubre jornada completa + margen)
+    // Nunca excluir picks en vivo o recientes — todo pick mostrado al usuario DEBE quedar en historial
+    if (p.commenceTs && p.commenceTs <= Date.now() - 20 * 3600 * 1000) return;
     // Para auto-publicar finde: los viernes guardamos picks de sábado y domingo también
     // (ya cubierto por el check anterior — si commenceTs > Date.now() pasan)
 

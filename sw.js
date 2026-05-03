@@ -15,18 +15,13 @@ self.addEventListener('install', event => {
   );
 });
 
-// ─── Activate: limpiar TODOS los caches viejos y tomar control inmediato ─────
+// ─── Activate: limpiar caches viejos y tomar control inmediato ───────────────
+// NUNCA forzar client.navigate() — destruye localStorage/estado en vuelo.
 self.addEventListener('activate', event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(keys.map(k => caches.delete(k))) // borra TODO, no solo los viejos
+      Promise.all(keys.map(k => caches.delete(k)))
     ).then(() => self.clients.claim())
-     .then(() => {
-       // Forzar recarga de todos los clientes para que carguen el HTML fresco
-       return self.clients.matchAll({ type: 'window' }).then(clients => {
-         clients.forEach(client => client.navigate(client.url));
-       });
-     })
   );
 });
 
