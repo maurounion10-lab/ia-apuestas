@@ -10420,7 +10420,7 @@ function renderPreds() {
           <div style="text-align:center;font-size:0.68rem;color:var(--texto-sec);opacity:0.6">Cargando pronósticos...</div>
         </div>`).join('') + `
       <div style="text-align:center;padding:8px 0 16px;opacity:0;animation:fadeInSlow 1s 8s forwards">
-        <button onclick="if(window._oddsLoading){return;}cacheSet('cache_odds_v7',null);loadRealOdds();" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--texto-sec);padding:8px 20px;border-radius:20px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(0,200,83,0.4)';this.style.color='var(--verde)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='var(--texto-sec)'">🔄 Reintentar</button>
+        <button onclick="if(window._oddsLoading){return;}cacheSet('cache_odds_v8',null);loadRealOdds();" style="background:transparent;border:1px solid rgba(255,255,255,0.15);color:var(--texto-sec);padding:8px 20px;border-radius:20px;font-size:0.72rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s" onmouseover="this.style.borderColor='rgba(0,200,83,0.4)';this.style.color='var(--verde)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='var(--texto-sec)'">🔄 Reintentar</button>
         <div style="font-size:0.65rem;color:var(--texto-sec);opacity:0.5;margin-top:6px">La carga está tardando más de lo normal</div>
       </div>`;
     } else if (_loadFailed) {
@@ -10432,7 +10432,7 @@ function renderPreds() {
             <div style="font-size:2.2rem">📡</div>
             <div style="font-size:1.05rem;font-weight:700;color:var(--texto-pri)">Error al cargar los pronósticos</div>
             <div style="font-size:0.82rem;color:var(--texto-sec);max-width:320px;line-height:1.5">No se pudo conectar con el servidor. Revisá tu conexión o recargá la página.</div>
-            <button onclick="clearTimeout(_autoRetryTimer);_autoRetryCount=0;_loadFailed=false;cacheSet('cache_odds_v7',null);localStorage.removeItem('cache_odds_stale_v7');loadRealOdds();"
+            <button onclick="clearTimeout(_autoRetryTimer);_autoRetryCount=0;_loadFailed=false;cacheSet('cache_odds_v8',null);localStorage.removeItem('cache_odds_stale_v8');loadRealOdds();"
               style="background:var(--verde);color:#000;border:none;border-radius:30px;padding:10px 26px;font-size:0.84rem;font-weight:700;cursor:pointer;font-family:inherit">
               🔄 Reintentar
             </button>
@@ -11525,7 +11525,7 @@ async function adminResetLockedPicks() {
     // 2. Limpiar memoria local
     window._sbLockedPicks = {};
     // 3. Limpiar caché de odds para forzar re-fetch
-    localStorage.removeItem('cache_odds_v7');
+    localStorage.removeItem('cache_odds_v8');
     localStorage.removeItem(DAILY_PREDS_KEY || 'gambeta_daily_preds_v9');
     // 4. Recargar odds y re-renderizar (el flujo normal guardará el nuevo lock)
     if (btn) { btn.textContent = '🔄 Recargando cuotas…'; }
@@ -14054,8 +14054,8 @@ function processOddsIntoComparador(data) {
 
 function forceRefreshOdds() {
   // Limpiar caché (fresca y stale) y recargar desde el Worker
-  localStorage.removeItem('cache_odds_v7');
-  localStorage.removeItem('cache_odds_stale_v7');
+  localStorage.removeItem('cache_odds_v8');
+  localStorage.removeItem('cache_odds_stale_v8');
   window._rawOddsGames = null;
   _oddsLoading = false;
   const statusBar = document.getElementById('predsStatusBar');
@@ -14073,7 +14073,7 @@ async function loadRealOdds() {
   if (_oddsLoading) return;
 
   // 1) localStorage fresco → esperar lock global antes de renderizar (máx 4s)
-  const localCached = cacheGet('cache_odds_v7', CACHE_ODDS_TTL);
+  const localCached = cacheGet('cache_odds_v8', CACHE_ODDS_TTL);
   if (localCached && Array.isArray(localCached) && localCached.length > 0) {
     window._rawOddsGames = localCached;
     processOddsIntoComparador(localCached);
@@ -14093,15 +14093,15 @@ async function loadRealOdds() {
     _autoRetryCount = 0;
     clearTimeout(_autoRetryTimer); _autoRetryTimer = null;
     if (window._retryCountdownTick) { clearInterval(window._retryCountdownTick); window._retryCountdownTick = null; }
-    cacheSet('cache_odds_v7', combined);
-    try { localStorage.setItem('cache_odds_stale_v7', JSON.stringify({ ts: Date.now(), data: combined })); } catch(_) {}
+    cacheSet('cache_odds_v8', combined);
+    try { localStorage.setItem('cache_odds_stale_v8', JSON.stringify({ ts: Date.now(), data: combined })); } catch(_) {}
     processOddsIntoComparador(combined);
     fixPendingHistCommenceTs();
   }
 
   function useStale() {
     try {
-      const raw = localStorage.getItem('cache_odds_stale_v7');
+      const raw = localStorage.getItem('cache_odds_stale_v8');
       if (raw) {
         const { data } = JSON.parse(raw);
         if (data?.length) {
@@ -14197,7 +14197,7 @@ function _scheduleAutoRetry() {
   _startRetryCountdown(delay);
   _autoRetryTimer = setTimeout(() => {
     console.log(`[Odds] Ejecutando auto-retry #${_autoRetryCount}`);
-    cacheSet('cache_odds_v7', null);
+    cacheSet('cache_odds_v8', null);
     loadRealOdds();
   }, delay);
 }
@@ -14215,7 +14215,7 @@ function _startRetryCountdown(ms) {
           La carga está tardando. Reintentando en <span id="_retryCountEl" style="color:var(--verde);font-weight:700">${remaining}s</span>
           ${_autoRetryCount >= _MAX_AUTO_RETRY ? '<br><span style="font-size:0.75rem;opacity:0.7">(último intento)</span>' : ''}
         </div>
-        <button onclick="clearTimeout(_autoRetryTimer);_autoRetryCount=0;cacheSet('cache_odds_v7',null);localStorage.removeItem('cache_odds_stale_v7');loadRealOdds();"
+        <button onclick="clearTimeout(_autoRetryTimer);_autoRetryCount=0;cacheSet('cache_odds_v8',null);localStorage.removeItem('cache_odds_stale_v8');loadRealOdds();"
           style="background:var(--verde);color:#000;border:none;border-radius:30px;padding:10px 26px;font-size:0.82rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:4px">
           🔄 Reintentar ahora
         </button>
@@ -14846,11 +14846,11 @@ try {
 
 // ── Sanear cache de odds: eliminar cualquier juego de liga bloqueada que pueda haber quedado en localStorage ──
 try {
-  const _staleRaw = localStorage.getItem('cache_odds_stale_v7');
+  const _staleRaw = localStorage.getItem('cache_odds_stale_v8');
   if (_staleRaw) {
     const _staleObj = JSON.parse(_staleRaw);
     if (_staleObj?.data?.some(g => g.sport_key?.includes('albania') || g.sport_key?.includes('faroe') || g.sport_key?.includes('gibraltar'))) {
-      localStorage.removeItem('cache_odds_stale_v7');
+      localStorage.removeItem('cache_odds_stale_v8');
       console.log('[Init] Eliminada cache de odds con ligas bloqueadas');
     }
   }
@@ -14877,7 +14877,7 @@ document.addEventListener('visibilitychange', () => {
     if (now - _lastVisCheck < 10 * 60 * 1000) return; // throttle: máx 1 vez cada 10 min
     _lastVisCheck = now;
     if (!cacheGet('cache_scores', CACHE_SCORES_TTL)) loadRealScores();
-    if (!cacheGet('cache_odds_v7',  CACHE_ODDS_TTL))  loadRealOdds();
+    if (!cacheGet('cache_odds_v8',  CACHE_ODDS_TTL))  loadRealOdds();
   }
 });
 
@@ -18477,9 +18477,9 @@ async function admDiagWorker() {
   await testUrl('/odds?category=main', `${WORKER_URL}/odds?category=main`);
   await testUrl('/odds?category=europe', `${WORKER_URL}/odds?category=europe`);
   await testUrl('/available', `${WORKER_URL}/available`);
-  const stale = localStorage.getItem('cache_odds_stale_v7');
+  const stale = localStorage.getItem('cache_odds_stale_v8');
   log(`\n💾 Stale cache: ${stale ? JSON.parse(stale).length + ' partidos guardados' : 'vacía (nunca hubo conexión exitosa)'}`);
-  const fresh = localStorage.getItem('cache_odds_v7');
+  const fresh = localStorage.getItem('cache_odds_v8');
   log(`💾 Fresh cache: ${fresh ? 'activa' : 'expirada/vacía'}`);
   const raw = window._rawOddsGames || [];
   log(`\n🔍 _rawOddsGames en memoria: ${raw.length} partidos`);
