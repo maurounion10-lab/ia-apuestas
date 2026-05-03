@@ -9077,6 +9077,37 @@ function sportKeyToLeague(sk, home, away) {
 // Convierte nombre de liga a bandera + sigla corta para mostrar en fichas
 function leagueShort(lg) {
   if (!lg) return '';
+  // ── Fast-path: sportKeyToLeague ya incluye el emoji de bandera ──────────────
+  // Si el string empieza con una bandera conocida, mapear directamente.
+  // Esto evita que "🇨🇭 Super League" caiga en la rama de Turquía o Alemania.
+  const _emojiShort = {
+    '⭐': '⭐ UCL',  '🌎': '🌎',    '🟢': '🟢 CONF', '🟠': '🟠 EUR',
+    '🏴󠁧󠁢󠁥󠁮󠁧󠁿': null,  // necesita distinción Premier/Championship — caer al texto
+    '🏴󠁧󠁢󠁳󠁣󠁴󠁿': '🏴󠁧󠁢󠁳󠁣󠁴󠁿 SPL',
+    '🇦🇷': null,   // necesita distinción LP/PN — caer al texto
+    '🇧🇷': '🇧🇷 BRA', '🇵🇹': '🇵🇹 LPOR', '🇳🇱': '🇳🇱 ERE',
+    '🇧🇪': '🇧🇪 BEL', '🇹🇷': '🇹🇷 SL',   '🇬🇷': '🇬🇷 GRE',
+    '🇨🇭': '🇨🇭 SUI', '🇦🇹': '🇦🇹 AUT', '🇩🇰': '🇩🇰 DEN',
+    '🇸🇪': '🇸🇪 SWE', '🇳🇴': '🇳🇴 NOR', '🇵🇱': '🇵🇱 POL',
+    '🇨🇿': '🇨🇿 CZE', '🇷🇴': '🇷🇴 ROM', '🇷🇺': '🇷🇺 RPL',
+    '🇨🇴': '🇨🇴 COL', '🇪🇨': '🇪🇨 ECU', '🇵🇪': '🇵🇪 PER',
+    '🇻🇪': '🇻🇪 VEN', '🇧🇴': '🇧🇴 BOL', '🇵🇾': '🇵🇾 PAR',
+    '🇸🇦': '🇸🇦 KSA', '🇰🇷': '🇰🇷 KOR', '🇦🇺': '🇦🇺 AUS',
+    '🇯🇵': '🇯🇵 JL',  '🇺🇾': '🇺🇾 URU', '🇨🇱': '🇨🇱 CHI',
+    '🇺🇸': '🇺🇸 MLS', '🇲🇽': '🇲🇽 MX',
+    '🎾': '🎾',
+  };
+  // Detectar el emoji inicial (los flags de UK son 8 bytes, los simples son 4)
+  const _runes = [...lg]; // spread respeta code points
+  const _flag  = _runes.slice(0, 2).join(''); // flags de país = 2 code points
+  const _flag1 = _runes[0] || '';             // flags England/Scotland = 1 secuencia visual pero más code points
+  if (_flag in _emojiShort && _emojiShort[_flag] !== null) return _emojiShort[_flag];
+  // Para Alemania/España/Italia/Francia que necesitan distinción por número de liga:
+  if (_flag === '🇩🇪') { const l2 = lg.toLowerCase(); return (l2.includes('2.') || l2.includes('bl2')) ? '🇩🇪 BL2' : '🇩🇪 BL'; }
+  if (_flag === '🇪🇸') { const l2 = lg.toLowerCase(); return l2.includes('segunda') ? '🇪🇸 2ª' : '🇪🇸 ES'; }
+  if (_flag === '🇮🇹') { const l2 = lg.toLowerCase(); return l2.includes('serie b') || l2.includes('b') ? '🇮🇹 SB' : '🇮🇹 SA'; }
+  if (_flag === '🇫🇷') { const l2 = lg.toLowerCase(); return l2.includes('2') ? '🇫🇷 L2' : '🇫🇷 L1'; }
+  // ── Fallback por texto (para picks sin _sportKey o con league string viejo) ──
   const l = lg.toLowerCase();
   if (l.includes('champions') || l.includes('champs') || l.includes('ucl')) return '⭐ UCL';
   if (l.includes('libertadores'))                                             return '🌎 LIB';
@@ -9092,6 +9123,7 @@ function leagueShort(lg) {
   if (l.includes('serie b'))                                                  return '🇮🇹 SB';
   if (l.includes('serie a'))                                                  return '🇮🇹 SA';
   if (l.includes('2. bundesliga') || l.includes('bundesliga 2'))             return '🇩🇪 BL2';
+  if (l.includes('bundesliga') && (l.includes('austria') || l.includes('austri'))) return '🇦🇹 AUT';
   if (l.includes('bundesliga'))                                               return '🇩🇪 BL';
   if (l.includes('ligue 2'))                                                  return '🇫🇷 L2';
   if (l.includes('ligue'))                                                    return '🇫🇷 L1';
@@ -9102,6 +9134,7 @@ function leagueShort(lg) {
   if (l.includes('scottish'))                                                 return '🏴󠁧󠁢󠁳󠁣󠁴󠁿 SPL';
   if (l.includes('süper') || l.includes('super lig') || l.includes('turkey')) return '🇹🇷 SL';
   if (l.includes('super league') && l.includes('greece'))                    return '🇬🇷 GRE';
+  if (l.includes('super league') && (l.includes('switzerland') || l.includes('swiss'))) return '🇨🇭 SUI';
   if (l.includes('austria'))                                                  return '🇦🇹 AUT';
   if (l.includes('switzerland') || l.includes('swiss'))                      return '🇨🇭 SUI';
   if (l.includes('superliga') || l.includes('denmark'))                      return '🇩🇰 DEN';
@@ -9127,7 +9160,7 @@ function leagueShort(lg) {
   if (l.includes('liga mx') || l.includes('mexico') || l.includes('méxico')) return '🇲🇽 MX';
   if (l.includes('tenis') || l.includes('tennis') || l.includes('atp') || l.includes('wta')) return '🎾';
   if (l.includes('otras ligas') || l.includes('otras'))                      return '⚽';
-  // fallback definitivo: cualquier liga desconocida → ⚽ (nunca mostrar bandera incorrecta)
+  // fallback definitivo
   return '⚽';
 }
 
