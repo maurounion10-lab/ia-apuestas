@@ -8966,6 +8966,8 @@ const _PL_TEAMS = new Set(['Arsenal','Chelsea','Liverpool','Manchester City','Ma
 
 function sportKeyToLeague(sk, home, away) {
   if (sk) {
+    // Ligas nunca soportadas: bloquear explícitamente para evitar flags incorrectas
+    if (sk.includes('albania') || sk.includes('faroe') || sk.includes('andorra') || sk.includes('san_marino') || sk.includes('gibraltar') || sk.includes('liechtenstein') || sk.includes('malta') || sk.includes('kosovo')) return null;
     if (sk.includes('argentina_primera_nacional'))          return '🇦🇷 Primera Nacional';
     if (sk.includes('argentina'))                           return '🇦🇷 Liga Prof.';
     if (sk.includes('champs') || sk.includes('champions')) return '⭐ Champions';
@@ -9074,12 +9076,29 @@ function leagueShort(lg) {
   if (l.includes('liga mx') || l.includes('mexico') || l.includes('méxico')) return '🇲🇽 MX';
   if (l.includes('tenis') || l.includes('tennis') || l.includes('atp') || l.includes('wta')) return '🎾';
   if (l.includes('otras ligas') || l.includes('otras'))                      return '⚽';
-  // fallback: devolver tal cual (truncado si es muy largo)
-  return lg.length > 14 ? lg.slice(0, 13) + '…' : lg;
+  // fallback definitivo: cualquier liga desconocida → ⚽ (nunca mostrar bandera incorrecta)
+  return '⚽';
 }
+
+// Sport keys de ligas bloqueadas — nunca deben generar picks ni aparecer en la UI
+const BLOCKED_SPORT_KEYS_OPT = new Set([
+  'soccer_albania_superliga', 'soccer_faroe_islands', 'soccer_andorra_primera',
+  'soccer_san_marino_superleague', 'soccer_gibraltar_ifl', 'soccer_liechtenstein',
+  'soccer_malta_premier_league', 'soccer_kosovo_superleague',
+]);
 
 function buildPredsFromOdds() {
   if (!window._rawOddsGames || !window._rawOddsGames.length) return null;
+
+  // Filtrar ligas bloqueadas antes de cualquier procesamiento
+  const filteredGames = window._rawOddsGames.filter(g =>
+    !BLOCKED_SPORT_KEYS_OPT.has(g.sport_key) &&
+    !g.sport_key?.includes('albania') &&
+    !g.sport_key?.includes('faroe') &&
+    !g.sport_key?.includes('gibraltar') &&
+    !g.sport_key?.includes('san_marino') &&
+    !g.sport_key?.includes('liechtenstein')
+  );
 
   const now       = Date.now();
 
@@ -9244,14 +9263,14 @@ function buildPredsFromOdds() {
       });
     };
     // Garantizar diversidad: hasta 20 de ligas top (prio≥90), hasta 25 de ligas europeas/continentales (60-89), resto
-    const topTier  = window._rawOddsGames.filter(baseFilter).filter(g => getGamePrio(g.sport_key) >= 90)
+    const topTier  = filteredGames.filter(baseFilter).filter(g => getGamePrio(g.sport_key) >= 90)
                        .sort(sortByPrioThenTime).slice(0, 20);
     const eurTier  = applyLeagueCaps(
-                       window._rawOddsGames.filter(baseFilter)
+                       filteredGames.filter(baseFilter)
                        .filter(g => { const p = getGamePrio(g.sport_key); return p >= 60 && p < 90; })
                        .sort(sortByPrioThenTime)).slice(0, 25);
     const rest     = applyLeagueCaps(
-                       window._rawOddsGames.filter(baseFilter).filter(g => getGamePrio(g.sport_key) < 60)
+                       filteredGames.filter(baseFilter).filter(g => getGamePrio(g.sport_key) < 60)
                        .sort(sortByPrioThenTime)).slice(0, 20);
     candidates = [...topTier, ...eurTier, ...rest];
     // Cortar solo si: hay 2+ candidatos Y ya cubrimos 48h (para no perder Champions/Libertadores de mañana)
@@ -9263,15 +9282,15 @@ function buildPredsFromOdds() {
   // Nota: el API solo devuelve partidos futuros. Los partidos ya iniciados con pick bloqueado
   // se rescatan desde _sbLockedPicks en renderPreds() donde tenemos home/away reales guardados.
 
-  const totalRaw = window._rawOddsGames.length;
-  const withH2H = window._rawOddsGames.filter(hasH2HData).length;
-  const upcoming = window._rawOddsGames.filter(g => new Date(g.commence_time).getTime() > now).length;
+  const totalRaw = filteredGames.length;
+  const withH2H = filteredGames.filter(hasH2HData).length;
+  const upcoming = filteredGames.filter(g => new Date(g.commence_time).getTime() > now).length;
   console.log(`[Preds] ${candidates.length} candidatos pre-partido | total:${totalRaw} withH2H:${withH2H} futuros:${upcoming}`);
 
   // Fallback nivel 1: sin límite de ventana pero solo partidos futuros
   if (!candidates.length) {
     console.warn('[Preds] Fallback L1: sin ventana de tiempo (posible parón internacional)');
-    candidates = window._rawOddsGames
+    candidates = filteredGames
       .filter(g => new Date(g.commence_time).getTime() > now)
       .filter(hasH2HData)
       .filter(g => !g.sport_key?.includes('basketball'))  // excluir NBA
@@ -9280,7 +9299,7 @@ function buildPredsFromOdds() {
   }
   if (!candidates.length) {
     console.warn('[Preds] Fallback L2: sin filtro de tiempo — mostrando cualquier partido con h2h');
-    candidates = window._rawOddsGames
+    candidates = filteredGames
       .filter(hasH2HData)
       .filter(g => !g.sport_key?.includes('basketball'))  // excluir NBA
       .sort(sortByPrioThenTime)
@@ -12566,18 +12585,24 @@ function renderHistorial(filter) {
   // Buscar scores históricos del servidor para pendientes sin resolver (rate-limited: máx 1 request cada 30s)
   if (!window._loadHistScoresRunning) loadHistoricalScores();
   // ── Ligas bloqueadas: remover del storage y no mostrar ──
-  const BLOCKED_SPORT_KEYS = ['soccer_chile_campeonato', 'soccer_portugal_primeira_liga'];
+  const BLOCKED_SPORT_KEYS = ['soccer_chile_campeonato', 'soccer_portugal_primeira_liga',
+    'soccer_albania_superliga', 'soccer_faroe_islands', 'soccer_andorra_primera',
+    'soccer_san_marino_superleague', 'soccer_gibraltar_ifl', 'soccer_liechtenstein',
+    'soccer_malta_premier_league', 'soccer_kosovo_superleague'];
   // Equipos bloqueados por nombre (por si fueron guardados sin _sportKey correcto)
   const _normB = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
   const BLOCKED_TEAMS = ['palestino','ucatolica','universidadcatolica','universidadcat'];
   const allRaw = loadHistorial();
   const allClean = allRaw.filter(h => {
     if (BLOCKED_SPORT_KEYS.includes(h._sportKey)) return false;
+    // Bloquear por sport_key que contenga palabras de ligas no soportadas
+    if (h._sportKey && (h._sportKey.includes('albania') || h._sportKey.includes('faroe') || h._sportKey.includes('gibraltar') || h._sportKey.includes('san_marino') || h._sportKey.includes('liechtenstein') || h._sportKey.includes('malta') || h._sportKey.includes('kosovo'))) return false;
     const nh = _normB(h.home), na = _normB(h.away);
     if (BLOCKED_TEAMS.some(t => nh.includes(t) || na.includes(t))) return false;
-    // Primeira Liga / Chile: filtrar también por nombre de liga
+    // Primeira Liga / Chile / Albania: filtrar también por nombre de liga
     if ((h.league||'').toLowerCase().includes('primeira liga')) return false;
     if ((h.league||'').toLowerCase().includes('chile')) return false;
+    if ((h.league||'').toLowerCase().includes('albania') || (h.league||'').includes('🇦🇱')) return false;
     return true;
   });
   if (allClean.length < allRaw.length) saveHistorial(allClean); // limpia storage silenciosamente
@@ -14076,8 +14101,15 @@ async function loadRealOdds() {
       if (raw) {
         const { data } = JSON.parse(raw);
         if (data?.length) {
-          window._rawOddsGames = data;
-          processOddsIntoComparador(data);
+          // Filtrar ligas bloqueadas antes de usar datos del caché
+          const cleanData = data.filter(g =>
+            !g.sport_key?.includes('albania') && !g.sport_key?.includes('faroe') &&
+            !g.sport_key?.includes('gibraltar') && !g.sport_key?.includes('san_marino') &&
+            !g.sport_key?.includes('liechtenstein') && !g.sport_key?.includes('malta') &&
+            !g.sport_key?.includes('kosovo')
+          );
+          window._rawOddsGames = cleanData;
+          processOddsIntoComparador(cleanData);
           _loadFailed = false;
           return true;
         }
@@ -14800,6 +14832,18 @@ try {
   ['cache_odds_v6', 'cache_odds_stale_v6', 'cache_odds_v5', 'cache_odds_stale_v5', 'cache_odds_v4', 'cache_odds_v3', 'cache_odds_stale',
    'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
     .forEach(k => localStorage.removeItem(k));
+} catch(_) {}
+
+// ── Sanear cache de odds: eliminar cualquier juego de liga bloqueada que pueda haber quedado en localStorage ──
+try {
+  const _staleRaw = localStorage.getItem('cache_odds_stale_v7');
+  if (_staleRaw) {
+    const _staleObj = JSON.parse(_staleRaw);
+    if (_staleObj?.data?.some(g => g.sport_key?.includes('albania') || g.sport_key?.includes('faroe') || g.sport_key?.includes('gibraltar'))) {
+      localStorage.removeItem('cache_odds_stale_v7');
+      console.log('[Init] Eliminada cache de odds con ligas bloqueadas');
+    }
+  }
 } catch(_) {}
 
 // Inicializar idioma detectado
