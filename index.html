@@ -9465,39 +9465,24 @@ function buildPredsFromOdds() {
     const maxProb  = best.prob || probH;
     const bestOdds = best.odds;
 
-    // Ligas "nuevas/desconocidas": piso mínimo Alta (62%) — Media-Alta no aplica
+    // Ligas menos conocidas: piso mínimo Alta (62%) — Media-Alta no aplica
+    // Las ligas europeas secundarias (Championship, BL2, etc.) usan el piso normal (58%)
     const STRICT_CONF_LEAGUES = new Set([
-      // Claves Odds API (definitivas)
-      'soccer_england_championship',
-      'soccer_belgium_first_div_a',
-      'soccer_germany_bundesliga2',
-      'soccer_spain_segunda_division',
-      'soccer_italy_serie_b',
-      'soccer_france_ligue_two',
-      'soccer_austria_football_bundesliga',
-      'soccer_switzerland_superleague',
-      'soccer_denmark_superliga',
-      'soccer_sweden_allsvenskan',
-      'soccer_norway_eliteserien',
-      'soccer_poland_ekstraklasa',
-      'soccer_czech_republic_first_league',
-      'soccer_romania_liga1',
-      'soccer_russia_premier_league',
+      // Sudamérica secundaria
       'soccer_colombia_primera_a',
       'soccer_ecuador_liga_pro',
+      'soccer_ecuador_primera_a',   // alias legacy
       'soccer_peru_primera_division',
       'soccer_venezuela_primera_division',
+      'soccer_venezuela_primera',   // alias legacy
       'soccer_bolivia_primera_division',
       'soccer_paraguay_primera_division',
+      // Asia / Oceanía
       'soccer_south_korea_kleague1',
       'soccer_australia_aleague',
-      // Aliases legacy por si viene con clave vieja
-      'soccer_belgium_first_div',
-      'soccer_austria_bundesliga',
-      'soccer_ecuador_primera_a',
-      'soccer_venezuela_primera',
-      'soccer_australia_a_league',
-      'soccer_czech_liga',
+      'soccer_australia_a_league',  // alias legacy
+      // Europa periférica
+      'soccer_romania_liga1',
     ]);
     const _isStrictLeague = STRICT_CONF_LEAGUES.has(g.sport_key || '');
     const _minProb = _isStrictLeague ? 62 : 58;
@@ -9606,7 +9591,7 @@ function renderPreds() {
 
   // ── Caché diaria de picks ──
   // Una vez generados los picks del día, no cambian hasta las 6am del día siguiente
-  const DAILY_PREDS_KEY = 'gambeta_daily_preds_v9';
+  const DAILY_PREDS_KEY = 'gambeta_daily_preds_v10';
   const DAILY_PREDS_RESET_HOUR = 6; // 6am
 
   function getDailyPredsCacheDate() {
@@ -9666,7 +9651,7 @@ function renderPreds() {
   if (realPreds) {
     const hasBasket = realPreds.some(p => (p._sportKey || '').includes('basketball') || p.sport === 'basket');
     if (hasBasket) {
-      localStorage.removeItem('gambeta_daily_preds_v9');
+      localStorage.removeItem('gambeta_daily_preds_v10');
       realPreds = null;
     }
   }
@@ -14840,7 +14825,7 @@ window._availableSports = null;
 // ── Limpiar claves de caché obsoletas (versiones anteriores) ──
 try {
   ['cache_odds_v6', 'cache_odds_stale_v6', 'cache_odds_v5', 'cache_odds_stale_v5', 'cache_odds_v4', 'cache_odds_v3', 'cache_odds_stale',
-   'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
+   'gambeta_daily_preds_v9', 'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
     .forEach(k => localStorage.removeItem(k));
 } catch(_) {}
 
@@ -18500,7 +18485,7 @@ async function admDiagWorker() {
 function admRefreshScores() { loadRealScores(); document.getElementById('admDatosMsg').textContent='🔄 Recargando marcadores...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Marcadores recargados'; },3000); }
 function admRefreshPreds()  {
   // Borrar caché diaria para forzar regeneración desde la API
-  try { localStorage.removeItem('gambeta_daily_preds_v9'); } catch(_) {}
+  try { localStorage.removeItem('gambeta_daily_preds_v10'); } catch(_) {}
   renderPreds();
   document.getElementById('admDatosMsg').textContent='✓ Pronósticos regenerados (caché limpiada)';
   setTimeout(()=>document.getElementById('admDatosMsg').textContent='',3000);
