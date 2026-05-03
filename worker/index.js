@@ -217,6 +217,7 @@ async function buildAPFData(env, leagueEntries) {
   const games = [];
 
   for (const [sportKey, leagueId] of leagueEntries) {
+    if (!leagueId) continue; // leagueId null/0 → solo Odds API, sin llamada APF
     const season = getSeason(sportKey);
     try {
       const [fixResp, oddsResp] = await Promise.all([
@@ -429,6 +430,36 @@ const LEAGUES_EUROPE = [
   ['soccer_usa_mls',                     253],
 ];
 
+// ── Ligas secundarias: 2ª divisiones + ligas regionales ─────────────────────
+// leagueId=null → solo Odds API (sin llamada APF — ligas sin datos de stats/H2H)
+const LEAGUES_SECONDARY = [
+  // Europa: 2ª divisiones y ligas medianas
+  ['soccer_england_championship',              40],  // Championship
+  ['soccer_belgium_first_div_a',              144],  // Belgian Pro League
+  ['soccer_germany_bundesliga2',               79],  // 2. Bundesliga
+  ['soccer_spain_segunda_division',           141],  // Segunda División
+  ['soccer_italy_serie_b',                    136],  // Serie B
+  ['soccer_france_ligue_two',                  62],  // Ligue 2
+  ['soccer_austria_football_bundesliga',      218],  // Austrian Bundesliga
+  ['soccer_switzerland_superleague',          207],  // Swiss Super League
+  ['soccer_denmark_superliga',                119],  // Danish Superliga
+  ['soccer_sweden_allsvenskan',               113],  // Allsvenskan
+  ['soccer_norway_eliteserien',               103],  // Eliteserien
+  ['soccer_poland_ekstraklasa',               106],  // Ekstraklasa
+  ['soccer_czech_republic_first_league',      345],  // Czech Liga
+  // Europa del Este / Otros
+  ['soccer_russia_premier_league',            235],  // RPL
+  // Latinoamérica extra
+  ['soccer_ecuador_liga_pro',                 240],  // Liga Pro
+  ['soccer_peru_primera_division',            316],  // Liga 1 Peru
+  ['soccer_venezuela_primera_division',       null], // FUTVE (solo Odds API)
+  ['soccer_bolivia_primera_division',         null], // Div. Prof. Bolivia (solo Odds API)
+  ['soccer_paraguay_primera_division',        null], // Div. Honor Paraguay (solo Odds API)
+  // Asia / Oceanía
+  ['soccer_south_korea_kleague1',             292],  // K League
+  ['soccer_australia_aleague',                188],  // A-League
+];
+
 // ── Router principal ─────────────────────────────────────────────────────────
 export default {
   async fetch(request, env) {
@@ -441,7 +472,7 @@ export default {
 
     // ── /available ───────────────────────────────────────────────────────────
     if (path === '/available') {
-      const keys = [...LEAGUES_MAIN, ...LEAGUES_EUROPE].map(([k]) => k);
+      const keys = [...LEAGUES_MAIN, ...LEAGUES_EUROPE, ...LEAGUES_SECONDARY].map(([k]) => k);
       return new Response(JSON.stringify({ keys }), { headers: CORS });
     }
 
@@ -451,7 +482,9 @@ export default {
       const hourKey  = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
       const cacheKey = `odds6_${category}_${hourKey}`;
 
-      const leagues = category === 'europe' ? LEAGUES_EUROPE : LEAGUES_MAIN;
+      const leagues = category === 'europe'    ? LEAGUES_EUROPE
+                    : category === 'secondary' ? LEAGUES_SECONDARY
+                    : LEAGUES_MAIN;
 
       const result = await cached(env, cacheKey, 3600, () => getLeagueData(env, leagues));
 

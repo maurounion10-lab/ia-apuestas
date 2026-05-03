@@ -9107,7 +9107,8 @@ function buildPredsFromOdds() {
     soccer_portugal_primeira_liga:           74,
     soccer_netherlands_eredivisie:           72,
     soccer_england_championship:             68,
-    soccer_belgium_first_div:                66,
+    soccer_belgium_first_div_a:              66,  // Belgian Pro League (Odds API key)
+    soccer_belgium_first_div:               66,   // alias legacy
     soccer_argentina_primera_nacional:       65,
     soccer_germany_bundesliga2:              64,
     soccer_colombia_primera_a:              63,
@@ -9117,9 +9118,11 @@ function buildPredsFromOdds() {
     soccer_italy_serie_b:                    58,
     soccer_turkey_super_league:              58,
     soccer_greece_super_league:              56,
-    soccer_austria_bundesliga:               55,
+    soccer_austria_football_bundesliga:      55,  // Austrian Bundesliga (Odds API key)
+    soccer_austria_bundesliga:               55,  // alias legacy
     soccer_usa_mls:                          55,
-    soccer_ecuador_primera_a:                54,
+    soccer_ecuador_liga_pro:                 54,  // Ecuador Liga Pro (Odds API key)
+    soccer_ecuador_primera_a:                54,  // alias legacy
     soccer_switzerland_superleague:          53,
     soccer_peru_primera_division:            52,
     soccer_denmark_superliga:                52,
@@ -9131,11 +9134,14 @@ function buildPredsFromOdds() {
     soccer_norway_eliteserien:               48,
     soccer_paraguay_primera_division:        47,
     soccer_saudi_professional_league:        46,
-    soccer_australia_a_league:               46,
+    soccer_australia_aleague:               46,   // A-League (Odds API key)
+    soccer_australia_a_league:              46,   // alias legacy
     soccer_south_korea_kleague1:             45,
-    soccer_czech_liga:                       45,
+    soccer_czech_republic_first_league:      45,  // Czech Liga (Odds API key)
+    soccer_czech_liga:                       45,  // alias legacy
     soccer_japan_j_league:                   44,
-    soccer_venezuela_primera:                43,
+    soccer_venezuela_primera_division:       43,  // FUTVE (Odds API key)
+    soccer_venezuela_primera:                43,  // alias legacy
     soccer_bolivia_primera_division:         42,
     soccer_romania_liga1:                    48,
     soccer_russia_premier_league:            50,
@@ -9190,37 +9196,43 @@ function buildPredsFromOdds() {
       soccer_spain_segunda_division:      3,
       soccer_italy_serie_b:               2,
       soccer_france_ligue_two:            2,
-      soccer_belgium_first_div:           3,
+      soccer_belgium_first_div_a:         3,  // Odds API key
+      soccer_belgium_first_div:           3,  // legacy alias
       soccer_portugal_primeira_liga:      2,
       soccer_netherlands_eredivisie:      3,
       soccer_scotland_premiership:        2,
       soccer_turkey_super_league:         2,
       soccer_greece_super_league:         2,
-      soccer_austria_bundesliga:          2,
+      soccer_austria_football_bundesliga: 2,  // Odds API key
+      soccer_austria_bundesliga:          2,  // legacy alias
       soccer_switzerland_superleague:     2,
       soccer_denmark_superliga:           2,
       soccer_sweden_allsvenskan:          2,
       soccer_norway_eliteserien:          2,
       soccer_poland_ekstraklasa:          2,
-      soccer_czech_liga:                  2,
+      soccer_czech_republic_first_league: 2,  // Odds API key
+      soccer_czech_liga:                  2,  // legacy alias
       soccer_romania_liga1:               2,
       soccer_russia_premier_league:       2,
       // América
       soccer_mexico_ligamx:               3,
       soccer_colombia_primera_a:          3,
-      soccer_ecuador_primera_a:           2,
+      soccer_ecuador_liga_pro:            2,  // Odds API key
+      soccer_ecuador_primera_a:           2,  // legacy alias
       soccer_peru_primera_division:       2,
       soccer_chile_campeonato:            2,
       soccer_uruguay_primera_division:    2,
       soccer_paraguay_primera_division:   2,
-      soccer_venezuela_primera:           2,
+      soccer_venezuela_primera_division:  2,  // Odds API key
+      soccer_venezuela_primera:           2,  // legacy alias
       soccer_bolivia_primera_division:    2,
       soccer_usa_mls:                     2,
       // Asia / Oceanía
       soccer_saudi_professional_league:   2,
       soccer_japan_j_league:              2,
       soccer_south_korea_kleague1:        2,
-      soccer_australia_a_league:          2,
+      soccer_australia_aleague:           2,  // Odds API key
+      soccer_australia_a_league:          2,  // legacy alias
     };
     const applyLeagueCaps = games => {
       const counts = {};
@@ -9434,18 +9446,37 @@ function buildPredsFromOdds() {
 
     // Ligas "nuevas/desconocidas": piso mínimo Alta (62%) — Media-Alta no aplica
     const STRICT_CONF_LEAGUES = new Set([
-      'soccer_england_championship', 'soccer_belgium_first_div',
-      'soccer_germany_bundesliga2',  'soccer_spain_segunda_division',
-      'soccer_italy_serie_b',        'soccer_france_ligue_two',
-      'soccer_austria_bundesliga',   'soccer_switzerland_superleague',
-      'soccer_denmark_superliga',    'soccer_sweden_allsvenskan',
-      'soccer_norway_eliteserien',   'soccer_poland_ekstraklasa',
-      'soccer_czech_liga',           'soccer_romania_liga1',
-      'soccer_russia_premier_league','soccer_colombia_primera_a',
-      'soccer_ecuador_primera_a',    'soccer_peru_primera_division',
-      'soccer_venezuela_primera',    'soccer_bolivia_primera_division',
-      'soccer_paraguay_primera_division', 'soccer_south_korea_kleague1',
+      // Claves Odds API (definitivas)
+      'soccer_england_championship',
+      'soccer_belgium_first_div_a',
+      'soccer_germany_bundesliga2',
+      'soccer_spain_segunda_division',
+      'soccer_italy_serie_b',
+      'soccer_france_ligue_two',
+      'soccer_austria_football_bundesliga',
+      'soccer_switzerland_superleague',
+      'soccer_denmark_superliga',
+      'soccer_sweden_allsvenskan',
+      'soccer_norway_eliteserien',
+      'soccer_poland_ekstraklasa',
+      'soccer_czech_republic_first_league',
+      'soccer_romania_liga1',
+      'soccer_russia_premier_league',
+      'soccer_colombia_primera_a',
+      'soccer_ecuador_liga_pro',
+      'soccer_peru_primera_division',
+      'soccer_venezuela_primera_division',
+      'soccer_bolivia_primera_division',
+      'soccer_paraguay_primera_division',
+      'soccer_south_korea_kleague1',
+      'soccer_australia_aleague',
+      // Aliases legacy por si viene con clave vieja
+      'soccer_belgium_first_div',
+      'soccer_austria_bundesliga',
+      'soccer_ecuador_primera_a',
+      'soccer_venezuela_primera',
       'soccer_australia_a_league',
+      'soccer_czech_liga',
     ]);
     const _isStrictLeague = STRICT_CONF_LEAGUES.has(g.sport_key || '');
     const _minProb = _isStrictLeague ? 62 : 58;
@@ -14072,16 +14103,17 @@ async function loadRealOdds() {
   }, 12000);
 
   try {
-    // 2) Worker API directo — datos frescos con BTTS real (timeout 9s)
-    console.log('[Odds] Fetching desde Worker API...');
+    // 2) Worker API directo — datos frescos con BTTS real (timeout 15s incluye secondary)
+    console.log('[Odds] Fetching desde Worker API (main + europe + secondary)...');
     const _ctrl = new AbortController();
-    const _fetchTimer = setTimeout(() => _ctrl.abort(), 9000);
-    const [resMain, resEur] = await Promise.all([
-      fetch(`${WORKER_URL}/odds?category=main`,   { signal: _ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
-      fetch(`${WORKER_URL}/odds?category=europe`, { signal: _ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+    const _fetchTimer = setTimeout(() => _ctrl.abort(), 15000);
+    const [resMain, resEur, resSec] = await Promise.all([
+      fetch(`${WORKER_URL}/odds?category=main`,      { signal: _ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+      fetch(`${WORKER_URL}/odds?category=europe`,    { signal: _ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+      fetch(`${WORKER_URL}/odds?category=secondary`, { signal: _ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
     ]);
     clearTimeout(_fetchTimer);
-    const combined = [...(resMain.data || []), ...(resEur.data || [])];
+    const combined = [...(resMain.data || []), ...(resEur.data || []), ...(resSec.data || [])];
 
     if (combined.length > 0) {
       useData(combined);
