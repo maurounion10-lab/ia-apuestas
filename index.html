@@ -5181,9 +5181,15 @@ window.toggleHeroBubble = function(n) {
       <button class="sport-tab"        data-league="europa"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('europa',this)">🟠 Europa League</button>
       <button class="sport-tab"        data-league="conference"   style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('conference',this)">🟣 Conference</button>
       <button class="sport-tab"        data-league="bundesliga"   style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('bundesliga',this)">🇩🇪 Bundesliga</button>
+      <button class="sport-tab"        data-league="bl2"          style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('bl2',this)">🇩🇪 BL2</button>
       <button class="sport-tab"        data-league="seriea"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('seriea',this)">🇮🇹 Serie A</button>
+      <button class="sport-tab"        data-league="serieb"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('serieb',this)">🇮🇹 Serie B</button>
       <button class="sport-tab"        data-league="ligue1"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('ligue1',this)">🇫🇷 Ligue 1</button>
+      <button class="sport-tab"        data-league="ligue2"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('ligue2',this)">🇫🇷 Ligue 2</button>
       <button class="sport-tab"        data-league="eredivisie"   style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('eredivisie',this)">🇳🇱 Eredivisie</button>
+      <button class="sport-tab"        data-league="championship" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('championship',this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Championship</button>
+      <button class="sport-tab"        data-league="segunda"      style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('segunda',this)">🇪🇸 2ª División</button>
+      <button class="sport-tab"        data-league="belgium"      style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('belgium',this)">🇧🇪 Bélgica</button>
       <button class="sport-tab"        data-league="scotland"     style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('scotland',this)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</button>
       <button class="sport-tab"        data-league="turkey"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('turkey',this)">🇹🇷 Süper Lig</button>
       <button class="sport-tab"        data-league="arg"          style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('arg',this)">🇦🇷 Argentina</button>
@@ -10304,11 +10310,26 @@ function renderPreds() {
     } else if (sf === 'laliga') {
       _leagueFilter(['spain_la_liga']);
     } else if (sf === 'bundesliga') {
-      _leagueFilter(['germany_bundesliga']);
+      // Solo BL1 — excluir BL2 explícitamente
+      const _blFn = p => { const sk = p._sportKey||''; return sk.includes('germany_bundesliga') && !sk.includes('bundesliga2'); };
+      upcoming = upcoming.filter(_blFn); finished = finished.filter(_blFn);
+      const _blAll = [...upcoming,...finished]; realPreds = _blAll.length ? _blAll : null;
+    } else if (sf === 'bl2') {
+      _leagueFilter(['germany_bundesliga2']);
     } else if (sf === 'seriea') {
-      _leagueFilter(['italy_serie_a','italy_serie']);
+      _leagueFilter(['italy_serie_a']);
+    } else if (sf === 'serieb') {
+      _leagueFilter(['italy_serie_b']);
     } else if (sf === 'ligue1') {
-      _leagueFilter(['france_ligue']);
+      _leagueFilter(['france_ligue_one']);
+    } else if (sf === 'ligue2') {
+      _leagueFilter(['france_ligue_two']);
+    } else if (sf === 'championship') {
+      _leagueFilter(['england_championship']);
+    } else if (sf === 'segunda') {
+      _leagueFilter(['spain_segunda_division']);
+    } else if (sf === 'belgium') {
+      _leagueFilter(['belgium_first_div']);
     } else if (sf === 'eredivisie') {
       _leagueFilter(['netherlands_eredivisie','eredivisie']);
     } else if (sf === 'scotland') {
@@ -11375,10 +11396,16 @@ const LEAGUE_FILTER_PATTERNS = {
   conference:   ['conference_league'],
   premier:      ['england_premier','soccer_epl'],
   laliga:       ['spain_la_liga'],
-  bundesliga:   ['germany_bundesliga'],
-  seriea:       ['italy_serie_a','italy_serie'],
-  ligue1:       ['france_ligue'],
+  bundesliga:   ['germany_bundesliga'],   // BL1 — el filtro de render excluye BL2 explícitamente
+  bl2:          ['germany_bundesliga2'],
+  seriea:       ['italy_serie_a'],
+  serieb:       ['italy_serie_b'],
+  ligue1:       ['france_ligue_one'],
+  ligue2:       ['france_ligue_two'],
   eredivisie:   ['netherlands_eredivisie','eredivisie'],
+  championship: ['england_championship'],
+  segunda:      ['spain_segunda_division'],
+  belgium:      ['belgium_first_div'],
   scotland:     ['scotland'],
   turkey:       ['turkey'],
   libertadores: ['copa_libertadores'],
