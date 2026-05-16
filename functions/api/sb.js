@@ -20,7 +20,8 @@ const CORS_HEADERS = {
 
 const CACHE_HEADERS = {
   ...CORS_HEADERS,
-  'Cache-Control': 'public, max-age=60, s-maxage=300, stale-while-revalidate=120',
+  // Reducido de 300s → 60s para que picks resueltos aparezcan más rápido a todos
+  'Cache-Control': 'public, max-age=30, s-maxage=60, stale-while-revalidate=60',
 };
 
 function sbFetch(path) {

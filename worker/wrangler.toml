@@ -5,8 +5,15 @@ compatibility_date = "2025-09-27"
 [vars]
 # API_FOOTBALL_KEY se setea como Secret en el dashboard de Cloudflare
 # No hardcodear aquí — usar: wrangler secret put API_FOOTBALL_KEY
-# ODDS_API_KEY también se setea como Secret
+# ODDS_API_KEY, RESEND_API_KEY y SUPABASE_SERVICE_ROLE_KEY también se setean como Secret
 
 [[kv_namespaces]]
 binding = "CACHE_KV"
 id = "1d4b161e78db4de9a9b806f369c73ceb"
+
+# ── Cron trigger: resolver de scores corre cada hora, automático sin browser ──
+# Replica lo que loadHistoricalScores() hace en el client. Marca picks pending
+# como win/loss/void usando ESPN + TheSportsDB. El trigger Postgres se encarga
+# de replicar a shared_cache.global_historial_v1.
+[triggers]
+crons = ["0 * * * *"]

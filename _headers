@@ -43,6 +43,4 @@
 /api/*
   X-Robots-Tag: noindex, nofollow
 
-# ── Bloquear indexación de URLs con parámetros de auth ──
-/?openauth=*
-  X-Robots-Tag: noindex, nofollow
+# (openauth URLs quedan bloqueadas por robots.txt Disallow: /*?openauth*)

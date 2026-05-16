@@ -1,0 +1,52 @@
+# Root index.html → homepage
+/index.html    /    308
+
+
+# .html versions → clean URLs
+/bonos.html    /bonos    308
+
+# Blog index
+/blog/index.html    /blog    308
+
+# Blog posts .html → clean URLs
+/blog/apuestas-multiples.html         /blog/apuestas-multiples         308
+/blog/como-ganar-en-futbol.html       /blog/como-ganar-en-futbol       308
+/blog/como-hablar-con-la-ia.html      /blog/como-hablar-con-la-ia      308
+/blog/como-leer-resultados.html       /blog/como-leer-resultados       308
+/blog/como-usar-bankroll-manager.html /blog/como-usar-bankroll-manager 308
+/blog/como-usar-bot-alerta.html       /blog/como-usar-bot-alerta       308
+/blog/como-usar-la-calculadora.html   /blog/como-usar-la-calculadora   308
+/blog/como-usar-mi-panel.html         /blog/como-usar-mi-panel         308
+/blog/como-usar-pronosticos-ia.html   /blog/como-usar-pronosticos-ia   308
+/blog/confianza-6-6.html              /blog/confianza-6-6              308
+/blog/cuotas-y-probabilidades.html    /blog/cuotas-y-probabilidades    308
+/blog/donde-encontrar-valor.html      /blog/donde-encontrar-valor      308
+/blog/futuro-ia-apuestas.html         /blog/futuro-ia-apuestas         308
+/blog/gestion-bankroll.html           /blog/gestion-bankroll           308
+/blog/ia-apostar-futbol-valor.html    /blog/ia-apostar-futbol-valor    308
+/blog/ia-champions-league.html        /blog/ia-champions-league        308
+/blog/ia-estadisticas-futbol.html     /blog/ia-estadisticas-futbol     308
+/blog/ia-para-apostar.html            /blog/ia-para-apostar            308
+/blog/ia-tiempo-real-futbol.html      /blog/ia-tiempo-real-futbol      308
+/blog/ia-vs-tipster.html              /blog/ia-vs-tipster              308
+/blog/mercados-rentables.html         /blog/mercados-rentables         308
+/blog/que-puede-hacer-la-ia.html      /blog/que-puede-hacer-la-ia      308
+/blog/ranking-gambeta-coins.html      /blog/ranking-gambeta-coins      308
+/blog/que-es-packball.html            /blog/que-es-packball            308
+/blog/packball-premium-vale-la-pena.html /blog/packball-premium-vale-la-pena 308
+/blog/packball-vip-gratis.html        /blog/packball-vip-gratis        308
+/blog/que-es-footystats.html          /blog/que-es-footystats          308
+/blog/footystats-premium-vale-la-pena.html /blog/footystats-premium-vale-la-pena 308
+/blog/footystats-vs-packball.html     /blog/footystats-vs-packball     308
+/blog/que-es-adamchoi.html            /blog/que-es-adamchoi            308
+/blog/adamchoi-premium-vale-la-pena.html /blog/adamchoi-premium-vale-la-pena 308
+/blog/como-usar-adamchoi-btts-corners.html /blog/como-usar-adamchoi-btts-corners 308
+/blog/que-es-forebet.html             /blog/que-es-forebet             308
+/blog/predicciones-forebet-son-confiables.html /blog/predicciones-forebet-son-confiables 308
+/blog/forebet-vs-footystats.html      /blog/forebet-vs-footystats      308
+/blog/que-es-propscash.html           /blog/que-es-propscash           308
+/blog/propscash-premium-vale-la-pena.html /blog/propscash-premium-vale-la-pena 308
+/blog/como-usar-propscash.html        /blog/como-usar-propscash        308
+/blog/que-es-tennis-metrics.html      /blog/que-es-tennis-metrics      308
+/blog/tennis-metrics-premium-vale-la-pena.html /blog/tennis-metrics-premium-vale-la-pena 308
+/blog/como-apostar-tenis-tennis-metrics.html /blog/como-apostar-tenis-tennis-metrics 308

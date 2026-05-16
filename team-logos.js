@@ -1070,7 +1070,7 @@ const teamLogos = {
   'RAAL La Louvière': 'https://a.espncdn.com/i/teamlogos/soccer/500/131235.png',
   'Racing (Montevideo)': 'https://a.espncdn.com/i/teamlogos/soccer/500/9903.png',
   'Racing Genk': 'https://a.espncdn.com/i/teamlogos/soccer/500/938.png',
-  'Randers FC': 'https://a.espncdn.com/i/teamlogos/soccer/500/3132.png',
+  'Randers FC': 'https://r2.thesportsdb.com/images/media/team/badge/w0kmhn1690407779.png',
   'Rapid Vienna': 'https://a.espncdn.com/i/teamlogos/soccer/500/519.png',
   'Real Oruro': 'https://a.espncdn.com/i/teamlogos/soccer/500/22523.png',
   'Real Tomayapo': 'https://a.espncdn.com/i/teamlogos/soccer/500/20890.png',

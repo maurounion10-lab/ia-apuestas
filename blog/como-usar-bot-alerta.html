@@ -1,28 +1,29 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Cómo usar el Bot de Alerta de gambeta.ai — Alertas en tiempo real para córners</title>
-<meta name="description" content="Guía completa del Bot de Alerta de gambeta.ai: cómo activarlo, cómo funciona el análisis de partidos en vivo, qué significa cada alerta y cómo apostar al córner en el momento exacto.">
-<meta name="keywords" content="Bot de Alerta, alertas en tiempo real, córners, apuestas en vivo, notificaciones, apuestas deportivas">
-<meta name="author" content="gambeta.ai">
-<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<link rel="canonical" href="https://gambeta.ai/blog/como-usar-bot-alerta">
-<meta property="og:type" content="article">
-<meta property="og:url" content="https://gambeta.ai/blog/como-usar-bot-alerta">
-<meta property="og:title" content="Cómo usar el Bot de Alerta de gambeta.ai — Alertas en tiempo real para córners">
-<meta property="og:description" content="Guía completa del Bot de Alerta de gambeta.ai: cómo activarlo, cómo funciona el análisis de partidos en vivo, qué significa cada alerta y cómo apostar al córner en el momento exacto.">
-<meta property="og:image" content="https://gambeta.ai/blog/og/og-como-usar-bot-alerta.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-<meta property="og:locale" content="es_AR">
-<meta property="og:site_name" content="gambeta.ai">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Cómo usar el Bot de Alerta de gambeta.ai — Alertas en tiempo real para córners">
-<meta name="twitter:description" content="Guía completa del Bot de Alerta de gambeta.ai: cómo activarlo, cómo funciona el análisis de partidos en vivo, qué significa cada alerta y cómo apostar al córner en el momento exacto.">
-<meta name="twitter:image" content="https://gambeta.ai/blog/og/og-como-usar-bot-alerta.png">
-<link rel="icon" href="/favicon.png" type="image/png">
+<meta content="Guía completa del Bot de Alerta de gambeta.ai: cómo activarlo, cómo funciona el análisis de partidos en vivo, qué significa cada alerta y cómo apostar al córner en el momento exacto." name="description"/>
+<meta content="Bot de Alerta, alertas en tiempo real, córners, apuestas en vivo, notificaciones, apuestas deportivas" name="keywords"/>
+<meta content="gambeta.ai" name="author"/>
+<meta content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" name="robots"/>
+<link href="https://gambeta.ai/blog/como-usar-bot-alerta" rel="canonical"/>
+<meta content="article" property="og:type"/>
+<meta content="https://gambeta.ai/blog/como-usar-bot-alerta" property="og:url"/>
+<meta content="Cómo usar el Bot de Alerta de gambeta.ai — Alertas en tiempo real para córners" property="og:title"/>
+<meta content="Guía completa del Bot de Alerta de gambeta.ai: cómo activarlo, cómo funciona el análisis de partidos en vivo, qué significa cada alerta y cómo apostar al córner en el momento exacto." property="og:description"/>
+<meta content="https://gambeta.ai/blog/og/og-como-usar-bot-alerta.png" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="es_AR" property="og:locale"/>
+<meta content="gambeta.ai" property="og:site_name"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="Cómo usar el Bot de Alerta de gambeta.ai — Alertas en tiempo real para córners" name="twitter:title"/>
+<meta content="Guía completa del Bot de Alerta de gambeta.ai: cómo activarlo, cómo funciona el análisis de partidos en vivo, qué significa cada alerta y cómo apostar al córner en el momento exacto." name="twitter:description"/>
+<meta content="https://gambeta.ai/blog/og/og-como-usar-bot-alerta.png" name="twitter:image"/>
+<link href="/favicon.png" rel="icon" type="image/png"/>
 <style>
 :root{--verde:#00c853;--fondo:#0d0d0d;--fondo2:#161622;--fondo3:#1e1e30;--texto:#e8e8e8;--texto-sec:#9e9e9e;--borde:rgba(255,255,255,0.07)}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -96,34 +97,33 @@ a:hover{text-decoration:underline}
 </head>
 <body>
 <nav class="nav">
-  <a href="https://gambeta.ai" class="nav-logo-wrap">
-    <div class="nav-icon-box">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="22" height="22">
-        <defs>
-          <linearGradient id="bolt-g" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ffd600"/>
-            <stop offset="100%" stop-color="#ff9100"/>
-          </linearGradient>
-          <filter id="bolt-glow"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <path d="M23,4 L13,22 L20,22 L17,36 L27,18 L20,18 Z" fill="url(#bolt-g)" filter="url(#bolt-glow)"/>
-        <circle cx="30" cy="8" r="2.5" fill="#00c853" opacity="0.9"/>
-        <circle cx="10" cy="30" r="1.8" fill="#00c853" opacity="0.6"/>
-      </svg>
-    </div>
-    <span class="nav-logo-text">gambeta<span>.ai</span></span>
-  </a>
-  <div class="nav-links">
-    <a href="https://gambeta.ai/#pronosticos">🔮 <span class="nav-text">Pronósticos</span></a>
-    <a href="https://gambeta.ai/#historial">📋 <span class="nav-text">Resultados</span></a>
-    <a href="https://gambeta.ai/#ranking">🏆 <span class="nav-text">Ranking</span></a>
-    <a href="https://gambeta.ai/#bot-alerta">🤖 <span class="nav-text">Bot Alerta</span></a>
-    <a href="https://gambeta.ai/#telegram">🎁 <span class="nav-text">Promos</span></a>
-    <a href="/blog/" class="active">📰 <span class="nav-text">Blog</span></a>
-  </div>
-  <a href="https://gambeta.ai/?openauth=1&returnTo=/blog/como-usar-bot-alerta.html" class="nav-links nav-cta-btn">✦ Entrar / Registro Gratis</a>
+<a class="nav-logo-wrap" href="https://gambeta.ai">
+<div class="nav-icon-box">
+<svg height="22" viewbox="0 0 40 40" width="22" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="bolt-g" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#ffd600"></stop>
+<stop offset="100%" stop-color="#ff9100"></stop>
+</lineargradient>
+<filter id="bolt-glow"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+</defs>
+<path d="M23,4 L13,22 L20,22 L17,36 L27,18 L20,18 Z" fill="url(#bolt-g)" filter="url(#bolt-glow)"></path>
+<circle cx="30" cy="8" fill="#00c853" opacity="0.9" r="2.5"></circle>
+<circle cx="10" cy="30" fill="#00c853" opacity="0.6" r="1.8"></circle>
+</svg>
+</div>
+<span class="nav-logo-text">gambeta<span>.ai</span></span>
+</a>
+<div class="nav-links">
+<a href="https://gambeta.ai/#pronosticos">🔮 <span class="nav-text">Pronósticos</span></a>
+<a href="https://gambeta.ai/#historial">📋 <span class="nav-text">Resultados</span></a>
+<a href="https://gambeta.ai/#ranking">🏆 <span class="nav-text">Ranking</span></a>
+<a href="https://gambeta.ai/#bot-alerta">🤖 <span class="nav-text">Bot Alerta</span></a>
+<a href="https://gambeta.ai/#telegram">🎁 <span class="nav-text">Promos</span></a>
+<a class="active" href="/blog/">📰 <span class="nav-text">Blog</span></a>
+</div>
+<a class="nav-links nav-cta-btn" href="https://gambeta.ai/?openauth=1&amp;returnTo=/blog/como-usar-bot-alerta">✦ Entrar / Registro Gratis</a>
 </nav>
-
 <div class="breadcrumb">
 <a href="https://gambeta.ai">Inicio</a>
 <span>›</span>
@@ -131,7 +131,6 @@ a:hover{text-decoration:underline}
 <span>›</span>
 <span>Bot de Alerta</span>
 </div>
-
 <div class="hero">
 <span class="badge">🤖 Manual de usuario</span>
 <h1>Cómo usar el Bot de Alerta de gambeta.ai — Alertas en tiempo real para córners</h1>
@@ -142,7 +141,6 @@ a:hover{text-decoration:underline}
 </div>
 <p class="lead">El Bot de Alerta monitorea partidos en vivo y te avisa el momento exacto para apostar al próximo córner — con segundos de ventaja sobre el mercado.</p>
 </div>
-
 <div class="container">
 <nav class="toc">
 <div class="toc-title">Contenido</div>
@@ -155,21 +153,18 @@ a:hover{text-decoration:underline}
 <li><a href="#seccion-6">Preguntas frecuentes</a></li>
 </ol>
 </nav>
-
 <article class="article">
 <h2 id="seccion-1">Qué es el Bot de Alerta</h2>
 <p>El <strong>Bot de Alerta</strong> de gambeta.ai es un sistema automatizado de inteligencia artificial que monitorea partidos de fútbol en vivo, específicamente en los últimos 20-30 minutos cuando la acción se intensifica.</p>
-    <figure class="article-img">
-      <img src="https://images.pexels.com/photos/16826134/pexels-photo-16826134.jpeg?auto=compress&cs=tinysrgb&w=1280" alt="Cancha iluminada de noche" loading="lazy" width="800" height="300">
-      <figcaption>Foto: Pexels · Libre uso comercial</figcaption>
-    </figure>
-
+<figure class="article-img">
+<img alt="Cancha iluminada de noche" height="300" loading="lazy" src="https://images.pexels.com/photos/16826134/pexels-photo-16826134.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1280" width="800"/>
+<figcaption>Foto: Pexels · Libre uso comercial</figcaption>
+</figure>
 <p>Su función principal: <strong>detectar patrones en tiempo real que predicen un córner inminente</strong> y enviarte una notificación instantánea para que puedas apostar antes de que las casas de apuestas cambien las cuotas.</p>
 <div class="highlight">
 <div class="highlight-title">⚡ Ventaja clave</div>
 <p>La mayoría de los apostadores vieron el córner ocurrir y luego intentan apostar. El Bot de Alerta te avisa ANTES de que ocurra, dándote una ventaja de 2-3 minutos en el mercado.</p>
 </div>
-
 <h2 id="seccion-2">Cómo activar las notificaciones</h2>
 <p>El Bot de Alerta funciona solo si tienes las notificaciones activadas. El proceso es simple y toma menos de un minuto:</p>
 <div class="steps">
@@ -183,8 +178,8 @@ a:hover{text-decoration:underline}
 <div class="step">
 <div class="step-num">2</div>
 <div class="step-body">
-<h3>Entra a "Bot Alerta"</h3>
-<p>Haz clic en la sección Bot Alerta para acceder al panel de configuración</p>
+<h3>Entra a "<strong>Bot Alerta</strong>"</h3>
+<p>Haz clic en la sección <strong>Bot Alerta</strong> para acceder al panel de configuración</p>
 </div>
 </div>
 <div class="step">
@@ -202,17 +197,14 @@ a:hover{text-decoration:underline}
 </div>
 </div>
 </div>
-
 <h3>Bonus: Pick diario GRATIS</h3>
 <p>Además de las alertas de córners, el Bot también te manda un <strong>🎁 Pick diario GRATIS</strong> como notificación push todos los días. Es el mejor pick del día seleccionado por los análisis de gambeta.ai, disponible sin costo para que lo registres en la plataforma.</p>
-
 <h2 id="seccion-3">Cómo funciona el análisis en tiempo real</h2>
 <p>El Bot de Alerta no es magia. Está basado en análisis matemáticos y reconocimiento de patrones en el juego. Estas son las señales que monitorea constantemente:</p>
-    <figure class="article-img">
-      <img src="https://images.pexels.com/photos/17071576/pexels-photo-17071576.jpeg?auto=compress&cs=tinysrgb&w=1280" alt="Fanáticos en el estadio" loading="lazy" width="800" height="300">
-      <figcaption>Foto: Pexels · Libre uso comercial</figcaption>
-    </figure>
-
+<figure class="article-img">
+<img alt="Fanáticos en el estadio" height="300" loading="lazy" src="https://images.pexels.com/photos/17071576/pexels-photo-17071576.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1280" width="800"/>
+<figcaption>Foto: Pexels · Libre uso comercial</figcaption>
+</figure>
 <ul>
 <li><strong>Presión ofensiva sostenida:</strong> Un equipo ataca durante más de 30 segundos sin perder la pelota</li>
 <li><strong>Equipo perdiendo que necesita empatar:</strong> Cuando falta poco tiempo y va perdiendo, aumenta la desesperación y los centros</li>
@@ -225,18 +217,14 @@ a:hover{text-decoration:underline}
 <div class="warning-title">⚠️ Importante</div>
 <p>El Bot no predice con 100% de exactitud. Es una herramienta de apoyo, no una garantía. La probabilidad de córner se calcula en base a patrones históricos, pero el fútbol siempre tiene variables impredecibles.</p>
 </div>
-
 <h2 id="seccion-4">Qué significa cada tipo de alerta</h2>
 <p>El Bot envía diferentes tipos de alertas según la confianza de su predicción:</p>
-
 <h3>🚨 ALERTA CÓRNER (Alta probabilidad)</h3>
 <p>Esta es la alerta principal. Significa que el sistema detectó una alta probabilidad de córner en los próximos 2 minutos. La confianza del algoritmo está por encima del 75%.</p>
 <p><strong>Qué hacer:</strong> Abre rápidamente la casa de apuestas y busca el mercado de "Próximo Córner" o "Total de Córners". Apuesta antes de que cambie la cuota.</p>
-
 <h3>⚽ ALERTA GOLES (Momentum ofensivo)</h3>
 <p>Detecta patrones de ataque intenso que pueden terminar en gol, no necesariamente córner. Algunos apostadores también juegan "Sí habrá gol" con estas alertas.</p>
 <p><strong>Qué hacer:</strong> Dependiendo de tu estrategia, puedes apostar al próximo gol, a goles totales, o esperar a que vuelva el momentum defensivo.</p>
-
 <h2 id="seccion-5">Estrategia: cómo apostar cuando llega una alerta</h2>
 <p>Una alerta es solo una señal. La forma en que la uses determina si ganás o perdés. Aquí está la estrategia recomendada:</p>
 <div class="steps">
@@ -276,7 +264,6 @@ a:hover{text-decoration:underline}
 </div>
 </div>
 </div>
-
 <h3>Pro Tips</h3>
 <ul>
 <li><strong>Cuota mínima:</strong> No apuestes si la cuota está por debajo de 1.50. No vale la pena el riesgo.</li>
@@ -284,15 +271,12 @@ a:hover{text-decoration:underline}
 <li><strong>Combina alertas:</strong> Si recibes dos alertas CÓRNER en el mismo partido, la probabilidad es aún mayor</li>
 <li><strong>Partidos al final:</strong> Las alertas son más precisas en los últimos 10 minutos cuando la desesperación es real</li>
 </ul>
-
 <h2 id="seccion-6">Preguntas frecuentes</h2>
-
-    <figure class="article-img">
-      <img src="https://images.pexels.com/photos/32179248/pexels-photo-32179248.jpeg?auto=compress&cs=tinysrgb&w=1280" alt="Jugador gambeteando" loading="lazy" width="800" height="300">
-      <figcaption>Foto: Pexels · Libre uso comercial</figcaption>
-    </figure>
-
-    <div class="faq">
+<figure class="article-img">
+<img alt="Jugador gambeteando" height="300" loading="lazy" src="https://images.pexels.com/photos/32179248/pexels-photo-32179248.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1280" width="800"/>
+<figcaption>Foto: Pexels · Libre uso comercial</figcaption>
+</figure>
+<div class="faq">
 <div class="faq-item">
 <div class="faq-q">¿Funciona el Bot de Alerta en todos los partidos?</div>
 <div class="faq-a">No. El Bot solo funciona en partidos de las 5 principales ligas (Premier League, La Liga, Serie A, Bundesliga, Ligue 1) y partidos internacionales importantes. Algunos partidos menores no están incluidos.</div>
@@ -315,17 +299,15 @@ a:hover{text-decoration:underline}
 </div>
 <div class="faq-item">
 <div class="faq-q">¿Puedo desactivar el Bot cuando quiera?</div>
-<div class="faq-a">Sí. Entra a 🤖 Bot Alerta → Desactivar. Las notificaciones se cortarán inmediatamente. Puedes reactivarlas en cualquier momento.</div>
+<div class="faq-a">Sí. Entra a 🤖 <strong>Bot Alerta</strong> → Desactivar. Las notificaciones se cortarán inmediatamente. Puedes reactivarlas en cualquier momento.</div>
 </div>
 </div>
 </article>
-
 <div class="cta-box">
 <h3>Activa el Bot de Alerta ahora</h3>
 <p>Recibe alertas en tiempo real de córners y aprovecha la ventaja del mercado antes que otros apostadores.</p>
-<a href="https://gambeta.ai" class="btn-cta">Entrar a gambeta.ai</a>
+<a class="btn-cta" href="https://gambeta.ai">Entrar a gambeta.ai</a>
 </div>
-
 <div class="related">
 <div class="related-title">Artículos relacionados</div>
 <div class="related-grid">
@@ -339,11 +321,9 @@ a:hover{text-decoration:underline}
 </div>
 </div>
 </div>
-
 <footer class="footer">
-<p>&copy; 2025 gambeta.ai. Todos los derechos reservados. | <a href="#">Privacidad</a> | <a href="#">Términos</a></p>
+<p>© 2025 gambeta.ai. Todos los derechos reservados. | <a href="#">Privacidad</a> | <a href="#">Términos</a></p>
 </footer>
-
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -369,7 +349,6 @@ a:hover{text-decoration:underline}
   ]
 }
 </script>
-
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",

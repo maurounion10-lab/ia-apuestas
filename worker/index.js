@@ -42,6 +42,19 @@ function getSeason(sportKey) {
   return LATAM_SPORT_KEYS.has(sportKey) ? 2026 : 2025;
 }
 
+// ── Normalización de nombres de equipos ──────────────────────────────────────
+// Mapea nombres largos/oficiales del API a nombres cortos para el frontend
+const TEAM_NAME_MAP = {
+  'Real Racing Club de Santander': 'Racing (S)',
+  'Racing Club de Santander':      'Racing (S)',
+  'Real Racing Club':              'Racing (S)',
+  'Racing Santander':              'Racing (S)',
+  'Racing de Santander':           'Racing (S)',
+};
+function normTeamName(name) {
+  return TEAM_NAME_MAP[name] || name;
+}
+
 // ── Mapeo: sport_key → ID de liga en API-Football ────────────────────────────
 const LEAGUE_MAP = {
   'soccer_argentina_primera_division':    128,
@@ -177,8 +190,8 @@ function transformAPFGame(fixture, oddsBookmakers, sportKey) {
     sport_key:     sportKey,
     sport_title:   sportKey,
     commence_time: f.date,
-    home_team:     hm.name,
-    away_team:     aw.name,
+    home_team:     normTeamName(hm.name),
+    away_team:     normTeamName(aw.name),
     bookmakers,
     _apf_fixture_id: f.id,
     _apf_home_id:    hm.id,
@@ -195,15 +208,15 @@ function transformOddsAPIGame(g) {
     sport_key:     g.sport_key,
     sport_title:   g.sport_title || g.sport_key,
     commence_time: g.commence_time,
-    home_team:     g.home_team,
-    away_team:     g.away_team,
+    home_team:     normTeamName(g.home_team),
+    away_team:     normTeamName(g.away_team),
     bookmakers:    (g.bookmakers || []).map(bm => ({
       key:   bm.key,
       title: bm.title,
       markets: (bm.markets || []).map(m => ({
         key:      m.key,
         outcomes: (m.outcomes || []).map(o => ({
-          name:  o.name,
+          name:  normTeamName(o.name),
           price: o.price,
           ...(o.point !== undefined ? { point: o.point } : {})
         }))
@@ -463,8 +476,334 @@ const LEAGUES_SECONDARY = [
   ['soccer_australia_aleague',                 null],  // A-League
 ];
 
+// ════════════════════════════════════════════════════════════════════════════
+// SCHEDULED RESOLVER (cron) — server-side, corre cada hora sin browser
+// ════════════════════════════════════════════════════════════════════════════
+//
+// Replica lo que loadHistoricalScores() hace en el client:
+//   1. Lee acoin_users.historial_full del admin (via service_role)
+//   2. Para cada pending pick con kick-off >2h pasado y <21 días:
+//      a. Fetch ESPN scoreboard de su liga + fecha
+//      b. Si ESPN no devolvió match, fetch TheSportsDB searchevents
+//   3. Match scores → calcula win/loss/void
+//   4. Upsert historial_full (el trigger Postgres replica a shared_cache)
+//
+// Requiere env.SUPABASE_SERVICE_ROLE_KEY como secret.
+
+const SUPABASE_URL  = 'https://ixfrtjvhnpapyuphqfxp.supabase.co';
+const ADMIN_EMAIL   = 'mauro.union10@gmail.com';
+const ESPN_BASE     = 'https://site.api.espn.com/apis/site/v2/sports/soccer';
+const TSDB_BASE     = 'https://www.thesportsdb.com/api/v1/json/3';
+
+// Mapa sport_key → ESPN league code (mirrors index.html line ~12990)
+const SPORT_TO_ESPN_RESOLVER = {
+  soccer_argentina_primera_division:   'arg.1',
+  soccer_argentina_primera_nacional:   'arg.nacional',
+  soccer_epl:                          'eng.1',
+  soccer_england_premier_league:       'eng.1',
+  soccer_spain_la_liga:                'esp.1',
+  soccer_germany_bundesliga:           'ger.1',
+  soccer_italy_serie_a:                'ita.1',
+  soccer_france_ligue_one:             'fra.1',
+  soccer_brazil_campeonato:            'bra.1',
+  soccer_uefa_champs_league:           'uefa.champions',
+  soccer_uefa_europa_league:           'uefa.europa',
+  soccer_uefa_conference_league:       'uefa.europa.conf',
+  soccer_uefa_europa_conference_league:'uefa.europa.conf',
+  soccer_conmebol_copa_libertadores:   'conmebol.libertadores',
+  soccer_conmebol_copa_sudamericana:   'conmebol.sudamericana',
+  soccer_mexico_ligamx:                'mex.1',
+  soccer_netherlands_eredivisie:       'ned.1',
+  soccer_portugal_primeira_liga:       'por.1',
+  soccer_turkey_super_league:          'tur.1',
+  soccer_england_championship:         'eng.2',
+  soccer_germany_bundesliga2:          'ger.2',
+  soccer_italy_serie_b:                'ita.2',
+  soccer_france_ligue_two:             'fra.2',
+  soccer_spain_segunda_division:       'esp.2',
+  soccer_scotland_premiership:         'sco.1',
+  soccer_greece_super_league:          'gre.1',
+  soccer_usa_mls:                      'usa.1',
+  soccer_colombia_primera_a:           'col.1',
+  soccer_uruguay_primera_division:     'uru.1',
+  soccer_paraguay_primera_division:    'par.1',
+  soccer_peru_primera_division:        'per.1',
+  soccer_ecuador_liga_pro:             'ecu.1',
+  soccer_chile_campeonato:             'chi.1',
+  soccer_australia_aleague:            'aus.1',
+  soccer_australia_a_league:           'aus.1',
+};
+
+// Ligas que ESPN no cubre — ir directo a TSDB
+const TSDB_ONLY_LEAGUES = new Set([
+  'soccer_poland_ekstraklasa',
+  'soccer_switzerland_superleague',
+  'soccer_belgium_first_div_a',
+  'soccer_belgium_first_div',
+  'soccer_austria_football_bundesliga',
+  'soccer_austria_bundesliga',
+  'soccer_denmark_superliga',
+  'soccer_sweden_allsvenskan',
+  'soccer_norway_eliteserien',
+]);
+
+// Normalizador de nombres de equipos (sin diacríticos, sin espacios, minúsculas)
+function normTeam(s) {
+  if (!s) return '';
+  return s.normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .toLowerCase().replace(/[^a-z0-9]/g, '');
+}
+
+// Match fuzzy entre dos nombres de equipo (mismo equipo, distintas variantes)
+function teamsMatch(a, b) {
+  if (!a || !b) return false;
+  const na = normTeam(a), nb = normTeam(b);
+  if (!na || !nb) return false;
+  if (na === nb) return true;
+  if (na.includes(nb) || nb.includes(na)) return true;
+  // Strip suffixes comunes (fc, sc, etc) y comparar
+  const stripped = s => s.replace(/(fc|cf|sc|ac|afc|sfc|rfc|fk|sk|bk|nk|gnk)$/, '');
+  return stripped(na) === stripped(nb);
+}
+
+// Fetch ESPN scoreboard para una liga × fecha (YYYYMMDD)
+async function fetchEspnScoreboard(leagueCode, dateStr) {
+  try {
+    const r = await fetch(`${ESPN_BASE}/${leagueCode}/scoreboard?dates=${dateStr}`);
+    if (!r.ok) return [];
+    const j = await r.json();
+    return (j.events || [])
+      .filter(e => e.status?.type?.completed)
+      .map(e => {
+        const comp  = e.competitions?.[0] || {};
+        const home  = comp.competitors?.find(t => t.homeAway === 'home') || {};
+        const away  = comp.competitors?.find(t => t.homeAway === 'away') || {};
+        return {
+          home:       home.team?.displayName || home.team?.name || '',
+          away:       away.team?.displayName || away.team?.name || '',
+          scoreH:     parseInt(home.score) || 0,
+          scoreA:     parseInt(away.score) || 0,
+          commenceTs: e.date ? new Date(e.date).getTime() : null,
+          src: 'espn',
+        };
+      });
+  } catch { return []; }
+}
+
+// Fetch TheSportsDB searchevents para un match específico (Home_vs_Away)
+async function fetchTsdbEvent(homeName, awayName) {
+  try {
+    const slug = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
+    const q = `${slug(homeName)}_vs_${slug(awayName)}`;
+    if (!q || q === '_vs_') return null;
+    const r = await fetch(`${TSDB_BASE}/searchevents.php?e=${q}`);
+    if (!r.ok) return null;
+    const j = await r.json();
+    const events = j.event || j.events || [];
+    for (const e of events) {
+      if (e.intHomeScore == null || e.intAwayScore == null) continue;
+      if (e.intHomeScore === '' || e.intAwayScore === '') continue;
+      const sH = parseInt(e.intHomeScore), sA = parseInt(e.intAwayScore);
+      if (!Number.isFinite(sH) || !Number.isFinite(sA)) continue;
+      const ts = e.strTimestamp
+        ? new Date(e.strTimestamp + (e.strTimestamp.endsWith('Z') ? '' : 'Z')).getTime()
+        : (e.dateEvent ? new Date(e.dateEvent + 'T18:00:00Z').getTime() : null);
+      return {
+        home: e.strHomeTeam || homeName,
+        away: e.strAwayTeam || awayName,
+        scoreH: sH, scoreA: sA,
+        commenceTs: ts,
+        src: 'tsdb',
+      };
+    }
+    return null;
+  } catch { return null; }
+}
+
+// Resuelve un pick contra un score: devuelve 'win'/'loss'/'void' o null
+function calcResult(pick, score) {
+  const sH = score.scoreH, sA = score.scoreA;
+  const homeWin = sH > sA;
+  const awayWin = sA > sH;
+  const draw    = sH === sA;
+  const total   = sH + sA;
+  const btts    = sH > 0 && sA > 0;
+  const rec = pick.rec || '';
+
+  if (rec === 'Gana Local')      return homeWin ? 'win' : 'loss';
+  if (rec === 'Gana Visitante')  return awayWin ? 'win' : 'loss';
+  if (rec === 'Empate')          return draw    ? 'win' : 'loss';
+  if (rec === 'Ambos Marcan')    return btts    ? 'win' : 'loss';
+  if (rec === 'Más de 1.5')      return total >= 2 ? 'win' : 'loss';
+  if (rec === 'Más de 2.5')      return total >= 3 ? 'win' : 'loss';
+  if (rec === 'Más de 3.5')      return total >= 4 ? 'win' : 'loss';
+  const mO = rec.match(/^Más de (\d+\.?\d*)$/);
+  if (mO) {
+    const line = parseFloat(mO[1]);
+    return total > line ? 'win' : 'loss';
+  }
+  const mU = rec.match(/^Menos de (\d+\.?\d*)$/);
+  if (mU) {
+    const line = parseFloat(mU[1]);
+    return total < line ? 'win' : 'loss';
+  }
+  const mG = rec.match(/^Gana\s+(.+)$/i);
+  if (mG) {
+    const team = mG[1].trim();
+    if (teamsMatch(team, pick.home)) return homeWin ? 'win' : 'loss';
+    if (teamsMatch(team, pick.away)) return awayWin ? 'win' : 'loss';
+  }
+  if (/(corner|hándicap|handicap)/i.test(rec) || /^Apuesta a [+\-]?\d/.test(rec)) {
+    return 'void';
+  }
+  return null; // no resoluble → dejar pending
+}
+
+// Fetch del historial admin desde acoin_users
+async function fetchAdminHistorial(env) {
+  const key = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_ANON_KEY;
+  if (!key) throw new Error('SUPABASE_SERVICE_ROLE_KEY no configurado');
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/acoin_users?email=eq.${encodeURIComponent(ADMIN_EMAIL)}&select=historial_full`,
+    { headers: { apikey: key, Authorization: `Bearer ${key}` } }
+  );
+  if (!r.ok) throw new Error(`Supabase fetch ${r.status}`);
+  const rows = await r.json();
+  return Array.isArray(rows?.[0]?.historial_full) ? rows[0].historial_full : [];
+}
+
+// Upsert el historial admin actualizado
+async function saveAdminHistorial(env, hist) {
+  const key = env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!key) throw new Error('SUPABASE_SERVICE_ROLE_KEY no configurado (necesario para escribir)');
+  const r = await fetch(
+    `${SUPABASE_URL}/rest/v1/acoin_users?email=eq.${encodeURIComponent(ADMIN_EMAIL)}`,
+    {
+      method: 'PATCH',
+      headers: {
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        'Content-Type': 'application/json',
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({
+        historial_full: hist.slice(-500),
+        updated_at: new Date().toISOString(),
+      }),
+    }
+  );
+  if (!r.ok) {
+    const t = await r.text();
+    throw new Error(`Supabase update ${r.status}: ${t}`);
+  }
+}
+
+// Función principal del cron: revisa picks pendientes y los resuelve
+async function runScheduledResolver(env) {
+  const stats = { checked: 0, resolved: 0, espn: 0, tsdb: 0, errors: 0, log: [] };
+  try {
+    const hist = await fetchAdminHistorial(env);
+    if (!hist.length) {
+      stats.log.push('historial vacío');
+      return stats;
+    }
+
+    const now = Date.now();
+    const TWO_H = 2 * 3600 * 1000;
+    const TWENTY_ONE_D = 21 * 24 * 3600 * 1000;
+
+    // Pending picks resolvables (kick-off > 2h ago, < 21 días)
+    const pending = hist.filter(p =>
+      p.result === 'pending' &&
+      p.commenceTs &&
+      (now - p.commenceTs) >= TWO_H &&
+      (now - p.commenceTs) <= TWENTY_ONE_D
+    );
+    stats.checked = pending.length;
+    if (!pending.length) {
+      stats.log.push('sin picks pendientes resolvables');
+      return stats;
+    }
+
+    // Agrupar por liga × fecha para minimizar requests ESPN
+    const espnCalls = new Map();  // key = "leagueCode_YYYYMMDD" → Promise<scores[]>
+    function getEspnScores(leagueCode, ts) {
+      const dateStr = new Date(ts).toISOString().slice(0,10).replace(/-/g,'');
+      const key = `${leagueCode}_${dateStr}`;
+      if (!espnCalls.has(key)) espnCalls.set(key, fetchEspnScoreboard(leagueCode, dateStr));
+      return espnCalls.get(key);
+    }
+
+    let changed = false;
+    for (const pick of pending) {
+      try {
+        let matched = null;
+
+        // Si la liga es ESPN-supported, intentar ESPN
+        const espnId = SPORT_TO_ESPN_RESOLVER[pick._sportKey || ''];
+        if (espnId && !TSDB_ONLY_LEAGUES.has(pick._sportKey)) {
+          // Probar el día del kick-off y el día siguiente (timezones)
+          for (const dayOffset of [0, 1, -1]) {
+            const scores = await getEspnScores(espnId, pick.commenceTs + dayOffset * 86400000);
+            matched = scores.find(s => teamsMatch(s.home, pick.home) && teamsMatch(s.away, pick.away));
+            if (matched) break;
+          }
+          if (matched) stats.espn++;
+        }
+
+        // Fallback: TheSportsDB searchevents
+        if (!matched) {
+          const tsdbScore = await fetchTsdbEvent(pick.home, pick.away);
+          if (tsdbScore) {
+            // Verificar que el TS está cerca (±5 días)
+            if (!pick.commenceTs || !tsdbScore.commenceTs ||
+                Math.abs(pick.commenceTs - tsdbScore.commenceTs) < 5 * 24 * 3600 * 1000) {
+              matched = tsdbScore;
+              stats.tsdb++;
+            }
+          }
+        }
+
+        if (!matched) continue;
+
+        const result = calcResult(pick, matched);
+        if (!result) continue;
+
+        pick.result = result;
+        pick.finalScore = `${matched.scoreH}-${matched.scoreA}`;
+        pick.pl = result === 'win'
+          ? parseFloat(((pick.odds - 1) * pick.stake).toFixed(2))
+          : result === 'loss' ? -pick.stake : 0;
+        pick.resolvedAt = Date.now();
+        pick._resolvedBy = `cron-${matched.src}`;
+        stats.resolved++;
+        stats.log.push(`${pick.home} vs ${pick.away}: ${matched.scoreH}-${matched.scoreA} → ${result}`);
+        changed = true;
+      } catch (e) {
+        stats.errors++;
+        stats.log.push(`error en ${pick.home} vs ${pick.away}: ${e.message}`);
+      }
+    }
+
+    if (changed) {
+      await saveAdminHistorial(env, hist);
+      stats.log.push(`historial actualizado: ${stats.resolved} picks resueltos`);
+    }
+  } catch (e) {
+    stats.errors++;
+    stats.log.push(`fatal: ${e.message}`);
+  }
+  return stats;
+}
+
 // ── Router principal ─────────────────────────────────────────────────────────
 export default {
+  async scheduled(controller, env, ctx) {
+    // Cron handler: cada hora
+    const stats = await runScheduledResolver(env);
+    console.log('[cron-resolver]', JSON.stringify(stats));
+  },
   async fetch(request, env) {
     const url  = new URL(request.url);
     const path = url.pathname;
@@ -608,13 +947,22 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v2.4',
+        worker: 'apuestas-api v2.5',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
         resend_key: env.RESEND_API_KEY ? 'configured' : 'MISSING',
+        sb_service_key: env.SUPABASE_SERVICE_ROLE_KEY ? 'configured' : 'MISSING',
         kv: env.CACHE_KV ? 'connected' : 'NOT connected'
       }), { headers: CORS });
+    }
+
+    // ── /cron-resolve ────────────────────────────────────────────────────────
+    // Trigger manual del resolver (mismo código que corre en el cron cada hora).
+    // Útil para testear / forzar resolución sin esperar al cron.
+    if (path === '/cron-resolve') {
+      const stats = await runScheduledResolver(env);
+      return new Response(JSON.stringify(stats, null, 2), { headers: CORS });
     }
 
     return new Response(JSON.stringify({ error: 'Not found', path }), { status: 404, headers: CORS });

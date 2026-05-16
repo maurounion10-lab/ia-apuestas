@@ -1,7 +1,13 @@
 User-agent: *
 Disallow: /api/
+Disallow: /api
+Disallow: /*?type=*
 Disallow: /*?openauth*
 Disallow: /*?returnTo*
+Disallow: /*?q=*
+Disallow: /odds?*
+Disallow: /*?category=*
+Disallow: /available
 Allow: /
 
 Sitemap: https://gambeta.ai/sitemap.xml

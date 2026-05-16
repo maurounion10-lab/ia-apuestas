@@ -1,34 +1,32 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cuotas y probabilidades: cómo convertirlas y encontrar valor | gambeta.ai</title>
-  <meta name="description" content="Entendé la relación entre cuotas y probabilidades reales. Cómo calcular el valor esperado y por qué es la base de apostar con inteligencia.">
-  <meta name="author" content="gambeta.ai">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://gambeta.ai/blog/cuotas-y-probabilidades">
-
-  <!-- Open Graph -->
-  <meta property="og:type" content="article">
-  <meta property="og:url" content="https://gambeta.ai/blog/cuotas-y-probabilidades">
-  <meta property="og:title" content="Cuotas y probabilidades: cómo convertirlas y encontrar valor | gambeta.ai">
-  <meta property="og:description" content="Entendé la relación entre cuotas y probabilidades reales. Cómo calcular el valor esperado y por qué es la base de apostar con inteligencia.">
-  <meta property="og:image" content="https://gambeta.ai/blog/og/og-cuotas-y-probabilidades.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:locale" content="es_AR">
-  <meta property="og:site_name" content="gambeta.ai">
-
-  <!-- Twitter Card -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:site" content="@gambetaia">
-  <meta name="twitter:title" content="Cuotas y probabilidades: cómo convertirlas y encontrar valor | gambeta.ai">
-  <meta name="twitter:description" content="Entendé la relación entre cuotas y probabilidades reales. Cómo calcular el valor esperado y por qué es la base de apostar con inteligencia.">
-  <meta name="twitter:image" content="https://gambeta.ai/blog/og/og-cuotas-y-probabilidades.png">
-
-  <!-- Schema.org Article -->
-  <script type="application/ld+json">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cuotas y probabilidades: cómo convertirlas y encontrar valor | gambeta.ai</title>
+<meta content="Entendé la relación entre cuotas y probabilidades reales. Cómo calcular el valor esperado y por qué es la base de apostar con inteligencia." name="description"/>
+<meta content="gambeta.ai" name="author"/>
+<meta content="index, follow" name="robots"/>
+<link href="https://gambeta.ai/blog/cuotas-y-probabilidades" rel="canonical"/>
+<!-- Open Graph -->
+<meta content="article" property="og:type"/>
+<meta content="https://gambeta.ai/blog/cuotas-y-probabilidades" property="og:url"/>
+<meta content="Cuotas y probabilidades: cómo convertirlas y encontrar valor | gambeta.ai" property="og:title"/>
+<meta content="Entendé la relación entre cuotas y probabilidades reales. Cómo calcular el valor esperado y por qué es la base de apostar con inteligencia." property="og:description"/>
+<meta content="https://gambeta.ai/blog/og/og-cuotas-y-probabilidades.png" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="es_AR" property="og:locale"/>
+<meta content="gambeta.ai" property="og:site_name"/>
+<!-- Twitter Card -->
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="@gambetaia" name="twitter:site"/>
+<meta content="Cuotas y probabilidades: cómo convertirlas y encontrar valor | gambeta.ai" name="twitter:title"/>
+<meta content="Entendé la relación entre cuotas y probabilidades reales. Cómo calcular el valor esperado y por qué es la base de apostar con inteligencia." name="twitter:description"/>
+<meta content="https://gambeta.ai/blog/og/og-cuotas-y-probabilidades.png" name="twitter:image"/>
+<!-- Schema.org Article -->
+<script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -43,9 +41,8 @@
     "mainEntityOfPage": "https://gambeta.ai/blog/cuotas-y-probabilidades.html"
   }
   </script>
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png">
-  <style>
+<link href="/favicon.png" rel="icon" sizes="32x32" type="image/png"/>
+<style>
     :root {
       --verde: #00c853;
       --fondo: #0f0f0f;
@@ -105,86 +102,74 @@
   </style>
 </head>
 <body>
-
 <nav class="nav">
-  <a href="https://gambeta.ai" class="nav-logo-wrap">
-    <div class="nav-icon-box">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="22" height="22">
-        <defs>
-          <linearGradient id="bolt-g" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#ffd600"/>
-            <stop offset="100%" stop-color="#ff9100"/>
-          </linearGradient>
-          <filter id="bolt-glow"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-        </defs>
-        <path d="M23,4 L13,22 L20,22 L17,36 L27,18 L20,18 Z" fill="url(#bolt-g)" filter="url(#bolt-glow)"/>
-        <circle cx="30" cy="8" r="2.5" fill="#00c853" opacity="0.9"/>
-        <circle cx="10" cy="30" r="1.8" fill="#00c853" opacity="0.6"/>
-      </svg>
-    </div>
-    <span class="nav-logo-text">gambeta<span>.ai</span></span>
-  </a>
-  <div class="nav-links">
-    <a href="https://gambeta.ai/#pronosticos">🔮 <span class="nav-text">Pronósticos</span></a>
-    <a href="https://gambeta.ai/#historial">📋 <span class="nav-text">Resultados</span></a>
-    <a href="https://gambeta.ai/#ranking">🏆 <span class="nav-text">Ranking</span></a>
-    <a href="https://gambeta.ai/#bot-alerta">🤖 <span class="nav-text">Bot Alerta</span></a>
-    <a href="https://gambeta.ai/#telegram">🎁 <span class="nav-text">Promos</span></a>
-    <a href="/blog/">📰 <span class="nav-text">Blog</span></a>
-  </div>
-  <a href="https://gambeta.ai/?openauth=1&returnTo=/blog/cuotas-y-probabilidades.html" class="nav-links nav-cta-btn">✦ Entrar / Registro Gratis</a>
+<a class="nav-logo-wrap" href="https://gambeta.ai">
+<div class="nav-icon-box">
+<svg height="22" viewbox="0 0 40 40" width="22" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<lineargradient id="bolt-g" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#ffd600"></stop>
+<stop offset="100%" stop-color="#ff9100"></stop>
+</lineargradient>
+<filter id="bolt-glow"><fegaussianblur result="b" stddeviation="1.8"></fegaussianblur><femerge><femergenode in="b"></femergenode><femergenode in="SourceGraphic"></femergenode></femerge></filter>
+</defs>
+<path d="M23,4 L13,22 L20,22 L17,36 L27,18 L20,18 Z" fill="url(#bolt-g)" filter="url(#bolt-glow)"></path>
+<circle cx="30" cy="8" fill="#00c853" opacity="0.9" r="2.5"></circle>
+<circle cx="10" cy="30" fill="#00c853" opacity="0.6" r="1.8"></circle>
+</svg>
+</div>
+<span class="nav-logo-text">gambeta<span>.ai</span></span>
+</a>
+<div class="nav-links">
+<a href="https://gambeta.ai/#pronosticos">🔮 <span class="nav-text">Pronósticos</span></a>
+<a href="https://gambeta.ai/#historial">📋 <span class="nav-text">Resultados</span></a>
+<a href="https://gambeta.ai/#ranking">🏆 <span class="nav-text">Ranking</span></a>
+<a href="https://gambeta.ai/#bot-alerta">🤖 <span class="nav-text">Bot Alerta</span></a>
+<a href="https://gambeta.ai/#telegram">🎁 <span class="nav-text">Promos</span></a>
+<a href="/blog/">📰 <span class="nav-text">Blog</span></a>
+</div>
+<a class="nav-links nav-cta-btn" href="https://gambeta.ai/?openauth=1&amp;returnTo=/blog/cuotas-y-probabilidades">✦ Entrar / Registro Gratis</a>
 </nav>
-
 <header class="hero">
-  <div class="badge">Fundamentos</div>
-  <h1>Cuotas y probabilidades: cómo convertirlas y encontrar valor</h1>
-  <p>Entendé la relación entre cuotas y probabilidades reales. Cómo calcular el valor esperado y por qué es la base de apostar con inteligencia.</p>
-  <!-- <img src="/blog/og/og-cuotas-y-probabilidades.png" alt="" class="hero-img" loading="lazy"> -->
+<div class="badge">Fundamentos</div>
+<h1>Cuotas y probabilidades: cómo convertirlas y encontrar valor</h1>
+<p>Entendé la relación entre cuotas y probabilidades reales. Cómo calcular el valor esperado y por qué es la base de apostar con inteligencia.</p>
+<!-- <img src="/blog/og/og-cuotas-y-probabilidades.png" alt="" class="hero-img" loading="lazy"> -->
 </header>
-
 <main class="container">
-  <article class="article">
-    <h2>¿Qué son las cuotas?</h2>
-<p>Las cuotas son el precio que paga la casa de apuestas por cada unidad apostada en caso de que tu selección gane. Una cuota de 2.00 significa que si apostás $1.000, recibís $2.000 (ganás $1.000 netos). Las cuotas reflejan la probabilidad que la casa le asigna a cada resultado, más su margen de ganancia.</p>
-
+<article class="article">
+<h2>¿Qué son las cuotas?</h2>
+<p>Las cuotas son el precio que paga la casa de apuestas por cada unidad apostada en caso de que tu selección gane. Una <strong>cuota</strong> de 2.00 significa que si apostás $1.000, recibís $2.000 (ganás $1.000 netos). Las cuotas reflejan la probabilidad que la casa le asigna a cada resultado, más su margen de ganancia.</p>
 <h2>Cómo convertir cuotas a probabilidades</h2>
-<p>La conversión es sencilla: probabilidad implícita = 1 / cuota. Una cuota de 2.00 implica una probabilidad del 50%. Una cuota de 1.50 implica 66.7%. Una cuota de 3.00 implica 33.3%. Pero acá está el truco: la suma de todas las probabilidades implícitas de un partido no da 100% sino más (por ej., 105% o 107%). Esa diferencia es el margen de la casa.</p>
-
+<p>La conversión es sencilla: <strong>probabilidad implícita</strong> = 1 / <strong>cuota</strong>. Una <strong>cuota</strong> de 2.00 implica una probabilidad del 50%. Una <strong>cuota</strong> de 1.50 implica 66.7%. Una <strong>cuota</strong> de 3.00 implica 33.3%. Pero acá está el truco: la suma de todas las <strong>probabilidades implícitas</strong> de un partido no da 100% sino más (por ej., 105% o 107%). Esa diferencia es el margen de la casa.</p>
 <h2>El concepto de valor esperado</h2>
-<p>Una apuesta tiene valor positivo cuando tu estimación de probabilidad es mayor a la probabilidad implícita de la cuota. Si creés que un equipo tiene 60% de chance de ganar, pero la cuota implica solo 50%, tenés una apuesta de valor. A largo plazo, apostar con valor positivo es la única estrategia que genera ganancias sostenibles.</p>
-
+<p>Una apuesta tiene valor positivo cuando tu estimación de probabilidad es mayor a la <strong>probabilidad implícita</strong> de la <strong>cuota</strong>. Si creés que un equipo tiene 60% de chance de ganar, pero la <strong>cuota</strong> implica solo 50%, tenés una apuesta de valor. A largo plazo, apostar con valor positivo es la única estrategia que genera ganancias sostenibles.</p>
 <h2>Cómo calcula probabilidades la IA de gambeta.ai</h2>
 <p>El sistema de gambeta.ai combina estadísticas históricas, forma reciente, diferencia de calidad entre equipos, y condición de local/visitante para estimar probabilidades independientes de las casas de apuestas. Luego compara esas probabilidades con las cuotas disponibles y señala dónde hay valor real.</p>
-
 <h2>El nivel de confianza 1-6</h2>
-<p>El indicador de confianza de gambeta.ai (del 1 al 6) refleja directamente qué tan grande y sólida es esa ventaja de valor. Un pick con confianza 6/6 indica que la diferencia entre la probabilidad estimada por la IA y la probabilidad implícita de la cuota es significativa y está respaldada por múltiples indicadores estadísticos.</p>
-
+<p>El indicador de confianza de gambeta.ai (del 1 al 6) refleja directamente qué tan grande y sólida es esa ventaja de valor. Un pick con confianza 6/6 indica que la diferencia entre la probabilidad estimada por la IA y la <strong>probabilidad implícita</strong> de la <strong>cuota</strong> es significativa y está respaldada por múltiples indicadores estadísticos.</p>
 <h2>Cuotas en decimal, fraccionario y americano</h2>
 <p>En Argentina y España usamos cuotas decimales (el sistema más intuitivo). El sistema fraccionario se usa en el Reino Unido (2/1 = 3.00 en decimal). El americano (línea americana) se usa en EE.UU. (+200 = 3.00, -150 = 1.67). Gambeta.ai siempre muestra cuotas en formato decimal para mayor claridad.</p>
-  </article>
-
-  <div class="cta-box">
-    <h3>⚡️ Probá la IA gratis ahora</h3>
-    <p>Picks diarios con análisis de inteligencia artificial. Champions, Premier, Libertadores y más — 100% gratis.</p>
-    <a href="https://gambeta.ai" class="btn-cta">Ver picks de hoy →</a>
-  </div>
-
-  <div class="related">
-    <h4>Más artículos</h4>
-    <div class="related-links">
-      <a href="/blog/">📰 Ver todos los artículos</a>
-      <a href="/blog/gestion-bankroll">💰 Gestión de bankroll</a>
-      <a href="/blog/cuotas-y-probabilidades">📊 Cuotas y probabilidades</a>
-      <a href="/blog/ia-para-apostar">🤖 IA para apostar</a>
-      <a href="/blog/ia-vs-tipster">⚔️ IA vs Tipster</a>
-    </div>
-  </div>
+</article>
+<div class="cta-box">
+<h3>⚡️ Probá la IA gratis ahora</h3>
+<p>Picks diarios con análisis de inteligencia artificial. Champions, Premier, Libertadores y más — 100% gratis.</p>
+<a class="btn-cta" href="https://gambeta.ai">Ver picks de hoy →</a>
+</div>
+<div class="related">
+<h4>Más artículos</h4>
+<div class="related-links">
+<a href="/blog/">📰 Ver todos los artículos</a>
+<a href="/blog/gestion-bankroll">💰 Gestión de bankroll</a>
+<a href="/blog/cuotas-y-probabilidades">📊 Cuotas y probabilidades</a>
+<a href="/blog/ia-para-apostar">🤖 IA para apostar</a>
+<a href="/blog/ia-vs-tipster">⚔️ IA vs Tipster</a>
+</div>
+</div>
 </main>
-
 <footer class="footer">
-  <p>© 2025 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar en Fútbol · 18+</p>
+<p>© 2025 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar en Fútbol · 18+</p>
 </footer>
-
 <!-- Blog Auth: sesión Supabase → muestra escudo + nombre igual al sitio principal -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
