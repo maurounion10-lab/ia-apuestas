@@ -1,0 +1,45 @@
+name: Deploy Cloudflare Pages
+
+# Auto-deploy de gambeta.ai. Garantiza que la versión live siempre = último commit en main.
+# Previene rollbacks accidentales por deploys ad_hoc desde otras máquinas.
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'worker/**'           # worker tiene su propio workflow (deploy-worker.yml)
+      - 'worker-chat/**'      # worker-chat se deploya manualmente (no está en repo)
+      - 'supabase-migrations/**'
+      - 'scripts/**'
+      - '*.md'
+      - '.gitignore'
+      - '.github/workflows/**'
+  workflow_dispatch:          # permite trigger manual desde Actions tab
+
+concurrency:
+  group: deploy-pages-main
+  cancel-in-progress: true    # si llega un nuevo push, cancela el deploy en curso
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy Pages to Cloudflare
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy to Cloudflare Pages
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy . --project-name=ia-apuestas --branch=main --commit-hash=${{ github.sha }} --commit-message="${{ github.event.head_commit.message }}"
+
+      - name: Print deployment URL
+        run: |
+          echo "Deployment URL: ${{ steps.deploy.outputs.deployment-url }}"
+          echo "Commit: ${{ github.sha }}"
