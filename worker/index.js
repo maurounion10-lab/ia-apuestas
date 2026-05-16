@@ -449,31 +449,36 @@ const LEAGUES_EUROPE = [
 // Todas las ligas secundarias van directo a The Odds API (null leagueId).
 // Motivo: APF tiene cupo diario limitado; las secundarias no necesitan H2H/stats.
 const LEAGUES_SECONDARY = [
+  // ── Migración 14-may-2026: leagueIds mapeados a API-Football PRO ($19) ──────
+  // Antes: null en todas → cada request gastaba ~21 credits de The Odds API ($119/mes).
+  // Después: APF maneja todo → Odds API solo se llama si APF falla globalmente.
+  // Ahorro objetivo: bajar uso Odds API de 527k/mes a <2k/mes → plan 20K ($30).
+  //
   // Europa: 2ª divisiones y ligas medianas
-  ['soccer_england_championship',              null],  // Championship
-  ['soccer_belgium_first_div_a',               null],  // Belgian Pro League
-  ['soccer_germany_bundesliga2',               null],  // 2. Bundesliga
-  ['soccer_spain_segunda_division',            null],  // Segunda División
-  ['soccer_italy_serie_b',                     null],  // Serie B
-  ['soccer_france_ligue_two',                  null],  // Ligue 2
-  ['soccer_austria_football_bundesliga',       null],  // Austrian Bundesliga
-  ['soccer_switzerland_superleague',           null],  // Swiss Super League
-  ['soccer_denmark_superliga',                 null],  // Danish Superliga
-  ['soccer_sweden_allsvenskan',                null],  // Allsvenskan
-  ['soccer_norway_eliteserien',                null],  // Eliteserien
-  ['soccer_poland_ekstraklasa',                null],  // Ekstraklasa
-  ['soccer_czech_republic_first_league',       null],  // Czech Liga
+  ['soccer_england_championship',              40],   // Championship
+  ['soccer_belgium_first_div_a',               144],  // Belgian Pro League
+  ['soccer_germany_bundesliga2',               79],   // 2. Bundesliga
+  ['soccer_spain_segunda_division',            141],  // Segunda División
+  ['soccer_italy_serie_b',                     136],  // Serie B
+  ['soccer_france_ligue_two',                  62],   // Ligue 2
+  ['soccer_austria_football_bundesliga',       218],  // Austrian Bundesliga
+  ['soccer_switzerland_superleague',           207],  // Swiss Super League
+  ['soccer_denmark_superliga',                 119],  // Danish Superliga
+  ['soccer_sweden_allsvenskan',                113],  // Allsvenskan
+  ['soccer_norway_eliteserien',                103],  // Eliteserien
+  ['soccer_poland_ekstraklasa',                106],  // Ekstraklasa
+  ['soccer_czech_republic_first_league',       345],  // Czech Liga
   // Europa del Este / Otros
-  ['soccer_russia_premier_league',             null],  // RPL
+  ['soccer_russia_premier_league',             235],  // RPL
   // Latinoamérica extra
-  ['soccer_ecuador_liga_pro',                  null],  // Liga Pro
-  ['soccer_peru_primera_division',             null],  // Liga 1 Peru
-  ['soccer_venezuela_primera_division',        null],  // FUTVE
-  ['soccer_bolivia_primera_division',          null],  // Div. Prof. Bolivia
-  ['soccer_paraguay_primera_division',         null],  // Div. Honor Paraguay
+  ['soccer_ecuador_liga_pro',                  240],  // Liga Pro
+  ['soccer_peru_primera_division',             281],  // Liga 1 Peru
+  ['soccer_venezuela_primera_division',        299],  // FUTVE
+  ['soccer_bolivia_primera_division',          344],  // Div. Prof. Bolivia
+  ['soccer_paraguay_primera_division',         271],  // Div. Honor Paraguay
   // Asia / Oceanía
-  ['soccer_south_korea_kleague1',              null],  // K League
-  ['soccer_australia_aleague',                 null],  // A-League
+  ['soccer_south_korea_kleague1',              292],  // K League 1
+  ['soccer_australia_aleague',                 188],  // A-League
 ];
 
 // ════════════════════════════════════════════════════════════════════════════

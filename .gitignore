@@ -4,3 +4,8 @@
 !.dev.vars.example
 .env*
 !.env.example
+
+# archivos de trabajo / backup que no van al deploy
+.cloudflare_config
+index_recovered.html
+worker-chat/
