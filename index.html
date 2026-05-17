@@ -22664,28 +22664,42 @@ function _fpUnsubscribe() {
   }
 }
 
+/* ── Helper: compute thread id from home/away (matches existing pattern: lowercased, no spaces, _vs_) ── */
+function _fpThreadIdFor(home, away) {
+  const norm = s => String(s || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')   // strip accents
+    .replace(/[^a-z0-9]/g, '');                          // alphanumeric only
+  return `${norm(home)}_vs_${norm(away)}`;
+}
+
 /* ── Auto-create thread for a pick (called by pick renderer) ── */
 window.forumEnsureThread = async function(pick) {
-  // pick = { id, home, away, league, match_date, prediction/pick, confidence/conf, ... }
-  if (!pick || !pick.id) return;
+  // pick = { id?, home, away, league, match_date, prediction/pick, confidence/conf, ... }
+  if (!pick || !pick.home || !pick.away) return;
+  const tid = String(pick.id || _fpThreadIdFor(pick.home, pick.away));
   try {
     const sb = typeof sbAnon !== 'undefined' ? sbAnon : sbClient;
     const { data: existing } = await sb
       .from('forum_threads')
       .select('id')
-      .eq('id', String(pick.id))
+      .eq('id', tid)
       .maybeSingle();
     if (existing) return;
 
     // create thread + AI post
-    await sbClient.from('forum_threads').insert([{
-      id:         String(pick.id),
+    const { error: insErr } = await sbClient.from('forum_threads').insert([{
+      id:         tid,
       pick_data:  pick,
       league:     pick.league || '',
       home:       pick.home   || '',
       away:       pick.away   || '',
       match_date: pick.match_date || pick.date || ''
     }]);
+    if (insErr) {
+      console.warn('[forum] No se pudo crear thread (RLS?):', insErr.message);
+      return;
+    }
 
     const rec  = pick.rec || pick.prediction || pick.pick || 'Sin pick';
     const conf = pick.bvrText || pick.confidence || pick.conf || '';
