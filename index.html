@@ -11307,11 +11307,17 @@ function _researchModalOpen(research, cardId) {
         ${research.cached ? '· Cache 12h' : '· En vivo'}
       </div>
     </div>`;
-  requestAnimationFrame(() => bg.classList.add('open'));
+  // Forzar apertura con inline styles (más confiable que .classList.add con transitions en elementos recién agregados)
+  bg.classList.add('open');
+  bg.style.opacity = '1';
+  bg.style.pointerEvents = 'all';
 }
 window._researchModalClose = function() {
   const bg = document.getElementById('iaModalBg');
-  if (bg) bg.classList.remove('open');
+  if (!bg) return;
+  bg.classList.remove('open');
+  bg.style.opacity = '0';
+  bg.style.pointerEvents = 'none';
 };
 
 // Cola con throttling para no saturar el endpoint
