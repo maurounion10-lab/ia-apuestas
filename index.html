@@ -13402,6 +13402,14 @@ function renderHistorial(filter) {
     setTimeout(() => renderHistorial(filter), 150);
     return;
   }
+  // ── AUTO-TRIGGER: si aún no cargó el global y no está cargando, dispararlo ──
+  // Previene el bug donde la tabla queda en skeleton para siempre porque
+  // sbLoadHistorial nunca se invocó al inicio (ej. session restaurada sin
+  // pasar por handleAuthSession).
+  if (!_histLoadedOnce && !_histLoading && typeof sbLoadHistorial === 'function') {
+    _histLoading = true;  // Evita loops por re-render en cadena
+    sbLoadHistorial().catch(e => console.warn('[renderHistorial] auto-trigger load failed:', e.message));
+  }
   try {
   const _rawCount = loadHistorial().length;
   console.log('[renderHistorial] storage:', _rawCount, 'picks | filtros: fecha='+histDateFilter+' conf='+histConfFilter+' liga='+histLeagueFilter+' mercado='+histMercadoFilter+' deporte='+histFilter);
