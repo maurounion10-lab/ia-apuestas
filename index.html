@@ -13650,7 +13650,11 @@ function renderHistorial(filter) {
   if (histPage < 0) histPage = 0;
   const pageData = _isHistSubPage ? data : data.slice(histPage * HIST_PAGE_SIZE, (histPage + 1) * HIST_PAGE_SIZE);
 
-  document.getElementById('histTableBody').innerHTML = data.length
+  // Si aún no terminó de cargar el global de Supabase (_histLoadedOnce=false),
+  // NO pintar con data potencialmente stale del localStorage: mostrar skeleton.
+  // Previene el bug donde un localStorage viejo (4 picks del 8/4) se muestra
+  // hasta que sbLoadHistorial complete (segundos después).
+  document.getElementById('histTableBody').innerHTML = (data.length && _histLoadedOnce)
     ? pageData.map(h => {
         const plHtml = h.result==='pending'||h.result==='void'
           ? '<span style="color:#555">—</span>'
