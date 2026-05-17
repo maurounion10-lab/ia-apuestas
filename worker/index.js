@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v2.5
+ * gambeta.ai — Cloudflare Worker: apuestas-api v2.6
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -552,6 +552,21 @@ const TSDB_ONLY_LEAGUES = new Set([
   'soccer_norway_eliteserien',
 ]);
 
+// Mapeo sport_key → TSDB league ID (para fallback por fecha cuando search por nombre falla)
+const SPORT_TO_TSDB_LEAGUE = {
+  'soccer_poland_ekstraklasa':      '4422',
+  'soccer_switzerland_superleague': '4675',
+  'soccer_denmark_superliga':       '4340',
+  'soccer_sweden_allsvenskan':      '4347',
+  'soccer_norway_eliteserien':      '4404',
+  'soccer_belgium_first_div':       '4403',
+  'soccer_belgium_first_div_a':     '4403',
+  'soccer_austria_bundesliga':      '4406',
+  'soccer_austria_football_bundesliga': '4406',
+  'soccer_france_ligue_two':        '4334',  // TSDB tiene Ligue 2 bajo "French Ligue 1"
+  'soccer_france_ligue_one':        '4334',
+};
+
 // Normalizador de nombres de equipos (sin diacríticos, sin espacios, minúsculas)
 function normTeam(s) {
   if (!s) return '';
@@ -621,6 +636,42 @@ async function fetchTsdbEvent(homeName, awayName) {
         commenceTs: ts,
         src: 'tsdb',
       };
+    }
+    return null;
+  } catch { return null; }
+}
+
+// Fallback: TSDB por league+date — más robusto que searchevents.php?e= cuando los nombres no matchean
+async function fetchTsdbByLeagueDate(leagueId, kickoffTs, pickHome, pickAway) {
+  if (!leagueId || !kickoffTs) return null;
+  try {
+    // Probar el día del kickoff y ±1 día (timezones)
+    for (const dayOffset of [0, -1, 1]) {
+      const dateStr = new Date(kickoffTs + dayOffset * 86400000).toISOString().substring(0, 10);
+      const r = await fetch(`${TSDB_BASE}/eventsday.php?d=${dateStr}&l=${leagueId}`);
+      if (!r.ok) continue;
+      const j = await r.json();
+      const events = j.events || [];
+      for (const e of events) {
+        if (!teamsMatch(e.strHomeTeam, pickHome) || !teamsMatch(e.strAwayTeam, pickAway)) continue;
+        if (e.intHomeScore == null || e.intAwayScore == null) continue;
+        if (e.intHomeScore === '' || e.intAwayScore === '') continue;
+        const sH = parseInt(e.intHomeScore), sA = parseInt(e.intAwayScore);
+        if (!Number.isFinite(sH) || !Number.isFinite(sA)) continue;
+        const status = (e.strStatus || '').toLowerCase();
+        // Aceptar 'Match Finished' o status vacío (TSDB a veces no lo setea)
+        if (status && !status.includes('finish') && !status.includes('final') && status !== 'ft') continue;
+        const ts = e.strTimestamp
+          ? new Date(e.strTimestamp + (e.strTimestamp.endsWith('Z') ? '' : 'Z')).getTime()
+          : (e.dateEvent ? new Date(e.dateEvent + 'T18:00:00Z').getTime() : null);
+        return {
+          home: e.strHomeTeam || pickHome,
+          away: e.strAwayTeam || pickAway,
+          scoreH: sH, scoreA: sA,
+          commenceTs: ts,
+          src: 'tsdb-ld',
+        };
+      }
     }
     return null;
   } catch { return null; }
@@ -765,6 +816,18 @@ async function runScheduledResolver(env) {
             if (!pick.commenceTs || !tsdbScore.commenceTs ||
                 Math.abs(pick.commenceTs - tsdbScore.commenceTs) < 5 * 24 * 3600 * 1000) {
               matched = tsdbScore;
+              stats.tsdb++;
+            }
+          }
+        }
+
+        // Fallback 2: TSDB por league+date (más robusto cuando los nombres no matchean exacto)
+        if (!matched) {
+          const tsdbLid = SPORT_TO_TSDB_LEAGUE[pick._sportKey || ''];
+          if (tsdbLid) {
+            const tsdbScore2 = await fetchTsdbByLeagueDate(tsdbLid, pick.commenceTs, pick.home, pick.away);
+            if (tsdbScore2) {
+              matched = tsdbScore2;
               stats.tsdb++;
             }
           }
@@ -952,7 +1015,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v2.5',
+        worker: 'apuestas-api v2.6',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
