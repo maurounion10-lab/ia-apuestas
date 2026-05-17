@@ -1680,22 +1680,23 @@
   .bvr-gem.ia-down { opacity:1 !important; filter:sepia(1) saturate(7) hue-rotate(310deg) brightness(1.15) !important; text-shadow:0 0 10px rgba(226,75,75,0.9) !important; }
   .bvr-gem.ia-up   { opacity:1 !important; filter:sepia(1) saturate(7) hue-rotate(70deg)  brightness(1.1)  !important; text-shadow:0 0 10px rgba(0,200,83,0.85) !important; }
 
-  /* ── Cinta de policía: aviso de la IA sobre el pick ── */
+  /* ── Cinta IA: aviso compacto de la IA sobre el pick ── */
   .pred-ia-strip {
     display:flex; align-items:center; justify-content:space-between;
-    gap:8px; padding:5px 10px;
-    margin:8px -14px 6px -14px;
-    font-size:0.68rem; font-weight:700; letter-spacing:0.3px;
+    gap:6px; padding:2px 8px;
+    margin:4px -14px 4px -14px;
+    font-size:0.6rem; font-weight:700; letter-spacing:0.2px;
     color:#fff; cursor:pointer;
-    border-top:1px solid rgba(0,0,0,0.35); border-bottom:1px solid rgba(0,0,0,0.35);
+    border-top:1px solid rgba(0,0,0,0.25); border-bottom:1px solid rgba(0,0,0,0.25);
     transition:filter 0.15s;
+    line-height:1.3;
   }
   .pred-ia-strip:hover { filter:brightness(1.15); }
-  .pred-ia-strip .ia-msg { background:rgba(0,0,0,0.7); padding:2px 8px; border-radius:4px; display:inline-flex; align-items:center; gap:5px; }
-  .pred-ia-strip .ia-cta { background:rgba(0,0,0,0.7); padding:2px 7px; border-radius:4px; font-size:0.62rem; }
-  .pred-ia-strip.severity-info     { background:repeating-linear-gradient(45deg,#00C853,#00C853 10px,#1a1a1a 10px,#1a1a1a 20px); }
-  .pred-ia-strip.severity-warning  { background:repeating-linear-gradient(45deg,#FFD600,#FFD600 10px,#1a1a1a 10px,#1a1a1a 20px); }
-  .pred-ia-strip.severity-critical { background:repeating-linear-gradient(45deg,#E24B4A,#E24B4A 10px,#ffffff 10px,#ffffff 20px); }
+  .pred-ia-strip .ia-msg { background:rgba(0,0,0,0.7); padding:1px 6px; border-radius:3px; display:inline-flex; align-items:center; gap:4px; }
+  .pred-ia-strip .ia-cta { background:rgba(0,0,0,0.6); padding:1px 5px; border-radius:3px; font-size:0.55rem; opacity:0.85; }
+  .pred-ia-strip.severity-info     { background:repeating-linear-gradient(45deg,#00C853,#00C853 6px,#1a1a1a 6px,#1a1a1a 12px); }
+  .pred-ia-strip.severity-warning  { background:repeating-linear-gradient(45deg,#FFD600,#FFD600 6px,#1a1a1a 6px,#1a1a1a 12px); }
+  .pred-ia-strip.severity-critical { background:repeating-linear-gradient(45deg,#E24B4A,#E24B4A 6px,#ffffff 6px,#ffffff 12px); }
 
   /* ── Modal expandible con findings de la IA ── */
   .pred-ia-modal-bg {
@@ -11192,9 +11193,10 @@ function renderPreds() {
 // ════════════════════════════════════════════════════════════════
 const _RESEARCH_ENDPOINT = 'https://apuestas-ia-chat.mauro-union10.workers.dev/research';
 const _RESEARCH_CACHE_TTL_MS = 12 * 3600 * 1000;
+const _RESEARCH_CACHE_VERSION = 'v2';   // bump esto cuando cambia el schema del backend para invalidar cache viejo
 
 function _researchCacheKey(p) {
-  return 'gb_res_' + (p.home || '') + '__' + (p.away || '') + '__' + (p.commenceTs || 0);
+  return 'gb_res_' + _RESEARCH_CACHE_VERSION + '_' + (p.home || '') + '__' + (p.away || '') + '__' + (p.commenceTs || 0);
 }
 function _researchCacheGet(key) {
   try {
@@ -11231,13 +11233,17 @@ function _researchEmojiFor(research) {
   return '🔍';
 }
 
-// Texto corto para la cinta (3-5 palabras del finding o summary)
+// Texto corto para la cinta (preferir short_label del backend si existe)
 function _researchShortLabel(research) {
+  // Backend provee short_label curado, 3-5 palabras max
+  if (research.short_label && research.short_label.length >= 3) {
+    return research.short_label.slice(0, 40);
+  }
+  // Fallback: tomar primeras 4 palabras del primer finding o summary
   const top = (research.key_findings || [])[0];
   let text = top?.text || research.summary || '';
-  // Quitar prefijos tipo "Real Madrid:" y tomar la primera frase corta
-  text = text.replace(/^[^:]+:\s*/, '').split(/[.;,]/)[0];
-  const words = text.trim().split(/\s+/).slice(0, 5);
+  text = text.replace(/^[^:]+:\s*/, '').split(/[.;,()]/)[0];
+  const words = text.trim().split(/\s+/).slice(0, 4);
   return words.join(' ');
 }
 
@@ -11253,7 +11259,7 @@ function _applyResearchToCard(cardId, research, bvr) {
   strip.className = 'pred-ia-strip severity-' + (research.severity || 'info');
   strip.innerHTML = `
     <span class="ia-msg">${emoji} IA: ${label}</span>
-    <span class="ia-cta">Ver análisis ▾</span>`;
+    <span class="ia-cta">+ info ▾</span>`;
   strip.style.display = 'flex';
   // Guardar research en el strip para el modal
   strip._research = research;
