@@ -1676,6 +1676,63 @@
   .bvr-gem.active-3, .bvr-gem.active-4 { opacity:1; filter:sepia(1) saturate(3) hue-rotate(330deg); }
   .bvr-gem.active-5 { opacity:1; filter:sepia(1) saturate(3) hue-rotate(60deg) brightness(1.1); }
   .bvr-gem.active-6 { opacity:1; filter:sepia(1) saturate(5) brightness(1.25); text-shadow:0 0 12px rgba(255,214,0,0.95), 0 0 5px rgba(255,180,0,0.7); }
+  /* ── Override por IA: última estrella roja (stake bajó) o verde (stake subió) ── */
+  .bvr-gem.ia-down { opacity:1 !important; filter:sepia(1) saturate(7) hue-rotate(310deg) brightness(1.15) !important; text-shadow:0 0 10px rgba(226,75,75,0.9) !important; }
+  .bvr-gem.ia-up   { opacity:1 !important; filter:sepia(1) saturate(7) hue-rotate(70deg)  brightness(1.1)  !important; text-shadow:0 0 10px rgba(0,200,83,0.85) !important; }
+
+  /* ── Cinta de policía: aviso de la IA sobre el pick ── */
+  .pred-ia-strip {
+    display:flex; align-items:center; justify-content:space-between;
+    gap:8px; padding:5px 10px;
+    margin:8px -14px 6px -14px;
+    font-size:0.68rem; font-weight:700; letter-spacing:0.3px;
+    color:#fff; cursor:pointer;
+    border-top:1px solid rgba(0,0,0,0.35); border-bottom:1px solid rgba(0,0,0,0.35);
+    transition:filter 0.15s;
+  }
+  .pred-ia-strip:hover { filter:brightness(1.15); }
+  .pred-ia-strip .ia-msg { background:rgba(0,0,0,0.7); padding:2px 8px; border-radius:4px; display:inline-flex; align-items:center; gap:5px; }
+  .pred-ia-strip .ia-cta { background:rgba(0,0,0,0.7); padding:2px 7px; border-radius:4px; font-size:0.62rem; }
+  .pred-ia-strip.severity-info     { background:repeating-linear-gradient(45deg,#00C853,#00C853 10px,#1a1a1a 10px,#1a1a1a 20px); }
+  .pred-ia-strip.severity-warning  { background:repeating-linear-gradient(45deg,#FFD600,#FFD600 10px,#1a1a1a 10px,#1a1a1a 20px); }
+  .pred-ia-strip.severity-critical { background:repeating-linear-gradient(45deg,#E24B4A,#E24B4A 10px,#ffffff 10px,#ffffff 20px); }
+
+  /* ── Modal expandible con findings de la IA ── */
+  .pred-ia-modal-bg {
+    position:fixed; inset:0; background:rgba(0,0,0,0.78); z-index:9998;
+    display:flex; align-items:center; justify-content:center; padding:16px;
+    opacity:0; pointer-events:none; transition:opacity 0.2s;
+  }
+  .pred-ia-modal-bg.open { opacity:1; pointer-events:all; }
+  .pred-ia-modal {
+    background:#0c1a0c; color:#fff; border-radius:14px;
+    max-width:540px; width:100%; max-height:80vh; overflow-y:auto;
+    border:1px solid rgba(255,255,255,0.1); padding:0;
+    transform:translateY(20px); transition:transform 0.2s;
+  }
+  .pred-ia-modal-bg.open .pred-ia-modal { transform:translateY(0); }
+  .pred-ia-modal-header {
+    padding:14px 18px; border-bottom:1px solid rgba(255,255,255,0.08);
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .pred-ia-modal-title { font-size:0.95rem; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .pred-ia-modal-close { background:none; border:0; color:#999; font-size:1.4rem; cursor:pointer; padding:0 4px; }
+  .pred-ia-modal-close:hover { color:#fff; }
+  .pred-ia-modal-body { padding:14px 18px; }
+  .pred-ia-summary { font-size:0.88rem; line-height:1.5; color:#e0e0e0; margin-bottom:14px; }
+  .pred-ia-findings { display:flex; flex-direction:column; gap:8px; }
+  .pred-ia-finding { background:rgba(255,255,255,0.04); border-left:3px solid #FFD600; padding:8px 12px; border-radius:4px; font-size:0.82rem; line-height:1.45; }
+  .pred-ia-finding.t-injury   { border-left-color:#E24B4A; }
+  .pred-ia-finding.t-weather  { border-left-color:#42A5F5; }
+  .pred-ia-finding.t-conflict { border-left-color:#FF7043; }
+  .pred-ia-finding.t-form     { border-left-color:#00C853; }
+  .pred-ia-finding.t-tactical { border-left-color:#AB47BC; }
+  .pred-ia-finding-source { font-size:0.7rem; color:#888; margin-top:3px; font-style:italic; }
+  .pred-ia-modal-footer {
+    padding:10px 18px; border-top:1px solid rgba(255,255,255,0.05);
+    font-size:0.7rem; color:#666; text-align:center;
+  }
+
   .bvr-text {
     font-size: 0.65rem;
     font-weight: 800;
@@ -10965,6 +11022,7 @@ function renderPreds() {
         </div>
       </div>
       ${bvrHtml}
+      <div class="pred-ia-strip" id="iastrip-${_cardId}" style="display:none"></div>
       <div class="pred-match">
         <div class="pred-team">
           <div class="pred-emoji">${logoHtml((p._sportKey?.includes('conmebol') && (p.homeRaw||p.home)==='Barcelona') ? 'Barcelona SC' : (p.homeRaw||p.home), 64)}</div>
@@ -11125,6 +11183,190 @@ function renderPreds() {
   // ── Actualizar contadores de likes en action rows (sincrónico, source ya en DOM) ──
   _updatePickLikeCounts(source);
 
+  // ── Research IA: fetch async por cada pick visible (con cache localStorage 12h) ──
+  _scheduleResearchFetch(source);
+}
+
+// ════════════════════════════════════════════════════════════════
+//  RESEARCH IA — cinta de policía + ajuste de estrellas + modal
+// ════════════════════════════════════════════════════════════════
+const _RESEARCH_ENDPOINT = 'https://apuestas-ia-chat.mauro-union10.workers.dev/research';
+const _RESEARCH_CACHE_TTL_MS = 12 * 3600 * 1000;
+
+function _researchCacheKey(p) {
+  return 'gb_res_' + (p.home || '') + '__' + (p.away || '') + '__' + (p.commenceTs || 0);
+}
+function _researchCacheGet(key) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    if (!obj || obj.expiresAt < Date.now()) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    return obj.data;
+  } catch { return null; }
+}
+function _researchCacheSet(key, data) {
+  try {
+    localStorage.setItem(key, JSON.stringify({ data, expiresAt: Date.now() + _RESEARCH_CACHE_TTL_MS }));
+  } catch { /* quota */ }
+}
+
+// Pick emoji según tipo de finding o severity
+function _researchEmojiFor(research) {
+  const findings = research.key_findings || [];
+  const top = findings[0] || {};
+  const t = (top.type || '').toLowerCase();
+  if (t === 'injury')     return '🤕';
+  if (t === 'weather')    return '🌧️';
+  if (t === 'conflict')   return '⚡';
+  if (t === 'financial')  return '💸';
+  if (t === 'form')       return '🔥';
+  if (t === 'tactical')   return '🧠';
+  if (t === 'rotation')   return '🔄';
+  if (research.severity === 'critical') return '🚨';
+  if (research.severity === 'warning')  return '⚠️';
+  return '🔍';
+}
+
+// Texto corto para la cinta (3-5 palabras del finding o summary)
+function _researchShortLabel(research) {
+  const top = (research.key_findings || [])[0];
+  let text = top?.text || research.summary || '';
+  // Quitar prefijos tipo "Real Madrid:" y tomar la primera frase corta
+  text = text.replace(/^[^:]+:\s*/, '').split(/[.;,]/)[0];
+  const words = text.trim().split(/\s+/).slice(0, 5);
+  return words.join(' ');
+}
+
+function _applyResearchToCard(cardId, research, bvr) {
+  const strip = document.getElementById('iastrip-' + cardId);
+  if (!strip) return;
+  if (!research || research.severity === 'none') {
+    strip.style.display = 'none';
+    return;
+  }
+  const emoji = _researchEmojiFor(research);
+  const label = _researchShortLabel(research);
+  strip.className = 'pred-ia-strip severity-' + (research.severity || 'info');
+  strip.innerHTML = `
+    <span class="ia-msg">${emoji} IA: ${label}</span>
+    <span class="ia-cta">Ver análisis ▾</span>`;
+  strip.style.display = 'flex';
+  // Guardar research en el strip para el modal
+  strip._research = research;
+  strip.onclick = () => _researchModalOpen(strip._research, cardId);
+
+  // Ajustar última estrella activa según stake_delta
+  if (research.stake_delta && bvr) {
+    const card = document.getElementById(cardId);
+    if (!card) return;
+    const gems = card.querySelectorAll('.bvr-gem');
+    if (gems.length >= bvr && bvr >= 1) {
+      const targetIdx = bvr - 1 + (research.stake_delta > 0 ? 1 : 0);
+      const gem = gems[Math.min(targetIdx, gems.length - 1)];
+      if (gem) gem.classList.add(research.stake_delta > 0 ? 'ia-up' : 'ia-down');
+    }
+  }
+}
+
+function _researchModalOpen(research, cardId) {
+  let bg = document.getElementById('iaModalBg');
+  if (!bg) {
+    bg = document.createElement('div');
+    bg.id = 'iaModalBg';
+    bg.className = 'pred-ia-modal-bg';
+    bg.onclick = (e) => { if (e.target === bg) _researchModalClose(); };
+    document.body.appendChild(bg);
+  }
+  const findings = (research.key_findings || []).map(f => `
+    <div class="pred-ia-finding t-${(f.type||'other').toLowerCase()}">
+      ${f.text || ''}
+      ${f.source_name ? `<div class="pred-ia-finding-source">— ${f.source_name}</div>` : ''}
+    </div>`).join('');
+  const deltaLabel = research.stake_delta > 0
+    ? '<span style="color:#00C853">⬆ Stake recomendado: +1 nivel</span>'
+    : research.stake_delta < 0
+    ? '<span style="color:#E24B4A">⬇ Stake recomendado: -1 nivel</span>'
+    : '';
+  bg.innerHTML = `
+    <div class="pred-ia-modal" onclick="event.stopPropagation()">
+      <div class="pred-ia-modal-header">
+        <div class="pred-ia-modal-title">🔍 Análisis IA del partido</div>
+        <button class="pred-ia-modal-close" onclick="_researchModalClose()" aria-label="Cerrar">×</button>
+      </div>
+      <div class="pred-ia-modal-body">
+        <div class="pred-ia-summary">${research.summary || 'Sin resumen.'}</div>
+        ${deltaLabel ? `<div style="margin-bottom:14px;font-size:0.82rem;font-weight:600">${deltaLabel}</div>` : ''}
+        ${findings ? `<div class="pred-ia-findings">${findings}</div>` : ''}
+      </div>
+      <div class="pred-ia-modal-footer">
+        Análisis generado por IA con datos de diarios locales, redes sociales y video-análisis.
+        ${research.cached ? '· Cache 12h' : '· En vivo'}
+      </div>
+    </div>`;
+  requestAnimationFrame(() => bg.classList.add('open'));
+}
+window._researchModalClose = function() {
+  const bg = document.getElementById('iaModalBg');
+  if (bg) bg.classList.remove('open');
+};
+
+// Cola con throttling para no saturar el endpoint
+let _researchInFlight = 0;
+const _RESEARCH_MAX_CONCURRENT = 3;
+const _researchQueue = [];
+function _drainResearchQueue() {
+  while (_researchInFlight < _RESEARCH_MAX_CONCURRENT && _researchQueue.length) {
+    const job = _researchQueue.shift();
+    _researchInFlight++;
+    job().finally(() => { _researchInFlight--; _drainResearchQueue(); });
+  }
+}
+
+function _scheduleResearchFetch(picks) {
+  if (!Array.isArray(picks) || !picks.length) return;
+  picks.forEach((p, idx) => {
+    // No researchar partidos ya finalizados o sin datos básicos
+    if (!p.home || !p.away) return;
+    if (p.result && p.result !== 'pending' && p.result !== 'void') return;
+
+    const cardId = 'predcard-' + (p.home + '-' + p.away).toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    const bvr = p.bvr || (p.conf === 'high' ? 5 : 3);
+    const key = _researchCacheKey(p);
+
+    // Cache hit → aplicar inmediatamente
+    const cached = _researchCacheGet(key);
+    if (cached) {
+      _applyResearchToCard(cardId, cached, bvr);
+      return;
+    }
+
+    // Cache miss → encolar fetch
+    _researchQueue.push(async () => {
+      try {
+        const res = await fetch(_RESEARCH_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            home: p.home, away: p.away,
+            league: p.league || '',
+            commenceTs: p.commenceTs || 0,
+            rec: p.rec || ''
+          })
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && (data.summary || data.severity)) {
+          _researchCacheSet(key, data);
+          _applyResearchToCard(cardId, data, bvr);
+        }
+      } catch (e) { /* silencioso, research es opcional */ }
+    });
+  });
+  _drainResearchQueue();
 }
 
 // Muestra un banner admin con los equipos sin escudo detectados en el último render
