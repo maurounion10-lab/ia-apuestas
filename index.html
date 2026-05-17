@@ -11825,7 +11825,13 @@ function loadHistorial()   {
   try {
     const raw = JSON.parse(localStorage.getItem(HIST_KEY)||'[]');
     // Normalizar labels de rec viejos (migración de nomenclatura)
-    raw.forEach(h => { if (h.rec) h.rec = _normRec(h.rec); });
+    raw.forEach(h => {
+      if (h.rec) h.rec = _normRec(h.rec);
+      // Normalizar sport: legacy 'soccer'/'tennis' → 'futbol'/'tenis'
+      if (h.sport === 'soccer')  h.sport = 'futbol';
+      if (h.sport === 'tennis')  h.sport = 'tenis';
+      if (!h.sport)              h.sport = 'futbol';  // default por si está vacío
+    });
     return raw;
   } catch { return []; }
 }
@@ -13454,7 +13460,10 @@ function renderHistorial(filter) {
   }
   // Si había duplicados, sanear el storage silenciosamente
   if (dedupedAll.length < all.length) saveHistorial(dedupedAll);
-  let data = filter==='all' ? dedupedAll : dedupedAll.filter(h=>h.sport===filter);
+  // Solo aceptar filtros de sport conocidos; cualquier otro valor (incl. legacy 'soccer') = mostrar todo.
+  const _validSports = new Set(['futbol', 'tenis']);
+  const _useFilter = _validSports.has(filter) ? filter : 'all';
+  let data = _useFilter === 'all' ? dedupedAll : dedupedAll.filter(h => (h.sport || 'futbol') === _useFilter);
 
   // ── Ordenar: pendientes primero (más próximo antes), luego resueltos (más reciente antes) ──
   data.sort((a, b) => {
