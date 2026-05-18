@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v2.6
+ * gambeta.ai — Cloudflare Worker: apuestas-api v2.6 (retry deploy)
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
