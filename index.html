@@ -11867,7 +11867,7 @@ function loadHistorial()   {
 }
 function saveHistorial(arr) {
   const sorted = [...arr].sort((a,b) => (b.commenceTs||0) - (a.commenceTs||0));
-  try { localStorage.setItem(HIST_KEY, JSON.stringify(sorted.slice(-500))); } catch {}
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(sorted.slice(-5000))); } catch {}
   // Sync a historial GLOBAL en Supabase (solo admin)
   if (authUser?.email === 'mauro.union10@gmail.com') {
     clearTimeout(_globalHistSyncTimer);
@@ -12424,7 +12424,7 @@ async function sbSaveGlobalHistorial(arr) {
   try {
     const { error } = await sbClient
       .from('shared_cache')
-      .upsert({ key: GLOBAL_HIST_KEY, data: arr.slice(-500), fetched_at: new Date().toISOString() },
+      .upsert({ key: GLOBAL_HIST_KEY, data: arr.slice(-5000), fetched_at: new Date().toISOString() },
                { onConflict: 'key' });
     if (error) console.warn('[globalHistSave]', error.message);
     else console.log('[globalHistSave] ✓', arr.length, 'entradas');
@@ -12464,11 +12464,11 @@ async function sbReconcileSharedCache() {
     //    Si el trigger no está instalado, el upsert a shared_cache lo cubre.
     await Promise.all([
       sbClient.from('acoin_users').upsert(
-        { email: ADMIN_EMAIL, historial_full: sourceOfTruth.slice(-500), updated_at: new Date().toISOString() },
+        { email: ADMIN_EMAIL, historial_full: sourceOfTruth.slice(-5000), updated_at: new Date().toISOString() },
         { onConflict: 'email' }
       ),
       sbClient.from('shared_cache').upsert(
-        { key: GLOBAL_HIST_KEY, data: sourceOfTruth.slice(-500), fetched_at: new Date().toISOString() },
+        { key: GLOBAL_HIST_KEY, data: sourceOfTruth.slice(-5000), fetched_at: new Date().toISOString() },
         { onConflict: 'key' }
       ),
     ]);
@@ -12518,7 +12518,7 @@ async function sbSaveHistorial(arr) {
   try {
     const { error } = await sbClient
       .from('acoin_users')
-      .upsert({ email: authUser.email, historial_full: arr.slice(-500), updated_at: new Date().toISOString() },
+      .upsert({ email: authUser.email, historial_full: arr.slice(-5000), updated_at: new Date().toISOString() },
                { onConflict: 'email' });
     if (error) console.warn('[histSave]', error.message);
   } catch(e) { console.warn('[histSave]', e.message); }
@@ -12659,7 +12659,7 @@ async function sbLoadHistorial() {
     const _hKey2 = h => h.id || `${h.home}|||${h.away}|||${h.date||''}`;
     const dbKeys = new Set(data.historial_full.map(_hKey2));
     const localOnly = localHist.filter(h => !dbKeys.has(_hKey2(h)));
-    const merged = [...data.historial_full, ...localOnly].slice(-500);
+    const merged = [...data.historial_full, ...localOnly].slice(-5000);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
     _histLoading = false; _histLoadedOnce = true;
     renderHistorial(histFilter);
