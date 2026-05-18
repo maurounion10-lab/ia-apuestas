@@ -1680,23 +1680,57 @@
   .bvr-gem.ia-down { opacity:1 !important; filter:sepia(1) saturate(7) hue-rotate(310deg) brightness(1.15) !important; text-shadow:0 0 10px rgba(226,75,75,0.9) !important; }
   .bvr-gem.ia-up   { opacity:1 !important; filter:sepia(1) saturate(7) hue-rotate(70deg)  brightness(1.1)  !important; text-shadow:0 0 10px rgba(0,200,83,0.85) !important; }
 
-  /* ── Cinta IA: aviso compacto de la IA sobre el pick ── */
+  /* ── Cinta IA: aviso compacto de la IA sobre el pick (estilo alerta minimalista) ── */
+  @keyframes iaStripIn {
+    from { opacity:0; transform:translateY(-3px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
   .pred-ia-strip {
     display:flex; align-items:center; justify-content:space-between;
-    gap:6px; padding:2px 8px;
-    margin:4px -14px 4px -14px;
-    font-size:0.6rem; font-weight:700; letter-spacing:0.2px;
-    color:#fff; cursor:pointer;
-    border-top:1px solid rgba(0,0,0,0.25); border-bottom:1px solid rgba(0,0,0,0.25);
-    transition:filter 0.15s;
-    line-height:1.3;
+    gap:8px; padding:7px 12px 7px 10px;
+    margin:6px -14px 6px -14px;
+    font-size:0.7rem; font-weight:600; letter-spacing:0.1px;
+    color:#f0f0f0; cursor:pointer;
+    border-left:3px solid;            /* color por severity */
+    transition:background 0.18s, transform 0.18s;
+    line-height:1.35;
+    animation:iaStripIn 0.25s ease-out;
   }
-  .pred-ia-strip:hover { filter:brightness(1.15); }
-  .pred-ia-strip .ia-msg { background:rgba(0,0,0,0.7); padding:1px 6px; border-radius:3px; display:inline-flex; align-items:center; gap:4px; }
-  .pred-ia-strip .ia-cta { background:rgba(0,0,0,0.6); padding:1px 5px; border-radius:3px; font-size:0.55rem; opacity:0.85; }
-  .pred-ia-strip.severity-info     { background:repeating-linear-gradient(45deg,#00C853,#00C853 6px,#1a1a1a 6px,#1a1a1a 12px); }
-  .pred-ia-strip.severity-warning  { background:repeating-linear-gradient(45deg,#FFD600,#FFD600 6px,#1a1a1a 6px,#1a1a1a 12px); }
-  .pred-ia-strip.severity-critical { background:repeating-linear-gradient(45deg,#E24B4A,#E24B4A 6px,#ffffff 6px,#ffffff 12px); }
+  .pred-ia-strip:hover { transform:translateX(1px); }
+  .pred-ia-strip .ia-msg {
+    display:inline-flex; align-items:center; gap:6px;
+    flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .pred-ia-strip .ia-msg::before {
+    content:''; flex-shrink:0;
+  }
+  .pred-ia-strip .ia-cta {
+    flex-shrink:0;
+    font-size:0.6rem; font-weight:700; opacity:0.75;
+    padding:2px 7px; border-radius:10px;
+    background:rgba(255,255,255,0.1);
+    transition:background 0.18s, opacity 0.18s;
+  }
+  .pred-ia-strip:hover .ia-cta { opacity:1; background:rgba(255,255,255,0.18); }
+  /* Severities: gradiente sutil con tinta del color + borde lateral fuerte */
+  .pred-ia-strip.severity-info {
+    background:linear-gradient(90deg, rgba(0,200,83,0.18), rgba(0,200,83,0.04) 60%, transparent);
+    border-left-color:#00C853;
+  }
+  .pred-ia-strip.severity-info:hover { background:linear-gradient(90deg, rgba(0,200,83,0.28), rgba(0,200,83,0.08) 60%, transparent); }
+  .pred-ia-strip.severity-warning {
+    background:linear-gradient(90deg, rgba(255,193,7,0.22), rgba(255,193,7,0.05) 60%, transparent);
+    border-left-color:#FFC107;
+    color:#fff;
+  }
+  .pred-ia-strip.severity-warning:hover { background:linear-gradient(90deg, rgba(255,193,7,0.34), rgba(255,193,7,0.09) 60%, transparent); }
+  .pred-ia-strip.severity-critical {
+    background:linear-gradient(90deg, rgba(226,75,75,0.28), rgba(226,75,75,0.06) 60%, transparent);
+    border-left-color:#E24B4A;
+    color:#fff;
+    box-shadow:inset 0 0 0 1px rgba(226,75,75,0.18);
+  }
+  .pred-ia-strip.severity-critical:hover { background:linear-gradient(90deg, rgba(226,75,75,0.4), rgba(226,75,75,0.1) 60%, transparent); }
 
   /* ── Modal expandible con findings de la IA ── */
   .pred-ia-modal-bg {
@@ -11285,7 +11319,15 @@ function _researchShortLabel(research) {
 function _applyResearchToCard(cardId, research, bvr) {
   const strip = document.getElementById('iastrip-' + cardId);
   if (!strip) return;
-  if (!research || research.severity === 'none') {
+  // Solo mostrar la cinta si la IA tiene algo importante que decir:
+  //  - severity warning/critical → siempre
+  //  - severity info → solo si la IA recomienda ajustar stake (stake_delta != 0)
+  //  - severity none → nunca
+  const sev = research?.severity || 'none';
+  const stakeDelta = Number(research?.stake_delta) || 0;
+  const shouldShow = (sev === 'warning' || sev === 'critical')
+                  || (sev === 'info' && stakeDelta !== 0);
+  if (!research || !shouldShow) {
     strip.style.display = 'none';
     return;
   }
