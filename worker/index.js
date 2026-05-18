@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v2.6 (retry deploy)
+ * gambeta.ai — Cloudflare Worker: apuestas-api v2.7
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -602,17 +602,29 @@ function teamsMatch(a, b) {
 }
 
 // Fetch ESPN scoreboard para una liga × fecha (YYYYMMDD)
+// Status names ESPN que indican partido NO completado regularmente → void
+const ESPN_VOID_STATUSES = new Set([
+  'STATUS_ABANDONED', 'STATUS_POSTPONED', 'STATUS_CANCELED', 'STATUS_CANCELLED',
+  'STATUS_SUSPENDED', 'STATUS_FORFEIT', 'STATUS_AWARDED',
+]);
+
 async function fetchEspnScoreboard(leagueCode, dateStr) {
   try {
     const r = await fetch(`${ESPN_BASE}/${leagueCode}/scoreboard?dates=${dateStr}`);
     if (!r.ok) return [];
     const j = await r.json();
     return (j.events || [])
-      .filter(e => e.status?.type?.completed)
+      .filter(e => {
+        const st = e.status?.type;
+        // Incluir partidos completados normalmente O abandonados/postpuestos (para marcar void)
+        return st?.completed || ESPN_VOID_STATUSES.has(st?.name || '');
+      })
       .map(e => {
         const comp  = e.competitions?.[0] || {};
         const home  = comp.competitors?.find(t => t.homeAway === 'home') || {};
         const away  = comp.competitors?.find(t => t.homeAway === 'away') || {};
+        const st = e.status?.type;
+        const voidReason = ESPN_VOID_STATUSES.has(st?.name || '') ? (st.description || st.name) : null;
         return {
           home:       home.team?.displayName || home.team?.name || '',
           away:       away.team?.displayName || away.team?.name || '',
@@ -620,6 +632,7 @@ async function fetchEspnScoreboard(leagueCode, dateStr) {
           scoreA:     parseInt(away.score) || 0,
           commenceTs: e.date ? new Date(e.date).getTime() : null,
           src: 'espn',
+          voidReason,
         };
       });
   } catch { return []; }
@@ -674,8 +687,10 @@ async function fetchTsdbByLeagueDate(leagueId, kickoffTs, pickHome, pickAway) {
         const sH = parseInt(e.intHomeScore), sA = parseInt(e.intAwayScore);
         if (!Number.isFinite(sH) || !Number.isFinite(sA)) continue;
         const status = (e.strStatus || '').toLowerCase();
-        // Aceptar 'Match Finished' o status vacío (TSDB a veces no lo setea)
-        if (status && !status.includes('finish') && !status.includes('final') && status !== 'ft') continue;
+        const voidReasonTsdb = ['abandon', 'postpon', 'cancel', 'suspend'].find(k => status.includes(k));
+        // Aceptar 'Match Finished' o status vacío O void-statuses (para marcar void)
+        const isFinished = status.includes('finish') || status.includes('final') || status === 'ft' || !status;
+        if (!isFinished && !voidReasonTsdb) continue;
         const ts = e.strTimestamp
           ? new Date(e.strTimestamp + (e.strTimestamp.endsWith('Z') ? '' : 'Z')).getTime()
           : (e.dateEvent ? new Date(e.dateEvent + 'T18:00:00Z').getTime() : null);
@@ -685,6 +700,7 @@ async function fetchTsdbByLeagueDate(leagueId, kickoffTs, pickHome, pickAway) {
           scoreH: sH, scoreA: sA,
           commenceTs: ts,
           src: 'tsdb-ld',
+          voidReason: voidReasonTsdb ? (e.strStatus || voidReasonTsdb) : null,
         };
       }
     }
@@ -850,18 +866,26 @@ async function runScheduledResolver(env) {
 
         if (!matched) continue;
 
-        const result = calcResult(pick, matched);
-        if (!result) continue;
+        let result, finalScoreStr;
+        if (matched.voidReason) {
+          // Partido abandonado/pospuesto/cancelado → void (stake devuelta)
+          result = 'void';
+          finalScoreStr = matched.voidReason;
+        } else {
+          result = calcResult(pick, matched);
+          if (!result) continue;
+          finalScoreStr = `${matched.scoreH}-${matched.scoreA}`;
+        }
 
         pick.result = result;
-        pick.finalScore = `${matched.scoreH}-${matched.scoreA}`;
+        pick.finalScore = finalScoreStr;
         pick.pl = result === 'win'
           ? parseFloat(((pick.odds - 1) * pick.stake).toFixed(2))
           : result === 'loss' ? -pick.stake : 0;
         pick.resolvedAt = Date.now();
         pick._resolvedBy = `cron-${matched.src}`;
         stats.resolved++;
-        stats.log.push(`${pick.home} vs ${pick.away}: ${matched.scoreH}-${matched.scoreA} → ${result}`);
+        stats.log.push(`${pick.home} vs ${pick.away}: ${finalScoreStr} → ${result}`);
         changed = true;
       } catch (e) {
         stats.errors++;
@@ -1030,7 +1054,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v2.6',
+        worker: 'apuestas-api v2.7',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
