@@ -651,6 +651,29 @@ REGLAS ANTI-ALUCINACION (criticas, no negociables):
 4. Para CADA finding tipo "injury" o "suspension", antes de incluirlo preguntate: "esta fuente confirma que ese jugador es de ${home} o ${away}, y no de un rival mencionado de paso?". Si no podes confirmarlo con la fuente, NO lo incluyas.
 5. NO confundas partidos previos de la misma serie con el partido actual. El historial es informativo, pero las bajas/eventos deben ser ESPECIFICOS del partido a analizar.
 6. Si las noticias parecen mezcladas o ambiguas, prefiere severity:"none" antes que arriesgar findings incorrectos.
+
+
+══ SCHEMA OBLIGATORIO ══
+Cada finding en key_findings DEBE incluir estos 5 campos:
+- type: uno de {injury, suspension, conflict, weather, form, tactical, rotation, financial, other}
+- text: maximo 2 oraciones
+- source_name: nombre de la fuente (ej: ESPN, Ole, OneFootball)
+- source_quote: CITA TEXTUAL LITERAL de la fuente, minimo 20 caracteres (no parafraseada, no inventada)
+- team_affected: uno de {home, away, both, neutral}
+
+══ VALIDACION (chequear cada finding antes de incluirlo) ══
+1. source_quote: tengo la cita literal de la fuente? Si no -> DESCARTAR el finding entero.
+2. team_affected: la fuente confirma explicitamente a que equipo afecta? Si la cita habla de otro equipo (un tercero, un rival de partido anterior) -> team_affected = neutral.
+3. Para type injury o suspension: el text DEBE mencionar el equipo correcto (${home} o ${away}). No inventes que un jugador de River es de Rosario Central porque la fuente dice "River vs Rosario". Identifica QUIEN se lesiono EN que equipo.
+4. Ante CUALQUIER duda -> DESCARTA el finding. Mejor severity none con findings vacios que un finding incorrecto.
+
+══ EJEMPLO CORRECTO ══
+{ "type":"injury", "text":"Komar de Rosario Central descartado por problemas cardiacos.", "source_name":"Ole", "source_quote":"Juan Cruz Komar, defensor de Rosario Central, no estara disponible por problemas cardiacos", "team_affected":"home" }
+
+══ EJEMPLOS QUE DEBES DESCARTAR ══
+- Fuente dice: "Lesiones en semifinal River vs Rosario: Driussi". -> NO concluyas que Driussi es de Rosario. Driussi es delantero de River. DESCARTAR.
+- Fuente NO menciona explicitamente al jugador con su equipo. -> DESCARTAR.
+- source_quote inventada o parafraseada. -> DESCARTAR.
 `;
 
   const userPrompt = `Partido: ${home} vs ${away}${league ? ' ('+league+')' : ''}
@@ -694,7 +717,7 @@ Devolvé el JSON.`;
       severity:     ['none','info','warning','critical'].includes(parsed.severity) ? parsed.severity : 'none',
       bias:         ['over','under','home','away','draw','none'].includes(parsed.bias) ? parsed.bias : 'none',
       stake_delta:  [-1, 0, 1].includes(parsed.stake_delta) ? parsed.stake_delta : 0,
-      key_findings: Array.isArray(parsed.key_findings) ? parsed.key_findings.slice(0, 4) : [],
+      key_findings: Array.isArray(parsed.key_findings) ? parsed.key_findings.filter(f => _isValidFinding(f, home, away)).slice(0, 4) : [],
     };
   } catch (err) {
     console.error('analyzePickWithIA error:', err);
@@ -809,6 +832,32 @@ async function handleResearch(body, env) {
 // ════════════════════════════════════════════════════════════════════════════
 // MAIN HANDLER (router)
 // ════════════════════════════════════════════════════════════════════════════
+
+
+
+// ═══ VALIDACION ANTI-ALUCINACION ═══
+function _isValidFinding(f, homeTeam, awayTeam) {
+  if (!f || typeof f !== 'object') return false;
+  if (typeof f.type !== 'string' || !f.type) return false;
+  if (typeof f.text !== 'string' || f.text.length < 10) return false;
+  if (typeof f.source_quote !== 'string' || f.source_quote.trim().length < 20) return false;
+  const ta = (f.team_affected || '').toLowerCase();
+  if (!['home', 'away', 'both', 'neutral'].includes(ta)) return false;
+  const tt = (f.type || '').toLowerCase();
+  if (tt === 'injury' || tt === 'suspension') {
+    const txt = (f.text || '').toLowerCase() + ' ' + (f.source_quote || '').toLowerCase();
+    const h = (homeTeam || '').toLowerCase();
+    const a = (awayTeam || '').toLowerCase();
+    if (ta === 'home') {
+      const hWords = h.split(/\s+/).filter(w => w.length >= 4);
+      if (hWords.length && !hWords.some(w => txt.includes(w))) return false;
+    } else if (ta === 'away') {
+      const aWords = a.split(/\s+/).filter(w => w.length >= 4);
+      if (aWords.length && !aWords.some(w => txt.includes(w))) return false;
+    }
+  }
+  return true;
+}
 
 export default {
   async fetch(request, env) {
