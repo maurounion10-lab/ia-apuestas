@@ -581,9 +581,24 @@ function teamsMatch(a, b) {
   if (!na || !nb) return false;
   if (na === nb) return true;
   if (na.includes(nb) || nb.includes(na)) return true;
-  // Strip suffixes comunes (fc, sc, etc) y comparar
-  const stripped = s => s.replace(/(fc|cf|sc|ac|afc|sfc|rfc|fk|sk|bk|nk|gnk)$/, '');
-  return stripped(na) === stripped(nb);
+  // Strip suffixes comunes (fc, sc, etc, plural 's') y prefijo 'st' vs 'saint' / 'ac' etc
+  const expand = s => s.replace(/^st(?=[a-z])/, 'saint').replace(/^saint(?=[a-z])/, 'saint');
+  const stripped = s => s
+    .replace(/(fc|cf|sc|ac|afc|sfc|rfc|fk|sk|bk|nk|gnk|ks|sk|if)$/, '')
+    .replace(/s$/, '');  // plurales tipo "Grasshoppers" ↔ "Grasshopper"
+  const sa = stripped(expand(na));
+  const sb = stripped(expand(nb));
+  if (sa === sb) return true;
+  if (sa && sb && (sa.includes(sb) || sb.includes(sa))) return true;
+  // Match por primera palabra significativa (≥4 chars): "Lausanne-Sport" ↔ "Lausanne"
+  const firstWord = s => {
+    const m = (s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().match(/[a-z]+/g) || [])
+      .filter(w => w.length >= 4);
+    return m[0] || '';
+  };
+  const fa = firstWord(a), fb = firstWord(b);
+  if (fa && fb && fa === fb) return true;
+  return false;
 }
 
 // Fetch ESPN scoreboard para una liga × fecha (YYYYMMDD)
