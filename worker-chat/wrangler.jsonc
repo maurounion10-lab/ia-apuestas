@@ -1,0 +1,6 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "apuestas-ia-chat",
+  "main": "index.js",
+  "compatibility_date": "2025-09-27"
+}
