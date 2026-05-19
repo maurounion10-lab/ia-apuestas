@@ -9726,6 +9726,30 @@ function buildPredsFromOdds() {
   }).filter(Boolean);
 }
 
+// ── Traductor de estados de match (ESPN/TSDB devuelven en inglés) ──
+function _translateMatchState(s) {
+  if (!s || typeof s !== 'string') return s;
+  const map = {
+    'Match Suspended': 'Suspendido',
+    'Suspended':       'Suspendido',
+    'Abandoned':       'Abandonado',
+    'Postponed':       'Pospuesto',
+    'Cancelled':       'Cancelado',
+    'Canceled':        'Cancelado',
+    'Walkover':        'W.O.',
+    'Forfeit':         'W.O.',
+    'Awarded':         'Adjudicado',
+  };
+  // Match exacto primero
+  if (map[s]) return map[s];
+  // Match case-insensitive como fallback
+  const lower = s.toLowerCase();
+  for (const [k, v] of Object.entries(map)) {
+    if (lower === k.toLowerCase()) return v;
+  }
+  return s;
+}
+
 function renderPreds() {
   // Reset logo miss tracker para este render
   window._logoMisses = new Set();
@@ -11086,7 +11110,7 @@ function renderPreds() {
           border-radius:10px 10px 0 0;
           margin:-14px -14px 10px -14px;
         ">
-          <span style="font-size:1rem;font-weight:900;color:${histResult === 'win' ? '#00e676' : '#ef5350'};letter-spacing:1.5px;font-family:'Arial Black',Arial,sans-serif;">${finalScore} ${histResult === 'win' ? '✅ Acertado!' : '❌ Fallado'}</span>
+          <span style="font-size:1rem;font-weight:900;color:${histResult === 'win' ? '#00e676' : '#ef5350'};letter-spacing:1.5px;font-family:'Arial Black',Arial,sans-serif;">${_translateMatchState(finalScore)} ${histResult === 'win' ? '✅ Acertado!' : '❌ Fallado'}</span>
         </div>` : ''}
       ${isMaxConf ? `
         <div class="max-sparkles">
@@ -11140,7 +11164,7 @@ function renderPreds() {
           : (!isPending && isStarted && finalScore)
           ? `<div style="text-align:center">
                <div class="pred-final-score ${isHighConfWin ? 'score-gold-win' : isFinishedWin ? 'score-win' : isFinishedLoss ? 'score-loss' : 'score-void'}">
-                 ${finalScore}
+                 ${_translateMatchState(finalScore)}
                </div>
                <div style="font-size:0.6rem;color:#666;margin-top:4px;letter-spacing:.5px">FINAL</div>
              </div>`
