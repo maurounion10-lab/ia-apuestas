@@ -11264,7 +11264,7 @@ function renderPreds() {
             isFinishedWin ? 'Pronóstico Acertado' :
             isFinishedLoss ? 'Pronóstico Fallado' : 'Resultado Pendiente'
           }</span>
-          ${finalScore ? `<span class="pred-result-stamp-sub">Resultado final: ${finalScore}</span>` : ''}
+          ${finalScore ? `<span class="pred-result-stamp-sub">Resultado final: ${_translateMatchState(finalScore)}</span>` : ''}
         </div>
       </div>` : ''}
       <!-- CTA casas afiliadas — solo para partidos no iniciados -->
