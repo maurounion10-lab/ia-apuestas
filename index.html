@@ -9808,7 +9808,7 @@ function renderPreds() {
 
   // ── Caché diaria de picks ──
   // Una vez generados los picks del día, no cambian hasta las 6am del día siguiente
-  const DAILY_PREDS_KEY = 'gambeta_daily_preds_v14'; // v14: regenerar — final/semi suben al tier top (boost de etapa en bucketing)
+  const DAILY_PREDS_KEY = 'gambeta_daily_preds_v15'; // v15: regenerar — descarta caché contaminada con odds stale (sin _stage)
   const DAILY_PREDS_RESET_HOUR = 6; // 6am
 
   function getDailyPredsCacheDate() {
@@ -9884,7 +9884,7 @@ function renderPreds() {
   if (realPreds) {
     const hasBasket = realPreds.some(p => (p._sportKey || '').includes('basketball') || p.sport === 'basket');
     if (hasBasket) {
-      localStorage.removeItem('gambeta_daily_preds_v14');
+      localStorage.removeItem('gambeta_daily_preds_v15');
       realPreds = null;
     }
   }
@@ -12250,7 +12250,7 @@ async function adminResetLockedPicks() {
     window._sbLockedPicks = {};
     // 3. Limpiar caché de odds para forzar re-fetch
     localStorage.removeItem('cache_odds_v9');
-    localStorage.removeItem(DAILY_PREDS_KEY || 'gambeta_daily_preds_v14');
+    localStorage.removeItem(DAILY_PREDS_KEY || 'gambeta_daily_preds_v15');
     // 4. Recargar odds y re-renderizar (el flujo normal guardará el nuevo lock)
     if (btn) { btn.textContent = '🔄 Recargando cuotas…'; }
     await loadOdds();  // recarga odds y llama renderPreds() internamente
@@ -16010,7 +16010,7 @@ window._availableSports = null;
 // ── Limpiar claves de caché obsoletas (versiones anteriores) ──
 try {
   ['cache_odds_v6', 'cache_odds_stale_v6', 'cache_odds_v5', 'cache_odds_stale_v5', 'cache_odds_v4', 'cache_odds_v3', 'cache_odds_stale',
-   'gambeta_daily_preds_v13', 'gambeta_daily_preds_v12', 'gambeta_daily_preds_v11', 'gambeta_daily_preds_v10', 'gambeta_daily_preds_v9', 'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
+   'gambeta_daily_preds_v14', 'gambeta_daily_preds_v13', 'gambeta_daily_preds_v12', 'gambeta_daily_preds_v11', 'gambeta_daily_preds_v10', 'gambeta_daily_preds_v9', 'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
     .forEach(k => localStorage.removeItem(k));
 } catch(_) {}
 
@@ -19794,7 +19794,7 @@ async function admDiagWorker() {
 function admRefreshScores() { loadRealScores(); document.getElementById('admDatosMsg').textContent='🔄 Recargando marcadores...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Marcadores recargados'; },3000); }
 function admRefreshPreds()  {
   // Borrar caché diaria para forzar regeneración desde la API
-  try { localStorage.removeItem('gambeta_daily_preds_v14'); } catch(_) {}
+  try { localStorage.removeItem('gambeta_daily_preds_v15'); } catch(_) {}
   renderPreds();
   document.getElementById('admDatosMsg').textContent='✓ Pronósticos regenerados (caché limpiada)';
   setTimeout(()=>document.getElementById('admDatosMsg').textContent='',3000);
