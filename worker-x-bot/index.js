@@ -292,6 +292,36 @@ const COM_POOL = [
 function genEducacion() { return EDU_POOL[dayOfYearART() % EDU_POOL.length]; }
 function genComunidad() { return COM_POOL[dayOfYearART() % COM_POOL.length]; }
 
+// Festejo de aciertos — se dispara apenas un pick gana.
+const CELEBRA = [
+  (p) => `💥 BOOOM. La IA LA CLAVÓ.\n\n${p.home} ${p.finalScore || ''} ${p.away} ✅\n` +
+         `El pick: ${p.rec}\n\nPicks gratis todos los días en el perfil 🟢`,
+  (p) => `🚨 ¡ACERTADO!\n\nLa IA dijo "${p.rec}" en ${p.home} vs ${p.away}.\n` +
+         `Final: ${p.finalScore || '—'}. ADENTRO ✅\n\n¿La tenías? 🟢`,
+  (p) => `✅ OTRA QUE ENTRA\n\n${p.home} ${p.finalScore || ''} ${p.away}\n` +
+         `La IA lo dio: ${p.rec} 🎯\n\nDatos, no corazonadas. 🟢`,
+  (p) => `🔥 LA IA NO FALLA TANTO...\n\n${p.home} ${p.finalScore || ''} ${p.away} — ` +
+         `pick ACERTADO: ${p.rec} ✅\n\nMás picks gratis en el perfil 🟢`,
+];
+// Festeja un acierto cuyo partido arrancó hace 3-4 h (ventana de 1 h → se
+// festeja una sola vez, sin necesidad de estado). Texto, sin placa.
+function genCelebracion(hist) {
+  const now = Date.now();
+  const lo = now - 4 * 3600 * 1000, hi = now - 3 * 3600 * 1000;
+  const wins = hist
+    .filter(h => h.result === 'win' && h.commenceTs
+      && h.commenceTs >= lo && h.commenceTs < hi)
+    .sort((a, b) => (b.bvr || 0) - (a.bvr || 0));
+  if (!wins.length) return null;
+  const p = wins[0];
+  let t = CELEBRA[dayOfYearART() % CELEBRA.length](p).replace(/  +/g, ' ');
+  if (wins.length > 1) {
+    const extra = `\n\n+${wins.length - 1} acierto${wins.length > 2 ? 's' : ''} más en esta tanda`;
+    if ((t + extra).length <= 280) t += extra;
+  }
+  return t;
+}
+
 function genHotTake(hist) {
   const picks = todayPendingPicks(hist);
   if (!picks.length) return null;
@@ -307,6 +337,7 @@ function genHotTake(hist) {
 
 // ───────────────────────── Router de slot → pilar ─────────────────────────
 const SLOT_BY_CRON = {
+  '0 * * * *':   'celebracion', // cada hora: festeja aciertos recién resueltos
   '30 12 * * *': 'resultados',
   '0 15 * * *':  'picks',
   '30 17 * * *': 'educacion',
@@ -321,6 +352,7 @@ function generateText(slot, hist) {
     case 'educacion':  return genEducacion();
     case 'hottake':    return genHotTake(hist);
     case 'comunidad':  return genComunidad();
+    case 'celebracion':return genCelebracion(hist);
     default:           return null;
   }
 }

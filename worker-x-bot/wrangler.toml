@@ -19,5 +19,6 @@ BOT_MODE = "live"
 #   30 17 → 14:30 ART  educación
 #    0 21 → 18:00 ART  hot take
 #    0 23 → 20:00 ART  comunidad
+#    0 * * * → cada hora: festejo de aciertos recién resueltos
 [triggers]
-crons = ["30 12 * * *", "0 15 * * *", "30 17 * * *", "0 21 * * *", "0 23 * * *"]
+crons = ["0 * * * *", "30 12 * * *", "0 15 * * *", "30 17 * * *", "0 21 * * *", "0 23 * * *"]
