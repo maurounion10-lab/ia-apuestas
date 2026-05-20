@@ -1316,6 +1316,35 @@
     0%   { background-position: -200% 0; }
     100% { background-position: 200% 0; }
   }
+  /* ── Ficha especial de FINAL / SEMIFINAL ── */
+  @keyframes final-glow {
+    0%,100% { box-shadow: 0 0 16px rgba(255,214,0,0.35), 0 4px 20px rgba(0,0,0,0.5); }
+    50%     { box-shadow: 0 0 36px rgba(255,214,0,0.65), 0 0 60px rgba(255,170,0,0.25), 0 4px 20px rgba(0,0,0,0.5); }
+  }
+  .pred-card-final {
+    border: 2px solid rgba(255,214,0,0.7) !important;
+    background: linear-gradient(180deg, rgba(255,214,0,0.10) 0%, rgba(255,170,0,0.03) 45%, var(--gris-card) 100%) !important;
+    animation: final-glow 3s ease-in-out infinite !important;
+  }
+  .pred-stage-badge {
+    display:flex; align-items:center; justify-content:center; gap:6px;
+    margin:-20px -20px 14px -20px;
+    padding:7px 14px;
+    background:linear-gradient(90deg, #b8860b, #ffd600 45%, #fff3a0 55%, #ffd600 65%, #b8860b);
+    color:#1a1400; font-weight:900; font-size:0.78rem; letter-spacing:1.2px;
+    text-transform:uppercase;
+    border-radius:14px 14px 0 0;
+    text-shadow:0 1px 0 rgba(255,255,255,0.35);
+  }
+  .pred-stage-badge.stage-semi {
+    background:linear-gradient(90deg, #6b6b6b, #d8d8d8 45%, #ffffff 55%, #d8d8d8 65%, #6b6b6b);
+    color:#1a1a1a;
+  }
+  .pred-stage-badge.stage-minor {
+    background:linear-gradient(90deg, #3a3a2a, #8a7a3a 50%, #3a3a2a);
+    color:#ffe9a0; font-size:0.7rem; letter-spacing:1px;
+  }
+
   .pred-card-max {
     border-color: rgba(255,214,0,0.5) !important;
     background:
@@ -9303,10 +9332,14 @@ function buildPredsFromOdds() {
 
   const hasH2HData = g => g.bookmakers?.some(b => b.markets?.some(m => m.key === 'h2h'));
 
-  // Comparador: primero por prioridad de liga (desc), luego por horario (asc)
+  // Boost de prioridad por etapa del torneo: finales/semis valen mucho más
+  const STAGE_BOOST = { final: 60, semi: 35, quarter: 15, r16: 5 };
+  const getEffectivePrio = g => getGamePrio(g.sport_key) + (STAGE_BOOST[g._stage] || 0);
+
+  // Comparador: primero por prioridad efectiva (liga + etapa), luego por horario (asc)
   const sortByPrioThenTime = (a, b) => {
-    const pa = getGamePrio(a.sport_key);
-    const pb = getGamePrio(b.sport_key);
+    const pa = getEffectivePrio(a);
+    const pb = getEffectivePrio(b);
     if (pa !== pb) return pb - pa;
     return new Date(a.commence_time) - new Date(b.commence_time);
   };
@@ -9708,6 +9741,8 @@ function buildPredsFromOdds() {
       _bookKey:   isAffiliate ? bmUsed?.key   : null,
       _bookLabel: isAffiliate ? bmUsed?.title : null,
       _sportKey:  g.sport_key || '',
+      _stage:     g._stage || null,   // 'final' | 'semi' | 'quarter' | 'r16' | null
+      _round:     g._round || null,   // string original del round (API-Football)
       _confLocked: true, // conf y bvr quedan bloqueados desde la primera asignación
     };
 
@@ -11058,6 +11093,20 @@ function renderPreds() {
                     : (isStarted && !isPending) ? 'pred-card-finished'
                     : isMaxConf                 ? 'pred-card-max'
                     : '';
+    // ── Etapa del torneo: ficha especial para finales/semis ──
+    const _stage = p._stage || null;
+    const _isBigStage = _stage === 'final' || _stage === 'semi';
+    const _stageLabels = {
+      final:   '🏆 Gran Final',
+      semi:    '🥈 Semifinal',
+      quarter: '⚔️ Cuartos de Final',
+      r16:     '🎯 Octavos de Final',
+    };
+    const _stageBadgeHtml = (_stage && _stageLabels[_stage] && !isStarted) ? `
+      <div class="pred-stage-badge ${_stage==='final'?'':_stage==='semi'?'stage-semi':'stage-minor'}">
+        ${_stageLabels[_stage]}
+      </div>` : '';
+    const _stageCardClass = _isBigStage && !isStarted ? ' pred-card-final' : '';
     // Badge de resultado (nunca mostrar si el partido sigue en vivo)
     const resultBadgeHtml = '';
 
@@ -11100,13 +11149,14 @@ function renderPreds() {
 
     const _cardId = 'predcard-' + (p.home+'-'+p.away).toLowerCase().replace(/[^a-z0-9]+/g,'-');
     return `
-    <div id="${_cardId}" class="pred-card ${cardClass}" style="${
+    <div id="${_cardId}" class="pred-card ${cardClass}${_stageCardClass}" style="${
       isGameLive
         ? 'border-color:rgba(229,57,53,0.4)'
         : (!isStarted && !isMaxConf && p.conf==='high')
           ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)'
           : ''
     }">
+      ${_stageBadgeHtml}
       ${(!isGameLive && isStarted && finalScore && (histResult === 'win' || histResult === 'loss')) ? `
         <div style="
           display:flex;align-items:center;justify-content:center;gap:8px;
