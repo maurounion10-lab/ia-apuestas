@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v3.3-dbg2
+ * gambeta.ai — Cloudflare Worker: apuestas-api v3.3
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -973,7 +973,7 @@ export default {
     if (path === '/odds') {
       const category = url.searchParams.get('category') || 'main';
       const hourKey  = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
-      const cacheKey = `odds8_${category}_${hourKey}`;  // v8: secondary via Odds API only
+      const cacheKey = `odds9_${category}_${hourKey}`;  // v9: incluye _round/_stage para detectar finales
 
       const leagues = category === 'europe'    ? LEAGUES_EUROPE
                     : category === 'secondary' ? LEAGUES_SECONDARY
@@ -1098,7 +1098,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v3.3-dbg2',
+        worker: 'apuestas-api v3.3',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
