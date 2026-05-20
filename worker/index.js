@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v2.7
+ * gambeta.ai — Cloudflare Worker: apuestas-api v2.8
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -132,6 +132,19 @@ async function fetchOddsAPI(sportKey, env) {
 }
 
 // ── Transformar fixture API-Football → formato frontend ─────────────────────
+// ── Detecta etapa del torneo desde el round de API-Football ──
+// Valores típicos de API-Football: "Final", "Semi-finals", "Quarter-finals",
+// "8th Finals", "Round of 16", "Regular Season - 12", "Group Stage - 3"
+function _parseStage(round) {
+  if (!round || typeof round !== 'string') return null;
+  const r = round.toLowerCase().trim();
+  if (r === 'final' || /\bgrand final\b/.test(r)) return 'final';
+  if (r.includes('semi')) return 'semi';
+  if (r.includes('quarter') || r.includes('1/4')) return 'quarter';
+  if (r.includes('round of 16') || r.includes('8th final') || r.includes('1/8')) return 'r16';
+  return null;
+}
+
 function transformAPFGame(fixture, oddsBookmakers, sportKey) {
   const f  = fixture.fixture;
   const hm = fixture.teams?.home;
@@ -198,6 +211,8 @@ function transformAPFGame(fixture, oddsBookmakers, sportKey) {
     _apf_away_id:    aw.id,
     _apf_league_id:  fixture.league?.id,
     _apf_status:     f.status?.short,
+    _round:          fixture.league?.round || null,
+    _stage:          _parseStage(fixture.league?.round),
   };
 }
 
@@ -1054,7 +1069,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v2.7',
+        worker: 'apuestas-api v2.8',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
