@@ -6968,66 +6968,37 @@ async function loadLiveStats() {
     }
   } catch(_) {}
 
-  // ── PASO 2: intentar stats globales desde Supabase (con caché 30 min) ──
-  // Requiere columna "predictions" JSONB en la tabla acoin_users.
-  // Si no existe, falla silenciosamente y se queda con los stats locales.
+  // ── PASO 2: stats reales desde el historial compartido del backend ──
+  // Usa /api/sb?type=historial — la MISMA fuente que ve todo visitante (incl. incógnito).
+  // Esto garantiza que el total de picks no dependa del localStorage del usuario.
   try {
-    // Leer desde caché local primero — evita query Supabase cuando hay muchos usuarios
-    const cachedStats = (() => {
-      try {
-        const raw = localStorage.getItem(STATS_CACHE_KEY);
-        if (!raw) return null;
-        const obj = JSON.parse(raw);
-        if (obj && obj.ts && (Date.now() - obj.ts) < _SB_TTL_STATS && obj.precision) return obj;
-        return null;
-      } catch { return null; }
-    })();
-    if (cachedStats) {
-      const _cachedTotal = localStats?.total ?? HERO_PICKS_BASE;
-      heroStatsApply(localStats?.roi ?? cachedStats.roi ?? cachedStats.precision, _cachedTotal, true);
-      return; // caché fresco, no hacer query
+    const resp = await fetch('/api/sb?type=historial');
+    if (!resp.ok) throw new Error(`proxy ${resp.status}`);
+    const d = await resp.json();
+    const histFull = (Array.isArray(d) && d[0] && Array.isArray(d[0].historial_full))
+      ? d[0].historial_full : [];
+
+    if (histFull.length > 0) {
+      const gs = computeStatsFromHistorial(histFull);
+      // Total: el del historial compartido (o el local si fuera mayor, ej. admin con picks nuevos)
+      const total    = Math.max(gs.total || 0, localStats?.total || 0);
+      const precision = gs.precision ?? (localStats?.precision ?? null);
+      const finalRoi  = (gs.roi != null ? gs.roi : (localStats?.roi != null ? localStats.roi : precision));
+      localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({
+        precision, roi: finalRoi, totalPicks: total, ts: Date.now(), source: 'historial'
+      }));
+      heroStatsApply(finalRoi, total, true);
+      return;
     }
-
-    // Proxy con caché de servidor; fallback directo a Supabase si falla
-    let data;
-    try {
-      const resp = await fetch('/api/sb?type=stats');
-      if (!resp.ok) throw new Error(`proxy ${resp.status}`);
-      data = await resp.json();
-    } catch {
-      const res = await sbClient.from('acoin_users').select('predictions').not('predictions', 'is', null);
-      if (res.error) throw res.error;
-      data = res.data;
-    }
-
-    const error = null; // proxy maneja errores arriba
-
-    const allRows = (data || [])
-      .map(row => Array.isArray(row.predictions) ? row.predictions : [])
-      .filter(arr => arr.length > 0);
-
-    if (!allRows.length) throw new Error('sin datos globales');
-
-    const gs = computeStatsFromHistorial(allRows);
-    const precision = gs.precision ?? (localStats?.precision ?? 71);
-    // Usar siempre el total local real (no inflar con picks de otros usuarios)
-    const total = localStats?.total ?? HERO_PICKS_BASE;
-    // ROI: priorizar el local (ya migrado y limpio) sobre el global
-    const finalRoi = localStats?.roi ?? gs.roi ?? gs.precision;
-
-    localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({
-      precision, roi: finalRoi, totalPicks: total, ts: Date.now(), source: 'global'
-    }));
-
-    heroStatsApply(finalRoi, total, true);
+    throw new Error('historial vacío');
   } catch(e) {
-    // Sin columna "predictions" en Supabase → stats locales ya aplicadas arriba.
-    // Si tampoco había stats locales, mostrar placeholder animado.
+    // Si ya teníamos stats locales, quedan aplicadas del PASO 1.
+    // Si no había nada (incógnito + backend caído), mostrar guión en lugar de 0.
     if (!localStats || localStats.total === 0) {
       const elP = document.getElementById('heroStatPrecision');
       const elN = document.getElementById('heroStatPicks');
       if (elP) elP.textContent = '–';
-      if (elN) elN.textContent = HERO_PICKS_BASE + '+'; // siempre mostrar el número real
+      if (elN) elN.textContent = '–';
     }
   }
 }
