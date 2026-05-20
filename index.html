@@ -9387,19 +9387,21 @@ function buildPredsFromOdds() {
       });
     };
     // Garantizar diversidad: hasta 20 de ligas top (prio≥90), hasta 25 de ligas europeas/continentales (60-89), resto
-    const topTier  = filteredGames.filter(baseFilter).filter(g => getGamePrio(g.sport_key) >= 90)
+    // IMPORTANTE: el bucketing usa getEffectivePrio (liga + boost de etapa), no la prio base.
+    // Así una FINAL/SEMI sube al tier top aunque su liga base sea media (ej: final Europa League).
+    const topTier  = filteredGames.filter(baseFilter).filter(g => getEffectivePrio(g) >= 90)
                        .sort(sortByPrioThenTime).slice(0, 20);
     const eurTier  = applyLeagueCaps(
                        filteredGames.filter(baseFilter)
-                       .filter(g => { const p = getGamePrio(g.sport_key); return p >= 60 && p < 90; })
+                       .filter(g => { const p = getEffectivePrio(g); return p >= 60 && p < 90; })
                        .sort(sortByPrioThenTime)).slice(0, 25);
     const rest     = applyLeagueCaps(
-                       filteredGames.filter(baseFilter).filter(g => getGamePrio(g.sport_key) < 60)
+                       filteredGames.filter(baseFilter).filter(g => getEffectivePrio(g) < 60)
                        .sort(sortByPrioThenTime)).slice(0, 20);
     candidates = [...topTier, ...eurTier, ...rest];
     // Cortar solo si: hay 2+ candidatos Y ya cubrimos 48h (para no perder Champions/Libertadores de mañana)
     // O si el mejor candidato ya es Champions/Libertadores en 24h
-    const bestPrio = candidates.length ? getGamePrio(candidates[0].sport_key) : 0;
+    const bestPrio = candidates.length ? getEffectivePrio(candidates[0]) : 0;
     if (candidates.length >= 2 && (hours >= 48 || bestPrio >= TOP_PRIO_THRESHOLD)) break;
   }
 
@@ -9806,7 +9808,7 @@ function renderPreds() {
 
   // ── Caché diaria de picks ──
   // Una vez generados los picks del día, no cambian hasta las 6am del día siguiente
-  const DAILY_PREDS_KEY = 'gambeta_daily_preds_v13'; // v13: regenerar con _stage (finales) + nuevo orden de prioridad
+  const DAILY_PREDS_KEY = 'gambeta_daily_preds_v14'; // v14: regenerar — final/semi suben al tier top (boost de etapa en bucketing)
   const DAILY_PREDS_RESET_HOUR = 6; // 6am
 
   function getDailyPredsCacheDate() {
@@ -9882,7 +9884,7 @@ function renderPreds() {
   if (realPreds) {
     const hasBasket = realPreds.some(p => (p._sportKey || '').includes('basketball') || p.sport === 'basket');
     if (hasBasket) {
-      localStorage.removeItem('gambeta_daily_preds_v13');
+      localStorage.removeItem('gambeta_daily_preds_v14');
       realPreds = null;
     }
   }
@@ -10871,9 +10873,15 @@ function renderPreds() {
       try { p._likesScore = (typeof _getFakeLikes === 'function') ? _getFakeLikes(i, _origLen) : 0; }
       catch(_) { p._likesScore = 0; }
     });
-    const _prioOf = (p) => (typeof getGamePrio === 'function')
-      ? getGamePrio(p._sportKey || p.sport_key)
-      : 0;
+    // Prio efectiva: liga base + boost de etapa (final/semi/quarter/r16).
+    // Una FINAL pesa +60, una SEMI +35 — así una final de Europa League queda
+    // por encima de partidos de fase de grupos de ligas con prio base mayor.
+    const _STAGE_BOOST_R = { final: 60, semi: 35, quarter: 15, r16: 5 };
+    const _prioOf = (p) => {
+      const base = (typeof getGamePrio === 'function')
+        ? getGamePrio(p._sportKey || p.sport_key) : 0;
+      return base + (_STAGE_BOOST_R[p._stage] || 0);
+    };
     const _bySocial   = (a, b) => {
       const da = _prioOf(b) - _prioOf(a);
       if (da) return da;
@@ -12242,7 +12250,7 @@ async function adminResetLockedPicks() {
     window._sbLockedPicks = {};
     // 3. Limpiar caché de odds para forzar re-fetch
     localStorage.removeItem('cache_odds_v8');
-    localStorage.removeItem(DAILY_PREDS_KEY || 'gambeta_daily_preds_v13');
+    localStorage.removeItem(DAILY_PREDS_KEY || 'gambeta_daily_preds_v14');
     // 4. Recargar odds y re-renderizar (el flujo normal guardará el nuevo lock)
     if (btn) { btn.textContent = '🔄 Recargando cuotas…'; }
     await loadOdds();  // recarga odds y llama renderPreds() internamente
@@ -15275,10 +15283,13 @@ async function loadRealOdds() {
     const ctrl = new AbortController();
     const timer = setTimeout(() => ctrl.abort(), timeoutMs);
     try {
+      // cache:'no-store' — evita que el navegador sirva una respuesta HTTP vieja
+      // del worker (sin _stage/_round). El worker igual tiene su propio cache KV
+      // de 1h, así que esto no genera llamadas extra a la API de odds.
       const [rM, rE, rS] = await Promise.all([
-        fetch(`${WORKER_URL}/odds?category=main`,      { signal: ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
-        fetch(`${WORKER_URL}/odds?category=europe`,    { signal: ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
-        fetch(`${WORKER_URL}/odds?category=secondary`, { signal: ctrl.signal }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch(`${WORKER_URL}/odds?category=main`,      { signal: ctrl.signal, cache: 'no-store' }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch(`${WORKER_URL}/odds?category=europe`,    { signal: ctrl.signal, cache: 'no-store' }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
+        fetch(`${WORKER_URL}/odds?category=secondary`, { signal: ctrl.signal, cache: 'no-store' }).then(r => r.ok ? r.json() : { data: [] }).catch(() => ({ data: [] })),
       ]);
       return [...(rM.data || []), ...(rE.data || []), ...(rS.data || [])];
     } finally {
@@ -15999,7 +16010,7 @@ window._availableSports = null;
 // ── Limpiar claves de caché obsoletas (versiones anteriores) ──
 try {
   ['cache_odds_v6', 'cache_odds_stale_v6', 'cache_odds_v5', 'cache_odds_stale_v5', 'cache_odds_v4', 'cache_odds_v3', 'cache_odds_stale',
-   'gambeta_daily_preds_v12', 'gambeta_daily_preds_v11', 'gambeta_daily_preds_v10', 'gambeta_daily_preds_v9', 'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
+   'gambeta_daily_preds_v13', 'gambeta_daily_preds_v12', 'gambeta_daily_preds_v11', 'gambeta_daily_preds_v10', 'gambeta_daily_preds_v9', 'gambeta_daily_preds_v8', 'gambeta_daily_preds_v7', 'gambeta_daily_preds_v6', 'gambeta_daily_preds_v5', 'gambeta_daily_preds_v4', 'gambeta_daily_preds_v3', 'gambeta_daily_preds_v2', 'gambeta_daily_preds_v1']
     .forEach(k => localStorage.removeItem(k));
 } catch(_) {}
 
@@ -19783,7 +19794,7 @@ async function admDiagWorker() {
 function admRefreshScores() { loadRealScores(); document.getElementById('admDatosMsg').textContent='🔄 Recargando marcadores...'; setTimeout(()=>{ admRefreshStatus(); document.getElementById('admDatosMsg').textContent='✓ Marcadores recargados'; },3000); }
 function admRefreshPreds()  {
   // Borrar caché diaria para forzar regeneración desde la API
-  try { localStorage.removeItem('gambeta_daily_preds_v13'); } catch(_) {}
+  try { localStorage.removeItem('gambeta_daily_preds_v14'); } catch(_) {}
   renderPreds();
   document.getElementById('admDatosMsg').textContent='✓ Pronósticos regenerados (caché limpiada)';
   setTimeout(()=>document.getElementById('admDatosMsg').textContent='',3000);
