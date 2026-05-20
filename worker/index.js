@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v3.2
+ * gambeta.ai — Cloudflare Worker: apuestas-api v3.3-dbg
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -213,6 +213,8 @@ function transformAPFGame(fixture, oddsBookmakers, sportKey) {
     _apf_status:     f.status?.short,
     _round:          fixture.league?.round || null,
     _stage:          _parseStage(fixture.league?.round),
+    _dbg_lg:         fixture.league ? Object.keys(fixture.league).join(',') : 'NO_LEAGUE',
+    _dbg_round:      fixture.league?.round ?? 'UNDEF',
   };
 }
 
@@ -1094,7 +1096,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v3.2',
+        worker: 'apuestas-api v3.3-dbg',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
