@@ -104,13 +104,15 @@ function genPicks(hist) {
     .filter(h => h.result === 'pending' && h.commenceTs && artDate(h.commenceTs) === today)
     .sort((a, b) => (b.bvr || 0) - (a.bvr || 0));
   if (!picks.length) return null;
-  const top = picks[0];
-  const rest = picks.slice(1, 4);
-  let t = '🎯 Los picks de la IA para hoy\n\n';
-  t += `⭐ Destacado: ${top.home} vs ${top.away} → ${top.rec}\n`;
-  rest.forEach(p => { t += `▪️ ${p.home} vs ${p.away} → ${p.rec}\n`; });
-  t += '\nAnálisis completo y picks gratis en el perfil 👇\n\n¿Le entran? 🟢';
-  return clamp(t);
+  const head = '🎯 Los picks de la IA para hoy\n\n';
+  const tail = '\n\nMás picks gratis en el perfil 👇  ¿Le entran? 🟢';
+  const lines = [`⭐ ${picks[0].home} vs ${picks[0].away} → ${picks[0].rec}`];
+  for (let i = 1; i < picks.length && i < 4; i++) {
+    lines.push(`▪️ ${picks[i].home} vs ${picks[i].away} → ${picks[i].rec}`);
+  }
+  // recorta picks hasta entrar holgado en el límite de X
+  while (lines.length > 1 && (head + lines.join('\n') + tail).length > 258) lines.pop();
+  return head + lines.join('\n') + tail;
 }
 
 // Pilar 2 — Resultados (transparencia)
@@ -123,15 +125,14 @@ function genResultados(hist) {
     .sort((a, b) => (b.commenceTs || 0) - (a.commenceTs || 0));
   if (!done.length) return null;
   const wins = done.filter(h => h.result === 'win').length;
-  const show = done.slice(0, 5);
-  let t = '📊 Cómo le fue a la IA\n\n';
-  show.forEach(h => {
-    t += `${h.result === 'win' ? '✅' : '❌'} ${h.home} vs ${h.away}` +
-         (h.finalScore ? ` (${h.finalScore})` : '') + '\n';
-  });
-  t += `\n${wins} de ${done.length}. Sin maquillar nada: el historial completo, ` +
-       'aciertos y fallos, está público. 🟢';
-  return clamp(t);
+  const head = '📊 Cómo le fue a la IA\n\n';
+  const tail = `\n\n${wins} de ${done.length}. Sin maquillar nada: el historial ` +
+               'completo, aciertos y fallos, está público. 🟢';
+  const lines = done.slice(0, 5).map(h =>
+    `${h.result === 'win' ? '✅' : '❌'} ${h.home} vs ${h.away}` +
+    (h.finalScore ? ` (${h.finalScore})` : ''));
+  while (lines.length > 1 && (head + lines.join('\n') + tail).length > 258) lines.pop();
+  return head + lines.join('\n') + tail;
 }
 
 // Pilar 3 — Educación (pool rotativo, evergreen)
