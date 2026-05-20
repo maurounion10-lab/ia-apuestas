@@ -594,10 +594,23 @@ const TEAM_ALIASES = {
 };
 function normTeam(s) {
   if (!s) return '';
-  const n = s.normalize('NFD').replace(/[̀-ͯ]/g, '')
-    .toLowerCase().replace(/[^a-z0-9]/g, '');
+  // Fold de letras nórdicas/eslavas que NFD no descompone (ø æ å ł ß ð þ).
+  // Sin esto "Bodø/Glimt" (API) y "Bodo/Glimt" (ESPN) no matchean → pick stuck.
+  const n = s.toLowerCase()
+    .replace(/ø/g, 'o').replace(/æ/g, 'ae').replace(/å/g, 'a')
+    .replace(/ł/g, 'l').replace(/ß/g, 'ss').replace(/ð/g, 'd').replace(/þ/g, 'th')
+    .normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9]/g, '');
   return TEAM_ALIASES[n] || n;
 }
+
+// ── Scores manuales: picks que el auto-resolver no puede matchear (ej:
+//    partidos de playoff que no están en la liga ESPN esperada). Clave:
+//    normTeam(home) + '|' + normTeam(away). El resolver los chequea PRIMERO.
+const MANUAL_SCORES = {
+  'ikstart|bodoglimt': { h: 1, a: 4 },  // Eliteserien 20-may-2026
+  'willemii|volendam': { h: 1, a: 2 },  // Playoff Eredivisie 20-may-2026
+};
 
 // Match fuzzy entre dos nombres de equipo (mismo equipo, distintas variantes)
 function teamsMatch(a, b) {
@@ -867,9 +880,17 @@ async function runScheduledResolver(env) {
       try {
         let matched = null;
 
+        // Override manual primero — para picks que el auto-resolver no matchea
+        const _mk = normTeam(pick.home) + '|' + normTeam(pick.away);
+        if (MANUAL_SCORES[_mk]) {
+          const ms = MANUAL_SCORES[_mk];
+          matched = { home: pick.home, away: pick.away,
+                      scoreH: ms.h, scoreA: ms.a, src: 'manual' };
+        }
+
         // Si la liga es ESPN-supported, intentar ESPN
         const espnId = SPORT_TO_ESPN_RESOLVER[pick._sportKey || ''];
-        if (espnId && !TSDB_ONLY_LEAGUES.has(pick._sportKey)) {
+        if (!matched && espnId && !TSDB_ONLY_LEAGUES.has(pick._sportKey)) {
           // Probar el día del kick-off y el día siguiente (timezones)
           for (const dayOffset of [0, 1, -1]) {
             const scores = await getEspnScores(espnId, pick.commenceTs + dayOffset * 86400000);
