@@ -12687,7 +12687,15 @@ async function sbLoadHistorial() {
 
     // Deduplicar: global + DB + local. Preferimos siempre la entrada RESUELTA (win/loss/void)
     // sobre la pending — evita que un global stale "pisar" el resultado ya calculado en local.
-    const _hKey = h => h.id || `${h.home}|||${h.away}|||${h.date||''}`;
+    // Clave canónica POR PARTIDO (no por id — pending y resuelto pueden tener ids distintos)
+    const _hKey = h => {
+      const norm = s => (s||'').toString().toLowerCase().normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+      const day = h.commenceTs ? new Date(h.commenceTs).toISOString().slice(0,10)
+                : (h.date ? String(h.date).slice(0,10) : '');
+      const k = norm(h.home) + '|' + norm(h.away) + '|' + day;
+      return k === '||' ? (h.id || JSON.stringify(h).slice(0,40)) : k;
+    };
     const _resolvedRank = h => (h?.result === 'win' || h?.result === 'loss') ? 2
                               : h?.result === 'void' ? 1
                               : 0;
