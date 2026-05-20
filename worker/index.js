@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v2.8
+ * gambeta.ai — Cloudflare Worker: apuestas-api v2.9
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -790,7 +790,7 @@ async function saveAdminHistorial(env, hist) {
         Prefer: 'return=minimal',
       },
       body: JSON.stringify({
-        historial_full: hist.slice(-500),
+        historial_full: hist.slice(-20000),  // destopado: contar picks reales (era -500)
         updated_at: new Date().toISOString(),
       }),
     }
@@ -1069,7 +1069,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v2.8',
+        worker: 'apuestas-api v2.9',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
