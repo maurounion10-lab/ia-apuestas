@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v3.1
+ * gambeta.ai — Cloudflare Worker: apuestas-api v3.2
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -664,16 +664,31 @@ async function fetchEspnScoreboard(leagueCode, dateStr) {
 }
 
 // Fetch TheSportsDB searchevents para un match específico (Home_vs_Away)
+// Aliases legibles para búsqueda en TSDB (siglas → nombre completo que usa TSDB)
+const TEAM_ALIAS_READABLE = {
+  'UCV': 'Universidad Central',
+  'UCV FC': 'Universidad Central',
+};
 async function fetchTsdbEvent(homeName, awayName) {
   try {
     const slug = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
       .replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
-    const q = `${slug(homeName)}_vs_${slug(awayName)}`;
-    if (!q || q === '_vs_') return null;
-    const r = await fetch(`${TSDB_BASE}/searchevents.php?e=${q}`);
-    if (!r.ok) return null;
-    const j = await r.json();
-    const events = j.event || j.events || [];
+    // Probar varias combinaciones de nombres (original + alias)
+    const homeVariants = [homeName, TEAM_ALIAS_READABLE[homeName]].filter(Boolean);
+    const awayVariants = [awayName, TEAM_ALIAS_READABLE[awayName]].filter(Boolean);
+    const queries = [];
+    for (const h of homeVariants) for (const a of awayVariants) {
+      const q = `${slug(h)}_vs_${slug(a)}`;
+      if (q && q !== '_vs_' && !queries.includes(q)) queries.push(q);
+    }
+    let events = [];
+    for (const q of queries) {
+      const r = await fetch(`${TSDB_BASE}/searchevents.php?e=${q}`);
+      if (!r.ok) continue;
+      const j = await r.json();
+      const ev = j.event || j.events || [];
+      if (ev && ev.length) { events = ev; break; }
+    }
     for (const e of events) {
       if (e.intHomeScore == null || e.intAwayScore == null) continue;
       if (e.intHomeScore === '' || e.intAwayScore === '') continue;
@@ -1079,7 +1094,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v3.1',
+        worker: 'apuestas-api v3.2',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
