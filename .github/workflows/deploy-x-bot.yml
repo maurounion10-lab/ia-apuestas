@@ -15,6 +15,15 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        working-directory: worker-x-bot
+        run: npm install
+
       - name: Deploy Worker
         uses: cloudflare/wrangler-action@v3
         with:
