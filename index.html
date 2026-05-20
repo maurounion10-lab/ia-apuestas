@@ -12708,7 +12708,34 @@ async function sbLoadHistorial() {
       // Si la nueva está resuelta y la existente no, reemplazar
       if (_resolvedRank(h) > _resolvedRank(ex)) seen.set(k, h);
     });
-    const merged = [...seen.values()].filter(h=>!BLOCKED_HIST_IDS.has(h?.id||'')).sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0));
+    let merged = [...seen.values()].filter(h=>!BLOCKED_HIST_IDS.has(h?.id||'')).sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0));
+
+    // ── Segunda pasada anti-duplicados: mismo enfrentamiento (home+away) registrado
+    //    2 veces con timestamps distintos. Si uno está RESUELTO y otro PENDING dentro
+    //    de ±6 días, descartar el PENDING (es el mismo partido mal duplicado).
+    const _matchKey = h => {
+      const norm = s => (s||'').toString().toLowerCase().normalize('NFD')
+        .replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+      return norm(h.home) + '|' + norm(h.away);
+    };
+    const _WIN6D = 6 * 24 * 3600 * 1000;
+    const resolvedByMatch = {};
+    merged.forEach(h => {
+      if (_resolvedRank(h) > 0 && h.commenceTs) {
+        const mk = _matchKey(h);
+        (resolvedByMatch[mk] = resolvedByMatch[mk] || []).push(h.commenceTs);
+      }
+    });
+    merged = merged.filter(h => {
+      if (_resolvedRank(h) > 0) return true;            // resuelto: siempre queda
+      if (!h.commenceTs) return true;
+      const mk = _matchKey(h);
+      const resolvedTs = resolvedByMatch[mk];
+      if (!resolvedTs) return true;
+      // Hay un resuelto del mismo enfrentamiento cerca → este pending es duplicado
+      const dup = resolvedTs.some(ts => Math.abs(ts - h.commenceTs) < _WIN6D);
+      return !dup;
+    });
 
     // ── Migración global de stakes (backtesting) ──────────────────────────────
     // Máxima(6)=$170 | Alta(5)=$130 | Media-Alta(4)=$50 | Media(3)=$30 | Baja=$15
