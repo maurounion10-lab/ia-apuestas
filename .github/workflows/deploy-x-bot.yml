@@ -1,0 +1,23 @@
+name: Deploy X Bot Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'worker-x-bot/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy gambeta-x-bot to Cloudflare
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker-x-bot

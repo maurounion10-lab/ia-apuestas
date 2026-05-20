@@ -1,0 +1,23 @@
+name = "gambeta-x-bot"
+main = "index.js"
+compatibility_date = "2026-05-01"
+
+# BOT_MODE controla el comportamiento. Default "off" = seguro.
+#   off  → no publica nada
+#   dry  → genera los tweets pero NO publica (para la semana supervisada)
+#   live → publica de verdad en X
+# Se puede cambiar en el dashboard de Cloudflare sin redeploy.
+[vars]
+BOT_MODE = "off"
+
+# Secrets (NO van acá — se cargan en el dashboard de Cloudflare):
+#   X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET, TRIGGER_TOKEN
+
+# Cron triggers (horario UTC; Argentina = UTC-3)
+#   30 12 → 09:30 ART  resultados
+#    0 15 → 12:00 ART  picks del día
+#   30 17 → 14:30 ART  educación
+#    0 21 → 18:00 ART  hot take
+#    0 23 → 20:00 ART  comunidad
+[triggers]
+crons = ["30 12 * * *", "0 15 * * *", "30 17 * * *", "0 21 * * *", "0 23 * * *"]
