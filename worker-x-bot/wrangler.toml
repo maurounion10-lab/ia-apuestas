@@ -8,7 +8,7 @@ compatibility_date = "2026-05-01"
 #   live → publica de verdad en X
 # Se puede cambiar en el dashboard de Cloudflare sin redeploy.
 [vars]
-BOT_MODE = "off"
+BOT_MODE = "live"
 
 # Secrets (NO van acá — se cargan en el dashboard de Cloudflare):
 #   X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET, TRIGGER_TOKEN
