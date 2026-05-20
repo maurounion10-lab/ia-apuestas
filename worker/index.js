@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v3.0
+ * gambeta.ai — Cloudflare Worker: apuestas-api v3.1
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -585,10 +585,18 @@ const SPORT_TO_TSDB_LEAGUE = {
 };
 
 // Normalizador de nombres de equipos (sin diacríticos, sin espacios, minúsculas)
+// Aliases de equipos: siglas/nombres alternativos → forma canónica normalizada
+const TEAM_ALIASES = {
+  'ucv':                          'universidadcentral',
+  'ucvfc':                        'universidadcentral',
+  'universidadcentraldevenezuela':'universidadcentral',
+  'ucvcaracas':                   'universidadcentral',
+};
 function normTeam(s) {
   if (!s) return '';
-  return s.normalize('NFD').replace(/[̀-ͯ]/g, '')
+  const n = s.normalize('NFD').replace(/[̀-ͯ]/g, '')
     .toLowerCase().replace(/[^a-z0-9]/g, '');
+  return TEAM_ALIASES[n] || n;
 }
 
 // Match fuzzy entre dos nombres de equipo (mismo equipo, distintas variantes)
@@ -1071,7 +1079,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v3.0',
+        worker: 'apuestas-api v3.1',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
