@@ -7733,6 +7733,8 @@ const teamLogos = {
   'Boyacá Chicó': 'https://a.espncdn.com/i/teamlogos/soccer/500/5480.png',
   'Brisbane Roar': 'https://a.espncdn.com/i/teamlogos/soccer/500/5326.png',
   'Brøndby IF': 'https://a.espncdn.com/i/teamlogos/soccer/500/575.png',
+  'Brondby IF': 'https://a.espncdn.com/i/teamlogos/soccer/500/575.png',
+  'Brondby': 'https://a.espncdn.com/i/teamlogos/soccer/500/575.png',
   'Bucaramanga': 'https://a.espncdn.com/i/teamlogos/soccer/500/6137.png',
   'C.D. Nacional': 'https://a.espncdn.com/i/teamlogos/soccer/500/3472.png',
   'CSKA Moscow': 'https://a.espncdn.com/i/teamlogos/soccer/500/1963.png',
@@ -8630,6 +8632,12 @@ const tennisWikiMap = {
 const playerPhotoCache = {};
 
 // Genera HTML de logo: imagen oficial si existe, avatar foto para tenistas
+// Fold de letras nórdicas/eslavas que NFD no descompone (ø æ å ł ß ð þ).
+// Sin esto, "Brøndby" (API) y "Brondby" no matchean → el escudo no se ve.
+function _foldSpecial(s) {
+  return (s||'').replace(/ø/g,'o').replace(/æ/g,'ae').replace(/å/g,'a')
+    .replace(/ł/g,'l').replace(/ß/g,'ss').replace(/ð/g,'d').replace(/þ/g,'th');
+}
 // Caché de lookup normalizado (sin acentos) para teamLogos — se construye una vez
 let _normLogoCache = null;
 function _getNormLogoCache() {
@@ -8637,7 +8645,7 @@ function _getNormLogoCache() {
   _normLogoCache = {};
   const _sfx = /\s+(FC|SC|TC|CF|AC|AS|CD|SD|RCD|FK|SK|BK|IF|IFK|RC|RFC|SFC|UD|CA|CE|SV|VfB|VfL|TSG|RB|BSC|GNK|NK|AFC|FBC|HFC|United|City|Town|Athletic|Rovers|Rangers|Wanderers|Albion)\s*$/i;
   const _pfx = /^(FC|SC|AC|AS|CD|SD|RCD|FK|SK|NK|GNK|RB|AFC|SFC)\s+/i;
-  const _norm = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').trim();
+  const _norm = s => _foldSpecial(s.toLowerCase()).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,' ').trim();
   Object.keys(teamLogos).forEach(k => {
     const n = _norm(k);
     if (!_normLogoCache[n]) _normLogoCache[n] = teamLogos[k];
@@ -8679,7 +8687,7 @@ function logoHtml(name, size=48) {
     if (teamLogos[n]) return teamLogos[n];
     // Intentar sin acentos (ej: "Atletico Mineiro" → encuentra "Atlético Mineiro")
     const normCache = _getNormLogoCache();
-    const normN = n.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,' ').trim();
+    const normN = _foldSpecial(n.toLowerCase()).normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9 ]/g,' ').trim();
     if (normCache[normN]) return normCache[normN];
     // Intentar sin sufijos comunes: FC, SC, TC, CF, AC, AS, CD, SD, RCD, FK, SK, BK, IF, IFK
     const stripped = n.replace(/\b(FC|SC|TC|CF|AC|AS|CD|SD|RCD|FK|SK|BK|IF|IFK|RC|UD|CA|CE|SV|VfB|VfL|TSG|RB|BSC|GNK|NK)\b\.?/gi, '').trim();
