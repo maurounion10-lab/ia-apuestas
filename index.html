@@ -17013,7 +17013,11 @@ function closeAcoinPanel() { document.getElementById('acoinPanel').classList.rem
 /* ── Toast ── */
 let _toastTimer = null;
 function acToast(icon, title, sub) {
+  // ── Gambeta Coins desactivado: silenciar cualquier toast que mencione coins/G$ ──
+  const _txt = ((title || '') + ' ' + (sub || '')).toLowerCase();
+  if (_txt.includes('coin') || _txt.includes('g$') || _txt.includes('recarga') || _txt.includes('saldo')) return;
   const t = document.getElementById('acoinToast');
+  if (!t) return;
   document.getElementById('acoinToastIcon').innerHTML  = icon;
   document.getElementById('acoinToastTitle').innerHTML = title;
   document.getElementById('acoinToastSub').innerHTML   = sub;
@@ -17022,8 +17026,20 @@ function acToast(icon, title, sub) {
   void t.offsetWidth; // forzar reflow
   t.classList.add('show');
   clearTimeout(_toastTimer);
-  // Limpiar clase cuando termina la animación (3.8s)
-  _toastTimer = setTimeout(() => t.classList.remove('show'), 3900);
+  // Duración: 4.9s (1s más que antes, pedido de Mauro)
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 4900);
+}
+
+// ── Toast de bienvenida para visitantes NO logueados: invita a registrarse gratis ──
+function welcomeRegisterToast() {
+  try {
+    if (typeof authUser !== 'undefined' && authUser && authUser.email) return; // ya logueado
+    if (sessionStorage.getItem('gb_welcome_toast_v1')) return;                  // ya se mostró
+    sessionStorage.setItem('gb_welcome_toast_v1', '1');
+    setTimeout(() => {
+      acToast('🎁', 'Creá tu cuenta gratis', 'Guardá tu historial y seguí tus picks favoritos · 100% gratis');
+    }, 1600);
+  } catch (e) {}
 }
 
 /* ── Marcar quiebra: llamar cuando el balance llega a 0 sin picks pendientes ── */
@@ -17895,6 +17911,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // $A-Coin: init balance display + daily bonus
   acUpdateUI();
   acCheckDaily();
+  // Toast de bienvenida: invitar a registrarse (visitantes no logueados)
+  welcomeRegisterToast();
   // Live stats in hero (async, non-blocking)
   loadLiveStats();
   // Broadcast mensajes del admin
