@@ -19422,14 +19422,21 @@ async function admLoadUsers() {
   listEl.innerHTML = '';
 
   try {
-    const { data, error, count } = await sbAnon
-      .from('acoin_users')
-      .select('email, balance, nickname, updated_at, history', { count: 'exact' })
-      .order('updated_at', { ascending: false });
+    // Paginar para traer TODOS los usuarios — Supabase corta de a 1000 por
+    // request, así que el total quedaba topado en 1000. Recorremos páginas.
+    let _allUsers = [];
+    for (let _from = 0; _from < 200000; _from += 1000) {
+      const { data, error } = await sbAnon
+        .from('acoin_users')
+        .select('email, balance, nickname, updated_at, history')
+        .order('updated_at', { ascending: false })
+        .range(_from, _from + 999);
+      if (error) throw error;
+      _allUsers = _allUsers.concat(data || []);
+      if (!data || data.length < 1000) break;
+    }
 
-    if (error) throw error;
-
-    _admAllUsers = data || [];
+    _admAllUsers = _allUsers;
     const total = _admAllUsers.length;
 
     // Stats
