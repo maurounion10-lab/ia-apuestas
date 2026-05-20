@@ -124,6 +124,61 @@ async function renderPicksCardPng(picks, dateLabel) {
   return new Uint8Array(buf);
 }
 
+// Placa de RESULTADOS: verde = acertó, rojo = falló.
+function buildResultadosCardElement(results, wins, total, dateLabel) {
+  const GREEN = '#00c853', RED = '#e5484d', DARK = '#0c1a12', CARD = '#13241a';
+  const rows = results.slice(0, 4).map((r) => {
+    const win = r.result === 'win';
+    return el('div', {
+      display: 'flex', flexDirection: 'column', background: CARD,
+      borderRadius: 14, padding: '14px 24px', marginBottom: 12,
+      borderLeft: `6px solid ${win ? GREEN : RED}`,
+    }, [
+      el('div', { display: 'flex', fontSize: 28, color: '#ffffff', fontWeight: 700 },
+        `${r.home}  vs  ${r.away}` + (r.finalScore ? `   ${r.finalScore}` : '')),
+      el('div', { display: 'flex', fontSize: 24, color: win ? GREEN : RED,
+        marginTop: 5, fontWeight: 700 }, win ? 'ACERTÓ' : 'FALLÓ'),
+    ]);
+  });
+  return el('div', {
+    display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
+    background: DARK, padding: '44px 56px', justifyContent: 'space-between',
+  }, [
+    el('div', { display: 'flex', flexDirection: 'column' }, [
+      el('div', { display: 'flex', fontSize: 28, color: GREEN, fontWeight: 800,
+        letterSpacing: 2 }, 'GAMBETA.AI'),
+      el('div', { display: 'flex', fontSize: 46, color: '#ffffff', fontWeight: 800,
+        marginTop: 4 }, 'Resultados de la IA'),
+      el('div', { display: 'flex', fontSize: 26, color: GREEN, marginTop: 2,
+        fontWeight: 800 }, `${wins} de ${total} aciertos · ${dateLabel}`),
+    ]),
+    el('div', { display: 'flex', flexDirection: 'column', marginTop: 14 }, rows),
+    el('div', { display: 'flex', fontSize: 22, color: '#7fae8f' },
+      'Historial completo y público — aciertos y fallos, sin maquillar nada'),
+  ]);
+}
+
+async function renderResultadosCardPng(results, wins, total, dateLabel) {
+  const element = buildResultadosCardElement(results, wins, total, dateLabel);
+  const resp = new ImageResponse(element, { width: 1200, height: 720, format: 'png' });
+  return new Uint8Array(await resp.arrayBuffer());
+}
+
+// Genera la placa que corresponde al slot (o null si no aplica / sin datos).
+async function renderCardForSlot(slot, hist) {
+  if (slot === 'picks') {
+    const picks = todayPendingPicks(hist);
+    return picks.length ? renderPicksCardPng(picks, dateLabelART()) : null;
+  }
+  if (slot === 'resultados') {
+    const done = yesterdayResults(hist);
+    if (!done.length) return null;
+    const wins = done.filter(h => h.result === 'win').length;
+    return renderResultadosCardPng(done, wins, done.length, dateLabelART());
+  }
+  return null;
+}
+
 // ───────────────────────── Datos reales ─────────────────────────
 async function fetchHistorial() {
   const r = await fetch(HIST_URL, { cf: { cacheTtl: 0 } });
@@ -170,14 +225,19 @@ function genPicks(hist) {
   return head + lines.join('\n') + tail;
 }
 
-// Pilar 2 — Resultados
-function genResultados(hist) {
+// Resultados resueltos de ayer/hoy (compartido entre el texto y la placa)
+function yesterdayResults(hist) {
   const today = todayART();
   const yest = new Date(Date.now() + ART_OFFSET - 86400000).toISOString().slice(0, 10);
-  const done = hist
+  return hist
     .filter(h => (h.result === 'win' || h.result === 'loss')
       && h.commenceTs && (artDate(h.commenceTs) === yest || artDate(h.commenceTs) === today))
     .sort((a, b) => (b.commenceTs || 0) - (a.commenceTs || 0));
+}
+
+// Pilar 2 — Resultados
+function genResultados(hist) {
+  const done = yesterdayResults(hist);
   if (!done.length) return null;
   const wins = done.filter(h => h.result === 'win').length;
   const head = '📊 Cómo le fue a la IA\n\n';
@@ -271,18 +331,11 @@ async function runSlot(slot, env, mode) {
   const text = generateText(slot, hist);
   if (!text) return { slot, status: 'skipped', reason: 'sin datos reales' };
 
-  // Placa de imagen solo para el slot de picks
-  let cardErr = null, hasCard = false;
-  let pngBytes = null;
-  if (slot === 'picks') {
-    try {
-      const picks = todayPendingPicks(hist);
-      if (picks.length) {
-        pngBytes = await renderPicksCardPng(picks, dateLabelART());
-        hasCard = true;
-      }
-    } catch (e) { cardErr = e.message; }
-  }
+  // Placa de imagen — picks y resultados la llevan
+  let cardErr = null, pngBytes = null;
+  try { pngBytes = await renderCardForSlot(slot, hist); }
+  catch (e) { cardErr = e.message; }
+  const hasCard = !!pngBytes;
 
   if (mode !== 'live') {
     return { slot, status: 'dry-run', chars: text.length, text,
@@ -343,13 +396,13 @@ export default {
       } catch (e) { return J({ error: e.message }, 500); }
     }
 
-    // Vista previa de la placa de imagen (PNG directo en el navegador)
+    // Vista previa de la placa de imagen — ?slot=picks (default) o ?slot=resultados
     if (url.pathname === '/card') {
       try {
+        const slot = url.searchParams.get('slot') || 'picks';
         const hist = await fetchHistorial();
-        const picks = todayPendingPicks(hist);
-        if (!picks.length) return J({ error: 'sin picks hoy' }, 404);
-        const png = await renderPicksCardPng(picks, dateLabelART());
+        const png = await renderCardForSlot(slot, hist);
+        if (!png) return J({ error: 'sin datos para la placa de ' + slot }, 404);
         return new Response(png, { headers: { 'Content-Type': 'image/png' } });
       } catch (e) { return J({ error: 'card: ' + e.message }, 500); }
     }
