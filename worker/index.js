@@ -1,5 +1,5 @@
 /**
- * gambeta.ai — Cloudflare Worker: apuestas-api v3.3
+ * gambeta.ai — Cloudflare Worker: apuestas-api v3.4
  * Fuente primaria: API-Football (api-sports.io) — con The Odds API como fallback
  *
  * Endpoints:
@@ -213,8 +213,6 @@ function transformAPFGame(fixture, oddsBookmakers, sportKey) {
     _apf_status:     f.status?.short,
     _round:          fixture.league?.round || null,
     _stage:          _parseStage(fixture.league?.round),
-    _dbg_lg:         fixture.league ? Object.keys(fixture.league).join(',') : 'NO_LEAGUE',
-    _dbg_round:      fixture.league?.round ?? 'UNDEF',
   };
 }
 
@@ -397,8 +395,6 @@ async function getLeagueData(env, leagueEntries) {
       g._apf_status     = src._apf_status;
       g._round          = src._round || null;
       g._stage          = src._stage || null;
-      g._dbg_lg         = src._dbg_lg || null;
-      g._dbg_round      = src._dbg_round || null;
     };
 
     // Fuzzy match por substring: "bragantino" ⊂ "red bull bragantino"
@@ -1098,7 +1094,7 @@ export default {
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
       return new Response(JSON.stringify({
-        worker: 'apuestas-api v3.3',
+        worker: 'apuestas-api v3.4',
         time: new Date().toISOString(),
         apf_key: env.API_FOOTBALL_KEY ? 'configured' : 'MISSING',
         odds_key: env.ODDS_API_KEY ? 'configured' : 'MISSING',
