@@ -10670,7 +10670,16 @@ function renderPreds() {
       // EXCEPCIÓN: si hay filtro de tiempo activo (HOY/PRÓXIMOS) no limitar a 6 — mostrar todos los que pasen el filtro
       const _tf = window._predTimeFilter || 'all';
       const _timeFilterActive = _tf === 'today' || _tf === 'upcoming';
-      const sortConf = (a, b) => (b.bvr || 0) - (a.bvr || 0) || (b.prob || 0) - (a.prob || 0);
+      // sortConf: FINALES y SEMIS primero (Mauro: "en finales/semis dale más
+      // importancia"), después por confianza (bvr) y probabilidad. Así una final
+      // de confianza media (ej: final Europa League) no queda tapada por picks
+      // de alta confianza de ligas comunes ni se cae del top 6 del home.
+      const _stageRank = { final: 3, semi: 2, quarter: 1, r16: 0 };
+      const sortConf = (a, b) => {
+        const sa = _stageRank[a._stage] || 0, sb = _stageRank[b._stage] || 0;
+        if (sa !== sb) return sb - sa;
+        return (b.bvr || 0) - (a.bvr || 0) || (b.prob || 0) - (a.prob || 0);
+      };
       const isEuropePick = p => { const sk = p._sportKey||''; return sk.includes('soccer') && !sk.includes('argentina') && !sk.includes('brazil') && !sk.includes('conmebol'); };
       // Upcoming: alta y media confianza, + Media (low) para Libertadores/Sudamericana
       const highMedUp = upcoming.filter(p =>
