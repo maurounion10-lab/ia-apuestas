@@ -13654,10 +13654,33 @@ function renderHistorial(filter) {
   }
   // Si había duplicados, sanear el storage silenciosamente
   if (dedupedAll.length < all.length) saveHistorial(dedupedAll);
+  // ── 2da pasada anti-duplicados: mismo enfrentamiento (home+away) registrado
+  //    2 veces con timestamps distintos (la ventana ±3h de arriba no los une).
+  //    Si uno está RESUELTO y el otro PENDING dentro de ±6 días, descartar el
+  //    PENDING — es el mismo partido mal duplicado (id/fecha distinta).
+  const _ddNorm = s => (s||'').toString().toLowerCase().normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
+  const _ddResolved = h => h && (h.result === 'win' || h.result === 'loss' || h.result === 'void');
+  const _ddResolvedTs = {};
+  dedupedAll.forEach(h => {
+    if (_ddResolved(h) && h.commenceTs) {
+      const mk = _ddNorm(h.home) + '|' + _ddNorm(h.away);
+      (_ddResolvedTs[mk] = _ddResolvedTs[mk] || []).push(h.commenceTs);
+    }
+  });
+  const _DD_WIN = 6 * 24 * 3600 * 1000;
+  const dedupedAll2 = dedupedAll.filter(h => {
+    if (_ddResolved(h)) return true;       // resuelto: siempre queda
+    if (!h.commenceTs) return true;
+    const ts = _ddResolvedTs[_ddNorm(h.home) + '|' + _ddNorm(h.away)];
+    if (!ts) return true;
+    return !ts.some(t => Math.abs(t - h.commenceTs) < _DD_WIN);
+  });
+  if (dedupedAll2.length < dedupedAll.length) saveHistorial(dedupedAll2);
   // Solo aceptar filtros de sport conocidos; cualquier otro valor (incl. legacy 'soccer') = mostrar todo.
   const _validSports = new Set(['futbol', 'tenis']);
   const _useFilter = _validSports.has(filter) ? filter : 'all';
-  let data = _useFilter === 'all' ? dedupedAll : dedupedAll.filter(h => (h.sport || 'futbol') === _useFilter);
+  let data = _useFilter === 'all' ? dedupedAll2 : dedupedAll2.filter(h => (h.sport || 'futbol') === _useFilter);
 
   // ── Ordenar: pendientes primero (más próximo antes), luego resueltos (más reciente antes) ──
   data.sort((a, b) => {
