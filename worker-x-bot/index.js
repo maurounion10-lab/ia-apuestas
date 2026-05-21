@@ -427,8 +427,8 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
       top: 44, left: 56, alignItems: 'center', fontSize: 46, fontWeight: 800 }, [
       { type: 'img', props: { src: LOGO_URL, width: 84, height: 84,
         style: { width: '84px', height: '84px', marginRight: 20 } } },
-      el('div', { display: 'flex', color: GREEN, marginRight: 14,
-        textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, 'Pick:'),
+      el('div', { display: 'flex', color: GREEN, marginRight: 16,
+        textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, 'Pick'),
       el('div', { display: 'flex', color: '#ffffff',
         textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, (p.rec || '').toUpperCase()),
     ]),
@@ -819,7 +819,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.22', mode,
+        bot: 'gambeta-x-bot', version: '1.23', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
