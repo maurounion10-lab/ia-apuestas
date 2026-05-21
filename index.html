@@ -13623,6 +13623,23 @@ function calcRacha(data) {
 // Se inyectan directamente al historial local si no existen.
 // _injectCopaAbr8Historial eliminado — los picks del 8-abr deben cargarse de Supabase
 
+// Clasifica el mercado de un pick para el filtro del historial:
+// "Gana <equipo>" se resuelve a "Gana Local" / "Gana Visitante" segun si ese
+// equipo jugo de local o visitante en ese partido.
+function histMarketKey(h) {
+  const rec = (h.rec || '').trim();
+  if (!rec) return rec;
+  const m = rec.match(/^Gana\s+(.+)$/i);
+  if (!m) return rec;
+  const norm = s => (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  const t = norm(m[1]);
+  if (t === 'local') return 'Gana Local';
+  if (t === 'visitante') return 'Gana Visitante';
+  if (h.home && norm(h.home) === t) return 'Gana Local';
+  if (h.away && norm(h.away) === t) return 'Gana Visitante';
+  return rec;
+}
+
 function renderHistorial(filter) {
   // Guard: si los elementos del DOM aún no existen, reprogramar
   const _summaryEl = document.getElementById('histSummary');
@@ -13828,7 +13845,7 @@ function renderHistorial(filter) {
   if (mercadoPanel) {
     const mercadoMap = {};
     for (const h of data) {
-      const mk = h.rec || null;
+      const mk = histMarketKey(h) || null;
       if (!mk) continue;
       if (!mercadoMap[mk]) mercadoMap[mk] = { total:0, comp:0, wins:0, pl:0 };
       mercadoMap[mk].total++;
@@ -13851,7 +13868,7 @@ function renderHistorial(filter) {
       }).join('');
     // Apply mercado filter
     if (histMercadoFilter !== 'all') {
-      data = data.filter(h => h.rec === histMercadoFilter);
+      data = data.filter(h => histMarketKey(h) === histMercadoFilter);
     }
   }
 
