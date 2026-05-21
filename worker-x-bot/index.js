@@ -210,7 +210,7 @@ function buildCelebracionCardElement(p) {
       el('div', { display: 'flex', fontSize: 26, color: GREEN, fontWeight: 800,
         letterSpacing: 2 }, 'GAMBETA.AI'),
       el('div', { display: 'flex', fontSize: 78, color: '#ffffff', fontWeight: 800,
-        marginTop: 4 }, 'LA IA ACERTO'),
+        marginTop: 4 }, 'LA IA ACERT\u00d3'),
     ]),
     el('div', { display: 'flex', flexDirection: 'column', alignItems: 'center' }, [
       el('div', { display: 'flex', fontSize: 42, color: '#cfe9d8', fontWeight: 700 },
