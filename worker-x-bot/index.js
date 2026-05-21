@@ -164,8 +164,42 @@ async function renderResultadosCardPng(results, wins, total, dateLabel) {
   return new Uint8Array(await resp.arrayBuffer());
 }
 
-// Genera la placa que corresponde al slot (o null si no aplica / sin datos).
-async function renderCardForSlot(slot, hist) {
+// Placa GENERICA branded — para educacion, hot take, comunidad y festejo.
+function stripEmoji(t) {
+  return (t || '').replace(
+    /[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2190}-\u{21FF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}\u{1F1E6}-\u{1F1FF}]/gu, '');
+}
+function cardBody(text) {
+  let t = stripEmoji(text).replace(/\s*\n\s*/g, '  ').replace(/\s{2,}/g, ' ').trim();
+  if (t.length > 240) t = t.slice(0, 237).trim() + '\u2026';
+  return t;
+}
+function buildGenericCardElement(kicker, body) {
+  const GREEN = '#00c853', DARK = '#0c1a12';
+  return el('div', {
+    display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
+    background: DARK, padding: '56px 64px', justifyContent: 'space-between',
+  }, [
+    el('div', { display: 'flex', flexDirection: 'column' }, [
+      el('div', { display: 'flex', fontSize: 28, color: GREEN, fontWeight: 800,
+        letterSpacing: 2 }, 'GAMBETA.AI'),
+      el('div', { display: 'flex', fontSize: 30, color: '#7fae8f', fontWeight: 800,
+        letterSpacing: 1, marginTop: 8 }, kicker),
+    ]),
+    el('div', { display: 'flex', fontSize: 40, color: '#ffffff', fontWeight: 800,
+      lineHeight: 1.35 }, body),
+    el('div', { display: 'flex', fontSize: 22, color: '#7fae8f' },
+      'Pron\u00f3sticos de f\u00fatbol con IA \u00b7 gratis todos los d\u00edas'),
+  ]);
+}
+async function renderGenericCardPng(kicker, body) {
+  const element = buildGenericCardElement(kicker, body);
+  const resp = new ImageResponse(element, { width: 1200, height: 720, format: 'png' });
+  return new Uint8Array(await resp.arrayBuffer());
+}
+
+// Genera la placa que corresponde al slot. Todos los slots llevan imagen.
+async function renderCardForSlot(slot, hist, text) {
   if (slot === 'picks') {
     const picks = todayPendingPicks(hist);
     return picks.length ? renderPicksCardPng(picks, dateLabelART()) : null;
@@ -175,6 +209,15 @@ async function renderCardForSlot(slot, hist) {
     if (!done.length) return null;
     const wins = done.filter(h => h.result === 'win').length;
     return renderResultadosCardPng(done, wins, done.length, dateLabelART());
+  }
+  const KICKER = {
+    educacion:   'CONSEJO DE LA IA',
+    hottake:     'HOT TAKE',
+    comunidad:   'SUMATE A LA CHARLA',
+    celebracion: 'ACERTO LA IA',
+  };
+  if (text && KICKER[slot]) {
+    return renderGenericCardPng(KICKER[slot], cardBody(text));
   }
   return null;
 }
@@ -275,7 +318,7 @@ const EDU_POOL = [
 ];
 
 const COM_POOL = [
-  'Buen día 🟢⚽\n\n¿A qué partido le tenés más fe hoy?\n\n' +
+  '⚽ ¿A qué partido le tenés más fe hoy?\n\n' +
   'Tirámelo abajo y te paso lo que dice la IA. 👇',
   '¿Cómo apostás vos?\n\n' +
   '— Siempre al favorito\n— Busco valor en las cuotas\n— Puro corazón ❤️\n— Solo miro\n\n' +
@@ -363,9 +406,9 @@ async function runSlot(slot, env, mode) {
   const text = generateText(slot, hist);
   if (!text) return { slot, status: 'skipped', reason: 'sin datos reales' };
 
-  // Placa de imagen — picks y resultados la llevan
+  // Placa de imagen — todos los slots la llevan
   let cardErr = null, pngBytes = null;
-  try { pngBytes = await renderCardForSlot(slot, hist); }
+  try { pngBytes = await renderCardForSlot(slot, hist, text); }
   catch (e) { cardErr = e.message; }
   const hasCard = !!pngBytes;
 
@@ -409,7 +452,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.1', mode,
+        bot: 'gambeta-x-bot', version: '1.2', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -433,7 +476,8 @@ export default {
       try {
         const slot = url.searchParams.get('slot') || 'picks';
         const hist = await fetchHistorial();
-        const png = await renderCardForSlot(slot, hist);
+        const t = generateText(slot, hist);
+        const png = await renderCardForSlot(slot, hist, t);
         if (!png) return J({ error: 'sin datos para la placa de ' + slot }, 404);
         return new Response(png, { headers: { 'Content-Type': 'image/png' } });
       } catch (e) { return J({ error: 'card: ' + e.message }, 500); }
