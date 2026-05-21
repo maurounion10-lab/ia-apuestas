@@ -22,3 +22,8 @@ BOT_MODE = "live"
 #    0 * * * → cada hora: festejo de aciertos recién resueltos
 [triggers]
 crons = ["0 * * * *", "30 12 * * *", "0 15 * * *", "30 17 * * *", "0 21 * * *", "0 23 * * *"]
+
+# Observability (Workers Logs) — Cloudflare lo tiene activado por defecto;
+# declararlo acá mantiene el wrangler.toml sincronizado con el dashboard.
+[observability]
+enabled = true
