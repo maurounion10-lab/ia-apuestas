@@ -301,12 +301,8 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
   const GREEN = '#00c853';
   const scene = stadiumScene(p.commenceTs);
   const escSize = opts.escudo;
-  const chip = (name, url) => el('div', {
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    width: (escSize + 56) + 'px', height: (escSize + 56) + 'px',
-    borderRadius: '9999px', background: 'rgba(6,16,10,0.72)',
-    border: '4px solid rgba(255,255,255,0.20)',
-  }, [escudoEl(name, url, escSize)]);
+  // escudos sin disco de fondo — directo sobre la foto del estadio
+  const shield = (name, url) => escudoEl(name, url, escSize);
   return el('div', {
     display: 'flex', position: 'relative',
     width: '1200px', height: '720px', background: '#06120a',
@@ -331,11 +327,11 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
       ]),
       el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
         justifyContent: 'center', flexGrow: 1 }, [
-        chip(p.home, hUrl),
+        shield(p.home, hUrl),
         el('div', { display: 'flex', fontSize: opts.centerSize, color: opts.centerColor,
           fontWeight: 800, padding: '0 40px',
           textShadow: '0 5px 20px rgba(0,0,0,0.95)' }, opts.center),
-        chip(p.away, aUrl),
+        shield(p.away, aUrl),
       ]),
       // check de acierto — grande, abajo y centrado
       ...(opts.check ? [el('div', {
@@ -349,7 +345,7 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
 // Placa de HOT TAKE — partido del día sobre el estadio, con "VS".
 function buildHotTakeCardElement(p, hUrl, aUrl) {
   return buildMatchCardElement(p, hUrl, aUrl, {
-    escudo: 234, center: 'VS', centerColor: 'rgba(255,255,255,0.96)', centerSize: 96,
+    escudo: 290, center: 'VS', centerColor: 'rgba(255,255,255,0.96)', centerSize: 96,
   });
 }
 async function renderHotTakeCardPng(p, hUrl, aUrl) {
@@ -367,7 +363,7 @@ async function renderGenericCardPng(kicker, body) {
 function buildCelebracionCardElement(p, hUrl, aUrl) {
   const score = (p.finalScore || '').toString().replace(/[-–]/, ' - ').trim() || 'WIN';
   return buildMatchCardElement(p, hUrl, aUrl, {
-    escudo: 226, center: score, centerColor: '#00e676', centerSize: 124, check: true,
+    escudo: 282, center: score, centerColor: '#00e676', centerSize: 124, check: true,
   });
 }
 async function renderCelebracionCardPng(p, hUrl, aUrl) {
@@ -650,7 +646,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.10', mode,
+        bot: 'gambeta-x-bot', version: '1.11', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
