@@ -337,11 +337,12 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
           textShadow: '0 5px 20px rgba(0,0,0,0.95)' }, opts.center),
         chip(p.away, aUrl),
       ]),
+      // check de acierto — grande, abajo y centrado
+      ...(opts.check ? [el('div', {
+        display: 'flex', justifyContent: 'center', marginTop: 4,
+      }, [{ type: 'img', props: { src: CHECK_URI, width: 212, height: 212,
+        style: { width: '212px', height: '212px' } } }])] : []),
     ]),
-    // check de acierto — grande, arriba a la derecha
-    ...(opts.check ? [{ type: 'img', props: { src: CHECK_URI, width: 226, height: 226,
-      style: { position: 'absolute', top: 36, right: 46,
-        width: '226px', height: '226px' } } }] : []),
   ]);
 }
 
@@ -649,7 +650,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.9', mode,
+        bot: 'gambeta-x-bot', version: '1.10', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
