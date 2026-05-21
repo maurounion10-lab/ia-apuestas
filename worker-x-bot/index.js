@@ -191,27 +191,27 @@ async function teamFormPair(p, hUrl, aUrl) {
     aId ? fetchTeamForm(aId, slug) : Promise.resolve(null),
   ]);
 }
-// Cuadrito de resultado — verde G, ámbar E, rojo P.
-function formSquare(r) {
+// Cuadrito de resultado — verde G, ámbar E, rojo P. El más reciente va destacado.
+function formSquare(r, big) {
   const bg = r === 'G' ? '#00c853' : r === 'E' ? '#f5a623' : '#e5484d';
-  return el('div', { display: 'flex', alignItems: 'center', justifyContent: 'center',
-    width: '40px', height: '40px', borderRadius: 8, marginTop: 4, marginBottom: 4,
-    background: bg, color: '#ffffff', fontSize: 23, fontWeight: 800 }, r);
+  const s = big ? 54 : 40;
+  const st = { display: 'flex', alignItems: 'center', justifyContent: 'center',
+    width: s + 'px', height: s + 'px', borderRadius: big ? 12 : 8,
+    marginTop: 4, marginBottom: 4, background: bg, color: '#ffffff',
+    fontSize: big ? 31 : 23, fontWeight: 800 };
+  if (big) st.border = '3px solid #ffffff';
+  return el('div', st, r);
 }
-// Tira de forma vertical (más reciente arriba) con la fecha del último partido al lado.
-function formColumn(form, side) {
-  const sq = form.list.slice().reverse();
+// Tira de forma vertical: fecha arriba, cuadrito más reciente destacado (grande, con borde).
+function formColumn(form) {
+  const sq = form.list.slice().reverse();   // más reciente arriba
+  const children = [];
+  if (form.lastDate) children.push(el('div', { display: 'flex', fontSize: 20,
+    fontWeight: 800, color: '#dfeee5', marginBottom: 8,
+    textShadow: '0 2px 8px rgba(0,0,0,0.95)' }, form.lastDate));
+  sq.forEach((r, i) => children.push(formSquare(r, i === 0)));
   return el('div', { display: 'flex', flexDirection: 'column', alignItems: 'center' },
-    sq.map((r, i) => {
-      const square = formSquare(r);
-      if (i !== 0 || !form.lastDate) return square;
-      const date = el('div', { display: 'flex', fontSize: 19, fontWeight: 800,
-        color: '#dfeee5', textShadow: '0 2px 8px rgba(0,0,0,0.95)',
-        marginLeft: side === 'R' ? 10 : 0, marginRight: side === 'L' ? 10 : 0 },
-        form.lastDate);
-      return el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center' },
-        side === 'L' ? [date, square] : [square, date]);
-    }));
+    children);
 }
 
 // ───────────────────────── Placa de imagen ─────────────────────────
@@ -492,7 +492,7 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
   const teamBlock = (name, url, form, side) => {
     const esc = escudoEl(name, url, escSize);
     if (!hasForm(form)) return esc;
-    const col = formColumn(form, side);
+    const col = formColumn(form);
     const gap = el('div', { display: 'flex', width: '18px' }, '');
     return el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center' },
       side === 'L' ? [col, gap, esc] : [esc, gap, col]);
@@ -566,15 +566,15 @@ async function renderGenericCardPng(kicker, body) {
 }
 
 // Placa de FESTEJO — escudos enfrentados, marcador grande sobre el estadio.
-function buildCelebracionCardElement(p, hUrl, aUrl, formH, formA) {
+// Sin forma de equipos: la forma va sólo en la previa del pick.
+function buildCelebracionCardElement(p, hUrl, aUrl) {
   const score = (p.finalScore || '').toString().replace(/[-–]/, ' - ').trim() || 'WIN';
   return buildMatchCardElement(p, hUrl, aUrl, {
-    escudo: 260, center: score, centerColor: '#00e676', centerSize: 124, check: true,
-    formH, formA,
+    escudo: 282, center: score, centerColor: '#00e676', centerSize: 124, check: true,
   });
 }
-async function renderCelebracionCardPng(p, hUrl, aUrl, formH, formA) {
-  return pngFromElement(buildCelebracionCardElement(p, hUrl, aUrl, formH, formA));
+async function renderCelebracionCardPng(p, hUrl, aUrl) {
+  return pngFromElement(buildCelebracionCardElement(p, hUrl, aUrl));
 }
 
 // Genera la placa que corresponde al slot. Todos los slots llevan imagen.
@@ -606,8 +606,7 @@ async function renderCardForSlot(slot, hist, text) {
     const map = await fetchLogoMap();
     const [hU, aU] = await Promise.all([
       resolveEscudo(w.pick.home, map), resolveEscudo(w.pick.away, map)]);
-    const [fH, fA] = await teamFormPair(w.pick, hU, aU);
-    return renderCelebracionCardPng(w.pick, hU, aU, fH, fA);
+    return renderCelebracionCardPng(w.pick, hU, aU);
   }
   if (slot === 'hottake') {
     const picks = todayPendingPicks(hist);
@@ -927,7 +926,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.27', mode,
+        bot: 'gambeta-x-bot', version: '1.28', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -962,8 +961,7 @@ export default {
             const map = await fetchLogoMap();
             const [hU, aU] = await Promise.all([
               resolveEscudo(lw.home, map), resolveEscudo(lw.away, map)]);
-            const [fH, fA] = await teamFormPair(lw, hU, aU);
-            png = await renderCelebracionCardPng(lw, hU, aU, fH, fA);
+            png = await renderCelebracionCardPng(lw, hU, aU);
           }
         }
         if (!png) return J({ error: 'sin datos para la placa de ' + slot }, 404);
