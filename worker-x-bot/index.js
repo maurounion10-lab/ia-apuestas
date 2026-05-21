@@ -198,6 +198,41 @@ async function renderGenericCardPng(kicker, body) {
   return new Uint8Array(await resp.arrayBuffer());
 }
 
+// Placa de FESTEJO — gráfico diseñado: equipos, marcador grande y sello del pick.
+function buildCelebracionCardElement(p) {
+  const GREEN = '#00c853', DARK = '#06120a', CARD = '#13241a';
+  const score = (p.finalScore || '').toString().replace(/[-–]/, '  -  ').trim();
+  return el('div', {
+    display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
+    background: DARK, padding: '54px 64px', justifyContent: 'space-between',
+  }, [
+    el('div', { display: 'flex', flexDirection: 'column' }, [
+      el('div', { display: 'flex', fontSize: 26, color: GREEN, fontWeight: 800,
+        letterSpacing: 2 }, 'GAMBETA.AI'),
+      el('div', { display: 'flex', fontSize: 78, color: '#ffffff', fontWeight: 800,
+        marginTop: 4 }, 'LA IA ACERTO'),
+    ]),
+    el('div', { display: 'flex', flexDirection: 'column', alignItems: 'center' }, [
+      el('div', { display: 'flex', fontSize: 42, color: '#cfe9d8', fontWeight: 700 },
+        `${p.home}   vs   ${p.away}`),
+      el('div', { display: 'flex', fontSize: 150, color: GREEN, fontWeight: 800,
+        marginTop: 6 }, score || 'WIN'),
+    ]),
+    el('div', { display: 'flex', flexDirection: 'column' }, [
+      el('div', { display: 'flex', background: CARD, border: `2px solid ${GREEN}`,
+        borderRadius: 14, padding: '16px 26px', fontSize: 34, color: '#ffffff',
+        fontWeight: 800 }, `ACERTADO  -  Pick de la IA: ${p.rec}`),
+      el('div', { display: 'flex', fontSize: 22, color: '#7fae8f', marginTop: 14 },
+        'Pron\u00f3sticos de f\u00fatbol con IA \u00b7 historial 100% p\u00fablico'),
+    ]),
+  ]);
+}
+async function renderCelebracionCardPng(p) {
+  const resp = new ImageResponse(buildCelebracionCardElement(p),
+    { width: 1200, height: 720, format: 'png' });
+  return new Uint8Array(await resp.arrayBuffer());
+}
+
 // Genera la placa que corresponde al slot. Todos los slots llevan imagen.
 async function renderCardForSlot(slot, hist, text) {
   if (slot === 'picks') {
@@ -210,11 +245,14 @@ async function renderCardForSlot(slot, hist, text) {
     const wins = done.filter(h => h.result === 'win').length;
     return renderResultadosCardPng(done, wins, done.length, dateLabelART());
   }
+  if (slot === 'celebracion') {
+    const w = celebracionWin(hist);
+    return w ? renderCelebracionCardPng(w.pick) : null;
+  }
   const KICKER = {
     educacion:   'CONSEJO DE LA IA',
     hottake:     'HOT TAKE',
     comunidad:   'SUMATE A LA CHARLA',
-    celebracion: 'ACERTO LA IA',
   };
   if (text && KICKER[slot]) {
     return renderGenericCardPng(KICKER[slot], cardBody(text));
@@ -346,20 +384,31 @@ const CELEBRA = [
   (p) => `🔥 LA IA NO FALLA TANTO...\n\n${p.home} ${p.finalScore || ''} ${p.away} — ` +
          `pick ACERTADO: ${p.rec} ✅\n\nMás picks gratis en el perfil 🟢`,
 ];
-// Festeja un acierto cuyo partido arrancó hace 3-4 h (ventana de 1 h → se
-// festeja una sola vez, sin necesidad de estado). Texto, sin placa.
-function genCelebracion(hist) {
+// Selecciona el acierto a festejar.
+// HORARIO DE SILENCIO: entre las 0 y las 9 ART el bot NO postea nada.
+// Los aciertos de la madrugada se acumulan y salen en la corrida de las 9 AM.
+// La corrida normal (10-23) festeja partidos que arrancaron hace 3-4 h.
+function celebracionWin(hist) {
+  const h = new Date(Date.now() + ART_OFFSET).getUTCHours();
+  if (h < 9) return null;                       // madrugada → silencio
   const now = Date.now();
-  const lo = now - 4 * 3600 * 1000, hi = now - 3 * 3600 * 1000;
+  const hi = now - 3 * 3600 * 1000;
+  const lo = (h === 9) ? now - 13 * 3600 * 1000  // 9 AM: barre toda la noche
+                       : now - 4 * 3600 * 1000;  // resto del día: ventana 3-4 h
   const wins = hist
-    .filter(h => h.result === 'win' && h.commenceTs
-      && h.commenceTs >= lo && h.commenceTs < hi)
+    .filter(w => w.result === 'win' && w.commenceTs
+      && w.commenceTs >= lo && w.commenceTs < hi)
     .sort((a, b) => (b.bvr || 0) - (a.bvr || 0));
-  if (!wins.length) return null;
-  const p = wins[0];
+  return wins.length ? { pick: wins[0], total: wins.length } : null;
+}
+
+function genCelebracion(hist) {
+  const w = celebracionWin(hist);
+  if (!w) return null;
+  const p = w.pick;
   let t = CELEBRA[dayOfYearART() % CELEBRA.length](p).replace(/  +/g, ' ');
-  if (wins.length > 1) {
-    const extra = `\n\n+${wins.length - 1} acierto${wins.length > 2 ? 's' : ''} más en esta tanda`;
+  if (w.total > 1) {
+    const extra = `\n\n+${w.total - 1} acierto${w.total > 2 ? 's' : ''} más en esta tanda`;
     if ((t + extra).length <= 280) t += extra;
   }
   return t;
@@ -452,7 +501,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.2', mode,
+        bot: 'gambeta-x-bot', version: '1.3', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -477,7 +526,14 @@ export default {
         const slot = url.searchParams.get('slot') || 'picks';
         const hist = await fetchHistorial();
         const t = generateText(slot, hist);
-        const png = await renderCardForSlot(slot, hist, t);
+        let png = await renderCardForSlot(slot, hist, t);
+        // Preview de la placa de festejo: si el horario/ventana no aplica,
+        // usar el acierto más reciente para poder verla en cualquier momento.
+        if (!png && slot === 'celebracion') {
+          const lw = hist.filter(w => w.result === 'win' && w.commenceTs)
+            .sort((a, b) => b.commenceTs - a.commenceTs)[0];
+          if (lw) png = await renderCelebracionCardPng(lw);
+        }
         if (!png) return J({ error: 'sin datos para la placa de ' + slot }, 404);
         return new Response(png, { headers: { 'Content-Type': 'image/png' } });
       } catch (e) { return J({ error: 'card: ' + e.message }, 500); }
