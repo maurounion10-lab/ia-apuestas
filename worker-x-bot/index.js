@@ -132,42 +132,68 @@ function el(type, style, children) {
   return { type, props: { style, children } };
 }
 
-// Construye el árbol Satori de la placa de picks del día.
-function buildPicksCardElement(picks, dateLabel) {
-  const GREEN = '#00c853', DARK = '#0c1a12', CARD = '#13241a';
-  const rows = picks.slice(0, 4).map((p) => el('div', {
-    display: 'flex', flexDirection: 'column', background: CARD,
-    borderRadius: 14, padding: '14px 24px', marginBottom: 12,
-    borderLeft: `6px solid ${GREEN}`,
-  }, [
-    el('div', { display: 'flex', fontSize: 28, color: '#ffffff', fontWeight: 700 },
-      `${p.home}  vs  ${p.away}`),
-    el('div', { display: 'flex', fontSize: 24, color: GREEN, marginTop: 5, fontWeight: 700 },
-      `» ${p.rec}`),
-  ]));
-  return el('div', {
-    display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
-    background: DARK, padding: '44px 56px', justifyContent: 'space-between',
-  }, [
-    el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', fontSize: 28, color: GREEN, fontWeight: 800,
-        letterSpacing: 2 }, 'GAMBETA.AI'),
-      el('div', { display: 'flex', fontSize: 46, color: '#ffffff', fontWeight: 800,
-        marginTop: 4 }, 'Picks de la IA — Hoy'),
-      el('div', { display: 'flex', fontSize: 22, color: '#7fae8f', marginTop: 2 },
-        dateLabel),
+// Placa de PICKS — lista de pronósticos del día con escudos sobre el estadio.
+// Una fila por pick: escudos, partido y la recomendación de la IA en píldora.
+function pickRowEl(r) {
+  const GREEN = '#00c853';
+  return el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
+    background: 'rgba(6,14,10,0.60)', borderRadius: 14, padding: '0 22px',
+    height: '88px', marginBottom: 12, borderLeft: `8px solid ${GREEN}` }, [
+    escudoEl(r.home, r.hU, 56),
+    el('div', { display: 'flex', width: '12px' }, ''),
+    escudoEl(r.away, r.aU, 56),
+    el('div', { display: 'flex', flexGrow: 1, fontSize: 31, color: '#ffffff',
+      fontWeight: 700, marginLeft: 22,
+      textShadow: '0 2px 8px rgba(0,0,0,0.9)' }, `${r.home}  vs  ${r.away}`),
+    el('div', { display: 'flex', alignItems: 'center',
+      background: 'rgba(0,200,83,0.20)', border: `2px solid ${GREEN}`,
+      borderRadius: '9999px', padding: '9px 26px', fontSize: 27,
+      color: '#00e676', fontWeight: 800, marginLeft: 16 }, (r.rec || '').toUpperCase()),
+  ]);
+}
+function buildPicksCardElement(rows, dateLabel) {
+  const GREEN = '#00c853';
+  const scene = stadiumScene(null);
+  return el('div', { display: 'flex', position: 'relative',
+    width: '1200px', height: '720px', background: '#06120a' }, [
+    { type: 'img', props: { src: scene.url, width: 1200, height: 720,
+      style: { position: 'absolute', top: 0, left: 0,
+        width: '1200px', height: '720px', objectFit: 'cover' } } },
+    el('div', { display: 'flex', position: 'absolute', top: 0, left: 0,
+      width: '1200px', height: '720px',
+      backgroundImage: 'linear-gradient(180deg,rgba(4,9,7,0.88) 0%,rgba(4,9,7,0.80) 100%)' }, ''),
+    el('div', { display: 'flex', flexDirection: 'column', position: 'absolute',
+      top: 0, left: 0, width: '1200px', height: '720px', padding: '40px 52px' }, [
+      // cabecera — logo + título + cantidad de picks
+      el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
+        marginBottom: 22 }, [
+        { type: 'img', props: { src: LOGO_URL, width: 86, height: 86,
+          style: { width: '86px', height: '86px', marginRight: 22 } } },
+        el('div', { display: 'flex', flexDirection: 'column', flexGrow: 1 }, [
+          el('div', { display: 'flex', fontSize: 46, color: '#ffffff', fontWeight: 800 },
+            'Picks de la IA'),
+          el('div', { display: 'flex', fontSize: 24, color: '#9fc7ad', marginTop: 2 },
+            'Pronósticos para hoy · ' + dateLabel),
+        ]),
+        el('div', { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }, [
+          el('div', { display: 'flex', fontSize: 82, color: GREEN, fontWeight: 800 },
+            String(rows.length)),
+          el('div', { display: 'flex', fontSize: 22, color: '#9fc7ad' }, 'picks'),
+        ]),
+      ]),
+      // filas de picks
+      el('div', { display: 'flex', flexDirection: 'column' }, rows.map(pickRowEl)),
+      // pie
+      el('div', { display: 'flex', fontSize: 21, color: '#8fc0a0', marginTop: 'auto' },
+        'Pronósticos de fútbol con IA · gratis todos los días en el perfil'),
     ]),
-    el('div', { display: 'flex', flexDirection: 'column', marginTop: 14 }, rows),
-    el('div', { display: 'flex', fontSize: 22, color: '#7fae8f' },
-      'Inteligencia Artificial para pronósticos de fútbol · gratis todos los días'),
   ]);
 }
 
-async function renderPicksCardPng(picks, dateLabel) {
-  const element = buildPicksCardElement(picks, dateLabel);
+async function renderPicksCardPng(rows, dateLabel) {
+  const element = buildPicksCardElement(rows, dateLabel);
   const resp = new ImageResponse(element, { width: 1200, height: 720, format: 'png' });
-  const buf = await resp.arrayBuffer();
-  return new Uint8Array(buf);
+  return new Uint8Array(await resp.arrayBuffer());
 }
 
 // Placa de RESULTADOS — lista con escudos sobre fondo de estadio.
@@ -424,7 +450,13 @@ async function renderCelebracionCardPng(p, hUrl, aUrl) {
 async function renderCardForSlot(slot, hist, text) {
   if (slot === 'picks') {
     const picks = todayPendingPicks(hist);
-    return picks.length ? renderPicksCardPng(picks, dateLabelART()) : null;
+    if (!picks.length) return null;
+    const map = await fetchLogoMap();
+    const rows = await Promise.all(picks.slice(0, 5).map(async (p) => ({
+      home: p.home, away: p.away, rec: p.rec,
+      hU: await resolveEscudo(p.home, map), aU: await resolveEscudo(p.away, map),
+    })));
+    return renderPicksCardPng(rows, dateLabelART());
   }
   if (slot === 'resultados') {
     const done = yesterdayResults(hist);
@@ -699,7 +731,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.13', mode,
+        bot: 'gambeta-x-bot', version: '1.14', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
