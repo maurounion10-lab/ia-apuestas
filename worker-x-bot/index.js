@@ -931,7 +931,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.30', mode,
+        bot: 'gambeta-x-bot', version: '1.31', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -954,9 +954,16 @@ export default {
     if (url.pathname === '/card') {
       try {
         const slot = url.searchParams.get('slot') || 'picks';
+        const matchStr = url.searchParams.get('match');
         const hist = await fetchHistorial();
-        const t = generateText(slot, hist);
-        let png = await renderCardForSlot(slot, hist, t);
+        let pickOverride = null;
+        if (slot === 'hottake' && matchStr) {
+          const m = matchStr.toLowerCase();
+          pickOverride = todayPendingPicks(hist).find(p =>
+            ((p.home || '') + ' ' + (p.away || '')).toLowerCase().includes(m)) || null;
+        }
+        const t = generateText(slot, hist, pickOverride);
+        let png = await renderCardForSlot(slot, hist, t, pickOverride);
         // Preview de la placa de festejo: si el horario/ventana no aplica,
         // usar el acierto más reciente para poder verla en cualquier momento.
         if (!png && slot === 'celebracion') {
