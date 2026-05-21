@@ -262,6 +262,9 @@ const STADIUM_IMG = {
   day:    'https://images.unsplash.com/photo-1620923090109-30f2e2b2e84c?fm=jpg&q=70&w=1400&h=840&fit=crop',
   golden: 'https://images.unsplash.com/photo-1748150572481-13ce492e1b2b?fm=jpg&q=70&w=1400&h=840&fit=crop',
 };
+// Logo de Gambeta — servido desde el propio dominio (estático, estable).
+const LOGO_URL = 'https://gambeta.ai/logo-x.png';
+
 function stadiumScene(ts) {
   const h = new Date((ts || Date.now()) + ART_OFFSET).getUTCHours();
   if (h >= 20 || h < 6)              // noche cerrada
@@ -314,31 +317,31 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
     // capa 2 — overlay oscuro para legibilidad del texto
     el('div', { display: 'flex', position: 'absolute', top: 0, left: 0,
       width: '1200px', height: '720px', backgroundImage: scene.overlay }, ''),
-    // capa 3 — contenido
-    el('div', {
-      display: 'flex', flexDirection: 'column', position: 'absolute',
-      top: 0, left: 0, width: '1200px', height: '720px', padding: '46px 56px',
-    }, [
-      el('div', { display: 'flex', flexDirection: 'row', fontSize: 46, fontWeight: 800 }, [
-        el('div', { display: 'flex', color: GREEN, marginRight: 14,
-          textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, 'Pick:'),
-        el('div', { display: 'flex', color: '#ffffff',
-          textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, (p.rec || '').toUpperCase()),
-      ]),
-      el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
-        justifyContent: 'center', flexGrow: 1 }, [
-        shield(p.home, hUrl),
-        el('div', { display: 'flex', fontSize: opts.centerSize, color: opts.centerColor,
-          fontWeight: 800, padding: '0 40px',
-          textShadow: '0 5px 20px rgba(0,0,0,0.95)' }, opts.center),
-        shield(p.away, aUrl),
-      ]),
-      // check de acierto — grande, abajo y centrado
-      ...(opts.check ? [el('div', {
-        display: 'flex', justifyContent: 'center', marginTop: 4,
-      }, [{ type: 'img', props: { src: CHECK_URI, width: 212, height: 212,
-        style: { width: '212px', height: '212px' } } }])] : []),
+    // capa 3 — escudos + resultado: centrados en el MEDIO EXACTO de la placa
+    // (el guión del marcador queda en el centro literal y todo nace hacia los lados)
+    el('div', { display: 'flex', flexDirection: 'row', position: 'absolute',
+      top: 0, left: 0, width: '1200px', height: '720px',
+      alignItems: 'center', justifyContent: 'center' }, [
+      shield(p.home, hUrl),
+      el('div', { display: 'flex', fontSize: opts.centerSize, color: opts.centerColor,
+        fontWeight: 800, padding: '0 40px',
+        textShadow: '0 5px 20px rgba(0,0,0,0.95)' }, opts.center),
+      shield(p.away, aUrl),
     ]),
+    // capa 4 — logo + "Pick: ..." arriba a la izquierda
+    el('div', { display: 'flex', flexDirection: 'row', position: 'absolute',
+      top: 44, left: 56, alignItems: 'center', fontSize: 46, fontWeight: 800 }, [
+      { type: 'img', props: { src: LOGO_URL, width: 84, height: 84,
+        style: { width: '84px', height: '84px', marginRight: 20 } } },
+      el('div', { display: 'flex', color: GREEN, marginRight: 14,
+        textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, 'Pick:'),
+      el('div', { display: 'flex', color: '#ffffff',
+        textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, (p.rec || '').toUpperCase()),
+    ]),
+    // capa 5 — check de acierto, abajo y centrado
+    ...(opts.check ? [{ type: 'img', props: { src: CHECK_URI, width: 178, height: 178,
+      style: { position: 'absolute', bottom: 24, left: 511,
+        width: '178px', height: '178px' } } }] : []),
   ]);
 }
 
@@ -646,7 +649,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.11', mode,
+        bot: 'gambeta-x-bot', version: '1.12', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
