@@ -399,29 +399,27 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
         textShadow: '0 5px 20px rgba(0,0,0,0.95)' }, opts.center),
       shield(p.away, aUrl),
     ]),
-    // capa 4 — logo + "Pick: ..." (+ confianza) arriba a la izquierda
-    el('div', { display: 'flex', flexDirection: 'column', position: 'absolute',
-      top: 44, left: 56 }, [
-      el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
-        fontSize: 46, fontWeight: 800 }, [
-        { type: 'img', props: { src: LOGO_URL, width: 84, height: 84,
-          style: { width: '84px', height: '84px', marginRight: 20 } } },
-        el('div', { display: 'flex', color: GREEN, marginRight: 14,
-          textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, 'Pick:'),
-        el('div', { display: 'flex', color: '#ffffff',
-          textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, (p.rec || '').toUpperCase()),
-      ]),
-      // pastilla de confianza del pronóstico
-      ...(opts.confLabel ? [el('div', { display: 'flex', alignSelf: 'flex-start',
-        marginTop: 16, marginLeft: 104, background: 'rgba(0,200,83,0.22)',
-        border: '2px solid #00c853', borderRadius: '9999px', padding: '8px 24px',
-        fontSize: 27, color: '#00e676', fontWeight: 800 },
-        'CONFIANZA ' + opts.confLabel.toUpperCase())] : []),
+    // capa 4 — logo + "Pick: ..." arriba a la izquierda
+    el('div', { display: 'flex', flexDirection: 'row', position: 'absolute',
+      top: 44, left: 56, alignItems: 'center', fontSize: 46, fontWeight: 800 }, [
+      { type: 'img', props: { src: LOGO_URL, width: 84, height: 84,
+        style: { width: '84px', height: '84px', marginRight: 20 } } },
+      el('div', { display: 'flex', color: GREEN, marginRight: 14,
+        textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, 'Pick:'),
+      el('div', { display: 'flex', color: '#ffffff',
+        textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, (p.rec || '').toUpperCase()),
     ]),
     // capa 5 — check de acierto, abajo y centrado
     ...(opts.check ? [{ type: 'img', props: { src: CHECK_URI, width: 178, height: 178,
       style: { position: 'absolute', bottom: 24, left: 511,
         width: '178px', height: '178px' } } }] : []),
+    // capa 6 — pastilla de confianza del pronóstico, abajo y centrada
+    ...(opts.confLabel ? [el('div', { display: 'flex', position: 'absolute',
+      bottom: 46, left: 0, width: '1200px', justifyContent: 'center' }, [
+      el('div', { display: 'flex', background: 'rgba(0,200,83,0.24)',
+        border: '3px solid #00c853', borderRadius: '9999px', padding: '13px 38px',
+        fontSize: 33, color: '#00e676', fontWeight: 800 },
+        'CONFIANZA ' + opts.confLabel.toUpperCase())])] : []),
   ]);
 }
 
@@ -804,7 +802,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.20', mode,
+        bot: 'gambeta-x-bot', version: '1.21', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
