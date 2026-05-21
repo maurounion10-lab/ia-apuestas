@@ -127,6 +127,74 @@ function escudoEl(name, url, size) {
   return initialsBadge(name, size);
 }
 
+// ───────────────────────── Forma reciente (ESPN) ─────────────────────────
+// _sportKey del pick → slug de liga en ESPN.
+const ESPN_LEAGUE = {
+  soccer_epl: 'eng.1', soccer_spain_la_liga: 'esp.1', soccer_germany_bundesliga: 'ger.1',
+  soccer_italy_serie_a: 'ita.1', soccer_france_ligue_one: 'fra.1',
+  soccer_netherlands_eredivisie: 'ned.1', soccer_usa_mls: 'usa.1',
+  soccer_mexico_ligamx: 'mex.1', soccer_turkey_super_league: 'tur.1',
+  soccer_switzerland_superleague: 'sui.1', soccer_greece_super_league: 'gre.1',
+  soccer_russia_premier_league: 'rus.1', soccer_australia_aleague: 'aus.1',
+  soccer_norway_eliteserien: 'nor.1', soccer_sweden_allsvenskan: 'swe.1',
+  soccer_denmark_superliga: 'den.1', soccer_brazil_campeonato: 'bra.1',
+  soccer_argentina_primera_division: 'arg.1', soccer_spain_segunda_division: 'esp.2',
+  soccer_italy_serie_b: 'ita.2', soccer_germany_bundesliga2: 'ger.2',
+  soccer_france_ligue_two: 'fra.2',
+  soccer_conmebol_copa_libertadores: 'conmebol.libertadores',
+  soccer_conmebol_copa_sudamericana: 'conmebol.sudamericana',
+  soccer_uefa_champs_league: 'uefa.champions', soccer_uefa_europa_league: 'uefa.europa',
+  soccer_uefa_europa_conference_league: 'uefa.europa.conf',
+};
+function espnIdFromUrl(u) {
+  const m = (u || '').match(/teamlogos\/soccer\/500\/(\d+)\.png/);
+  return m ? m[1] : null;
+}
+// Últimos 5 resultados del equipo (G/E/P) vía el calendario público de ESPN.
+async function fetchTeamForm(espnId, slug) {
+  try {
+    const r = await fetch(
+      `https://site.api.espn.com/apis/site/v2/sports/soccer/${slug}/teams/${espnId}/schedule`,
+      { cf: { cacheTtl: 3600, cacheEverything: true } });
+    if (!r.ok) return null;
+    const j = await r.json();
+    const ev = Array.isArray(j.events) ? j.events : [];
+    const done = ev.filter(e => {
+      const c = e.competitions && e.competitions[0];
+      return c && c.status && c.status.type && c.status.type.completed;
+    }).sort((a, b) => new Date(a.date) - new Date(b.date));
+    const form = [];
+    for (const e of done) {
+      const cs = e.competitions[0].competitors || [];
+      const me = cs.find(x => String((x.team && x.team.id) || x.id) === String(espnId));
+      const opp = cs.find(x => x !== me);
+      if (!me || !opp) continue;
+      const ms = parseInt((me.score && me.score.displayValue) || me.score, 10);
+      const os = parseInt((opp.score && opp.score.displayValue) || opp.score, 10);
+      if (Number.isNaN(ms) || Number.isNaN(os)) continue;
+      form.push(ms > os ? 'G' : ms === os ? 'E' : 'P');
+    }
+    return form.length ? form.slice(-5) : null;
+  } catch (e) { return null; }
+}
+// Forma de los dos equipos del pick — [formH, formA] (cada uno array o null).
+async function teamFormPair(p, hUrl, aUrl) {
+  const slug = ESPN_LEAGUE[p && p._sportKey];
+  if (!slug) return [null, null];
+  const hId = espnIdFromUrl(hUrl), aId = espnIdFromUrl(aUrl);
+  return Promise.all([
+    hId ? fetchTeamForm(hId, slug) : Promise.resolve(null),
+    aId ? fetchTeamForm(aId, slug) : Promise.resolve(null),
+  ]);
+}
+// Cuadrito de resultado para la tira de forma — verde G, ámbar E, rojo P.
+function formSquare(r) {
+  const bg = r === 'G' ? '#00c853' : r === 'E' ? '#f5a623' : '#e5484d';
+  return el('div', { display: 'flex', alignItems: 'center', justifyContent: 'center',
+    width: '44px', height: '44px', borderRadius: 9, marginLeft: 5, marginRight: 5,
+    background: bg, color: '#ffffff', fontSize: 25, fontWeight: 800 }, r);
+}
+
 // ───────────────────────── Placa de imagen ─────────────────────────
 function el(type, style, children) {
   return { type, props: { style, children } };
@@ -400,8 +468,17 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
   const GREEN = '#00c853';
   const scene = stadiumScene(p.commenceTs);
   const escSize = opts.escudo;
-  // escudos sin disco de fondo — directo sobre la foto del estadio
-  const shield = (name, url) => escudoEl(name, url, escSize);
+  const anyForm = !!((opts.formH && opts.formH.length) || (opts.formA && opts.formA.length));
+  // escudo (directo sobre la foto) + tira de forma debajo si hay datos
+  const teamBlock = (name, url, form) => {
+    const esc = escudoEl(name, url, escSize);
+    if (!anyForm) return esc;
+    return el('div', { display: 'flex', flexDirection: 'column', alignItems: 'center' }, [
+      esc,
+      el('div', { display: 'flex', flexDirection: 'row', marginTop: 18, height: '44px' },
+        (form && form.length) ? form.map(formSquare) : []),
+    ]);
+  };
   return el('div', {
     display: 'flex', position: 'relative',
     width: '1200px', height: '720px', background: '#06120a',
@@ -418,11 +495,11 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
     el('div', { display: 'flex', flexDirection: 'row', position: 'absolute',
       top: 0, left: 0, width: '1200px', height: '720px',
       alignItems: 'center', justifyContent: 'center' }, [
-      shield(p.home, hUrl),
+      teamBlock(p.home, hUrl, opts.formH),
       el('div', { display: 'flex', fontSize: opts.centerSize, color: opts.centerColor,
-        fontWeight: 800, padding: '0 40px',
+        fontWeight: 800, padding: '0 40px', marginBottom: anyForm ? 62 : 0,
         textShadow: '0 5px 20px rgba(0,0,0,0.95)' }, opts.center),
-      shield(p.away, aUrl),
+      teamBlock(p.away, aUrl, opts.formA),
     ]),
     // capa 4 — logo + "Pick: ..." arriba a la izquierda
     el('div', { display: 'flex', flexDirection: 'row', position: 'absolute',
@@ -451,28 +528,29 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
 }
 
 // Placa de HOT TAKE — partido del día sobre el estadio, con "VS".
-function buildHotTakeCardElement(p, hUrl, aUrl) {
+function buildHotTakeCardElement(p, hUrl, aUrl, formH, formA) {
   return buildMatchCardElement(p, hUrl, aUrl, {
     escudo: 290, center: 'VS', centerColor: 'rgba(255,255,255,0.96)', centerSize: 96,
-    confLabel: confLabel(p),
+    confLabel: confLabel(p), formH, formA,
   });
 }
-async function renderHotTakeCardPng(p, hUrl, aUrl) {
-  return pngFromElement(buildHotTakeCardElement(p, hUrl, aUrl));
+async function renderHotTakeCardPng(p, hUrl, aUrl, formH, formA) {
+  return pngFromElement(buildHotTakeCardElement(p, hUrl, aUrl, formH, formA));
 }
 async function renderGenericCardPng(kicker, body) {
   return pngFromElement(buildGenericCardElement(kicker, body));
 }
 
 // Placa de FESTEJO — escudos enfrentados, marcador grande sobre el estadio.
-function buildCelebracionCardElement(p, hUrl, aUrl) {
+function buildCelebracionCardElement(p, hUrl, aUrl, formH, formA) {
   const score = (p.finalScore || '').toString().replace(/[-–]/, ' - ').trim() || 'WIN';
   return buildMatchCardElement(p, hUrl, aUrl, {
     escudo: 282, center: score, centerColor: '#00e676', centerSize: 124, check: true,
+    formH, formA,
   });
 }
-async function renderCelebracionCardPng(p, hUrl, aUrl) {
-  return pngFromElement(buildCelebracionCardElement(p, hUrl, aUrl));
+async function renderCelebracionCardPng(p, hUrl, aUrl, formH, formA) {
+  return pngFromElement(buildCelebracionCardElement(p, hUrl, aUrl, formH, formA));
 }
 
 // Genera la placa que corresponde al slot. Todos los slots llevan imagen.
@@ -504,7 +582,8 @@ async function renderCardForSlot(slot, hist, text) {
     const map = await fetchLogoMap();
     const [hU, aU] = await Promise.all([
       resolveEscudo(w.pick.home, map), resolveEscudo(w.pick.away, map)]);
-    return renderCelebracionCardPng(w.pick, hU, aU);
+    const [fH, fA] = await teamFormPair(w.pick, hU, aU);
+    return renderCelebracionCardPng(w.pick, hU, aU, fH, fA);
   }
   if (slot === 'hottake') {
     const picks = todayPendingPicks(hist);
@@ -513,7 +592,8 @@ async function renderCardForSlot(slot, hist, text) {
     const map = await fetchLogoMap();
     const [hU, aU] = await Promise.all([
       resolveEscudo(p.home, map), resolveEscudo(p.away, map)]);
-    return renderHotTakeCardPng(p, hU, aU);
+    const [fH, fA] = await teamFormPair(p, hU, aU);
+    return renderHotTakeCardPng(p, hU, aU, fH, fA);
   }
   // educacion / comunidad: sin placa — el tweet ya es texto, una placa de texto no aporta.
   return null;
@@ -823,7 +903,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.25', mode,
+        bot: 'gambeta-x-bot', version: '1.26', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -858,7 +938,8 @@ export default {
             const map = await fetchLogoMap();
             const [hU, aU] = await Promise.all([
               resolveEscudo(lw.home, map), resolveEscudo(lw.away, map)]);
-            png = await renderCelebracionCardPng(lw, hU, aU);
+            const [fH, fA] = await teamFormPair(lw, hU, aU);
+            png = await renderCelebracionCardPng(lw, hU, aU, fH, fA);
           }
         }
         if (!png) return J({ error: 'sin datos para la placa de ' + slot }, 404);
