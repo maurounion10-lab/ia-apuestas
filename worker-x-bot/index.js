@@ -299,9 +299,6 @@ function buildPicksCardElement(rows, dateLabel) {
       ]),
       // filas de picks
       el('div', { display: 'flex', flexDirection: 'column' }, rows.map(pickRowEl)),
-      // pie
-      el('div', { display: 'flex', fontSize: 21, color: '#8fc0a0', marginTop: 'auto' },
-        'Pronósticos de fútbol con IA · gratis todos los días en el perfil'),
     ]),
   ]);
 }
@@ -926,7 +923,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.28', mode,
+        bot: 'gambeta-x-bot', version: '1.29', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
