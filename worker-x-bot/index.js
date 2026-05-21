@@ -644,15 +644,15 @@ function genCelebracion(hist) {
   return t;
 }
 
-// ───────── Hilo de la previa: respuesta con stats de rendimiento ─────────
-// Calcula el rendimiento real desde el historial y arma el tweet-respuesta.
+// ───────── Stats de rendimiento para la previa ─────────
+// Calcula el rendimiento real desde el historial.
 function fmtRate(picks) {
   const v = picks.filter(p => p.result === 'win').length;
   const d = picks.filter(p => p.result === 'loss').length;
   const n = v + d;
   if (!n) return null;
   const pct = Math.round(v / n * 100);
-  return { n, v, d, pct, txt: pct + '% de acierto (' + v + 'V-' + d + 'D)' };
+  return { n, v, d, pct, txt: pct + '% (' + v + 'V-' + d + 'D)' };
 }
 // Clasifica el mercado del pick a partir del texto de la recomendación.
 function classifyMarket(rec) {
@@ -679,9 +679,9 @@ function prettyLeague(league) {
   if (/^libertadores$/i.test(l)) return 'Copa Libertadores';
   return l;
 }
-function buildStatsReply(hist, pick) {
+function buildStatsBlock(hist, pick) {
   const resolved = hist.filter(h => (h.result === 'win' || h.result === 'loss') && h.commenceTs);
-  if (resolved.length < 10) return null;
+  if (resolved.length < 10) return '';
   const now = Date.now();
   const yest = new Date(now + ART_OFFSET - 86400000).toISOString().slice(0, 10);
   const ayer = fmtRate(resolved.filter(h => artDate(h.commenceTs) === yest));
@@ -697,24 +697,22 @@ function buildStatsReply(hist, pick) {
     const mkR = fmtRate(inMk);
     const lgR = fmtRate(inMk.filter(h => cleanLeague(h.league) === cleanLeague(pick.league)));
     const mkLines = [];
-    if (mkR) mkLines.push('🎯 Mercado ' + mk.label + ' en gral— ' +
-      mkR.pct + '% (' + mkR.v + 'V-' + mkR.d + 'D)');
-    if (lgR && lgR.n >= 3) mkLines.push('🏆 Mercado ' + mk.label + ' en esta liga— ' +
-      lgR.pct + '% (' + lgR.v + 'V-' + lgR.d + 'D)');
+    if (mkR) mkLines.push('🎯 Mercado ' + mk.label + ' en gral— ' + mkR.txt);
+    if (lgR && lgR.n >= 3) mkLines.push('🏆 Mercado ' + mk.label + ' en esta liga— ' + lgR.txt);
     if (mkLines.length) lines.push('', ...mkLines);
   }
-  if (!lines.length) return null;
-  let txt = lines.join('\n');
-  if (txt.length > 280) txt = txt.slice(0, 279);
-  return txt;
+  return lines.join('\n');
 }
 
 function genHotTake(hist) {
   const picks = todayPendingPicks(hist);
   if (!picks.length) return null;
   const p = picks[0];
-  return `🔥 En ${p.home} vs ${p.away} la IA dice que ${p.rec} — ` +
-         `Confianza ${confLabel(p)} (${prettyLeague(p.league)})`;
+  const head = `🔥 En ${p.home} vs ${p.away} la IA dice que ${p.rec} — ` +
+               `Confianza ${confLabel(p)} (${prettyLeague(p.league)})`;
+  const stats = buildStatsBlock(hist, p);
+  const full = stats ? head + '\n\n' + stats : head;
+  return full.length <= 280 ? full : head;   // si no entra, solo el titular
 }
 
 // ───────────────────────── Router de slot → pilar ─────────────────────────
@@ -745,14 +743,6 @@ async function runSlot(slot, env, mode) {
   const text = generateText(slot, hist);
   if (!text) return { slot, status: 'skipped', reason: 'sin datos reales' };
 
-  // Previa (hot take): arma la respuesta del hilo con el historial de rendimiento
-  // real, para contextualizar el pick que se está dando.
-  let replyText = null;
-  if (slot === 'hottake') {
-    const picks = todayPendingPicks(hist);
-    if (picks.length) replyText = buildStatsReply(hist, picks[0]);
-  }
-
   // Placa de imagen — todos los slots la llevan
   let cardErr = null, pngBytes = null;
   try { pngBytes = await renderCardForSlot(slot, hist, text); }
@@ -760,7 +750,7 @@ async function runSlot(slot, env, mode) {
   const hasCard = !!pngBytes;
 
   if (mode !== 'live') {
-    return { slot, status: 'dry-run', chars: text.length, text, reply: replyText,
+    return { slot, status: 'dry-run', chars: text.length, text,
              card: hasCard ? 'generada (' + pngBytes.length + ' bytes)' : null,
              cardError: cardErr };
   }
@@ -772,14 +762,8 @@ async function runSlot(slot, env, mode) {
     catch (e) { cardErr = 'upload: ' + e.message; }  // degrada a texto
   }
   const id = await postTweet(text, env, { mediaId });
-  // Previa: postea la respuesta de stats como hilo (no rompe si falla)
-  let replyId = null;
-  if (replyText && id) {
-    try { replyId = await postTweet(replyText, env, { replyToId: id }); }
-    catch (e) { cardErr = (cardErr ? cardErr + ' | ' : '') + 'reply: ' + e.message; }
-  }
-  return { slot, status: 'posted', tweetId: id, replyId, chars: text.length,
-           withImage: !!mediaId, cardError: cardErr, text, reply: replyText };
+  return { slot, status: 'posted', tweetId: id, chars: text.length,
+           withImage: !!mediaId, cardError: cardErr, text };
 }
 
 // ───────────────────────── Handlers ─────────────────────────
@@ -805,7 +789,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.17', mode,
+        bot: 'gambeta-x-bot', version: '1.18', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -820,12 +804,6 @@ export default {
           const t = generateText(slot, hist);
           out[slot] = t ? { chars: t.length, text: t } : { status: 'skipped' };
         }
-        // respuesta de stats de la previa (hot take) — contextualiza el próximo pick
-        const hotPick = todayPendingPicks(hist)[0]
-          || hist.filter(w => w.result === 'win' && w.commenceTs)
-               .sort((a, b) => b.commenceTs - a.commenceTs)[0];
-        const rep = hotPick ? buildStatsReply(hist, hotPick) : null;
-        out.hottake_reply = rep ? { chars: rep.length, text: rep } : { status: 'sin datos' };
         return J({ fecha: todayART(), preview: out });
       } catch (e) { return J({ error: e.message }, 500); }
     }
