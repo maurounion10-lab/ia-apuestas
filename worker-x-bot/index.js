@@ -137,15 +137,17 @@ let _fonts = null;
 async function loadFonts() {
   if (_fonts) return _fonts;
   try {
-    const [r4, r8] = await Promise.all([
+    const [r4, r8, r9] = await Promise.all([
       fetch('https://gambeta.ai/font-400.woff', { cf: { cacheTtl: 86400, cacheEverything: true } }),
       fetch('https://gambeta.ai/font-800.woff', { cf: { cacheTtl: 86400, cacheEverything: true } }),
+      fetch('https://gambeta.ai/font-900.woff', { cf: { cacheTtl: 86400, cacheEverything: true } }),
     ]);
-    if (!r4.ok || !r8.ok) return null;
-    const [d4, d8] = await Promise.all([r4.arrayBuffer(), r8.arrayBuffer()]);
+    if (!r4.ok || !r8.ok || !r9.ok) return null;
+    const [d4, d8, d9] = await Promise.all([r4.arrayBuffer(), r8.arrayBuffer(), r9.arrayBuffer()]);
     _fonts = [
       { name: 'Gambeta', data: d4, weight: 400, style: 'normal' },
       { name: 'Gambeta', data: d8, weight: 800, style: 'normal' },
+      { name: 'Gambeta', data: d9, weight: 900, style: 'normal' },
     ];
     return _fonts;
   } catch (e) { return null; }
@@ -427,9 +429,9 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
       top: 44, left: 56, alignItems: 'center', fontSize: 46, fontWeight: 800 }, [
       { type: 'img', props: { src: LOGO_URL, width: 84, height: 84,
         style: { width: '84px', height: '84px', marginRight: 20 } } },
-      el('div', { display: 'flex', color: GREEN, marginRight: 16,
+      el('div', { display: 'flex', color: GREEN, marginRight: 16, fontWeight: 900,
         textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, 'Pick'),
-      el('div', { display: 'flex', color: '#ffffff',
+      el('div', { display: 'flex', color: '#ffffff', fontWeight: 900,
         textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, (p.rec || '').toUpperCase()),
     ]),
     // capa 5 — check de acierto, abajo y centrado
@@ -819,7 +821,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.23', mode,
+        bot: 'gambeta-x-bot', version: '1.24', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
