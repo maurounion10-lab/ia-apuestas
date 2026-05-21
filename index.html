@@ -926,7 +926,7 @@
   }
   .bcast-stack {
     position: fixed;
-    top: 114px;
+    top: 122px;
     left: 8px;
     z-index: 7100;
     display: none;
@@ -3839,6 +3839,7 @@
     body { padding-top: 110px; } /* nav 60px + gap 6px + sapphire 44px = 110px */
     #sapphire-sponsor-bar { top: 60px; } /* pegar el banner debajo del nav en móvil */
     #gbPageBar { top: 60px; } /* ajustar al nav de 60px en mobile */
+    .bcast-stack { top: 116px; } /* respetar nav 60 + banner sponsor en movil */
     body[data-gbpage] { padding-top: 101px; } /* 60 nav + 40 page bar + 1 border */
     /* Scroll-margin y sticky thead ajustados a mobile (nav 60px + sapphire 44px = 104px) */
     #predictions, #historial, #ranking, #bankroll, #calculator,
@@ -17379,6 +17380,7 @@ function acEvaluatePicks(extraScores = []) {
 
 /* ── Build pick HTML ── */
 function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
+  return ''; /* Gambeta Coins removido: sin seccion de apuesta por pick */
   const matchId  = (homeRaw||home) + '__' + (awayRaw||away);
   const safeId   = matchId.replace(/'/g,"\\'");
   const safeHome = (homeRaw||home).replace(/'/g,"\\'");
@@ -19931,8 +19933,9 @@ const COIN_NOTIFS_KEY    = 'gambeta_coin_notifs'; // localStorage: notificacione
 
 // Agrega una notificación G$ al inbox (sin popup, solo badge + inbox)
 function _addCoinNotif(icon, title, sub) {
+  return; /* Gambeta Coins removido: sin notificaciones de coins */
   try {
-    const notifs = JSON.parse(localStorage.getItem(COIN_NOTIFS_KEY) || '[]');
+    const notifs = JSON.parse('[]');
     notifs.unshift({ id: `cn_${Date.now()}`, icon, title, sub, ts: Date.now(), read: false });
     localStorage.setItem(COIN_NOTIFS_KEY, JSON.stringify(notifs.slice(0, 50)));
   } catch {}
@@ -20305,7 +20308,7 @@ function _updateInboxBadge() {
   let seen = []; try { seen = JSON.parse(localStorage.getItem(BROADCAST_SEEN_KEY) || '[]'); } catch(_) {}
   const unreadBC  = msgs.filter(m => !seen.includes(m.id)).length;
 
-  let coinNotifs = []; try { coinNotifs = JSON.parse(localStorage.getItem(COIN_NOTIFS_KEY) || '[]'); } catch(_) {}
+  let coinNotifs = []; try { coinNotifs = JSON.parse('[]'); } catch(_) {}
   const unreadCN   = coinNotifs.filter(n => !n.read).length;
 
   const unread = unreadBC + unreadCN;
@@ -20341,7 +20344,7 @@ function _renderInboxList() {
 
   const msgs      = (window._broadcastMsgs || []).slice().sort((a,b) => b.ts - a.ts);
   const seen      = JSON.parse(localStorage.getItem(BROADCAST_SEEN_KEY) || '[]');
-  const coinNotifs = JSON.parse(localStorage.getItem(COIN_NOTIFS_KEY) || '[]');
+  const coinNotifs = JSON.parse('[]');
 
   // Combinar y ordenar por ts descendente
   const allItems = [
@@ -20402,7 +20405,7 @@ function _renderInboxList() {
 // Marca una notificación G$ como leída
 function inboxMarkCoinRead(notifId) {
   try {
-    const notifs = JSON.parse(localStorage.getItem(COIN_NOTIFS_KEY) || '[]');
+    const notifs = JSON.parse('[]');
     const updated = notifs.map(n => n.id === notifId ? { ...n, read: true } : n);
     localStorage.setItem(COIN_NOTIFS_KEY, JSON.stringify(updated));
   } catch {}
@@ -20427,7 +20430,7 @@ function inboxMarkAllRead() {
   const allIds = msgs.map(m => m.id);
   try { localStorage.setItem(BROADCAST_SEEN_KEY, JSON.stringify(allIds)); } catch {}
   try {
-    const notifs  = JSON.parse(localStorage.getItem(COIN_NOTIFS_KEY) || '[]');
+    const notifs  = JSON.parse('[]');
     const updated = notifs.map(n => ({ ...n, read: true }));
     localStorage.setItem(COIN_NOTIFS_KEY, JSON.stringify(updated));
   } catch {}
