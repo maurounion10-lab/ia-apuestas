@@ -132,6 +132,33 @@ function el(type, style, children) {
   return { type, props: { style, children } };
 }
 
+// Fuente de marca (Montserrat) — servida desde gambeta.ai, cacheada por instancia.
+let _fonts = null;
+async function loadFonts() {
+  if (_fonts) return _fonts;
+  try {
+    const [r4, r8] = await Promise.all([
+      fetch('https://gambeta.ai/font-400.woff', { cf: { cacheTtl: 86400, cacheEverything: true } }),
+      fetch('https://gambeta.ai/font-800.woff', { cf: { cacheTtl: 86400, cacheEverything: true } }),
+    ]);
+    if (!r4.ok || !r8.ok) return null;
+    const [d4, d8] = await Promise.all([r4.arrayBuffer(), r8.arrayBuffer()]);
+    _fonts = [
+      { name: 'Gambeta', data: d4, weight: 400, style: 'normal' },
+      { name: 'Gambeta', data: d8, weight: 800, style: 'normal' },
+    ];
+    return _fonts;
+  } catch (e) { return null; }
+}
+// Render del árbol Satori a PNG, con la fuente de marca si está disponible.
+async function pngFromElement(element) {
+  const opts = { width: 1200, height: 720, format: 'png' };
+  const fonts = await loadFonts();
+  if (fonts) opts.fonts = fonts;
+  const resp = new ImageResponse(element, opts);
+  return new Uint8Array(await resp.arrayBuffer());
+}
+
 // Placa de PICKS — lista de pronósticos del día con escudos sobre el estadio.
 // Una fila por pick: escudos, partido y la recomendación de la IA en píldora.
 function pickRowEl(r) {
@@ -191,9 +218,7 @@ function buildPicksCardElement(rows, dateLabel) {
 }
 
 async function renderPicksCardPng(rows, dateLabel) {
-  const element = buildPicksCardElement(rows, dateLabel);
-  const resp = new ImageResponse(element, { width: 1200, height: 720, format: 'png' });
-  return new Uint8Array(await resp.arrayBuffer());
+  return pngFromElement(buildPicksCardElement(rows, dateLabel));
 }
 
 // Placa de RESULTADOS — lista con escudos sobre fondo de estadio.
@@ -259,9 +284,7 @@ function buildResultadosCardElement(rows, wins, total, dateLabel) {
 }
 
 async function renderResultadosCardPng(rows, wins, total, dateLabel) {
-  const element = buildResultadosCardElement(rows, wins, total, dateLabel);
-  const resp = new ImageResponse(element, { width: 1200, height: 720, format: 'png' });
-  return new Uint8Array(await resp.arrayBuffer());
+  return pngFromElement(buildResultadosCardElement(rows, wins, total, dateLabel));
 }
 
 // Placa GENERICA branded — para educacion, hot take, comunidad y festejo.
@@ -416,9 +439,9 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
     // capa 6 — pastilla de confianza del pronóstico, abajo y centrada
     ...(opts.confLabel ? [el('div', { display: 'flex', position: 'absolute',
       bottom: 46, left: 0, width: '1200px', justifyContent: 'center' }, [
-      el('div', { display: 'flex', background: 'rgba(0,200,83,0.24)',
-        border: '3px solid #00c853', borderRadius: '9999px', padding: '13px 38px',
-        fontSize: 33, color: '#00e676', fontWeight: 800 },
+      el('div', { display: 'flex', background: '#00e676',
+        borderRadius: '9999px', padding: '20px 56px',
+        fontSize: 48, color: '#08130b', fontWeight: 800, letterSpacing: 1 },
         'CONFIANZA ' + opts.confLabel.toUpperCase())])] : []),
   ]);
 }
@@ -431,14 +454,10 @@ function buildHotTakeCardElement(p, hUrl, aUrl) {
   });
 }
 async function renderHotTakeCardPng(p, hUrl, aUrl) {
-  const resp = new ImageResponse(buildHotTakeCardElement(p, hUrl, aUrl),
-    { width: 1200, height: 720, format: 'png' });
-  return new Uint8Array(await resp.arrayBuffer());
+  return pngFromElement(buildHotTakeCardElement(p, hUrl, aUrl));
 }
 async function renderGenericCardPng(kicker, body) {
-  const element = buildGenericCardElement(kicker, body);
-  const resp = new ImageResponse(element, { width: 1200, height: 720, format: 'png' });
-  return new Uint8Array(await resp.arrayBuffer());
+  return pngFromElement(buildGenericCardElement(kicker, body));
 }
 
 // Placa de FESTEJO — escudos enfrentados, marcador grande sobre el estadio.
@@ -449,9 +468,7 @@ function buildCelebracionCardElement(p, hUrl, aUrl) {
   });
 }
 async function renderCelebracionCardPng(p, hUrl, aUrl) {
-  const resp = new ImageResponse(buildCelebracionCardElement(p, hUrl, aUrl),
-    { width: 1200, height: 720, format: 'png' });
-  return new Uint8Array(await resp.arrayBuffer());
+  return pngFromElement(buildCelebracionCardElement(p, hUrl, aUrl));
 }
 
 // Genera la placa que corresponde al slot. Todos los slots llevan imagen.
@@ -802,7 +819,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.21', mode,
+        bot: 'gambeta-x-bot', version: '1.22', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
