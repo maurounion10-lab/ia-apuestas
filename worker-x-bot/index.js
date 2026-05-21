@@ -644,49 +644,67 @@ function genCelebracion(hist) {
   return t;
 }
 
-// ───────── Respuesta de stats del festejo (hilo) ─────────
+// ───────── Hilo de la previa: respuesta con stats de rendimiento ─────────
 // Calcula el rendimiento real desde el historial y arma el tweet-respuesta.
 function fmtRate(picks) {
   const v = picks.filter(p => p.result === 'win').length;
   const d = picks.filter(p => p.result === 'loss').length;
   const n = v + d;
-  return n ? { n, txt: Math.round(v / n * 100) + '% de acierto (' + v + 'V-' + d + 'D)' } : null;
+  if (!n) return null;
+  const pct = Math.round(v / n * 100);
+  return { n, v, d, pct, txt: pct + '% de acierto (' + v + 'V-' + d + 'D)' };
 }
 // Clasifica el mercado del pick a partir del texto de la recomendación.
 function classifyMarket(rec) {
   const r = (rec || '').toLowerCase();
   let m = r.match(/m[áa]s de\s+([\d.]+)/);
-  if (m) return { key: 'o' + m[1], label: 'Más de ' + m[1] + ' goles' };
+  if (m) return { key: 'o' + m[1], label: 'Más de ' + m[1] };
   m = r.match(/menos de\s+([\d.]+)/);
-  if (m) return { key: 'u' + m[1], label: 'Menos de ' + m[1] + ' goles' };
+  if (m) return { key: 'u' + m[1], label: 'Menos de ' + m[1] };
   if (/ambos marcan/.test(r)) return { key: 'btts', label: 'Ambos Marcan' };
-  if (/^gana |^empate|doble oportunidad/.test(r)) return { key: '1x2', label: 'Ganador del partido' };
+  if (/^gana |^empate|doble oportunidad/.test(r)) return { key: '1x2', label: 'Ganador' };
   return { key: 'x', label: null };
+}
+// Nivel de confianza legible del pick.
+function confLabel(p) {
+  const t = ((p && p.bvrText) || '').trim();
+  if (/^(Máxima|Alta|Media-Alta|Media|Baja)$/i.test(t)) return t;
+  const c = ((p && p.conf) || '').toLowerCase();
+  return c === 'high' ? 'Alta' : c === 'low' ? 'Baja' : 'Media';
+}
+// Nombre de liga legible (saca emoji, completa las copas CONMEBOL).
+function prettyLeague(league) {
+  const l = cleanLeague(league);
+  if (/^sudamericana$/i.test(l)) return 'Copa Sudamericana';
+  if (/^libertadores$/i.test(l)) return 'Copa Libertadores';
+  return l;
 }
 function buildStatsReply(hist, pick) {
   const resolved = hist.filter(h => (h.result === 'win' || h.result === 'loss') && h.commenceTs);
   if (resolved.length < 10) return null;
   const now = Date.now();
   const yest = new Date(now + ART_OFFSET - 86400000).toISOString().slice(0, 10);
-  const mes  = fmtRate(resolved.filter(h => h.commenceTs >= now - 30 * 86400000));
-  const sem  = fmtRate(resolved.filter(h => h.commenceTs >= now - 7 * 86400000));
   const ayer = fmtRate(resolved.filter(h => artDate(h.commenceTs) === yest));
-  const lines = ['📊 La IA detrás de este pick:', ''];
-  if (mes)  lines.push('📅 Mes: ' + mes.txt);
-  if (sem)  lines.push('📆 Semana: ' + sem.txt);
-  if (ayer) lines.push('⏱️ Ayer: ' + ayer.txt);
+  const sem  = fmtRate(resolved.filter(h => h.commenceTs >= now - 7 * 86400000));
+  const mes  = fmtRate(resolved.filter(h => h.commenceTs >= now - 30 * 86400000));
+  const lines = [];
+  if (ayer) lines.push('⏱️ Ayer— ' + ayer.txt);
+  if (sem)  lines.push('📆 Semana— ' + sem.txt);
+  if (mes)  lines.push('📅 Mes— ' + mes.txt);
   const mk = classifyMarket(pick && pick.rec);
   if (mk.label) {
     const inMk = resolved.filter(h => classifyMarket(h.rec).key === mk.key);
     const mkR = fmtRate(inMk);
-    if (mkR) lines.push('🎯 Rendimiento en ' + mk.label + ': ' + mkR.txt);
-    const inLg = inMk.filter(h => cleanLeague(h.league) === cleanLeague(pick.league));
-    const lgR = fmtRate(inLg);
-    if (lgR && lgR.n >= 3) lines.push('🏆 ' + mk.label + ' en esta liga: ' + lgR.txt);
+    const lgR = fmtRate(inMk.filter(h => cleanLeague(h.league) === cleanLeague(pick.league)));
+    const mkLines = [];
+    if (mkR) mkLines.push('🎯 Mercado ' + mk.label + ' en gral— ' +
+      mkR.pct + '% (' + mkR.v + 'V-' + mkR.d + 'D)');
+    if (lgR && lgR.n >= 3) mkLines.push('🏆 Mercado ' + mk.label + ' en esta liga— ' +
+      lgR.pct + '% (' + lgR.v + 'V-' + lgR.d + 'D)');
+    if (mkLines.length) lines.push('', ...mkLines);
   }
-  if (lines.length <= 2) return null;
+  if (!lines.length) return null;
   let txt = lines.join('\n');
-  if (txt.length > 275) txt = txt.replace(/ de acierto/g, '');   // red de seguridad
   if (txt.length > 280) txt = txt.slice(0, 279);
   return txt;
 }
@@ -695,13 +713,8 @@ function genHotTake(hist) {
   const picks = todayPendingPicks(hist);
   if (!picks.length) return null;
   const p = picks[0];
-  const prob = Math.max(p.probH || 0, p.probA || 0, p.probD || 0);
-  let t = `🔥 ${p.home} vs ${p.away}\n\nLa IA dice: ${p.rec}`;
-  if (prob) t += ` — le da ${prob}% de probabilidad`;
-  t += '.\n\n';
-  if (p.league) t += `(${cleanLeague(p.league)})\n\n`;
-  t += '¿Vos qué ves? Dejá tu pronóstico abajo 👇';
-  return t;
+  return `🔥 En ${p.home} vs ${p.away} la IA dice que ${p.rec} — ` +
+         `Confianza ${confLabel(p)} (${prettyLeague(p.league)})`;
 }
 
 // ───────────────────────── Router de slot → pilar ─────────────────────────
@@ -792,7 +805,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.16', mode,
+        bot: 'gambeta-x-bot', version: '1.17', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
