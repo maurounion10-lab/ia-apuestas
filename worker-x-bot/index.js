@@ -671,7 +671,7 @@ function buildStatsReply(hist, pick) {
   const mes  = fmtRate(resolved.filter(h => h.commenceTs >= now - 30 * 86400000));
   const sem  = fmtRate(resolved.filter(h => h.commenceTs >= now - 7 * 86400000));
   const ayer = fmtRate(resolved.filter(h => artDate(h.commenceTs) === yest));
-  const lines = ['📊 La IA de Gambeta, sin maquillar nada:', ''];
+  const lines = ['📊 La IA detrás de este pick:', ''];
   if (mes)  lines.push('📅 Mes: ' + mes.txt);
   if (sem)  lines.push('📆 Semana: ' + sem.txt);
   if (ayer) lines.push('⏱️ Ayer: ' + ayer.txt);
@@ -732,11 +732,12 @@ async function runSlot(slot, env, mode) {
   const text = generateText(slot, hist);
   if (!text) return { slot, status: 'skipped', reason: 'sin datos reales' };
 
-  // Festejo: arma la respuesta del hilo con el historial de rendimiento real
+  // Previa (hot take): arma la respuesta del hilo con el historial de rendimiento
+  // real, para contextualizar el pick que se está dando.
   let replyText = null;
-  if (slot === 'celebracion') {
-    const w = celebracionWin(hist);
-    if (w) replyText = buildStatsReply(hist, w.pick);
+  if (slot === 'hottake') {
+    const picks = todayPendingPicks(hist);
+    if (picks.length) replyText = buildStatsReply(hist, picks[0]);
   }
 
   // Placa de imagen — todos los slots la llevan
@@ -758,7 +759,7 @@ async function runSlot(slot, env, mode) {
     catch (e) { cardErr = 'upload: ' + e.message; }  // degrada a texto
   }
   const id = await postTweet(text, env, { mediaId });
-  // Festejo: postea la respuesta de stats como hilo (no rompe si falla)
+  // Previa: postea la respuesta de stats como hilo (no rompe si falla)
   let replyId = null;
   if (replyText && id) {
     try { replyId = await postTweet(replyText, env, { replyToId: id }); }
@@ -791,7 +792,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.15', mode,
+        bot: 'gambeta-x-bot', version: '1.16', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -806,11 +807,12 @@ export default {
           const t = generateText(slot, hist);
           out[slot] = t ? { chars: t.length, text: t } : { status: 'skipped' };
         }
-        // respuesta de stats del festejo (con el último acierto si no hay ventana activa)
-        const lw = hist.filter(w => w.result === 'win' && w.commenceTs)
-          .sort((a, b) => b.commenceTs - a.commenceTs)[0];
-        const rep = lw ? buildStatsReply(hist, lw) : null;
-        out.celebracion_reply = rep ? { chars: rep.length, text: rep } : { status: 'sin datos' };
+        // respuesta de stats de la previa (hot take) — contextualiza el próximo pick
+        const hotPick = todayPendingPicks(hist)[0]
+          || hist.filter(w => w.result === 'win' && w.commenceTs)
+               .sort((a, b) => b.commenceTs - a.commenceTs)[0];
+        const rep = hotPick ? buildStatsReply(hist, hotPick) : null;
+        out.hottake_reply = rep ? { chars: rep.length, text: rep } : { status: 'sin datos' };
         return J({ fecha: todayART(), preview: out });
       } catch (e) { return J({ error: e.message }, 500); }
     }
