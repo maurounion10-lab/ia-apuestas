@@ -575,7 +575,7 @@ async function renderCelebracionCardPng(p, hUrl, aUrl) {
 }
 
 // Genera la placa que corresponde al slot. Todos los slots llevan imagen.
-async function renderCardForSlot(slot, hist, text) {
+async function renderCardForSlot(slot, hist, text, pickOverride) {
   if (slot === 'picks') {
     const picks = todayPendingPicks(hist);
     if (!picks.length) return null;
@@ -606,9 +606,8 @@ async function renderCardForSlot(slot, hist, text) {
     return renderCelebracionCardPng(w.pick, hU, aU);
   }
   if (slot === 'hottake') {
-    const picks = todayPendingPicks(hist);
-    if (!picks.length) return null;
-    const p = picks[0];
+    const p = pickOverride || todayPendingPicks(hist)[0];
+    if (!p) return null;
     const map = await fetchLogoMap();
     const [hU, aU] = await Promise.all([
       resolveEscudo(p.home, map), resolveEscudo(p.away, map)]);
@@ -838,10 +837,9 @@ function buildStatsBlock(hist, pick) {
   return lines.join('\n');
 }
 
-function genHotTake(hist) {
-  const picks = todayPendingPicks(hist);
-  if (!picks.length) return null;
-  const p = picks[0];
+function genHotTake(hist, pickOverride) {
+  const p = pickOverride || todayPendingPicks(hist)[0];
+  if (!p) return null;
   const head = `🔥 En ${p.home} vs ${p.away} la IA dice que ${p.rec} — ` +
                `Confianza ${confLabel(p)} (${leagueLabel(p.league)})`;
   const stats = buildStatsBlock(hist, p);
@@ -859,12 +857,12 @@ const SLOT_BY_CRON = {
   '0 23 * * *':  'comunidad',
 };
 
-function generateText(slot, hist) {
+function generateText(slot, hist, pickOverride) {
   switch (slot) {
     case 'picks':      return genPicks(hist);
     case 'resultados': return genResultados(hist);
     case 'educacion':  return genEducacion();
-    case 'hottake':    return genHotTake(hist);
+    case 'hottake':    return genHotTake(hist, pickOverride);
     case 'comunidad':  return genComunidad();
     case 'celebracion':return genCelebracion(hist);
     default:           return null;
@@ -872,14 +870,24 @@ function generateText(slot, hist) {
 }
 
 // Corre un slot: genera texto + la placa de imagen (+ respuesta de stats en festejo).
-async function runSlot(slot, env, mode) {
+async function runSlot(slot, env, mode, matchStr) {
   const hist = await fetchHistorial();
-  const text = generateText(slot, hist);
+  // matchStr (opcional, sólo hot take): elige un pick puntual por nombre de equipo
+  let pickOverride = null;
+  if (slot === 'hottake' && matchStr) {
+    const m = String(matchStr).toLowerCase();
+    pickOverride = todayPendingPicks(hist).find(p =>
+      ((p.home || '') + ' ' + (p.away || '')).toLowerCase().includes(m)) || null;
+    if (!pickOverride) {
+      return { slot, status: 'skipped', reason: 'sin pick que coincida con "' + matchStr + '"' };
+    }
+  }
+  const text = generateText(slot, hist, pickOverride);
   if (!text) return { slot, status: 'skipped', reason: 'sin datos reales' };
 
   // Placa de imagen — todos los slots la llevan
   let cardErr = null, pngBytes = null;
-  try { pngBytes = await renderCardForSlot(slot, hist, text); }
+  try { pngBytes = await renderCardForSlot(slot, hist, text, pickOverride); }
   catch (e) { cardErr = e.message; }
   const hasCard = !!pngBytes;
 
@@ -923,7 +931,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.29', mode,
+        bot: 'gambeta-x-bot', version: '1.30', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -976,8 +984,9 @@ export default {
       }
       const runMode = url.searchParams.get('force') === 'live' ? 'live'
                      : (mode === 'off' ? 'dry' : mode);
+      const match = url.searchParams.get('match') || null;
       try {
-        return J(await runSlot(slot, env, runMode));
+        return J(await runSlot(slot, env, runMode, match));
       } catch (e) { return J({ error: e.message }, 500); }
     }
 
