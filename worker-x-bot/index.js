@@ -91,7 +91,7 @@ async function fetchLogoMap() {
   if (_logoMap) return _logoMap;
   const map = {};
   try {
-    const r = await fetch('https://gambeta.ai/', { cf: { cacheTtl: 3600, cacheEverything: true } });
+    const r = await fetch('https://gambeta.ai/?lm=2', { cf: { cacheTtl: 600 } });
     const html = await r.text();
     const m = html.match(/const teamLogos = \{([\s\S]*?)\n\};/);
     if (m) {
@@ -931,7 +931,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.31', mode,
+        bot: 'gambeta-x-bot', version: '1.32', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
