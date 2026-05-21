@@ -815,25 +815,28 @@ function leagueLabel(raw) {
 function buildStatsBlock(hist, pick) {
   const resolved = hist.filter(h => (h.result === 'win' || h.result === 'loss') && h.commenceTs);
   if (resolved.length < 10) return '';
+  // TODAS las stats son del MERCADO del pick — nada genérico.
+  const mk = classifyMarket(pick && pick.rec);
+  if (!mk.label) return '';
+  const inMk = resolved.filter(h => classifyMarket(h.rec).key === mk.key);
+  if (!inMk.length) return '';
   const now = Date.now();
   const yest = new Date(now + ART_OFFSET - 86400000).toISOString().slice(0, 10);
-  const ayer = fmtRate(resolved.filter(h => artDate(h.commenceTs) === yest));
-  const sem  = fmtRate(resolved.filter(h => h.commenceTs >= now - 7 * 86400000));
-  const mes  = fmtRate(resolved.filter(h => h.commenceTs >= now - 30 * 86400000));
+  // Ayer / Semana / Mes — rendimiento de la IA EN ESE MERCADO en cada ventana.
+  const ayer = fmtRate(inMk.filter(h => artDate(h.commenceTs) === yest));
+  const sem  = fmtRate(inMk.filter(h => h.commenceTs >= now - 7 * 86400000));
+  const mes  = fmtRate(inMk.filter(h => h.commenceTs >= now - 30 * 86400000));
   const lines = [];
   if (ayer) lines.push('⏱️ Ayer— ' + ayer.txt);
   if (sem)  lines.push('📆 Semana— ' + sem.txt);
   if (mes)  lines.push('📅 Mes— ' + mes.txt);
-  const mk = classifyMarket(pick && pick.rec);
-  if (mk.label) {
-    const inMk = resolved.filter(h => classifyMarket(h.rec).key === mk.key);
-    const mkR = fmtRate(inMk);
-    const lgR = fmtRate(inMk.filter(h => cleanLeague(h.league) === cleanLeague(pick.league)));
-    const mkLines = [];
-    if (mkR) mkLines.push('🎯 Mercado ' + mk.label + ' en gral— ' + mkR.txt);
-    if (lgR && lgR.n >= 3) mkLines.push('🏆 Mercado ' + mk.label + ' en esta liga— ' + lgR.txt);
-    if (mkLines.length) lines.push('', ...mkLines);
-  }
+  // Mercado: histórico total y histórico en esta misma liga.
+  const mkR = fmtRate(inMk);
+  const lgR = fmtRate(inMk.filter(h => cleanLeague(h.league) === cleanLeague(pick.league)));
+  const mkLines = [];
+  if (mkR) mkLines.push('🎯 Mercado ' + mk.label + ' en gral— ' + mkR.txt);
+  if (lgR && lgR.n >= 3) mkLines.push('🏆 Mercado ' + mk.label + ' en esta liga— ' + lgR.txt);
+  if (mkLines.length) { if (lines.length) lines.push(''); lines.push(...mkLines); }
   return lines.join('\n');
 }
 
@@ -931,7 +934,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.32', mode,
+        bot: 'gambeta-x-bot', version: '1.33', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
