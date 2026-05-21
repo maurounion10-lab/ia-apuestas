@@ -262,8 +262,6 @@ function buildHotTakeCardElement(p, hUrl, aUrl) {
     background: DARK, padding: '48px 60px', justifyContent: 'space-between',
     alignItems: 'center',
   }, [
-    el('div', { display: 'flex', alignSelf: 'flex-start', fontSize: 26, color: GREEN,
-      fontWeight: 800, letterSpacing: 2 }, 'GAMBETA.AI'),
     el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
       justifyContent: 'center', flexGrow: 1 }, [
       escudoEl(p.home, hUrl, 260),
@@ -297,8 +295,6 @@ function buildCelebracionCardElement(p, hUrl, aUrl) {
     background: DARK, padding: '48px 60px', justifyContent: 'space-between',
     alignItems: 'center',
   }, [
-    el('div', { display: 'flex', alignSelf: 'flex-start', fontSize: 26, color: GREEN,
-      fontWeight: 800, letterSpacing: 2 }, 'GAMBETA.AI'),
     el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
       justifyContent: 'center', flexGrow: 1 }, [
       escudoEl(p.home, hUrl, 240),
@@ -592,7 +588,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.5', mode,
+        bot: 'gambeta-x-bot', version: '1.6', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
