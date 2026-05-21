@@ -644,6 +644,53 @@ function genCelebracion(hist) {
   return t;
 }
 
+// ───────── Respuesta de stats del festejo (hilo) ─────────
+// Calcula el rendimiento real desde el historial y arma el tweet-respuesta.
+function fmtRate(picks) {
+  const v = picks.filter(p => p.result === 'win').length;
+  const d = picks.filter(p => p.result === 'loss').length;
+  const n = v + d;
+  return n ? { n, txt: Math.round(v / n * 100) + '% de acierto (' + v + 'V-' + d + 'D)' } : null;
+}
+// Clasifica el mercado del pick a partir del texto de la recomendación.
+function classifyMarket(rec) {
+  const r = (rec || '').toLowerCase();
+  let m = r.match(/m[áa]s de\s+([\d.]+)/);
+  if (m) return { key: 'o' + m[1], label: 'Más de ' + m[1] + ' goles' };
+  m = r.match(/menos de\s+([\d.]+)/);
+  if (m) return { key: 'u' + m[1], label: 'Menos de ' + m[1] + ' goles' };
+  if (/ambos marcan/.test(r)) return { key: 'btts', label: 'Ambos Marcan' };
+  if (/^gana |^empate|doble oportunidad/.test(r)) return { key: '1x2', label: 'Ganador del partido' };
+  return { key: 'x', label: null };
+}
+function buildStatsReply(hist, pick) {
+  const resolved = hist.filter(h => (h.result === 'win' || h.result === 'loss') && h.commenceTs);
+  if (resolved.length < 10) return null;
+  const now = Date.now();
+  const yest = new Date(now + ART_OFFSET - 86400000).toISOString().slice(0, 10);
+  const mes  = fmtRate(resolved.filter(h => h.commenceTs >= now - 30 * 86400000));
+  const sem  = fmtRate(resolved.filter(h => h.commenceTs >= now - 7 * 86400000));
+  const ayer = fmtRate(resolved.filter(h => artDate(h.commenceTs) === yest));
+  const lines = ['📊 La IA de Gambeta, sin maquillar nada:', ''];
+  if (mes)  lines.push('📅 Mes: ' + mes.txt);
+  if (sem)  lines.push('📆 Semana: ' + sem.txt);
+  if (ayer) lines.push('⏱️ Ayer: ' + ayer.txt);
+  const mk = classifyMarket(pick && pick.rec);
+  if (mk.label) {
+    const inMk = resolved.filter(h => classifyMarket(h.rec).key === mk.key);
+    const mkR = fmtRate(inMk);
+    if (mkR) lines.push('🎯 Rendimiento en ' + mk.label + ': ' + mkR.txt);
+    const inLg = inMk.filter(h => cleanLeague(h.league) === cleanLeague(pick.league));
+    const lgR = fmtRate(inLg);
+    if (lgR && lgR.n >= 3) lines.push('🏆 ' + mk.label + ' en esta liga: ' + lgR.txt);
+  }
+  if (lines.length <= 2) return null;
+  let txt = lines.join('\n');
+  if (txt.length > 275) txt = txt.replace(/ de acierto/g, '');   // red de seguridad
+  if (txt.length > 280) txt = txt.slice(0, 279);
+  return txt;
+}
+
 function genHotTake(hist) {
   const picks = todayPendingPicks(hist);
   if (!picks.length) return null;
@@ -679,11 +726,18 @@ function generateText(slot, hist) {
   }
 }
 
-// Corre un slot: genera texto + (para picks) la placa de imagen.
+// Corre un slot: genera texto + la placa de imagen (+ respuesta de stats en festejo).
 async function runSlot(slot, env, mode) {
   const hist = await fetchHistorial();
   const text = generateText(slot, hist);
   if (!text) return { slot, status: 'skipped', reason: 'sin datos reales' };
+
+  // Festejo: arma la respuesta del hilo con el historial de rendimiento real
+  let replyText = null;
+  if (slot === 'celebracion') {
+    const w = celebracionWin(hist);
+    if (w) replyText = buildStatsReply(hist, w.pick);
+  }
 
   // Placa de imagen — todos los slots la llevan
   let cardErr = null, pngBytes = null;
@@ -692,7 +746,7 @@ async function runSlot(slot, env, mode) {
   const hasCard = !!pngBytes;
 
   if (mode !== 'live') {
-    return { slot, status: 'dry-run', chars: text.length, text,
+    return { slot, status: 'dry-run', chars: text.length, text, reply: replyText,
              card: hasCard ? 'generada (' + pngBytes.length + ' bytes)' : null,
              cardError: cardErr };
   }
@@ -704,8 +758,14 @@ async function runSlot(slot, env, mode) {
     catch (e) { cardErr = 'upload: ' + e.message; }  // degrada a texto
   }
   const id = await postTweet(text, env, { mediaId });
-  return { slot, status: 'posted', tweetId: id, chars: text.length,
-           withImage: !!mediaId, cardError: cardErr, text };
+  // Festejo: postea la respuesta de stats como hilo (no rompe si falla)
+  let replyId = null;
+  if (replyText && id) {
+    try { replyId = await postTweet(replyText, env, { replyToId: id }); }
+    catch (e) { cardErr = (cardErr ? cardErr + ' | ' : '') + 'reply: ' + e.message; }
+  }
+  return { slot, status: 'posted', tweetId: id, replyId, chars: text.length,
+           withImage: !!mediaId, cardError: cardErr, text, reply: replyText };
 }
 
 // ───────────────────────── Handlers ─────────────────────────
@@ -731,7 +791,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.14', mode,
+        bot: 'gambeta-x-bot', version: '1.15', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -746,6 +806,11 @@ export default {
           const t = generateText(slot, hist);
           out[slot] = t ? { chars: t.length, text: t } : { status: 'skipped' };
         }
+        // respuesta de stats del festejo (con el último acierto si no hay ventana activa)
+        const lw = hist.filter(w => w.result === 'win' && w.commenceTs)
+          .sort((a, b) => b.commenceTs - a.commenceTs)[0];
+        const rep = lw ? buildStatsReply(hist, lw) : null;
+        out.celebracion_reply = rep ? { chars: rep.length, text: rep } : { status: 'sin datos' };
         return J({ fecha: todayART(), preview: out });
       } catch (e) { return J({ error: e.message }, 500); }
     }
