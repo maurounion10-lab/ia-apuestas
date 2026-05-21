@@ -164,6 +164,7 @@ async function fetchTeamForm(espnId, slug) {
       return c && c.status && c.status.type && c.status.type.completed;
     }).sort((a, b) => new Date(a.date) - new Date(b.date));
     const form = [];
+    let lastDate = '';
     for (const e of done) {
       const cs = e.competitions[0].competitors || [];
       const me = cs.find(x => String((x.team && x.team.id) || x.id) === String(espnId));
@@ -173,8 +174,11 @@ async function fetchTeamForm(espnId, slug) {
       const os = parseInt((opp.score && opp.score.displayValue) || opp.score, 10);
       if (Number.isNaN(ms) || Number.isNaN(os)) continue;
       form.push(ms > os ? 'G' : ms === os ? 'E' : 'P');
+      const d = new Date(e.date);
+      lastDate = String(d.getUTCDate()).padStart(2, '0') + '/' +
+                 String(d.getUTCMonth() + 1).padStart(2, '0');
     }
-    return form.length ? form.slice(-5) : null;
+    return form.length ? { list: form.slice(-5), lastDate } : null;
   } catch (e) { return null; }
 }
 // Forma de los dos equipos del pick — [formH, formA] (cada uno array o null).
@@ -187,12 +191,27 @@ async function teamFormPair(p, hUrl, aUrl) {
     aId ? fetchTeamForm(aId, slug) : Promise.resolve(null),
   ]);
 }
-// Cuadrito de resultado para la tira de forma — verde G, ámbar E, rojo P.
+// Cuadrito de resultado — verde G, ámbar E, rojo P.
 function formSquare(r) {
   const bg = r === 'G' ? '#00c853' : r === 'E' ? '#f5a623' : '#e5484d';
   return el('div', { display: 'flex', alignItems: 'center', justifyContent: 'center',
-    width: '44px', height: '44px', borderRadius: 9, marginLeft: 5, marginRight: 5,
-    background: bg, color: '#ffffff', fontSize: 25, fontWeight: 800 }, r);
+    width: '40px', height: '40px', borderRadius: 8, marginTop: 4, marginBottom: 4,
+    background: bg, color: '#ffffff', fontSize: 23, fontWeight: 800 }, r);
+}
+// Tira de forma vertical (más reciente arriba) con la fecha del último partido al lado.
+function formColumn(form, side) {
+  const sq = form.list.slice().reverse();
+  return el('div', { display: 'flex', flexDirection: 'column', alignItems: 'center' },
+    sq.map((r, i) => {
+      const square = formSquare(r);
+      if (i !== 0 || !form.lastDate) return square;
+      const date = el('div', { display: 'flex', fontSize: 19, fontWeight: 800,
+        color: '#dfeee5', textShadow: '0 2px 8px rgba(0,0,0,0.95)',
+        marginLeft: side === 'R' ? 10 : 0, marginRight: side === 'L' ? 10 : 0 },
+        form.lastDate);
+      return el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center' },
+        side === 'L' ? [date, square] : [square, date]);
+    }));
 }
 
 // ───────────────────────── Placa de imagen ─────────────────────────
@@ -468,16 +487,15 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
   const GREEN = '#00c853';
   const scene = stadiumScene(p.commenceTs);
   const escSize = opts.escudo;
-  const anyForm = !!((opts.formH && opts.formH.length) || (opts.formA && opts.formA.length));
-  // escudo (directo sobre la foto) + tira de forma debajo si hay datos
-  const teamBlock = (name, url, form) => {
+  const hasForm = f => !!(f && f.list && f.list.length);
+  // escudo directo sobre la foto, con la tira de forma vertical al costado externo
+  const teamBlock = (name, url, form, side) => {
     const esc = escudoEl(name, url, escSize);
-    if (!anyForm) return esc;
-    return el('div', { display: 'flex', flexDirection: 'column', alignItems: 'center' }, [
-      esc,
-      el('div', { display: 'flex', flexDirection: 'row', marginTop: 18, height: '44px' },
-        (form && form.length) ? form.map(formSquare) : []),
-    ]);
+    if (!hasForm(form)) return esc;
+    const col = formColumn(form, side);
+    const gap = el('div', { display: 'flex', width: '18px' }, '');
+    return el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center' },
+      side === 'L' ? [col, gap, esc] : [esc, gap, col]);
   };
   return el('div', {
     display: 'flex', position: 'relative',
@@ -495,11 +513,11 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
     el('div', { display: 'flex', flexDirection: 'row', position: 'absolute',
       top: 0, left: 0, width: '1200px', height: '720px',
       alignItems: 'center', justifyContent: 'center' }, [
-      teamBlock(p.home, hUrl, opts.formH),
+      teamBlock(p.home, hUrl, opts.formH, 'L'),
       el('div', { display: 'flex', fontSize: opts.centerSize, color: opts.centerColor,
-        fontWeight: 800, padding: '0 40px', marginBottom: anyForm ? 62 : 0,
+        fontWeight: 800, padding: '0 40px',
         textShadow: '0 5px 20px rgba(0,0,0,0.95)' }, opts.center),
-      teamBlock(p.away, aUrl, opts.formA),
+      teamBlock(p.away, aUrl, opts.formA, 'R'),
     ]),
     // capa 4 — logo + "Pick: ..." arriba a la izquierda
     el('div', { display: 'flex', flexDirection: 'row', position: 'absolute',
@@ -513,10 +531,16 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
         fontFamily: 'GambetaBlack', fontWeight: 900,
         textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, (p.rec || '').toUpperCase()),
     ]),
-    // capa 5 — check de acierto, abajo y centrado
-    ...(opts.check ? [{ type: 'img', props: { src: CHECK_URI, width: 178, height: 178,
-      style: { position: 'absolute', bottom: 24, left: 511,
-        width: '178px', height: '178px' } } }] : []),
+    // capa 5 — check + "ACERTADO", abajo y centrado
+    ...(opts.check ? [el('div', { display: 'flex', flexDirection: 'row',
+      alignItems: 'center', position: 'absolute', bottom: 30, left: 0,
+      width: '1200px', justifyContent: 'center' }, [
+      { type: 'img', props: { src: CHECK_URI, width: 152, height: 152,
+        style: { width: '152px', height: '152px' } } },
+      el('div', { display: 'flex', marginLeft: 26, fontFamily: 'GambetaBlack',
+        fontWeight: 900, fontSize: 80, color: '#00e676',
+        textShadow: '0 4px 16px rgba(0,0,0,0.92)' }, 'ACERTADO'),
+    ])] : []),
     // capa 6 — pastilla de confianza del pronóstico, abajo y centrada
     ...(opts.confLabel ? [el('div', { display: 'flex', position: 'absolute',
       bottom: 46, left: 0, width: '1200px', justifyContent: 'center' }, [
@@ -530,7 +554,7 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
 // Placa de HOT TAKE — partido del día sobre el estadio, con "VS".
 function buildHotTakeCardElement(p, hUrl, aUrl, formH, formA) {
   return buildMatchCardElement(p, hUrl, aUrl, {
-    escudo: 290, center: 'VS', centerColor: 'rgba(255,255,255,0.96)', centerSize: 96,
+    escudo: 270, center: 'VS', centerColor: 'rgba(255,255,255,0.96)', centerSize: 96,
     confLabel: confLabel(p), formH, formA,
   });
 }
@@ -545,7 +569,7 @@ async function renderGenericCardPng(kicker, body) {
 function buildCelebracionCardElement(p, hUrl, aUrl, formH, formA) {
   const score = (p.finalScore || '').toString().replace(/[-–]/, ' - ').trim() || 'WIN';
   return buildMatchCardElement(p, hUrl, aUrl, {
-    escudo: 282, center: score, centerColor: '#00e676', centerSize: 124, check: true,
+    escudo: 260, center: score, centerColor: '#00e676', centerSize: 124, check: true,
     formH, formA,
   });
 }
@@ -903,7 +927,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.26', mode,
+        bot: 'gambeta-x-bot', version: '1.27', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
