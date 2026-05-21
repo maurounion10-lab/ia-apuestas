@@ -277,6 +277,25 @@ function stadiumScene(ts) {
       : 'linear-gradient(180deg,rgba(6,14,10,0.74) 0%,rgba(6,14,10,0.42) 46%,rgba(6,14,10,0.85) 100%)' };
 }
 
+// Check de acierto — SVG vectorial propio (nítido a cualquier tamaño),
+// círculo verde con degradé, anillo blanco y sombra. Mejor que el emoji ✅.
+const CHECK_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">' +
+  '<defs>' +
+  '<linearGradient id="cg" x1="0" y1="0" x2="0" y2="1">' +
+  '<stop offset="0" stop-color="#2bed74"/><stop offset="1" stop-color="#00a844"/>' +
+  '</linearGradient>' +
+  '<filter id="cs" x="-60%" y="-60%" width="220%" height="220%">' +
+  '<feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.62"/>' +
+  '</filter>' +
+  '</defs>' +
+  '<circle cx="120" cy="120" r="103" fill="#ffffff" fill-opacity="0.16"/>' +
+  '<circle cx="120" cy="120" r="85" fill="url(#cg)" stroke="#ffffff" stroke-width="8" filter="url(#cs)"/>' +
+  '<path d="M76 124 l30 31 l60 -67" fill="none" stroke="#ffffff" ' +
+  'stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>' +
+  '</svg>';
+const CHECK_URI = 'data:image/svg+xml;base64,' + btoa(CHECK_SVG);
+
 // Placa de partido con fondo de estadio — base de festejo y hot take.
 function buildMatchCardElement(p, hUrl, aUrl, opts) {
   const GREEN = '#00c853';
@@ -319,6 +338,10 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
         chip(p.away, aUrl),
       ]),
     ]),
+    // check de acierto — grande, arriba a la derecha
+    ...(opts.check ? [{ type: 'img', props: { src: CHECK_URI, width: 226, height: 226,
+      style: { position: 'absolute', top: 36, right: 46,
+        width: '226px', height: '226px' } } }] : []),
   ]);
 }
 
@@ -343,7 +366,7 @@ async function renderGenericCardPng(kicker, body) {
 function buildCelebracionCardElement(p, hUrl, aUrl) {
   const score = (p.finalScore || '').toString().replace(/[-–]/, ' - ').trim() || 'WIN';
   return buildMatchCardElement(p, hUrl, aUrl, {
-    escudo: 226, center: score, centerColor: '#00e676', centerSize: 124,
+    escudo: 226, center: score, centerColor: '#00e676', centerSize: 124, check: true,
   });
 }
 async function renderCelebracionCardPng(p, hUrl, aUrl) {
@@ -626,7 +649,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.8', mode,
+        bot: 'gambeta-x-bot', version: '1.9', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
