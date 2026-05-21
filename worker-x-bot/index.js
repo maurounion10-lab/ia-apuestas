@@ -174,23 +174,73 @@ function cardBody(text) {
   if (t.length > 240) t = t.slice(0, 237).trim() + '\u2026';
   return t;
 }
-function buildGenericCardElement(kicker, body) {
+// Titular para la placa: solo el gancho (primer parrafo), sin emojis.
+function cardHeadline(text) {
+  let t = stripEmoji((text || '').split('\n\n')[0])
+    .replace(/\s*\n\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
+  if (t.length > 140) t = t.slice(0, 137).trim() + '\u2026';
+  return t;
+}
+function buildGenericCardElement(kicker, headline) {
   const GREEN = '#00c853', DARK = '#0c1a12';
+  return el('div', {
+    display: 'flex', flexDirection: 'row', width: '1200px', height: '720px',
+    background: DARK,
+  }, [
+    el('div', { display: 'flex', width: '16px', height: '720px', background: GREEN }, ''),
+    el('div', {
+      display: 'flex', flexDirection: 'column', flexGrow: 1,
+      padding: '58px 64px', justifyContent: 'space-between',
+    }, [
+      el('div', { display: 'flex', flexDirection: 'column' }, [
+        el('div', { display: 'flex', fontSize: 26, color: GREEN, fontWeight: 800,
+          letterSpacing: 2 }, 'GAMBETA.AI'),
+        el('div', { display: 'flex', alignSelf: 'flex-start',
+          background: 'rgba(0,200,83,0.14)', border: `1px solid ${GREEN}`,
+          borderRadius: 30, padding: '8px 22px', fontSize: 24, color: GREEN,
+          fontWeight: 800, letterSpacing: 1, marginTop: 16 }, kicker),
+      ]),
+      el('div', { display: 'flex', fontSize: 52, color: '#ffffff', fontWeight: 800,
+        lineHeight: 1.24 }, headline),
+      el('div', { display: 'flex', fontSize: 22, color: '#7fae8f' },
+        'Pron\u00f3sticos de f\u00fatbol con IA \u00b7 gratis todos los d\u00edas'),
+    ]),
+  ]);
+}
+
+// Placa de HOT TAKE — gráfico con el partido y la lectura de la IA.
+function buildHotTakeCardElement(p) {
+  const GREEN = '#00c853', DARK = '#0c1a12', CARD = '#13241a';
+  const prob = Math.max(p.probH || 0, p.probA || 0, p.probD || 0);
   return el('div', {
     display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
     background: DARK, padding: '56px 64px', justifyContent: 'space-between',
   }, [
     el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', fontSize: 28, color: GREEN, fontWeight: 800,
+      el('div', { display: 'flex', fontSize: 26, color: GREEN, fontWeight: 800,
         letterSpacing: 2 }, 'GAMBETA.AI'),
-      el('div', { display: 'flex', fontSize: 30, color: '#7fae8f', fontWeight: 800,
-        letterSpacing: 1, marginTop: 8 }, kicker),
+      el('div', { display: 'flex', fontSize: 66, color: '#ffffff', fontWeight: 800,
+        marginTop: 4 }, 'HOT TAKE'),
     ]),
-    el('div', { display: 'flex', fontSize: 40, color: '#ffffff', fontWeight: 800,
-      lineHeight: 1.35 }, body),
-    el('div', { display: 'flex', fontSize: 22, color: '#7fae8f' },
-      'Pron\u00f3sticos de f\u00fatbol con IA \u00b7 gratis todos los d\u00edas'),
+    el('div', { display: 'flex', flexDirection: 'column' }, [
+      el('div', { display: 'flex', fontSize: 24, color: '#7fae8f', fontWeight: 700 },
+        cleanLeague(p.league || '')),
+      el('div', { display: 'flex', fontSize: 52, color: '#ffffff', fontWeight: 800,
+        marginTop: 6 }, `${p.home}   vs   ${p.away}`),
+    ]),
+    el('div', { display: 'flex', flexDirection: 'column' }, [
+      el('div', { display: 'flex', alignSelf: 'flex-start', background: CARD,
+        border: `2px solid ${GREEN}`, borderRadius: 14, padding: '16px 26px',
+        fontSize: 34, color: '#ffffff', fontWeight: 800 }, `La IA dice: ${p.rec}`),
+      el('div', { display: 'flex', fontSize: 22, color: '#7fae8f', marginTop: 14 },
+        prob ? `La IA le da ${prob}% de probabilidad` : 'An\u00e1lisis de la IA \u00b7 gratis todos los d\u00edas'),
+    ]),
   ]);
+}
+async function renderHotTakeCardPng(p) {
+  const resp = new ImageResponse(buildHotTakeCardElement(p),
+    { width: 1200, height: 720, format: 'png' });
+  return new Uint8Array(await resp.arrayBuffer());
 }
 async function renderGenericCardPng(kicker, body) {
   const element = buildGenericCardElement(kicker, body);
@@ -249,13 +299,16 @@ async function renderCardForSlot(slot, hist, text) {
     const w = celebracionWin(hist);
     return w ? renderCelebracionCardPng(w.pick) : null;
   }
+  if (slot === 'hottake') {
+    const picks = todayPendingPicks(hist);
+    return picks.length ? renderHotTakeCardPng(picks[0]) : null;
+  }
   const KICKER = {
-    educacion:   'CONSEJO DE LA IA',
-    hottake:     'HOT TAKE',
-    comunidad:   'SUMATE A LA CHARLA',
+    educacion: 'CONSEJO DE LA IA',
+    comunidad: 'SUMATE A LA CHARLA',
   };
   if (text && KICKER[slot]) {
-    return renderGenericCardPng(KICKER[slot], cardBody(text));
+    return renderGenericCardPng(KICKER[slot], cardHeadline(text));
   }
   return null;
 }
@@ -392,9 +445,9 @@ function celebracionWin(hist) {
   const h = new Date(Date.now() + ART_OFFSET).getUTCHours();
   if (h < 9) return null;                       // madrugada → silencio
   const now = Date.now();
-  const hi = now - 3 * 3600 * 1000;
-  const lo = (h === 9) ? now - 13 * 3600 * 1000  // 9 AM: barre toda la noche
-                       : now - 4 * 3600 * 1000;  // resto del día: ventana 3-4 h
+  const hi = now - 2.5 * 3600 * 1000;
+  const lo = (h === 9) ? now - 12.5 * 3600 * 1000 // 9 AM: barre toda la noche
+                       : now - 3.5 * 3600 * 1000; // resto del dia: ventana 2.5-3.5 h
   const wins = hist
     .filter(w => w.result === 'win' && w.commenceTs
       && w.commenceTs >= lo && w.commenceTs < hi)
@@ -501,7 +554,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.3', mode,
+        bot: 'gambeta-x-bot', version: '1.4', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
