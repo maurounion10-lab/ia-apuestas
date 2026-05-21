@@ -81,6 +81,52 @@ async function postTweet(text, env, opts = {}) {
   return j.data && j.data.id;
 }
 
+// ───────────────────────── Escudos de equipos ─────────────────────────
+function normTeam(s) {
+  return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/ø/g, 'o').replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+}
+let _logoMap = null;
+async function fetchLogoMap() {
+  if (_logoMap) return _logoMap;
+  const map = {};
+  try {
+    const r = await fetch('https://gambeta.ai/', { cf: { cacheTtl: 3600, cacheEverything: true } });
+    const html = await r.text();
+    const m = html.match(/const teamLogos = \{([\s\S]*?)\n\};/);
+    if (m) {
+      const re = /'([^']+)'\s*:\s*'(https?:\/\/[^']+)'/g;
+      let mm;
+      while ((mm = re.exec(m[1]))) { const k = normTeam(mm[1]); if (!map[k]) map[k] = mm[2]; }
+    }
+  } catch (e) {}
+  _logoMap = map;
+  return map;
+}
+async function resolveEscudo(name, map) {
+  const u = map[normTeam(name)];
+  if (!u) return null;
+  try { const r = await fetch(u, { cf: { cacheTtl: 86400 } }); return r.ok ? u : null; }
+  catch (e) { return null; }
+}
+function initialsBadge(name, size) {
+  const w = (name || '?').replace(/[^\wáéíóúñ ]/gi, '').trim().split(/\s+/).filter(Boolean);
+  const ini = !w.length ? '?'
+    : w.length === 1 ? w[0].slice(0, 2).toUpperCase()
+    : (w[0][0] + w[w.length - 1][0]).toUpperCase();
+  return el('div', {
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    width: size + 'px', height: size + 'px', borderRadius: size + 'px',
+    background: '#16331f', color: '#cfe9d8', fontSize: Math.round(size * 0.34) + 'px',
+    fontWeight: 800,
+  }, ini);
+}
+function escudoEl(name, url, size) {
+  if (url) return { type: 'img', props: { src: url, width: size, height: size,
+    style: { width: size + 'px', height: size + 'px', objectFit: 'contain' } } };
+  return initialsBadge(name, size);
+}
+
 // ───────────────────────── Placa de imagen ─────────────────────────
 function el(type, style, children) {
   return { type, props: { style, children } };
@@ -209,36 +255,30 @@ function buildGenericCardElement(kicker, headline) {
 }
 
 // Placa de HOT TAKE — gráfico con el partido y la lectura de la IA.
-function buildHotTakeCardElement(p) {
-  const GREEN = '#00c853', DARK = '#0c1a12', CARD = '#13241a';
-  const prob = Math.max(p.probH || 0, p.probA || 0, p.probD || 0);
+function buildHotTakeCardElement(p, hUrl, aUrl) {
+  const GREEN = '#00c853', DARK = '#0c1a12';
   return el('div', {
     display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
-    background: DARK, padding: '56px 64px', justifyContent: 'space-between',
+    background: DARK, padding: '48px 60px', justifyContent: 'space-between',
+    alignItems: 'center',
   }, [
-    el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', fontSize: 26, color: GREEN, fontWeight: 800,
-        letterSpacing: 2 }, 'GAMBETA.AI'),
-      el('div', { display: 'flex', fontSize: 66, color: '#ffffff', fontWeight: 800,
-        marginTop: 4 }, 'HOT TAKE'),
+    el('div', { display: 'flex', alignSelf: 'flex-start', fontSize: 26, color: GREEN,
+      fontWeight: 800, letterSpacing: 2 }, 'GAMBETA.AI'),
+    el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
+      justifyContent: 'center', flexGrow: 1 }, [
+      escudoEl(p.home, hUrl, 260),
+      el('div', { display: 'flex', fontSize: 88, color: '#3a5547', fontWeight: 800,
+        padding: '0 48px' }, 'VS'),
+      escudoEl(p.away, aUrl, 260),
     ]),
-    el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', fontSize: 24, color: '#7fae8f', fontWeight: 700 },
-        cleanLeague(p.league || '')),
-      el('div', { display: 'flex', fontSize: 52, color: '#ffffff', fontWeight: 800,
-        marginTop: 6 }, `${p.home}   vs   ${p.away}`),
-    ]),
-    el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', alignSelf: 'flex-start', background: CARD,
-        border: `2px solid ${GREEN}`, borderRadius: 14, padding: '16px 26px',
-        fontSize: 34, color: '#ffffff', fontWeight: 800 }, `La IA dice: ${p.rec}`),
-      el('div', { display: 'flex', fontSize: 22, color: '#7fae8f', marginTop: 14 },
-        prob ? `La IA le da ${prob}% de probabilidad` : 'An\u00e1lisis de la IA \u00b7 gratis todos los d\u00edas'),
-    ]),
+    el('div', { display: 'flex', alignSelf: 'center', alignItems: 'center',
+      background: 'rgba(0,200,83,0.14)', border: `3px solid ${GREEN}`,
+      borderRadius: 18, padding: '20px 46px', fontSize: 48, color: '#ffffff',
+      fontWeight: 800 }, (p.rec || '').toUpperCase()),
   ]);
 }
-async function renderHotTakeCardPng(p) {
-  const resp = new ImageResponse(buildHotTakeCardElement(p),
+async function renderHotTakeCardPng(p, hUrl, aUrl) {
+  const resp = new ImageResponse(buildHotTakeCardElement(p, hUrl, aUrl),
     { width: 1200, height: 720, format: 'png' });
   return new Uint8Array(await resp.arrayBuffer());
 }
@@ -248,37 +288,32 @@ async function renderGenericCardPng(kicker, body) {
   return new Uint8Array(await resp.arrayBuffer());
 }
 
-// Placa de FESTEJO — gráfico diseñado: equipos, marcador grande y sello del pick.
-function buildCelebracionCardElement(p) {
-  const GREEN = '#00c853', DARK = '#06120a', CARD = '#13241a';
-  const score = (p.finalScore || '').toString().replace(/[-–]/, '  -  ').trim();
+// Placa de FESTEJO — escudos enfrentados, marcador grande y el pick. Sin texto de relleno.
+function buildCelebracionCardElement(p, hUrl, aUrl) {
+  const GREEN = '#00c853', DARK = '#06120a';
+  const score = (p.finalScore || '').toString().replace(/[-–]/, ' - ').trim() || 'WIN';
   return el('div', {
     display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
-    background: DARK, padding: '54px 64px', justifyContent: 'space-between',
+    background: DARK, padding: '48px 60px', justifyContent: 'space-between',
+    alignItems: 'center',
   }, [
-    el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', fontSize: 26, color: GREEN, fontWeight: 800,
-        letterSpacing: 2 }, 'GAMBETA.AI'),
-      el('div', { display: 'flex', fontSize: 78, color: '#ffffff', fontWeight: 800,
-        marginTop: 4 }, 'LA IA ACERT\u00d3'),
+    el('div', { display: 'flex', alignSelf: 'flex-start', fontSize: 26, color: GREEN,
+      fontWeight: 800, letterSpacing: 2 }, 'GAMBETA.AI'),
+    el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
+      justifyContent: 'center', flexGrow: 1 }, [
+      escudoEl(p.home, hUrl, 240),
+      el('div', { display: 'flex', fontSize: 120, color: GREEN, fontWeight: 800,
+        padding: '0 40px' }, score),
+      escudoEl(p.away, aUrl, 240),
     ]),
-    el('div', { display: 'flex', flexDirection: 'column', alignItems: 'center' }, [
-      el('div', { display: 'flex', fontSize: 42, color: '#cfe9d8', fontWeight: 700 },
-        `${p.home}   vs   ${p.away}`),
-      el('div', { display: 'flex', fontSize: 150, color: GREEN, fontWeight: 800,
-        marginTop: 6 }, score || 'WIN'),
-    ]),
-    el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', background: CARD, border: `2px solid ${GREEN}`,
-        borderRadius: 14, padding: '16px 26px', fontSize: 34, color: '#ffffff',
-        fontWeight: 800 }, `ACERTADO  -  Pick de la IA: ${p.rec}`),
-      el('div', { display: 'flex', fontSize: 22, color: '#7fae8f', marginTop: 14 },
-        'Pron\u00f3sticos de f\u00fatbol con IA \u00b7 historial 100% p\u00fablico'),
-    ]),
+    el('div', { display: 'flex', alignSelf: 'center', alignItems: 'center',
+      background: 'rgba(0,200,83,0.16)', border: `3px solid ${GREEN}`,
+      borderRadius: 18, padding: '20px 46px', fontSize: 48, color: '#ffffff',
+      fontWeight: 800 }, (p.rec || '').toUpperCase()),
   ]);
 }
-async function renderCelebracionCardPng(p) {
-  const resp = new ImageResponse(buildCelebracionCardElement(p),
+async function renderCelebracionCardPng(p, hUrl, aUrl) {
+  const resp = new ImageResponse(buildCelebracionCardElement(p, hUrl, aUrl),
     { width: 1200, height: 720, format: 'png' });
   return new Uint8Array(await resp.arrayBuffer());
 }
@@ -297,19 +332,22 @@ async function renderCardForSlot(slot, hist, text) {
   }
   if (slot === 'celebracion') {
     const w = celebracionWin(hist);
-    return w ? renderCelebracionCardPng(w.pick) : null;
+    if (!w) return null;
+    const map = await fetchLogoMap();
+    const [hU, aU] = await Promise.all([
+      resolveEscudo(w.pick.home, map), resolveEscudo(w.pick.away, map)]);
+    return renderCelebracionCardPng(w.pick, hU, aU);
   }
   if (slot === 'hottake') {
     const picks = todayPendingPicks(hist);
-    return picks.length ? renderHotTakeCardPng(picks[0]) : null;
+    if (!picks.length) return null;
+    const p = picks[0];
+    const map = await fetchLogoMap();
+    const [hU, aU] = await Promise.all([
+      resolveEscudo(p.home, map), resolveEscudo(p.away, map)]);
+    return renderHotTakeCardPng(p, hU, aU);
   }
-  const KICKER = {
-    educacion: 'CONSEJO DE LA IA',
-    comunidad: 'SUMATE A LA CHARLA',
-  };
-  if (text && KICKER[slot]) {
-    return renderGenericCardPng(KICKER[slot], cardHeadline(text));
-  }
+  // educacion / comunidad: sin placa — el tweet ya es texto, una placa de texto no aporta.
   return null;
 }
 
@@ -554,7 +592,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.4', mode,
+        bot: 'gambeta-x-bot', version: '1.5', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -585,7 +623,12 @@ export default {
         if (!png && slot === 'celebracion') {
           const lw = hist.filter(w => w.result === 'win' && w.commenceTs)
             .sort((a, b) => b.commenceTs - a.commenceTs)[0];
-          if (lw) png = await renderCelebracionCardPng(lw);
+          if (lw) {
+            const map = await fetchLogoMap();
+            const [hU, aU] = await Promise.all([
+              resolveEscudo(lw.home, map), resolveEscudo(lw.away, map)]);
+            png = await renderCelebracionCardPng(lw, hU, aU);
+          }
         }
         if (!png) return J({ error: 'sin datos para la placa de ' + slot }, 404);
         return new Response(png, { headers: { 'Content-Type': 'image/png' } });
