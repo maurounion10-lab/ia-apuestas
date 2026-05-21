@@ -254,25 +254,79 @@ function buildGenericCardElement(kicker, headline) {
   ]);
 }
 
-// Placa de HOT TAKE — gráfico con el partido y la lectura de la IA.
-function buildHotTakeCardElement(p, hUrl, aUrl) {
-  const GREEN = '#00c853', DARK = '#0c1a12';
+// ───────── Fondo de estadio según la hora ART del partido ─────────
+// 3 fotos HD (Unsplash, licencia libre): noche / día / luz dorada.
+// El overlay se ajusta por franja horaria para dar sensación de "cantidad de sol".
+const STADIUM_IMG = {
+  night:  'https://images.unsplash.com/photo-1745997645080-941f962f1392?fm=jpg&q=70&w=1400&h=840&fit=crop',
+  day:    'https://images.unsplash.com/photo-1620923090109-30f2e2b2e84c?fm=jpg&q=70&w=1400&h=840&fit=crop',
+  golden: 'https://images.unsplash.com/photo-1748150572481-13ce492e1b2b?fm=jpg&q=70&w=1400&h=840&fit=crop',
+};
+function stadiumScene(ts) {
+  const h = new Date((ts || Date.now()) + ART_OFFSET).getUTCHours();
+  if (h >= 20 || h < 6)              // noche cerrada
+    return { url: STADIUM_IMG.night,
+      overlay: 'linear-gradient(180deg,rgba(4,9,15,0.80) 0%,rgba(4,9,15,0.50) 44%,rgba(3,7,12,0.88) 100%)' };
+  if (h < 9 || h >= 17)              // amanecer / atardecer — luz dorada
+    return { url: STADIUM_IMG.golden,
+      overlay: 'linear-gradient(180deg,rgba(22,13,4,0.76) 0%,rgba(22,13,4,0.44) 46%,rgba(12,8,4,0.86) 100%)' };
+  const midday = h >= 11 && h <= 15; // pleno día — mediodía más luminoso
+  return { url: STADIUM_IMG.day,
+    overlay: midday
+      ? 'linear-gradient(180deg,rgba(6,14,10,0.66) 0%,rgba(6,14,10,0.30) 50%,rgba(6,14,10,0.82) 100%)'
+      : 'linear-gradient(180deg,rgba(6,14,10,0.74) 0%,rgba(6,14,10,0.42) 46%,rgba(6,14,10,0.85) 100%)' };
+}
+
+// Placa de partido con fondo de estadio — base de festejo y hot take.
+function buildMatchCardElement(p, hUrl, aUrl, opts) {
+  const GREEN = '#00c853';
+  const scene = stadiumScene(p.commenceTs);
+  const escSize = opts.escudo;
+  const chip = (name, url) => el('div', {
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    width: (escSize + 56) + 'px', height: (escSize + 56) + 'px',
+    borderRadius: '9999px', background: 'rgba(6,16,10,0.72)',
+    border: '4px solid rgba(255,255,255,0.20)',
+  }, [escudoEl(name, url, escSize)]);
   return el('div', {
-    display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
-    background: DARK, padding: '46px 56px',
+    display: 'flex', position: 'relative',
+    width: '1200px', height: '720px', background: '#06120a',
   }, [
-    el('div', { display: 'flex', flexDirection: 'row', fontSize: 44, fontWeight: 800 }, [
-      el('div', { display: 'flex', color: GREEN, marginRight: 14 }, 'Pick:'),
-      el('div', { display: 'flex', color: '#ffffff' }, (p.rec || '').toUpperCase()),
-    ]),
-    el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
-      justifyContent: 'center', flexGrow: 1 }, [
-      escudoEl(p.home, hUrl, 260),
-      el('div', { display: 'flex', fontSize: 88, color: '#3a5547', fontWeight: 800,
-        padding: '0 48px' }, 'VS'),
-      escudoEl(p.away, aUrl, 260),
+    // capa 1 — foto HD del estadio
+    { type: 'img', props: { src: scene.url, width: 1200, height: 720,
+      style: { position: 'absolute', top: 0, left: 0,
+        width: '1200px', height: '720px', objectFit: 'cover' } } },
+    // capa 2 — overlay oscuro para legibilidad del texto
+    el('div', { display: 'flex', position: 'absolute', top: 0, left: 0,
+      width: '1200px', height: '720px', backgroundImage: scene.overlay }, ''),
+    // capa 3 — contenido
+    el('div', {
+      display: 'flex', flexDirection: 'column', position: 'absolute',
+      top: 0, left: 0, width: '1200px', height: '720px', padding: '46px 56px',
+    }, [
+      el('div', { display: 'flex', flexDirection: 'row', fontSize: 46, fontWeight: 800 }, [
+        el('div', { display: 'flex', color: GREEN, marginRight: 14,
+          textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, 'Pick:'),
+        el('div', { display: 'flex', color: '#ffffff',
+          textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, (p.rec || '').toUpperCase()),
+      ]),
+      el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
+        justifyContent: 'center', flexGrow: 1 }, [
+        chip(p.home, hUrl),
+        el('div', { display: 'flex', fontSize: opts.centerSize, color: opts.centerColor,
+          fontWeight: 800, padding: '0 40px',
+          textShadow: '0 5px 20px rgba(0,0,0,0.95)' }, opts.center),
+        chip(p.away, aUrl),
+      ]),
     ]),
   ]);
+}
+
+// Placa de HOT TAKE — partido del día sobre el estadio, con "VS".
+function buildHotTakeCardElement(p, hUrl, aUrl) {
+  return buildMatchCardElement(p, hUrl, aUrl, {
+    escudo: 234, center: 'VS', centerColor: 'rgba(255,255,255,0.96)', centerSize: 96,
+  });
 }
 async function renderHotTakeCardPng(p, hUrl, aUrl) {
   const resp = new ImageResponse(buildHotTakeCardElement(p, hUrl, aUrl),
@@ -285,26 +339,12 @@ async function renderGenericCardPng(kicker, body) {
   return new Uint8Array(await resp.arrayBuffer());
 }
 
-// Placa de FESTEJO — escudos enfrentados, marcador grande y el pick. Sin texto de relleno.
+// Placa de FESTEJO — escudos enfrentados, marcador grande sobre el estadio.
 function buildCelebracionCardElement(p, hUrl, aUrl) {
-  const GREEN = '#00c853', DARK = '#06120a';
   const score = (p.finalScore || '').toString().replace(/[-–]/, ' - ').trim() || 'WIN';
-  return el('div', {
-    display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
-    background: DARK, padding: '46px 56px',
-  }, [
-    el('div', { display: 'flex', flexDirection: 'row', fontSize: 44, fontWeight: 800 }, [
-      el('div', { display: 'flex', color: GREEN, marginRight: 14 }, 'Pick:'),
-      el('div', { display: 'flex', color: '#ffffff' }, (p.rec || '').toUpperCase()),
-    ]),
-    el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
-      justifyContent: 'center', flexGrow: 1 }, [
-      escudoEl(p.home, hUrl, 250),
-      el('div', { display: 'flex', fontSize: 130, color: GREEN, fontWeight: 800,
-        padding: '0 44px' }, score),
-      escudoEl(p.away, aUrl, 250),
-    ]),
-  ]);
+  return buildMatchCardElement(p, hUrl, aUrl, {
+    escudo: 226, center: score, centerColor: '#00e676', centerSize: 124,
+  });
 }
 async function renderCelebracionCardPng(p, hUrl, aUrl) {
   const resp = new ImageResponse(buildCelebracionCardElement(p, hUrl, aUrl),
@@ -586,7 +626,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.7', mode,
+        bot: 'gambeta-x-bot', version: '1.8', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
