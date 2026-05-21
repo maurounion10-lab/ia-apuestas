@@ -170,42 +170,70 @@ async function renderPicksCardPng(picks, dateLabel) {
   return new Uint8Array(buf);
 }
 
-// Placa de RESULTADOS: verde = acertó, rojo = falló.
-function buildResultadosCardElement(results, wins, total, dateLabel) {
-  const GREEN = '#00c853', RED = '#e5484d', DARK = '#0c1a12', CARD = '#13241a';
-  const rows = results.slice(0, 4).map((r) => {
-    const win = r.result === 'win';
-    return el('div', {
-      display: 'flex', flexDirection: 'column', background: CARD,
-      borderRadius: 14, padding: '14px 24px', marginBottom: 12,
-      borderLeft: `6px solid ${win ? GREEN : RED}`,
-    }, [
-      el('div', { display: 'flex', fontSize: 28, color: '#ffffff', fontWeight: 700 },
-        `${r.home}  vs  ${r.away}` + (r.finalScore ? `   ${r.finalScore}` : '')),
-      el('div', { display: 'flex', fontSize: 24, color: win ? GREEN : RED,
-        marginTop: 5, fontWeight: 700 }, win ? 'ACERTÓ' : 'FALLÓ'),
-    ]);
-  });
-  return el('div', {
-    display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
-    background: DARK, padding: '44px 56px', justifyContent: 'space-between',
-  }, [
-    el('div', { display: 'flex', flexDirection: 'column' }, [
-      el('div', { display: 'flex', fontSize: 28, color: GREEN, fontWeight: 800,
-        letterSpacing: 2 }, 'GAMBETA.AI'),
-      el('div', { display: 'flex', fontSize: 46, color: '#ffffff', fontWeight: 800,
-        marginTop: 4 }, 'Resultados de la IA'),
-      el('div', { display: 'flex', fontSize: 26, color: GREEN, marginTop: 2,
-        fontWeight: 800 }, `${wins} de ${total} aciertos · ${dateLabel}`),
+// Placa de RESULTADOS — lista con escudos sobre fondo de estadio.
+// Una fila por partido: escudos, partido, marcador y check/cruz.
+function resultadoRowEl(r) {
+  const GREEN = '#00c853', RED = '#ff5a5f';
+  const win = r.result === 'win';
+  const score = (r.finalScore || '').toString().replace(/[-–]/, ' - ').trim();
+  return el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
+    background: 'rgba(6,14,10,0.60)', borderRadius: 14, padding: '0 24px',
+    height: '86px', marginBottom: 12,
+    borderLeft: `8px solid ${win ? GREEN : RED}` }, [
+    escudoEl(r.home, r.hU, 54),
+    el('div', { display: 'flex', width: '12px' }, ''),
+    escudoEl(r.away, r.aU, 54),
+    el('div', { display: 'flex', flexGrow: 1, fontSize: 31, color: '#ffffff',
+      fontWeight: 700, marginLeft: 22,
+      textShadow: '0 2px 8px rgba(0,0,0,0.9)' }, `${r.home}  vs  ${r.away}`),
+    el('div', { display: 'flex', fontSize: 37, color: '#ffffff', fontWeight: 800,
+      marginLeft: 16, marginRight: 22,
+      textShadow: '0 2px 8px rgba(0,0,0,0.9)' }, score),
+    { type: 'img', props: { src: win ? CHECK_URI : CROSS_URI, width: 62, height: 62,
+      style: { width: '62px', height: '62px' } } },
+  ]);
+}
+function buildResultadosCardElement(rows, wins, total, dateLabel) {
+  const GREEN = '#00c853';
+  const scene = stadiumScene(null);
+  return el('div', { display: 'flex', position: 'relative',
+    width: '1200px', height: '720px', background: '#06120a' }, [
+    { type: 'img', props: { src: scene.url, width: 1200, height: 720,
+      style: { position: 'absolute', top: 0, left: 0,
+        width: '1200px', height: '720px', objectFit: 'cover' } } },
+    el('div', { display: 'flex', position: 'absolute', top: 0, left: 0,
+      width: '1200px', height: '720px',
+      backgroundImage: 'linear-gradient(180deg,rgba(4,9,7,0.88) 0%,rgba(4,9,7,0.80) 100%)' }, ''),
+    el('div', { display: 'flex', flexDirection: 'column', position: 'absolute',
+      top: 0, left: 0, width: '1200px', height: '720px', padding: '40px 52px' }, [
+      // cabecera — logo + título + el stat grande
+      el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
+        marginBottom: 22 }, [
+        { type: 'img', props: { src: LOGO_URL, width: 86, height: 86,
+          style: { width: '86px', height: '86px', marginRight: 22 } } },
+        el('div', { display: 'flex', flexDirection: 'column', flexGrow: 1 }, [
+          el('div', { display: 'flex', fontSize: 46, color: '#ffffff', fontWeight: 800 },
+            'Resultados de la IA'),
+          el('div', { display: 'flex', fontSize: 24, color: '#9fc7ad', marginTop: 2 },
+            dateLabel),
+        ]),
+        el('div', { display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }, [
+          el('div', { display: 'flex', fontSize: 82, color: GREEN, fontWeight: 800 },
+            `${wins}/${total}`),
+          el('div', { display: 'flex', fontSize: 22, color: '#9fc7ad' }, 'aciertos'),
+        ]),
+      ]),
+      // filas de partidos
+      el('div', { display: 'flex', flexDirection: 'column' }, rows.map(resultadoRowEl)),
+      // pie
+      el('div', { display: 'flex', fontSize: 21, color: '#8fc0a0', marginTop: 'auto' },
+        'Historial completo y público — aciertos y fallos, sin maquillar nada'),
     ]),
-    el('div', { display: 'flex', flexDirection: 'column', marginTop: 14 }, rows),
-    el('div', { display: 'flex', fontSize: 22, color: '#7fae8f' },
-      'Historial completo y público — aciertos y fallos, sin maquillar nada'),
   ]);
 }
 
-async function renderResultadosCardPng(results, wins, total, dateLabel) {
-  const element = buildResultadosCardElement(results, wins, total, dateLabel);
+async function renderResultadosCardPng(rows, wins, total, dateLabel) {
+  const element = buildResultadosCardElement(rows, wins, total, dateLabel);
   const resp = new ImageResponse(element, { width: 1200, height: 720, format: 'png' });
   return new Uint8Array(await resp.arrayBuffer());
 }
@@ -298,6 +326,23 @@ const CHECK_SVG =
   'stroke-width="20" stroke-linecap="round" stroke-linejoin="round"/>' +
   '</svg>';
 const CHECK_URI = 'data:image/svg+xml;base64,' + btoa(CHECK_SVG);
+// Cruz de fallo — mismo estilo que el check, en rojo.
+const CROSS_SVG =
+  '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">' +
+  '<defs>' +
+  '<linearGradient id="xg" x1="0" y1="0" x2="0" y2="1">' +
+  '<stop offset="0" stop-color="#ff6b6f"/><stop offset="1" stop-color="#d32f2f"/>' +
+  '</linearGradient>' +
+  '<filter id="xs" x="-60%" y="-60%" width="220%" height="220%">' +
+  '<feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.62"/>' +
+  '</filter>' +
+  '</defs>' +
+  '<circle cx="120" cy="120" r="103" fill="#ffffff" fill-opacity="0.16"/>' +
+  '<circle cx="120" cy="120" r="85" fill="url(#xg)" stroke="#ffffff" stroke-width="8" filter="url(#xs)"/>' +
+  '<path d="M86 86 L154 154 M154 86 L86 154" fill="none" stroke="#ffffff" ' +
+  'stroke-width="20" stroke-linecap="round"/>' +
+  '</svg>';
+const CROSS_URI = 'data:image/svg+xml;base64,' + btoa(CROSS_SVG);
 
 // Placa de partido con fondo de estadio — base de festejo y hot take.
 function buildMatchCardElement(p, hUrl, aUrl, opts) {
@@ -385,7 +430,12 @@ async function renderCardForSlot(slot, hist, text) {
     const done = yesterdayResults(hist);
     if (!done.length) return null;
     const wins = done.filter(h => h.result === 'win').length;
-    return renderResultadosCardPng(done, wins, done.length, dateLabelART());
+    const map = await fetchLogoMap();
+    const rows = await Promise.all(done.slice(0, 5).map(async (r) => ({
+      home: r.home, away: r.away, finalScore: r.finalScore, result: r.result,
+      hU: await resolveEscudo(r.home, map), aU: await resolveEscudo(r.away, map),
+    })));
+    return renderResultadosCardPng(rows, wins, done.length, dateLabelART());
   }
   if (slot === 'celebracion') {
     const w = celebracionWin(hist);
@@ -649,7 +699,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.12', mode,
+        bot: 'gambeta-x-bot', version: '1.13', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
