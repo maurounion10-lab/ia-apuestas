@@ -672,12 +672,17 @@ function confLabel(p) {
   const c = ((p && p.conf) || '').toLowerCase();
   return c === 'high' ? 'Alta' : c === 'low' ? 'Baja' : 'Media';
 }
-// Nombre de liga legible (saca emoji, completa las copas CONMEBOL).
-function prettyLeague(league) {
-  const l = cleanLeague(league);
-  if (/^sudamericana$/i.test(l)) return 'Copa Sudamericana';
-  if (/^libertadores$/i.test(l)) return 'Copa Libertadores';
-  return l;
+// Nombre de liga + bandera del país (o 🏆 si es competición internacional).
+function leagueLabel(raw) {
+  const s = (raw || '').trim();
+  const m = s.match(/^(\S+)\s+(.+)$/);
+  let icon = '', name = s;
+  if (m) { icon = m[1]; name = m[2]; }
+  // bandera de país = pares de indicadores regionales (🇲🇽) o bandera negra con tags (🏴 ENG)
+  const isCountryFlag = /[\u{1F1E6}-\u{1F1FF}]/u.test(icon) || /\u{1F3F4}/u.test(icon);
+  if (/^sudamericana$/i.test(name)) name = 'Copa Sudamericana';
+  else if (/^libertadores$/i.test(name)) name = 'Copa Libertadores';
+  return name + ' ' + (isCountryFlag ? icon : '🏆');
 }
 function buildStatsBlock(hist, pick) {
   const resolved = hist.filter(h => (h.result === 'win' || h.result === 'loss') && h.commenceTs);
@@ -709,7 +714,7 @@ function genHotTake(hist) {
   if (!picks.length) return null;
   const p = picks[0];
   const head = `🔥 En ${p.home} vs ${p.away} la IA dice que ${p.rec} — ` +
-               `Confianza ${confLabel(p)} (${prettyLeague(p.league)})`;
+               `Confianza ${confLabel(p)} (${leagueLabel(p.league)})`;
   const stats = buildStatsBlock(hist, p);
   const full = stats ? head + '\n\n' + stats : head;
   return full.length <= 280 ? full : head;   // si no entra, solo el titular
@@ -789,7 +794,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.18', mode,
+        bot: 'gambeta-x-bot', version: '1.19', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
