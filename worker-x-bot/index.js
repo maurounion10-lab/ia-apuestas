@@ -650,6 +650,18 @@ function todayPendingPicks(hist) {
     .sort((a, b) => (b.bvr || 0) - (a.bvr || 0));
 }
 
+// Busca un pick por nombre de equipo (para /run y /card con &match=).
+// Primero entre los de hoy; si no, entre TODOS los pendientes (la fecha de
+// algunos picks viene mal seteada y quedarían fuera de "hoy").
+function findPickByMatch(hist, matchStr) {
+  const m = String(matchStr || '').toLowerCase().trim();
+  if (!m) return null;
+  const hit = arr => arr.find(p =>
+    ((p.home || '') + ' ' + (p.away || '')).toLowerCase().includes(m));
+  return hit(todayPendingPicks(hist))
+      || hit(hist.filter(h => h.result === 'pending')) || null;
+}
+
 // Pilar 1 — Picks del día (texto)
 function genPicks(hist) {
   const picks = todayPendingPicks(hist);
@@ -878,9 +890,7 @@ async function runSlot(slot, env, mode, matchStr) {
   // matchStr (opcional, sólo hot take): elige un pick puntual por nombre de equipo
   let pickOverride = null;
   if (slot === 'hottake' && matchStr) {
-    const m = String(matchStr).toLowerCase();
-    pickOverride = todayPendingPicks(hist).find(p =>
-      ((p.home || '') + ' ' + (p.away || '')).toLowerCase().includes(m)) || null;
+    pickOverride = findPickByMatch(hist, matchStr);
     if (!pickOverride) {
       return { slot, status: 'skipped', reason: 'sin pick que coincida con "' + matchStr + '"' };
     }
@@ -934,7 +944,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.33', mode,
+        bot: 'gambeta-x-bot', version: '1.34', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -961,9 +971,7 @@ export default {
         const hist = await fetchHistorial();
         let pickOverride = null;
         if (slot === 'hottake' && matchStr) {
-          const m = matchStr.toLowerCase();
-          pickOverride = todayPendingPicks(hist).find(p =>
-            ((p.home || '') + ' ' + (p.away || '')).toLowerCase().includes(m)) || null;
+          pickOverride = findPickByMatch(hist, matchStr);
         }
         const t = generateText(slot, hist, pickOverride);
         let png = await renderCardForSlot(slot, hist, t, pickOverride);
