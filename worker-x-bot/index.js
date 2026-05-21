@@ -259,9 +259,12 @@ function buildHotTakeCardElement(p, hUrl, aUrl) {
   const GREEN = '#00c853', DARK = '#0c1a12';
   return el('div', {
     display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
-    background: DARK, padding: '48px 60px', justifyContent: 'space-between',
-    alignItems: 'center',
+    background: DARK, padding: '46px 56px',
   }, [
+    el('div', { display: 'flex', flexDirection: 'row', fontSize: 44, fontWeight: 800 }, [
+      el('div', { display: 'flex', color: GREEN, marginRight: 14 }, 'Pick:'),
+      el('div', { display: 'flex', color: '#ffffff' }, (p.rec || '').toUpperCase()),
+    ]),
     el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
       justifyContent: 'center', flexGrow: 1 }, [
       escudoEl(p.home, hUrl, 260),
@@ -269,10 +272,6 @@ function buildHotTakeCardElement(p, hUrl, aUrl) {
         padding: '0 48px' }, 'VS'),
       escudoEl(p.away, aUrl, 260),
     ]),
-    el('div', { display: 'flex', alignSelf: 'center', alignItems: 'center',
-      background: 'rgba(0,200,83,0.14)', border: `3px solid ${GREEN}`,
-      borderRadius: 18, padding: '20px 46px', fontSize: 48, color: '#ffffff',
-      fontWeight: 800 }, (p.rec || '').toUpperCase()),
   ]);
 }
 async function renderHotTakeCardPng(p, hUrl, aUrl) {
@@ -292,20 +291,19 @@ function buildCelebracionCardElement(p, hUrl, aUrl) {
   const score = (p.finalScore || '').toString().replace(/[-–]/, ' - ').trim() || 'WIN';
   return el('div', {
     display: 'flex', flexDirection: 'column', width: '1200px', height: '720px',
-    background: DARK, padding: '48px 60px', justifyContent: 'space-between',
-    alignItems: 'center',
+    background: DARK, padding: '46px 56px',
   }, [
+    el('div', { display: 'flex', flexDirection: 'row', fontSize: 44, fontWeight: 800 }, [
+      el('div', { display: 'flex', color: GREEN, marginRight: 14 }, 'Pick:'),
+      el('div', { display: 'flex', color: '#ffffff' }, (p.rec || '').toUpperCase()),
+    ]),
     el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
       justifyContent: 'center', flexGrow: 1 }, [
-      escudoEl(p.home, hUrl, 240),
-      el('div', { display: 'flex', fontSize: 120, color: GREEN, fontWeight: 800,
-        padding: '0 40px' }, score),
-      escudoEl(p.away, aUrl, 240),
+      escudoEl(p.home, hUrl, 250),
+      el('div', { display: 'flex', fontSize: 130, color: GREEN, fontWeight: 800,
+        padding: '0 44px' }, score),
+      escudoEl(p.away, aUrl, 250),
     ]),
-    el('div', { display: 'flex', alignSelf: 'center', alignItems: 'center',
-      background: 'rgba(0,200,83,0.16)', border: `3px solid ${GREEN}`,
-      borderRadius: 18, padding: '20px 46px', fontSize: 48, color: '#ffffff',
-      fontWeight: 800 }, (p.rec || '').toUpperCase()),
   ]);
 }
 async function renderCelebracionCardPng(p, hUrl, aUrl) {
@@ -588,7 +586,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.6', mode,
+        bot: 'gambeta-x-bot', version: '1.7', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
