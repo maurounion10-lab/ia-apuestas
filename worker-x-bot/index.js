@@ -598,12 +598,12 @@ async function renderCardForSlot(slot, hist, text, pickOverride) {
     return renderResultadosCardPng(rows, wins, done.length, dateLabelART());
   }
   if (slot === 'celebracion') {
-    const w = celebracionWin(hist);
-    if (!w) return null;
+    const p = pickOverride || ((celebracionWin(hist) || {}).pick);
+    if (!p) return null;
     const map = await fetchLogoMap();
     const [hU, aU] = await Promise.all([
-      resolveEscudo(w.pick.home, map), resolveEscudo(w.pick.away, map)]);
-    return renderCelebracionCardPng(w.pick, hU, aU);
+      resolveEscudo(p.home, map), resolveEscudo(p.away, map)]);
+    return renderCelebracionCardPng(p, hU, aU);
   }
   if (slot === 'hottake') {
     const p = pickOverride || todayPendingPicks(hist)[0];
@@ -660,6 +660,16 @@ function findPickByMatch(hist, matchStr) {
     ((p.home || '') + ' ' + (p.away || '')).toLowerCase().includes(m));
   return hit(todayPendingPicks(hist))
       || hit(hist.filter(h => h.result === 'pending')) || null;
+}
+
+// Busca un acierto (pick ganado) por nombre de equipo — para festejar un pick puntual.
+function findWinByMatch(hist, matchStr) {
+  const m = String(matchStr || '').toLowerCase().trim();
+  if (!m) return null;
+  return hist
+    .filter(h => h.result === 'win' && h.commenceTs &&
+      ((h.home || '') + ' ' + (h.away || '')).toLowerCase().includes(m))
+    .sort((a, b) => (b.commenceTs || 0) - (a.commenceTs || 0))[0] || null;
 }
 
 // Pilar 1 — Picks del día (texto)
@@ -772,13 +782,17 @@ function celebracionWin(hist) {
   return wins.length ? { pick: wins[0], total: wins.length } : null;
 }
 
-function genCelebracion(hist) {
-  const w = celebracionWin(hist);
-  if (!w) return null;
-  const p = w.pick;
+function genCelebracion(hist, pickOverride) {
+  let p, total;
+  if (pickOverride) { p = pickOverride; total = 1; }
+  else {
+    const w = celebracionWin(hist);
+    if (!w) return null;
+    p = w.pick; total = w.total;
+  }
   let t = CELEBRA[dayOfYearART() % CELEBRA.length](p).replace(/  +/g, ' ');
-  if (w.total > 1) {
-    const extra = `\n\n+${w.total - 1} acierto${w.total > 2 ? 's' : ''} más en esta tanda`;
+  if (total > 1) {
+    const extra = `\n\n+${total - 1} acierto${total > 2 ? 's' : ''} más en esta tanda`;
     if ((t + extra).length <= 280) t += extra;
   }
   return t;
@@ -879,7 +893,7 @@ function generateText(slot, hist, pickOverride) {
     case 'educacion':  return genEducacion();
     case 'hottake':    return genHotTake(hist, pickOverride);
     case 'comunidad':  return genComunidad();
-    case 'celebracion':return genCelebracion(hist);
+    case 'celebracion':return genCelebracion(hist, pickOverride);
     default:           return null;
   }
 }
@@ -893,6 +907,12 @@ async function runSlot(slot, env, mode, matchStr) {
     pickOverride = findPickByMatch(hist, matchStr);
     if (!pickOverride) {
       return { slot, status: 'skipped', reason: 'sin pick que coincida con "' + matchStr + '"' };
+    }
+  }
+  if (slot === 'celebracion' && matchStr) {
+    pickOverride = findWinByMatch(hist, matchStr);
+    if (!pickOverride) {
+      return { slot, status: 'skipped', reason: 'sin acierto que coincida con "' + matchStr + '"' };
     }
   }
   const text = generateText(slot, hist, pickOverride);
@@ -944,7 +964,7 @@ export default {
 
     if (url.pathname === '/' || url.pathname === '/status') {
       return J({
-        bot: 'gambeta-x-bot', version: '1.34', mode,
+        bot: 'gambeta-x-bot', version: '1.35', mode,
         slots: SLOT_BY_CRON,
         keysConfigured: !!(env.X_API_KEY && env.X_API_SECRET &&
                            env.X_ACCESS_TOKEN && env.X_ACCESS_SECRET),
@@ -972,6 +992,8 @@ export default {
         let pickOverride = null;
         if (slot === 'hottake' && matchStr) {
           pickOverride = findPickByMatch(hist, matchStr);
+        } else if (slot === 'celebracion' && matchStr) {
+          pickOverride = findWinByMatch(hist, matchStr);
         }
         const t = generateText(slot, hist, pickOverride);
         let png = await renderCardForSlot(slot, hist, t, pickOverride);
