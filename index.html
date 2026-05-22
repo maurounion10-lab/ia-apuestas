@@ -9596,7 +9596,8 @@ function buildPredsFromOdds() {
       { rec: 'Gana ' + hN, prob: probH, odds: hOP, _recSide: 'home' },
       { rec: 'Gana ' + aN, prob: probA, odds: aOP, _recSide: 'away' },
       ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dOP, _recSide: 'draw' }] : []),
-      ...(_isArgentina ? [] : ['1.5','2.5','3.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS)
+      ...(_isArgentina ? [] : ['1.5','2.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS
+          && (pt !== '2.5' || (probOver[pt] || 0) >= 62))
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
       ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
     ]
