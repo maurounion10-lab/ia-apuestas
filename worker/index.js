@@ -853,13 +853,17 @@ async function runScheduledResolver(env) {
     const TWO_H = 2 * 3600 * 1000;
     const TWENTY_ONE_D = 21 * 24 * 3600 * 1000;
 
-    // Pending picks resolvables (kick-off > 2h ago, < 21 días)
-    const pending = hist.filter(p =>
-      p.result === 'pending' &&
-      p.commenceTs &&
-      (now - p.commenceTs) >= TWO_H &&
-      (now - p.commenceTs) <= TWENTY_ONE_D
-    );
+    // Picks resolvables: pendientes + "a medio resolver" — picks con result
+    // win/loss pero sin marcador o con P/L en 0. El resolver los re-procesa y
+    // los deja consistentes (result + finalScore + pl), auto-sanando ese estado roto.
+    const pending = hist.filter(p => {
+      if (!p.commenceTs) return false;
+      const age = now - p.commenceTs;
+      if (age < TWO_H || age > TWENTY_ONE_D) return false;
+      const halfResolved = (p.result === 'win' || p.result === 'loss')
+        && (!p.finalScore || p.pl === 0);
+      return p.result === 'pending' || halfResolved;
+    });
     stats.checked = pending.length;
     if (!pending.length) {
       stats.log.push('sin picks pendientes resolvables');
