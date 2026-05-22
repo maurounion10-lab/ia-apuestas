@@ -12798,13 +12798,14 @@ async function sbLoadHistorial() {
 
     // ── Segunda pasada anti-duplicados: mismo enfrentamiento (home+away) registrado
     //    2 veces con timestamps distintos. Si uno está RESUELTO y otro PENDING dentro
-    //    de ±6 días, descartar el PENDING (es el mismo partido mal duplicado).
+    //    de ±3 días, descartar el PENDING (es el mismo partido mal duplicado).
+    //    Ventana corta: NO toca ida/vuelta de copas (legs ≥6-7 días aparte).
     const _matchKey = h => {
       const norm = s => (s||'').toString().toLowerCase().normalize('NFD')
         .replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
       return norm(h.home) + '|' + norm(h.away);
     };
-    const _WIN6D = 6 * 24 * 3600 * 1000;
+    const _WIN6D = 3 * 24 * 3600 * 1000;
     const resolvedByMatch = {};
     merged.forEach(h => {
       if (_resolvedRank(h) > 0 && h.commenceTs) {
@@ -13759,8 +13760,9 @@ function renderHistorial(filter) {
   if (dedupedAll.length < all.length) saveHistorial(dedupedAll);
   // ── 2da pasada anti-duplicados: mismo enfrentamiento (home+away) registrado
   //    2 veces con timestamps distintos (la ventana ±3h de arriba no los une).
-  //    Si uno está RESUELTO y el otro PENDING dentro de ±6 días, descartar el
+  //    Si uno está RESUELTO y el otro PENDING dentro de ±3 días, descartar el
   //    PENDING — es el mismo partido mal duplicado (id/fecha distinta).
+  //    Ventana corta: NO borra ida/vuelta de copas (legs ≥6-7 días aparte).
   const _ddNorm = s => (s||'').toString().toLowerCase().normalize('NFD')
     .replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
   const _ddResolved = h => h && (h.result === 'win' || h.result === 'loss' || h.result === 'void');
@@ -13771,7 +13773,7 @@ function renderHistorial(filter) {
       (_ddResolvedTs[mk] = _ddResolvedTs[mk] || []).push(h.commenceTs);
     }
   });
-  const _DD_WIN = 6 * 24 * 3600 * 1000;
+  const _DD_WIN = 3 * 24 * 3600 * 1000;
   const dedupedAll2 = dedupedAll.filter(h => {
     if (_ddResolved(h)) return true;       // resuelto: siempre queda
     if (!h.commenceTs) return true;
