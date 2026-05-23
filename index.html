@@ -12769,10 +12769,19 @@ async function sbLoadGlobalHistorial(forceFresh = false) {
   }
   // Estrategia: pedimos AMBAS fuentes en paralelo (proxy CDN + Supabase directo)
   // y nos quedamos con la que tenga MÁS picks. Esto evita quedarnos con un CDN cache stale.
+  // Timeout helper: una promesa que rechaza si tarda más de ms — evita que
+  // un fetch colgado deje el historial en skeleton para siempre (bug 1ra visita).
+  const _raceTimeout = (promise, ms) => Promise.race([
+    promise,
+    new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms)),
+  ]);
   const _resBest = (async () => {
     let fromProxy = null, fromDirect = null;
     try {
-      const resp = await fetch('/api/sb?type=historial' + (forceFresh ? `&t=${Date.now()}` : ''));
+      const _ctrl = new AbortController();
+      const _to = setTimeout(() => _ctrl.abort(), 8000);
+      const resp = await fetch('/api/sb?type=historial' + (forceFresh ? `&t=${Date.now()}` : ''), { signal: _ctrl.signal });
+      clearTimeout(_to);
       if (resp.ok) {
         const rows = await resp.json();
         const r = rows?.[0]?.historial_full;
@@ -12780,8 +12789,10 @@ async function sbLoadGlobalHistorial(forceFresh = false) {
       }
     } catch(_) {}
     try {
-      const { data } = await sbAnon
-        .from('acoin_users').select('historial_full').eq('email', ADMIN_EMAIL).maybeSingle();
+      const { data } = await _raceTimeout(
+        sbAnon.from('acoin_users').select('historial_full').eq('email', ADMIN_EMAIL).maybeSingle(),
+        8000
+      );
       if (Array.isArray(data?.historial_full)) fromDirect = data.historial_full;
     } catch(_) {}
     if (!fromProxy && !fromDirect) return null;
@@ -13778,6 +13789,16 @@ function renderHistorial(filter) {
   if (!_histLoadedOnce && !_histLoading && typeof sbLoadHistorial === 'function') {
     _histLoading = true;  // Evita loops por re-render en cadena
     sbLoadHistorial().catch(e => console.warn('[renderHistorial] auto-trigger load failed:', e.message));
+    // Watchdog: si en 15s sigue sin cargar (ej. red colgada en 1ra visita),
+    // salir del skeleton infinito y mostrar reintentar / datos locales.
+    setTimeout(() => {
+      if (!_histLoadedOnce) {
+        _histLoading = false;
+        _histLoadedOnce = true;
+        _histLoadFailed = loadHistorial().length === 0;
+        renderHistorial(filter);
+      }
+    }, 15000);
   }
   try {
   const _rawCount = loadHistorial().length;
