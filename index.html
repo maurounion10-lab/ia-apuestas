@@ -12147,7 +12147,7 @@ function loadHistorial()   {
 }
 function saveHistorial(arr) {
   const sorted = [...arr].sort((a,b) => (b.commenceTs||0) - (a.commenceTs||0));
-  try { localStorage.setItem(HIST_KEY, JSON.stringify(sorted.slice(-20000))); } catch {}
+  try { localStorage.setItem(HIST_KEY, JSON.stringify(sorted.slice(-1000000))); } catch {}
   // Sync a historial GLOBAL en Supabase (solo admin)
   if (authUser?.email === 'mauro.union10@gmail.com') {
     clearTimeout(_globalHistSyncTimer);
@@ -12704,7 +12704,7 @@ async function sbSaveGlobalHistorial(arr) {
   try {
     const { error } = await sbClient
       .from('shared_cache')
-      .upsert({ key: GLOBAL_HIST_KEY, data: arr.slice(-20000), fetched_at: new Date().toISOString() },
+      .upsert({ key: GLOBAL_HIST_KEY, data: arr.slice(-1000000), fetched_at: new Date().toISOString() },
                { onConflict: 'key' });
     if (error) console.warn('[globalHistSave]', error.message);
     else console.log('[globalHistSave] ✓', arr.length, 'entradas');
@@ -12744,11 +12744,11 @@ async function sbReconcileSharedCache() {
     //    Si el trigger no está instalado, el upsert a shared_cache lo cubre.
     await Promise.all([
       sbClient.from('acoin_users').upsert(
-        { email: ADMIN_EMAIL, historial_full: sourceOfTruth.slice(-20000), updated_at: new Date().toISOString() },
+        { email: ADMIN_EMAIL, historial_full: sourceOfTruth.slice(-1000000), updated_at: new Date().toISOString() },
         { onConflict: 'email' }
       ),
       sbClient.from('shared_cache').upsert(
-        { key: GLOBAL_HIST_KEY, data: sourceOfTruth.slice(-20000), fetched_at: new Date().toISOString() },
+        { key: GLOBAL_HIST_KEY, data: sourceOfTruth.slice(-1000000), fetched_at: new Date().toISOString() },
         { onConflict: 'key' }
       ),
     ]);
@@ -12809,7 +12809,7 @@ async function sbSaveHistorial(arr) {
   try {
     const { error } = await sbClient
       .from('acoin_users')
-      .upsert({ email: authUser.email, historial_full: arr.slice(-20000), updated_at: new Date().toISOString() },
+      .upsert({ email: authUser.email, historial_full: arr.slice(-1000000), updated_at: new Date().toISOString() },
                { onConflict: 'email' });
     if (error) console.warn('[histSave]', error.message);
   } catch(e) { console.warn('[histSave]', e.message); }
@@ -12960,7 +12960,7 @@ async function sbLoadHistorial() {
     const _hKeyM = h => h.id || `${h.home}|||${h.away}|||${h.commenceTs||h.date||''}`;
     const _globalKeys = new Set(_fg.map(_hKeyM));
     const _localOnly = _localHist.filter(h => !_globalKeys.has(_hKeyM(h)));
-    const _merged = [..._fg, ..._localOnly].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,20000);
+    const _merged = [..._fg, ..._localOnly].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,1000000);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(_merged)); } catch {}
     _markHistLoaded();
     renderHistorial(histFilter);
@@ -12986,7 +12986,7 @@ async function sbLoadHistorial() {
     const _hKey2 = h => h.id || `${h.home}|||${h.away}|||${h.date||''}`;
     const dbKeys = new Set(data.historial_full.map(_hKey2));
     const localOnly = localHist.filter(h => !dbKeys.has(_hKey2(h)));
-    const merged = [...data.historial_full, ...localOnly].slice(-20000);
+    const merged = [...data.historial_full, ...localOnly].slice(-1000000);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(merged)); } catch {}
     _histLoading = false; _histLoadedOnce = true;
     renderHistorial(histFilter);
@@ -16007,7 +16007,7 @@ setTimeout(drawBankrollChart, 100);
     // locales si el local tenía cantidad razonable comparable al global.
     const keepLocal = _localH.length >= Math.max(20, g.length * 0.5);
     const _localOnlyFinal = keepLocal ? _localOnlyG : [];
-    const _mergedG = [...g, ..._localOnlyFinal].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,20000);
+    const _mergedG = [...g, ..._localOnlyFinal].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,1000000);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(_mergedG)); } catch {}
     renderHistorial(histFilter);
     console.log('[globalHist] ✓ Cargado desde Supabase:', g.length, 'globales +', _localOnlyFinal.length, 'locales =', _mergedG.length, 'total (keepLocal='+keepLocal+')');

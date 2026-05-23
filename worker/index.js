@@ -828,7 +828,7 @@ async function saveAdminHistorial(env, hist) {
         Prefer: 'return=minimal',
       },
       body: JSON.stringify({
-        historial_full: hist.slice(-20000),  // destopado: contar picks reales (era -500)
+        historial_full: hist.slice(-1000000),  // destopado: contar picks reales (era -500)
         updated_at: new Date().toISOString(),
       }),
     }
