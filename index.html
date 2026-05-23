@@ -5311,7 +5311,7 @@ window.toggleHeroBubble = function(n) {
     <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apuestas de Fútbol <span class="hero-emoji-btn" id="heroEmoji1" onclick="toggleHeroBubble(1)" title="Más info">🌎<sup class="hero-emoji-hint">✦</sup></span></span></h1>
     <p>Soy una IA que pronostica Fútbol automáticamente, configurada por un experto y gratis para todo mundo <span class="hero-emoji-btn" id="heroEmoji2" onclick="toggleHeroBubble(2)" title="Más info">💚<sup class="hero-emoji-hint">✦</sup></span></p>
     <div class="hero-stats">
-      <div class="hero-stat"><span class="num" id="heroStatPrecision">–</span><span class="lbl">ROI</span></div>
+      <div class="hero-stat"><span class="num" id="heroStatPrecision">–</span><span class="lbl">Picks de hoy</span></div>
       <div class="hero-stat"><span class="num" id="heroStatPicks">–</span><span class="lbl">Picks realizados</span></div>
       <a class="hero-stat" href="https://x.com/Gambeta_ai" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer" title="Seguinos en X @Gambeta_ai">
         <span class="num" style="color:#fff;line-height:1;display:flex;align-items:center;justify-content:center;height:2.4rem">
@@ -6987,7 +6987,7 @@ async function acLoadFromDB(email) {
 // ═══════════════════════════════════════════════
 //  LIVE STATS (Hero section — Supabase aggregate)
 // ═══════════════════════════════════════════════
-const STATS_CACHE_KEY = 'ia_live_stats_v3'; // bumped 20-may-2026 → fuerza recálculo del total
+const STATS_CACHE_KEY = 'ia_live_stats_v4'; // v4: hero muestra Picks de hoy en vez de ROI
 const STATS_CACHE_TTL = 30 * 60 * 1000; // 30 min
 
 // ── Caché genérico con TTL para reducir carga en Supabase ──────────────────
@@ -7030,22 +7030,20 @@ function animateCounter(el, from, to, suffix, duration) {
   requestAnimationFrame(step);
 }
 
-function heroStatsApply(roi, totalPicks, animate) {
+function heroStatsApply(picksToday, totalPicks, animate) {
   const elP = document.getElementById('heroStatPrecision');
   const elN = document.getElementById('heroStatPicks');
   if (!elP || !elN) return;
-  const roiNum  = parseFloat(roi) || 0;
-  const roiStr  = (roiNum >= 0 ? '+' : '') + roiNum.toFixed(1) + '%';
-  const roiColor = roiNum >= 0 ? 'var(--verde)' : '#ff5f5f';
-  elP.style.color = roiColor;
+  const hoy = parseInt(picksToday, 10) || 0;
+  elP.style.color = 'var(--verde)';
+  // Total topado: el historial guarda máx 500 → mostrar "+500" (piso real, no engañoso)
+  const totalStr = totalPicks >= 500 ? '+500' : '+' + totalPicks;
   if (animate) {
-    elP.textContent = roiStr;
-    animateCounter(elN, 0, totalPicks, totalPicks >= 1000 ? '' : '', 1600);
+    animateCounter(elP, 0, hoy, '', 1200);
+    elN.textContent = totalStr;
   } else {
-    elP.textContent = roiStr;
-    elN.textContent = totalPicks >= 1000
-      ? (totalPicks / 1000).toFixed(1).replace('.0','') + 'K+'
-      : totalPicks + '+';
+    elP.textContent = String(hoy);
+    elN.textContent = totalStr;
   }
 }
 
@@ -7065,14 +7063,18 @@ function computeStatsFromHistorial(rows) {
   const _pl   = flat.reduce((s,h) => s + (h && h.pl ? h.pl : 0), 0);
   const _stk  = _comp.reduce((s,h) => s + (h.stake || 0), 0);
   const roi   = _stk >= 10 ? parseFloat((_pl / _stk * 100).toFixed(1)) : null;
-  return { total, wins, losses, resolved, precision, roi };
+  // Picks de hoy: partidos cuya fecha (hora ARG) es hoy
+  const _fmtAR = ts => new Date(ts).toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit',timeZone:'America/Argentina/Buenos_Aires'});
+  const _todayAR = _fmtAR(Date.now());
+  const picksToday = flat.filter(h => h && h.commenceTs && _fmtAR(h.commenceTs) === _todayAR).length;
+  return { total, wins, losses, resolved, precision, roi, picksToday };
 }
 
 async function loadLiveStats() {
   // Invalidar caché de stats si fue guardada sin roi (versión anterior)
   try {
     const _sc = localStorage.getItem(STATS_CACHE_KEY);
-    if (_sc) { const _sco = JSON.parse(_sc); if (_sco && !('roi' in _sco)) localStorage.removeItem(STATS_CACHE_KEY); }
+    if (_sc) { const _sco = JSON.parse(_sc); if (_sco && !('picksToday' in _sco)) localStorage.removeItem(STATS_CACHE_KEY); }
   } catch {}
   // ── PASO 1: mostrar stats locales instantáneamente ──
   // (siempre disponibles, sin esperar red)
@@ -7085,7 +7087,7 @@ async function loadLiveStats() {
     if (localHist.length > 0) {
       localStats = computeStatsFromHistorial(localHist);
       const _localTotal = Math.max(HERO_PICKS_BASE, localStats.total);
-      heroStatsApply(localStats.roi, _localTotal, true);
+      heroStatsApply(localStats.picksToday, _localTotal, true);
     }
   } catch(_) {}
 
@@ -7102,13 +7104,12 @@ async function loadLiveStats() {
     if (histFull.length > 0) {
       const gs = computeStatsFromHistorial(histFull);
       // Total: el del historial compartido (o el local si fuera mayor, ej. admin con picks nuevos)
-      const total    = Math.max(gs.total || 0, localStats?.total || 0);
-      const precision = gs.precision ?? (localStats?.precision ?? null);
-      const finalRoi  = (gs.roi != null ? gs.roi : (localStats?.roi != null ? localStats.roi : precision));
+      const total      = Math.max(gs.total || 0, localStats?.total || 0);
+      const picksToday = gs.picksToday != null ? gs.picksToday : (localStats?.picksToday || 0);
       localStorage.setItem(STATS_CACHE_KEY, JSON.stringify({
-        precision, roi: finalRoi, totalPicks: total, ts: Date.now(), source: 'historial'
+        picksToday, totalPicks: total, ts: Date.now(), source: 'historial'
       }));
-      heroStatsApply(finalRoi, total, true);
+      heroStatsApply(picksToday, total, true);
       return;
     }
     throw new Error('historial vacío');
