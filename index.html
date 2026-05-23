@@ -7036,8 +7036,8 @@ function heroStatsApply(picksToday, totalPicks, animate) {
   if (!elP || !elN) return;
   const hoy = parseInt(picksToday, 10) || 0;
   elP.style.color = 'var(--verde)';
-  // Total topado: el historial guarda máx 500 → mostrar "+500" (piso real, no engañoso)
-  const totalStr = totalPicks >= 500 ? '+500' : '+' + totalPicks;
+  // Conteo real de picks (sin tope artificial)
+  const totalStr = (parseInt(totalPicks, 10) || 0).toLocaleString('es-AR');
   if (animate) {
     animateCounter(elP, 0, hoy, '', 1200);
     elN.textContent = totalStr;
@@ -12960,7 +12960,7 @@ async function sbLoadHistorial() {
     const _hKeyM = h => h.id || `${h.home}|||${h.away}|||${h.commenceTs||h.date||''}`;
     const _globalKeys = new Set(_fg.map(_hKeyM));
     const _localOnly = _localHist.filter(h => !_globalKeys.has(_hKeyM(h)));
-    const _merged = [..._fg, ..._localOnly].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,500);
+    const _merged = [..._fg, ..._localOnly].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,20000);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(_merged)); } catch {}
     _markHistLoaded();
     renderHistorial(histFilter);
@@ -16007,7 +16007,7 @@ setTimeout(drawBankrollChart, 100);
     // locales si el local tenía cantidad razonable comparable al global.
     const keepLocal = _localH.length >= Math.max(20, g.length * 0.5);
     const _localOnlyFinal = keepLocal ? _localOnlyG : [];
-    const _mergedG = [...g, ..._localOnlyFinal].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,500);
+    const _mergedG = [...g, ..._localOnlyFinal].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,20000);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(_mergedG)); } catch {}
     renderHistorial(histFilter);
     console.log('[globalHist] ✓ Cargado desde Supabase:', g.length, 'globales +', _localOnlyFinal.length, 'locales =', _mergedG.length, 'total (keepLocal='+keepLocal+')');
