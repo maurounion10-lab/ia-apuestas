@@ -16740,6 +16740,7 @@ async function _handleAuthSession(u) {
   await acLoadFromDB(u.email);
   await sbLoadHistorial();
   initUserSync(u.email);
+  checkBroadcastMessages();   // ahora sí: usuario registrado → puede ver mensajes
   closeAuth();
   // Migración puntual: elevar picks a Máxima si admin y aún no están en bvr=6
   if (u.email === ADMIN_EMAIL) _adminMigrateMaxima();
@@ -20284,6 +20285,9 @@ async function admSendBroadcast() {
 // ── Verificar mensajes no leídos al cargar la app ──
 // Usa proxy /api/sb con caché de servidor Cloudflare (3 min compartido entre todos)
 async function checkBroadcastMessages() {
+  // Los mensajes broadcast (inbox de gambeta.ai) son SOLO para usuarios
+  // registrados — no se muestran a visitantes anónimos.
+  if (!authUser?.email) return;
   try {
     let picks = _sbGetCache('bcast');
     if (!picks) {
@@ -20624,6 +20628,7 @@ function initBroadcastRealtime() {
         table: 'acoin_users',
         filter: `email=eq.${BROADCAST_EMAIL}`
       }, payload => {
+        if (!authUser?.email) return;   // solo usuarios registrados
         const msgs = payload.new?.picks || [];
         if (!msgs.length) return;
         const seen   = JSON.parse(localStorage.getItem(BROADCAST_SEEN_KEY) || '[]');
