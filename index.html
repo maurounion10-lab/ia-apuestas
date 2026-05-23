@@ -20646,6 +20646,104 @@ function initBroadcastRealtime() {
   } catch(e) { console.warn('[broadcast/realtime]', e.message); }
 }
 
+/* ── Banderas de pais como imagenes ───────────────────────────────────────
+   Windows y muchos navegadores de escritorio NO renderizan los emojis de
+   bandera (muestran "AR", "BR"...). Este modulo reemplaza, solo a nivel
+   visual del DOM, cada emoji de bandera por una miniatura de flagcdn.com.
+   No toca ningun string de datos: los emojis siguen intactos en memoria,
+   asi que filtros, claves y comparaciones de texto no se ven afectados. */
+(function(){
+  // Pareja de regional indicators (paises) o secuencia tag de bandera negra
+  // (Inglaterra / Escocia / Gales).
+  var FLAG_RE = /(?:\uD83C[\uDDE6-\uDDFF]){2}|🏴(?:\uDB40[\uDC61-\uDC7A])+󠁿/g;
+  function toCC(flag){
+    var cps = Array.from(flag).map(function(c){ return c.codePointAt(0); });
+    if (cps.length === 2 && cps[0] >= 0x1F1E6 && cps[0] <= 0x1F1FF){
+      var a = cps[0] - 0x1F1E6, b = cps[1] - 0x1F1E6;
+      if (a < 0 || a > 25 || b < 0 || b > 25) return null;
+      return String.fromCharCode(97 + a) + String.fromCharCode(97 + b);
+    }
+    if (cps[0] === 0x1F3F4){
+      var letters = '';
+      for (var i = 1; i < cps.length; i++){
+        var t = cps[i];
+        if (t >= 0xE0061 && t <= 0xE007A) letters += String.fromCharCode(t - 0xE0061 + 97);
+      }
+      if (letters.length > 2) return letters.slice(0,2) + '-' + letters.slice(2);
+      return null;
+    }
+    return null;
+  }
+  function flagImgHtml(cc){
+    return '<img class="gb-flagimg" src="https://flagcdn.com/' + cc + '.svg" alt="" '
+         + 'loading="lazy" decoding="async" style="display:inline-block;width:1.12em;'
+         + 'height:0.82em;vertical-align:-0.13em;border-radius:2px;object-fit:cover;'
+         + 'box-shadow:0 0 0 1px rgba(0,0,0,0.18);margin:0 0.06em">';
+  }
+  function processTextNode(tn){
+    var txt = tn.nodeValue;
+    if (!txt) return;
+    FLAG_RE.lastIndex = 0;
+    if (!FLAG_RE.test(txt)) return;
+    FLAG_RE.lastIndex = 0;
+    var frag = document.createDocumentFragment();
+    var last = 0, m;
+    while ((m = FLAG_RE.exec(txt))){
+      if (m.index > last) frag.appendChild(document.createTextNode(txt.slice(last, m.index)));
+      var cc = toCC(m[0]);
+      if (cc){
+        var holder = document.createElement('span');
+        holder.innerHTML = flagImgHtml(cc);
+        if (holder.firstChild) frag.appendChild(holder.firstChild);
+        else frag.appendChild(document.createTextNode(m[0]));
+      } else {
+        frag.appendChild(document.createTextNode(m[0]));
+      }
+      last = m.index + m[0].length;
+    }
+    if (last < txt.length) frag.appendChild(document.createTextNode(txt.slice(last)));
+    if (tn.parentNode) tn.parentNode.replaceChild(frag, tn);
+  }
+  function flagify(root){
+    if (!root) return;
+    if (root.nodeType === 3){ processTextNode(root); return; }
+    if (!root.querySelectorAll) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(n){
+        var p = n.parentNode;
+        if (!p) return NodeFilter.FILTER_REJECT;
+        var tag = p.nodeName;
+        if (tag==='SCRIPT'||tag==='STYLE'||tag==='TEXTAREA'||tag==='OPTION'||tag==='NOSCRIPT')
+          return NodeFilter.FILTER_REJECT;
+        return /\uD83C[\uDDE6-\uDDFF]|🏴/.test(n.nodeValue || '')
+          ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    var nodes = [], n;
+    while ((n = walker.nextNode())) nodes.push(n);
+    nodes.forEach(processTextNode);
+  }
+  var _t = null;
+  function scheduleFlagify(){
+    if (_t) return;
+    _t = setTimeout(function(){ _t = null; try { flagify(document.body); } catch(e){} }, 260);
+  }
+  function initFlagify(){
+    try { flagify(document.body); } catch(e){}
+    try {
+      var obs = new MutationObserver(function(muts){
+        for (var i = 0; i < muts.length; i++){
+          if (muts[i].addedNodes && muts[i].addedNodes.length){ scheduleFlagify(); break; }
+        }
+      });
+      obs.observe(document.body, { childList:true, subtree:true });
+    } catch(e){}
+  }
+  if (document.readyState === 'loading')
+    document.addEventListener('DOMContentLoaded', initFlagify);
+  else initFlagify();
+})();
+
 </script>
 
 <!-- $A-COIN PANEL MODAL -->
