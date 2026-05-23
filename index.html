@@ -17261,11 +17261,21 @@ function acToast(icon, title, sub) {
 }
 
 // ── Toast de bienvenida para visitantes NO logueados: invita a registrarse gratis ──
+// Solo visitantes NUEVOS y un máximo de 2 veces en total (contador persistente).
 function welcomeRegisterToast() {
   try {
     if (typeof authUser !== 'undefined' && authUser && authUser.email) return; // ya logueado
-    if (sessionStorage.getItem('gb_welcome_toast_v1')) return;                  // ya se mostró
-    sessionStorage.setItem('gb_welcome_toast_v1', '1');
+    const KEY = 'gb_welcome_toast_count_v2';
+    const count = parseInt(localStorage.getItem(KEY) || '0', 10);
+    if (count >= 2) return;                                  // ya se mostró el máximo (2 veces)
+    if (count === 0) {
+      // Primera vez que corre: si el visitante ya tenía historial guardado
+      // no es "nuevo" → marcar como agotado y no mostrar.
+      let _established = false;
+      try { _established = (JSON.parse(localStorage.getItem('apuestas_historial_v1') || '[]') || []).length > 0; } catch (e) {}
+      if (_established) { localStorage.setItem(KEY, '2'); return; }
+    }
+    localStorage.setItem(KEY, String(count + 1));            // registrar esta aparición
     setTimeout(() => {
       acToast('🎁', 'Creá tu cuenta gratis', 'Guardá tu historial y seguí tus picks favoritos · 100% gratis');
     }, 1600);
