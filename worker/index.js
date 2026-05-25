@@ -610,6 +610,9 @@ function normTeam(s) {
 const MANUAL_SCORES = {
   'ikstart|bodoglimt': { h: 1, a: 4 },  // Eliteserien 20-may-2026
   'willemii|volendam': { h: 1, a: 2 },  // Playoff Eredivisie 20-may-2026
+  'rakow|arkagdynia':  { h: 3, a: 0 },  // Ekstraklasa 23-may-2026
+  'volendam|willemii': { h: 1, a: 2 },  // Playoff Eredivisie 23-may-2026 (vuelta)
+  'bodoglimt|brann':   { h: 3, a: 1 },  // Eliteserien 24-may-2026
 };
 
 // Match fuzzy entre dos nombres de equipo (mismo equipo, distintas variantes)
