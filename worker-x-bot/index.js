@@ -1206,14 +1206,37 @@ export default {
       } catch (e) { return J({ error: 'card: ' + e.message }, 500); }
     }
 
+    if (url.pathname === '/clear-dedup') {
+      if (!env.TRIGGER_TOKEN || url.searchParams.get('token') !== env.TRIGGER_TOKEN) {
+        return J({ error: 'token inválido' }, 403);
+      }
+      if (!env.CACHE_KV) return J({ error: 'KV no configurado' }, 500);
+      const cleared = { count: 0, errors: [] };
+      let cursor = undefined;
+      try {
+        do {
+          const list = await env.CACHE_KV.list({ prefix: 'xpost:', cursor });
+          for (const k of list.keys) {
+            try { await env.CACHE_KV.delete(k.name); cleared.count++; }
+            catch (e) { cleared.errors.push(k.name + ':' + e.message); }
+          }
+          cursor = list.list_complete ? null : list.cursor;
+        } while (cursor);
+        return J({ status: 'ok', cleared });
+      } catch (e) { return J({ error: e.message }, 500); }
+    }
+
     if (url.pathname === '/seed-dedup') {
       if (!env.TRIGGER_TOKEN || url.searchParams.get('token') !== env.TRIGGER_TOKEN) {
         return J({ error: 'token inválido' }, 403);
       }
       const marked = { edu: 0, com: 0, celebra: 0, errors: [] };
       try {
-        for (const t of EDU_POOL) { try { await markPosted(t, env); marked.edu++; } catch (e) { marked.errors.push('edu:' + e.message); } }
-        for (const t of COM_POOL) { try { await markPosted(t, env); marked.com++; } catch (e) { marked.errors.push('com:' + e.message); } }
+        const firstN = parseInt(url.searchParams.get('firstN') || '0', 10);
+        const eduList = firstN > 0 ? EDU_POOL.slice(0, firstN) : EDU_POOL;
+        const comList = firstN > 0 ? COM_POOL.slice(0, firstN) : COM_POOL;
+        for (const t of eduList) { try { await markPosted(t, env); marked.edu++; } catch (e) { marked.errors.push('edu:' + e.message); } }
+        for (const t of comList) { try { await markPosted(t, env); marked.com++; } catch (e) { marked.errors.push('com:' + e.message); } }
         const hist = await fetchHistorial();
         const lastWin = hist.filter(w => w.result === 'win' && w.commenceTs)
           .sort((a, b) => b.commenceTs - a.commenceTs)[0];
@@ -1243,6 +1266,6 @@ export default {
       } catch (e) { return J({ error: e.message }, 500); }
     }
 
-    return J({ error: 'ruta desconocida', rutas: ['/status', '/preview', '/card', '/run', '/seed-dedup'] }, 404);
+    return J({ error: 'ruta desconocida', rutas: ['/status', '/preview', '/card', '/run', '/seed-dedup', '/clear-dedup'] }, 404);
   },
 };
