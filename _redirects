@@ -67,3 +67,12 @@
 /blog/mejores-apps-apostar-tenis.html         /blog/mejores-apps-apostar-tenis   308
 /blog/mejores-apps-apostar-ufc.html           /blog/mejores-apps-apostar-ufc   308
 /blog/mejores-apps-apostar-rugby.html         /blog/mejores-apps-apostar-rugby   308
+
+
+# 404 cleanup (URLs encontrados por Google que ya no existen)
+/blog/como-leer-picks         /blog/como-leer-resultados       301
+/blog/como-leer-picks/        /blog/como-leer-resultados       301
+/ranking                      /blog/ranking-gambeta-coins       301
+/ranking/                     /blog/ranking-gambeta-coins       301
+/nba/500                      /                                 301
+/nba/500/                     /                                 301
