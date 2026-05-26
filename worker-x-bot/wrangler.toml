@@ -14,14 +14,16 @@ BOT_MODE = "live"
 #   X_API_KEY, X_API_SECRET, X_ACCESS_TOKEN, X_ACCESS_SECRET, TRIGGER_TOKEN
 
 # Cron triggers (horario UTC; Argentina = UTC-3)
-#   30 12 → 09:30 ART  resultados
-#    0 15 → 12:00 ART  picks del día
-#   30 17 → 14:30 ART  educación
-#    0 21 → 18:00 ART  hot take
-#    0 23 → 20:00 ART  comunidad
-#    0 * * * → cada hora: festejo de aciertos recién resueltos
+# Minutos irregulares a propósito — para que no parezca un bot programado
+# a horas redondas. Igual es bot, pero no se nota tanto.
+#   23 12 → 09:23 ART  resultados
+#    7 15 → 12:07 ART  picks del día
+#   47 17 → 14:47 ART  educación
+#   13 21 → 18:13 ART  hot take
+#   23 23 → 20:23 ART  comunidad
+#   17 *  → cada hora :17 → festejo de aciertos recién resueltos
 [triggers]
-crons = ["0 * * * *", "30 12 * * *", "0 15 * * *", "30 17 * * *", "0 21 * * *", "0 23 * * *"]
+crons = ["17 * * * *", "23 12 * * *", "7 15 * * *", "47 17 * * *", "13 21 * * *", "23 23 * * *"]
 
 # Observability (Workers Logs) — Cloudflare lo tiene activado por defecto;
 # declararlo acá mantiene el wrangler.toml sincronizado con el dashboard.
