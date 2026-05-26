@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Conversor de cuotas: decimal, fraccionaria, americana | gambeta.ai</title>
+<meta name="description" content="Conversor gratuito de cuotas entre formatos: decimal (europeo), fraccionaria (UK), americana (US) y probabilidad implícita. Cambiá cualquiera y se actualizan todas."/>
+<meta name="author" content="gambeta.ai"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://gambeta.ai/herramientas/conversor-cuotas"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://gambeta.ai/herramientas/conversor-cuotas"/>
+<meta property="og:title" content="Conversor de cuotas: decimal, fraccionaria, americana | gambeta.ai"/>
+<meta property="og:description" content="Conversor gratuito de cuotas entre formatos: decimal, fraccionaria, americana y probabilidad implícita."/>
+<meta property="og:image" content="https://gambeta.ai/og-image.png"/>
+<meta property="og:locale" content="es_AR"/>
+<meta property="og:site_name" content="gambeta.ai"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Conversor de cuotas | gambeta.ai"/>
+<meta name="twitter:description" content="Conversor gratuito entre formatos de cuotas."/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Conversor de cuotas","url":"https://gambeta.ai/herramientas/conversor-cuotas","applicationCategory":"FinanceApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Conversor gratuito de cuotas entre formato decimal, fraccionario y americano."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Herramientas","item":"https://gambeta.ai/herramientas"},{"@type":"ListItem","position":3,"name":"Conversor de cuotas","item":"https://gambeta.ai/herramientas/conversor-cuotas"}]}
+</script>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png"/>
+<style>
+  :root { --verde:#00c853; --fondo:#0f0f0f; --fondo2:#1a1a2e; --texto:#e8e8e8; --texto-sec:#9e9e9e; --borde:rgba(255,255,255,0.08); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { padding-top:66px; background:var(--fondo); color:var(--texto); font-family:'Segoe UI',system-ui,sans-serif; line-height:1.7; }
+  a { text-decoration:none; color:inherit; }
+  nav.nav { background:#060d06; border-bottom:1px solid rgba(0,200,83,0.2); padding:0 28px; height:66px; display:flex; align-items:center; justify-content:space-between; position:fixed; top:0; left:0; right:0; z-index:10000; gap:16px; }
+  .nav-logo-text { font-size:1.08rem; font-weight:900; color:#fff; }
+  .nav-logo-text span { color:#00c853; }
+  .nav-links { display:flex; gap:2px; flex:1; justify-content:center; }
+  .nav-links a { color:rgba(165,214,167,0.65); padding:7px 12px; border-radius:8px; font-size:.82rem; }
+  .nav-cta-btn { background:linear-gradient(135deg,#00c853,#00a846); color:#000; font-weight:700; padding:8px 18px; border-radius:8px; font-size:.82rem; }
+  @media(max-width:640px) { .nav-links { display:none; } }
+  .hero { background:linear-gradient(180deg,#071007 0%,#0c180c 100%); border-bottom:1px solid rgba(0,200,83,0.15); padding:52px 24px 44px; text-align:center; }
+  .badge { display:inline-block; background:rgba(0,200,83,0.12); border:1px solid rgba(0,200,83,0.3); color:var(--verde); font-size:0.7rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; padding:4px 14px; border-radius:20px; margin-bottom:18px; }
+  .hero h1 { font-size:clamp(1.5rem,4vw,2.2rem); font-weight:900; color:#fff; max-width:760px; margin:0 auto 14px; }
+  .hero p { font-size:1rem; color:rgba(255,255,255,0.5); max-width:620px; margin:0 auto; }
+  .container { max-width:760px; margin:0 auto; padding:36px 24px; }
+  .calc-card { background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(0,200,83,0.02)); border:1px solid rgba(0,200,83,0.3); border-radius:18px; padding:32px 28px; margin-bottom:32px; }
+  .calc-row { margin-bottom:18px; }
+  .calc-row label { display:block; font-size:0.78rem; color:rgba(255,255,255,0.65); font-weight:700; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px; }
+  .calc-row input[type="number"], .calc-row select { width:100%; padding:12px 14px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#fff; font-size:1rem; font-family:inherit; }
+  .calc-row input[type="number"]:focus, .calc-row select:focus { outline:none; border-color:rgba(0,200,83,0.5); background:rgba(0,0,0,0.5); }
+  .calc-row .hint { font-size:0.75rem; color:rgba(255,255,255,0.35); margin-top:4px; }
+  .calc-output { margin-top:24px; padding-top:22px; border-top:1px solid rgba(255,255,255,0.08); }
+  .out-headline { font-size:0.72rem; color:#00c853; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
+  .out-main { font-size:2.2rem; font-weight:900; color:#fff; margin-bottom:6px; }
+  .out-sub { font-size:0.92rem; color:rgba(255,255,255,0.6); }
+  .out-warning { background:rgba(229,115,115,0.1); border:1px solid rgba(229,115,115,0.3); border-radius:10px; padding:14px 18px; margin-top:18px; color:#ef9a9a; font-size:0.88rem; }
+  .out-positive { background:rgba(0,200,83,0.08); border:1px solid rgba(0,200,83,0.3); border-radius:10px; padding:14px 18px; margin-top:18px; color:#a5d6a7; font-size:0.88rem; }
+  .article h2 { font-size:1.25rem; font-weight:800; color:#fff; margin:36px 0 12px; }
+  .article p { font-size:0.97rem; color:rgba(255,255,255,0.68); margin-bottom:18px; }
+  .article ul,.article ol { padding-left:22px; margin-bottom:18px; }
+  .article li { font-size:0.95rem; color:rgba(255,255,255,0.65); margin-bottom:6px; }
+  .article strong { color:rgba(255,255,255,0.9); }
+  .article a { color:var(--verde); text-decoration:underline; text-underline-offset:3px; }
+  .info-box { background:rgba(255,255,255,0.03); border-left:3px solid var(--verde); padding:16px 20px; margin:24px 0; }
+  .info-box p { margin:0; font-size:0.9rem; color:rgba(255,255,255,0.55); }
+  .cta-box { background:linear-gradient(135deg,rgba(0,200,83,0.12),rgba(0,200,83,0.04)); border:1px solid rgba(0,200,83,0.3); border-radius:18px; padding:28px 24px; text-align:center; margin:32px 0; }
+  .cta-box h3 { color:#fff; margin-bottom:8px; font-size:1.05rem; }
+  .cta-box p { color:rgba(255,255,255,0.5); margin-bottom:18px; }
+  .btn-cta { display:inline-block; background:var(--verde); color:#000; font-weight:800; padding:12px 26px; border-radius:10px; }
+  .tool-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:20px; }
+  .tool-card { background:rgba(255,255,255,0.04); border:1px solid rgba(0,200,83,0.15); border-radius:12px; padding:18px 20px; transition:border-color .2s,background .2s; display:block; }
+  .tool-card:hover { border-color:rgba(0,200,83,0.4); background:rgba(0,200,83,0.05); }
+  .tool-card-icon { font-size:1.4rem; margin-bottom:8px; }
+  .tool-card-title { font-size:0.97rem; font-weight:700; color:#fff; margin-bottom:6px; }
+  .tool-card-desc { font-size:0.82rem; color:rgba(255,255,255,0.5); }
+  .footer { background:#060d06; border-top:1px solid rgba(0,200,83,0.12); padding:24px; text-align:center; font-size:0.82rem; color:rgba(255,255,255,0.3); }
+  .footer a { color:var(--verde); }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="nav-logo-text" href="https://gambeta.ai">gambeta<span>.ai</span></a>
+  <div class="nav-links">
+    <a href="https://gambeta.ai/#pronosticos">🔮 Pronósticos</a>
+    <a href="/blog/">📰 Blog</a>
+    <a href="/herramientas">🧮 Herramientas</a>
+  </div>
+  <a class="nav-cta-btn" href="https://gambeta.ai">✦ Ver picks</a>
+</nav>
+<header class="hero">
+  <div class="badge">Herramienta gratis</div>
+  <h1>Conversor de <strong>cuotas</strong> (decimal, fraccionaria, americana)</h1>
+  <p>Modificá cualquiera de los 4 campos y los demás se actualizan al instante. Útil cuando una casa usa formato distinto al que estás acostumbrado.</p>
+</header>
+<main class="container">
+
+<div class="calc-card">
+  <div class="calc-row">
+    <label for="cDec">Decimal (europeo)</label>
+    <input type="number" id="cDec" step="0.01" min="1.01" placeholder="ej. 2.50" value="2.50"/>
+    <div class="hint">Formato usado en Latam, Europa y la mayoría de las casas online.</div>
+  </div>
+  <div class="calc-row">
+    <label for="cFrac">Fraccionaria (UK)</label>
+    <input type="text" id="cFrac" placeholder="ej. 3/2" value="3/2"/>
+    <div class="hint">Formato británico. Ej: 3/2 significa "ganás 3 por cada 2 apostados".</div>
+  </div>
+  <div class="calc-row">
+    <label for="cUS">Americana (US)</label>
+    <input type="number" id="cUS" step="1" placeholder="ej. +150" value="150"/>
+    <div class="hint">Usado en EE.UU. Valores positivos (+150) son underdog; negativos (-200) son favorito.</div>
+  </div>
+  <div class="calc-row">
+    <label for="cImpl">Probabilidad implícita (%)</label>
+    <input type="number" id="cImpl" step="0.01" min="0.1" max="99.9" placeholder="ej. 40" value="40"/>
+    <div class="hint">La probabilidad que la cuota implica (sin margen de la casa).</div>
+  </div>
+</div>
+
+<article class="article">
+  <h2>Los 3 formatos de cuota explicados</h2>
+  <h3>Decimal (europeo)</h3>
+  <p>El más común en Latam y Europa. Te dice cuánto te devuelven por cada unidad apostada, incluyendo tu stake. Si la cuota es 2.50 y apostás 00, recibís 50 (ganaste 50). Es el más intuitivo para principiantes.</p>
+  <h3>Fraccionaria (UK)</h3>
+  <p>Usado tradicionalmente en Reino Unido e Irlanda. Te dice cuánto ganás <strong>sin contar tu stake</strong>. Una cuota 3/2 significa: ganás 3 unidades por cada 2 apostadas. Si apostás 00, ganás 50 (devuelven 50). Es equivalente a decimal 2.50.</p>
+  <h3>Americana (US)</h3>
+  <p>Usado en casinos y casas de EE.UU. Tiene dos formas:</p>
+  <ul>
+    <li><strong>Positiva (+150):</strong> ganás 50 por cada 00 apostados. Es el underdog (probabilidad implícita menor a 50%).</li>
+    <li><strong>Negativa (-200):</strong> tenés que apostar 00 para ganar 00. Es el favorito (probabilidad implícita mayor a 50%).</li>
+  </ul>
+  <h2>Fórmulas de conversión</h2>
+  <ul>
+    <li><strong>Decimal → Fraccionaria:</strong> (decimal − 1) como fracción</li>
+    <li><strong>Decimal → Americana:</strong> si decimal ≥ 2: (decimal − 1) × 100. Si decimal &lt; 2: −100 / (decimal − 1)</li>
+    <li><strong>Decimal → Probabilidad implícita:</strong> 100 / decimal</li>
+  </ul>
+  <h2>¿Por qué importa?</h2>
+  <p>Si estás siguiendo picks de varios tipsters internacionales o leyendo análisis en inglés, vas a encontrar cuotas en formatos distintos. Saber convertir rápido entre ellos evita confusiones y te permite comparar valor entre fuentes. La <strong>probabilidad implícita</strong> es la más útil para decidir si hay valor — es lo que tu probabilidad estimada tiene que superar.</p>
+  <div class="info-box">
+    <p>💡 Una vez que tenés la probabilidad implícita, podés usar la <a href="/herramientas/valor-esperado">calculadora de EV</a> para ver si la apuesta tiene valor, y la <a href="/herramientas/kelly">calculadora de Kelly</a> para definir el stake óptimo.</p>
+  </div>
+</article>
+
+<div class="cta-box">
+  <h3>🧠 Probá la IA de gambeta.ai</h3>
+  <p>Picks gratuitos con cuotas en formato decimal y stake sugerido ya calculado.</p>
+  <a class="btn-cta" href="https://gambeta.ai/#pronosticos">Ver pronósticos →</a>
+</div>
+
+</main>
+<footer class="footer"><p>© 2026 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar · 18+</p></footer>
+<script>
+(function() {
+  // GCD for fractional simplification
+  function gcd(a, b) { return b ? gcd(b, a % b) : a; }
+  function decToFrac(d) {
+    if (!d || d <= 1) return '';
+    const net = d - 1;
+    // Try common denominators 1..100
+    let best = { num: 1, den: 1, err: Infinity };
+    for (let den = 1; den <= 100; den++) {
+      const num = Math.round(net * den);
+      const err = Math.abs(num / den - net);
+      if (err < best.err) best = { num, den, err };
+      if (err < 0.0001) break;
+    }
+    const g = gcd(best.num, best.den);
+    return (best.num / g) + '/' + (best.den / g);
+  }
+  function fracToDec(f) {
+    if (!f) return null;
+    const m = f.match(/^(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)$/);
+    if (!m) return null;
+    const num = parseFloat(m[1]), den = parseFloat(m[2]);
+    if (!den) return null;
+    return (num / den) + 1;
+  }
+  function decToUS(d) {
+    if (!d || d <= 1) return '';
+    if (d >= 2) return '+' + Math.round((d - 1) * 100);
+    return String(Math.round(-100 / (d - 1)));
+  }
+  function usToDec(u) {
+    if (!u || u === 0) return null;
+    if (u > 0) return (u / 100) + 1;
+    return (100 / -u) + 1;
+  }
+
+  let updating = false;
+  function update(from) {
+    if (updating) return;
+    updating = true;
+
+    let dec = null;
+    if (from === 'dec') {
+      dec = parseFloat(document.getElementById('cDec').value);
+    } else if (from === 'frac') {
+      dec = fracToDec(document.getElementById('cFrac').value.trim());
+    } else if (from === 'us') {
+      const v = parseFloat(document.getElementById('cUS').value);
+      dec = usToDec(v);
+    } else if (from === 'impl') {
+      const p = parseFloat(document.getElementById('cImpl').value);
+      if (p > 0 && p < 100) dec = 100 / p;
+    }
+
+    if (dec && dec > 1 && isFinite(dec)) {
+      if (from !== 'dec') document.getElementById('cDec').value = dec.toFixed(2);
+      if (from !== 'frac') document.getElementById('cFrac').value = decToFrac(dec);
+      if (from !== 'us') document.getElementById('cUS').value = decToUS(dec);
+      if (from !== 'impl') document.getElementById('cImpl').value = (100 / dec).toFixed(2);
+    }
+
+    updating = false;
+  }
+
+  document.getElementById('cDec').addEventListener('input', () => update('dec'));
+  document.getElementById('cFrac').addEventListener('input', () => update('frac'));
+  document.getElementById('cUS').addEventListener('input', () => update('us'));
+  document.getElementById('cImpl').addEventListener('input', () => update('impl'));
+  update('dec');
+})();
+</script>
+</body></html>

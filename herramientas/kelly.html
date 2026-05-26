@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Calculadora Kelly Criterion para apuestas (gratuita) | gambeta.ai</title>
+<meta name="description" content="Calculadora gratuita del Kelly Criterion para apuestas deportivas. Calcula el stake óptimo según cuota, probabilidad y bankroll. Con explicación y modo half-Kelly."/>
+<meta name="author" content="gambeta.ai"/>
+<meta name="robots" content="index, follow"/>
+<link rel="canonical" href="https://gambeta.ai/herramientas/kelly"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://gambeta.ai/herramientas/kelly"/>
+<meta property="og:title" content="Calculadora Kelly Criterion para apuestas | gambeta.ai"/>
+<meta property="og:description" content="Calculadora gratuita del Kelly Criterion: stake óptimo según cuota, probabilidad y bankroll. Modo half-Kelly y full-Kelly."/>
+<meta property="og:image" content="https://gambeta.ai/og-image.png"/>
+<meta property="og:locale" content="es_AR"/>
+<meta property="og:site_name" content="gambeta.ai"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Calculadora Kelly Criterion para apuestas | gambeta.ai"/>
+<meta name="twitter:description" content="Calculadora gratuita del Kelly Criterion: stake óptimo según cuota, probabilidad y bankroll."/>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebApplication","name":"Calculadora Kelly Criterion","url":"https://gambeta.ai/herramientas/kelly","applicationCategory":"FinanceApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"description":"Calculadora gratuita del Kelly Criterion para calcular el stake óptimo en apuestas deportivas."}
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Herramientas","item":"https://gambeta.ai/herramientas"},{"@type":"ListItem","position":3,"name":"Calculadora Kelly Criterion","item":"https://gambeta.ai/herramientas/kelly"}]}
+</script>
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png"/>
+<style>
+  :root { --verde:#00c853; --fondo:#0f0f0f; --fondo2:#1a1a2e; --texto:#e8e8e8; --texto-sec:#9e9e9e; --borde:rgba(255,255,255,0.08); }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { padding-top:66px; background:var(--fondo); color:var(--texto); font-family:'Segoe UI',system-ui,sans-serif; line-height:1.7; }
+  a { text-decoration:none; color:inherit; }
+  nav.nav { background:#060d06; border-bottom:1px solid rgba(0,200,83,0.2); padding:0 28px; height:66px; display:flex; align-items:center; justify-content:space-between; position:fixed; top:0; left:0; right:0; z-index:10000; gap:16px; }
+  .nav-logo-text { font-size:1.08rem; font-weight:900; color:#fff; }
+  .nav-logo-text span { color:#00c853; }
+  .nav-links { display:flex; gap:2px; flex:1; justify-content:center; }
+  .nav-links a { color:rgba(165,214,167,0.65); padding:7px 12px; border-radius:8px; font-size:.82rem; }
+  .nav-cta-btn { background:linear-gradient(135deg,#00c853,#00a846); color:#000; font-weight:700; padding:8px 18px; border-radius:8px; font-size:.82rem; }
+  @media(max-width:640px) { .nav-links { display:none; } }
+  .hero { background:linear-gradient(180deg,#071007 0%,#0c180c 100%); border-bottom:1px solid rgba(0,200,83,0.15); padding:52px 24px 44px; text-align:center; }
+  .badge { display:inline-block; background:rgba(0,200,83,0.12); border:1px solid rgba(0,200,83,0.3); color:var(--verde); font-size:0.7rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; padding:4px 14px; border-radius:20px; margin-bottom:18px; }
+  .hero h1 { font-size:clamp(1.5rem,4vw,2.2rem); font-weight:900; color:#fff; max-width:760px; margin:0 auto 14px; }
+  .hero p { font-size:1rem; color:rgba(255,255,255,0.5); max-width:620px; margin:0 auto; }
+  .container { max-width:760px; margin:0 auto; padding:36px 24px; }
+  .calc-card { background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(0,200,83,0.02)); border:1px solid rgba(0,200,83,0.3); border-radius:18px; padding:32px 28px; margin-bottom:32px; }
+  .calc-row { margin-bottom:18px; }
+  .calc-row label { display:block; font-size:0.78rem; color:rgba(255,255,255,0.65); font-weight:700; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px; }
+  .calc-row input[type="number"], .calc-row select { width:100%; padding:12px 14px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#fff; font-size:1rem; font-family:inherit; }
+  .calc-row input[type="number"]:focus, .calc-row select:focus { outline:none; border-color:rgba(0,200,83,0.5); background:rgba(0,0,0,0.5); }
+  .calc-row .hint { font-size:0.75rem; color:rgba(255,255,255,0.35); margin-top:4px; }
+  .calc-output { margin-top:24px; padding-top:22px; border-top:1px solid rgba(255,255,255,0.08); }
+  .out-headline { font-size:0.72rem; color:#00c853; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
+  .out-main { font-size:2.2rem; font-weight:900; color:#fff; margin-bottom:6px; }
+  .out-sub { font-size:0.92rem; color:rgba(255,255,255,0.6); }
+  .out-warning { background:rgba(229,115,115,0.1); border:1px solid rgba(229,115,115,0.3); border-radius:10px; padding:14px 18px; margin-top:18px; color:#ef9a9a; font-size:0.88rem; }
+  .out-positive { background:rgba(0,200,83,0.08); border:1px solid rgba(0,200,83,0.3); border-radius:10px; padding:14px 18px; margin-top:18px; color:#a5d6a7; font-size:0.88rem; }
+  .article h2 { font-size:1.25rem; font-weight:800; color:#fff; margin:36px 0 12px; }
+  .article p { font-size:0.97rem; color:rgba(255,255,255,0.68); margin-bottom:18px; }
+  .article ul,.article ol { padding-left:22px; margin-bottom:18px; }
+  .article li { font-size:0.95rem; color:rgba(255,255,255,0.65); margin-bottom:6px; }
+  .article strong { color:rgba(255,255,255,0.9); }
+  .article a { color:var(--verde); text-decoration:underline; text-underline-offset:3px; }
+  .info-box { background:rgba(255,255,255,0.03); border-left:3px solid var(--verde); padding:16px 20px; margin:24px 0; }
+  .info-box p { margin:0; font-size:0.9rem; color:rgba(255,255,255,0.55); }
+  .cta-box { background:linear-gradient(135deg,rgba(0,200,83,0.12),rgba(0,200,83,0.04)); border:1px solid rgba(0,200,83,0.3); border-radius:18px; padding:28px 24px; text-align:center; margin:32px 0; }
+  .cta-box h3 { color:#fff; margin-bottom:8px; font-size:1.05rem; }
+  .cta-box p { color:rgba(255,255,255,0.5); margin-bottom:18px; }
+  .btn-cta { display:inline-block; background:var(--verde); color:#000; font-weight:800; padding:12px 26px; border-radius:10px; }
+  .tool-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:20px; }
+  .tool-card { background:rgba(255,255,255,0.04); border:1px solid rgba(0,200,83,0.15); border-radius:12px; padding:18px 20px; transition:border-color .2s,background .2s; display:block; }
+  .tool-card:hover { border-color:rgba(0,200,83,0.4); background:rgba(0,200,83,0.05); }
+  .tool-card-icon { font-size:1.4rem; margin-bottom:8px; }
+  .tool-card-title { font-size:0.97rem; font-weight:700; color:#fff; margin-bottom:6px; }
+  .tool-card-desc { font-size:0.82rem; color:rgba(255,255,255,0.5); }
+  .footer { background:#060d06; border-top:1px solid rgba(0,200,83,0.12); padding:24px; text-align:center; font-size:0.82rem; color:rgba(255,255,255,0.3); }
+  .footer a { color:var(--verde); }
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="nav-logo-text" href="https://gambeta.ai">gambeta<span>.ai</span></a>
+  <div class="nav-links">
+    <a href="https://gambeta.ai/#pronosticos">🔮 Pronósticos</a>
+    <a href="/blog/">📰 Blog</a>
+    <a href="/herramientas">🧮 Herramientas</a>
+  </div>
+  <a class="nav-cta-btn" href="https://gambeta.ai">✦ Ver picks</a>
+</nav>
+<header class="hero">
+  <div class="badge">Herramienta gratis</div>
+  <h1>Calculadora <strong>Kelly Criterion</strong> para apuestas</h1>
+  <p>Ingresá la cuota, tu probabilidad estimada y el bankroll. Calculamos el stake óptimo según la fórmula de Kelly — sin trackers, sin registro.</p>
+</header>
+<main class="container">
+
+<div class="calc-card">
+  <div class="calc-row">
+    <label for="kCuota">Cuota decimal</label>
+    <input type="number" id="kCuota" step="0.01" min="1.01" placeholder="ej. 2.10" value="2.10"/>
+    <div class="hint">La cuota que paga la casa de apuestas (formato europeo/decimal).</div>
+  </div>
+  <div class="calc-row">
+    <label for="kProb">Probabilidad estimada (%)</label>
+    <input type="number" id="kProb" step="0.1" min="0.01" max="99.99" placeholder="ej. 55" value="55"/>
+    <div class="hint">Tu probabilidad de ganar (de tu modelo, IA, lectura propia).</div>
+  </div>
+  <div class="calc-row">
+    <label for="kBank">Bankroll total</label>
+    <input type="number" id="kBank" step="1" min="1" placeholder="ej. 10000" value="10000"/>
+    <div class="hint">El total de la banca con la que apostás (en cualquier moneda).</div>
+  </div>
+  <div class="calc-row">
+    <label for="kFrac">Fracción de Kelly</label>
+    <select id="kFrac">
+      <option value="1">Full Kelly (1×) — agresivo</option>
+      <option value="0.5" selected>Half Kelly (½×) — recomendado</option>
+      <option value="0.25">Quarter Kelly (¼×) — conservador</option>
+      <option value="0.1">10% Kelly — muy conservador</option>
+    </select>
+    <div class="hint">Full Kelly es matemáticamente óptimo pero brutal. La mayoría usa half o quarter.</div>
+  </div>
+
+  <div class="calc-output" id="kOut">
+    <div class="out-headline">Stake recomendado</div>
+    <div class="out-main" id="kStake">—</div>
+    <div class="out-sub" id="kStakeAbs">—</div>
+    <div id="kAlert"></div>
+  </div>
+</div>
+
+<article class="article">
+  <h2>¿Qué es el Kelly Criterion?</h2>
+  <p>El <strong>Kelly Criterion</strong> es una fórmula matemática que calcula el porcentaje óptimo de tu banca a apostar en una jugada, dado una cuota y una probabilidad estimada de ganar. La idea: maximizar el crecimiento del bankroll a largo plazo sin arruinarse en una racha mala.</p>
+  <p>Fórmula básica: <code>f* = (bp - q) / b</code>, donde:</p>
+  <ul>
+    <li><strong>f*</strong> es la fracción del bankroll a apostar</li>
+    <li><strong>b</strong> es la cuota decimal menos 1 (la ganancia neta por unidad apostada)</li>
+    <li><strong>p</strong> es tu probabilidad estimada de ganar (0 a 1)</li>
+    <li><strong>q</strong> es la probabilidad de perder (1 − p)</li>
+  </ul>
+  <h2>¿Por qué half-Kelly es lo recomendado?</h2>
+  <p>Kelly completo (full Kelly) asume que tus probabilidades son exactas. En la realidad, casi nunca lo son — siempre hay error de estimación. <strong>Half Kelly</strong> (apostar la mitad del stake que Kelly recomienda) protege contra ese error y reduce la varianza dramáticamente, sacrificando solo un 25% del crecimiento teórico óptimo. Es el sweet spot entre crecimiento y supervivencia.</p>
+  <h2>¿Cuándo no usar Kelly?</h2>
+  <ul>
+    <li><strong>Si tu probabilidad estimada es inflada:</strong> Kelly amplifica errores. Si decís 60% pero la real es 50%, perdés rápido.</li>
+    <li><strong>En múltiples picks correlacionados:</strong> Kelly asume eventos independientes. Si apostás 5 partidos del mismo torneo, no son independientes.</li>
+    <li><strong>Si tu bankroll es muy chico:</strong> stakes mínimos de la casa pueden hacer que Kelly recomiende fracciones impracticables.</li>
+  </ul>
+  <div class="info-box">
+    <p>💡 La <a href="https://gambeta.ai/#pronosticos">IA de gambeta.ai</a> publica picks con probabilidad del modelo, cuota y stake sugerido — todos calculados internamente con un Kelly modificado. Si querés ver el cálculo aplicado por la IA en picks reales, los pronósticos diarios están ahí.</p>
+  </div>
+  <h2>Cómo usar esta calculadora</h2>
+  <ol>
+    <li>Ingresá la <strong>cuota decimal</strong> (formato europeo: 2.10, 1.85, etc.). Si tu casa muestra otro formato, primero convertilo en el <a href="/herramientas/conversor-cuotas">conversor de cuotas</a>.</li>
+    <li>Estimá la <strong>probabilidad real</strong> de que ganes. Esto puede venir de un modelo cuantitativo, una IA, o tu lectura del partido. Sé conservador.</li>
+    <li>Ingresá tu <strong>bankroll total</strong> — la cantidad de dinero que considerás "para apostar" exclusivamente.</li>
+    <li>Elegí la <strong>fracción de Kelly</strong>. Si no tenés años de experiencia ajustando: usá half (½) o quarter (¼).</li>
+    <li>La calculadora muestra el <strong>stake óptimo</strong> en porcentaje y en monto absoluto.</li>
+  </ol>
+</article>
+
+<div class="cta-box">
+  <h3>🧠 Probá la IA de gambeta.ai</h3>
+  <p>Picks gratuitos con probabilidad del modelo, cuota y stake sugerido ya calculado.</p>
+  <a class="btn-cta" href="https://gambeta.ai/#pronosticos">Ver pronósticos →</a>
+</div>
+
+</main>
+<footer class="footer"><p>© 2026 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar · 18+</p></footer>
+<script>
+(function() {
+  function calc() {
+    const o = parseFloat(document.getElementById('kCuota').value);
+    const p = parseFloat(document.getElementById('kProb').value) / 100;
+    const bank = parseFloat(document.getElementById('kBank').value);
+    const frac = parseFloat(document.getElementById('kFrac').value);
+
+    const stakeEl = document.getElementById('kStake');
+    const subEl = document.getElementById('kStakeAbs');
+    const alertEl = document.getElementById('kAlert');
+    alertEl.innerHTML = '';
+
+    if (!o || !p || !bank || o <= 1 || p <= 0 || p >= 1) {
+      stakeEl.textContent = '—';
+      subEl.textContent = 'Completá los 3 campos para calcular.';
+      return;
+    }
+
+    const b = o - 1;
+    const q = 1 - p;
+    const kelly = (b * p - q) / b;
+    const fStake = kelly * frac;
+    const ev = (p * b) - q;
+
+    if (kelly <= 0) {
+      stakeEl.textContent = 'No apostar';
+      stakeEl.style.color = '#ef9a9a';
+      subEl.textContent = 'El valor esperado es negativo. Esta apuesta tiene EV < 0.';
+      alertEl.innerHTML = '<div class="out-warning">⚠️ La cuota no compensa la probabilidad. Saltá este pick.</div>';
+      return;
+    }
+
+    stakeEl.style.color = '#fff';
+    const pct = (fStake * 100).toFixed(2);
+    const abs = (fStake * bank).toFixed(2);
+    stakeEl.textContent = pct + '%';
+    subEl.textContent = 'Apostá ' + abs + ' (' + frac + '× Kelly) · EV: +' + (ev * 100).toFixed(1) + '%';
+    alertEl.innerHTML = '<div class="out-positive">✅ Hay valor esperado positivo. El stake recomendado es ' + abs + '.</div>';
+  }
+
+  ['kCuota','kProb','kBank','kFrac'].forEach(id => {
+    document.getElementById(id).addEventListener('input', calc);
+    document.getElementById(id).addEventListener('change', calc);
+  });
+  calc();
+})();
+</script>
+</body></html>
