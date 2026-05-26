@@ -27,3 +27,8 @@ crons = ["0 * * * *", "30 12 * * *", "0 15 * * *", "30 17 * * *", "0 21 * * *", 
 # declararlo acá mantiene el wrangler.toml sincronizado con el dashboard.
 [observability]
 enabled = true
+
+# KV namespace para dedup de tweets (compartido con apuestas-api)
+[[kv_namespaces]]
+binding = "CACHE_KV"
+id = "1d4b161e78db4de9a9b806f369c73ceb"

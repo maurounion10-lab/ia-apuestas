@@ -20,6 +20,42 @@ const X_TWEETS_URL = 'https://api.x.com/2/tweets';
 const X_MEDIA_URL = 'https://upload.twitter.com/1.1/media/upload.json';
 const ART_OFFSET = -3 * 3600 * 1000; // Argentina = UTC-3
 
+// ───────────────────── Dedup de tweets (KV) ─────────────────────
+// Hashea el contenido del tweet y lo guarda en KV. Antes de generar
+// un nuevo tweet, el bot chequea que el hash NO esté ya marcado.
+// Así jamás repite un mismo texto, incluso si el pool rota cada N días.
+async function hashTweet(text) {
+  const norm = (text || '').trim().replace(/\s+/g, ' ');
+  const data = new TextEncoder().encode(norm);
+  const buf = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(buf)).slice(0, 16)
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function wasPosted(text, env) {
+  if (!env || !env.CACHE_KV || !text) return false;
+  try { return (await env.CACHE_KV.get('xpost:' + (await hashTweet(text)))) !== null; }
+  catch (e) { console.log('[dedup] read err:', e.message); return false; }
+}
+async function markPosted(text, env) {
+  if (!env || !env.CACHE_KV || !text) return;
+  try { await env.CACHE_KV.put('xpost:' + (await hashTweet(text)), '1'); }
+  catch (e) { console.log('[dedup] write err:', e.message); }
+}
+
+// Recorre un pool empezando por el indice deterministico del dia y devuelve
+// el primer texto que NO se haya posteado todavia. Si todos estan usados,
+// devuelve null (el slot se salta — mejor saltar que repetir).
+async function pickFreshFromPool(pool, env) {
+  const start = dayOfYearART() % pool.length;
+  for (let i = 0; i < pool.length; i++) {
+    const idx = (start + i) % pool.length;
+    const text = pool[idx];
+    if (!text) continue;
+    if (!(await wasPosted(text, env))) return text;
+  }
+  return null;
+}
+
 // ───────────────────────── OAuth 1.0a ─────────────────────────
 function pctEncode(s) {
   return encodeURIComponent(s).replace(/[!*'()]/g,
@@ -733,6 +769,99 @@ const EDU_POOL = [
   '💡 Apostar con cabeza es aburrido y funciona. Apostar con el corazón ' +
   'es divertido y funde.\n\nLa IA elige lo primero, siempre. ' +
   'Y solo se apuesta lo que uno se puede permitir perder.',
+
+
+  '🎯 El % de aciertos no te dice si ganas plata.\n\n' +
+  'Podes acertar 70% y perder. Podes acertar 40% y ganar. Lo que decide ' +
+  'es si la CUOTA paga mas que tu probabilidad real.\n\n' +
+  'Acertar es facil. Acertar donde el mercado se equivoca es lo que importa.',
+
+  '📉 Apostar despues de perder con stake mas alto = martingala.\n\n' +
+  'Es la forma matematicamente mas rapida de quebrar.\n\n' +
+  'La IA no levanta stake cuando viene golpeada. La regla es la regla, ' +
+  'gane o pierda. Disciplina.',
+
+  '🔥 No existen las rachas en las apuestas.\n\n' +
+  'Sentirte "encendido" o "frio" es sesgo cognitivo, no estadistica. ' +
+  'Cada apuesta es independiente.\n\n' +
+  'La IA no se siente caliente ni fria. Eso es su ventaja.',
+
+  '🎰 In-play es donde mas se pierde.\n\n' +
+  'Las cuotas se mueven mas rapido de lo que cualquier humano (o IA pre-partido) ' +
+  'puede procesar. Los casinos lo saben.\n\n' +
+  'Pre-partido tenes tiempo, info y calma. Apostar en vivo es para casos puntuales, ' +
+  'no rutina.',
+
+  '⚖️ "Cuota baja = seguro". Mentira.\n\n' +
+  'Una cuota 1.20 implica 83% de probabilidad. Si la real es 80%, perdes plata ' +
+  'a largo plazo aunque "acierte casi siempre".\n\n' +
+  'No hay favoritos seguros, solo cuotas mal calibradas.',
+
+  '🧮 Las combinadas multiplican el margen del casino.\n\n' +
+  'Cada pata tiene su vig (5-8%). En una combinada de 4 patas, el casino se ' +
+  'queda con ~25% del valor antes de empezar.\n\n' +
+  'Por eso la IA no recomienda combinadas. Picks simples, con valor real.',
+
+  '📊 CLV (Closing Line Value) es lo que separa apostadores serios de los demas.\n\n' +
+  'Si tu cuota cuando apostaste era mejor que la cuota de cierre del partido, ' +
+  'tenias ventaja. CLV positivo predice ROI positivo mejor que el % de aciertos.',
+
+  '👀 3 sesgos que arruinan apostadores buenos:\n\n' +
+  '1. Recency bias (los ultimos 3 partidos pesan demasiado)\n' +
+  '2. Sunk cost (recuperar la racha mala doblando stake)\n' +
+  '3. Confirmation bias (buscar datos que respalden lo que ya decidiste)\n\n' +
+  'La IA no tiene ninguno.',
+
+  '🎓 Especializarse > diversificar (apostando).\n\n' +
+  'Un apostador que conoce profundamente UNA liga gana mas que el que mira 20. ' +
+  'Mas info por partido, menos ruido.\n\n' +
+  'Si recien empezas: elegi un torneo, dominalo, despues expandi.',
+
+  '🧠 Probabilidad real vs probabilidad implicita en la cuota.\n\n' +
+  'Cuota 2.50 = implicita 40%. Si vos pensas que la real es 50%, hay valor. ' +
+  'Si pensas 35%, no apuestes.\n\n' +
+  'Es la matematica mas importante. La IA la corre en cada pick automatico.',
+
+  '🚪 Los picks que NO apostas pesan mas que los que apostas.\n\n' +
+  'Pasar partidos donde no hay valor es lo que define la disciplina. ' +
+  'El instinto pide accion; el bankroll pide paciencia.\n\n' +
+  'La IA pasa el 80% de los partidos. Apuesta solo donde encontro valor.',
+
+  '🃏 "Esta vez es distinto" — la frase mas cara del apostador.\n\n' +
+  'El partido nunca es distinto. Las cuotas son distintas, vos sos el mismo. ' +
+  'La unica pregunta valida: ¿hay valor o no?\n\n' +
+  'Lo demas es ruido mental.',
+
+  '🎲 Apostar con dinero que necesitas para vivir = no estas apostando, estas en problemas.\n\n' +
+  'El bankroll tiene que ser plata que podes perder al 100% sin que te afecte. ' +
+  'Cualquier otro enfoque es jugar con fuego.',
+
+  '🔬 Por que la IA no se enamora de equipos.\n\n' +
+  'No tiene un equipo del corazon. No le duele perder con un equipo. No se le ' +
+  'gana facil cuando juega "el clasico". Solo procesa numeros.\n\n' +
+  'Esa frialdad es ventaja, no defecto.',
+
+  '💧 Apostar es 80% gestion y 20% pick.\n\n' +
+  'El error mas comun: obsesionarse con elegir bien y descuidar cuanto se apuesta. ' +
+  'Stake mal dimensionado destruye buenos picks.\n\n' +
+  'Antes del pick: definir stake. Despues: respetar el stake.',
+
+  '🎯 Mercado con menos margen del casino: 1X2 en ligas grandes.\n\n' +
+  'Vig tipico: 4-6%. Lo que te paga es muy cerca de la probabilidad real.\n\n' +
+  'Mercado con mas margen: player props, exoticas, en vivo. Vig 8-12%. Eviltalos ' +
+  'si recien empezas.',
+
+  '⏱️ La cuota se mueve cada minuto.\n\n' +
+  'La cuota que ves a las 10 AM no es la que vas a apostar a las 3 PM. ' +
+  'El movimiento (line movement) tiene informacion: te dice lo que el mercado ' +
+  'esta aprendiendo.\n\n' +
+  'La IA monitorea esos movimientos en tiempo real.',
+
+  '🤐 Por que el historial publico importa.\n\n' +
+  'Cualquier tipster puede inventar aciertos cuando borra los fallos. La unica ' +
+  'forma honesta de evaluar a alguien es ver TODO su track record.\n\n' +
+  'La IA de gambeta tiene cada pick guardado, incluidos los que pierden. ' +
+  'Asi se construye confianza.',
 ];
 
 const COM_POOL = [
@@ -748,10 +877,64 @@ const COM_POOL = [
   'humano puede. Él me enseñó qué mirar. Buen equipo. ⚽',
   '¿Qué te gustaría que la IA analice esta semana?\n\n' +
   'Tirá liga, equipo o partido abajo 👇 y lo metemos en el radar.',
+
+
+  '🎉 ¿Cual es la mayor ganada que recordas?\n\nDecimela abajo 👇 — bonus si ' +
+  'pones la cuota.',
+
+  '🤔 ¿Equipo del que dejaste de apostar y por que?\n\nTodos tenemos uno. ' +
+  'Hablen 👇',
+
+  '📊 ¿Que mercado te funciona mejor?\n\n— 1X2\n— BTTS\n— Over/Under\n— Otro\n\n' +
+  'Curiosidad genuina, no hay respuesta correcta.',
+
+  '🎢 ¿Como manejas una racha mala?\n\n— Bajo stake\n— Pauso 1 semana\n— Sigo igual\n— Triplico (no hagan esto)\n\nHonestamente 👇',
+
+  '🏆 Tu mejor consejo para alguien que recien arranca a apostar:\n\n' +
+  'En una linea 👇. Los junto y los pongo en un post.',
+
+  '⚽ ¿Liga que mas te gusta apostar? (no la mas mirada, la que mas te FUNCIONA)\n\n' +
+  'Contala abajo 👇',
+
+  '📱 ¿Que herramientas de stats usas?\n\nUna o dos, sin marca personal. ' +
+  'Armamos un mapa entre todos 👇',
+
+  '🧘 ¿Cuanto del bankroll arriesgas por pick? Honestamente.\n\n' +
+  '— Menos de 1%\n— 1-3%\n— 3-5%\n— Mas de 5%\n— No lo se 😅',
+
+  '💸 Cuota mas alta que te entro:\n\nDecila abajo + el partido si lo recordas 👇',
+
+  '🚪 Pick que dejaste pasar y despues entro perfecto.\n\nA todos nos paso. ' +
+  'Contala 👇',
+
+  '🤖 Pregunta seria: ¿confias en una IA para apostar?\n\n— Si, ya uso\n— Tal vez\n— No, prefiero tipster humano\n— Solo confio en mi mismo\n\nSin juicios.',
+
+  '⏱️ ¿En que momento del dia apostas?\n\n— Maniana (planificado)\n— Tarde (despues de leer)\n— Minuto antes del partido\n— En vivo\n\nCurioso.',
+
+  '🎲 Apuesta mas rara que hiciste y entro:\n\nLa mia: un corner exacto. Y vos 👇',
+
+  '👀 ¿Que liga subestimaste y termino dandote ganancia?\n\nLa mia: Liga Polaca. ' +
+  'Cuotas mal calibradas por meses. Vos?',
+
+  '🧠 ¿Como elegis a quien seguir? (tipsters / herramientas / IAs)\n\n' +
+  '— Historial publico\n— Seguidores\n— Que te recomendaron\n— Otro\n\nMe interesa.',
+
+  '💬 ¿Te pasa que despues de leer un analisis igual apostas otra cosa?\n\n' +
+  'Es muy comun. La pregunta es: ¿por que? Cuentenmelo 👇',
+
+  '🏟️ ¿Mejor recuerdo de un partido apostando?\n\nUno corto, contame 👇',
 ];
 
-function genEducacion() { return EDU_POOL[dayOfYearART() % EDU_POOL.length]; }
-function genComunidad() { return COM_POOL[dayOfYearART() % COM_POOL.length]; }
+async function genEducacion(env) {
+  const t = await pickFreshFromPool(EDU_POOL, env);
+  if (!t) console.log('[x-bot] EDU pool exhausted — slot skipped');
+  return t;
+}
+async function genComunidad(env) {
+  const t = await pickFreshFromPool(COM_POOL, env);
+  if (!t) console.log('[x-bot] COM pool exhausted — slot skipped');
+  return t;
+}
 
 // Festejo de aciertos — se dispara apenas un pick gana.
 const CELEBRA = [
@@ -782,7 +965,7 @@ function celebracionWin(hist) {
   return wins.length ? { pick: wins[0], total: wins.length } : null;
 }
 
-function genCelebracion(hist, pickOverride) {
+async function genCelebracion(hist, pickOverride, env) {
   let p, total;
   if (pickOverride) { p = pickOverride; total = 1; }
   else {
@@ -790,12 +973,19 @@ function genCelebracion(hist, pickOverride) {
     if (!w) return null;
     p = w.pick; total = w.total;
   }
-  let t = CELEBRA[dayOfYearART() % CELEBRA.length](p).replace(/  +/g, ' ');
-  if (total > 1) {
-    const extra = `\n\n+${total - 1} acierto${total > 2 ? 's' : ''} más en esta tanda`;
-    if ((t + extra).length <= 280) t += extra;
+  // Recorre CELEBRA buscando una variante cuyo render no este ya posteado.
+  const start = dayOfYearART() % CELEBRA.length;
+  for (let i = 0; i < CELEBRA.length; i++) {
+    const idx = (start + i) % CELEBRA.length;
+    let t = CELEBRA[idx](p).replace(/  +/g, ' ');
+    if (total > 1) {
+      const extra = `\n\n+${total - 1} acierto${total > 2 ? 's' : ''} más en esta tanda`;
+      if ((t + extra).length <= 280) t += extra;
+    }
+    if (!(await wasPosted(t, env))) return t;
   }
-  return t;
+  console.log('[x-bot] CELEBRA exhausted para', p?.home, 'vs', p?.away);
+  return null;
 }
 
 // ───────── Stats de rendimiento para la previa ─────────
@@ -886,14 +1076,14 @@ const SLOT_BY_CRON = {
   '0 23 * * *':  'comunidad',
 };
 
-function generateText(slot, hist, pickOverride) {
+async function generateText(slot, hist, pickOverride, env) {
   switch (slot) {
     case 'picks':      return genPicks(hist);
     case 'resultados': return genResultados(hist);
-    case 'educacion':  return genEducacion();
+    case 'educacion':  return await genEducacion(env);
     case 'hottake':    return genHotTake(hist, pickOverride);
-    case 'comunidad':  return genComunidad();
-    case 'celebracion':return genCelebracion(hist, pickOverride);
+    case 'comunidad':  return await genComunidad(env);
+    case 'celebracion':return await genCelebracion(hist, pickOverride, env);
     default:           return null;
   }
 }
@@ -915,7 +1105,7 @@ async function runSlot(slot, env, mode, matchStr) {
       return { slot, status: 'skipped', reason: 'sin acierto que coincida con "' + matchStr + '"' };
     }
   }
-  const text = generateText(slot, hist, pickOverride);
+  const text = await generateText(slot, hist, pickOverride, env);
   if (!text) return { slot, status: 'skipped', reason: 'sin datos reales' };
 
   // Placa de imagen — todos los slots la llevan
@@ -937,6 +1127,8 @@ async function runSlot(slot, env, mode, matchStr) {
     catch (e) { cardErr = 'upload: ' + e.message; }  // degrada a texto
   }
   const id = await postTweet(text, env, { mediaId });
+  // Dedup: marcar este texto como ya posteado para que nunca se repita.
+  await markPosted(text, env);
   return { slot, status: 'posted', tweetId: id, chars: text.length,
            withImage: !!mediaId, cardError: cardErr, text };
 }
@@ -976,7 +1168,7 @@ export default {
         const hist = await fetchHistorial();
         const out = {};
         for (const slot of Object.values(SLOT_BY_CRON)) {
-          const t = generateText(slot, hist);
+          const t = await generateText(slot, hist, null, env);
           out[slot] = t ? { chars: t.length, text: t } : { status: 'skipped' };
         }
         return J({ fecha: todayART(), preview: out });
@@ -995,7 +1187,7 @@ export default {
         } else if (slot === 'celebracion' && matchStr) {
           pickOverride = findWinByMatch(hist, matchStr);
         }
-        const t = generateText(slot, hist, pickOverride);
+        const t = await generateText(slot, hist, pickOverride, env);
         let png = await renderCardForSlot(slot, hist, t, pickOverride);
         // Preview de la placa de festejo: si el horario/ventana no aplica,
         // usar el acierto más reciente para poder verla en cualquier momento.
@@ -1014,6 +1206,27 @@ export default {
       } catch (e) { return J({ error: 'card: ' + e.message }, 500); }
     }
 
+    if (url.pathname === '/seed-dedup') {
+      if (!env.TRIGGER_TOKEN || url.searchParams.get('token') !== env.TRIGGER_TOKEN) {
+        return J({ error: 'token inválido' }, 403);
+      }
+      const marked = { edu: 0, com: 0, celebra: 0, errors: [] };
+      try {
+        for (const t of EDU_POOL) { try { await markPosted(t, env); marked.edu++; } catch (e) { marked.errors.push('edu:' + e.message); } }
+        for (const t of COM_POOL) { try { await markPosted(t, env); marked.com++; } catch (e) { marked.errors.push('com:' + e.message); } }
+        const hist = await fetchHistorial();
+        const lastWin = hist.filter(w => w.result === 'win' && w.commenceTs)
+          .sort((a, b) => b.commenceTs - a.commenceTs)[0];
+        if (lastWin) {
+          for (const tplFn of CELEBRA) {
+            const t = tplFn(lastWin).replace(/  +/g, ' ');
+            try { await markPosted(t, env); marked.celebra++; } catch (e) { marked.errors.push('celebra:' + e.message); }
+          }
+        }
+        return J({ status: 'ok', marked });
+      } catch (e) { return J({ error: e.message }, 500); }
+    }
+
     if (url.pathname === '/run') {
       if (!env.TRIGGER_TOKEN || url.searchParams.get('token') !== env.TRIGGER_TOKEN) {
         return J({ error: 'token inválido' }, 403);
@@ -1030,6 +1243,6 @@ export default {
       } catch (e) { return J({ error: e.message }, 500); }
     }
 
-    return J({ error: 'ruta desconocida', rutas: ['/status', '/preview', '/card', '/run'] }, 404);
+    return J({ error: 'ruta desconocida', rutas: ['/status', '/preview', '/card', '/run', '/seed-dedup'] }, 404);
   },
 };
