@@ -1068,12 +1068,12 @@ function genHotTake(hist, pickOverride) {
 
 // ───────────────────────── Router de slot → pilar ─────────────────────────
 const SLOT_BY_CRON = {
-  '0 * * * *':   'celebracion', // cada hora: festeja aciertos recién resueltos
-  '30 12 * * *': 'resultados',
-  '0 15 * * *':  'picks',
-  '30 17 * * *': 'educacion',
-  '0 21 * * *':  'hottake',
-  '0 23 * * *':  'comunidad',
+  '17 * * * *':  'celebracion', // cada hora :17 — aciertos resueltos
+  '23 12 * * *': 'resultados',  // 09:23 ART
+  '7 15 * * *':  'picks',       // 12:07 ART
+  '47 17 * * *': 'educacion',   // 14:47 ART
+  '13 21 * * *': 'hottake',     // 18:13 ART
+  '23 23 * * *': 'comunidad',   // 20:23 ART
 };
 
 async function generateText(slot, hist, pickOverride, env) {
