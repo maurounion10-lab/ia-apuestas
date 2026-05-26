@@ -131,9 +131,19 @@ async function fetchLogoMap() {
     const html = await r.text();
     const m = html.match(/const teamLogos = \{([\s\S]*?)\n\};/);
     if (m) {
-      const re = /'([^']+)'\s*:\s*'(https?:\/\/[^']+)'/g;
+      // Acepta claves con apostrofos escapados ('O\'Higgins') y URLs tanto
+      // absolutas (https://...) como relativas (/escudos/...). A las
+      // relativas las prefija con https://gambeta.ai para que el worker
+      // las pueda fetchear desde el edge.
+      const re = /'((?:\\.|[^'\\])+)'\s*:\s*'((?:\/escudos\/|https?:\/\/)[^']+)'/g;
       let mm;
-      while ((mm = re.exec(m[1]))) { const k = normTeam(mm[1]); if (!map[k]) map[k] = mm[2]; }
+      while ((mm = re.exec(m[1]))) {
+        const rawKey = mm[1].replace(/\\'/g, "'");
+        const k = normTeam(rawKey);
+        let url = mm[2];
+        if (url.startsWith('/escudos/')) url = 'https://gambeta.ai' + url;
+        if (!map[k]) map[k] = url;
+      }
     }
   } catch (e) {}
   _logoMap = map;
@@ -157,9 +167,14 @@ function initialsBadge(name, size) {
     fontWeight: 800,
   }, ini);
 }
+// Tracker global de escudos faltantes durante el render actual.
+// runSlot lo chequea antes de postear para decidir si saltea la placa.
+let _missingShields = [];
 function escudoEl(name, url, size) {
   if (url) return { type: 'img', props: { src: url, width: size, height: size,
     style: { width: size + 'px', height: size + 'px', objectFit: 'contain' } } };
+  _missingShields.push(name);
+  console.log('[x-bot] sin escudo para:', name);
   return initialsBadge(name, size);
 }
 
@@ -1108,10 +1123,22 @@ async function runSlot(slot, env, mode, matchStr) {
   const text = await generateText(slot, hist, pickOverride, env);
   if (!text) return { slot, status: 'skipped', reason: 'sin datos reales' };
 
-  // Placa de imagen — todos los slots la llevan
+  // Placa de imagen — todos los slots la llevan.
+  // Reseteamos el tracker de escudos faltantes antes de renderizar.
+  _missingShields = [];
   let cardErr = null, pngBytes = null;
   try { pngBytes = await renderCardForSlot(slot, hist, text, pickOverride); }
   catch (e) { cardErr = e.message; }
+  // Si la placa es de partido (hottake/celebracion) y falta CUALQUIER
+  // escudo, descartamos la placa: queda muy mal con iniciales.
+  // Para 'picks' y 'resultados' (listas) toleramos uno o dos faltantes,
+  // pero si faltan 3+ tambien descartamos.
+  const isMatchCard = slot === 'hottake' || slot === 'celebracion';
+  const tooManyMissing = _missingShields.length > 0 && (isMatchCard || _missingShields.length >= 3);
+  if (tooManyMissing) {
+    cardErr = (cardErr ? cardErr + ' / ' : '') + 'placa descartada — sin escudo para: ' + _missingShields.join(', ');
+    pngBytes = null;
+  }
   const hasCard = !!pngBytes;
 
   if (mode !== 'live') {
