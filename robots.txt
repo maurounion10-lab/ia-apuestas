@@ -11,3 +11,4 @@ Disallow: /available
 Allow: /
 
 Sitemap: https://gambeta.ai/sitemap.xml
+Sitemap: https://gambeta.ai/sitemap-previas.xml
