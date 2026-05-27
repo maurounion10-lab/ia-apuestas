@@ -4986,6 +4986,69 @@
   @media (max-width:360px) {
     .bono-grid { grid-template-columns:1fr !important; }
   }
+
+  /* ── BONOS CALENDARIO SEMANAL ── */
+  .bonos-cal-eyebrow { display:inline-flex;align-items:center;gap:6px;background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.28);border-radius:30px;padding:5px 18px;font-size:0.72rem;font-weight:700;color:#ffd600;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:18px; }
+  .bonos-cal-title { font-size:clamp(1.5rem,4vw,2rem);font-weight:900;color:#fff;margin:0 0 10px;letter-spacing:-0.3px; }
+  .bonos-cal-sub { font-size:0.95rem;color:rgba(255,255,255,0.55);margin:0 0 28px;line-height:1.55; }
+  .bonos-cal-stage {
+    text-decoration:none;
+    background:linear-gradient(135deg,rgba(255,214,0,0.10),rgba(255,180,0,0.03));
+    border:2px solid rgba(255,214,0,0.35);
+    border-radius:18px;
+    padding:26px 24px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    transition:border-color .2s,background .2s;
+  }
+  .bonos-cal-stage:hover { border-color:rgba(255,214,0,0.65);background:linear-gradient(135deg,rgba(255,214,0,0.16),rgba(255,180,0,0.05)); }
+  .bonos-cal-stage-left { display:flex;align-items:center;gap:18px;flex:1;min-width:240px;text-align:left; }
+  .bonos-cal-logo-wrap { background:#0f0f1a;border-radius:12px;padding:10px 14px;border:1px solid rgba(255,255,255,0.1);flex-shrink:0;min-width:84px;height:56px;display:flex;align-items:center;justify-content:center; }
+  .bonos-cal-logo-wrap img { max-height:36px;width:auto;display:block; }
+  .bonos-cal-name-row { display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:4px; }
+  .bonos-cal-name { font-size:1.15rem;font-weight:900;color:#fff;line-height:1.2; }
+  .bonos-cal-hoy { display:none;font-size:0.6rem;background:#00c853;color:#000;font-weight:900;padding:3px 9px;border-radius:20px;letter-spacing:1.5px; }
+  .bonos-cal-hoy.show { display:inline-block; }
+  .bonos-cal-bono { font-size:0.9rem;color:#ffd600;font-weight:700;line-height:1.45; }
+  .bonos-cal-cta { background:#ffd600;color:#000;font-weight:900;font-size:0.92rem;padding:13px 26px;border-radius:10px;white-space:nowrap;transition:filter .15s,transform .15s; }
+  .bonos-cal-stage:hover .bonos-cal-cta { filter:brightness(1.1); }
+  .bonos-cal-tabs { display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:14px; }
+  .bonos-cal-tab {
+    background:rgba(255,255,255,0.04);
+    border:1px solid rgba(255,255,255,0.08);
+    border-radius:10px;
+    padding:10px 4px 8px;
+    text-align:center;
+    cursor:pointer;
+    transition:border-color .15s,background .15s,transform .15s;
+    user-select:none;
+  }
+  .bonos-cal-tab:hover { border-color:rgba(255,214,0,0.35);background:rgba(255,214,0,0.04);transform:translateY(-1px); }
+  .bonos-cal-tab.is-active { border-color:rgba(255,214,0,0.65);background:rgba(255,214,0,0.10); }
+  .bonos-cal-tab.is-today { border-color:rgba(0,200,83,0.55); }
+  .bonos-cal-tab.is-today.is-active { border-color:rgba(0,200,83,0.85);background:rgba(0,200,83,0.10); }
+  .bonos-cal-tab-marker { font-size:0.5rem;font-weight:900;color:#00c853;letter-spacing:1.5px;margin-bottom:2px;height:9px;visibility:hidden; }
+  .bonos-cal-tab.is-today .bonos-cal-tab-marker { visibility:visible; }
+  .bonos-cal-tab-day { font-size:0.7rem;font-weight:800;color:rgba(255,255,255,0.6);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px; }
+  .bonos-cal-tab.is-active .bonos-cal-tab-day { color:#ffd600; }
+  .bonos-cal-tab.is-today.is-active .bonos-cal-tab-day { color:#00c853; }
+  .bonos-cal-tab-mini { font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.8);line-height:1.2; }
+  .bonos-cal-foot { font-size:0.75rem;color:rgba(255,255,255,0.3);margin-top:18px;line-height:1.5; }
+  @media (max-width:640px) {
+    .bonos-cal-stage { flex-direction:column;align-items:stretch;padding:22px 18px; }
+    .bonos-cal-stage-left { text-align:center;justify-content:center;flex-direction:column;gap:12px; }
+    .bonos-cal-name-row { justify-content:center; }
+    .bonos-cal-cta { width:100%;text-align:center;font-size:0.95rem;padding:14px 22px;box-sizing:border-box; }
+    .bonos-cal-tabs { grid-template-columns:repeat(7,1fr);gap:4px; }
+    .bonos-cal-tab { padding:8px 2px 6px; }
+    .bonos-cal-tab-marker { font-size:0.42rem;letter-spacing:1px;height:7px; }
+    .bonos-cal-tab-day { font-size:0.6rem;letter-spacing:0.5px; }
+    .bonos-cal-tab-mini { font-size:0.58rem; }
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="application/ld+json">
@@ -5917,81 +5980,88 @@ window.toggleHeroBubble = function(n) {
 </section>
 
 <!-- SECCIÓN: BONOS -->
-<section id="gbBonos" style="background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:44px 20px 40px;text-align:center">
-  <div style="max-width:1000px;margin:0 auto">
+<section id="gbBonos" style="background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:48px 20px 42px">
+  <div style="max-width:1000px;margin:0 auto;text-align:center">
 
-    <div style="font-size:clamp(1.3rem,3.5vw,1.75rem);font-weight:900;color:#fff;margin-bottom:28px;letter-spacing:-.3px">
-      🎁 Duplican tu <span style="color:#ffd600">primer depósito</span>
-    </div>
+    <div class="bonos-cal-eyebrow">📅 Calendario semanal de bonos</div>
+    <h2 class="bonos-cal-title">Un <span style="color:#ffd600">bono distinto</span> cada día</h2>
+    <p class="bonos-cal-sub">Volvé cada día. La oferta del día se renueva sola — hoy es <strong id="bonosCalToday" style="color:#00c853">…</strong>.</p>
 
-    <!-- SapphireBet destacado -->
-    <a href="https://subjectprof.com/L?tag=d_5550638m_127836c_&site=5550638&ad=127836" target="_blank" rel="noopener nofollow"
-       class="bono-featured"
-       style="text-decoration:none;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;background:linear-gradient(135deg,rgba(255,214,0,0.12),rgba(255,180,0,0.05));border:2px solid rgba(255,214,0,0.45);border-radius:16px;padding:22px 28px;margin-bottom:16px;transition:border-color .2s,background .2s"
-       onmouseover="this.style.borderColor='rgba(255,214,0,.75)';this.style.background='linear-gradient(135deg,rgba(255,214,0,0.18),rgba(255,180,0,0.08))'"
-       onmouseout="this.style.borderColor='rgba(255,214,0,0.45)';this.style.background='linear-gradient(135deg,rgba(255,214,0,0.12),rgba(255,180,0,0.05))'">
-      <div style="display:flex;align-items:center;gap:14px">
-        <div style="background:#0f0f1a;border-radius:10px;padding:5px 10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:1px solid rgba(255,255,255,0.1)">
-          <img src="https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg" style="height:32px;width:auto;display:block" alt="SapphireBet">
-        </div>
-        <div style="text-align:left">
-          <div style="font-size:1.05rem;font-weight:900;color:#fff">SapphireBet <span style="font-size:.7rem;background:#FFD700;color:#000;font-weight:800;padding:2px 8px;border-radius:20px;margin-left:6px;vertical-align:middle">⭐ SPONSOR</span></div>
-          <div style="font-size:.82rem;color:#ffd600;font-weight:700;margin-top:2px">100% hasta $100 USD en tu primer depósito</div>
+    <!-- Bono destacado del día -->
+    <a id="bonosCalStage" class="bonos-cal-stage" href="#" target="_blank" rel="noopener nofollow" onclick="trackEvent('bono_click',{src:'calendar-stage'})">
+      <div class="bonos-cal-stage-left">
+        <div class="bonos-cal-logo-wrap"><img id="bonosCalLogo" src="" alt=""></div>
+        <div>
+          <div class="bonos-cal-name-row">
+            <span id="bonosCalName" class="bonos-cal-name">…</span>
+            <span id="bonosCalHoy" class="bonos-cal-hoy">HOY</span>
+          </div>
+          <div class="bonos-cal-bono" id="bonosCalBono">…</div>
         </div>
       </div>
-      <div class="bono-featured-cta" style="background:#ffd600;color:#000;font-weight:900;font-size:.88rem;padding:10px 22px;border-radius:9px;white-space:nowrap">Registrarme →</div>
+      <span class="bonos-cal-cta">Reclamar bono →</span>
     </a>
 
-    <!-- Otras casas -->
-    <div class="bono-grid">
+    <!-- Tabs de los 7 días -->
+    <div class="bonos-cal-tabs" id="bonosCalTabs"></div>
 
-      <a href="https://proarg.megapari-003572.in/" target="_blank" rel="noopener nofollow"
-         style="text-decoration:none;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:border-color .2s,background .2s"
-         onmouseover="this.style.borderColor='rgba(198,40,40,.4)';this.style.background='rgba(198,40,40,.05)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(255,255,255,0.03)'">
-        <div style="background:#0f0f1a;border-radius:8px;padding:6px 10px;display:flex;align-items:center;justify-content:center;height:40px;border:1px solid rgba(255,255,255,0.1)">
-          <img src="https://v3.traincdn.com/genfiles/cms/192-824/desktop/media_asset/39b027cf6619aa7814a4f426943fc3f7.svg" style="height:24px;width:auto" alt="Megapari">
-        </div>
-        <div style="font-size:.68rem;color:rgba(255,255,255,0.45);line-height:1.3;text-align:center">100% en tu<br>primer depósito</div>
-        <div style="background:#22c55e;color:#000;font-weight:800;font-size:.72rem;padding:7px 16px;border-radius:7px;white-space:nowrap;width:100%;text-align:center;box-sizing:border-box">Registrarme →</div>
-      </a>
-
-      <a href="https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration" target="_blank" rel="noopener nofollow"
-         style="text-decoration:none;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:border-color .2s,background .2s"
-         onmouseover="this.style.borderColor='rgba(30,136,229,.4)';this.style.background='rgba(30,136,229,.05)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(255,255,255,0.03)'">
-        <div style="background:#0f0f1a;border-radius:8px;padding:6px 10px;display:flex;align-items:center;justify-content:center;height:40px;border:1px solid rgba(255,255,255,0.1)">
-          <img src="https://v3.traincdn.com/genfiles/cms/8-62/desktop/media_asset/dd77c8f1b5bd23e38cd81fb7d861af10.svg" style="height:24px;width:auto" alt="Melbet">
-        </div>
-        <div style="font-size:.68rem;color:rgba(255,255,255,0.45);line-height:1.3;text-align:center">100% en tu<br>primer depósito</div>
-        <div style="background:#22c55e;color:#000;font-weight:800;font-size:.72rem;padding:7px 16px;border-radius:7px;white-space:nowrap;width:100%;text-align:center;box-sizing:border-box">Registrarme →</div>
-      </a>
-
-      <a href="https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM" target="_blank" rel="noopener nofollow"
-         style="text-decoration:none;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:border-color .2s,background .2s"
-         onmouseover="this.style.borderColor='rgba(67,160,71,.4)';this.style.background='rgba(67,160,71,.05)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(255,255,255,0.03)'">
-        <div style="background:#0f0f1a;border-radius:8px;padding:6px 10px;display:flex;align-items:center;justify-content:center;height:40px;border:1px solid rgba(255,255,255,0.1)">
-          <img src="https://v3.traincdn.com/genfiles/cms/152-495/desktop/media_asset/023b82537b5c5fa4a9cc627e295e7e95.svg" style="width:90px;height:auto" alt="BetWinner">
-        </div>
-        <div style="font-size:.68rem;color:rgba(255,255,255,0.45);line-height:1.3;text-align:center">100% en tu<br>primer depósito</div>
-        <div style="background:#22c55e;color:#000;font-weight:800;font-size:.72rem;padding:7px 16px;border-radius:7px;white-space:nowrap;width:100%;text-align:center;box-sizing:border-box">Registrarme →</div>
-      </a>
-
-      <a href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213" target="_blank" rel="noopener nofollow"
-         style="text-decoration:none;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;transition:border-color .2s,background .2s"
-         onmouseover="this.style.borderColor='rgba(227,28,61,.4)';this.style.background='rgba(227,28,61,.05)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.08)';this.style.background='rgba(255,255,255,0.03)'">
-        <div style="background:#0f0f1a;border-radius:8px;padding:6px 10px;display:flex;align-items:center;justify-content:center;height:40px;border:1px solid rgba(255,255,255,0.1)">
-          <img src="https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg" style="height:24px;width:auto" alt="DBbet" onerror="this.outerHTML='<span style=\'font-weight:900;font-size:.95rem;color:#ff4d6d\'>DB<span style=\'color:#fff\'>bet</span></span>'">
-        </div>
-        <div style="font-size:.68rem;color:rgba(255,255,255,0.45);line-height:1.3;text-align:center">100% en tu<br>primer depósito</div>
-        <div style="background:#22c55e;color:#000;font-weight:800;font-size:.72rem;padding:7px 16px;border-radius:7px;white-space:nowrap;width:100%;text-align:center;box-sizing:border-box">Registrarme →</div>
-      </a>
-
-    </div>
-
-    <a href="#gbBonos" style="display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,.3);font-size:.8rem;text-decoration:none;transition:color .2s" onmouseover="this.style.color='rgba(255,255,255,.6)'" onmouseout="this.style.color='rgba(255,255,255,.3)'">
-      Ver detalle de cada bono →
-    </a>
+    <p class="bonos-cal-foot">+18 · Jugá responsablemente · Bonos sujetos a términos y condiciones de cada casa</p>
 
   </div>
+
+  <script>
+  (function(){
+    var BONOS = {
+      1: { d:'Lun', nameLong:'Lunes',     name:'SapphireBet',  bono:'100% hasta $100 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg', href:'https://subjectprof.com/L?tag=d_5550638m_127836c_&site=5550638&ad=127836' },
+      2: { d:'Mar', nameLong:'Martes',    name:'Megapari',     bono:'100% hasta $300 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/192-824/desktop/media_asset/39b027cf6619aa7814a4f426943fc3f7.svg', href:'https://proarg.megapari-003572.in/' },
+      3: { d:'Mié', nameLong:'Miércoles', name:'Melbet',       bono:'100% hasta $130 USD + 30 giros gratis',      logo:'https://v3.traincdn.com/genfiles/cms/8-62/desktop/media_asset/dd77c8f1b5bd23e38cd81fb7d861af10.svg',   href:'https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration' },
+      4: { d:'Jue', nameLong:'Jueves',    name:'BetWinner',    bono:'100% hasta $100 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/152-495/desktop/media_asset/023b82537b5c5fa4a9cc627e295e7e95.svg', href:'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
+      5: { d:'Vie', nameLong:'Viernes',   name:'DBbet',        bono:'100% hasta $200 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg', href:'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213' },
+      6: { d:'Sáb', nameLong:'Sábado',    name:'SapphireBet',  bono:'⭐ Sponsor del finde: 100% hasta $100 USD',   logo:'https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg', href:'https://subjectprof.com/L?tag=d_5550638m_127836c_&site=5550638&ad=127836' },
+      7: { d:'Dom', nameLong:'Domingo',   name:'Megapari',     bono:'Domingo de fútbol: 100% hasta $300 USD',     logo:'https://v3.traincdn.com/genfiles/cms/192-824/desktop/media_asset/39b027cf6619aa7814a4f426943fc3f7.svg', href:'https://proarg.megapari-003572.in/' }
+    };
+
+    var jsDay = new Date().getDay();  // 0=dom .. 6=sab
+    var todayCode = jsDay === 0 ? 7 : jsDay;  // 1=Lun .. 7=Dom
+    var todayEl = document.getElementById('bonosCalToday');
+    if (todayEl) todayEl.textContent = BONOS[todayCode].nameLong;
+
+    var tabsEl = document.getElementById('bonosCalTabs');
+    var html = '';
+    for (var d = 1; d <= 7; d++) {
+      var classes = 'bonos-cal-tab';
+      if (d === todayCode) classes += ' is-today is-active';
+      html += '<div class="' + classes + '" data-day="' + d + '" onclick="window.gbSelectBonoDay(' + d + ')">' +
+              '<div class="bonos-cal-tab-marker">HOY</div>' +
+              '<div class="bonos-cal-tab-day">' + BONOS[d].d + '</div>' +
+              '<div class="bonos-cal-tab-mini">' + BONOS[d].name + '</div>' +
+              '</div>';
+    }
+    tabsEl.innerHTML = html;
+
+    window.gbSelectBonoDay = function(d) {
+      var b = BONOS[d];
+      if (!b) return;
+      var logo = document.getElementById('bonosCalLogo');
+      logo.src = b.logo;
+      logo.alt = b.name;
+      document.getElementById('bonosCalName').textContent = b.name;
+      document.getElementById('bonosCalBono').textContent = b.bono;
+      var stage = document.getElementById('bonosCalStage');
+      stage.href = b.href;
+      var hoy = document.getElementById('bonosCalHoy');
+      if (d === todayCode) hoy.classList.add('show'); else hoy.classList.remove('show');
+      var tabs = tabsEl.querySelectorAll('.bonos-cal-tab');
+      for (var i = 0; i < tabs.length; i++) {
+        if (Number(tabs[i].dataset.day) === d) tabs[i].classList.add('is-active');
+        else tabs[i].classList.remove('is-active');
+      }
+      try { window.trackEvent && trackEvent('bono_day_select',{day:d,casa:b.name}); } catch(e){}
+    };
+
+    window.gbSelectBonoDay(todayCode);
+  })();
+  </script>
 </section>
 
   <div class="section-divider"></div>
