@@ -5611,49 +5611,6 @@ window.toggleHeroBubble = function(n) {
 
   </section>
 
-  <div class="section-divider"></div>
-
-  <!-- MIS PICKS: PANEL PERSONAL DE STATS G$ -->
-  <section id="myPicksPanel" style="display:none">
-    <div class="section-title"><div class="icon">📊</div>Mis Picks · Rendimiento Personal</div>
-    <div class="mypicks-stats" id="myPicksStats"></div>
-    <div class="mypicks-list" id="myPicksList"></div>
-    <div id="myPicksEmpty" style="display:none;text-align:center;padding:28px 0;color:var(--texto-sec);font-size:0.88rem">
-      Todavía no pusiste G$ en ningún pronóstico.<br>
-      <span style="font-size:0.78rem;opacity:.6">Usá tus Gambeta Coins en los pronósticos para ver tu rendimiento acá.</span>
-    </div>
-
-
-    <!-- Cross-navigation (visible solo en página #stats) -->
-    <div class="gb-cross-nav" id="gbCrossNavStats">
-      <div class="gb-cross-nav-label">Explorá también</div>
-      <div class="gb-cross-nav-btns">
-        <a class="gb-cross-nav-item" onclick="navTo('predictions')">
-          <span class="gb-cni-icon">🔮</span>
-          <span class="gb-cni-label">Pronósticos</span>
-          <span class="gb-cni-desc">Picks de hoy</span>
-        </a>
-        <a class="gb-cross-nav-item" onclick="navTo('historial')">
-          <span class="gb-cni-icon">📋</span>
-          <span class="gb-cni-label">Resultados</span>
-          <span class="gb-cni-desc">Picks finalizados</span>
-        </a>
-        <a class="gb-cross-nav-item" onclick="navTo('ranking')">
-          <span class="gb-cni-icon">🏆</span>
-          <span class="gb-cni-label">Ranking</span>
-          <span class="gb-cni-desc">Top jugadores G$</span>
-        </a>
-        <a class="gb-cross-nav-item" onclick="navTo('telegram')">
-          <span class="gb-cni-icon">📣</span>
-          <span class="gb-cni-label">Canales</span>
-          <span class="gb-cni-desc">Comunidad &amp; promos</span>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <div class="section-divider" id="myPicksDivider" style="display:none"></div>
-
   <!-- FEED PÚBLICO G$ — eliminado (Gambeta Coins removido) -->
   <section id="gFeedWrap" style="display:none !important">
     <div class="section-title">
@@ -6036,6 +5993,50 @@ window.toggleHeroBubble = function(n) {
 
   </div>
 </section>
+
+  <div class="section-divider"></div>
+
+  <!-- MIS PICKS: PANEL PERSONAL DE STATS G$ -->
+  <section id="myPicksPanel" style="display:none">
+    <div class="section-title"><div class="icon">📊</div>Mis Picks · Rendimiento Personal</div>
+    <div class="mypicks-stats" id="myPicksStats"></div>
+    <div class="mypicks-list" id="myPicksList"></div>
+    <div id="myPicksEmpty" style="display:none;text-align:center;padding:28px 0;color:var(--texto-sec);font-size:0.88rem">
+      Todavía no pusiste G$ en ningún pronóstico.<br>
+      <span style="font-size:0.78rem;opacity:.6">Usá tus Gambeta Coins en los pronósticos para ver tu rendimiento acá.</span>
+    </div>
+
+
+    <!-- Cross-navigation (visible solo en página #stats) -->
+    <div class="gb-cross-nav" id="gbCrossNavStats">
+      <div class="gb-cross-nav-label">Explorá también</div>
+      <div class="gb-cross-nav-btns">
+        <a class="gb-cross-nav-item" onclick="navTo('predictions')">
+          <span class="gb-cni-icon">🔮</span>
+          <span class="gb-cni-label">Pronósticos</span>
+          <span class="gb-cni-desc">Picks de hoy</span>
+        </a>
+        <a class="gb-cross-nav-item" onclick="navTo('historial')">
+          <span class="gb-cni-icon">📋</span>
+          <span class="gb-cni-label">Resultados</span>
+          <span class="gb-cni-desc">Picks finalizados</span>
+        </a>
+        <a class="gb-cross-nav-item" onclick="navTo('ranking')">
+          <span class="gb-cni-icon">🏆</span>
+          <span class="gb-cni-label">Ranking</span>
+          <span class="gb-cni-desc">Top jugadores G$</span>
+        </a>
+        <a class="gb-cross-nav-item" onclick="navTo('telegram')">
+          <span class="gb-cni-icon">📣</span>
+          <span class="gb-cni-label">Canales</span>
+          <span class="gb-cni-desc">Comunidad &amp; promos</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider" id="myPicksDivider" style="display:none"></div>
+
 
   <!-- Mi Panel: oculto del home (decisión de UX 14-may-2026). Se conserva el DOM por compatibilidad con renderMyPanel/renderBetsList — las funciones populan el contenido sin renderizarlo visible. -->
   <section id="mipanel" style="display:none">
