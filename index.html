@@ -5869,6 +5869,46 @@ window.toggleHeroBubble = function(n) {
       📚 Ver todos los artículos
     </a>
 
+    <!-- CROSS-PROMO: MasterProps — mejor billete del día (al pie de Lecturas relacionadas) -->
+    <div id="masterprops-crosspromo" style="max-width:920px;margin:36px auto 8px;padding:0;display:none">
+      <a href="https://masterpropsai.github.io/?utm_source=gambeta&utm_medium=crosspromo&utm_campaign=home" target="_blank" rel="noopener" style="display:block;text-decoration:none;background:linear-gradient(135deg,rgba(212,165,32,0.10),rgba(212,165,32,0.03));border:1px solid rgba(212,165,32,0.35);border-radius:14px;padding:20px 24px;transition:border-color .2s,background .2s">
+        <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;justify-content:space-between;text-align:left">
+          <div style="flex:1;min-width:240px">
+            <div style="font-size:0.72rem;color:#d4a520;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px">🐋 También del equipo Latam</div>
+            <div id="mp-title" style="font-size:1.05rem;font-weight:800;color:#fff;line-height:1.35;margin-bottom:4px">Cargando billete del día…</div>
+            <div id="mp-sub" style="font-size:0.85rem;color:rgba(255,255,255,0.55);line-height:1.5"></div>
+          </div>
+          <div style="background:#d4a520;color:#000;font-weight:800;font-size:0.85rem;padding:11px 22px;border-radius:8px;white-space:nowrap">Ver MasterProps →</div>
+        </div>
+      </a>
+    </div>
+    <script>
+    (function(){
+      var el = document.getElementById('masterprops-crosspromo');
+      if (!el) return;
+      fetch('https://masterpropsai.github.io/tickets_data.json', { cache: 'default' })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(tickets){
+          if (!Array.isArray(tickets) || !tickets.length) return;
+          var best = null, bestOdds = 0;
+          for (var i = 0; i < tickets.length; i++) {
+            var t = tickets[i], o = 1;
+            for (var j = 0; j < (t.events||[]).length; j++) o *= (t.events[j].Coef || 1);
+            if (o > bestOdds) { bestOdds = o; best = t; }
+          }
+          if (!best) return;
+          var legs = (best.events||[]).length;
+          var tier = bestOdds >= 1000 ? '🐋 MEGALODON' : bestOdds >= 100 ? '🐳 WHALE' : bestOdds >= 30 ? '🦈 SHARK' : '🎯 HUNTER';
+          document.getElementById('mp-title').textContent =
+            tier + ' · Billete del día: x' + bestOdds.toFixed(0);
+          document.getElementById('mp-sub').textContent =
+            legs + ' patas combinadas · La IA que arma billetes con cuotas x10 o más en MasterProps';
+          el.style.display = 'block';
+        })
+        .catch(function(e){ console.log('[mp-crosspromo]', e && e.message); });
+    })();
+    </script>
+
   </div>
 </section>
 
