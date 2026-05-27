@@ -5630,6 +5630,92 @@ window.toggleHeroBubble = function(n) {
     </a>
   </section>
 
+
+  <!-- CALENDARIO SEMANAL DE BONOS — debajo del banner sponsor -->
+<section id="gbBonos" style="background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:48px 20px 42px">
+  <div style="max-width:1000px;margin:0 auto;text-align:center">
+
+    <div class="bonos-cal-eyebrow">📅 Calendario semanal de bonos</div>
+    <h2 class="bonos-cal-title">Un <span style="color:#ffd600">bono distinto</span> cada día</h2>
+    <p class="bonos-cal-sub">Volvé cada día. La oferta del día se renueva sola — hoy es <strong id="bonosCalToday" style="color:#00c853">…</strong>.</p>
+
+    <!-- Bono destacado del día -->
+    <a id="bonosCalStage" class="bonos-cal-stage" href="#" target="_blank" rel="noopener nofollow" onclick="trackEvent('bono_click',{src:'calendar-stage'})">
+      <div class="bonos-cal-stage-left">
+        <div class="bonos-cal-logo-wrap"><img id="bonosCalLogo" src="" alt=""></div>
+        <div>
+          <div class="bonos-cal-name-row">
+            <span id="bonosCalName" class="bonos-cal-name">…</span>
+            <span id="bonosCalHoy" class="bonos-cal-hoy">HOY</span>
+          </div>
+          <div class="bonos-cal-bono" id="bonosCalBono">…</div>
+        </div>
+      </div>
+      <span class="bonos-cal-cta">Reclamar bono →</span>
+    </a>
+
+    <!-- Tabs de los 7 días -->
+    <div class="bonos-cal-tabs" id="bonosCalTabs"></div>
+
+    <p class="bonos-cal-foot">+18 · Jugá responsablemente · Bonos sujetos a términos y condiciones de cada casa</p>
+
+  </div>
+
+  <script>
+  (function(){
+    var BONOS = {
+      1: { d:'Lun', nameLong:'Lunes',     name:'SapphireBet',  bono:'100% hasta $100 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg', href:'https://subjectprof.com/L?tag=d_5550638m_127836c_&site=5550638&ad=127836' },
+      2: { d:'Mar', nameLong:'Martes',    name:'Megapari',     bono:'100% hasta $300 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/192-824/desktop/media_asset/39b027cf6619aa7814a4f426943fc3f7.svg', href:'https://proarg.megapari-003572.in/' },
+      3: { d:'Mié', nameLong:'Miércoles', name:'Melbet',       bono:'100% hasta $130 USD + 30 giros gratis',      logo:'https://v3.traincdn.com/genfiles/cms/8-62/desktop/media_asset/dd77c8f1b5bd23e38cd81fb7d861af10.svg',   href:'https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration' },
+      4: { d:'Jue', nameLong:'Jueves',    name:'BetWinner',    bono:'100% hasta $100 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/152-495/desktop/media_asset/023b82537b5c5fa4a9cc627e295e7e95.svg', href:'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
+      5: { d:'Vie', nameLong:'Viernes',   name:'DBbet',        bono:'100% hasta $200 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg', href:'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213' },
+      6: { d:'Sáb', nameLong:'Sábado',    name:'SapphireBet',  bono:'⭐ Sponsor del finde: 100% hasta $100 USD',   logo:'https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg', href:'https://subjectprof.com/L?tag=d_5550638m_127836c_&site=5550638&ad=127836' },
+      7: { d:'Dom', nameLong:'Domingo',   name:'Megapari',     bono:'Domingo de fútbol: 100% hasta $300 USD',     logo:'https://v3.traincdn.com/genfiles/cms/192-824/desktop/media_asset/39b027cf6619aa7814a4f426943fc3f7.svg', href:'https://proarg.megapari-003572.in/' }
+    };
+
+    var jsDay = new Date().getDay();  // 0=dom .. 6=sab
+    var todayCode = jsDay === 0 ? 7 : jsDay;  // 1=Lun .. 7=Dom
+    var todayEl = document.getElementById('bonosCalToday');
+    if (todayEl) todayEl.textContent = BONOS[todayCode].nameLong;
+
+    var tabsEl = document.getElementById('bonosCalTabs');
+    var html = '';
+    for (var d = 1; d <= 7; d++) {
+      var classes = 'bonos-cal-tab';
+      if (d === todayCode) classes += ' is-today is-active';
+      html += '<div class="' + classes + '" data-day="' + d + '" onclick="window.gbSelectBonoDay(' + d + ')">' +
+              '<div class="bonos-cal-tab-marker">HOY</div>' +
+              '<div class="bonos-cal-tab-day">' + BONOS[d].d + '</div>' +
+              '<div class="bonos-cal-tab-mini">' + BONOS[d].name + '</div>' +
+              '</div>';
+    }
+    tabsEl.innerHTML = html;
+
+    window.gbSelectBonoDay = function(d) {
+      var b = BONOS[d];
+      if (!b) return;
+      var logo = document.getElementById('bonosCalLogo');
+      logo.src = b.logo;
+      logo.alt = b.name;
+      document.getElementById('bonosCalName').textContent = b.name;
+      document.getElementById('bonosCalBono').textContent = b.bono;
+      var stage = document.getElementById('bonosCalStage');
+      stage.href = b.href;
+      var hoy = document.getElementById('bonosCalHoy');
+      if (d === todayCode) hoy.classList.add('show'); else hoy.classList.remove('show');
+      var tabs = tabsEl.querySelectorAll('.bonos-cal-tab');
+      for (var i = 0; i < tabs.length; i++) {
+        if (Number(tabs[i].dataset.day) === d) tabs[i].classList.add('is-active');
+        else tabs[i].classList.remove('is-active');
+      }
+      try { window.trackEvent && trackEvent('bono_day_select',{day:d,casa:b.name}); } catch(e){}
+    };
+
+    window.gbSelectBonoDay(todayCode);
+  })();
+  </script>
+</section>
+
   <!-- BANNER MASTERPROPS — billete del día -->
   <section id="gbMasterPropsMid" style="padding:0 20px;margin-top:18px">
     <!-- CROSS-PROMO: MasterProps — mejor billete del día (debajo del banner SapphireBet) -->
@@ -5980,89 +6066,6 @@ window.toggleHeroBubble = function(n) {
 </section>
 
 <!-- SECCIÓN: BONOS -->
-<section id="gbBonos" style="background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:48px 20px 42px">
-  <div style="max-width:1000px;margin:0 auto;text-align:center">
-
-    <div class="bonos-cal-eyebrow">📅 Calendario semanal de bonos</div>
-    <h2 class="bonos-cal-title">Un <span style="color:#ffd600">bono distinto</span> cada día</h2>
-    <p class="bonos-cal-sub">Volvé cada día. La oferta del día se renueva sola — hoy es <strong id="bonosCalToday" style="color:#00c853">…</strong>.</p>
-
-    <!-- Bono destacado del día -->
-    <a id="bonosCalStage" class="bonos-cal-stage" href="#" target="_blank" rel="noopener nofollow" onclick="trackEvent('bono_click',{src:'calendar-stage'})">
-      <div class="bonos-cal-stage-left">
-        <div class="bonos-cal-logo-wrap"><img id="bonosCalLogo" src="" alt=""></div>
-        <div>
-          <div class="bonos-cal-name-row">
-            <span id="bonosCalName" class="bonos-cal-name">…</span>
-            <span id="bonosCalHoy" class="bonos-cal-hoy">HOY</span>
-          </div>
-          <div class="bonos-cal-bono" id="bonosCalBono">…</div>
-        </div>
-      </div>
-      <span class="bonos-cal-cta">Reclamar bono →</span>
-    </a>
-
-    <!-- Tabs de los 7 días -->
-    <div class="bonos-cal-tabs" id="bonosCalTabs"></div>
-
-    <p class="bonos-cal-foot">+18 · Jugá responsablemente · Bonos sujetos a términos y condiciones de cada casa</p>
-
-  </div>
-
-  <script>
-  (function(){
-    var BONOS = {
-      1: { d:'Lun', nameLong:'Lunes',     name:'SapphireBet',  bono:'100% hasta $100 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg', href:'https://subjectprof.com/L?tag=d_5550638m_127836c_&site=5550638&ad=127836' },
-      2: { d:'Mar', nameLong:'Martes',    name:'Megapari',     bono:'100% hasta $300 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/192-824/desktop/media_asset/39b027cf6619aa7814a4f426943fc3f7.svg', href:'https://proarg.megapari-003572.in/' },
-      3: { d:'Mié', nameLong:'Miércoles', name:'Melbet',       bono:'100% hasta $130 USD + 30 giros gratis',      logo:'https://v3.traincdn.com/genfiles/cms/8-62/desktop/media_asset/dd77c8f1b5bd23e38cd81fb7d861af10.svg',   href:'https://refpa3665.com/L?tag=d_4230545m_2170c_&site=4230545&ad=2170&r=registration' },
-      4: { d:'Jue', nameLong:'Jueves',    name:'BetWinner',    bono:'100% hasta $100 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/152-495/desktop/media_asset/023b82537b5c5fa4a9cc627e295e7e95.svg', href:'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
-      5: { d:'Vie', nameLong:'Viernes',   name:'DBbet',        bono:'100% hasta $200 USD en tu primer depósito',  logo:'https://v3.traincdn.com/genfiles/cms/164-751/desktop/media_asset/bd8aed15eb6ca33c2680f8d2f76427d1.svg', href:'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213' },
-      6: { d:'Sáb', nameLong:'Sábado',    name:'SapphireBet',  bono:'⭐ Sponsor del finde: 100% hasta $100 USD',   logo:'https://v3.traincdn.com/genfiles/cms/109-845/desktop/media_asset/8093e8b8aaf44da30d688a41a91a6bda.svg', href:'https://subjectprof.com/L?tag=d_5550638m_127836c_&site=5550638&ad=127836' },
-      7: { d:'Dom', nameLong:'Domingo',   name:'Megapari',     bono:'Domingo de fútbol: 100% hasta $300 USD',     logo:'https://v3.traincdn.com/genfiles/cms/192-824/desktop/media_asset/39b027cf6619aa7814a4f426943fc3f7.svg', href:'https://proarg.megapari-003572.in/' }
-    };
-
-    var jsDay = new Date().getDay();  // 0=dom .. 6=sab
-    var todayCode = jsDay === 0 ? 7 : jsDay;  // 1=Lun .. 7=Dom
-    var todayEl = document.getElementById('bonosCalToday');
-    if (todayEl) todayEl.textContent = BONOS[todayCode].nameLong;
-
-    var tabsEl = document.getElementById('bonosCalTabs');
-    var html = '';
-    for (var d = 1; d <= 7; d++) {
-      var classes = 'bonos-cal-tab';
-      if (d === todayCode) classes += ' is-today is-active';
-      html += '<div class="' + classes + '" data-day="' + d + '" onclick="window.gbSelectBonoDay(' + d + ')">' +
-              '<div class="bonos-cal-tab-marker">HOY</div>' +
-              '<div class="bonos-cal-tab-day">' + BONOS[d].d + '</div>' +
-              '<div class="bonos-cal-tab-mini">' + BONOS[d].name + '</div>' +
-              '</div>';
-    }
-    tabsEl.innerHTML = html;
-
-    window.gbSelectBonoDay = function(d) {
-      var b = BONOS[d];
-      if (!b) return;
-      var logo = document.getElementById('bonosCalLogo');
-      logo.src = b.logo;
-      logo.alt = b.name;
-      document.getElementById('bonosCalName').textContent = b.name;
-      document.getElementById('bonosCalBono').textContent = b.bono;
-      var stage = document.getElementById('bonosCalStage');
-      stage.href = b.href;
-      var hoy = document.getElementById('bonosCalHoy');
-      if (d === todayCode) hoy.classList.add('show'); else hoy.classList.remove('show');
-      var tabs = tabsEl.querySelectorAll('.bonos-cal-tab');
-      for (var i = 0; i < tabs.length; i++) {
-        if (Number(tabs[i].dataset.day) === d) tabs[i].classList.add('is-active');
-        else tabs[i].classList.remove('is-active');
-      }
-      try { window.trackEvent && trackEvent('bono_day_select',{day:d,casa:b.name}); } catch(e){}
-    };
-
-    window.gbSelectBonoDay(todayCode);
-  })();
-  </script>
-</section>
 
   <div class="section-divider"></div>
 
