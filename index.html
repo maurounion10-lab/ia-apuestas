@@ -13315,12 +13315,17 @@ function savePredictions(preds) {
   const _BLOCKED_SPORT_KEYS_SAVE = ['soccer_chile_campeonato', 'soccer_portugal_primeira_liga'];
   const _normBSave = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
   const _BLOCKED_TEAMS_SAVE = ['palestino','ucatolica','universidadcatolica','universidadcat'];
+  // 🆕 (27-may-2026) Permitir equipos bloqueados cuando juegan en torneos Conmebol (ligas soportadas).
+  //    Fix bug: Boca vs U. Católica (CHI) en Libertadores era filtrado por incluir 'ucatolica'.
+  const _ALLOW_BLOCKED_IN_CUPS = ['soccer_conmebol_copa_libertadores', 'soccer_conmebol_copa_sudamericana', 'soccer_conmebol_copa_america'];
   preds.forEach(p => {
     // Excluir ligas bloqueadas (Portugal, Chile) por sportKey
     if (p._sportKey && _BLOCKED_SPORT_KEYS_SAVE.includes(p._sportKey)) return;
-    // Excluir también por nombre de equipo (por si sportKey viene vacío)
+    // Excluir también por nombre de equipo (por si sportKey viene vacío) — EXCEPTO si está en copa soportada
     const _nh = _normBSave(p.home), _na = _normBSave(p.away);
-    if (_BLOCKED_TEAMS_SAVE.some(t => _nh.includes(t) || _na.includes(t))) return;
+    if (_BLOCKED_TEAMS_SAVE.some(t => _nh.includes(t) || _na.includes(t))) {
+      if (!_ALLOW_BLOCKED_IN_CUPS.includes(p._sportKey)) return;
+    }
     // Excluir partidos que comenzaron hace más de 20 horas (cubre jornada completa + margen)
     // Nunca excluir picks en vivo o recientes — todo pick mostrado al usuario DEBE quedar en historial
     if (p.commenceTs && p.commenceTs <= Date.now() - 20 * 3600 * 1000) return;
@@ -14037,13 +14042,18 @@ function renderHistorial(filter) {
   // Equipos bloqueados por nombre (por si fueron guardados sin _sportKey correcto)
   const _normB = s => (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,'');
   const BLOCKED_TEAMS = ['palestino','ucatolica','universidadcatolica','universidadcat'];
+  // 🆕 (27-may-2026) Permitir equipos bloqueados cuando juegan en torneos Conmebol soportados.
+  const ALLOW_BLOCKED_IN_CUPS = ['soccer_conmebol_copa_libertadores', 'soccer_conmebol_copa_sudamericana', 'soccer_conmebol_copa_america'];
   const allRaw = loadHistorial();
   const allClean = allRaw.filter(h => {
     if (BLOCKED_SPORT_KEYS.includes(h._sportKey)) return false;
     // Bloquear por sport_key que contenga palabras de ligas no soportadas
     if (h._sportKey && (h._sportKey.includes('albania') || h._sportKey.includes('faroe') || h._sportKey.includes('gibraltar') || h._sportKey.includes('san_marino') || h._sportKey.includes('liechtenstein') || h._sportKey.includes('malta') || h._sportKey.includes('kosovo'))) return false;
     const nh = _normB(h.home), na = _normB(h.away);
-    if (BLOCKED_TEAMS.some(t => nh.includes(t) || na.includes(t))) return false;
+    // Bloqueo por nombre — EXCEPTO si está en copa Conmebol (donde estos equipos son válidos)
+    if (BLOCKED_TEAMS.some(t => nh.includes(t) || na.includes(t))) {
+      if (!ALLOW_BLOCKED_IN_CUPS.includes(h._sportKey)) return false;
+    }
     // Primeira Liga / Chile / Albania: filtrar también por nombre de liga
     if ((h.league||'').toLowerCase().includes('primeira liga')) return false;
     if ((h.league||'').toLowerCase().includes('chile')) return false;
