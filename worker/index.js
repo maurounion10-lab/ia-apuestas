@@ -103,6 +103,95 @@ async function cached(env, key, ttl, fn) {
   return data;
 }
 
+// ── 🆕 (27-may-2026) Cup context: computa "qué equipo clasifica con empate" ──
+//    Sirve para que el frontend prefiera Doble Oportunidad / Empate sobre Gana Local/Visitante
+//    cuando el contexto del torneo (fase de grupos de Conmebol) lo amerita.
+//    Output format: { "home_team|away_team": { prefer: '1x'|'x2'|'empate', reason: string, league: string } }
+const CUP_SEASONS = [
+  { id: 13, name: 'Libertadores',  season: 2026 },
+  { id: 11, name: 'Sudamericana', season: 2026 },
+];
+
+async function computeCupContext(env) {
+  const result = {};
+  for (const cup of CUP_SEASONS) {
+    let standings, fixtures;
+    try {
+      const stReq = await apf(`/standings?league=${cup.id}&season=${cup.season}`, env);
+      const leagues = stReq.response;
+      if (!leagues || !leagues[0]) continue;
+      standings = leagues[0].league.standings; // array of groups
+    } catch (e) {
+      console.error(`[cup-ctx] standings ${cup.name} error:`, e.message);
+      continue;
+    }
+    try {
+      const fxReq = await apf(`/fixtures?league=${cup.id}&season=${cup.season}&next=30`, env);
+      fixtures = fxReq.response || [];
+    } catch (e) {
+      console.error(`[cup-ctx] fixtures ${cup.name} error:`, e.message);
+      continue;
+    }
+
+    for (const fx of fixtures) {
+      const homeId = fx.teams?.home?.id;
+      const awayId = fx.teams?.away?.id;
+      const homeName = fx.teams?.home?.name;
+      const awayName = fx.teams?.away?.name;
+      if (!homeId || !awayId || !homeName || !awayName) continue;
+
+      // Find the group containing both teams
+      let group = null;
+      for (const g of standings) {
+        const hasHome = g.some(t => t.team.id === homeId);
+        const hasAway = g.some(t => t.team.id === awayId);
+        if (hasHome && hasAway) { group = g; break; }
+      }
+      if (!group) continue;
+
+      const homeStand = group.find(t => t.team.id === homeId);
+      const awayStand = group.find(t => t.team.id === awayId);
+      if (!homeStand || !awayStand) continue;
+
+      const homePts  = homeStand.points;
+      const awayPts  = awayStand.points;
+      const homeRank = homeStand.rank;
+      const awayRank = awayStand.rank;
+      const played   = group[0].all?.played || 0;
+
+      // Heurística simple: suponer 1 partido restante (típico para el contexto que nos interesa).
+      // Esto es conservador — si quedan más partidos, el override no se activa (volvemos al modelo regular).
+      const remaining = 1;
+      const ptsAfterDraw_home = homePts + 1;
+      const ptsAfterDraw_away = awayPts + 1;
+
+      // Mejor puntuación posible del 3ro y abajo después de los partidos restantes
+      const thirdAndBelow = group.filter(t => t.rank > 2);
+      if (!thirdAndBelow.length) continue;
+      const maxThirdPts = Math.max(...thirdAndBelow.map(t => t.points + 3 * remaining));
+
+      let prefer = null;
+      let reason = null;
+
+      // Home necesita empate para mantenerse en top 2 (clasificación)
+      if (homeRank <= 2 && ptsAfterDraw_home > maxThirdPts) {
+        prefer = '1x';
+        reason = `${homeName} clasifica con empate (rank ${homeRank} del grupo, ${homePts}pts vs max ${maxThirdPts} del 3ro)`;
+      }
+      // Away necesita empate para mantenerse en top 2
+      else if (awayRank <= 2 && ptsAfterDraw_away > maxThirdPts) {
+        prefer = 'x2';
+        reason = `${awayName} clasifica con empate (rank ${awayRank} del grupo, ${awayPts}pts vs max ${maxThirdPts} del 3ro)`;
+      }
+
+      if (prefer) {
+        result[`${homeName}|${awayName}`] = { prefer, reason, league: cup.name, fixtureId: fx.fixture.id };
+      }
+    }
+  }
+  return result;
+}
+
 // ── API-Football fetch helper ────────────────────────────────────────────────
 async function apf(path, env) {
   const key = env.API_FOOTBALL_KEY;
@@ -993,6 +1082,13 @@ export default {
     if (path === '/available') {
       const keys = [...LEAGUES_MAIN, ...LEAGUES_EUROPE, ...LEAGUES_SECONDARY].map(([k]) => k);
       return new Response(JSON.stringify({ keys }), { headers: CORS });
+    }
+
+    // ── 🆕 /cup-context (Conmebol cups standings-aware preferences) ──────────
+    if (path === '/cup-context') {
+      const cacheKey = `cup_context_v1_${new Date().toISOString().slice(0,10)}`; // refresh daily
+      const ctx = await cached(env, cacheKey, 21600, () => computeCupContext(env)); // 6h TTL within day
+      return new Response(JSON.stringify(ctx || {}), { headers: CORS });
     }
 
     // ── /odds ────────────────────────────────────────────────────────────────

@@ -9907,7 +9907,32 @@ function buildPredsFromOdds() {
     });
 
     if (!candidates2.length) return null;
-    const best     = candidates2[0];
+    let best     = candidates2[0];
+
+    // 🆕 (27-may-2026) CUP CONTEXT OVERRIDE — para Conmebol cups en fase de grupos
+    //    El worker /cup-context computa "qué equipo clasifica con empate" usando standings.
+    //    Si hay match, forzamos Doble Oportunidad o Empate sobre el pick natural.
+    try {
+      const _cupCtx = window._cupContext || {};
+      const _cupKey1 = `${g.home_team}|${g.away_team}`;
+      const _cupKey2 = `${hN}|${aN}`;
+      const _ovEntry = _cupCtx[_cupKey1] || _cupCtx[_cupKey2];
+      if (_ovEntry && _ovEntry.prefer) {
+        let _ovBest = null;
+        if (_ovEntry.prefer === '1x' && odds1X && odds1X >= 1.10) {
+          _ovBest = { rec: 'Doble 1X', prob: prob1X, odds: odds1X, _recSide: '1x', _isDoubleChance: true, _cupOverride: true };
+        } else if (_ovEntry.prefer === 'x2' && oddsX2 && oddsX2 >= 1.10) {
+          _ovBest = { rec: 'Doble X2', prob: probX2, odds: oddsX2, _recSide: 'x2', _isDoubleChance: true, _cupOverride: true };
+        } else if (_ovEntry.prefer === 'empate' && dOP) {
+          _ovBest = { rec: 'Empate', prob: probD, odds: dOP, _recSide: 'draw', _cupOverride: true };
+        }
+        if (_ovBest) {
+          console.log(`[cup-ctx] Override aplicado: ${g.home_team} vs ${g.away_team} → ${_ovEntry.prefer} (${_ovEntry.reason})`);
+          best = _ovBest;
+        }
+      }
+    } catch (e) { /* override es best-effort, no rompe */ }
+
     const rec      = best.rec;
     const maxProb  = best.prob || probH;
     const bestOdds = best.odds;
@@ -14964,6 +14989,31 @@ function _updatePickLikeCounts(source) {
 //  WORKER — DATOS REALES
 // ═══════════════════════════════════════════════
 const WORKER_URL = 'https://apuestas-api.mauro-union10.workers.dev';
+
+// 🆕 (27-may-2026) Cup context — pre-fetch para overrides de picks de fase de grupos Conmebol
+(function loadCupContext() {
+  try {
+    const cached = localStorage.getItem('gb_cup_ctx_v1');
+    if (cached) {
+      const obj = JSON.parse(cached);
+      if (obj && obj.ts && (Date.now() - obj.ts) < 6 * 3600 * 1000) {
+        window._cupContext = obj.data || {};
+      }
+    }
+  } catch (e) {}
+  fetch(WORKER_URL + '/cup-context', { cache: 'default' })
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (data && typeof data === 'object') {
+        window._cupContext = data;
+        try { localStorage.setItem('gb_cup_ctx_v1', JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+        const n = Object.keys(data).length;
+        if (n > 0) console.log(`[cup-ctx] ${n} override(s) cargados.`);
+      }
+    })
+    .catch(e => console.log('[cup-ctx] fetch err:', e && e.message));
+})();
+
 
 const teamShortNames = {
   'Brighton and Hove Albion': 'Brighton',
