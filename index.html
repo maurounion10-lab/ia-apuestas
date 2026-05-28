@@ -9920,8 +9920,12 @@ function buildPredsFromOdds() {
     const _minProb = _isStrictLeague ? 62 : (_isRelaxedLeague ? 50 : 55); // flex: 58 → 55 para no-Tier-1
 
     let conf, confLabel;
+    // 📈 RECALIBRACIÓN (27-may-2026): conf=med revertido a 58% (deshace el flex 58→55).
+    //    Razón: conf=med rinde -25% ROI a 14 días. Subir el floor para reducir volumen y mejorar calidad.
+    //    Strict leagues: solo Alta (62+). Por debajo se descarta.
     if      (maxProb >= 62)        { conf = 'high'; confLabel = 'Alta'; }
-    else if (maxProb >= 55)        { conf = 'med';  confLabel = 'Media-Alta'; } // flex: 58 → 55
+    else if (_isStrictLeague)      { return null; } // strict: solo Alta — no se publica Media-Alta en ligas menores
+    else if (maxProb >= 58)        { conf = 'med';  confLabel = 'Media-Alta'; } // ↑ era 55 (flex), volvió a 58
     else if (maxProb >= _minProb)  { conf = 'low';  confLabel = 'Media'; }
     else                           { return null; } // Debajo del piso mínimo de la liga
 
@@ -9943,6 +9947,10 @@ function buildPredsFromOdds() {
     if      (bvr === 6 || bvr === 5) conf = 'high';
     else if (bvr === 4)              conf = 'med';
     confLabel = bvrText;
+
+    // 🔒 FILTRO POST-MORTEM (27-may-2026): "Gana Local" rinde -80% ROI con bvr<5 (1/8 en 14 días).
+    //    Solo se publica si conf=high con BVR≥5. Si el mejor candidato es Gana Local y no llega, descartamos el partido.
+    if (best._recSide === 'home' && bvr < 5) return null;
 
     // Cuotas formateadas
     const fmtO = v => v != null ? ` (cuota ${parseFloat(v).toFixed(2)})` : '';
