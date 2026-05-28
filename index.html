@@ -9862,25 +9862,47 @@ function buildPredsFromOdds() {
     const MIN_ODDS = 1.40;
     // Liga argentina: prohibido pronosticar overs (Más de X.5). Solo 1X2 + Ambos/No Marcan.
     const _isArgentina = (g.sport_key || '').includes('argentina');
+
+    // 🆕 (27-may-2026) DOBLE OPORTUNIDAD (1X / X2) — captura el escenario "el favorito necesita ganar pero el empate es plausible".
+    //    Caso de uso real: Cienciano vs Juventud (Sudamericana) donde Cienciano clasificaba con empate.
+    //    Gates de inclusión:
+    //      • Default: no hay favorito claro (probH<62 Y probA<62) Y probD>=25%
+    //      • Conmebol Cup (Libertadores/Sudamericana): más permisivo — probD>=22% y no hay goleador absoluto (<70%)
+    //    Cuota derivada de cuotas individuales (h*d/(h+d), aprox harmonic).
+    const _isConmebolCup = ['soccer_conmebol_copa_libertadores', 'soccer_conmebol_copa_sudamericana'].includes(g.sport_key || '');
+    const _hasClearFavorite = (probH >= 62 || probA >= 62);
+    const _doProbDMin = _isConmebolCup ? 22 : 25;
+    const _doInclude  = (!_hasClearFavorite || (_isConmebolCup && probH < 70 && probA < 70)) && (probD >= _doProbDMin);
+    const prob1X = probH + probD;
+    const probX2 = probA + probD;
+    const odds1X = (hO > 0 && dO > 0) ? +((hO * dO) / (hO + dO)).toFixed(2) : null;
+    const oddsX2 = (aO > 0 && dO > 0) ? +((aO * dO) / (aO + dO)).toFixed(2) : null;
+    const MIN_DO_ODDS = 1.25;
+
     const candidates2 = [
       { rec: 'Gana ' + hN, prob: probH, odds: hOP, _recSide: 'home' },
       { rec: 'Gana ' + aN, prob: probA, odds: aOP, _recSide: 'away' },
       ...(dOP ? [{ rec: 'Empate', prob: probD, odds: dOP, _recSide: 'draw' }] : []),
+      // 🆕 Doble Oportunidad: solo se incluye si el gate de probabilidad pasa
+      ...((_doInclude && odds1X && odds1X >= MIN_DO_ODDS) ? [{ rec: 'Doble 1X', prob: prob1X, odds: odds1X, _recSide: '1x', _isDoubleChance: true }] : []),
+      ...((_doInclude && oddsX2 && oddsX2 >= MIN_DO_ODDS) ? [{ rec: 'Doble X2', prob: probX2, odds: oddsX2, _recSide: 'x2', _isDoubleChance: true }] : []),
       ...(_isArgentina ? [] : ['1.5','2.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS
           && (pt !== '2.5' || (probOver[pt] || 0) >= 62))
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
       ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
     ]
     .filter(c => c.prob > 0)
-    .filter(c => !c.odds || parseFloat(c.odds) >= MIN_ODDS);
+    .filter(c => c._isDoubleChance || !c.odds || parseFloat(c.odds) >= MIN_ODDS);
 
     candidates2.sort((a, b) => {
       if (b.prob !== a.prob) return b.prob - a.prob;
-      // En empate de probabilidad: 1X2 > totals > btts
-      if (a.isTotals && !b.isTotals) return 1;   // totals pierden vs 1X2
-      if (!a.isTotals && b.isTotals) return -1;  // 1X2 gana vs totals
-      if (a.isBtts  && !b.isBtts)   return 1;   // btts pierde vs todo
+      // Tiebreaker: 1X2 puro > DobleOportunidad > totals > btts
+      if (a.isTotals && !b.isTotals) return 1;
+      if (!a.isTotals && b.isTotals) return -1;
+      if (a.isBtts  && !b.isBtts)   return 1;
       if (!a.isBtts && b.isBtts)    return -1;
+      if (a._isDoubleChance && !b._isDoubleChance) return 1;   // DO pierde vs 1X2 puro
+      if (!a._isDoubleChance && b._isDoubleChance) return -1;
       return 0;
     });
 
@@ -9935,10 +9957,12 @@ function buildPredsFromOdds() {
     //    Las Altas (5) y Media-Altas (4) de Tier 3+ pasan tal cual — sin handicap entero.
     // 🔒 REGLA FILTRO: bvr < 4 (Media o Baja) → descartado, sin importar tier.
     let rawBvr;
-    if      (conf === 'high' && maxProb >= 75) rawBvr = 6;
-    else if (conf === 'high')                  rawBvr = 5;
-    else if (conf === 'med')                   rawBvr = 4;
-    else                                       rawBvr = 3;
+    if      (best._isDoubleChance && conf === 'high')   rawBvr = 5;   // 🆕 DO nunca alcanza Máxima
+    else if (best._isDoubleChance && conf === 'med')    rawBvr = 4;
+    else if (conf === 'high' && maxProb >= 75)          rawBvr = 6;
+    else if (conf === 'high')                            rawBvr = 5;
+    else if (conf === 'med')                             rawBvr = 4;
+    else                                                  rawBvr = 3;
     const _isTopTier = isTopTierLeague(g.sport_key);
     let bvr = (_isTopTier || rawBvr < 6) ? rawBvr : 5; // solo bloquea 6 → 5 si no es Top-Tier
     if (bvr < 4) return null; // descartar Media y Baja
@@ -9963,7 +9987,11 @@ function buildPredsFromOdds() {
 
     // Insight generado por probabilidades (hN/aN ya declarados arriba)
     let insight;
-    if (best._recSide === 'home')
+    if (best._isDoubleChance && best._recSide === '1x')
+      insight = `Doble Oportunidad — ${hN} puede ganar o empatar (combinado: ${prob1X}%). El mercado da ${probH}% a ${hN} ganando y ${probD}% al empate. La IA cubre los dos escenarios y descarta solo la victoria de ${aN} (${probA}%). Pick conservador, especialmente cuando el contexto del torneo favorece resultados pactados.`;
+    else if (best._isDoubleChance && best._recSide === 'x2')
+      insight = `Doble Oportunidad — ${aN} puede ganar o empatar (combinado: ${probX2}%). El mercado da ${probA}% a ${aN} ganando y ${probD}% al empate. La IA cubre los dos escenarios y descarta solo la victoria de ${hN} (${probH}%). Pick conservador, especialmente cuando el contexto del torneo favorece resultados pactados.`;
+    else if (best._recSide === 'home')
       insight = `${hN} parte como favorito con ${probH}% de probabilidad implícita según el mercado${fmtO(hO)}. ${aN} tiene ${probA}% de chances como visitante. Las cuotas reflejan ventaja clara del local — apuesta con valor en línea de 1X.`;
     else if (best._recSide === 'away')
       insight = `${aN} es favorito visitante con ${probA}% de probabilidad implícita${fmtO(aO)}. El mercado descuenta a ${hN} que solo tiene ${probH}% de chances. Valor en apostar al visitante directo.`;
@@ -12269,6 +12297,8 @@ function _recSideOf(p) {
   if (r === 'Gana Local')     return 'home';
   if (r === 'Gana Visitante') return 'away';
   if (r === 'Empate')         return 'draw';
+  if (r === 'Doble 1X')       return '1x';   // 🆕
+  if (r === 'Doble X2')       return 'x2';   // 🆕
   // Formato nuevo guardado sin _recSide (picks intermedios)
   if (r.startsWith('Gana ') && p.home && r === 'Gana ' + p.home) return 'home';
   if (r.startsWith('Gana ') && p.away && r === 'Gana ' + p.away) return 'away';
@@ -12280,6 +12310,8 @@ function _recLabel(rec, home, away) {
   const r = _normRec(rec || '');
   if (r === 'Gana Local')     return 'Gana ' + shortName(home || 'Local');
   if (r === 'Gana Visitante') return 'Gana ' + shortName(away || 'Visitante');
+  if (r === 'Doble 1X')       return 'Gana ' + shortName(home || 'Local') + ' o Empate';      // 🆕
+  if (r === 'Doble X2')       return 'Gana ' + shortName(away || 'Visitante') + ' o Empate';  // 🆕
   // Si el rec es "Gana <nombre largo>" (pick guardado con nombre completo), normalizar
   if (r.startsWith('Gana ')) {
     const teamPart = r.slice(5).trim();
@@ -13079,6 +13111,8 @@ async function sbLoadHistorial() {
       if      (p.rec === 'Gana Local'     && p._hO)  correctOdds = parseFloat(parseFloat(p._hO).toFixed(2));
       else if (p.rec === 'Gana Visitante' && p._aO)  correctOdds = parseFloat(parseFloat(p._aO).toFixed(2));
       else if (p.rec === 'Empate'         && p._dO)  correctOdds = parseFloat(parseFloat(p._dO).toFixed(2));
+      else if (p.rec === 'Doble 1X' && p._hO && p._dO) correctOdds = parseFloat(((p._hO * p._dO) / (p._hO + p._dO)).toFixed(2));  // 🆕 DO
+      else if (p.rec === 'Doble X2' && p._aO && p._dO) correctOdds = parseFloat(((p._aO * p._dO) / (p._aO + p._dO)).toFixed(2));  // 🆕 DO
       else if (p._bestOdds)                           correctOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
 
       const stakeChanged = p.stake !== correctStake;
@@ -13184,6 +13218,8 @@ function migrateHistStakes() {
     if      (p.rec === 'Gana Local'     && p._hO)  correctOdds = parseFloat(parseFloat(p._hO).toFixed(2));
     else if (p.rec === 'Gana Visitante' && p._aO)  correctOdds = parseFloat(parseFloat(p._aO).toFixed(2));
     else if (p.rec === 'Empate'         && p._dO)  correctOdds = parseFloat(parseFloat(p._dO).toFixed(2));
+    else if (p.rec === 'Doble 1X' && p._hO && p._dO) correctOdds = parseFloat(((p._hO * p._dO) / (p._hO + p._dO)).toFixed(2));  // 🆕 DO
+    else if (p.rec === 'Doble X2' && p._aO && p._dO) correctOdds = parseFloat(((p._aO * p._dO) / (p._aO + p._dO)).toFixed(2));  // 🆕 DO
     else if (p._bestOdds)                           correctOdds = parseFloat(parseFloat(p._bestOdds).toFixed(2));
 
     const stakeChanged = p.stake !== correctStake;
@@ -13375,6 +13411,8 @@ function resolveCompletedGames(scores, skipRender) {
       if      (p.rec === 'Gana Local')     result = homeWin    ? 'win' : 'loss';
       else if (p.rec === 'Gana Visitante') result = awayWin    ? 'win' : 'loss';
       else if (p.rec === 'Empate')         result = draw       ? 'win' : 'loss';
+      else if (p.rec === 'Doble 1X')       result = (homeWin || draw) ? 'win' : 'loss';   // 🆕
+      else if (p.rec === 'Doble X2')       result = (awayWin || draw) ? 'win' : 'loss';   // 🆕
       else if (p.rec === 'Ambos Marcan')   result = bttsMet    ? 'win' : 'loss';
       else if (p.rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
       else if (p.rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
@@ -13865,6 +13903,8 @@ function resolveAllGames(scores) {
       if      (p.rec === 'Gana Local')     result = homeWin       ? 'win' : 'loss';
       else if (p.rec === 'Gana Visitante') result = awayWin       ? 'win' : 'loss';
       else if (p.rec === 'Empate')         result = draw          ? 'win' : 'loss';
+      else if (p.rec === 'Doble 1X')       result = (homeWin || draw) ? 'win' : 'loss';   // 🆕
+      else if (p.rec === 'Doble X2')       result = (awayWin || draw) ? 'win' : 'loss';   // 🆕
       else if (p.rec === 'Ambos Marcan')   result = bttsMet       ? 'win' : 'loss';
       else if (p.rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
       else if (p.rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';

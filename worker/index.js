@@ -777,6 +777,8 @@ function calcResult(pick, score) {
   if (rec === 'Gana Local')      return homeWin ? 'win' : 'loss';
   if (rec === 'Gana Visitante')  return awayWin ? 'win' : 'loss';
   if (rec === 'Empate')          return draw    ? 'win' : 'loss';
+  if (rec === 'Doble 1X')        return (homeWin || draw) ? 'win' : 'loss';   // 🆕 (27-may-2026) DO local o empate
+  if (rec === 'Doble X2')        return (awayWin || draw) ? 'win' : 'loss';   // 🆕 (27-may-2026) DO visitante o empate
   if (rec === 'Ambos Marcan')    return btts    ? 'win' : 'loss';
   if (rec === 'Más de 1.5')      return total >= 2 ? 'win' : 'loss';
   if (rec === 'Más de 2.5')      return total >= 3 ? 'win' : 'loss';
