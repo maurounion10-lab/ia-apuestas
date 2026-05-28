@@ -7175,18 +7175,18 @@ function animateCounter(el, from, to, suffix, duration) {
 }
 
 function heroStatsApply(picksToday, totalPicks, animate) {
-  const elP = document.getElementById('heroStatPrecision');
+  const elP = document.getElementById('heroStatPrecision'); // ⚠️ deprecated (Picks hoy removido del hero)
   const elN = document.getElementById('heroStatPicks');
-  if (!elP || !elN) return;
+  if (!elN) return; // solo necesitamos el contador total
   const hoy = parseInt(picksToday, 10) || 0;
-  elP.style.color = 'var(--verde)';
+  if (elP) elP.style.color = 'var(--verde)';
   // Conteo real de picks (sin tope artificial)
   const totalStr = (parseInt(totalPicks, 10) || 0).toLocaleString('es-AR');
   if (animate) {
-    animateCounter(elP, 0, hoy, '', 1200);
+    if (elP) animateCounter(elP, 0, hoy, '', 1200);
     elN.textContent = totalStr;
   } else {
-    elP.textContent = String(hoy);
+    if (elP) elP.textContent = String(hoy);
     elN.textContent = totalStr;
   }
 }
