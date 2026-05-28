@@ -413,9 +413,9 @@ function buildResultadosCardElement(rows, wins, total, dateLabel) {
       ]),
       // filas de partidos
       el('div', { display: 'flex', flexDirection: 'column' }, rows.map(resultadoRowEl)),
-      // pie
+      // pie — rotable según performance
       el('div', { display: 'flex', fontSize: 21, color: '#8fc0a0', marginTop: 'auto' },
-        'Historial completo y público — aciertos y fallos, sin maquillar nada'),
+        pickResultadosCardFooter(wins, total)),
     ]),
   ]);
 }
@@ -737,6 +737,79 @@ function genPicks(hist) {
   return head + lines.join('\n') + tail;
 }
 
+// 🆕 (27-may-2026) Pools de frases finales rotables según performance del día.
+//    GREAT (≥66% acierto Y al menos 3 picks): hype.
+//    GOOD  (50-65% acierto): balanceado, honesto sin venderse.
+//    NEUTRAL (40-49%): "raspamos" — ni hype ni lamento.
+//    BAD   (<40%): reconoce los rojos sin maquillarlos, mantiene credibilidad.
+const RESULTADOS_TAILS_GREAT = [
+  'Día verde fuerte. Lo lindo de un proyecto serio: no esconde nada y todavía rinde. 🔥',
+  'Cuando los números acompañan, la convicción crece. Método > suerte. Historial público para verlo. 🟢',
+  'Días así justifican mantener disciplina cuando vienen los flojos. El historial completo está, sin filtros. 🔥',
+  'Acierto alto + transparencia total. Esa es la diferencia entre un proyecto y un tipster con capturas elegidas. 🟢',
+  'La IA agarra ritmo. Recordatorio: el historial está completo, ganados y perdidos, todo público. 🚀',
+  'Verde para arriba. Pero la métrica que importa es el promedio en 100 picks, no el de hoy. Igual disfrutamos. 🟢',
+];
+const RESULTADOS_TAILS_GOOD = [
+  'Sin maquillar nada: el historial completo, aciertos y fallos, está público. 🟢',
+  'Día decente. Lo importante: cero capturas elegidas, todo el track record público. 🟢',
+  'Acertamos lo necesario. Nos importa más el largo plazo que el día a día — historial sin filtros. 🟢',
+  'Saldo positivo, sin festejar de más. El método funciona cuando lo respetás todos los días. 🟢',
+  'Mas verde que rojo, lo cual ya es bueno. Como siempre: nada se esconde, todo está en el historial. 🟢',
+];
+const RESULTADOS_TAILS_NEUTRAL = [
+  'Día parejo, sin grandes ganancias ni pérdidas. Bien para no romper la banca. Historial entero público. 🟡',
+  'Raspamos. Pasa. Lo que no negociamos: mostrar todo, lo bueno y lo malo. 🟢',
+  'Día tibio. La diferencia con los tipsters tradicionales: nosotros no maquillamos esto. 🟢',
+  'No hubo magia hoy. Tampoco hace falta — lo importante es que el historial completo está visible. 🟡',
+];
+const RESULTADOS_TAILS_BAD = [
+  'Día rojo. No vamos a esconderlo. Como siempre, está todo público — el método se mide en cientos de picks, no en uno solo.',
+  'Mala racha. Lo único que cambia es que NOSOTROS lo decimos antes de que vos lo notes. Historial entero a la vista.',
+  'Día flojo. Si nunca te muestro un día así es porque te miento. Todo el historial está, sin filtros.',
+  'Hoy perdimos. Mañana puede mejorar o empeorar. Lo único constante: no escondemos nada. 🔴',
+  'Cayó. Pasa. Lo importante es no triplicar stake para "recuperar" — disciplina sobre emoción. Historial visible.',
+  'Día rojo, sin excusas. Si querés un tipster que solo te cuente los aciertos, ese no soy yo. 🔴',
+];
+function pickResultadosTail(wins, total) {
+  const rate = total > 0 ? wins / total : 0;
+  let pool;
+  if      (rate >= 0.66 && total >= 3) pool = RESULTADOS_TAILS_GREAT;
+  else if (rate >= 0.50)               pool = RESULTADOS_TAILS_GOOD;
+  else if (rate >= 0.40)               pool = RESULTADOS_TAILS_NEUTRAL;
+  else                                  pool = RESULTADOS_TAILS_BAD;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+const RESULTADOS_CARD_FOOTERS_GREAT = [
+  'Dia verde — todo publico igual',
+  'Acerto fuerte. Historial completo a la vista',
+  'Cuando rinde, mejor — pero el historial sigue publico igual',
+];
+const RESULTADOS_CARD_FOOTERS_GOOD = [
+  'Historial completo y publico — aciertos y fallos, sin maquillar nada',
+  'Track record completo — todo visible, lo bueno y lo malo',
+  'Sin filtros, sin capturas elegidas — todo el historial publico',
+];
+const RESULTADOS_CARD_FOOTERS_NEUTRAL = [
+  'Dia parejo — historial completo publico igual',
+  'Raspamos. Como siempre: nada se esconde',
+];
+const RESULTADOS_CARD_FOOTERS_BAD = [
+  'Dia rojo. Lo decimos nosotros, no lo escondemos',
+  'Mala racha — pero el historial sigue publico, sin maquillar',
+  'Hoy perdimos. No vamos a esconderlo',
+];
+function pickResultadosCardFooter(wins, total) {
+  const rate = total > 0 ? wins / total : 0;
+  let pool;
+  if      (rate >= 0.66 && total >= 3) pool = RESULTADOS_CARD_FOOTERS_GREAT;
+  else if (rate >= 0.50)               pool = RESULTADOS_CARD_FOOTERS_GOOD;
+  else if (rate >= 0.40)               pool = RESULTADOS_CARD_FOOTERS_NEUTRAL;
+  else                                  pool = RESULTADOS_CARD_FOOTERS_BAD;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
 // Resultados resueltos de ayer/hoy (compartido entre el texto y la placa)
 function yesterdayResults(hist) {
   const today = todayART();
@@ -753,8 +826,7 @@ function genResultados(hist) {
   if (!done.length) return null;
   const wins = done.filter(h => h.result === 'win').length;
   const head = '📊 Cómo le fue a la IA\n\n';
-  const tail = `\n\n${wins} de ${done.length}. Sin maquillar nada: el historial ` +
-               'completo, aciertos y fallos, está público. 🟢';
+  const tail = `\n\n${wins} de ${done.length}. ${pickResultadosTail(wins, done.length)}`;
   const lines = done.slice(0, 5).map(h =>
     `${h.result === 'win' ? '✅' : '❌'} ${h.home} vs ${h.away}` +
     (h.finalScore ? ` (${h.finalScore})` : ''));
