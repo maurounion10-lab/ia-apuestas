@@ -9876,7 +9876,7 @@ function buildPredsFromOdds() {
     const probX2 = probA + probD;
     const odds1X = (hO > 0 && dO > 0) ? +((hO * dO) / (hO + dO)).toFixed(2) : null;
     const oddsX2 = (aO > 0 && dO > 0) ? +((aO * dO) / (aO + dO)).toFixed(2) : null;
-    const MIN_DO_ODDS = 1.25;
+    const MIN_DO_ODDS = 1.40;  // 🔧 (28-may-2026) subido de 1.25 — picks a 1.05-1.25 no tienen valor real
 
     const candidates2 = [
       { rec: 'Gana ' + hN, prob: probH, odds: hOP, _recSide: 'home' },
@@ -9918,9 +9918,9 @@ function buildPredsFromOdds() {
       const _ovEntry = _cupCtx[_cupKey1] || _cupCtx[_cupKey2];
       if (_ovEntry && _ovEntry.prefer) {
         let _ovBest = null;
-        if (_ovEntry.prefer === '1x' && odds1X && odds1X >= 1.10) {
+        if (_ovEntry.prefer === '1x' && odds1X && odds1X >= 1.35) {  // 🔧 cuota mínima razonable
           _ovBest = { rec: 'Doble 1X', prob: prob1X, odds: odds1X, _recSide: '1x', _isDoubleChance: true, _cupOverride: true };
-        } else if (_ovEntry.prefer === 'x2' && oddsX2 && oddsX2 >= 1.10) {
+        } else if (_ovEntry.prefer === 'x2' && oddsX2 && oddsX2 >= 1.35) {  // 🔧 cuota mínima razonable
           _ovBest = { rec: 'Doble X2', prob: probX2, odds: oddsX2, _recSide: 'x2', _isDoubleChance: true, _cupOverride: true };
         } else if (_ovEntry.prefer === 'empate' && dOP) {
           _ovBest = { rec: 'Empate', prob: probD, odds: dOP, _recSide: 'draw', _cupOverride: true };
