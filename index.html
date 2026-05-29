@@ -5397,6 +5397,42 @@ window.toggleHeroBubble = function(n) {
 
 <main>
 
+  <!-- BANNER MUNDIAL 2026 — countdown dinámico -->
+  <section id="gbMundialBanner" style="background:linear-gradient(135deg,#1a3a1a 0%,#0d1f0d 100%);border-top:1px solid rgba(212,175,55,0.35);border-bottom:1px solid rgba(212,175,55,0.35);padding:18px 20px;text-align:center;position:relative;overflow:hidden;margin:0 0 4px">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(212,175,55,0.18) 0%,transparent 65%);pointer-events:none"></div>
+    <div style="position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,#d4af37 50%,transparent 100%);opacity:0.7"></div>
+    <div style="max-width:920px;margin:0 auto;position:relative;display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap">
+      <div style="font-size:2.4rem;filter:drop-shadow(0 2px 6px rgba(212,175,55,0.5))" class="gbMundialTrophy">🏆</div>
+      <div style="text-align:left;min-width:240px">
+        <div style="font-size:0.7rem;font-weight:800;letter-spacing:2.5px;color:#d4af37;text-transform:uppercase;margin-bottom:4px" class="gbMundialPulse">⚡ Próximamente</div>
+        <div style="font-size:1.2rem;font-weight:900;color:#fff;letter-spacing:-0.3px;line-height:1.2">Mundial 2026 · <span id="gbMundialDays" style="color:#d4af37">14</span> <span style="color:rgba(255,255,255,0.85)">días</span></div>
+        <div style="font-size:0.78rem;color:rgba(255,255,255,0.6);margin-top:4px;line-height:1.4">USA 🇺🇸 · Canadá 🇨🇦 · México 🇲🇽 — la IA se está preparando con picks especiales</div>
+      </div>
+    </div>
+  </section>
+  <style>
+    @keyframes gbMundialGlow { 0%,100% { opacity:0.55; text-shadow:none } 50% { opacity:1; text-shadow:0 0 12px rgba(212,175,55,0.6) } }
+    .gbMundialPulse { animation: gbMundialGlow 2.2s ease-in-out infinite; }
+    @keyframes gbMundialFloat { 0%,100% { transform:translateY(0) rotate(-3deg) } 50% { transform:translateY(-4px) rotate(3deg) } }
+    .gbMundialTrophy { display:inline-block; animation: gbMundialFloat 3.5s ease-in-out infinite; }
+  </style>
+  <script>
+  (function(){
+    var wcDate = new Date('2026-06-11T20:00:00Z'); // Inaugural: 11 de junio 2026
+    var el = document.getElementById('gbMundialDays');
+    if (!el) return;
+    function update() {
+      var diff = Math.max(0, Math.ceil((wcDate - Date.now()) / 86400000));
+      el.textContent = diff;
+      if (diff === 0) {
+        el.parentElement.innerHTML = 'Mundial 2026 <span style="color:#d4af37">EN VIVO</span> 🔥';
+      }
+    }
+    update();
+    setInterval(update, 60 * 60 * 1000); // refresh every hour
+  })();
+  </script>
+
   <!-- PREDICTIONS -->
   <section id="predictions">
     <div class="section-title">
