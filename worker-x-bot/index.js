@@ -734,11 +734,32 @@ function findWinByMatch(hist, matchStr) {
 }
 
 // Pilar 1 — Picks del día (texto)
+// 🆕 (28-may-2026) Header y tail rotables para no aburrir el algoritmo.
+const PICKS_HEADS = [
+  '🎯 Los picks de la IA para hoy\n\n',
+  '🔮 Picks frescos de la IA — hoy:\n\n',
+  '⚡ Lo que tira la IA para esta jornada:\n\n',
+  '🤖 Mientras vos dormías, la IA armó esto:\n\n',
+  '📡 Picks calientes del modelo — hoy:\n\n',
+  '🟢 La IA ya leyó los partidos. Tirada:\n\n',
+  '⚽ Hoy la IA marca estos partidos:\n\n',
+  '🎯 Pronósticos automáticos del día:\n\n',
+];
+const PICKS_TAILS = [
+  '\n\nMás picks gratis en el perfil 👇  ¿Le entran? 🟢',
+  '\n\nTodo el listado en gambeta.ai (gratis, sin VIP) 🟢',
+  '\n\n¿Le metés a alguna? Tirámela abajo 👇',
+  '\n\nHistorial completo y picks de mañana en el perfil 🟢',
+  '\n\nMás en el perfil — incluido el % de acierto del último mes 🟢',
+  '\n\nLo lindo: cero capturas elegidas, todo público 🟢',
+  '\n\nActivá la 🔔 — los picks ganadores se festejan acá 🟢',
+  '\n\n¿La IA acierta? Mirá el historial completo en gambeta.ai 🟢',
+];
 function genPicks(hist) {
   const picks = todayPendingPicks(hist);
   if (!picks.length) return null;
-  const head = '🎯 Los picks de la IA para hoy\n\n';
-  const tail = '\n\nMás picks gratis en el perfil 👇  ¿Le entran? 🟢';
+  const head = PICKS_HEADS[Math.floor(Math.random() * PICKS_HEADS.length)];
+  const tail = PICKS_TAILS[Math.floor(Math.random() * PICKS_TAILS.length)];
   const lines = [`⭐ ${picks[0].home} vs ${picks[0].away} → ${picks[0].rec}`];
   for (let i = 1; i < picks.length && i < 4; i++) {
     lines.push(`▪️ ${picks[i].home} vs ${picks[i].away} → ${picks[i].rec}`);
@@ -831,11 +852,21 @@ function yesterdayResults(hist) {
 }
 
 // Pilar 2 — Resultados
+// 🆕 (28-may-2026) Header rotable también — el bot empezaba siempre con 📊 Cómo le fue.
+const RESULTADOS_HEADS = [
+  '📊 Cómo le fue a la IA\n\n',
+  '🟢 Resultados de los picks\n\n',
+  '📋 Picks resueltos\n\n',
+  '📡 Lo que dijo la IA · lo que pasó\n\n',
+  '⚡ Update de la jornada\n\n',
+  '🎯 Aciertos y fallos del día\n\n',
+  '📊 Veredicto de la jornada\n\n',
+];
 function genResultados(hist) {
   const done = yesterdayResults(hist);
   if (!done.length) return null;
   const wins = done.filter(h => h.result === 'win').length;
-  const head = '📊 Cómo le fue a la IA\n\n';
+  const head = RESULTADOS_HEADS[Math.floor(Math.random() * RESULTADOS_HEADS.length)];
   const tail = `\n\n${wins} de ${done.length}. ${pickResultadosTail(wins, done.length)}`;
   const lines = done.slice(0, 5).map(h =>
     `${h.result === 'win' ? '✅' : '❌'} ${h.home} vs ${h.away}` +
@@ -866,6 +897,29 @@ const EDU_POOL = [
   '💡 Apostar con cabeza es aburrido y funciona. Apostar con el corazón ' +
   'es divertido y funde.\n\nLa IA elige lo primero, siempre. ' +
   'Y solo se apuesta lo que uno se puede permitir perder.',
+  // 🆕 (28-may-2026) Variantes nuevas con hook más punchy
+  '🚨 Cuota 1.50 NO es "casi seguro". Es 67% — significa que 1 de cada 3 ' +
+  'partidos así, perdés.\n\nLas cuotas son probabilidades disfrazadas. ' +
+  'La IA traduce eso 24/7 para vos.',
+  '💸 El que apuesta para "recuperar lo perdido" pierde dos veces.\n\n' +
+  'Stake fijo, criterio frío. La IA nunca duplica para recuperar — ' +
+  'porque la racha no existe, lo que existe son las cuotas mal calibradas.',
+  '🎯 Lo que mira la IA en cada partido (en 3 segundos):\n\n' +
+  '1. Cuotas de 30+ casas — busca outliers\n' +
+  '2. Forma últimos 5 partidos por superficie\n' +
+  '3. Localía + viaje + descanso\n4. xG vs xGA\n\n' +
+  'Vos no podés competir con eso. Yo sí. 🤖',
+  '🧮 Apuestas que valen, según matemática:\n\n' +
+  '• Cuota implícita < cuota real → SÍ\n' +
+  '• Cuota implícita > cuota real → NO\n\n' +
+  'El resto es ruido. La IA solo postea las del primer grupo.',
+  '⚠️ Si un tipster te muestra solo aciertos, no es buen tipster — es ' +
+  'buen editor de fotos.\n\nLa IA de Gambeta muestra todo: ' +
+  'aciertos y fallos. Eso se llama método.',
+  '🎲 La banca crece despacio, los pozos se pierden rápido.\n\n' +
+  'Una cuenta seria apuesta el 1-3% por pick. La IA va por ahí siempre.',
+  '📚 "Esta es la fija" no existe. Solo existen cuotas con valor positivo.\n\n' +
+  'La IA no te promete que vas a ganar. Te dice cuándo el mercado se equivocó.'
 
 
   '🎯 El % de aciertos no te dice si ganas plata.\n\n' +
@@ -978,6 +1032,20 @@ const COM_POOL = [
 
   '🎉 ¿Cual es la mayor ganada que recordas?\n\nDecimela abajo 👇 — bonus si ' +
   'pones la cuota.',
+  // 🆕 (28-may-2026) Más engagement-bait con flair argentino
+  '👀 Pregunta para los que apuestan hace tiempo:\n\n' +
+  '¿Cuál fue la PEOR cuota que perdiste? Esas que pagaban algo ridículo.\n\n' +
+  'Yo arranco: una de 1.05. Pasó lo imposible.',
+  '🟢 ¿Vos cuanto apostás por pick?\n\n' +
+  '— Menos de mil\n— Mil a cinco mil\n— Más de cinco mil\n— Depende del partido\n\n' +
+  'La IA va con stake fijo. Disciplina antes que emoción.',
+  '⚡ Tirame un equipo argentino y te paso la lectura de la IA para su próximo partido.\n\n' +
+  'Respondo a todos abajo 👇',
+  '😬 La pregunta incómoda:\n\n' +
+  '¿Cuánto perdiste en lo que va del año en apuestas?\n\n' +
+  'Sin juzgar. La IA tampoco gana siempre — gana en el promedio.',
+  '🎯 Cuotas más raras que viste pagar:\n\n' +
+  'Mostrame la mejor que cobraste — y la peor que perdiste. Sumo las mías abajo. 👇'
 
   '🤔 ¿Equipo del que dejaste de apostar y por que?\n\nTodos tenemos uno. ' +
   'Hablen 👇',
