@@ -9959,9 +9959,9 @@ function buildPredsFromOdds() {
       const _ovEntry = _cupCtx[_cupKey1] || _cupCtx[_cupKey2];
       if (_ovEntry && _ovEntry.prefer) {
         let _ovBest = null;
-        if (_ovEntry.prefer === '1x' && odds1X && odds1X >= 1.35) {  // 🔧 cuota mínima razonable
+        if (_ovEntry.prefer === '1x' && odds1X && odds1X >= 1.35) {
           _ovBest = { rec: 'Doble 1X', prob: prob1X, odds: odds1X, _recSide: '1x', _isDoubleChance: true, _cupOverride: true };
-        } else if (_ovEntry.prefer === 'x2' && oddsX2 && oddsX2 >= 1.35) {  // 🔧 cuota mínima razonable
+        } else if (_ovEntry.prefer === 'x2' && oddsX2 && oddsX2 >= 1.35) {
           _ovBest = { rec: 'Doble X2', prob: probX2, odds: oddsX2, _recSide: 'x2', _isDoubleChance: true, _cupOverride: true };
         } else if (_ovEntry.prefer === 'empate' && dOP) {
           _ovBest = { rec: 'Empate', prob: probD, odds: dOP, _recSide: 'draw', _cupOverride: true };
@@ -9972,6 +9972,33 @@ function buildPredsFromOdds() {
         }
       }
     } catch (e) { /* override es best-effort, no rompe */ }
+
+    // 🆕 (29-may-2026) LEAGUE CONTEXT — asimetría de motivación en ligas regulares.
+    //    Si el modelo quiere apostar a favor de un equipo que 'no se juega nada' (Monza-style),
+    //    descartamos ese pick y dejamos que el candidato siguiente tome el lugar.
+    try {
+      const _lgCtx = window._leagueContext || {};
+      const _lgKey1 = `${g.home_team}|${g.away_team}`;
+      const _lgKey2 = `${hN}|${aN}`;
+      const _lgEntry = _lgCtx[_lgKey1] || _lgCtx[_lgKey2];
+      if (_lgEntry && _lgEntry.prefer) {
+        const _side = best._recSide;
+        const _isHomeFavor = (_side === 'home' || _side === '1x');
+        const _isAwayFavor = (_side === 'away' || _side === 'x2');
+        if (_lgEntry.prefer === 'avoid_home' && _isHomeFavor) {
+          console.log(`[league-ctx] Skip: ${g.home_team} vs ${g.away_team} → avoid_home (${_lgEntry.reason})`);
+          // Buscar candidato alternativo que NO sea a favor del local
+          const _alt = candidates2.find(c => c._recSide !== 'home' && c._recSide !== '1x' && c !== best);
+          if (_alt) { best = _alt; }
+          else return null; // sin alternativa razonable, descartar partido
+        } else if (_lgEntry.prefer === 'avoid_away' && _isAwayFavor) {
+          console.log(`[league-ctx] Skip: ${g.home_team} vs ${g.away_team} → avoid_away (${_lgEntry.reason})`);
+          const _alt = candidates2.find(c => c._recSide !== 'away' && c._recSide !== 'x2' && c !== best);
+          if (_alt) { best = _alt; }
+          else return null;
+        }
+      }
+    } catch (e) { /* league override best-effort */ }
 
     const rec      = best.rec;
     const maxProb  = best.prob || probH;
@@ -15116,6 +15143,31 @@ const WORKER_URL = 'https://apuestas-api.mauro-union10.workers.dev';
       }
     })
     .catch(e => console.log('[cup-ctx] fetch err:', e && e.message));
+})();
+
+// 🆕 (29-may-2026) League context UNIVERSAL — detecta asimetría de motivación
+// (equipo sin nada en juego vs equipo jugándose la vida) en ligas regulares (no solo cup).
+(function loadLeagueContext() {
+  try {
+    const cached = localStorage.getItem('gb_league_ctx_v1');
+    if (cached) {
+      const obj = JSON.parse(cached);
+      if (obj && obj.ts && (Date.now() - obj.ts) < 12 * 3600 * 1000) {
+        window._leagueContext = obj.data || {};
+      }
+    }
+  } catch (e) {}
+  fetch(WORKER_URL + '/league-context', { cache: 'default' })
+    .then(r => r.ok ? r.json() : null)
+    .then(data => {
+      if (data && typeof data === 'object') {
+        window._leagueContext = data;
+        try { localStorage.setItem('gb_league_ctx_v1', JSON.stringify({ ts: Date.now(), data: data })); } catch(e) {}
+        const n = Object.keys(data).length;
+        if (n > 0) console.log(`[league-ctx] ${n} asimetría(s) de motivación detectadas.`);
+      }
+    })
+    .catch(e => console.log('[league-ctx] fetch err:', e && e.message));
 })();
 
 

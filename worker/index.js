@@ -192,6 +192,126 @@ async function computeCupContext(env) {
   return result;
 }
 
+// ── 🆕 (29-may-2026) /league-context UNIVERSAL — extiende cup-context a ligas regulares ──
+//    Detecta asimetría de motivación: equipo sin nada en juego (clasificado/descendido/medio sin riesgo)
+//    vs equipo jugándose la vida. Cuando la asimetría existe, el modelo debería evitar apostar
+//    a favor del 'sin motivación' (puede perder relajado, ejemplo Monza 0-2 ante Catanzaro).
+//    Output igual que cup-context: { 'home|away': { prefer: '1x'|'x2'|'empate'|'avoid_home'|'avoid_away', reason, league } }
+
+const LEAGUE_CONTEXT_CONFIG = [
+  // Ligas europeas grandes — temporada 2025-26 (API season=2025), termina mayo-jun
+  { id: 39,  name: 'Premier League',     season: 2025, topZone: 5, dropZone: 3, sportKey: 'soccer_epl' },
+  { id: 140, name: 'La Liga',            season: 2025, topZone: 5, dropZone: 3, sportKey: 'soccer_spain_la_liga' },
+  { id: 135, name: 'Serie A',            season: 2025, topZone: 5, dropZone: 3, sportKey: 'soccer_italy_serie_a' },
+  { id: 78,  name: 'Bundesliga',         season: 2025, topZone: 5, dropZone: 3, sportKey: 'soccer_germany_bundesliga' },
+  { id: 61,  name: 'Ligue 1',            season: 2025, topZone: 4, dropZone: 3, sportKey: 'soccer_france_ligue_one' },
+  { id: 88,  name: 'Eredivisie',         season: 2025, topZone: 4, dropZone: 2, sportKey: 'soccer_netherlands_eredivisie' },
+  { id: 94,  name: 'Primeira Liga',      season: 2025, topZone: 4, dropZone: 2, sportKey: 'soccer_portugal_primeira_liga' },
+  { id: 203, name: 'Süper Lig',          season: 2025, topZone: 4, dropZone: 3, sportKey: 'soccer_turkey_super_league' },
+  // 2ª divisiones europeas (top zone = promoción)
+  { id: 40,  name: 'Championship',       season: 2025, topZone: 2, dropZone: 3, sportKey: 'soccer_england_championship' },
+  { id: 79,  name: '2. Bundesliga',      season: 2025, topZone: 2, dropZone: 3, sportKey: 'soccer_germany_bundesliga2' },
+  { id: 136, name: 'Serie B',            season: 2025, topZone: 2, dropZone: 3, sportKey: 'soccer_italy_serie_b' },
+  { id: 141, name: 'Segunda División',   season: 2025, topZone: 2, dropZone: 3, sportKey: 'soccer_spain_segunda_division' },
+  { id: 62,  name: 'Ligue 2',            season: 2025, topZone: 2, dropZone: 3, sportKey: 'soccer_france_ligue_two' },
+  // Sudamerica (calendar year season=2026)
+  { id: 128, name: 'Liga Argentina',     season: 2026, topZone: 4, dropZone: 4, sportKey: 'soccer_argentina_primera_division' },
+  { id: 71,  name: 'Brasileirão',        season: 2026, topZone: 6, dropZone: 4, sportKey: 'soccer_brazil_campeonato' },
+];
+
+// Clasifica el estado de motivación de un equipo dado standings
+function classifyMotivation(team, totalTeams, remaining, topZone, dropZone) {
+  const pts = team.points;
+  const rank = team.rank;
+  const maxFuture = pts + 3 * remaining; // si gana todos los restantes
+  const minFuture = pts;                  // si pierde todos
+  // Aprox: posición final si gana todo / si pierde todo. Heurística — no es exacta porque
+  // depende de qué hacen los demás, pero captura el caso "asegurado" en la mayoría.
+  // 'CLINCHED_TOP' — incluso si pierde todo, queda en zona top
+  // 'CLINCHED_BOTTOM' — incluso si gana todo, no escapa la zona descenso
+  // 'FIGHTING_TOP' — gana todo y entra a top
+  // 'FIGHTING_BOTTOM' — pierde todo y cae a zona descenso
+  // 'MID_NO_STAKES' — entre top y descenso, sin chance arriba ni riesgo abajo
+  if (rank <= topZone && remaining === 0) return 'CLINCHED_TOP';
+  if (rank > totalTeams - dropZone && remaining === 0) return 'CLINCHED_BOTTOM';
+  // Estimación post-jornada actual
+  if (rank <= topZone && remaining <= 3) {
+    // Si lidera con margen
+    return 'FIGHTING_TOP'; // siempre tiene motivación
+  }
+  if (rank > totalTeams - dropZone - 2 && remaining <= 5) return 'FIGHTING_BOTTOM';
+  if (rank > topZone + 1 && rank <= totalTeams - dropZone - 1 && remaining <= 3) return 'MID_NO_STAKES';
+  return 'MOTIVATED'; // default: hay motivación normal
+}
+
+async function computeLeagueContext(env) {
+  const result = {};
+  for (const lg of LEAGUE_CONTEXT_CONFIG) {
+    let standings = null, fixtures = null, totalTeams = 0;
+    try {
+      const stReq = await apf(`/standings?league=${lg.id}&season=${lg.season}`, env);
+      const leagues = stReq.response;
+      if (!leagues || !leagues[0]) { console.log(`[league-ctx] ${lg.name}: sin standings`); continue; }
+      const groups = leagues[0].league.standings;
+      if (!groups || !groups[0]) continue;
+      standings = groups[0]; // liga regular: 1 sola tabla
+      totalTeams = standings.length;
+    } catch (e) { console.error(`[league-ctx] standings ${lg.name}:`, e.message); continue; }
+
+    try {
+      const fxReq = await apf(`/fixtures?league=${lg.id}&season=${lg.season}&next=20`, env);
+      fixtures = fxReq.response || [];
+    } catch (e) { console.error(`[league-ctx] fixtures ${lg.name}:`, e.message); continue; }
+
+    if (!fixtures.length) continue;
+
+    // Estimar fechas restantes: promedio de played en todos los equipos
+    const playedAvg = standings.reduce((s, t) => s + (t.all?.played || 0), 0) / standings.length;
+    // En liga regular cada equipo juega (totalTeams-1)*2 partidos
+    const totalMatches = (totalTeams - 1) * 2;
+    const remainingMatches = Math.max(0, Math.round(totalMatches - playedAvg));
+
+    for (const fx of fixtures) {
+      const homeId = fx.teams?.home?.id;
+      const awayId = fx.teams?.away?.id;
+      const homeName = fx.teams?.home?.name;
+      const awayName = fx.teams?.away?.name;
+      if (!homeId || !awayId || !homeName || !awayName) continue;
+
+      const homeStand = standings.find(t => t.team.id === homeId);
+      const awayStand = standings.find(t => t.team.id === awayId);
+      if (!homeStand || !awayStand) continue;
+
+      const homeMot = classifyMotivation(homeStand, totalTeams, remainingMatches, lg.topZone, lg.dropZone);
+      const awayMot = classifyMotivation(awayStand, totalTeams, remainingMatches, lg.topZone, lg.dropZone);
+
+      // ASIMETRÍA: uno juega por algo, el otro no
+      const motivated = new Set(['FIGHTING_TOP', 'FIGHTING_BOTTOM']);
+      const noStakes  = new Set(['MID_NO_STAKES', 'CLINCHED_TOP', 'CLINCHED_BOTTOM']);
+
+      let prefer = null, reason = null;
+
+      if (noStakes.has(homeMot) && motivated.has(awayMot)) {
+        // Home sin motivación, away se juega la vida → el modelo no debería apostar a favor de home
+        prefer = 'avoid_home';
+        reason = `${homeName} no se juega nada (${homeMot}); ${awayName} sí (${awayMot}). Evitar pick a favor del local relajado.`;
+      } else if (noStakes.has(awayMot) && motivated.has(homeMot)) {
+        prefer = 'avoid_away';
+        reason = `${awayName} no se juega nada (${awayMot}); ${homeName} sí (${homeMot}). Evitar pick a favor del visitante relajado.`;
+      }
+
+      if (prefer) {
+        result[`${homeName}|${awayName}`] = {
+          prefer, reason, league: lg.name, sportKey: lg.sportKey,
+          fixtureId: fx.fixture.id,
+          homeMot, awayMot, remainingMatches
+        };
+      }
+    }
+  }
+  return result;
+}
+
 // ── API-Football fetch helper ────────────────────────────────────────────────
 async function apf(path, env) {
   const key = env.API_FOOTBALL_KEY;
@@ -1088,6 +1208,13 @@ export default {
     if (path === '/cup-context') {
       const cacheKey = `cup_context_v1_${new Date().toISOString().slice(0,10)}`; // refresh daily
       const ctx = await cached(env, cacheKey, 21600, () => computeCupContext(env)); // 6h TTL within day
+      return new Response(JSON.stringify(ctx || {}), { headers: CORS });
+    }
+
+    // ── 🆕 /league-context (universal — detecta asimetría de motivación en ligas regulares) ──
+    if (path === '/league-context') {
+      const cacheKey = `league_context_v1_${new Date().toISOString().slice(0,10)}`;
+      const ctx = await cached(env, cacheKey, 43200, () => computeLeagueContext(env)); // 12h TTL
       return new Response(JSON.stringify(ctx || {}), { headers: CORS });
     }
 
