@@ -665,7 +665,17 @@ async function renderCardForSlot(slot, hist, text, pickOverride) {
     const [fH, fA] = await teamFormPair(p, hU, aU);
     return renderHotTakeCardPng(p, hU, aU, fH, fA);
   }
-  // educacion / comunidad: sin placa — el tweet ya es texto, una placa de texto no aporta.
+  // 🆕 (28-may-2026) Educacion / comunidad: ANTES se posteaba sin placa porque
+  // pensábamos que una placa de texto no aporta. La data prueba lo contrario:
+  // tweets con imagen sacan ~400 views, sin imagen ~218. Generamos placa branded.
+  if (slot === 'educacion') {
+    if (!text) return null;
+    return renderGenericCardPng('EDUCACIÓN', cardHeadline(text));
+  }
+  if (slot === 'comunidad') {
+    if (!text) return null;
+    return renderGenericCardPng('HABLEMOS', cardHeadline(text));
+  }
   return null;
 }
 
