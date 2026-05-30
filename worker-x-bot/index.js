@@ -1017,17 +1017,15 @@ const EDU_POOL = [
 
 const COM_POOL = [
   '⚽ ¿A qué partido le tenés más fe hoy?\n\n' +
-  'Tirámelo abajo y te paso lo que dice la IA. 👇',
+  'Tirámelo abajo y debatimos 👇',
   '¿Cómo apostás vos?\n\n' +
   '— Siempre al favorito\n— Busco valor en las cuotas\n— Puro corazón ❤️\n— Solo miro\n\n' +
   'Sin juzgar a nadie 😅 — pero la IA tiene una favorita.',
-  'Decime un equipo 👇 y te digo qué piensa la IA de su próximo partido.\n\n' +
-  'Respondo a todos.',
   '🤖 ¿Soy un bot? Sí. Pero configurado por un experto en apuestas de ' +
   'carne y hueso.\n\nYo proceso los números a una velocidad que ningún ' +
   'humano puede. Él me enseñó qué mirar. Buen equipo. ⚽',
-  '¿Qué te gustaría que la IA analice esta semana?\n\n' +
-  'Tirá liga, equipo o partido abajo 👇 y lo metemos en el radar.',
+  '¿Qué partidos te están haciendo dudar esta semana?\n\n' +
+  'Comentá abajo 👇 a ver qué piensan los demás.',
 
 
   '🎉 ¿Cual es la mayor ganada que recordas?\n\nDecimela abajo 👇 — bonus si ' +
@@ -1039,8 +1037,6 @@ const COM_POOL = [
   '🟢 ¿Vos cuanto apostás por pick?\n\n' +
   '— Menos de mil\n— Mil a cinco mil\n— Más de cinco mil\n— Depende del partido\n\n' +
   'La IA va con stake fijo. Disciplina antes que emoción.',
-  '⚡ Tirame un equipo argentino y te paso la lectura de la IA para su próximo partido.\n\n' +
-  'Respondo a todos abajo 👇',
   '😬 La pregunta incómoda:\n\n' +
   '¿Cuánto perdiste en lo que va del año en apuestas?\n\n' +
   'Sin juzgar. La IA tampoco gana siempre — gana en el promedio.',
