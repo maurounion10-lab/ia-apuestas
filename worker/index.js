@@ -1218,6 +1218,42 @@ export default {
       return new Response(JSON.stringify(ctx || {}), { headers: CORS });
     }
 
+    // ── Debug: pull raw standings + motivacion classification para 1 liga ──
+    if (path === '/league-context-debug') {
+      const leagueIdParam = url.searchParams.get('league') || '136'; // Serie B Italia default
+      const seasonParam   = url.searchParams.get('season') || '2025';
+      const cfg = LEAGUE_CONTEXT_CONFIG.find(c => String(c.id) === String(leagueIdParam))
+                  || { id: parseInt(leagueIdParam), name: 'Custom', season: parseInt(seasonParam), topZone: 4, dropZone: 3 };
+      try {
+        const stReq = await apf(`/standings?league=${cfg.id}&season=${cfg.season}`, env);
+        const fxReq = await apf(`/fixtures?league=${cfg.id}&season=${cfg.season}&next=10`, env);
+        const standings = stReq.response?.[0]?.league?.standings?.[0] || [];
+        const fixtures = fxReq.response || [];
+        const totalTeams = standings.length;
+        const playedAvg = standings.reduce((s, t) => s + (t.all?.played || 0), 0) / Math.max(1, standings.length);
+        const totalMatches = (totalTeams - 1) * 2;
+        const remainingMatches = Math.max(0, Math.round(totalMatches - playedAvg));
+        const teamsWithMot = standings.map(t => ({
+          rank: t.rank, name: t.team?.name, pts: t.points, played: t.all?.played,
+          motivation: classifyMotivation(t, totalTeams, remainingMatches, cfg.topZone, cfg.dropZone)
+        }));
+        const sampleFx = fixtures.slice(0, 5).map(fx => ({
+          date: fx.fixture?.date,
+          home: fx.teams?.home?.name,
+          away: fx.teams?.away?.name,
+          homeStandingFound: !!standings.find(t => t.team.id === fx.teams?.home?.id),
+          awayStandingFound: !!standings.find(t => t.team.id === fx.teams?.away?.id)
+        }));
+        return new Response(JSON.stringify({
+          config: cfg, totalTeams, playedAvg, remainingMatches,
+          standings_count: standings.length, fixtures_count: fixtures.length,
+          standings: teamsWithMot, sample_fixtures: sampleFx
+        }, null, 2), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message, config: cfg }), { headers: CORS });
+      }
+    }
+
     // ── /odds ────────────────────────────────────────────────────────────────
     if (path === '/odds') {
       const category = url.searchParams.get('category') || 'main';
