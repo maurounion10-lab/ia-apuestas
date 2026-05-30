@@ -10041,6 +10041,60 @@ function buildPredsFromOdds() {
     //    Solo se publica si conf=high con BVR≥5. Si el mejor candidato es Gana Local y no llega, descartamos el partido.
     if (best._recSide === 'home' && bvr < 5) return null;
 
+    // 🆕 (29-may-2026) PARCHE FIN-DE-TEMPORADA — protege contra "asimetría de motivación".
+    //    Caso Monza vs Catanzaro (Serie B Italia, mayo): Monza ya ascendido jugaba relajado y perdió 0-2.
+    //    Caso Cienciano vs Juventud (Sudamericana, mayo): Cienciano clasificaba con empate y empató.
+    //    El modelo no entiende contexto de tabla. En fin de temporada hay equipos sin nada en juego
+    //    + equipos jugándose la vida. Esa asimetría rompe la lectura de probabilidad pura.
+    //    Mientras /league-context universal no esté listo, parche temporal por mes/liga:
+    //      • Bloquear Doble Oportunidad completamente
+    //      • Exigir BVR=6 (Máxima) para "Gana Local/Visitante"
+    //      • Empate y Over/Under se mantienen (no dependen tanto de motivación)
+    const SEASON_END_EUROPEAN = new Set([
+      'soccer_italy_serie_a', 'soccer_italy_serie_b',
+      'soccer_spain_la_liga', 'soccer_spain_segunda_division',
+      'soccer_germany_bundesliga', 'soccer_germany_bundesliga2',
+      'soccer_epl', 'soccer_england_efl_championship', 'soccer_england_league1',
+      'soccer_france_ligue_one', 'soccer_france_ligue_two',
+      'soccer_netherlands_eredivisie', 'soccer_belgium_first_div_a', 'soccer_belgium_first_div',
+      'soccer_scotland_premiership',
+      'soccer_austria_bundesliga', 'soccer_austria_football_bundesliga',
+      'soccer_switzerland_superleague',
+      'soccer_denmark_superliga',
+      'soccer_poland_ekstraklasa',
+      'soccer_czech_liga', 'soccer_czech_republic_first_league',
+      'soccer_romania_liga1',
+      'soccer_greece_super_league',
+      'soccer_turkey_super_league',
+      'soccer_portugal_primeira_liga',
+    ]);
+    const SEASON_END_SPRING = new Set([
+      'soccer_sweden_allsvenskan',
+      'soccer_norway_eliteserien',
+      'soccer_russia_premier_league',
+      'soccer_usa_mls',
+      'soccer_south_korea_kleague1',
+      'soccer_australia_aleague', 'soccer_australia_a_league',
+    ]);
+    const SEASON_END_SUDAMERICA = new Set([
+      'soccer_argentina_primera_division',
+      'soccer_brazil_campeonato', 'soccer_brazil_serie_b',
+    ]);
+    function _isLikelyEndOfSeason(sk, ts) {
+      if (!sk || !ts) return false;
+      const m = new Date(ts).getUTCMonth(); // 0=ene, 4=mayo, 5=junio, 9=oct, 10=nov
+      if (SEASON_END_EUROPEAN.has(sk))    return m === 4 || m === 5;        // mayo-junio
+      if (SEASON_END_SPRING.has(sk))      return m === 9 || m === 10;        // oct-nov (temp jul-nov)
+      if (SEASON_END_SUDAMERICA.has(sk))  return m === 10 || m === 11;       // nov-dic
+      return false;
+    }
+    if (_isLikelyEndOfSeason(g.sport_key, g.commence_time)) {
+      // Doble Oportunidad: bloqueada — la asimetría de motivación la mata.
+      if (best._isDoubleChance) return null;
+      // Gana Local/Visitante: solo si BVR=6 (Máxima). Cualquier otra cosa, fuera.
+      if ((best._recSide === 'home' || best._recSide === 'away') && bvr < 6) return null;
+    }
+
     // Cuotas formateadas
     const fmtO = v => v != null ? ` (cuota ${parseFloat(v).toFixed(2)})` : '';
     const oddsPills = [];
