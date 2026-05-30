@@ -1218,6 +1218,17 @@ export default {
       return new Response(JSON.stringify(ctx || {}), { headers: CORS });
     }
 
+    // ── Raw passthrough debug ──
+    if (path === '/apf-raw') {
+      const apfPath = url.searchParams.get('path') || '/standings?league=136&season=2025';
+      try {
+        const r = await apf(apfPath, env);
+        return new Response(JSON.stringify(r, null, 2).slice(0, 5000), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { headers: CORS });
+      }
+    }
+
     // ── Debug: pull raw standings + motivacion classification para 1 liga ──
     if (path === '/league-context-debug') {
       const leagueIdParam = url.searchParams.get('league') || '136'; // Serie B Italia default
