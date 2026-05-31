@@ -825,11 +825,36 @@ const MANUAL_SCORES = {
 };
 
 // Match fuzzy entre dos nombres de equipo (mismo equipo, distintas variantes)
+// Aliases para resolver matches API-Football vs nombres del Odds API
+const TEAM_ALIASES_RESOLVER = {
+  'psg': 'paris saint germain',
+  'paris saint germain': 'psg',
+  'paris sg': 'paris saint germain',
+  'man utd': 'manchester united',
+  'man united': 'manchester united',
+  'man city': 'manchester city',
+  'atm': 'atletico madrid',
+  'atletico de madrid': 'atletico madrid',
+  'inter': 'inter milan',
+  'inter milano': 'inter milan',
+  'milan': 'ac milan',
+  'real betis': 'betis',
+  'olimpique marseille': 'marseille',
+  'om': 'marseille',
+  'ol': 'lyon',
+  'olympique lyon': 'lyon',
+  'olympique lyonnais': 'lyon',
+};
+
 function teamsMatch(a, b) {
   if (!a || !b) return false;
   const na = normTeam(a), nb = normTeam(b);
   if (!na || !nb) return false;
   if (na === nb) return true;
+  // Aliases: si a o b están en el dict, probar la expansión
+  if (TEAM_ALIASES_RESOLVER[na] === nb || TEAM_ALIASES_RESOLVER[nb] === na) return true;
+  if (TEAM_ALIASES_RESOLVER[na] && nb.includes(TEAM_ALIASES_RESOLVER[na])) return true;
+  if (TEAM_ALIASES_RESOLVER[nb] && na.includes(TEAM_ALIASES_RESOLVER[nb])) return true;
   if (na.includes(nb) || nb.includes(na)) return true;
   // Strip suffixes comunes (fc, sc, etc, plural 's') y prefijo 'st' vs 'saint' / 'ac' etc
   const expand = s => s.replace(/^st(?=[a-z])/, 'saint').replace(/^saint(?=[a-z])/, 'saint');
