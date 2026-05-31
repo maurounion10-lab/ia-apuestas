@@ -1699,6 +1699,20 @@ export default {
       }), { headers: CORS });
     }
 
+    // ── 🆕 /escudos-known-init — inicializa KV con lista de equipos conocidos ──
+    if (path === '/escudos-known-init' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        if (!Array.isArray(body)) {
+          return new Response(JSON.stringify({ error: 'body debe ser array' }), { status: 400, headers: CORS });
+        }
+        await env.CACHE_KV.put('escudos_known_v1', JSON.stringify(body));
+        return new Response(JSON.stringify({ ok: true, count: body.length }), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
     // ── 🆕 /check-escudos — manual trigger del checker de escudos ────────────
     if (path === '/check-escudos') {
       const stats = await runEscudosChecker(env);
