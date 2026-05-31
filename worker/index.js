@@ -1570,6 +1570,21 @@ async function runScheduledResolver(env) {
           }
         }
 
+        // 🆕 (31-may-2026) Auto-void: si el pick lleva >14 días pending y NO
+        // pudimos resolverlo con ninguna fuente, y además los equipos son de
+        // reserva/no-resolvable, marcamos como 'void' (cuota devuelta).
+        // Esto limpia el historial de picks que nunca se van a resolver.
+        if (!matched && pick.commenceTs && (now - pick.commenceTs) > 14 * 24 * 3600 * 1000) {
+          if (isReserveTeam(pick.home) || isReserveTeam(pick.away)) {
+            pick.result = 'void';
+            pick.finalScore = '';
+            pick.pl = 0;
+            stats.resolved++;
+            stats.log.push(`${pick.home} vs ${pick.away}: VOID (equipo reserva/sin cobertura)`);
+            changed = true;
+          }
+          continue;
+        }
         if (!matched) continue;
 
         let result, finalScoreStr;
