@@ -16,4 +16,4 @@ id = "1d4b161e78db4de9a9b806f369c73ceb"
 # como win/loss/void usando ESPN + TheSportsDB. El trigger Postgres se encarga
 # de replicar a shared_cache.global_historial_v1.
 [triggers]
-crons = ["0 * * * *"]
+crons = ["0 * * * *", "0 */6 * * *"]  # 1: hourly resolver, 2: every 6h odds updater

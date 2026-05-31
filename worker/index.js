@@ -1054,6 +1054,176 @@ async function saveAdminHistorial(env, hist) {
 }
 
 // Función principal del cron: revisa picks pendientes y los resuelve
+
+// ── 🆕 (31-may-2026) Cron: actualizar cuotas de picks pendientes ─────────────
+// Migra la tarea Cowork 'actualizar-cuotas-pronosticos'. Corre cada 6h via
+// cron trigger '0 */6 * * *'. Lee picks pendientes del admin, busca cuotas
+// frescas en /odds, actualiza SOLO el campo `odds` (y `oddsFrozen` para
+// partidos < 2h).
+//
+// REGLA INVIOLABLE: solo modifica `odds` y `oddsFrozen`. Cualquier otro
+// campo intacto. Si detecta modificación de campo prohibido, aborta.
+const ODDS_READONLY_FIELDS = ['rec','conf','bvr','bvrText','stake','home','away','date','result','league','commenceTs'];
+
+function _normCuota(s) { return (s || '').toLowerCase().trim(); }
+
+function getPriceForPick(game, rec) {
+  if (!game) return null;
+  const recL = _normCuota(rec);
+
+  // Más de X.X / Menos de X.X (totals)
+  const overM = recL.match(/m[áa]s de\s*([\d.]+)/);
+  const underM = recL.match(/menos de\s*([\d.]+)/);
+  if (overM || underM) {
+    const lineTarget = parseFloat((overM || underM)[1]);
+    const direction = overM ? 'Over' : 'Under';
+    for (const bk of (game.bookmakers || [])) {
+      for (const mkt of (bk.markets || [])) {
+        if (mkt.key === 'totals') {
+          for (const o of (mkt.outcomes || [])) {
+            if (o.name === direction && o.point != null && Math.abs(parseFloat(o.point) - lineTarget) < 0.01) {
+              return parseFloat(parseFloat(o.price).toFixed(2));
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  // Ambos Marcan / BTTS
+  if (recL.includes('ambos') || recL.includes('btts') || recL.includes('marcan')) {
+    for (const bk of (game.bookmakers || [])) {
+      for (const mkt of (bk.markets || [])) {
+        const k = (mkt.key || '').toLowerCase();
+        if (k.includes('btts') || k.includes('both')) {
+          for (const o of (mkt.outcomes || [])) {
+            const name = _normCuota(o.name);
+            if (name === 'yes' || name === 'sí' || name === 'si') {
+              return parseFloat(parseFloat(o.price).toFixed(2));
+            }
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  // H2H: Local / Visitante / Empate / Gana <equipo>
+  let target = null;
+  if (recL.includes('local') || recL === 'home') target = game.home_team;
+  else if (recL.includes('visita') || recL === 'away') target = game.away_team;
+  else if (recL.includes('empate') || recL.includes('draw')) target = 'Draw';
+  else {
+    const ganaM = recL.match(/gana\s+(.+)/);
+    if (ganaM) {
+      const who = ganaM[1].trim();
+      if (_normCuota(game.home_team || '') === who) target = game.home_team;
+      else if (_normCuota(game.away_team || '') === who) target = game.away_team;
+    }
+  }
+  if (!target) return null;
+
+  for (const bk of (game.bookmakers || [])) {
+    for (const mkt of (bk.markets || [])) {
+      if (mkt.key === 'h2h') {
+        for (const o of (mkt.outcomes || [])) {
+          if (_normCuota(o.name) === _normCuota(target)) {
+            return parseFloat(parseFloat(o.price).toFixed(2));
+          }
+        }
+      }
+    }
+  }
+  return null;
+}
+
+async function runOddsUpdater(env) {
+  const stats = { checked: 0, updated: 0, frozen: 0, errors: 0, log: [] };
+  try {
+    const hist = await fetchAdminHistorial(env);
+    if (!hist.length) { stats.log.push('historial vacío'); return stats; }
+
+    // Pull all odds (main + europe + secondary)
+    const cats = ['main', 'europe', 'secondary'];
+    const allOdds = [];
+    for (const cat of cats) {
+      try {
+        const leagues = cat === 'main' ? LEAGUES_MAIN : cat === 'europe' ? LEAGUES_EUROPE : LEAGUES_SECONDARY;
+        const cacheKey = `odds9_${cat}_${new Date().toISOString().slice(0, 13)}`;
+        const r = await cached(env, cacheKey, 3600, () => getLeagueData(env, leagues));
+        allOdds.push(...(r.data || []));
+      } catch (e) {
+        stats.log.push(`odds ${cat} error: ${e.message}`);
+      }
+    }
+    if (!allOdds.length) { stats.log.push('sin odds frescas'); return stats; }
+
+    const oddsIndex = new Map();
+    for (const g of allOdds) {
+      const k = `${_normCuota(g.home_team)}|${_normCuota(g.away_team)}`;
+      oddsIndex.set(k, g);
+    }
+    function findGame(home, away) {
+      const k1 = `${_normCuota(home)}|${_normCuota(away)}`;
+      const k2 = `${_normCuota(away)}|${_normCuota(home)}`;
+      return oddsIndex.get(k1) || oddsIndex.get(k2);
+    }
+
+    const NOW_MS = Date.now();
+    const TWO_H_MS = 2 * 3600 * 1000;
+    let changed = false;
+
+    for (const pick of hist) {
+      const result = (pick.result || '').toLowerCase();
+      if (result && result !== 'pending') continue;
+      if (pick.oddsFrozen) continue;
+
+      stats.checked++;
+
+      // Freeze odds if match starts in < 2h
+      if (pick.commenceTs && (pick.commenceTs - NOW_MS) <= TWO_H_MS) {
+        pick.oddsFrozen = true;
+        stats.frozen++;
+        changed = true;
+        continue;
+      }
+
+      const game = findGame(pick.home, pick.away);
+      const price = getPriceForPick(game, pick.rec);
+      if (price == null || price === pick.odds) continue;
+
+      // Safety check: snapshot read-only fields
+      const before = {};
+      for (const f of ODDS_READONLY_FIELDS) before[f] = pick[f];
+
+      pick.odds = price;
+
+      // Verify nothing else changed
+      for (const f of ODDS_READONLY_FIELDS) {
+        if (pick[f] !== before[f]) {
+          stats.log.push(`ERROR: field '${f}' modified on ${pick.home} vs ${pick.away}, aborting`);
+          stats.errors++;
+          return stats;
+        }
+      }
+      stats.updated++;
+      changed = true;
+    }
+
+    if (changed) {
+      await saveAdminHistorial(env, hist);
+      stats.log.push(`saved: ${stats.updated} updated, ${stats.frozen} frozen`);
+    } else {
+      stats.log.push('no changes');
+    }
+  } catch (e) {
+    stats.errors++;
+    stats.log.push(`fatal: ${e.message}`);
+  }
+  return stats;
+}
+
 async function runScheduledResolver(env) {
   const stats = { checked: 0, resolved: 0, espn: 0, tsdb: 0, errors: 0, log: [] };
   try {
@@ -1186,9 +1356,17 @@ async function runScheduledResolver(env) {
 // ── Router principal ─────────────────────────────────────────────────────────
 export default {
   async scheduled(controller, env, ctx) {
-    // Cron handler: cada hora
-    const stats = await runScheduledResolver(env);
-    console.log('[cron-resolver]', JSON.stringify(stats));
+    // Cron handler — multiple crons distinguished by controller.cron string
+    const cronExpr = controller.cron;
+    if (cronExpr === '0 */6 * * *') {
+      // Every 6h: update odds for pending picks
+      const stats = await runOddsUpdater(env);
+      console.log('[cron-odds]', JSON.stringify(stats));
+    } else {
+      // Default (0 * * * * — hourly): resolve completed picks
+      const stats = await runScheduledResolver(env);
+      console.log('[cron-resolver]', JSON.stringify(stats));
+    }
   },
   async fetch(request, env) {
     const url  = new URL(request.url);
@@ -1404,6 +1582,12 @@ export default {
         sb_service_key: env.SUPABASE_SERVICE_ROLE_KEY ? 'configured' : 'MISSING',
         kv: env.CACHE_KV ? 'connected' : 'NOT connected'
       }), { headers: CORS });
+    }
+
+    // ── 🆕 /cron-update-odds — manual trigger del update de cuotas ───────────
+    if (path === '/cron-update-odds') {
+      const stats = await runOddsUpdater(env);
+      return new Response(JSON.stringify(stats), { headers: CORS });
     }
 
     // ── /cron-resolve ────────────────────────────────────────────────────────
