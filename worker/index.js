@@ -1055,6 +1055,117 @@ async function saveAdminHistorial(env, hist) {
 
 // Función principal del cron: revisa picks pendientes y los resuelve
 
+
+// ── 🆕 (31-may-2026) Cron: chequeo de escudos faltantes ─────────────────────
+// Migra la tarea Cowork 'chequeo-escudos-gambeta'. Detecta equipos nuevos
+// en picks pendientes que NO tienen escudo en el repo local. Para cada
+// equipo NO ambiguo, busca el logo en API-Football y lo almacena en KV.
+// Cron '0 0,12 * * *' (cada 12h). Endpoint /escudos-discovered devuelve
+// el map para que el frontend pueda usar como fallback (lookup runtime).
+//
+// NOTA: NO hace commit al repo. Eso queda como tarea manual de Mauro:
+// cuando KV tiene N equipos descubiertos, los baja a /escudos/ y comitea.
+
+// Nombres ambiguos que NUNCA autodescubrimos (varios clubes con mismo nombre)
+const AMBIGUOUS_NAMES = new Set([
+  'nacional', 'universitario', 'independiente', 'san lorenzo', 'america',
+  'cerro', 'olimpia', 'universidad', 'atletico', 'racing', 'river',
+  'river plate', 'sporting', 'deportivo'
+]);
+
+function isAmbiguous(name) {
+  const n = (name || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  if (AMBIGUOUS_NAMES.has(n)) return true;
+  // Single-word ambiguous variants
+  const words = n.split(/\s+/);
+  if (words.length === 1 && AMBIGUOUS_NAMES.has(words[0])) return true;
+  return false;
+}
+
+async function fetchTeamLogo(teamName, env) {
+  try {
+    const q = encodeURIComponent(teamName);
+    const r = await apf(`/teams?search=${q}`, env);
+    const teams = r.response || [];
+    if (!teams.length) return null;
+    // Tomar el primer match (API-Football ordena por relevancia)
+    const t = teams[0];
+    return {
+      teamId: t.team?.id,
+      teamName: t.team?.name,
+      country: t.team?.country,
+      logoUrl: t.team?.logo
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+async function runEscudosChecker(env) {
+  const stats = { teamsFromPicks: 0, alreadyKnown: 0, newDiscovered: 0, skippedAmbiguous: 0, notFoundInAPF: 0, errors: 0, log: [] };
+  try {
+    // 1. Lee historial admin (Supabase service or anon)
+    const hist = await fetchAdminHistorial(env);
+    if (!hist.length) { stats.log.push('historial vacío'); return stats; }
+
+    // 2. Extrae equipos únicos de picks pendientes (próximos 7 días)
+    const now = Date.now();
+    const SEVEN_D = 7 * 24 * 3600 * 1000;
+    const teamSet = new Set();
+    for (const p of hist) {
+      if (p.result && p.result !== 'pending') continue;
+      if (p.commenceTs && (p.commenceTs - now) > SEVEN_D) continue;
+      if (p.home) teamSet.add(p.home);
+      if (p.away) teamSet.add(p.away);
+    }
+    stats.teamsFromPicks = teamSet.size;
+    if (!teamSet.size) { stats.log.push('sin equipos en picks recientes'); return stats; }
+
+    // 3. Lee KV con equipos ya conocidos
+    const knownRaw = await env.CACHE_KV.get('escudos_known_v1');
+    const known = knownRaw ? new Set(JSON.parse(knownRaw)) : new Set();
+    const discoveredRaw = await env.CACHE_KV.get('escudos_discovered_v1');
+    const discovered = discoveredRaw ? JSON.parse(discoveredRaw) : {};
+
+    // 4. Para cada equipo nuevo: validar con API-Football
+    const newOnes = [];
+    for (const teamName of teamSet) {
+      if (known.has(teamName) || discovered[teamName]) {
+        stats.alreadyKnown++;
+        continue;
+      }
+      if (isAmbiguous(teamName)) {
+        stats.skippedAmbiguous++;
+        stats.log.push(`ambiguous (skip): ${teamName}`);
+        continue;
+      }
+      const teamInfo = await fetchTeamLogo(teamName, env);
+      if (!teamInfo || !teamInfo.logoUrl) {
+        stats.notFoundInAPF++;
+        stats.log.push(`not found in APF: ${teamName}`);
+        continue;
+      }
+      discovered[teamName] = {
+        url: teamInfo.logoUrl,
+        teamId: teamInfo.teamId,
+        country: teamInfo.country,
+        discoveredAt: new Date().toISOString()
+      };
+      newOnes.push(teamName);
+      stats.newDiscovered++;
+    }
+
+    if (newOnes.length) {
+      await env.CACHE_KV.put('escudos_discovered_v1', JSON.stringify(discovered));
+      stats.log.push(`new: ${newOnes.join(', ')}`);
+    }
+  } catch (e) {
+    stats.errors++;
+    stats.log.push(`fatal: ${e.message}`);
+  }
+  return stats;
+}
+
 // ── 🆕 (31-may-2026) Cron: actualizar cuotas de picks pendientes ─────────────
 // Migra la tarea Cowork 'actualizar-cuotas-pronosticos'. Corre cada 6h via
 // cron trigger '0 */6 * * *'. Lee picks pendientes del admin, busca cuotas
@@ -1362,6 +1473,10 @@ export default {
       // Every 6h: update odds for pending picks
       const stats = await runOddsUpdater(env);
       console.log('[cron-odds]', JSON.stringify(stats));
+    } else if (cronExpr === '0 0,12 * * *') {
+      // 0:00 + 12:00: chequeo de escudos faltantes
+      const stats = await runEscudosChecker(env);
+      console.log('[cron-escudos]', JSON.stringify(stats));
     } else {
       // Default (0 * * * * — hourly): resolve completed picks
       const stats = await runScheduledResolver(env);
@@ -1582,6 +1697,18 @@ export default {
         sb_service_key: env.SUPABASE_SERVICE_ROLE_KEY ? 'configured' : 'MISSING',
         kv: env.CACHE_KV ? 'connected' : 'NOT connected'
       }), { headers: CORS });
+    }
+
+    // ── 🆕 /check-escudos — manual trigger del checker de escudos ────────────
+    if (path === '/check-escudos') {
+      const stats = await runEscudosChecker(env);
+      return new Response(JSON.stringify(stats, null, 2), { headers: CORS });
+    }
+
+    // ── 🆕 /escudos-discovered — map para fallback del frontend ──────────────
+    if (path === '/escudos-discovered') {
+      const raw = await env.CACHE_KV.get('escudos_discovered_v1');
+      return new Response(raw || '{}', { headers: CORS });
     }
 
     // ── 🆕 /cron-update-odds — manual trigger del update de cuotas ───────────
