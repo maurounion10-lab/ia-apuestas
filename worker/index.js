@@ -638,8 +638,42 @@ async function getLeagueData(env, leagueEntries) {
   // Descartar juegos APF sin odds y reemplazar con Odds API para esas ligas
   const filteredApf = apfData.filter(g => !needsSet.has(g.sport_key));
   const combined = [...filteredApf, ...supplementData];
+
+  // 🆕 (31-may-2026) Filtrar equipos B / reservas / filiales — esos partidos
+  // se categorizan mal por The Odds API (ej. Real Sociedad B aparece en
+  // soccer_spain_segunda_division pero juega en Primera RFEF que no tiene
+  // cobertura en ESPN/TSDB/APF). Si bloqueamos en la fuente, nunca se genera
+  // pick y nunca queda stuck en pending.
+  const filteredBReserves = combined.filter(g => {
+    if (isReserveTeam(g.home_team) || isReserveTeam(g.away_team)) {
+      console.log(`[filter-B] descartado: ${g.home_team} vs ${g.away_team} (${g.sport_key})`);
+      return false;
+    }
+    return true;
+  });
+
   const source = filteredApf.length > 0 ? 'api-football+odds-api' : 'odds-api';
-  return { data: combined, source };
+  return { data: filteredBReserves, source };
+}
+
+// ── 🆕 isReserveTeam: detecta equipos B/filiales que no tienen cobertura en
+//     ninguna fuente de scores (Primera RFEF, regional leagues, etc).
+//     Si un partido tiene alguno de estos equipos, descartamos antes de que
+//     genere pick para evitar que quede stuck pending para siempre.
+function isReserveTeam(name) {
+  if (!name) return false;
+  const n = name.trim();
+  // Sufijos típicos de equipos filiales
+  // 'B' al final: Real Sociedad B, Atletico Madrid B, Barcelona B
+  // 'II' al final: Bayern Munich II, Borussia Dortmund II
+  // 'U23' / 'U-23' / 'Sub-23' / 'Sub23': equipos juveniles
+  // 'Reserves' / 'Reserve' al final
+  // 'Castilla' (Real Madrid B se llama Castilla)
+  if (/\s+(B|II|U-?23|U23|Sub-?23|Reserves?)$/i.test(n)) return true;
+  if (/^Castilla$/i.test(n) || /Real Madrid Castilla/i.test(n)) return true;
+  // 'C. Leonesa' = Cultural Leonesa, juega en Primera RFEF, sin cobertura
+  if (/^C\.\s?Leonesa$/i.test(n) || /Cultural Leonesa/i.test(n)) return true;
+  return false;
 }
 
 // ── Definición de categorías de ligas ────────────────────────────────────────
