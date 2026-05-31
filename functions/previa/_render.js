@@ -136,7 +136,7 @@ export function renderPrevia(pick) {
 <title>${escapeHtml(title)}</title>
 <meta content="${escapeHtml(desc)}" name="description"/>
 <meta content="gambeta.ai" name="author"/>
-<meta content="index, follow" name="robots"/>
+<meta content="${(pick.commenceTs && (Date.now() - pick.commenceTs) > 7*24*60*60*1000) ? 'noindex, follow' : 'index, follow'}" name="robots"/>
 <link href="${url}" rel="canonical"/>
 <meta content="article" property="og:type"/>
 <meta content="${url}" property="og:url"/>

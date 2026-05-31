@@ -13,8 +13,18 @@ export async function onRequest(context) {
       const s = pickSlug(p);
       if (!seen.has(s)) { seen.add(s); unique.push(p); }
     }
-    // Sitemap max 50,000 URLs per file — we have at most a few thousand for years
-    const top = unique.slice(0, 49000);
+    // 🆕 (30-may-2026) Solo incluir previas VIGENTES — partidos próximos 14 días + últimos 7 días.
+    //    Razón: Google rechaza indexar previas de partidos jugados hace semanas (thin content).
+    //    Antes el sitemap mandaba 87+ páginas que nunca se iban a indexar, dañando el dominio.
+    const now = Date.now();
+    const FUTURE_WINDOW = 14 * 24 * 60 * 60 * 1000;
+    const PAST_WINDOW   = 7  * 24 * 60 * 60 * 1000;
+    const fresh = unique.filter(p => {
+      if (!p.commenceTs) return false;
+      const dt = p.commenceTs - now;
+      return dt > -PAST_WINDOW && dt < FUTURE_WINDOW;
+    });
+    const top = fresh.slice(0, 49000);
     const today = new Date().toISOString().slice(0, 10);
     const items = top.map(p => {
       const slug = pickSlug(p);
