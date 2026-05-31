@@ -1335,8 +1335,74 @@ async function runOddsUpdater(env) {
   return stats;
 }
 
+
+// ── 🆕 (31-may-2026) API-Football fallback para resolver scores ──────────────
+// El resolver actual usa ESPN + TheSportsDB. Falla en ligas chicas (Eliteserien,
+// Segunda B España, etc). Agregamos APF PRO como último fallback antes de skip.
+function _getApfLeagueIdForSportKey(sportKey) {
+  const all = [...LEAGUES_MAIN, ...LEAGUES_EUROPE, ...LEAGUES_SECONDARY];
+  const entry = all.find(([k]) => k === sportKey);
+  return entry ? entry[1] : null;
+}
+
+async function fetchApfScore(pick, env) {
+  if (!pick._sportKey || !pick.commenceTs) return null;
+  const leagueId = _getApfLeagueIdForSportKey(pick._sportKey);
+  if (!leagueId) return null;
+  // APF season number: para ligas europeas (jun-mayo) = año de inicio.
+  // Para liga argentina/brasil = año calendario.
+  const dt = new Date(pick.commenceTs);
+  const year = dt.getUTCFullYear();
+  const month = dt.getUTCMonth(); // 0-11
+  let season;
+  // Euro leagues: season starts in Aug (month 7)
+  const euroLeagueIds = new Set([39,40,140,141,135,136,78,79,61,62,88,94,203,2,3,848,235,103,113,106,119,144,207,218,239,265,131,268]);
+  if (euroLeagueIds.has(leagueId)) {
+    // si estamos en ago-dic => season es year. Si estamos en ene-jul => season es year-1.
+    season = month >= 7 ? year : year - 1;
+  } else {
+    // Calendar year (Conmebol, Argentina, Brasil, MLS, etc)
+    season = year;
+  }
+  const dateStr = dt.toISOString().slice(0, 10);
+  try {
+    const r = await apf(`/fixtures?league=${leagueId}&season=${season}&date=${dateStr}`, env);
+    const fixtures = r.response || [];
+    if (!fixtures.length) return null;
+    // Find matching fixture by team names
+    const nHome = normTeam(pick.home), nAway = normTeam(pick.away);
+    for (const fx of fixtures) {
+      const fxHome = fx.teams?.home?.name || '';
+      const fxAway = fx.teams?.away?.name || '';
+      if ((teamsMatch(fxHome, pick.home) && teamsMatch(fxAway, pick.away)) ||
+          (teamsMatch(fxHome, pick.away) && teamsMatch(fxAway, pick.home))) {
+        const status = fx.fixture?.status?.short || '';
+        const finished = ['FT', 'AET', 'PEN'].includes(status);
+        const voidLike = ['PST', 'CANC', 'ABD', 'AWD'].includes(status);
+        if (voidLike) {
+          return { home: pick.home, away: pick.away, voidReason: status, src: 'apf' };
+        }
+        if (!finished) return null;
+        const goalsH = fx.goals?.home;
+        const goalsA = fx.goals?.away;
+        if (goalsH == null || goalsA == null) return null;
+        return {
+          home: pick.home,
+          away: pick.away,
+          scoreH: parseInt(goalsH),
+          scoreA: parseInt(goalsA),
+          src: 'apf'
+        };
+      }
+    }
+    return null;
+  } catch (e) {
+    return null;
+  }
+}
+
 async function runScheduledResolver(env) {
-  const stats = { checked: 0, resolved: 0, espn: 0, tsdb: 0, errors: 0, log: [] };
+  const stats = { checked: 0, resolved: 0, espn: 0, tsdb: 0, apf: 0, errors: 0, log: [] };
   try {
     const hist = await fetchAdminHistorial(env);
     if (!hist.length) {
@@ -1421,6 +1487,15 @@ async function runScheduledResolver(env) {
               matched = tsdbScore2;
               stats.tsdb++;
             }
+          }
+        }
+
+        // 🆕 Fallback 3: API-Football PRO — cubre ligas que ESPN/TSDB no tienen
+        if (!matched) {
+          const apfMatch = await fetchApfScore(pick, env);
+          if (apfMatch) {
+            matched = apfMatch;
+            stats.apf = (stats.apf || 0) + 1;
           }
         }
 
