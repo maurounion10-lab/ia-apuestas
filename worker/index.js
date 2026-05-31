@@ -1206,15 +1206,17 @@ export default {
 
     // ── 🆕 /cup-context (Conmebol cups standings-aware preferences) ──────────
     if (path === '/cup-context') {
-      const cacheKey = `cup_context_v1_${new Date().toISOString().slice(0,10)}`; // refresh daily
-      const ctx = await cached(env, cacheKey, 21600, () => computeCupContext(env)); // 6h TTL within day
+      const cacheKey = `cup_context_v2_${new Date().toISOString().slice(0,10)}`; // refresh daily
+      const force = url.searchParams.get('force') === '1';
+      const ctx = force ? await computeCupContext(env) : await cached(env, cacheKey, 21600, () => computeCupContext(env));
       return new Response(JSON.stringify(ctx || {}), { headers: CORS });
     }
 
     // ── 🆕 /league-context (universal — detecta asimetría de motivación en ligas regulares) ──
     if (path === '/league-context') {
-      const cacheKey = `league_context_v1_${new Date().toISOString().slice(0,10)}`;
-      const ctx = await cached(env, cacheKey, 43200, () => computeLeagueContext(env)); // 12h TTL
+      const cacheKey = `league_context_v2_${new Date().toISOString().slice(0,10)}`;
+      const force = url.searchParams.get('force') === '1';
+      const ctx = force ? await computeLeagueContext(env) : await cached(env, cacheKey, 43200, () => computeLeagueContext(env));
       return new Response(JSON.stringify(ctx || {}), { headers: CORS });
     }
 
