@@ -1356,7 +1356,17 @@ async function fetchApfScore(pick, env) {
   const month = dt.getUTCMonth(); // 0-11
   let season;
   // Euro leagues: season starts in Aug (month 7)
-  const euroLeagueIds = new Set([39,40,140,141,135,136,78,79,61,62,88,94,203,2,3,848,235,103,113,106,119,144,207,218,239,265,131,268]);
+  // Ligas con calendario europeo (agosto-mayo):
+  // Premier(39), Championship(40), La Liga(140), Segunda(141), Serie A(135),
+  // Serie B(136), Bundesliga(78), 2.Bundes(79), Ligue 1(61), Ligue 2(62),
+  // Eredivisie(88), Primeira Liga(94), Süper Lig(203), UCL(2), UEL(3),
+  // Conf League(848), RPL(235), Belgian Pro(144), Swiss(207), Austrian(218),
+  // Polish(106), Czech(345), Greek(197)
+  const euroLeagueIds = new Set([39,40,140,141,135,136,78,79,61,62,88,94,203,2,3,848,235,144,207,218,106,345,197]);
+  // Resto (Noruega Eliteserien 103, Suecia 113, Dinamarca 119, MLS 253,
+  // K-League 292, Conmebol, Liga Arg 128, Brasileirão 71, Mexico 262,
+  // Colombia 239, Chile 265, Uruguay 268, Ecuador 240, Argentina B 131,
+  // etc) = calendar year
   if (euroLeagueIds.has(leagueId)) {
     // si estamos en ago-dic => season es year. Si estamos en ene-jul => season es year-1.
     season = month >= 7 ? year : year - 1;
