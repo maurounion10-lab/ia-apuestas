@@ -5403,10 +5403,9 @@ window.toggleHeroBubble = function(n) {
   if (!el) return;
   function daysUntilMundial() {
     var now = new Date();
-    // UTC para hoy y para target → diferencia exacta en días de calendario,
-    // sin importar la hora del día ni la zona horaria local del visitante.
-    var today  = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
-    var target = Date.UTC(TARGET_Y, TARGET_M, TARGET_D);
+    // HORA LOCAL del visitante: el contador baja 1 a su 00:00 real, no a las 00:00 UTC.
+    var today  = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    var target = new Date(TARGET_Y, TARGET_M, TARGET_D).getTime();
     return Math.max(0, Math.round((target - today) / 86400000));
   }
   function update() {
