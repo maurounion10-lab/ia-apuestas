@@ -13464,6 +13464,10 @@ function savePredictions(preds) {
     // Excluir partidos que comenzaron hace más de 20 horas (cubre jornada completa + margen)
     // Nunca excluir picks en vivo o recientes — todo pick mostrado al usuario DEBE quedar en historial
     if (p.commenceTs && p.commenceTs <= Date.now() - 20 * 3600 * 1000) return;
+    // Excluir partidos MUY anticipados (>14 días vista). Evita publicar picks de Libertadores/
+    // Sudamericana/temporadas futuras meses antes — el modelo no tiene info confiable a tanta distancia.
+    // Hoy (jun-2026) esto permite picks del Mundial 2026 (arranca 11-jun) y bloquea fixtures de jul-ago.
+    if (p.commenceTs && p.commenceTs > Date.now() + 14 * 24 * 3600 * 1000) return;
     // Para auto-publicar finde: los viernes guardamos picks de sábado y domingo también
     // (ya cubierto por el check anterior — si commenceTs > Date.now() pasan)
 
