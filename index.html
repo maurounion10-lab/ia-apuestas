@@ -13466,8 +13466,20 @@ function savePredictions(preds) {
     if (p.commenceTs && p.commenceTs <= Date.now() - 20 * 3600 * 1000) return;
     // Excluir partidos MUY anticipados (>14 días vista). Evita publicar picks de Libertadores/
     // Sudamericana/temporadas futuras meses antes — el modelo no tiene info confiable a tanta distancia.
-    // Hoy (jun-2026) esto permite picks del Mundial 2026 (arranca 11-jun) y bloquea fixtures de jul-ago.
+    // Hoy (jun-2026) bloquea fixtures de jul-ago. El Mundial 2026 está bajo bloqueo manual (abajo).
     if (p.commenceTs && p.commenceTs > Date.now() + 14 * 24 * 3600 * 1000) return;
+    // 🚫 BLOQUEO MUNDIAL 2026 — sólo levantar manualmente cuando Mauro dé luz verde.
+    // The Odds API usa varios keys para el WC; cubrimos todas las variantes conocidas.
+    // Para activar: cambiar BLOCK_WC2026 a false (o sacar este bloque).
+    const BLOCK_WC2026 = true;
+    if (BLOCK_WC2026) {
+      const _sk = (p._sportKey || '').toLowerCase();
+      const WC_KEYS = ['soccer_world_cup', 'soccer_fifa_world_cup', 'soccer_fifa_world_cup_winner', 'soccer_world_cup_winner', 'soccer_fifa_world_cup_2026'];
+      if (WC_KEYS.some(k => _sk === k || _sk.includes('world_cup'))) {
+        console.log('[BLOCK_WC2026] Pick bloqueado:', p.home, 'vs', p.away, '(', _sk, ')');
+        return;
+      }
+    }
     // Para auto-publicar finde: los viernes guardamos picks de sábado y domingo también
     // (ya cubierto por el check anterior — si commenceTs > Date.now() pasan)
 
