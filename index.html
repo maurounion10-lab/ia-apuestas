@@ -13231,7 +13231,23 @@ async function sbLoadHistorial() {
     const _resolvedRank = h => (h?.result === 'win' || h?.result === 'loss') ? 2
                               : h?.result === 'void' ? 1
                               : 0;
-    const allEntries = [...(globalHist||[]), ...dbHist, ...localHist];
+    // ── Filtro de seguridad runtime: descartar picks pendientes >14d futuros ──
+    // Mauro pidió que no se publiquen picks tan anticipados. Si quedó alguno en
+    // localStorage (cache vieja) lo descartamos aquí, aunque Supabase ya esté limpio.
+    const _MAX_FUTURE_MS = 14 * 24 * 3600 * 1000;
+    const _nowFutureGuard = Date.now();
+    const _isStaleFuture = h => {
+      if (!h || !h.commenceTs) return false;
+      const res = (h.result || '').toString().toLowerCase();
+      if (res && res !== 'pending') return false; // resueltos siempre pasan
+      return (h.commenceTs - _nowFutureGuard) > _MAX_FUTURE_MS;
+    };
+    const _g = (globalHist||[]).filter(h=>!_isStaleFuture(h));
+    const _d = (dbHist||[]).filter(h=>!_isStaleFuture(h));
+    const _l = (localHist||[]).filter(h=>!_isStaleFuture(h));
+    const _filteredCount = (globalHist?.length||0)+(dbHist?.length||0)+(localHist?.length||0) - _g.length - _d.length - _l.length;
+    if (_filteredCount > 0) console.log('[histGuard] Descartados', _filteredCount, 'picks futuros >14d (cache vieja)');
+    const allEntries = [..._g, ..._d, ..._l];
     const seen = new Map();
     allEntries.forEach(h => {
       const k = _hKey(h);
