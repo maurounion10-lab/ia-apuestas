@@ -5377,9 +5377,10 @@ window.toggleHeroBubble = function(n) {
   <div style="max-width:1000px;margin:0 auto;position:relative;display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:nowrap">
     <div style="font-size:2.8rem;filter:drop-shadow(0 2px 8px rgba(212,175,55,0.55));flex-shrink:0" class="gbMundialTrophy">🏆</div>
     <div style="text-align:left;min-width:0;flex:0 1 auto" class="gbMundialText">
-      <div style="font-size:0.78rem;font-weight:800;letter-spacing:2.5px;color:#d4af37;text-transform:uppercase;line-height:1;margin-bottom:3px" class="gbMundialPulse">⚡ Próximamente</div>
+      <div style="font-size:0.78rem;font-weight:800;letter-spacing:2.5px;color:#d4af37;text-transform:uppercase;line-height:1;margin-bottom:3px" class="gbMundialPulse"><span id="gbMundialTag">⚡ Próximamente</span></div>
       <div style="font-size:1.35rem;font-weight:900;color:#fff;letter-spacing:-0.3px;line-height:1.2">Mundial 2026 · <span id="gbMundialDays" style="color:#d4af37">14</span> <span style="color:rgba(255,255,255,0.85)">días</span></div>
-      <div style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-top:4px;line-height:1.4" class="gbMundialSub">USA 🇺🇸 · Canadá 🇨🇦 · México 🇲🇽 — la IA se está preparando con picks especiales</div>
+      <div style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-top:4px;line-height:1.4" class="gbMundialSub" id="gbMundialSub">USA 🇺🇸 · Canadá 🇨🇦 · México 🇲🇽 — la IA se está preparando con picks especiales</div>
+      <div style="font-size:0.82rem;font-weight:700;margin-top:6px;line-height:1.35" id="gbMundialPicksTeaser"></div>
     </div>
   </div>
 </section>
@@ -5408,9 +5409,30 @@ window.toggleHeroBubble = function(n) {
     var target = new Date(TARGET_Y, TARGET_M, TARGET_D).getTime();
     return Math.max(0, Math.round((target - today) / 86400000));
   }
+  // 5 días antes del Mundial salen los 10 picks de futures (locked-in 6-jun-2026)
+  var PICKS_PUBLISH_Y = 2026, PICKS_PUBLISH_M = 5, PICKS_PUBLISH_D = 6;
+  function daysUntilPicks() {
+    var now = new Date();
+    var today  = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+    var target = new Date(PICKS_PUBLISH_Y, PICKS_PUBLISH_M, PICKS_PUBLISH_D).getTime();
+    return Math.max(0, Math.round((target - today) / 86400000));
+  }
   function update() {
     var d = daysUntilMundial();
     el.textContent = d;
+    var teaser = document.getElementById('gbMundialPicksTeaser');
+    var dPicks = daysUntilPicks();
+    if (teaser) {
+      if (dPicks > 0) {
+        teaser.innerHTML = '🎯 <span style="color:#d4af37">' + dPicks + ' día' + (dPicks===1?'':'s') + '</span> para que la IA publique sus <span style="color:#d4af37">10 predicciones del Mundial</span>';
+        teaser.style.color = 'rgba(255,255,255,0.78)';
+      } else if (d > 0) {
+        teaser.innerHTML = '🔥 <a href="#predicciones" style="color:#d4af37;text-decoration:none;border-bottom:1px dotted #d4af37">10 predicciones del Mundial — disponibles ahora</a>';
+        teaser.style.color = '#fff';
+      } else {
+        teaser.innerHTML = '';
+      }
+    }
     if (d === 0) {
       el.parentElement.innerHTML = 'Mundial 2026 <span style="color:#d4af37">EN VIVO</span> 🔥';
     }
