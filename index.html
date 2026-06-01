@@ -5396,18 +5396,29 @@ window.toggleHeroBubble = function(n) {
 </style>
 <script>
 (function(){
-  var wcDate = new Date('2026-06-11T20:00:00Z');
+  // Fecha objetivo: partido inaugural Mundial 2026 (11-jun-2026 en Estadio Azteca).
+  // Para el contador de DÍAS solo importa la fecha calendario, no la hora exacta del kickoff.
+  var TARGET_Y = 2026, TARGET_M = 5 /* junio (0-indexed) */, TARGET_D = 11;
   var el = document.getElementById('gbMundialDays');
   if (!el) return;
+  function daysUntilMundial() {
+    var now = new Date();
+    // UTC para hoy y para target → diferencia exacta en días de calendario,
+    // sin importar la hora del día ni la zona horaria local del visitante.
+    var today  = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+    var target = Date.UTC(TARGET_Y, TARGET_M, TARGET_D);
+    return Math.max(0, Math.round((target - today) / 86400000));
+  }
   function update() {
-    var diff = Math.max(0, Math.ceil((wcDate - Date.now()) / 86400000));
-    el.textContent = diff;
-    if (diff === 0) {
+    var d = daysUntilMundial();
+    el.textContent = d;
+    if (d === 0) {
       el.parentElement.innerHTML = 'Mundial 2026 <span style="color:#d4af37">EN VIVO</span> 🔥';
     }
   }
   update();
-  setInterval(update, 60 * 60 * 1000);
+  // Cada minuto: cuando cruza la medianoche UTC el contador se refresca solo.
+  setInterval(update, 60 * 1000);
 })();
 </script>
 
