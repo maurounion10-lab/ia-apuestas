@@ -24190,44 +24190,133 @@ setTimeout(_fpBadgeInit, 1200);
 
 <!-- ─── 🏆 Banner sticky VIP Mundial 2026 → Telegram atención ─── -->
 <style>
+  /* ── Keyframes del banner VIP ── */
+  @keyframes gbVipSlideUp {
+    0%   { transform: translateY(105%); }
+    60%  { transform: translateY(-6px); }
+    80%  { transform: translateY(2px); }
+    100% { transform: translateY(0); }
+  }
+  @keyframes gbVipTrophyFloat {
+    0%, 100% { transform: translateY(0) rotate(-4deg) scale(1); }
+    50%      { transform: translateY(-4px) rotate(4deg) scale(1.08); }
+  }
+  @keyframes gbVipTrophyGlow {
+    0%, 100% { filter: drop-shadow(0 1px 3px rgba(212,175,55,0.5)); }
+    50%      { filter: drop-shadow(0 1px 14px rgba(212,175,55,0.95)); }
+  }
+  @keyframes gbVipShine {
+    0%   { transform: translateX(-150%); opacity: 0; }
+    20%  { opacity: 1; }
+    80%  { opacity: 1; }
+    100% { transform: translateX(150%); opacity: 0; }
+  }
+  @keyframes gbVipBorderRunner {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  @keyframes gbVipCtaPulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(212,175,55,0.25), 0 0 0 0 rgba(212,175,55,0.6); }
+    50%      { box-shadow: 0 4px 14px rgba(212,175,55,0.55), 0 0 0 8px rgba(212,175,55,0.0); }
+  }
+  @keyframes gbVipCtaArrow {
+    0%, 100% { transform: translateX(0); }
+    50%      { transform: translateX(4px); }
+  }
+  @keyframes gbVipAttention {
+    0%, 92%, 100% { transform: translateY(0); }
+    94%           { transform: translateY(-6px); }
+    96%           { transform: translateY(2px); }
+    98%           { transform: translateY(-2px); }
+  }
+  @keyframes gbVipTextShimmer {
+    0%, 100% { background-position: -100% 0; }
+    50%      { background-position: 200% 0; }
+  }
+
+  /* ── Banner ── */
   #gbVipSticky {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 9998;
     background: linear-gradient(90deg,#0d1f0d 0%,#1a3a1a 50%,#0d1f0d 100%);
     border-top: 1.5px solid #d4af37;
-    box-shadow: 0 -4px 18px rgba(0,0,0,0.4);
+    box-shadow: 0 -4px 18px rgba(0,0,0,0.4), 0 -1px 0 rgba(212,175,55,0.15);
     padding: 10px 14px; display: flex; align-items: center; gap: 12px;
-    transform: translateY(0); transition: transform 0.28s ease;
-    font-family: inherit;
+    transform: translateY(0); font-family: inherit;
+    overflow: hidden;
+    animation: gbVipAttention 18s ease-in-out infinite;
   }
-  #gbVipSticky.gb-hidden { transform: translateY(105%); }
+  #gbVipSticky.gb-hidden { transform: translateY(105%); animation: none; transition: transform 0.28s ease; }
+  #gbVipSticky.gb-show { animation: gbVipSlideUp 0.7s cubic-bezier(.34,1.56,.64,1) 1, gbVipAttention 18s 1.5s ease-in-out infinite; }
+
+  /* ── Línea dorada animada en el borde superior ── */
   #gbVipSticky::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1.5px;
-    background: linear-gradient(90deg,transparent 0%,#d4af37 50%,transparent 100%);
-    opacity: 0.7; pointer-events: none;
+    background: linear-gradient(90deg, transparent 0%, #d4af37 20%, #ffe680 50%, #d4af37 80%, transparent 100%);
+    background-size: 50% 100%;
+    animation: gbVipBorderRunner 3.5s linear infinite;
+    pointer-events: none; opacity: 0.85;
   }
+
+  /* ── Banda de shine que recorre el banner ── */
+  #gbVipSticky::after {
+    content: ''; position: absolute; top: 0; bottom: 0; left: 0; width: 35%;
+    background: linear-gradient(90deg, transparent 0%, rgba(212,175,55,0.18) 50%, transparent 100%);
+    animation: gbVipShine 4.5s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* ── Trofeo: flota + glow pulsante ── */
   #gbVipSticky .gb-vip-trophy {
-    font-size: 1.5rem; flex-shrink: 0; filter: drop-shadow(0 1px 3px rgba(212,175,55,0.5));
+    font-size: 1.5rem; flex-shrink: 0; display: inline-block;
+    animation: gbVipTrophyFloat 2.6s ease-in-out infinite, gbVipTrophyGlow 2.6s ease-in-out infinite;
+    position: relative; z-index: 2;
   }
+
+  /* ── Texto ── */
   #gbVipSticky .gb-vip-txt {
     flex: 1 1 auto; min-width: 0; color: #fff;
     font-size: 0.88rem; line-height: 1.3; font-weight: 700;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    position: relative; z-index: 2;
   }
-  #gbVipSticky .gb-vip-txt .gb-vip-hl { color: #d4af37; }
+  #gbVipSticky .gb-vip-txt .gb-vip-hl {
+    background: linear-gradient(90deg, #d4af37 0%, #ffe680 25%, #d4af37 50%, #ffe680 75%, #d4af37 100%);
+    background-size: 200% 100%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; color: #d4af37;
+    animation: gbVipTextShimmer 3s linear infinite;
+    font-weight: 900;
+  }
+
+  /* ── CTA: pulse + flecha que se mueve ── */
   #gbVipSticky .gb-vip-cta {
-    flex-shrink: 0; background: linear-gradient(135deg,#d4af37 0%,#b8941f 100%);
+    flex-shrink: 0; background: linear-gradient(135deg,#d4af37 0%,#ffd76a 50%,#b8941f 100%);
     color: #0d1f0d; font-weight: 800; font-size: 0.82rem;
     padding: 8px 16px; border-radius: 7px; text-decoration: none;
     letter-spacing: 0.3px; white-space: nowrap;
     box-shadow: 0 2px 8px rgba(212,175,55,0.25);
+    animation: gbVipCtaPulse 1.8s ease-in-out infinite;
+    position: relative; z-index: 2;
+    transition: transform 0.18s ease, filter 0.18s ease;
   }
-  #gbVipSticky .gb-vip-cta:hover { filter: brightness(1.1); }
+  #gbVipSticky .gb-vip-cta:hover {
+    filter: brightness(1.08); transform: translateY(-1px) scale(1.03);
+  }
+  #gbVipSticky .gb-vip-cta-arrow {
+    display: inline-block; animation: gbVipCtaArrow 1.2s ease-in-out infinite;
+  }
+
+  /* ── Botón de cierre ── */
   #gbVipSticky .gb-vip-close {
     flex-shrink: 0; background: transparent; border: none; color: rgba(255,255,255,0.55);
     font-size: 1.2rem; line-height: 1; cursor: pointer; padding: 4px 6px;
     font-family: inherit; font-weight: 400;
+    position: relative; z-index: 2;
+    transition: color 0.18s ease, transform 0.18s ease;
   }
-  #gbVipSticky .gb-vip-close:hover { color: #fff; }
+  #gbVipSticky .gb-vip-close:hover { color: #fff; transform: rotate(90deg); }
+
+  /* ── Mobile ── */
   @media (max-width: 560px) {
     #gbVipSticky { padding: 8px 10px; gap: 8px; }
     #gbVipSticky .gb-vip-trophy { font-size: 1.2rem; }
@@ -24235,13 +24324,25 @@ setTimeout(_fpBadgeInit, 1200);
     #gbVipSticky .gb-vip-txt .gb-vip-sub { display: none; }
     #gbVipSticky .gb-vip-cta { font-size: 0.76rem; padding: 7px 12px; }
   }
+
+  /* Respetar prefers-reduced-motion ── accesibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    #gbVipSticky,
+    #gbVipSticky::before, #gbVipSticky::after,
+    #gbVipSticky .gb-vip-trophy,
+    #gbVipSticky .gb-vip-txt .gb-vip-hl,
+    #gbVipSticky .gb-vip-cta,
+    #gbVipSticky .gb-vip-cta-arrow {
+      animation: none !important;
+    }
+  }
 </style>
 <div id="gbVipSticky" class="gb-hidden" role="complementary" aria-label="Servicio VIP del Mundial">
   <span class="gb-vip-trophy">🏆</span>
   <div class="gb-vip-txt">
     <span class="gb-vip-hl">VIP Mundial 2026</span> · <span class="gb-vip-sub">picks premium + análisis directo</span>
   </div>
-  <a href="https://t.me/AtencionVipProArg" target="_blank" rel="noopener" class="gb-vip-cta" onclick="try{localStorage.setItem('gb_vip_clicked','1')}catch(e){}">Contratar →</a>
+  <a href="https://t.me/AtencionVipProArg" target="_blank" rel="noopener" class="gb-vip-cta" onclick="try{localStorage.setItem('gb_vip_clicked','1')}catch(e){}">Contratar <span class="gb-vip-cta-arrow">→</span></a>
   <button class="gb-vip-close" type="button" aria-label="Cerrar" onclick="(function(){try{localStorage.setItem('gb_vip_dismissed_ts',String(Date.now()))}catch(e){}var el=document.getElementById('gbVipSticky');if(el)el.classList.add('gb-hidden')})();return false;">×</button>
 </div>
 <script>
@@ -24259,8 +24360,12 @@ setTimeout(_fpBadgeInit, 1200);
     var ts = parseInt(localStorage.getItem('gb_vip_dismissed_ts') || '0', 10);
     if (ts && (Date.now() - ts) < DISMISS_TTL_MS) return;
   } catch(e){}
-  // Mostrar con pequeño delay para no competir con la carga inicial
-  setTimeout(function(){ el.classList.remove('gb-hidden'); }, 1500);
+  // Mostrar con pequeño delay para no competir con la carga inicial.
+  // gb-show dispara la animación de slide-up con bounce.
+  setTimeout(function(){
+    el.classList.remove('gb-hidden');
+    el.classList.add('gb-show');
+  }, 1500);
 })();
 </script>
 <!-- ─── /Banner sticky VIP Mundial ─── -->
