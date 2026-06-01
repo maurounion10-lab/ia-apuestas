@@ -21,6 +21,8 @@
  *   CACHE_KV → gambeta-cache (ID: 1d4b161e78db4de9a9b806f369c73ceb)
  */
 
+import { WC_FUTURES, WC_FUTURES_PUBLISH_TS } from './wc-futures.js';
+
 const API_FOOTBALL_BASE = 'https://v3.football.api-sports.io';
 
 // Temporadas por liga: europeas usan 2025 (= 2025/26), latinoamericanas usan 2026 (año calendario)
@@ -1489,6 +1491,8 @@ async function runScheduledResolver(env) {
     // win/loss pero sin marcador o con P/L en 0. El resolver los re-procesa y
     // los deja consistentes (result + finalScore + pl), auto-sanando ese estado roto.
     const pending = hist.filter(p => {
+      // Skip apuestas de futuro WC2026 — se resuelven manual
+      if (p._wcFuture) return false;
       if (!p.commenceTs) return false;
       const age = now - p.commenceTs;
       if (age < TWO_H || age > TWENTY_ONE_D) return false;
@@ -1626,6 +1630,75 @@ async function runScheduledResolver(env) {
 }
 
 // ── Router principal ─────────────────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 🏆 WC2026 Futures Publisher
+// Inserta los 10 outright picks en historial_full del admin EL DÍA programado
+// (WC_FUTURES_PUBLISH_TS = 6-jun-2026 03:00 UTC). Solo lo hace una vez —
+// usa los IDs de los picks para detectar si ya están publicados.
+// ─────────────────────────────────────────────────────────────────────────────
+async function runWcFuturesPublisher(env) {
+  const stats = { skip: null, published: 0, alreadyPublished: 0 };
+  try {
+    const now = Date.now();
+    if (now < WC_FUTURES_PUBLISH_TS) {
+      stats.skip = `aún no llegó la fecha de publicación (${new Date(WC_FUTURES_PUBLISH_TS).toISOString()})`;
+      return stats;
+    }
+
+    const hist = await fetchAdminHistorial(env);
+    if (!Array.isArray(hist)) {
+      stats.skip = 'historial no disponible';
+      return stats;
+    }
+
+    const existingIds = new Set(hist.map(p => p && p.id).filter(Boolean));
+    const toAdd = WC_FUTURES.filter(p => !existingIds.has(p.id));
+
+    stats.alreadyPublished = WC_FUTURES.length - toAdd.length;
+    if (toAdd.length === 0) {
+      stats.skip = 'los 10 picks WC2026 ya están en el historial';
+      return stats;
+    }
+
+    // Insertar al inicio del historial (más nuevos primero, como el resto del feed)
+    const newHist = [...toAdd, ...hist];
+
+    const key = env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!key) {
+      stats.skip = 'SUPABASE_SERVICE_ROLE_KEY no configurado';
+      return stats;
+    }
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/acoin_users?email=eq.${encodeURIComponent(ADMIN_EMAIL)}&select=email`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': key,
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+      },
+      body: JSON.stringify({
+        historial_full: newHist,
+        updated_at: new Date().toISOString(),
+      }),
+    });
+
+    if (!r.ok) {
+      stats.skip = `PATCH HTTP ${r.status}: ${(await r.text()).slice(0, 200)}`;
+      return stats;
+    }
+    const body = await r.text();
+    if (body.trim() === '[]' || !body.trim()) {
+      stats.skip = 'PATCH no afectó ninguna fila';
+      return stats;
+    }
+    stats.published = toAdd.length;
+  } catch (e) {
+    stats.skip = `error: ${e.message}`;
+  }
+  return stats;
+}
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
@@ -1642,6 +1715,9 @@ export default {
       // Default (0 * * * * — hourly): resolve completed picks
       const stats = await runScheduledResolver(env);
       console.log('[cron-resolver]', JSON.stringify(stats));
+      // Publicar WC2026 futures el 6-jun (sólo se inserta una vez)
+      const wcStats = await runWcFuturesPublisher(env);
+      console.log('[cron-wc-futures]', JSON.stringify(wcStats));
     }
   },
   async fetch(request, env) {
