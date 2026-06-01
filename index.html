@@ -11334,11 +11334,56 @@ function renderPreds() {
             </div>
           </div>`) : '';
 
+        // ── 🏆 Hype del Mundial 2026 ──
+        // En lugar del placeholder genérico "sin picks hoy", aprovechamos el espacio
+        // para promocionar las 10 predicciones del Mundial. Tres estados según la fecha.
+        const _now = new Date();
+        const _today = new Date(_now.getFullYear(), _now.getMonth(), _now.getDate()).getTime();
+        const _picksTs   = new Date(2026, 5, 6).getTime();  // 6-jun-2026 (publicación)
+        const _kickoffTs = new Date(2026, 5, 11).getTime(); // 11-jun-2026 (kickoff)
+        const _finalTs   = new Date(2026, 6, 19).getTime(); // 19-jul-2026 (final)
+        const _dPicks   = Math.max(0, Math.round((_picksTs   - _today) / 86400000));
+        const _dKickoff = Math.max(0, Math.round((_kickoffTs - _today) / 86400000));
+
+        let _wcHeadline, _wcSubtitle, _wcCta, _wcEmoji;
+        if (_today < _picksTs) {
+          // FASE 1: aún no se publicaron las 10 predicciones (1-jun → 5-jun)
+          _wcEmoji    = '🏆';
+          _wcHeadline = `En ${_dPicks} día${_dPicks===1?'':'s'} la IA publica sus <span style="color:#d4af37">10 predicciones del Mundial</span>`;
+          _wcSubtitle = `México, España, Argentina, Mbappé... La IA ya cargó sus apuestas a futuro del Mundial 2026. Cuotas frozen pre-torneo. Aparecen el 6 de junio.`;
+          _wcCta      = `<div style="font-size:0.78rem;color:#d4af37;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;margin-top:8px">⚡ Vuelve el 6 de junio</div>`;
+        } else if (_today < _kickoffTs) {
+          // FASE 2: predicciones publicadas, falta el kickoff (6-jun → 10-jun)
+          _wcEmoji    = '🔥';
+          _wcHeadline = `Las <span style="color:#d4af37">10 predicciones del Mundial</span> ya están en el feed`;
+          _wcSubtitle = `Falta${_dKickoff===1?'':'n'} ${_dKickoff} día${_dKickoff===1?'':'s'} para el kickoff. Las cuotas están locked desde el 6 de junio. Mirá quién dice la IA que gana el Mundial.`;
+          _wcCta      = `<a href="#predicciones" style="display:inline-block;background:linear-gradient(135deg,#d4af37 0%,#b8941f 100%);color:#0d1f0d;font-weight:800;font-size:0.88rem;padding:11px 26px;border-radius:8px;text-decoration:none;letter-spacing:0.3px;margin-top:8px">Ver las 10 predicciones →</a>`;
+        } else if (_today <= _finalTs) {
+          // FASE 3: Mundial en curso (11-jun → 19-jul)
+          _wcEmoji    = '⚽';
+          _wcHeadline = `<span style="color:#d4af37">Mundial 2026 EN VIVO</span>`;
+          _wcSubtitle = `La IA dejó 10 apuestas a futuro antes del torneo. Mirá cómo van. El feed de picks diarios vuelve cuando termine el Mundial.`;
+          _wcCta      = `<a href="#predicciones" style="display:inline-block;background:linear-gradient(135deg,#d4af37 0%,#b8941f 100%);color:#0d1f0d;font-weight:800;font-size:0.88rem;padding:11px 26px;border-radius:8px;text-decoration:none;letter-spacing:0.3px;margin-top:8px">Ver predicciones del Mundial →</a>`;
+        } else {
+          // FASE 4: post-Mundial — fallback al mensaje genérico
+          return `
+            <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px 60px;gap:14px;text-align:center">
+              <div style="font-size:2.5rem">🔍</div>
+              <div style="font-size:1.1rem;font-weight:700;color:var(--texto-pri)">Sin pronósticos de alta confianza hoy</div>
+              <div style="font-size:0.85rem;color:var(--texto-sec);max-width:340px;line-height:1.5">La IA no encontró partidos con suficiente certeza para recomendar. Volvé más tarde cuando haya más partidos disponibles.</div>
+              ${_pushCard}
+              ${_emailCard}
+            </div>`;
+        }
+
         return `
-          <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 20px 60px;gap:14px;text-align:center">
-            <div style="font-size:2.5rem">🔍</div>
-            <div style="font-size:1.1rem;font-weight:700;color:var(--texto-pri)">Sin pronósticos de alta confianza hoy</div>
-            <div style="font-size:0.85rem;color:var(--texto-sec);max-width:340px;line-height:1.5">La IA no encontró partidos con suficiente certeza para recomendar. Volvé más tarde cuando haya más partidos disponibles.</div>
+          <div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:54px 20px 60px;gap:14px;text-align:center;background:linear-gradient(180deg,rgba(26,58,26,0.55) 0%,rgba(13,31,13,0.35) 100%);border:1.5px solid rgba(212,175,55,0.35);border-radius:14px;position:relative;overflow:hidden">
+            <div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent 0%,#d4af37 50%,transparent 100%);opacity:0.8"></div>
+            <div style="font-size:3rem;filter:drop-shadow(0 2px 8px rgba(212,175,55,0.5));animation:gbMundialFloat 3.5s ease-in-out infinite">${_wcEmoji}</div>
+            <div style="font-size:0.7rem;font-weight:800;letter-spacing:2.5px;color:#d4af37;text-transform:uppercase">⚡ Próximamente en gambeta.ai</div>
+            <div style="font-size:1.25rem;font-weight:900;color:#fff;max-width:480px;line-height:1.3;letter-spacing:-0.2px">${_wcHeadline}</div>
+            <div style="font-size:0.92rem;color:rgba(255,255,255,0.72);max-width:440px;line-height:1.55">${_wcSubtitle}</div>
+            ${_wcCta}
             ${_pushCard}
             ${_emailCard}
           </div>`;
