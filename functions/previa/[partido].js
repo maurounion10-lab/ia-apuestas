@@ -20,6 +20,15 @@ export async function onRequest(context) {
       });
     }
 
+    // 301 redirect para previas muy viejas (>30 días). Google saca estas URLs
+    // del reporte "Descubierta sin indexar" cuando ve el 301 permanente.
+    // GSC tenía 161 URLs viejas marcadas como "Descubierta sin indexar"; con
+    // este redirect deberían limpiarse en 2-4 semanas.
+    const THIRTY_DAYS_MS = 30 * 24 * 3600 * 1000;
+    if (pick.commenceTs && (Date.now() - pick.commenceTs) > THIRTY_DAYS_MS) {
+      return Response.redirect('https://gambeta.ai/previas', 301);
+    }
+
     const html = renderPrevia(pick);
     const resolved = pick.result && pick.result !== 'pending';
     // Past resolved picks: cache 1 day. Pending/upcoming: 10 min.
