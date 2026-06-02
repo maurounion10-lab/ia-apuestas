@@ -90,3 +90,20 @@
 /nba/500/                     /                                 301
 /blog/que-es-tennisstats      /blog/tennisstats-para-apostar    301
 /blog/que-es-tennisstats/     /blog/tennisstats-para-apostar    301
+
+# GSC fix: 404s detectados — redirigir a destinos útiles
+# (commit jun-2026)
+
+# Endpoints API que Google descubrió como páginas → home
+/league-context        /                301
+/cup-context           /                301
+/ranking               /                301
+/ranking/              /                301
+
+# Blog posts referenciados pero no creados → blog index
+/blog/que-es-tennisstats               /blog                  301
+/blog/tennisstats-vs-tennis-metrics    /blog                  301
+/blog/como-leer-picks                  /blog/como-leer-resultados   301
+
+# URL inválida (probable garbage de algún tracker)
+/nba/500/              /                301
