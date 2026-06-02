@@ -1086,12 +1086,132 @@ const COM_POOL = [
   '🏟️ ¿Mejor recuerdo de un partido apostando?\n\nUno corto, contame 👇',
 ];
 
+
+// ───────────────────── HYPE MUNDIAL 2026 ─────────────────────
+// Pool especial para los días previos al Mundial (kickoff 11-jun-2026).
+// genEducacion y genComunidad lo priorizan si la fecha actual está entre 2-jun y 11-jun.
+// 20 tweets escalonados: countdown, teasers de las 10 predicciones (publicación 6-jun),
+// encuestas, datos crudos, hilos, anuncio del canal VIP Telegram.
+const MUNDIAL_POOL = [
+  '🇦🇷 Faltan 9 días para el Mundial 2026.\n\n' +
+  'El 6 de junio publicamos las 10 predicciones que la IA cruzó con cuotas frozen pre-torneo.\n\n' +
+  'Spoiler: la favorita NO es la que pensás.',
+
+  '🤖 La IA terminó de procesar 1.247 partidos previos de selección.\n\n' +
+  'Le pedí que me diga el campeón del Mundial 2026.\n\n' +
+  'Lo publica el 6 de junio. Sin trampas, con cuotas pre-torneo. Te suscribís y te llega.',
+
+  '⚽ Pregunta seria para los que ven Mundial:\n\n' +
+  '— España\n— Francia\n— Argentina\n— Brasil\n\n' +
+  '¿Quién levanta la copa? Voten 👇',
+
+  '🏆 Datos crudos para el Mundial 2026:\n\n' +
+  '• España viene de 30+ partidos invicto\n' +
+  '• Francia es #1 del ranking FIFA\n' +
+  '• Argentina defiende el título\n' +
+  '• 3 sedes, 48 equipos, 104 partidos\n\n' +
+  'Empieza el 11 de junio. Falta poco.',
+
+  '🇦🇷 Si Argentina gana el Mundial:\n' +
+  '• Bicampeonato consecutivo (no pasa hace 60 años)\n' +
+  '• Messi se va con 3 copas\n' +
+  '• Cuota actual: ~7.50\n\n' +
+  '¿Le tenés fe? 👇',
+
+  '📊 La IA lleva +500 picks resueltos con historial público (no es marketing, está todo en el sitio).\n\n' +
+  'El 6 de junio mete su análisis del Mundial 2026.\n\n' +
+  'Si querés acceso anticipado: t.me/AtencionVipProArg',
+
+  '🔮 Faltan 7 días para el Mundial 2026.\n\n' +
+  'En 24 hs publicamos las 10 apuestas a futuro: campeón, finalista, dark horses, goleador.\n\n' +
+  'Con cuotas reales frozen pre-torneo. Cero edición posterior.',
+
+  '⚽ ¿Cuál es el "dark horse" del Mundial 2026 que casi nadie nombra?\n\n' +
+  'La IA detectó 2 selecciones donde la cuota paga MÁS de lo que la probabilidad real justifica.\n\n' +
+  'Pista: una africana, una sudamericana (no Argentina).',
+
+  '🇦🇷 Tema delicado:\n\n' +
+  '¿Messi se retira del Mundial si Argentina queda eliminada en fase de grupos?\n\n' +
+  '— Sí, fijo\n— Espera la Copa América 2028\n— Sigue hasta los 40\n\n' +
+  'Curioso 👇',
+
+  '🏆 HOY publicamos las 10 predicciones del Mundial 2026.\n\n' +
+  '• 3 ganadores de grupo\n• 2 selecciones que clasifican\n• 2 selecciones que llegan a una fase\n• 1 dark horse\n• 1 outright al campeón\n• 1 goleador del torneo\n\n' +
+  'En gambeta.ai, gratis.',
+
+  '👀 Si todavía no leíste el análisis del Mundial:\n\n' +
+  'gambeta.ai/blog/cuotas-mundial-2026\n\n' +
+  'Favoritos, dark horses, mercados secundarios. Sin marketing. Datos.',
+
+  '🤖 La pregunta que me hacen 100 veces:\n\n' +
+  '"¿La IA acierta más que un tipster humano?"\n\n' +
+  'No siempre. Pero NUNCA te miente sobre los fallos. Cada pick — ganado o perdido — está guardado en la web. Verificá vos mismo.',
+
+  '🇪🇸 España es la favorita absoluta (~5.50).\n' +
+  '🇫🇷 Francia segunda (~5.50).\n' +
+  '🇦🇷 Argentina tercera (~7.50).\n' +
+  '🇧🇷 Brasil cuarta (~8.50).\n\n' +
+  '¿Cuál tiene mejor valor a esa cuota? Te tiro la respuesta cruda abajo. 👇',
+
+  '⚽ Faltan 5 días para el Mundial 2026.\n\n' +
+  'Si todavía no abriste cuenta en alguna casa legal de Argentina, esto es para vos:\n\n' +
+  'gambeta.ai/blog/como-apostar-mundial-2026-argentina\n\n' +
+  'Bonos, métodos de pago, casas reguladas. Guía honesta.',
+
+  '🏟️ El Estadio Azteca abre el Mundial 2026 el 11 de junio.\n\n' +
+  'Es la 3ra vez que México hace de sede inaugural (1970, 1986, 2026).\n\n' +
+  'Datos para cuando alguien te diga "¿quién hizo el primer Mundial?". 🇲🇽',
+
+  '🟢 ¿Qué selección va a sorprender en este Mundial?\n\n' +
+  'Quiero leerlas 👇\n\n' +
+  'No vale poner Argentina, Brasil, España, Francia. Banco el que se anime a una de las "chicas".',
+
+  '🤖 La IA terminó de calcular los grupos del Mundial 2026.\n\n' +
+  'Le di los 12 grupos y le pedí que me marque cuáles son los más impredecibles.\n\n' +
+  'Hilo abajo 🧵',
+
+  '⚽ ¿Goleador del Mundial 2026? Los favoritos son:\n\n' +
+  '🇫🇷 Mbappé (~5.00)\n' +
+  '🇳🇴 Haaland (~6.00) — pero Noruega no clasifica\n' +
+  '🏴 Kane (~7.00)\n' +
+  '🇧🇷 Vinicius (~8.00)\n\n' +
+  '¿Quién la rompe? 👇',
+
+  '🚨 Mañana arranca el Mundial 2026.\n\n' +
+  'Tenemos canal VIP con análisis en vivo, picks específicos por partido y respuesta directa: t.me/AtencionVipProArg\n\n' +
+  'Gratis durante el torneo. Después se cobra.',
+
+  '🏆 Hoy arranca el Mundial 2026.\n\n' +
+  '11 de junio, Estadio Azteca, México vs el ganador del repechaje.\n\n' +
+  'Las 10 predicciones de la IA están publicadas. Andá a gambeta.ai y revisalas. ⚽',
+];
+
+// Decide si estamos en el período de hype Mundial (2-jun a 11-jun-2026, inclusive).
+function isMundialHypeWindow() {
+  const now = new Date();
+  const start = new Date('2026-06-02T00:00:00-03:00');
+  const end   = new Date('2026-06-12T00:00:00-03:00'); // inclusive todo 11-jun
+  return now >= start && now < end;
+}
+
 async function genEducacion(env) {
+  // Durante la ventana pre-Mundial, el slot educación se reemplaza por hype Mundial
+  if (isMundialHypeWindow()) {
+    const t = await pickFreshFromPool(MUNDIAL_POOL, env);
+    if (t) return t;
+    console.log('[x-bot] MUNDIAL pool exhausted — fallback a EDU');
+  }
   const t = await pickFreshFromPool(EDU_POOL, env);
   if (!t) console.log('[x-bot] EDU pool exhausted — slot skipped');
   return t;
 }
 async function genComunidad(env) {
+  // Durante la ventana pre-Mundial, el slot comunidad también prioriza hype Mundial
+  if (isMundialHypeWindow()) {
+    const t = await pickFreshFromPool(MUNDIAL_POOL, env);
+    if (t) return t;
+    console.log('[x-bot] MUNDIAL pool exhausted — fallback a COM');
+  }
   const t = await pickFreshFromPool(COM_POOL, env);
   if (!t) console.log('[x-bot] COM pool exhausted — slot skipped');
   return t;
