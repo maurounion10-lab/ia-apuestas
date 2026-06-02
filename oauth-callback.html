@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>OAuth Callback — Gambeta</title>
+<style>
+  body{margin:0;padding:0;background:#0d1f0d;color:#eee;font-family:Arial,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh}
+  .box{background:#1a3a1a;border:1px solid #d4af37;border-radius:12px;padding:32px;max-width:640px;width:90%}
+  h1{color:#d4af37;margin:0 0 16px;font-size:1.4rem}
+  pre{background:#0d1f0d;padding:14px;border-radius:8px;font-size:0.78rem;color:#9bcf9b;overflow-x:auto;word-break:break-all;white-space:pre-wrap}
+  p{line-height:1.5;color:#cfd}
+  .ok{color:#9bcf9b}.err{color:#ff8b8b}
+</style>
+</head>
+<body>
+<div class="box">
+  <h1 id="t">Procesando OAuth callback...</h1>
+  <p id="msg">Si ves esto, el flow OAuth completó. El token está abajo, listo para pasarlo al sandbox.</p>
+  <pre id="out"></pre>
+</div>
+<script>
+(() => {
+  const hash = (window.location.hash || '').replace(/^#/, '');
+  const search = (window.location.search || '').replace(/^\?/, '');
+  const all = (hash + '&' + search).replace(/^&/, '');
+  const params = {};
+  new URLSearchParams(all).forEach((v,k) => params[k] = v);
+  document.getElementById('out').textContent = JSON.stringify(params, null, 2);
+  if (params.access_token) {
+    document.getElementById('t').innerHTML = '<span class="ok">✓ Token recibido</span>';
+    document.getElementById('msg').textContent = 'Pegale el contenido de abajo al chat del sandbox para que continúe.';
+  } else if (params.error) {
+    document.getElementById('t').innerHTML = '<span class="err">✗ Error</span>';
+  }
+})();
+</script>
+</body>
+</html>
