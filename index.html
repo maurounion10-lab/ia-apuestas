@@ -114,6 +114,50 @@
     --borde: #2e4a2e;
   }
 
+  /* ════════════ MUNDIAL 2026 THEME ════════════
+     Activado automáticamente entre 2-jun-2026 y 19-jul-2026 (final).
+     Paleta festiva: oro + rojo carmesí + verde mexicano. */
+  body.wc2026-theme {
+    --verde:        #006847;  /* verde mexicano (más profundo que #00c853) */
+    --verde-oscuro: #004d33;
+    --verde-neon:   #FFD700;  /* el "neón" pasa a ser dorado */
+    --negro:        #0a0a0f;
+    --gris-oscuro:  #14110a;  /* matiz cálido */
+    --gris-medio:   #1f1a10;
+    --gris-card:    #221a10;
+    --texto:        #fff8e1;  /* off-white cálido */
+    --texto-sec:    #F5C77E;  /* dorado suave para secundario */
+    --amarillo:     #FFD700;  /* dorado puro */
+    --rojo:         #C8102E;  /* rojo carmesí México */
+    --azul:         #29b6f6;
+    --naranja:      #FFA000;
+    --borde:        rgba(255,215,0,0.18);  /* borde dorado tenue */
+  }
+  /* Acentos festivos sobre nav, botones y badges */
+  body.wc2026-theme nav.nav-main,
+  body.wc2026-theme .nav,
+  body.wc2026-theme header.hero {
+    background: linear-gradient(135deg, #14110a 0%, #1f1a10 60%, #2a1f10 100%) !important;
+    border-bottom-color: rgba(255,215,0,0.28) !important;
+  }
+  body.wc2026-theme .btn-cta,
+  body.wc2026-theme button.cta,
+  body.wc2026-theme .nav-cta-btn {
+    background: linear-gradient(135deg, #FFD700, #f59e0b) !important;
+    color: #14110a !important;
+    box-shadow: 0 2px 14px rgba(255,215,0,0.35) !important;
+  }
+  /* Confetti hover ligero en cards principales */
+  body.wc2026-theme .card,
+  body.wc2026-theme .pick-card {
+    border-color: rgba(255,215,0,0.16) !important;
+  }
+  body.wc2026-theme .card:hover,
+  body.wc2026-theme .pick-card:hover {
+    box-shadow: 0 8px 24px rgba(200,16,46,0.18), 0 2px 8px rgba(255,215,0,0.18) !important;
+  }
+
+
   * { margin:0; padding:0; box-sizing:border-box; min-width:0; }
 
   html { overflow-x: hidden; }
@@ -5107,6 +5151,25 @@
  ]
 }
 </script>
+
+<script>
+  // Activador automático del theming Mundial 2026 (2-jun → 19-jul).
+  (function(){
+    try {
+      var now  = new Date();
+      var start= new Date('2026-06-02T00:00:00-03:00');
+      var end  = new Date('2026-07-20T00:00:00-03:00');
+      if (now >= start && now < end) {
+        // Aplicar antes de DOMContentLoaded para evitar flash
+        document.addEventListener('DOMContentLoaded', function(){
+          document.body.classList.add('wc2026-theme');
+        });
+        // Por si el body ya existe (modo edge), aplicar de una
+        if (document.body) document.body.classList.add('wc2026-theme');
+      }
+    } catch(e){}
+  })();
+</script>
 </head>
 <body>
 
@@ -9029,7 +9092,123 @@ function teamInitialsBadge(name, size=48) {
   return `<span title="${(name||'').replace(/"/g,'&quot;')}" style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:#fff;font-size:${fsz}px;font-weight:800;letter-spacing:-.5px;line-height:1;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.5);font-family:inherit">${inits}</span>`;
 }
 
+
+// ───────────── WC 2026 — Selecciones nacionales + eventos especiales ─────────────
+// Para selecciones que no tienen escudo de club, mostramos:
+//   • Escudo de la confederación (chico, esquina superior izq)
+//   • Banderita del país (grande, ocupa el círculo)
+const WC2026_NATIONS = {
+  // CONMEBOL (Sudamérica)
+  'Argentina':       { conf:'CONMEBOL', iso:'ar' },
+  'Brasil':          { conf:'CONMEBOL', iso:'br' },
+  'Uruguay':         { conf:'CONMEBOL', iso:'uy' },
+  'Colombia':        { conf:'CONMEBOL', iso:'co' },
+  'Paraguay':        { conf:'CONMEBOL', iso:'py' },
+  'Ecuador':         { conf:'CONMEBOL', iso:'ec' },
+  // UEFA
+  'España':          { conf:'UEFA', iso:'es' },
+  'Francia':         { conf:'UEFA', iso:'fr' },
+  'Inglaterra':      { conf:'UEFA', iso:'gb-eng' },
+  'Portugal':        { conf:'UEFA', iso:'pt' },
+  'Italia':          { conf:'UEFA', iso:'it' },
+  'Alemania':        { conf:'UEFA', iso:'de' },
+  'Países Bajos':    { conf:'UEFA', iso:'nl' },
+  'Holanda':         { conf:'UEFA', iso:'nl' },
+  'Bélgica':         { conf:'UEFA', iso:'be' },
+  'Croacia':         { conf:'UEFA', iso:'hr' },
+  'Suiza':           { conf:'UEFA', iso:'ch' },
+  'Austria':         { conf:'UEFA', iso:'at' },
+  'Dinamarca':       { conf:'UEFA', iso:'dk' },
+  'Noruega':         { conf:'UEFA', iso:'no' },
+  'Polonia':         { conf:'UEFA', iso:'pl' },
+  'Suecia':          { conf:'UEFA', iso:'se' },
+  'Escocia':         { conf:'UEFA', iso:'gb-sct' },
+  'Turquía':         { conf:'UEFA', iso:'tr' },
+  'Ucrania':         { conf:'UEFA', iso:'ua' },
+  'Serbia':          { conf:'UEFA', iso:'rs' },
+  // CONCACAF (Norte/Centroamérica/Caribe)
+  'México':          { conf:'CONCACAF', iso:'mx' },
+  'Canadá':          { conf:'CONCACAF', iso:'ca' },
+  'Estados Unidos':  { conf:'CONCACAF', iso:'us' },
+  'USA':             { conf:'CONCACAF', iso:'us' },
+  'Costa Rica':      { conf:'CONCACAF', iso:'cr' },
+  'Panamá':          { conf:'CONCACAF', iso:'pa' },
+  'Jamaica':         { conf:'CONCACAF', iso:'jm' },
+  'Honduras':        { conf:'CONCACAF', iso:'hn' },
+  // CAF (África)
+  'Marruecos':       { conf:'CAF', iso:'ma' },
+  'Senegal':         { conf:'CAF', iso:'sn' },
+  'Argelia':         { conf:'CAF', iso:'dz' },
+  'Egipto':          { conf:'CAF', iso:'eg' },
+  'Nigeria':         { conf:'CAF', iso:'ng' },
+  'Sudáfrica':       { conf:'CAF', iso:'za' },
+  'Camerún':         { conf:'CAF', iso:'cm' },
+  'Costa de Marfil': { conf:'CAF', iso:'ci' },
+  'Ghana':           { conf:'CAF', iso:'gh' },
+  'Túnez':           { conf:'CAF', iso:'tn' },
+  'Cabo Verde':      { conf:'CAF', iso:'cv' },
+  // AFC (Asia)
+  'Japón':           { conf:'AFC', iso:'jp' },
+  'Corea del Sur':   { conf:'AFC', iso:'kr' },
+  'Australia':       { conf:'AFC', iso:'au' },
+  'Irán':            { conf:'AFC', iso:'ir' },
+  'Arabia Saudita':  { conf:'AFC', iso:'sa' },
+  'Qatar':           { conf:'AFC', iso:'qa' },
+  'Catar':           { conf:'AFC', iso:'qa' },
+  'República Checa': { conf:'UEFA', iso:'cz' },
+  'Chequia':         { conf:'UEFA', iso:'cz' },
+  // OFC (Oceanía)
+  'Nueva Zelanda':   { conf:'OFC', iso:'nz' },
+};
+
+const WC2026_CONFEDS = {
+  UEFA:     'https://upload.wikimedia.org/wikipedia/en/thumb/3/3a/UEFA.svg/120px-UEFA.svg.png',
+  CONMEBOL: 'https://upload.wikimedia.org/wikipedia/en/thumb/9/97/Conmebol_logo_%282022%29.svg/120px-Conmebol_logo_%282022%29.svg.png',
+  CONCACAF: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/CONCACAF_logo_%282020%29.svg/120px-CONCACAF_logo_%282020%29.svg.png',
+  CAF:      'https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/Caf-confederation-of-african-football.svg/120px-Caf-confederation-of-african-football.svg.png',
+  AFC:      'https://upload.wikimedia.org/wikipedia/en/thumb/1/19/Asian_Football_Confederation_logo.svg/120px-Asian_Football_Confederation_logo.svg.png',
+  OFC:      'https://upload.wikimedia.org/wikipedia/en/thumb/a/ad/OFC_2014_logo.svg/120px-OFC_2014_logo.svg.png',
+};
+
+// Eventos especiales del Mundial (away = "Grupo A", "Campeón Mundial 2026", "Bota de Oro", etc.)
+function wcEventBadge(name, size=48) {
+  const lower = (name||'').toLowerCase();
+  let emoji = '🏆', bg = 'linear-gradient(135deg,#c8102e 0%,#FFD700 100%)';
+  if (lower.includes('grupo'))         { emoji='⚽'; bg='linear-gradient(135deg,#006847 0%,#15803d 100%)'; }
+  else if (lower.includes('octavos'))  { emoji='🥇'; bg='linear-gradient(135deg,#FFD700 0%,#f59e0b 100%)'; }
+  else if (lower.includes('cuartos'))  { emoji='🥈'; bg='linear-gradient(135deg,#FFD700 0%,#f59e0b 100%)'; }
+  else if (lower.includes('semi'))     { emoji='🥉'; bg='linear-gradient(135deg,#FFD700 0%,#f59e0b 100%)'; }
+  else if (lower.includes('final'))    { emoji='🏆'; bg='linear-gradient(135deg,#FFD700 0%,#c8102e 100%)'; }
+  else if (lower.includes('campeón') || lower.includes('campeon'))  { emoji='🏆'; bg='linear-gradient(135deg,#FFD700 0%,#c8102e 100%)'; }
+  else if (lower.includes('bota')) { emoji='👟'; bg='linear-gradient(135deg,#FFD700 0%,#f59e0b 100%)'; }
+  else if (lower.includes('goleador')) { emoji='⚽'; bg='linear-gradient(135deg,#FFD700 0%,#c8102e 100%)'; }
+  const fsz = Math.round(size * 0.5);
+  return `<span title="${(name||'').replace(/"/g,'&quot;')}" style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:#fff;font-size:${fsz}px;line-height:1;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.4);border:2px solid rgba(255,215,0,0.5)">${emoji}</span>`;
+}
+
+// Badge para selección nacional: bandera grande + escudo confederación esquina superior izq
+function nationalTeamBadge(name, size=48) {
+  const info = WC2026_NATIONS[name];
+  if (!info) return null;
+  const flagUrl = `https://flagcdn.com/w160/${info.iso}.png`;
+  const confUrl = WC2026_CONFEDS[info.conf];
+  const confSize = Math.max(14, Math.round(size * 0.38));
+  return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:visible;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.5);background:#fff">`
+       + `<img src="${flagUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:50%;display:block">`
+       + `<img src="${confUrl}" alt="${info.conf}" width="${confSize}" height="${confSize}" style="position:absolute;top:-3px;left:-3px;width:${confSize}px;height:${confSize}px;border-radius:50%;background:#fff;padding:2px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.4)" onerror="this.style.display='none'">`
+       + `</span>`;
+}
+
 function logoHtml(name, size=48) {
+  // ─ WC2026 fallback: selecciones nacionales sin escudo de club
+  if (name && WC2026_NATIONS[name]) {
+    const nb = nationalTeamBadge(name, size);
+    if (nb) return nb;
+  }
+  // ─ WC2026 fallback: eventos especiales (Grupo X, Campeón, Bota de Oro, etc.)
+  if (name && /^(grupo|campe[óo]n|finalista|semifinal|cuartos|octavos|bota|goleador)/i.test(name)) {
+    return wcEventBadge(name, size);
+  }
   // Buscar logo con fallbacks de nombre: exacto → sin acento → sin sufijo → sin prefijo → normalizado parcial
   function findLogoUrl(n) {
     if (!n) return null;

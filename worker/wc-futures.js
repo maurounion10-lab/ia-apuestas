@@ -11,7 +11,8 @@
 // Mix calibrado por Mauro: 3 ganadores de grupo + 2 clasifica + 2 stage + 1 dark horse
 //                          + 1 outright winner + 1 top scorer.
 
-export const WC_FUTURES_PUBLISH_TS = Date.UTC(2026, 5, 6, 3, 0, 0); // 6-jun-2026 03:00 UTC = 00:00 ART
+// 🚀 Adelantado a 2-jun por decisión del usuario (publicar ya, ganar SEO).
+export const WC_FUTURES_PUBLISH_TS = Date.UTC(2026, 5, 2, 0, 0, 0); // 2-jun-2026 00:00 UTC
 export const WC_KICKOFF_TS         = Date.UTC(2026, 5, 11, 20, 0, 0); // 11-jun-2026 (referencia)
 export const WC_FINAL_TS           = Date.UTC(2026, 6, 19, 20, 0, 0); // 19-jul-2026 (final)
 
