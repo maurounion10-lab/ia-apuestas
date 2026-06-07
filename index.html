@@ -11408,10 +11408,19 @@ function renderPreds() {
     } else if (sf === 'libertadores') {
       _leagueFilter(['copa_libertadores']);
     } else if (sf === 'mundial') {
-      // 🏆 Mundial 2026 — partidos del torneo (excluye los futures de largo plazo)
+      // 🏆 Mundial 2026 — SOLO partidos del torneo (no apuestas a futuro/largo plazo).
+      // Triple filtro de exclusión: flag explícito, _wcType, y formato away de evento.
+      const _isLongTerm = p => {
+        if (p._wcFuture === true || p._wcType) return true;
+        const away = (p.away || '').toLowerCase();
+        if (/^(grupo |grupo$|semifinal|cuartos|octavos|bota de oro|campe[óo]n|finalista|goleador)/i.test(away)) return true;
+        const rec = (p.rec || '').toLowerCase();
+        if (/(gana el grupo|gana el mundial|llega a |clasifica |bota de oro|es el goleador)/i.test(rec)) return true;
+        return false;
+      };
       const fn = p => {
         const sk = p._sportKey || '';
-        return sk.includes('fifa_world_cup') && !p._wcFuture;
+        return sk.includes('fifa_world_cup') && !_isLongTerm(p);
       };
       upcoming = upcoming.filter(fn); finished = finished.filter(fn);
       const all = [...upcoming, ...finished];
