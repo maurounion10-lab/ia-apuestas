@@ -5547,21 +5547,28 @@ window.toggleHeroBubble = function(n) {
     padding:0 3px;
     letter-spacing:0.5px;
   }
+  #gbWcTicker .gb-ticker-item .gb-tk-team {
+    font-weight:700;
+    color:rgba(255,255,255,0.96);
+  }
   #gbWcTicker .gb-ticker-item .gb-tk-meta {
-    color:rgba(255,215,0,0.62);
-    font-weight:500;
-    font-size:.74rem;
-    margin-left:6px;
-    border-left:1px solid rgba(255,215,0,0.18);
-    padding-left:8px;
+    color:rgba(255,215,0,0.78);
+    font-weight:700;
+    font-size:.78rem;
+    margin-left:10px;
+    padding:2px 9px;
+    border-radius:5px;
+    background:rgba(255,215,0,0.10);
+    border:1px solid rgba(255,215,0,0.22);
+    letter-spacing:0.2px;
   }
   @keyframes gbWcTickerScroll {
     from { transform: translateX(0); }
     to   { transform: translateX(-50%); }
   }
   @media (max-width:560px) {
-    #gbWcTicker .gb-ticker-item { font-size:.78rem; }
-    #gbWcTicker .gb-ticker-item .gb-tk-meta { display:none; }
+    #gbWcTicker .gb-ticker-item { font-size:.78rem; gap:7px; }
+    #gbWcTicker .gb-ticker-item .gb-tk-meta { font-size:.7rem; margin-left:6px; padding:1px 7px; }
   }
 </style>
 <script>
@@ -5569,29 +5576,29 @@ window.toggleHeroBubble = function(n) {
   // Fixtures reales primeros días Mundial 2026 (fase de grupos).
   // home, away, fecha-hora ART (UTC-3), sede.
   var FIXTURES = [
-    { h:'mx', H:'México',         a:'sa', A:'Arabia Saudita', when:'11-jun 13:00 ART', sede:'Estadio Azteca · México' },
-    { h:'us', H:'Estados Unidos', a:'no', A:'Noruega',        when:'12-jun 16:00 ART', sede:'SoFi · Los Ángeles' },
-    { h:'ca', H:'Canadá',         a:'jp', A:'Japón',          when:'12-jun 19:00 ART', sede:'BMO · Toronto' },
-    { h:'es', H:'España',         a:'cv', A:'Cabo Verde',     when:'13-jun 13:00 ART', sede:'Lumen · Seattle' },
-    { h:'ar', H:'Argentina',      a:'sn', A:'Senegal',        when:'13-jun 16:00 ART', sede:'MetLife · New Jersey' },
-    { h:'br', H:'Brasil',         a:'pt', A:'Portugal',       when:'14-jun 16:00 ART', sede:'Hard Rock · Miami' },
-    { h:'fr', H:'Francia',        a:'cr', A:'Costa Rica',     when:'14-jun 19:00 ART', sede:'NRG · Houston' },
-    { h:'gb-eng', H:'Inglaterra', a:'pl', A:'Polonia',        when:'15-jun 13:00 ART', sede:'AT&T · Dallas' },
-    { h:'de', H:'Alemania',       a:'tn', A:'Túnez',          when:'15-jun 16:00 ART', sede:'Mercedes-Benz · Atlanta' },
-    { h:'it', H:'Italia',         a:'kr', A:'Corea del Sur',  when:'16-jun 13:00 ART', sede:'Levi\'s · San Francisco' },
-    { h:'nl', H:'Países Bajos',   a:'au', A:'Australia',      when:'16-jun 19:00 ART', sede:'Arrowhead · Kansas City' },
-    { h:'ma', H:'Marruecos',      a:'co', A:'Colombia',       when:'17-jun 13:00 ART', sede:'Estadio Akron · Guadalajara' },
-    { h:'uy', H:'Uruguay',        a:'cz', A:'Chequia',        when:'17-jun 19:00 ART', sede:'Gillette · Boston' },
+    { h:'mx',     H:'México',         a:'sa', A:'Arabia Saudita', when:'Jue 11-jun · 13:00' },
+    { h:'us',     H:'Estados Unidos', a:'no', A:'Noruega',        when:'Vie 12-jun · 16:00' },
+    { h:'ca',     H:'Canadá',         a:'jp', A:'Japón',          when:'Vie 12-jun · 19:00' },
+    { h:'es',     H:'España',         a:'cv', A:'Cabo Verde',     when:'Sáb 13-jun · 13:00' },
+    { h:'ar',     H:'Argentina',      a:'sn', A:'Senegal',        when:'Sáb 13-jun · 16:00' },
+    { h:'br',     H:'Brasil',         a:'pt', A:'Portugal',       when:'Dom 14-jun · 16:00' },
+    { h:'fr',     H:'Francia',        a:'cr', A:'Costa Rica',     when:'Dom 14-jun · 19:00' },
+    { h:'gb-eng', H:'Inglaterra',     a:'pl', A:'Polonia',        when:'Lun 15-jun · 13:00' },
+    { h:'de',     H:'Alemania',       a:'tn', A:'Túnez',          when:'Lun 15-jun · 16:00' },
+    { h:'it',     H:'Italia',         a:'kr', A:'Corea del Sur',  when:'Mar 16-jun · 13:00' },
+    { h:'nl',     H:'Países Bajos',   a:'au', A:'Australia',      when:'Mar 16-jun · 19:00' },
+    { h:'ma',     H:'Marruecos',      a:'co', A:'Colombia',       when:'Mié 17-jun · 13:00' },
+    { h:'uy',     H:'Uruguay',        a:'cz', A:'Chequia',        when:'Mié 17-jun · 19:00' },
   ];
 
   function buildItem(f) {
     return '<span class="gb-ticker-item">'
       + '<img class="gb-tk-flag" src="https://flagcdn.com/w40/'+f.h+'.png" alt="'+f.H+'">'
-      + '<span>'+f.H+'</span>'
+      + '<span class="gb-tk-team">'+f.H+'</span>'
       + '<span class="gb-tk-vs">VS</span>'
       + '<img class="gb-tk-flag" src="https://flagcdn.com/w40/'+f.a+'.png" alt="'+f.A+'">'
-      + '<span>'+f.A+'</span>'
-      + '<span class="gb-tk-meta">📅 '+f.when+' · 📍 '+f.sede+'</span>'
+      + '<span class="gb-tk-team">'+f.A+'</span>'
+      + '<span class="gb-tk-meta">'+f.when+'</span>'
       + '</span>';
   }
 
