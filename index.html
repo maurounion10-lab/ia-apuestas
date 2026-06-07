@@ -9197,6 +9197,28 @@ function teamInitialsBadge(name, size=48) {
 }
 
 
+
+// Jugadores estrella del Mundial 2026 — fotos verificadas (Wikimedia CC)
+const WC2026_STARS = {
+  'Kylian Mbappé':     { photo:'/blog/img/mbappe-francia.jpg',  iso:'fr', name:'Mbappé' },
+  'Mbappé':            { photo:'/blog/img/mbappe-francia.jpg',  iso:'fr', name:'Mbappé' },
+  'Lionel Messi':      { photo:'/blog/img/messi-argentina.jpg', iso:'ar', name:'Messi'  },
+  'Messi':             { photo:'/blog/img/messi-argentina.jpg', iso:'ar', name:'Messi'  },
+  'Cristiano Ronaldo': { photo:'/blog/img/cr7-portugal.jpg',    iso:'pt', name:'CR7'    },
+  'CR7':               { photo:'/blog/img/cr7-portugal.jpg',    iso:'pt', name:'CR7'    },
+};
+
+// Badge para jugador estrella: foto del jugador en círculo + banderita de su selección abajo-derecha
+function wcStarBadge(name, size=48) {
+  const info = WC2026_STARS[name];
+  if (!info) return null;
+  const flagSize = Math.max(14, Math.round(size * 0.42));
+  return `<span title="${info.name}" style="position:relative;display:inline-block;width:${size}px;height:${size}px;flex-shrink:0">`
+       + `<img src="${info.photo}" alt="${info.name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;object-position:center top;border-radius:50%;display:block;border:2px solid #FFD700;box-shadow:0 2px 8px rgba(255,215,0,0.4)" onerror="this.outerHTML=teamInitialsBadge('${info.name}',${size})">`
+       + `<img src="https://flagcdn.com/w40/${info.iso}.png" alt="${info.iso}" width="${flagSize}" height="${flagSize}" style="position:absolute;bottom:-2px;right:-2px;width:${flagSize}px;height:${flagSize}px;border-radius:50%;object-fit:cover;border:1.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.5)">`
+       + `</span>`;
+}
+
 // ───────────── WC 2026 — Selecciones nacionales + eventos especiales ─────────────
 // Para selecciones que no tienen escudo de club, mostramos:
 //   • Escudo de la confederación (chico, esquina superior izq)
@@ -9304,6 +9326,11 @@ function nationalTeamBadge(name, size=48) {
 }
 
 function logoHtml(name, size=48) {
+  // ─ WC2026 fallback: jugadores estrella (Mbappé, Messi, CR7) — foto + banderita
+  if (name && WC2026_STARS[name]) {
+    const sb = wcStarBadge(name, size);
+    if (sb) return sb;
+  }
   // ─ WC2026 fallback: selecciones nacionales sin escudo de club
   if (name && WC2026_NATIONS[name]) {
     const nb = nationalTeamBadge(name, size);
@@ -14889,7 +14916,14 @@ function renderHistorial(filter) {
           dateCellStyle = baseDateStyle;
         }
         const dateCell = `<td style="${dateCellStyle}">${dateLabel}</td>`;
-        return `<tr class="${rowClass}" style="${rowStyle}">${dateCell}${matchCell}<td style="color:var(--verde)">${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
+        // 🏆 Resaltar picks futures del Mundial 2026 con estilo dorado distintivo
+        const _wcExtra = h._wcFuture
+          ? 'background:linear-gradient(90deg,rgba(255,215,0,0.08) 0%,rgba(200,16,46,0.05) 100%);border-left:3px solid #FFD700;'
+          : '';
+        const _wcBadge = h._wcFuture
+          ? '<span style="display:inline-block;background:linear-gradient(135deg,#FFD700,#f59e0b);color:#14110a;font-size:0.6rem;font-weight:900;letter-spacing:0.5px;padding:1px 6px;border-radius:4px;margin-right:6px;vertical-align:middle">🏆 WC2026</span>'
+          : '';
+        return `<tr class="${rowClass}" style="${rowStyle}${_wcExtra}">${dateCell}${matchCell}<td style="color:var(--verde)">${_wcBadge}${recDisplay}</td><td style="color:var(--amarillo);font-weight:600">${parseFloat(h.odds).toFixed(2)}</td><td>$${h.stake}</td><td>${resultCell}</td><td>${marcador}</td><td>${plHtml}</td></tr>`;
       }).join('')
     : (() => {
         // Diferenciar estado de carga vs error vs genuinamente vacío
