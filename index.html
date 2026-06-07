@@ -5651,6 +5651,8 @@ window.toggleHeroBubble = function(n) {
       <button class="sport-tab"        data-league="premier"      data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('premier',this)">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier</button>
       <button class="sport-tab"        data-league="laliga"       data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('laliga',this)">🇪🇸 La Liga</button>
       <button class="sport-tab"        data-league="libertadores" data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('libertadores',this)">🌎 Libertadores</button>
+      <button class="sport-tab"        data-league="mundial"      data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap;background:linear-gradient(135deg,rgba(255,215,0,0.18),rgba(200,16,46,0.18));border:1px solid rgba(255,215,0,0.45);color:#FFD700;font-weight:800" onclick="filterPredSport('mundial',this)">🏆 Mundial 2026</button>
+      <button class="sport-tab"        data-league="wcfutures"    data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap;background:linear-gradient(135deg,rgba(200,16,46,0.18),rgba(255,215,0,0.18));border:1px solid rgba(255,215,0,0.45);color:#FFD700;font-weight:800" onclick="filterPredSport('wcfutures',this)">🎯 WC Largo Plazo</button>
       <button class="sport-tab-more" id="predVerMasHome" onclick="window.location.hash='picks'" style="padding:6px 12px;font-size:0.75rem;white-space:nowrap;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.45);border-radius:20px;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='rgba(0,200,83,0.5)';this.style.color='rgba(0,200,83,0.8)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.45)'">Ver más →</button>
       <button class="sport-tab"        data-league="europa"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('europa',this)">🟠 Europa League</button>
       <button class="sport-tab"        data-league="conference"   style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('conference',this)">🟣 Conference</button>
@@ -11405,6 +11407,33 @@ function renderPreds() {
       _leagueFilter(['turkey']);
     } else if (sf === 'libertadores') {
       _leagueFilter(['copa_libertadores']);
+    } else if (sf === 'mundial') {
+      // 🏆 Mundial 2026 — partidos del torneo (excluye los futures de largo plazo)
+      const fn = p => {
+        const sk = p._sportKey || '';
+        return sk.includes('fifa_world_cup') && !p._wcFuture;
+      };
+      upcoming = upcoming.filter(fn); finished = finished.filter(fn);
+      const all = [...upcoming, ...finished];
+      realPreds = all.length ? all : null;
+    } else if (sf === 'wcfutures') {
+      // 🎯 WC Largo Plazo — los 10 picks futures del Mundial 2026 desde el historial
+      try {
+        const hist = (window.__sbHistorialCache && window.__sbHistorialCache.list) || [];
+        const futures = hist.filter(x => x && x._wcFuture);
+        const adapted = futures.map(f => ({
+          ...f,
+          _bestOdds: f.odds,
+          _started: f.result && f.result !== 'pending',
+          prob: f.bvr ? f.bvr/6 : 0.5,
+        }));
+        upcoming = adapted.filter(p => !p._started);
+        finished = adapted.filter(p =>  p._started);
+        realPreds = adapted.length ? adapted : null;
+      } catch(e) {
+        console.log('[wcfutures] error', e);
+        realPreds = null;
+      }
     } else if (sf === 'sudamericana') {
       _leagueFilter(['copa_sudamericana']);
     } else if (sf === 'arg') {
