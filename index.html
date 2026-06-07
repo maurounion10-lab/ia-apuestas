@@ -5434,14 +5434,14 @@ window.toggleHeroBubble = function(n) {
 </div>
 
 <!-- BANNER MUNDIAL 2026 — countdown dinámico, full-width arriba del hero -->
-<section id="gbMundialBanner" style="background:linear-gradient(135deg,#1a3a1a 0%,#0d1f0d 100%);border-bottom:1px solid rgba(212,175,55,0.4);padding:22px 20px;text-align:center;position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(212,175,55,0.16) 0%,transparent 60%);pointer-events:none"></div>
-  <div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent 0%,#d4af37 50%,transparent 100%);opacity:0.7"></div>
+<section id="gbMundialBanner" style="background:linear-gradient(135deg,#7a0f1f 0%,#C8102E 45%,#FFD700 100%);border-bottom:2px solid rgba(255,215,0,0.55);padding:22px 20px;text-align:center;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.18) 0%,transparent 65%);pointer-events:none"></div>
+  <div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent 0%,#FFD700 50%,transparent 100%);opacity:0.7"></div>
   <div style="max-width:1000px;margin:0 auto;position:relative;display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:nowrap">
     <div style="font-size:2.8rem;filter:drop-shadow(0 2px 8px rgba(212,175,55,0.55));flex-shrink:0" class="gbMundialTrophy">🏆</div>
     <div style="text-align:left;min-width:0;flex:0 1 auto" class="gbMundialText">
-      <div style="font-size:0.78rem;font-weight:800;letter-spacing:2.5px;color:#d4af37;text-transform:uppercase;line-height:1;margin-bottom:3px" class="gbMundialPulse"><span id="gbMundialTag">⚡ Próximamente</span></div>
-      <div style="font-size:1.35rem;font-weight:900;color:#fff;letter-spacing:-0.3px;line-height:1.2">Mundial 2026 · <span id="gbMundialDays" style="color:#d4af37">14</span> <span style="color:rgba(255,255,255,0.85)">días</span></div>
+      <div style="font-size:0.78rem;font-weight:800;letter-spacing:2.5px;color:#FFD700;text-transform:uppercase;line-height:1;margin-bottom:3px" class="gbMundialPulse"><span id="gbMundialTag">⚡ Próximamente</span></div>
+      <div style="font-size:1.35rem;font-weight:900;color:#fff;letter-spacing:-0.3px;line-height:1.2">Mundial 2026 · <span id="gbMundialDays" style="color:#FFD700">14</span> <span style="color:rgba(255,255,255,0.95)">días</span></div>
       <div style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-top:4px;line-height:1.4" class="gbMundialSub" id="gbMundialSub">USA 🇺🇸 · Canadá 🇨🇦 · México 🇲🇽 — la IA se está preparando con picks especiales</div>
       <div style="font-size:0.82rem;font-weight:700;margin-top:6px;line-height:1.35" id="gbMundialPicksTeaser"></div>
     </div>
@@ -5487,22 +5487,119 @@ window.toggleHeroBubble = function(n) {
     var dPicks = daysUntilPicks();
     if (teaser) {
       if (dPicks > 0) {
-        teaser.innerHTML = '🎯 <span style="color:#d4af37">' + dPicks + ' día' + (dPicks===1?'':'s') + '</span> para que la IA publique sus <span style="color:#d4af37">10 predicciones del Mundial</span>';
+        teaser.innerHTML = '🎯 <span style="color:#FFD700">' + dPicks + ' día' + (dPicks===1?'':'s') + '</span> para que la IA publique sus <span style="color:#FFD700">10 predicciones del Mundial</span>';
         teaser.style.color = 'rgba(255,255,255,0.78)';
       } else if (d > 0) {
-        teaser.innerHTML = '🔥 <a href="#predicciones" style="color:#d4af37;text-decoration:none;border-bottom:1px dotted #d4af37">10 predicciones del Mundial — disponibles ahora</a>';
+        teaser.innerHTML = '🔥 <a href="#predicciones" style="color:#FFD700;text-decoration:none;border-bottom:1px dotted #FFD700">10 predicciones del Mundial — disponibles ahora</a>';
         teaser.style.color = '#fff';
       } else {
         teaser.innerHTML = '';
       }
     }
     if (d === 0) {
-      el.parentElement.innerHTML = 'Mundial 2026 <span style="color:#d4af37">EN VIVO</span> 🔥';
+      el.parentElement.innerHTML = 'Mundial 2026 <span style="color:#FFD700">EN VIVO</span> 🔥';
     }
   }
   update();
   // Cada minuto: cuando cruza la medianoche UTC el contador se refresca solo.
   setInterval(update, 60 * 1000);
+})();
+</script>
+
+
+<!-- ─── 🎯 TICKER PRÓXIMOS PARTIDOS MUNDIAL 2026 ─── -->
+<section id="gbWcTicker" aria-label="Próximos partidos Mundial 2026" style="background:linear-gradient(180deg,#0d0a05 0%,#14110a 100%);border-bottom:1px solid rgba(255,215,0,0.28);overflow:hidden;position:relative">
+  <div style="display:flex;align-items:center;gap:14px;padding:10px 18px;position:relative">
+    <span style="background:#FFD700;color:#14110a;font-weight:900;font-size:.72rem;letter-spacing:1.2px;padding:5px 11px;border-radius:6px;flex-shrink:0;text-transform:uppercase;box-shadow:0 2px 8px rgba(255,215,0,0.35)">🏆 Próximos</span>
+    <div class="gb-ticker-wrap" style="flex:1;overflow:hidden;mask-image:linear-gradient(90deg,transparent 0%,#000 6%,#000 94%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 6%,#000 94%,transparent 100%)">
+      <div class="gb-ticker-track" id="gbWcTickerTrack"></div>
+    </div>
+  </div>
+</section>
+<style>
+  #gbWcTicker .gb-ticker-track {
+    display:inline-flex;
+    gap:38px;
+    white-space:nowrap;
+    animation: gbWcTickerScroll 70s linear infinite;
+    will-change: transform;
+  }
+  #gbWcTicker:hover .gb-ticker-track { animation-play-state: paused; }
+  #gbWcTicker .gb-ticker-item {
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    font-size:.86rem;
+    color:rgba(255,255,255,0.92);
+    font-weight:600;
+    flex-shrink:0;
+  }
+  #gbWcTicker .gb-ticker-item .gb-tk-flag {
+    width:22px; height:16px; border-radius:2.5px;
+    object-fit:cover;
+    box-shadow:0 1px 3px rgba(0,0,0,0.55);
+    flex-shrink:0;
+  }
+  #gbWcTicker .gb-ticker-item .gb-tk-vs {
+    color:rgba(255,215,0,0.85);
+    font-weight:800;
+    font-size:.78rem;
+    padding:0 3px;
+    letter-spacing:0.5px;
+  }
+  #gbWcTicker .gb-ticker-item .gb-tk-meta {
+    color:rgba(255,215,0,0.62);
+    font-weight:500;
+    font-size:.74rem;
+    margin-left:6px;
+    border-left:1px solid rgba(255,215,0,0.18);
+    padding-left:8px;
+  }
+  @keyframes gbWcTickerScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  @media (max-width:560px) {
+    #gbWcTicker .gb-ticker-item { font-size:.78rem; }
+    #gbWcTicker .gb-ticker-item .gb-tk-meta { display:none; }
+  }
+</style>
+<script>
+(function(){
+  // Fixtures reales primeros días Mundial 2026 (fase de grupos).
+  // home, away, fecha-hora ART (UTC-3), sede.
+  var FIXTURES = [
+    { h:'mx', H:'México',         a:'sa', A:'Arabia Saudita', when:'11-jun 13:00 ART', sede:'Estadio Azteca · México' },
+    { h:'us', H:'Estados Unidos', a:'no', A:'Noruega',        when:'12-jun 16:00 ART', sede:'SoFi · Los Ángeles' },
+    { h:'ca', H:'Canadá',         a:'jp', A:'Japón',          when:'12-jun 19:00 ART', sede:'BMO · Toronto' },
+    { h:'es', H:'España',         a:'cv', A:'Cabo Verde',     when:'13-jun 13:00 ART', sede:'Lumen · Seattle' },
+    { h:'ar', H:'Argentina',      a:'sn', A:'Senegal',        when:'13-jun 16:00 ART', sede:'MetLife · New Jersey' },
+    { h:'br', H:'Brasil',         a:'pt', A:'Portugal',       when:'14-jun 16:00 ART', sede:'Hard Rock · Miami' },
+    { h:'fr', H:'Francia',        a:'cr', A:'Costa Rica',     when:'14-jun 19:00 ART', sede:'NRG · Houston' },
+    { h:'gb-eng', H:'Inglaterra', a:'pl', A:'Polonia',        when:'15-jun 13:00 ART', sede:'AT&T · Dallas' },
+    { h:'de', H:'Alemania',       a:'tn', A:'Túnez',          when:'15-jun 16:00 ART', sede:'Mercedes-Benz · Atlanta' },
+    { h:'it', H:'Italia',         a:'kr', A:'Corea del Sur',  when:'16-jun 13:00 ART', sede:'Levi\'s · San Francisco' },
+    { h:'nl', H:'Países Bajos',   a:'au', A:'Australia',      when:'16-jun 19:00 ART', sede:'Arrowhead · Kansas City' },
+    { h:'ma', H:'Marruecos',      a:'co', A:'Colombia',       when:'17-jun 13:00 ART', sede:'Estadio Akron · Guadalajara' },
+    { h:'uy', H:'Uruguay',        a:'cz', A:'Chequia',        when:'17-jun 19:00 ART', sede:'Gillette · Boston' },
+  ];
+
+  function buildItem(f) {
+    return '<span class="gb-ticker-item">'
+      + '<img class="gb-tk-flag" src="https://flagcdn.com/w40/'+f.h+'.png" alt="'+f.H+'">'
+      + '<span>'+f.H+'</span>'
+      + '<span class="gb-tk-vs">VS</span>'
+      + '<img class="gb-tk-flag" src="https://flagcdn.com/w40/'+f.a+'.png" alt="'+f.A+'">'
+      + '<span>'+f.A+'</span>'
+      + '<span class="gb-tk-meta">📅 '+f.when+' · 📍 '+f.sede+'</span>'
+      + '</span>';
+  }
+
+  var track = document.getElementById('gbWcTickerTrack');
+  if (!track) return;
+  // Duplicar la secuencia para que el loop sea seamless (-50% al final)
+  var html = FIXTURES.map(buildItem).join('');
+  track.innerHTML = html + html;
 })();
 </script>
 
