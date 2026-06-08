@@ -11426,9 +11426,22 @@ function renderPreds() {
       const all = [...upcoming, ...finished];
       realPreds = all.length ? all : null;
     } else if (sf === 'wcfutures') {
-      // 🎯 WC Largo Plazo — los 10 picks futures del Mundial 2026 desde el historial
+      // 🎯 WC Largo Plazo — los 10 picks futures del Mundial 2026 desde el historial global
       try {
-        const hist = (window.__sbHistorialCache && window.__sbHistorialCache.list) || [];
+        // CACHE CORRECTA: _sbGetCache('ghist') no window.__sbHistorialCache (esa no existe)
+        let hist = [];
+        if (typeof _sbGetCache === 'function') {
+          hist = _sbGetCache('ghist') || [];
+        }
+        // Si no hay cache aún, disparar carga en background y mostrar mensaje
+        if (!hist.length && typeof sbLoadGlobalHistorial === 'function' && !window._wcfBgLoading) {
+          window._wcfBgLoading = true;
+          sbLoadGlobalHistorial().then(() => {
+            window._wcfBgLoading = false;
+            // Re-render cuando llegue el historial
+            if (window._predSportFilter === 'wcfutures' && typeof renderPreds === 'function') renderPreds();
+          }).catch(() => { window._wcfBgLoading = false; });
+        }
         const futures = hist.filter(x => x && x._wcFuture);
         const adapted = futures.map(f => ({
           ...f,
@@ -17085,6 +17098,19 @@ setLang(detectLang());
 // Cargar datos reales desde el Worker
 loadRealScores();
 loadRealOdds();  // ← carga cuotas para las fichas de pronósticos
+
+// 🌍 Precarga historial global en background para que WC Largo Plazo y otros filtros
+// tengan los datos disponibles desde la 1ra interacción (sin esperar al click).
+// No bloquea: si falla, los flows lazy on-demand siguen funcionando.
+setTimeout(() => {
+  try {
+    if (typeof _sbGetCache === 'function' && !_sbGetCache('ghist') &&
+        typeof sbLoadGlobalHistorial === 'function') {
+      sbLoadGlobalHistorial().catch(e => console.log('[bg-ghist preload]', e.message));
+    }
+  } catch(e) {}
+}, 1500);
+
 loadRealStats('futbol'); // Stats: carga fútbol al iniciar
 setTimeout(fetchGFeed, 0);  // diferido para evitar TDZ con GAMBETA_VIP (declarado más adelante)
 setInterval(fetchGFeed, 15 * 60 * 1000); // refrescar feed cada 15 min (era 5)
