@@ -17958,17 +17958,22 @@ function renderMyBets() {
 function renderMyStats() {
   const grid = document.getElementById('myStatsGrid');
   if (!grid) return;
-  const hist = bankrollData.history;
+  // 🛡️ Helper: convertir a número saneado (undefined/NaN/null → 0)
+  const _n = v => { const x = parseFloat(v); return Number.isFinite(x) ? x : 0; };
+  const hist = (bankrollData.history || []);
   const wins = hist.filter(b => b.result === 'win').length;
   const losses = hist.filter(b => b.result === 'loss').length;
   const draws = hist.filter(b => b.result === 'draw').length;
   const total = hist.length;
   const winRate = total ? ((wins / total) * 100).toFixed(1) : '0.0';
-  const totalPL = hist.reduce((s, b) => s + b.pl, 0);
-  const roi = bankrollData.initial ? ((totalPL / bankrollData.initial) * 100).toFixed(1) : '0.0';
-  const avgOdds = total ? (hist.reduce((s, b) => s + b.odds, 0) / total).toFixed(2) : '—';
-  const bestBet = hist.reduce((best, b) => b.pl > (best ? best.pl : -Infinity) ? b : best, null);
-  const worstBet = hist.reduce((worst, b) => b.pl < (worst ? worst.pl : Infinity) ? b : worst, null);
+  const totalPL = hist.reduce((s, b) => s + _n(b.pl), 0);
+  // Bankroll initial puede ser 0/null/undefined → fallback a suma de stakes para que ROI no sea NaN
+  const _stakesSum = hist.reduce((s, b) => s + _n(b.stake), 0);
+  const _initial = _n(bankrollData.initial) || _stakesSum;
+  const roi = _initial ? ((totalPL / _initial) * 100).toFixed(1) : '0.0';
+  const avgOdds = total ? (hist.reduce((s, b) => s + _n(b.odds), 0) / total).toFixed(2) : '—';
+  const bestBet = hist.reduce((best, b) => _n(b.pl) > (best ? _n(best.pl) : -Infinity) ? b : best, null);
+  const worstBet = hist.reduce((worst, b) => _n(b.pl) < (worst ? _n(worst.pl) : Infinity) ? b : worst, null);
 
   const stat = (label, value, color = 'var(--texto)') =>
     `<div class="card" style="text-align:center;padding:14px 10px">
@@ -17984,7 +17989,7 @@ function renderMyStats() {
     stat('ROI', (parseFloat(roi) >= 0 ? '+' : '') + roi + '%', parseFloat(roi) >= 0 ? 'var(--verde)' : 'var(--rojo)') +
     stat('Profit Total', (totalPL >= 0 ? '+' : '') + '$' + totalPL.toFixed(0), totalPL >= 0 ? 'var(--verde)' : 'var(--rojo)') +
     stat('Cuota Prom.', avgOdds, 'var(--azul)') +
-    stat('Mejor Bet', bestBet ? '+$' + bestBet.pl : '—', 'var(--verde)');
+    stat('Mejor Bet', bestBet ? '+$' + _n(bestBet.pl).toFixed(0) : '—', 'var(--verde)');
 }
 
 function drawMyPanelChart() {
