@@ -11870,10 +11870,16 @@ function renderPreds() {
   if (_isPicksSubPage) {
     realPreds = _upcoming; // subpágina: solo upcoming, sin finalizados
   } else {
-    realPreds = [..._upcoming.slice(0, 6), ..._homeShowcase];
+    // 🏆 WC Largo Plazo necesita mostrar los 10 picks futures completos,
+    // no los 6 que caben en el home normal. Detectar y subir el cap.
+    const _isWcFutures = window._predSportFilter === 'wcfutures';
+    const _homeUpLimit = _isWcFutures ? 20 : 6;
+    realPreds = [..._upcoming.slice(0, _homeUpLimit), ..._homeShowcase];
   }
 
-  const HOME_PICKS_LIMIT = 9;
+  // WC Largo Plazo: subir el cap para que los 10 picks futures (Mbappé, España campeón,
+  // Argentina semis, Marruecos cuartos, Noruega octavos, etc.) se muestren todos.
+  const HOME_PICKS_LIMIT = window._predSportFilter === 'wcfutures' ? 20 : 9;
   const source = _isPicksSubPage ? realPreds : realPreds.slice(0, HOME_PICKS_LIMIT);
 
   // ── Banner de estado ──
