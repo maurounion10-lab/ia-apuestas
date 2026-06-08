@@ -95,7 +95,7 @@ export const WC_FUTURES = [
   {
     id: 'wc2026_stage_arg_semis',
     home: 'Argentina', away: 'Semifinales',
-    rec: 'Argentina llega a Semifinales',
+    rec: 'Argentina a Semis',
     conf: 'med', bvr: 4, bvrText: 'Media-Alta',
     stake: 50, odds: 2.50, oddsFrozen: true,
     result: 'pending',
@@ -109,7 +109,7 @@ export const WC_FUTURES = [
   {
     id: 'wc2026_stage_mar_qf',
     home: 'Marruecos', away: 'Cuartos de Final',
-    rec: 'Marruecos llega a Cuartos de Final',
+    rec: 'Marruecos llega a 4tos',
     conf: 'med', bvr: 4, bvrText: 'Media-Alta',
     stake: 50, odds: 4.50, oddsFrozen: true,
     result: 'pending',
@@ -125,7 +125,7 @@ export const WC_FUTURES = [
   {
     id: 'wc2026_stage_nor_r16',
     home: 'Noruega', away: 'Octavos de Final',
-    rec: 'Noruega llega a Octavos de Final',
+    rec: 'Noruega llega a 8vos',
     conf: 'med', bvr: 4, bvrText: 'Media-Alta',
     stake: 50, odds: 2.20, oddsFrozen: true,
     result: 'pending',
@@ -141,7 +141,7 @@ export const WC_FUTURES = [
   {
     id: 'wc2026_champion_esp',
     home: 'España', away: 'Campeón Mundial 2026',
-    rec: 'España gana el Mundial 2026',
+    rec: 'España Campeón',
     conf: 'med', bvr: 4, bvrText: 'Media-Alta',
     stake: 50, odds: 5.50, oddsFrozen: true,
     result: 'pending',
@@ -157,7 +157,7 @@ export const WC_FUTURES = [
   {
     id: 'wc2026_topscorer_mbappe',
     home: 'Kylian Mbappé', away: 'Bota de Oro',
-    rec: 'Mbappé es el goleador del Mundial 2026',
+    rec: 'Mbappé goleador',
     conf: 'med', bvr: 4, bvrText: 'Media-Alta',
     stake: 50, odds: 5.00, oddsFrozen: true,
     result: 'pending',

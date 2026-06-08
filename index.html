@@ -1910,6 +1910,7 @@
     flex-direction: column;
     gap: 2px;
     min-width: 0;
+    flex: 1 1 auto;
   }
   .pred-rec-label {
     font-size: 0.65rem;
@@ -1921,7 +1922,14 @@
     font-size: 1rem;
     font-weight: 700;
     color: var(--verde);
-    white-space: nowrap;
+    /* Permitir wrap si el texto es muy largo (picks Mundial con frases extendidas).
+       Antes era white-space: nowrap → se solapaba con la cuota. */
+    line-height: 1.25;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+  .pred-rec-right {
+    flex: 0 0 auto;
   }
   .pred-rec-right {
     display: flex;
@@ -12901,6 +12909,13 @@ function _recSideOf(p) {
 // Muestra la recomendación con nombre de equipo en lugar de Local/Visitante
 function _recLabel(rec, home, away) {
   const r = _normRec(rec || '');
+  // 🏆 Atajos para apuestas a futuro del Mundial 2026 — versiones más cortas
+  if (/^Mbapp[ée] es el goleador/i.test(r))      return 'Mbappé goleador';
+  if (/gana el Mundial 2026/i.test(r))           return shortName(home || '') + ' Campeón';
+  if (/llega a Octavos/i.test(r))                return shortName(home || '') + ' llega a 8vos';
+  if (/llega a Cuartos/i.test(r))                return shortName(home || '') + ' llega a 4tos';
+  if (/llega a Semifinales/i.test(r))            return shortName(home || '') + ' a Semis';
+  if (/llega a Final$/i.test(r))                 return shortName(home || '') + ' a la Final';
   if (r === 'Gana Local')     return 'Gana ' + shortName(home || 'Local');
   if (r === 'Gana Visitante') return 'Gana ' + shortName(away || 'Visitante');
   if (r === 'Doble 1X')       return 'Gana ' + shortName(home || 'Local') + ' o Empate';      // 🆕
