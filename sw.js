@@ -1,5 +1,5 @@
-// gambeta.ai — Service Worker v1.8
-const CACHE_NAME = 'gambeta-v9';
+// gambeta.ai — Service Worker v2.0 (bump 7-jun-2026: forzar HTML fresh tras WC integration)
+const CACHE_NAME = 'gambeta-v10';
 // NO cacheamos HTML — siempre se pide a la red para que los deploys sean inmediatos
 const STATIC_ASSETS = [
   '/manifest.json',
