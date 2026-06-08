@@ -20510,7 +20510,13 @@ async function admLoadUsers() {
       if (!data || data.length < 1000) break;
     }
 
-    _admAllUsers = _allUsers;
+    // 🧹 Filtrar contadores internos de analytics (__ev_pv_YYYY-MM-DD__, __ev_pc_promo_YYYY-MM-DD__).
+    //    No son usuarios reales — son filas fantasma que usamos para llevar page views/clicks.
+    //    Sin esto, el export CSV, copy emails y stats se mezclaban con estas filas.
+    _admAllUsers = _allUsers.filter(u => {
+      const e = u && u.email || '';
+      return e && !/^__(ev_pv|ev_pc)_/.test(e) && !/^__.*__$/.test(e);
+    });
     const total = _admAllUsers.length;
 
     // Stats
