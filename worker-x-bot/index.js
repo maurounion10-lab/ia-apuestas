@@ -1186,6 +1186,55 @@ const MUNDIAL_POOL = [
   'Las 10 predicciones de la IA están publicadas. Andá a gambeta.ai y revisalas. ⚽',
 ];
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 📣 DISTRIB_POOL — 12 tweets distribución mega lote 85 posts (jun 2026)
+// Postea 1 por día durante 12 días para acelerar indexación + tráfico orgánico.
+// Cada tweet con link distinto al blog. Después de los 12 vuelve a EDU/COM normal.
+// ═══════════════════════════════════════════════════════════════════════════
+const DISTRIB_POOL = [
+  // Día 1 — Hype Mundial + pregunta
+  '¿Quién gana el Grupo J del Mundial 2026?\n\n🇦🇷 Argentina (cuota 1.40)\n🇸🇳 Senegal (cuota 4.50)\n\nLa IA calculó probabilidad real cruzando ranking FIFA + Elo + forma. Spoiler: hay valor donde no esperás.\n\n📊 https://gambeta.ai/blog/plantilla-argentina-mundial-2026',
+  // Día 2 — Concepto
+  '¿Sabés qué es el hándicap asiático?\n\nEs el mercado favorito de los apostadores profesionales — elimina el empate y las cuotas son justas.\n\nTe lo expliqué con ejemplos reales para que lo entiendas en 5 min ⤵️\nhttps://gambeta.ai/blog/handicap-asiatico-explicado',
+  // Día 3 — Comparativa
+  '🇨🇴 ¿Wplay o Yajuego?\n\nLas 2 casas legales de Colombia. La diferencia real:\n• Cuotas: gana Yajuego (+3% en promedio)\n• Bonos: empate\n• Confianza: gana Wplay (más antigua)\n\nReview honesto:\nhttps://gambeta.ai/blog/wplay-colombia-opiniones',
+  // Día 4 — Encuesta
+  '⚽ ¿Qué casa de apuestas usás?\n\n— Bplay\n— Bet365\n— Pinnacle (la sharp)\n— Otra\n\nSi querés saber por qué los pros usan Pinnacle 👇\nhttps://gambeta.ai/blog/pinnacle-argentina-review',
+  // Día 5 — Trivia Mundial
+  '🤔 Trivia: ¿qué estadio tendrá el partido inaugural del Mundial 2026?\n\na) MetLife (NJ)\nb) Estadio Azteca (México)  ← 👀\nc) AT&T Stadium (Dallas)\nd) BMO Field (Toronto)\n\n11-jun-2026, 13:00 ART.\nhttps://gambeta.ai/blog/sedes-mundial-2026',
+  // Día 6 — Cómo ver Mundial Argentina
+  '📺 ¿Cómo ver el Mundial 2026 desde Argentina?\n\nGRATIS:\n• TV Pública (Canal 7)\n• Telefé (algunos partidos)\n• Cont.ar app (sin registro)\n\nHorarios ART + canales cable:\nhttps://gambeta.ai/blog/como-ver-mundial-2026-argentina',
+  // Día 7 — Concepto
+  'Te quieren convencer de que apostar al "ganador" siempre paga.\n\nMentira.\n\nLa diferencia entre apostadores rentables y los demás es entender el VALOR ESPERADO. Te lo expliqué simple 👇\nhttps://gambeta.ai/blog/doble-oportunidad-vs-empate-sin-apuesta',
+  // Día 8 — Comparativa stats
+  '📊 Statarea vs Forebet vs Predictz\n\n3 herramientas de predicciones gratis. Cuál acierta más:\n• Statarea: 50% en 1X2\n• Forebet: 52%\n• Predictz (3 estrellas): 58-62%\n\nNinguna te da valor. Te expliqué qué falta:\nhttps://gambeta.ai/blog/statarea-espanol',
+  // Día 9 — España
+  '🇪🇸 Si vivís en España, esto te interesa:\n\nBet365 España, William Hill, Bwin... la DGOJ las regula a todas. Pero solo UNA tiene las mejores cuotas para el Mundial.\n\nAnálisis honesto:\nhttps://gambeta.ai/blog/por-que-bet365-espana',
+  // Día 10 — Promiedos
+  '¿Por qué los apostadores serios usan Promiedos en Argentina y NO Sofascore?\n\nSpoiler: es 100% argentino, sin pub invasiva y tiene los descensos al día.\n\nAnálisis:\nhttps://gambeta.ai/blog/por-que-en-argentina-usan-promiedos',
+  // Día 11 — Cuotas campeón
+  '📊 Cuotas pre-Mundial 2026 al CAMPEÓN:\n\n🇪🇸 España: 5.50 (favorita)\n🇫🇷 Francia: 5.50\n🇦🇷 Argentina: 7.50\n🇧🇷 Brasil: 8.50\n\n¿Dónde está el VALOR real?\nhttps://gambeta.ai/blog/calendario-mundial-2026',
+  // Día 12 — México plantilla
+  '🇲🇽 México arranca el Mundial el 11-jun en el Estadio Azteca.\n\nPor 3ra vez en la historia (1970, 1986, 2026) hacen partido inaugural.\n\nPlantilla + análisis Aguirre:\nhttps://gambeta.ai/blog/plantilla-mexico-mundial-2026\n\n👇 ¿Quién va a llegar más lejos?',
+];
+
+// Ventana de distribución: del 9-jun al 21-jun (12 días)
+function isDistribWindow() {
+  const now = new Date();
+  const start = new Date('2026-06-09T00:00:00-03:00');
+  const end   = new Date('2026-06-22T00:00:00-03:00'); // último: 21-jun fin de día
+  return now >= start && now < end;
+}
+
+// Genera tweet de distribución — 1 por día durante la ventana.
+async function genDistribucion(env) {
+  if (!isDistribWindow()) return null;
+  const t = await pickFreshFromPool(DISTRIB_POOL, env);
+  if (!t) console.log('[x-bot] DISTRIB pool exhausted — skip');
+  return t;
+}
+
 // Decide si estamos en el período de hype Mundial (2-jun a 11-jun-2026, inclusive).
 function isMundialHypeWindow() {
   const now = new Date();
@@ -1195,12 +1244,16 @@ function isMundialHypeWindow() {
 }
 
 async function genEducacion(env) {
-  // Durante la ventana pre-Mundial, el slot educación se reemplaza por hype Mundial
+  // PRIORIDAD 1: distribución mega lote (jun 9-21) — solo el slot educación
+  const distrib = await genDistribucion(env);
+  if (distrib) return distrib;
+  // PRIORIDAD 2: hype Mundial
   if (isMundialHypeWindow()) {
     const t = await pickFreshFromPool(MUNDIAL_POOL, env);
     if (t) return t;
     console.log('[x-bot] MUNDIAL pool exhausted — fallback a EDU');
   }
+  // PRIORIDAD 3: educación normal
   const t = await pickFreshFromPool(EDU_POOL, env);
   if (!t) console.log('[x-bot] EDU pool exhausted — slot skipped');
   return t;
