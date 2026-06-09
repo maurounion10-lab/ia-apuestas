@@ -6184,6 +6184,128 @@ window.toggleHeroBubble = function(n) {
 </div>
 
 
+<!-- SECCIÓN: PICK DEL DÍA MASTERPROPS -->
+<section id="gbMpPickDelDia" style="padding:48px 20px 8px;background:radial-gradient(ellipse at center top,rgba(212,165,32,0.06),transparent 60%)">
+  <div style="max-width:920px;margin:0 auto">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(212,165,32,0.12);border:1px solid rgba(212,165,32,0.38);border-radius:30px;padding:5px 18px;font-size:0.72rem;font-weight:700;color:#d4a520;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px">🎯 Pick del día · IA MasterProps</div>
+    <h2 style="font-size:clamp(1.4rem,4.2vw,1.85rem);font-weight:900;color:#fff;margin:0 0 8px;letter-spacing:-0.4px;text-align:left">El billete con mayor cuota que armó nuestra otra IA hoy</h2>
+    <p style="color:rgba(255,255,255,0.55);font-size:0.92rem;margin:0 0 22px;text-align:left">MasterProps arma combinadas con cuotas altas usando market intelligence. Esto es lo que armó hoy:</p>
+
+    <div id="mpPickCard" style="background:linear-gradient(135deg,#111118 0%,#16161f 100%);border:1px solid rgba(212,165,32,0.32);border-radius:18px;padding:22px;box-shadow:0 12px 32px rgba(0,0,0,0.35);min-height:200px;display:flex;align-items:center;justify-content:center">
+      <div style="color:rgba(255,255,255,0.45);font-size:0.92rem">Cargando billete del día…</div>
+    </div>
+  </div>
+
+  <style>
+    #mpPickCard .mp-pick-header { display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(212,165,32,0.15) }
+    #mpPickCard .mp-pick-tier { font-size:0.74rem;font-weight:900;color:#d4a520;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:6px }
+    #mpPickCard .mp-pick-name { font-size:1.18rem;font-weight:800;color:#f0ece0;line-height:1.25 }
+    #mpPickCard .mp-pick-cuota { background:linear-gradient(135deg,#d4a520,#f0c850);color:#000;font-weight:900;font-size:1.6rem;padding:10px 18px;border-radius:12px;line-height:1;letter-spacing:-0.5px;box-shadow:0 6px 18px rgba(212,165,32,0.35);white-space:nowrap }
+    #mpPickCard .mp-pick-legs { display:flex;flex-direction:column;gap:8px;margin-bottom:18px }
+    #mpPickCard .mp-leg { display:flex;justify-content:space-between;gap:12px;background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.05);border-radius:10px;padding:10px 14px;font-size:0.86rem;flex-wrap:wrap }
+    #mpPickCard .mp-leg-match { color:rgba(255,255,255,0.85);font-weight:600;flex:1;min-width:0 }
+    #mpPickCard .mp-leg-pick { color:#d4a520;font-weight:800;white-space:nowrap }
+    #mpPickCard .mp-leg-coef { color:rgba(255,255,255,0.45);font-weight:700;font-variant-numeric:tabular-nums }
+    #mpPickCard .mp-pick-cta { display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06) }
+    #mpPickCard .mp-pick-meta { font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.5 }
+    #mpPickCard .mp-pick-btn { background:#d4a520;color:#000;font-weight:800;font-size:0.88rem;padding:12px 22px;border-radius:10px;text-decoration:none;transition:transform .15s,box-shadow .15s;display:inline-block }
+    #mpPickCard .mp-pick-btn:hover { transform:translateY(-1px);box-shadow:0 8px 22px rgba(212,165,32,0.4) }
+    @media(max-width:600px){
+      #mpPickCard .mp-pick-cuota { font-size:1.3rem;padding:8px 14px }
+      #mpPickCard .mp-pick-name { font-size:1.02rem }
+      #mpPickCard .mp-leg { font-size:0.8rem }
+    }
+  </style>
+
+  <script>
+  (function(){
+    var el = document.getElementById('mpPickCard');
+    if (!el) return;
+    fetch('https://masterpropsai.github.io/tickets_data.json', { cache: 'default' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(tickets){
+        if (!Array.isArray(tickets) || !tickets.length) {
+          el.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.9rem;text-align:center">No hay billete disponible ahora — volvé en unas horas</div>';
+          return;
+        }
+        // Filtrar por billetes con eventos pendientes (no resueltos) si está la data
+        var pendingTickets = tickets.filter(function(t){
+          var evs = t.events || [];
+          if (!evs.length) return false;
+          // si tiene 'resolved' o 'status' en eventos, filtrar los no-resueltos
+          var hasUnresolved = evs.some(function(e){
+            return !e.resolved && !e.status && !e.result;
+          });
+          return hasUnresolved || evs.length > 0; // fallback: aceptar todos si no hay flag
+        });
+        var pool = pendingTickets.length ? pendingTickets : tickets;
+
+        // Seleccionar el de mayor cuota acumulada
+        var best = null, bestOdds = 0;
+        for (var i = 0; i < pool.length; i++) {
+          var t = pool[i], o = 1;
+          for (var j = 0; j < (t.events||[]).length; j++) o *= (t.events[j].Coef || 1);
+          if (o > bestOdds) { bestOdds = o; best = t; }
+        }
+        if (!best) {
+          el.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.9rem;text-align:center">No hay billete disponible ahora</div>';
+          return;
+        }
+
+        var legs = best.events || [];
+        var tier, tierEmoji;
+        if (bestOdds >= 1000) { tier = 'MEGALODON'; tierEmoji = '🐋'; }
+        else if (bestOdds >= 100) { tier = 'BALLENA'; tierEmoji = '🐳'; }
+        else if (bestOdds >= 30) { tier = 'TIBURÓN'; tierEmoji = '🦈'; }
+        else { tier = 'CAZADOR'; tierEmoji = '🎯'; }
+
+        var legsHtml = legs.slice(0, 6).map(function(ev){
+          var match = (ev.team1 && ev.team2) ? (ev.team1 + ' vs ' + ev.team2)
+                    : (ev.match || ev.partido || ev.event || 'Partido');
+          var pick = ev.pick || ev.bet || ev.seleccion || ev.tipo || '—';
+          var coef = (ev.Coef || ev.coef || ev.cuota || '').toString();
+          return '<div class="mp-leg"><span class="mp-leg-match">' +
+                 escapeHtml(match) +
+                 '</span><span class="mp-leg-pick">' +
+                 escapeHtml(pick) +
+                 '</span><span class="mp-leg-coef">' +
+                 (coef ? '@' + coef : '') +
+                 '</span></div>';
+        }).join('');
+
+        var moreLegs = legs.length > 6 ? ('<div style="text-align:center;font-size:0.8rem;color:rgba(255,255,255,0.4);padding:6px 0">+ ' + (legs.length - 6) + ' patas más en el billete completo</div>') : '';
+
+        // Nombre del billete: usar 'name' o 'title' o construir uno
+        var name = best.name || best.title || best.titulo || (legs.length + ' partidos para hoy');
+
+        el.innerHTML =
+          '<div style="width:100%">' +
+          '  <div class="mp-pick-header">' +
+          '    <div style="flex:1;min-width:200px">' +
+          '      <div class="mp-pick-tier">' + tierEmoji + ' ' + tier + ' · ' + legs.length + ' patas</div>' +
+          '      <div class="mp-pick-name">' + escapeHtml(name) + '</div>' +
+          '    </div>' +
+          '    <div class="mp-pick-cuota">x' + bestOdds.toFixed(bestOdds >= 100 ? 0 : 2) + '</div>' +
+          '  </div>' +
+          '  <div class="mp-pick-legs">' + legsHtml + moreLegs + '</div>' +
+          '  <div class="mp-pick-cta">' +
+          '    <div class="mp-pick-meta">📅 Pick del ' + new Date().toLocaleDateString('es-AR',{day:'numeric',month:'long'}) + ' · IA MasterProps</div>' +
+          '    <a class="mp-pick-btn" href="https://masterpropsai.github.io/?utm_source=gambeta&utm_medium=pickdeldia&utm_campaign=home" target="_blank" rel="noopener">Ver billete completo →</a>' +
+          '  </div>' +
+          '</div>';
+      })
+      .catch(function(e){
+        console.log('[mp-pickdeldia]', e && e.message);
+        el.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.9rem;text-align:center">No pudimos cargar el billete ahora. <a href="https://masterpropsai.github.io" target="_blank" rel="noopener" style="color:#d4a520">Ver en MasterProps →</a></div>';
+      });
+
+    function escapeHtml(s){
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+  })();
+  </script>
+</section>
+
 <!-- SECCIÓN: BLOG -->
 <section id="gbBlog" style="background:linear-gradient(180deg,#071007 0%,#0a150a 100%);border-top:1px solid rgba(0,200,83,0.15);padding:56px 20px 52px;text-align:center">
   <div style="max-width:900px;margin:0 auto">
