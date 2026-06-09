@@ -5078,6 +5078,8 @@
     cursor:pointer;
     transition:border-color .15s,background .15s,transform .15s;
     user-select:none;
+    min-width:0;
+    overflow:hidden;
   }
   .bonos-cal-tab:hover { border-color:rgba(255,214,0,0.35);background:rgba(255,214,0,0.04);transform:translateY(-1px); }
   .bonos-cal-tab.is-active { border-color:rgba(255,214,0,0.65);background:rgba(255,214,0,0.10); }
@@ -5088,9 +5090,15 @@
   .bonos-cal-tab-day { font-size:0.7rem;font-weight:800;color:rgba(255,255,255,0.6);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px; }
   .bonos-cal-tab.is-active .bonos-cal-tab-day { color:#ffd600; }
   .bonos-cal-tab.is-today.is-active .bonos-cal-tab-day { color:#00c853; }
-  .bonos-cal-tab-mini { font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.8);line-height:1.2; }
+  .bonos-cal-tab-mini { font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.8);line-height:1.2;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:100%;
+  }
   .bonos-cal-foot { font-size:0.75rem;color:rgba(255,255,255,0.3);margin-top:18px;line-height:1.5; }
   @media (max-width:640px) {
+    .bonos-cal-tabs { gap:4px; }
+    .bonos-cal-tab { padding:8px 2px 6px; }
+    .bonos-cal-tab-day { font-size:0.6rem;letter-spacing:0.8px;margin-bottom:3px; }
+    .bonos-cal-tab-mini { font-size:0.58rem;letter-spacing:-0.1px; }
     .bonos-cal-stage { flex-direction:column;align-items:stretch;padding:22px 18px; }
     .bonos-cal-stage-left { text-align:center;justify-content:center;flex-direction:column;gap:12px; }
     .bonos-cal-name-row { justify-content:center; }
@@ -9319,11 +9327,6 @@ function wcEventBadge(name, size=48) {
   else if (lower.includes('bota')) { emoji='👟'; bg='linear-gradient(135deg,#FFD700 0%,#f59e0b 100%)'; }
   else if (lower.includes('goleador')) { emoji='⚽'; bg='linear-gradient(135deg,#FFD700 0%,#c8102e 100%)'; }
   const fsz = Math.round(size * 0.5);
-  // 🏆 Reemplazar emoji ⚽ por la pelota oficial Trionda del Mundial 2026 (si el theming Mundial está activo)
-  const _isMundial = (document.body && document.body.classList && document.body.classList.contains('wc2026-theme'));
-  if (emoji === '⚽' && _isMundial) {
-    return `<span title="${(name||'').replace(/"/g,'&quot;')}" style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};line-height:1;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.4);border:2px solid rgba(255,215,0,0.55)"><img src="/blog/img/mundial-2026-trionda.jpg" alt="Trionda" style="width:${Math.round(size*0.78)}px;height:${Math.round(size*0.78)}px;object-fit:cover;border-radius:50%" onerror="this.outerHTML='⚽'"></span>`;
-  }
   return `<span title="${(name||'').replace(/"/g,'&quot;')}" style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:#fff;font-size:${fsz}px;line-height:1;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.4);border:2px solid rgba(255,215,0,0.5)">${emoji}</span>`;
 }
 
