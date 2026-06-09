@@ -5466,7 +5466,8 @@ window.toggleHeroBubble = function(n) {
 <style>
   @keyframes gbMundialGlow { 0%,100% { opacity:0.6; text-shadow:none } 50% { opacity:1; text-shadow:0 0 10px rgba(212,175,55,0.6) } }
   .gbMundialPulse { animation: gbMundialGlow 2.2s ease-in-out infinite; }
-  @keyframes gbMundialFloat { 0%,100% { transform:translateY(0) rotate(-3deg) } 50% { transform:translateY(-3px) rotate(3deg) } }
+  @keyframes gbMundialFloat { 0%,100% { transform:translateY(0) rotate(-3deg) } 50% { transform:translateY(-3px) rotate(3deg) }
+@keyframes gbTriondaFloat { 0%,100% { transform:translateY(0) rotate(-3deg); } 50% { transform:translateY(-4px) rotate(3deg); } } }
   .gbMundialTrophy { display:inline-block; animation: gbMundialFloat 3.5s ease-in-out infinite; }
   @media (max-width:560px) {
     #gbMundialBanner { padding:10px 12px; }
@@ -9327,6 +9328,11 @@ function wcEventBadge(name, size=48) {
   else if (lower.includes('bota')) { emoji='👟'; bg='linear-gradient(135deg,#FFD700 0%,#f59e0b 100%)'; }
   else if (lower.includes('goleador')) { emoji='⚽'; bg='linear-gradient(135deg,#FFD700 0%,#c8102e 100%)'; }
   const fsz = Math.round(size * 0.5);
+  // 🏆 Pelota Trionda flotando sin fondo cuando el theming Mundial está activo (solo donde habría ⚽)
+  const _isMundial = (typeof document !== 'undefined' && document.body && document.body.classList && document.body.classList.contains('wc2026-theme'));
+  if (emoji === '⚽' && _isMundial) {
+    return `<img src="/img/trionda-float.png" alt="${(name||'').replace(/"/g,'&quot;')}" title="${(name||'').replace(/"/g,'&quot;')}" style="width:${size}px;height:${size}px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.45)) drop-shadow(0 0 8px rgba(255,215,0,0.25));animation:gbTriondaFloat 3.5s ease-in-out infinite" onerror="this.outerHTML='⚽'">`;
+  }
   return `<span title="${(name||'').replace(/"/g,'&quot;')}" style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:#fff;font-size:${fsz}px;line-height:1;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.4);border:2px solid rgba(255,215,0,0.5)">${emoji}</span>`;
 }
 
