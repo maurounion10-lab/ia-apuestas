@@ -483,11 +483,13 @@
     position: relative;
     box-shadow: 0 8px 40px rgba(0,200,83,0.3), 0 0 0 2px rgba(0,200,83,0.2);
   }
-  .hero-mascot img {
+  .hero-mascot img,
+  .hero-mascot video {
     width: 100%;
     height: 100%;
     object-fit: cover;
     object-position: 50% 35%;
+    display: block;
   }
   @media (max-width: 768px) {
     .hero-mascot { width: 170px; height: 170px; border-radius: 20px; }
@@ -5647,7 +5649,11 @@ window.toggleHeroBubble = function(n) {
     <div class="hero-bubble hero-bubble--mascot" id="heroBubble1">Somos de Argentina pero ya recibimos visitas de todo el mundo 🌍</div>
     <div class="hero-bubble hero-bubble--mascot" id="heroBubble2">Para que siga siendo gratis compártela por redes, a tus amigos o en los grupos 🙌</div>
     <div class="hero-mascot">
-      <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="gambeta.ai Bot">
+      <video autoplay loop muted playsinline preload="metadata" poster="/img/hero-mascot-poster.jpg" aria-label="gambeta.ai Bot animado">
+        <source src="/img/hero-mascot.webm" type="video/webm">
+        <source src="/img/hero-mascot.mp4" type="video/mp4">
+        <img src="/img/hero-mascot-poster.jpg" alt="gambeta.ai Bot">
+      </video>
     </div>
   </div>
 </div>
