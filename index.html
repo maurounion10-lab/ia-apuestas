@@ -14894,8 +14894,11 @@ function renderHistorial(filter) {
   const completed = data.filter(h=>h.result!=='pending'&&h.result!=='void');
   const wins    = completed.filter(h=>h.result==='win').length;
   const hitRate = completed.length ? Math.round(wins/completed.length*100) : 0;
-  const totalPL     = data.reduce((s,h)=>s+h.pl,0);
-  const totalStaked = completed.reduce((s,h)=>s+(h.stake||0),0);
+  // 🛡️ Sanear pl: picks pendientes (WC futures) tienen pl undefined → NaN propagado.
+  //    Convertir cualquier valor no finito a 0 antes de sumar.
+  const _safeN = v => { const x = parseFloat(v); return Number.isFinite(x) ? x : 0; };
+  const totalPL     = data.reduce((s,h)=>s+_safeN(h.pl),0);
+  const totalStaked = completed.reduce((s,h)=>s+_safeN(h.stake),0);
   const roi         = totalStaked > 0 ? (totalPL / totalStaked * 100) : 0;
   const racha       = calcRacha(data);
 
@@ -15327,12 +15330,15 @@ function clearBankrollData() {
   renderBetsList();
 }
 function calcBankrollHistory() {
-  let bal=bankrollData.initial;
-  return [bal,...bankrollData.history.map(b=>{bal+=b.pl;return bal;})];
+  const _safeN = v => { const x = parseFloat(v); return Number.isFinite(x) ? x : 0; };
+  let bal=_safeN(bankrollData.initial);
+  return [bal,...(bankrollData.history||[]).map(b=>{bal+=_safeN(b.pl);return bal;})];
 }
 function renderBankrollSummary() {
-  const hist=calcBankrollHistory(), cur=hist[hist.length-1], profit=cur-bankrollData.initial;
-  const roi=((profit/bankrollData.initial)*100).toFixed(1);
+  const _safeN = v => { const x = parseFloat(v); return Number.isFinite(x) ? x : 0; };
+  const _ini=_safeN(bankrollData.initial);
+  const hist=calcBankrollHistory(), cur=_safeN(hist[hist.length-1]), profit=cur-_ini;
+  const roi=(_ini>0 ? (profit/_ini)*100 : 0).toFixed(1);
   document.getElementById('bankrollSummary').innerHTML = `
     <div class="bk-stat"><span class="bv">$${bankrollData.initial}</span><span class="bl">Inicial</span></div>
     <div class="bk-stat"><span class="bv" style="color:${cur>=bankrollData.initial?'var(--verde)':'var(--rojo)'}">$${cur.toFixed(0)}</span><span class="bl">Actual</span></div>
