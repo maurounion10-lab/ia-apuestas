@@ -760,10 +760,14 @@ function genPicks(hist) {
   if (!picks.length) return null;
   const head = PICKS_HEADS[Math.floor(Math.random() * PICKS_HEADS.length)];
   const tail = PICKS_TAILS[Math.floor(Math.random() * PICKS_TAILS.length)];
-  const lines = [`⭐ ${picks[0].home} vs ${picks[0].away} → ${picks[0].rec}`];
-  for (let i = 1; i < picks.length && i < 4; i++) {
-    lines.push(`▪️ ${picks[i].home} vs ${picks[i].away} → ${picks[i].rec}`);
+  // Ordenar por confianza (bvr) descendente, así el más fuerte queda primero
+  const sorted = [...picks].sort((a, b) => (b.bvr || 0) - (a.bvr || 0));
+  const lines = [`⭐ ${sorted[0].home} vs ${sorted[0].away} → ${sorted[0].rec}`];
+  // Incluir TODOS los picks del día (hasta 8 máximo razonable)
+  for (let i = 1; i < sorted.length && i < 8; i++) {
+    lines.push(`▪️ ${sorted[i].home} vs ${sorted[i].away} → ${sorted[i].rec}`);
   }
+  // Si no entran en 280 chars, recortar los menos confiables (final de la lista)
   while (lines.length > 1 && (head + lines.join('\n') + tail).length > 258) lines.pop();
   return head + lines.join('\n') + tail;
 }
@@ -1404,7 +1408,7 @@ function genHotTake(hist, pickOverride) {
 const SLOT_BY_CRON = {
   '17 * * * *':  'celebracion', // cada hora :17 — aciertos resueltos
   '23 12 * * *': 'resultados',  // 09:23 ART
-  '7 15 * * *':  'picks',       // 12:07 ART
+  '30 12 * * *': 'picks',       // 09:30 ART — todos los picks del día
   '47 17 * * *': 'educacion',   // 14:47 ART
   '13 21 * * *': 'hottake',     // 18:13 ART
   '23 23 * * *': 'comunidad',   // 20:23 ART
