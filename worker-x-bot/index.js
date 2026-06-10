@@ -301,6 +301,43 @@ async function pngFromElement(element) {
 
 // Placa de PICKS — lista de pronósticos del día con escudos sobre el estadio.
 // Una fila por pick: escudos, partido y la recomendación de la IA en píldora.
+// ───────────────────── Traducción de recomendación a texto amigable ─────────
+// Convierte 'Gana Local' → 'Gana México', 'Doble 1X' → 'Gana México o Empate', etc.
+// Replica la lógica del frontend (_recLabel en index.html).
+function shortName(name) {
+  const s = (name || '').trim();
+  if (!s) return s;
+  // Mapeo de nombres largos → cortos (selecciones)
+  const SHORT = {
+    'Estados Unidos': 'EE.UU.',
+    'Países Bajos':   'Países Bajos',
+    'Corea del Sur':  'Corea',
+    'Arabia Saudita': 'Arabia',
+    'Costa de Marfil':'C. de Marfil',
+    'República Checa':'Chequia',
+    'Reino Unido':    'Inglaterra',
+  };
+  return SHORT[s] || s;
+}
+function friendlyRec(rec, home, away) {
+  const r = (rec || '').trim();
+  if (!r) return r;
+  // Atajos para apuestas a futuro del Mundial 2026
+  if (/^Mbapp[ée] es el goleador/i.test(r))      return 'Mbappé goleador';
+  if (/gana el Mundial 2026/i.test(r))           return shortName(home || '') + ' Campeón';
+  if (/llega a Octavos/i.test(r))                return shortName(home || '') + ' llega a 8vos';
+  if (/llega a Cuartos/i.test(r))                return shortName(home || '') + ' llega a 4tos';
+  if (/llega a Semifinales/i.test(r))            return shortName(home || '') + ' a Semis';
+  if (/llega a Final$/i.test(r))                 return shortName(home || '') + ' a la Final';
+  if (r === 'Gana Local')     return 'Gana ' + shortName(home || 'Local');
+  if (r === 'Gana Visitante') return 'Gana ' + shortName(away || 'Visitante');
+  if (r === 'Doble 1X')       return 'Gana ' + shortName(home || 'Local') + ' o Empate';
+  if (r === 'Doble X2')       return 'Gana ' + shortName(away || 'Visitante') + ' o Empate';
+  // Si el rec ya está en formato "Gana <nombre>" lo dejamos pasar
+  return r;
+}
+
+
 function pickRowEl(r) {
   const GREEN = '#00c853';
   return el('div', { display: 'flex', flexDirection: 'row', alignItems: 'center',
@@ -315,7 +352,7 @@ function pickRowEl(r) {
     el('div', { display: 'flex', alignItems: 'center',
       background: 'rgba(0,200,83,0.20)', border: `2px solid ${GREEN}`,
       borderRadius: '9999px', padding: '9px 26px', fontSize: 27,
-      color: '#00e676', fontWeight: 800, marginLeft: 16 }, (r.rec || '').toUpperCase()),
+      color: '#00e676', fontWeight: 800, marginLeft: 16 }, (friendlyRec(r.rec, r.home, r.away) || '').toUpperCase()),
   ]);
 }
 function buildPicksCardElement(rows, dateLabel) {
@@ -577,7 +614,7 @@ function buildMatchCardElement(p, hUrl, aUrl, opts) {
         textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, 'Pick'),
       el('div', { display: 'flex', color: '#ffffff',
         fontFamily: 'GambetaBlack', fontWeight: 900,
-        textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, (p.rec || '').toUpperCase()),
+        textShadow: '0 3px 14px rgba(0,0,0,0.95)' }, (friendlyRec(p.rec, p.home, p.away) || '').toUpperCase()),
     ]),
     // capa 5 — check + "ACERTADO", abajo y centrado
     ...(opts.check ? [el('div', { display: 'flex', flexDirection: 'row',
@@ -762,10 +799,10 @@ function genPicks(hist) {
   const tail = PICKS_TAILS[Math.floor(Math.random() * PICKS_TAILS.length)];
   // Ordenar por confianza (bvr) descendente, así el más fuerte queda primero
   const sorted = [...picks].sort((a, b) => (b.bvr || 0) - (a.bvr || 0));
-  const lines = [`⭐ ${sorted[0].home} vs ${sorted[0].away} → ${sorted[0].rec}`];
+  const lines = [`⭐ ${sorted[0].home} vs ${sorted[0].away} → ${friendlyRec(sorted[0].rec, sorted[0].home, sorted[0].away)}`];
   // Incluir TODOS los picks del día (hasta 8 máximo razonable)
   for (let i = 1; i < sorted.length && i < 8; i++) {
-    lines.push(`▪️ ${sorted[i].home} vs ${sorted[i].away} → ${sorted[i].rec}`);
+    lines.push(`▪️ ${sorted[i].home} vs ${sorted[i].away} → ${friendlyRec(sorted[i].rec, sorted[i].home, sorted[i].away)}`);
   }
   // Si no entran en 280 chars, recortar los menos confiables (final de la lista)
   while (lines.length > 1 && (head + lines.join('\n') + tail).length > 258) lines.pop();
@@ -1277,13 +1314,13 @@ async function genComunidad(env) {
 // Festejo de aciertos — se dispara apenas un pick gana.
 const CELEBRA = [
   (p) => `💥 BOOOM. La IA LA CLAVÓ.\n\n${p.home} ${p.finalScore || ''} ${p.away} ✅\n` +
-         `El pick: ${p.rec}\n\nPicks gratis todos los días en el perfil 🟢`,
-  (p) => `🚨 ¡ACERTADO!\n\nLa IA dijo "${p.rec}" en ${p.home} vs ${p.away}.\n` +
+         `El pick: ${friendlyRec(p.rec, p.home, p.away)}\n\nPicks gratis todos los días en el perfil 🟢`,
+  (p) => `🚨 ¡ACERTADO!\n\nLa IA dijo "${friendlyRec(p.rec, p.home, p.away)}" en ${p.home} vs ${p.away}.\n` +
          `Final: ${p.finalScore || '—'}. ADENTRO ✅\n\n¿La tenías? 🟢`,
   (p) => `✅ OTRA QUE ENTRA\n\n${p.home} ${p.finalScore || ''} ${p.away}\n` +
-         `La IA lo dio: ${p.rec} 🎯\n\nDatos, no corazonadas. 🟢`,
+         `La IA lo dio: ${friendlyRec(p.rec, p.home, p.away)} 🎯\n\nDatos, no corazonadas. 🟢`,
   (p) => `🔥 LA IA NO FALLA TANTO...\n\n${p.home} ${p.finalScore || ''} ${p.away} — ` +
-         `pick ACERTADO: ${p.rec} ✅\n\nMás picks gratis en el perfil 🟢`,
+         `pick ACERTADO: ${friendlyRec(p.rec, p.home, p.away)} ✅\n\nMás picks gratis en el perfil 🟢`,
 ];
 // Selecciona el acierto a festejar.
 // HORARIO DE SILENCIO: entre las 0 y las 9 ART el bot NO postea nada.
@@ -1397,7 +1434,7 @@ function buildStatsBlock(hist, pick) {
 function genHotTake(hist, pickOverride) {
   const p = pickOverride || todayPendingPicks(hist)[0];
   if (!p) return null;
-  const head = `🔥 En ${p.home} vs ${p.away} la IA dice que ${p.rec} — ` +
+  const head = `🔥 En ${p.home} vs ${p.away} la IA dice que ${friendlyRec(p.rec, p.home, p.away)} — ` +
                `Confianza ${confLabel(p)} (${leagueLabel(p.league)})`;
   const stats = buildStatsBlock(hist, p);
   const full = stats ? head + '\n\n' + stats : head;
