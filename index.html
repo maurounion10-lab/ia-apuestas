@@ -1907,64 +1907,182 @@
   }
 
   
-  /* ── PRED CARD — Botón DBbet 1-click bet ── */
+  /* ── PRED CARD — Botón DBbet 1-click bet (PREMIUM) ── */
   .pred-dbbet-1click {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 8px;
+    gap: 12px;
     width: 100%;
-    margin-top: 10px;
-    padding: 11px 14px;
-    background: linear-gradient(135deg, #dc1e2e 0%, #a30f1d 100%);
+    margin-top: 11px;
+    padding: 12px 16px;
+    background:
+      linear-gradient(135deg, rgba(255,215,0,0.06) 0%, transparent 40%),
+      linear-gradient(135deg, #dc1e2e 0%, #b8121f 50%, #8a0a16 100%);
     color: #fff;
-    border: 1px solid rgba(255,215,0,0.4);
-    border-radius: 10px;
+    border: 1.5px solid #FFD700;
+    border-radius: 12px;
     text-decoration: none;
-    font-size: 0.85rem;
-    font-weight: 800;
-    letter-spacing: 0.2px;
     cursor: pointer;
-    transition: transform .15s, box-shadow .15s, border-color .15s;
-    box-shadow: 0 4px 14px rgba(220,30,46,0.30), 0 0 0 1px rgba(255,215,0,0.08) inset;
     position: relative;
     overflow: hidden;
+    transition: transform .2s cubic-bezier(0.34,1.56,0.64,1), box-shadow .2s, border-color .2s;
+    box-shadow:
+      0 6px 18px rgba(220,30,46,0.35),
+      0 0 0 1px rgba(255,215,0,0.20) inset,
+      0 -2px 8px rgba(255,215,0,0.05) inset;
+    animation: dbbet1cPulse 3s ease-in-out infinite;
+  }
+  /* shimmer dorado que cruza cada 4s */
+  .pred-dbbet-1click::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(105deg,
+      transparent 0%,
+      transparent 30%,
+      rgba(255,215,0,0.0) 40%,
+      rgba(255,215,0,0.35) 50%,
+      rgba(255,255,255,0.45) 52%,
+      rgba(255,215,0,0.35) 55%,
+      transparent 65%,
+      transparent 100%);
+    transform: skewX(-22deg);
+    pointer-events: none;
+    animation: dbbet1cShine 4s ease-in-out infinite;
+  }
+  /* pequeñas chispas decorativas en bordes */
+  .pred-dbbet-1click::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 12px;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 8% 50%, rgba(255,215,0,0.18) 0%, transparent 18%),
+      radial-gradient(circle at 92% 50%, rgba(255,215,0,0.15) 0%, transparent 18%);
   }
   .pred-dbbet-1click:hover {
-    transform: translateY(-1px);
-    border-color: #FFD700;
-    box-shadow: 0 8px 22px rgba(220,30,46,0.50), 0 0 0 1px rgba(255,215,0,0.25) inset;
+    transform: translateY(-2px) scale(1.01);
+    border-color: #fff;
+    box-shadow:
+      0 12px 28px rgba(220,30,46,0.55),
+      0 0 0 2px rgba(255,215,0,0.45) inset,
+      0 -2px 12px rgba(255,215,0,0.18) inset,
+      0 0 30px rgba(255,215,0,0.25);
+    animation-play-state: paused;
   }
-  .pred-dbbet-1click:active { transform: translateY(0); }
-  .pred-dbbet-1click .db-tag {
-    background: #FFD700;
-    color: #0a0a0a;
-    font-size: 0.62rem;
+  .pred-dbbet-1click:active { transform: translateY(0) scale(1); }
+
+  @keyframes dbbet1cPulse {
+    0%, 100% { box-shadow: 0 6px 18px rgba(220,30,46,0.35), 0 0 0 1px rgba(255,215,0,0.20) inset, 0 -2px 8px rgba(255,215,0,0.05) inset; }
+    50%      { box-shadow: 0 8px 24px rgba(220,30,46,0.55), 0 0 0 1px rgba(255,215,0,0.35) inset, 0 -2px 12px rgba(255,215,0,0.15) inset; }
+  }
+  @keyframes dbbet1cShine {
+    0%   { left: -100%; }
+    35%  { left: 120%; }
+    100% { left: 120%; }
+  }
+
+  /* Logo DBbet (SVG inline) */
+  .pred-dbbet-1click .db-logo-svg {
+    flex-shrink: 0;
+    height: 22px;
+    width: auto;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.45));
+    transition: transform .2s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    z-index: 2;
+  }
+  .pred-dbbet-1click:hover .db-logo-svg { transform: scale(1.10) rotate(-2deg); }
+
+  /* Separador vertical */
+  .pred-dbbet-1click .db-sep {
+    width: 1px;
+    height: 22px;
+    background: linear-gradient(180deg, transparent 0%, rgba(255,215,0,0.7) 50%, transparent 100%);
+    flex-shrink: 0;
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Bloque central: texto + pick */
+  .pred-dbbet-1click .db-msg {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+    line-height: 1.1;
+    position: relative;
+    z-index: 2;
+  }
+  .pred-dbbet-1click .db-msg-top {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: rgba(255,215,0,0.95);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+  }
+  .pred-dbbet-1click .db-msg-bot {
+    font-size: 0.86rem;
     font-weight: 900;
-    padding: 3px 7px;
-    border-radius: 5px;
-    letter-spacing: 0.5px;
+    color: #fff;
+    letter-spacing: -0.2px;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
-  .pred-dbbet-1click .db-icon {
-    font-size: 1rem;
+
+  /* Cuota destacada en badge */
+  .pred-dbbet-1click .db-odds {
+    flex-shrink: 0;
+    background: linear-gradient(135deg, #FFD700 0%, #ffaa00 100%);
+    color: #0a0a0a;
+    font-weight: 900;
+    font-size: 0.96rem;
+    padding: 5px 11px;
+    border-radius: 8px;
     line-height: 1;
+    letter-spacing: -0.3px;
+    box-shadow: 0 2px 8px rgba(255,215,0,0.45), 0 1px 0 rgba(0,0,0,0.15) inset;
+    font-variant-numeric: tabular-nums;
+    position: relative;
+    z-index: 2;
   }
-  .pred-dbbet-1click .db-mid {
-    flex: 1;
-    text-align: center;
-    font-size: 0.84rem;
-  }
+
+  /* Flecha animada */
   .pred-dbbet-1click .db-arrow {
-    font-size: 0.9rem;
-    opacity: 0.85;
-    transition: transform .15s;
+    flex-shrink: 0;
+    font-size: 1.05rem;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
+    transition: transform .2s cubic-bezier(0.34,1.56,0.64,1);
+    position: relative;
+    z-index: 2;
   }
-  .pred-dbbet-1click:hover .db-arrow { transform: translateX(3px); }
-  @media (max-width: 480px) {
-    .pred-dbbet-1click { padding: 10px 12px; font-size: 0.78rem; gap: 6px; }
-    .pred-dbbet-1click .db-tag { font-size: 0.56rem; padding: 2px 5px; }
-    .pred-dbbet-1click .db-mid { font-size: 0.76rem; }
+  .pred-dbbet-1click:hover .db-arrow { transform: translateX(5px); }
+
+  /* Responsive mobile */
+  @media (max-width: 520px) {
+    .pred-dbbet-1click { padding: 10px 12px; gap: 8px; }
+    .pred-dbbet-1click .db-logo-svg { height: 18px; }
+    .pred-dbbet-1click .db-sep { height: 20px; }
+    .pred-dbbet-1click .db-msg-top { font-size: 0.6rem; letter-spacing: 1px; }
+    .pred-dbbet-1click .db-msg-bot { font-size: 0.78rem; }
+    .pred-dbbet-1click .db-odds { font-size: 0.86rem; padding: 4px 9px; }
+    .pred-dbbet-1click .db-arrow { font-size: 0.9rem; }
+  }
+  @media (max-width: 380px) {
+    .pred-dbbet-1click { padding: 9px 10px; gap: 6px; }
+    .pred-dbbet-1click .db-sep { display: none; }
+    .pred-dbbet-1click .db-msg-top { display: none; }
+    .pred-dbbet-1click .db-msg-bot { font-size: 0.74rem; }
   }
 
   .pred-recommendation {
@@ -12373,12 +12491,28 @@ function renderPreds() {
           </a>` : ''}
         </div>
       </div>
-      ${!isFinishedWin && !isFinishedLoss ? `
-      <a class="pred-dbbet-1click" href="${buildDBbetCouponURL(p)}" target="_blank" rel="noopener" onclick="return betOnDBbetPick({matchId:${p.matchId ? "'"+p.matchId+"'" : 'null'},home:'${(p.home||'').replace(/'/g,"\\'")}',away:'${(p.away||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',_recSide:'${p._recSide||''}',_bestOdds:${p._bestOdds||'null'},fecha:'${p.fecha||p.kickoff||''}'});">
-        <span class="db-tag">DBbet</span>
-        <span class="db-mid">🎰 Apostar este pick en 1 click</span>
-        <span class="db-arrow">→</span>
-      </a>` : ''}
+      ${!isFinishedWin && !isFinishedLoss ? (()=>{
+        const _pickShort = _recLabel(p.rec, p.home, p.away);
+        const _side = _recSideOf(p);
+        const _odds = _side==='home' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null)
+                    : _side==='away' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null)
+                    : _side==='draw' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null)
+                    : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null);
+        return `
+        <a class="pred-dbbet-1click" href="${buildDBbetCouponURL(p)}" target="_blank" rel="noopener" onclick="return betOnDBbetPick({matchId:${p.matchId ? "'"+p.matchId+"'" : 'null'},home:'${(p.home||'').replace(/'/g,"\\'")}',away:'${(p.away||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',_recSide:'${p._recSide||''}',_bestOdds:${p._bestOdds||'null'},fecha:'${p.fecha||p.kickoff||''}'});" aria-label="Apostar ${_pickShort} en DBbet con 1 click">
+          <svg class="db-logo-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 152 26" aria-hidden="true">
+            <path fill="#fff" d="M71 25.23h8.51l.42-2.05H80a4.98 4.98 0 0 0 2.64 2.11c1.2.5 2.74.7 4.64.7 2.5 0 4.78-.53 6.86-1.66a12.08 12.08 0 0 0 4.78-4.62 13.01 13.01 0 0 0 1.73-6.61c0-2.4-.81-4.28-2.43-5.65-1.62-1.38-3.83-2.09-6.65-2.09-3.58 0-6.33.92-8.2 2.72h-.06L84.99 0h-8.8L71 25.23ZM87.42 11.3a4.7 4.7 0 0 1 3.03.84c.7.56 1.05 1.38 1.05 2.44.02 1.43-.5 2.8-1.47 3.85-.98 1.1-2.43 1.63-4.36 1.63-1.4 0-2.47-.25-3.1-.78-.63-.5-.95-1.24-.95-2.23a8.2 8.2 0 0 1 .35-2.15c.22-.75.6-1.44 1.12-2.02a4.84 4.84 0 0 1 1.87-1.2 7.4 7.4 0 0 1 2.46-.38Zm23.68 6.32h19.34c.26-1.22.4-2.46.42-3.7 0-2.94-1.02-5.13-3.06-6.62-2.04-1.44-5.13-2.19-9.35-2.19-3.52 0-6.54.64-9.04 1.84a12.06 12.06 0 0 0-5.45 4.8 12.43 12.43 0 0 0-1.68 6.22 6.65 6.65 0 0 0 3.16 5.97c1.06.7 2.4 1.2 3.94 1.55 1.55.35 3.38.5 5.52.5 3.8 0 6.96-.53 9.5-1.66a11.46 11.46 0 0 0 5.59-4.91h-9.37c-.52.56-1.17 1-1.9 1.27-.73.28-1.75.42-3.02.42a6.04 6.04 0 0 1-3.41-.81 2.55 2.55 0 0 1-1.23-2.26l.04-.42Zm11.4-4.45H112a4.68 4.68 0 0 1 2.18-2.58 7.87 7.87 0 0 1 3.73-.81c1.49 0 2.6.28 3.41.8a2.5 2.5 0 0 1 1.2 2.16l-.04.43Zm25.78 12.05 1.05-5.16c-.7.07-1.65.07-2.81.07-.7 0-1.2-.07-1.48-.25-.28-.14-.42-.42-.42-.84.03-.37.09-.74.17-1.1l1.34-6.54h4.75L152 5.9h-4.75L148.5 0h-8.8l-1.23 5.9h-4.08l-1.12 5.5h4.08l-1.66 8c-.2.83-.3 1.68-.31 2.54 0 .98.2 1.73.7 2.25a3.6 3.6 0 0 0 1.82 1.13c.78.21 2.08.32 3.9.32 1.38 0 2.6-.04 3.7-.11a25.5 25.5 0 0 0 2.79-.3Z"/>
+            <path fill="#FFD700" d="M36 25h21.59a16.8 16.8 0 0 0 4.35-.5 9.75 9.75 0 0 0 3.64-1.75c1.09-.87 1.94-2 2.49-3.28.6-1.34.91-2.6.91-3.78a5.08 5.08 0 0 0-.87-2.91 4.07 4.07 0 0 0-2.32-1.61v-.07a5.92 5.92 0 0 0 3.05-2.53A7.37 7.37 0 0 0 70 4.47c0-1.5-.56-2.62-1.61-3.35C67.29.38 65.79 0 63.86 0H41.2L36 25ZM49.6 6.1h7.5c.54-.02 1.07.06 1.58.24a.88.88 0 0 1 .52.83c0 .7-.2 1.26-.63 1.61-.42.36-1.12.53-2.14.53h-7.5l.67-3.22Zm-1.86 8.88h8.1c.87 0 1.5.14 1.93.35a1.13 1.13 0 0 1 .63 1.09 2.32 2.32 0 0 1-.74 1.79c-.49.49-1.19.7-2.17.7h-8.55l.8-3.93ZM36 8.26c0 1.4-.15 2.78-.43 4.14-.3 1.42-.72 2.81-1.28 4.16-2.36 5.64-7.1 8.45-14.2 8.44H0l2.65-12.5.57-2.82h10.13L11.4 18.7h5.94c2.65 0 4.62-.77 5.9-2.38a9.08 9.08 0 0 0 1.98-5.77c0-2.8-1.76-4.24-5.23-4.24H.35L1.67.01h23.49c1.6-.03 3.2.14 4.76.48 1.36.35 2.47.84 3.36 1.47C35.07 3.3 36 5.4 36 8.26Z"/>
+          </svg>
+          <span class="db-sep"></span>
+          <span class="db-msg">
+            <span class="db-msg-top">🎰 Apostar 1-Click</span>
+            <span class="db-msg-bot">${_pickShort}</span>
+          </span>
+          ${_odds ? `<span class="db-odds">${_odds}</span>` : ''}
+          <span class="db-arrow">→</span>
+        </a>`;
+      })() : ''}
       ${(p.probH > 0 || p.probA > 0) ? `
       <div class="pred-bars">
         <div class="pred-bar-item">
