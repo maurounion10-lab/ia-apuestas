@@ -2078,6 +2078,54 @@
     .pred-dbbet-1click .db-odds { font-size: 0.86rem; padding: 4px 9px; }
     .pred-dbbet-1click .db-arrow { font-size: 0.9rem; }
   }
+
+  /* MÁXIMA CONFIANZA — botón DBbet con highlight extra (mejor cuota) */
+  .pred-card-max .pred-dbbet-1click {
+    border-width: 2px;
+    box-shadow:
+      0 8px 22px rgba(220,30,46,0.50),
+      0 0 0 1px rgba(255,215,0,0.40) inset,
+      0 -2px 12px rgba(255,215,0,0.15) inset,
+      0 0 18px rgba(255,215,0,0.18);
+  }
+  .pred-card-max .pred-dbbet-1click .db-msg-top {
+    color: #FFD700;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(255,215,0,0.4);
+  }
+  .pred-card-max .pred-dbbet-1click .db-odds {
+    background: linear-gradient(135deg, #FFD700 0%, #ffaa00 50%, #FFD700 100%);
+    background-size: 200% 100%;
+    animation: dbbet1cOddsPulse 2s ease-in-out infinite;
+    box-shadow: 0 3px 12px rgba(255,215,0,0.55), 0 1px 0 rgba(0,0,0,0.15) inset;
+  }
+  @keyframes dbbet1cOddsPulse {
+    0%, 100% { background-position: 0% 0%; }
+    50%      { background-position: 100% 0%; }
+  }
+  /* Marca la cuota normal como "Cuota base" cuando es max conf — la cuota DBbet brilla más */
+  .pred-card-max .pred-rec-odds {
+    color: rgba(255,255,255,0.60) !important;
+    font-size: 1.6rem !important;
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+    text-decoration-color: rgba(255,215,0,0.4);
+    position: relative;
+  }
+  .pred-card-max .pred-rec-odds::after {
+    content: 'BASE';
+    position: absolute;
+    top: -8px;
+    right: -4px;
+    font-size: 0.5rem;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: rgba(255,215,0,0.7);
+    background: rgba(0,0,0,0.5);
+    padding: 2px 4px;
+    border-radius: 3px;
+    text-decoration: none;
+  }
+
   @media (max-width: 380px) {
     .pred-dbbet-1click { padding: 9px 10px; gap: 6px; }
     .pred-dbbet-1click .db-sep { display: none; }
@@ -12484,7 +12532,7 @@ function renderPreds() {
           <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '🎯'} ${_recLabel(p.rec, p.home, p.away)}</div>
         </div>
         <div class="pred-rec-right">
-          ${(()=>{ const _s=_recSideOf(p); const ro = _s==='home' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null) : _s==='away' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null) : _s==='draw' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null) : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null); return ro ? `<div class="pred-rec-odds">${ro}</div>` : ''; })()}
+          ${(()=>{ const _s=_recSideOf(p); const _roRaw = _s==='home' ? (p._hO ? parseFloat(p._hO) : null) : _s==='away' ? (p._aO ? parseFloat(p._aO) : null) : _s==='draw' ? (p._dO ? parseFloat(p._dO) : null) : (p._bestOdds ? parseFloat(p._bestOdds) : null); if (!_roRaw) return ''; const _roShown = isMaxConf ? (_roRaw * 0.95).toFixed(2) : _roRaw.toFixed(2); return `<div class="pred-rec-odds">${_roShown}</div>`; })()}
           ${p._bookKey ? `<a class="pred-rec-book" href="${getBookLink(p._bookKey)}" target="_blank" rel="noopener" title="Apostar en ${p._bookLabel||p._bookKey}" onclick="trackEvent('promo_click',{promo:'${p._bookKey}',type:'bookmaker_rec'})">
             <img src="${getBookLogo(p._bookKey)}" alt="${p._bookLabel||p._bookKey}" onerror="this.style.display='none'">
             <span class="pred-rec-bonus">Apostar aquí</span>
@@ -12494,10 +12542,13 @@ function renderPreds() {
       ${!isFinishedWin && !isFinishedLoss ? (()=>{
         const _pickShort = _recLabel(p.rec, p.home, p.away);
         const _side = _recSideOf(p);
-        const _odds = _side==='home' ? (p._hO ? parseFloat(p._hO).toFixed(2) : null)
-                    : _side==='away' ? (p._aO ? parseFloat(p._aO).toFixed(2) : null)
-                    : _side==='draw' ? (p._dO ? parseFloat(p._dO).toFixed(2) : null)
-                    : (p._bestOdds ? parseFloat(p._bestOdds).toFixed(2) : null);
+        // DBbet siempre muestra la cuota REAL (sin el descuento del 5% de máxima conf)
+        // Esto crea el incentivo: usuario ve cuota mejor en DBbet vs cuota normal
+        const _oddsRaw = _side==='home' ? (p._hO ? parseFloat(p._hO) : null)
+                       : _side==='away' ? (p._aO ? parseFloat(p._aO) : null)
+                       : _side==='draw' ? (p._dO ? parseFloat(p._dO) : null)
+                       : (p._bestOdds ? parseFloat(p._bestOdds) : null);
+        const _odds = _oddsRaw ? _oddsRaw.toFixed(2) : null;
         return `
         <a class="pred-dbbet-1click" href="${buildDBbetCouponURL(p)}" target="_blank" rel="noopener" onclick="return betOnDBbetPick({matchId:${p.matchId ? "'"+p.matchId+"'" : 'null'},home:'${(p.home||'').replace(/'/g,"\\'")}',away:'${(p.away||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',_recSide:'${p._recSide||''}',_bestOdds:${p._bestOdds||'null'},fecha:'${p.fecha||p.kickoff||''}'});" aria-label="Apostar ${_pickShort} en DBbet con 1 click">
           <svg class="db-logo-svg" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 152 26" aria-hidden="true">
@@ -12506,7 +12557,7 @@ function renderPreds() {
           </svg>
           <span class="db-sep"></span>
           <span class="db-msg">
-            <span class="db-msg-top">🎰 Apostar 1-Click</span>
+            <span class="db-msg-top">${isMaxConf ? '💎 MEJOR CUOTA · 1-Click' : '🎰 Apostar 1-Click'}</span>
             <span class="db-msg-bot">${_pickShort}</span>
           </span>
           ${_odds ? `<span class="db-odds">${_odds}</span>` : ''}
