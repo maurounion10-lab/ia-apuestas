@@ -5664,29 +5664,82 @@ window.toggleHeroBubble = function(n) {
 </div>
 
 <!-- BANNER MUNDIAL 2026 — countdown dinámico, full-width arriba del hero -->
-<section id="gbMundialBanner" style="background:linear-gradient(135deg,#7a0f1f 0%,#C8102E 45%,#FFD700 100%);border-bottom:2px solid rgba(255,215,0,0.55);padding:22px 20px;text-align:center;position:relative;overflow:hidden">
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.18) 0%,transparent 65%);pointer-events:none"></div>
-  <div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent 0%,#FFD700 50%,transparent 100%);opacity:0.7"></div>
-  <div style="max-width:1000px;margin:0 auto;position:relative;display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:nowrap">
-    <div style="font-size:2.8rem;filter:drop-shadow(0 2px 8px rgba(212,175,55,0.55));flex-shrink:0" class="gbMundialTrophy">🏆</div>
+<section id="gbMundialBanner" style="background:linear-gradient(135deg,#5c0816 0%,#a30f1d 35%,#dc1e2e 65%,#a30f1d 100%);border-bottom:2px solid rgba(255,255,255,0.18);padding:22px 20px;text-align:center;position:relative;overflow:hidden">
+  <!-- Shine sweeping animation -->
+  <div class="gbMundialShine" aria-hidden="true"></div>
+  <!-- Top highlight line -->
+  <div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.65) 50%,transparent 100%);opacity:0.6"></div>
+  <!-- Radial vignette -->
+  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.10) 0%,transparent 65%);pointer-events:none"></div>
+  <div style="max-width:1000px;margin:0 auto;position:relative;display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:nowrap;z-index:2">
+    <div style="font-size:2.8rem;filter:drop-shadow(0 2px 10px rgba(0,0,0,0.45));flex-shrink:0" class="gbMundialTrophy">🏆</div>
     <div style="text-align:left;min-width:0;flex:0 1 auto" class="gbMundialText">
-      <div style="font-size:0.78rem;font-weight:800;letter-spacing:2.5px;color:#FFD700;text-transform:uppercase;line-height:1;margin-bottom:3px" class="gbMundialPulse"><span id="gbMundialTag">⚡ Próximamente</span></div>
-      <div style="font-size:1.35rem;font-weight:900;color:#fff;letter-spacing:-0.3px;line-height:1.2">Mundial 2026 · <span id="gbMundialDays" style="color:#FFD700">14</span> <span style="color:rgba(255,255,255,0.95)">días</span></div>
-      <div style="font-size:0.85rem;color:rgba(255,255,255,0.6);margin-top:4px;line-height:1.4" class="gbMundialSub" id="gbMundialSub">USA 🇺🇸 · Canadá 🇨🇦 · México 🇲🇽 — la IA se está preparando con picks especiales</div>
+      <div style="font-size:0.78rem;font-weight:800;letter-spacing:2.5px;color:rgba(255,255,255,0.85);text-transform:uppercase;line-height:1;margin-bottom:3px" class="gbMundialPulse"><span id="gbMundialTag">⚡ Próximamente</span></div>
+      <div id="gbMundialHeadline" style="font-size:1.35rem;font-weight:900;color:#fff;letter-spacing:-0.3px;line-height:1.2;text-shadow:0 2px 6px rgba(0,0,0,0.4)">Mundial 2026 · <span id="gbMundialDays">14</span> <span>días</span></div>
+      <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);margin-top:4px;line-height:1.4" class="gbMundialSub" id="gbMundialSub">USA 🇺🇸 · Canadá 🇨🇦 · México 🇲🇽 — la IA se está preparando con picks especiales</div>
       <div style="font-size:0.82rem;font-weight:700;margin-top:6px;line-height:1.35" id="gbMundialPicksTeaser"></div>
     </div>
   </div>
 </section>
 <style>
-  @keyframes gbMundialGlow { 0%,100% { opacity:0.6; text-shadow:none } 50% { opacity:1; text-shadow:0 0 10px rgba(212,175,55,0.6) } }
+  @keyframes gbMundialGlow { 0%,100% { opacity:0.7; text-shadow:none } 50% { opacity:1; text-shadow:0 0 10px rgba(255,255,255,0.5) } }
   .gbMundialPulse { animation: gbMundialGlow 2.2s ease-in-out infinite; }
-  @keyframes gbMundialFloat { 0%,100% { transform:translateY(0) rotate(-3deg) } 50% { transform:translateY(-3px) rotate(3deg) }
-@keyframes gbTriondaFloat { 0%,100% { transform:translateY(0) rotate(-3deg); } 50% { transform:translateY(-4px) rotate(3deg); } } }
+  @keyframes gbMundialFloat { 0%,100% { transform:translateY(0) rotate(-3deg) } 50% { transform:translateY(-3px) rotate(3deg) } }
   .gbMundialTrophy { display:inline-block; animation: gbMundialFloat 3.5s ease-in-out infinite; }
+  /* Shine: barra blanca diagonal que cruza el banner cada 5s */
+  .gbMundialShine {
+    position: absolute; top: 0; left: -40%; width: 30%; height: 100%;
+    background: linear-gradient(105deg, transparent 0%, transparent 35%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0.06) 55%, transparent 65%, transparent 100%);
+    transform: skewX(-20deg); pointer-events: none; z-index: 1;
+    animation: gbMundialShineLoop 5s ease-in-out infinite;
+  }
+  @keyframes gbMundialShineLoop {
+    0%   { left: -40%; }
+    40%  { left: 130%; }
+    100% { left: 130%; }
+  }
+  /* TODAY MODE — HOY COMIENZA EL MUNDIAL */
+  #gbMundialBanner.gbMundialToday {
+    background: linear-gradient(135deg, #3a0510 0%, #6e0a1a 25%, #b50d22 50%, #6e0a1a 75%, #3a0510 100%);
+    background-size: 200% 200%;
+    animation: gbMundialTodayBg 4s ease-in-out infinite;
+    border-bottom: 2px solid rgba(255,255,255,0.35);
+    box-shadow: 0 6px 30px rgba(180,13,34,0.45) inset, 0 4px 22px rgba(180,13,34,0.45);
+  }
+  @keyframes gbMundialTodayBg {
+    0%,100% { background-position: 0% 0%; }
+    50%     { background-position: 100% 100%; }
+  }
+  #gbMundialBanner.gbMundialToday .gbMundialTrophy { animation: gbMundialTodayTrophy 1.2s ease-in-out infinite; }
+  @keyframes gbMundialTodayTrophy {
+    0%,100% { transform: scale(1) rotate(-6deg); filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
+    50%     { transform: scale(1.18) rotate(6deg); filter: drop-shadow(0 6px 16px rgba(255,200,200,0.6)); }
+  }
+  #gbMundialBanner.gbMundialToday #gbMundialHeadline {
+    font-size: clamp(1.5rem, 4.5vw, 2.4rem);
+    font-weight: 900;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.55), 0 0 24px rgba(255,255,255,0.18);
+    animation: gbMundialTodayPulse 1.4s ease-in-out infinite;
+  }
+  @keyframes gbMundialTodayPulse {
+    0%,100% { transform: scale(1); }
+    50%     { transform: scale(1.025); }
+  }
+  /* Responsive */
+  @media (max-width:760px) {
+    #gbMundialBanner.gbMundialToday #gbMundialHeadline { font-size: clamp(1.2rem, 5vw, 1.7rem); line-height: 1.15; }
+  }
   @media (max-width:560px) {
     #gbMundialBanner { padding:10px 12px; }
-    #gbMundialBanner .gbMundialTrophy { font-size:1.6rem !important; }
+    #gbMundialBanner .gbMundialTrophy { font-size:1.8rem !important; }
     #gbMundialBanner .gbMundialSub { display:none; }
+    .gbMundialShine { width: 50%; }
+    #gbMundialBanner.gbMundialToday .gbMundialTrophy { font-size: 2.4rem !important; }
+  }
+  @media (max-width:380px) {
+    #gbMundialBanner .gbMundialPulse { font-size: 0.65rem !important; }
+    #gbMundialBanner.gbMundialToday #gbMundialHeadline { font-size: 1.05rem; }
   }
 </style>
 <script>
@@ -5728,7 +5781,14 @@ window.toggleHeroBubble = function(n) {
       }
     }
     if (d === 0) {
-      el.parentElement.innerHTML = 'Mundial 2026 <span style="color:#FFD700">EN VIVO</span> 🔥';
+      var head = document.getElementById('gbMundialHeadline');
+      var tag  = document.getElementById('gbMundialTag');
+      var sub  = document.getElementById('gbMundialSub');
+      var ban  = document.getElementById('gbMundialBanner');
+      if (head) head.innerHTML = '¡ES HOY! 🔥 HOY COMIENZA EL MUNDIAL';
+      if (tag)  tag.innerHTML  = '✨ Edición FIFA 2026';
+      if (sub)  sub.innerHTML  = 'México vs Sudáfrica abre el torneo en el Estadio Azteca — picks IA del día en gambeta.ai';
+      if (ban)  ban.classList.add('gbMundialToday');
     }
   }
   update();
