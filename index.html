@@ -1906,6 +1906,67 @@
     padding: 0 8px;
   }
 
+  
+  /* ── PRED CARD — Botón DBbet 1-click bet ── */
+  .pred-dbbet-1click {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 10px;
+    padding: 11px 14px;
+    background: linear-gradient(135deg, #dc1e2e 0%, #a30f1d 100%);
+    color: #fff;
+    border: 1px solid rgba(255,215,0,0.4);
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s, border-color .15s;
+    box-shadow: 0 4px 14px rgba(220,30,46,0.30), 0 0 0 1px rgba(255,215,0,0.08) inset;
+    position: relative;
+    overflow: hidden;
+  }
+  .pred-dbbet-1click:hover {
+    transform: translateY(-1px);
+    border-color: #FFD700;
+    box-shadow: 0 8px 22px rgba(220,30,46,0.50), 0 0 0 1px rgba(255,215,0,0.25) inset;
+  }
+  .pred-dbbet-1click:active { transform: translateY(0); }
+  .pred-dbbet-1click .db-tag {
+    background: #FFD700;
+    color: #0a0a0a;
+    font-size: 0.62rem;
+    font-weight: 900;
+    padding: 3px 7px;
+    border-radius: 5px;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .pred-dbbet-1click .db-icon {
+    font-size: 1rem;
+    line-height: 1;
+  }
+  .pred-dbbet-1click .db-mid {
+    flex: 1;
+    text-align: center;
+    font-size: 0.84rem;
+  }
+  .pred-dbbet-1click .db-arrow {
+    font-size: 0.9rem;
+    opacity: 0.85;
+    transition: transform .15s;
+  }
+  .pred-dbbet-1click:hover .db-arrow { transform: translateX(3px); }
+  @media (max-width: 480px) {
+    .pred-dbbet-1click { padding: 10px 12px; font-size: 0.78rem; gap: 6px; }
+    .pred-dbbet-1click .db-tag { font-size: 0.56rem; padding: 2px 5px; }
+    .pred-dbbet-1click .db-mid { font-size: 0.76rem; }
+  }
+
   .pred-recommendation {
     background: rgba(0,200,83,0.08);
     border: 1px solid rgba(0,200,83,0.2);
@@ -12312,6 +12373,12 @@ function renderPreds() {
           </a>` : ''}
         </div>
       </div>
+      ${!isFinishedWin && !isFinishedLoss ? `
+      <a class="pred-dbbet-1click" href="${buildDBbetCouponURL(p)}" target="_blank" rel="noopener" onclick="return betOnDBbetPick({matchId:${p.matchId ? "'"+p.matchId+"'" : 'null'},home:'${(p.home||'').replace(/'/g,"\\'")}',away:'${(p.away||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',_recSide:'${p._recSide||''}',_bestOdds:${p._bestOdds||'null'},fecha:'${p.fecha||p.kickoff||''}'});">
+        <span class="db-tag">DBbet</span>
+        <span class="db-mid">🎰 Apostar este pick en 1 click</span>
+        <span class="db-arrow">→</span>
+      </a>` : ''}
       ${(p.probH > 0 || p.probA > 0) ? `
       <div class="pred-bars">
         <div class="pred-bar-item">
@@ -13048,6 +13115,63 @@ let histConfFilter = 'all';
 const PAGE_LAUNCH_DATE = new Date('2025-03-01');
 
 function _normRec(r) { return (r||'').replace('Visitante Gana','Gana Visitante').replace('Local Gana','Gana Local'); }
+
+
+// ════════════════════════════════════════════════════════════
+// DBBET 1-CLICK BET — sistema de carga rápida de apuestas
+// Apunta al afiliado DBbet con coupon code deeplink (cuando API esté lista)
+// ════════════════════════════════════════════════════════════
+const DBBET_AFFILIATE_BASE = 'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213';
+// Cuando DBbet active la API de coupon deeplink, cambiar a true.
+// Mientras tanto, el botón abre el afiliado y el usuario completa manualmente.
+const COUPON_DEEPLINK_ENABLED = false;
+
+// Genera un couponCode determinístico desde los datos del pick
+// Formato: GMB_{home3}_{away3}_{side}_{YYYYMMDD}
+function _dbbetCouponCode(p) {
+  if (!p) return '';
+  const s = (x) => (x||'').toString().replace(/[^A-Za-z0-9]/g,'').slice(0,3).toUpperCase();
+  const side = _recSideOf(p) || 'X';
+  // datos del partido: prefiero ID del partido si existe
+  if (p.matchId)  return ('GMB_' + p.matchId + '_' + side).toUpperCase();
+  const home = s(p.homeRaw || p.home);
+  const away = s(p.awayRaw || p.away);
+  const date = (p.fecha || p.kickoff || '').toString().slice(0,10).replace(/-/g,'');
+  return ['GMB', home, away, side, date].filter(Boolean).join('_').toUpperCase();
+}
+
+function buildDBbetCouponURL(p) {
+  const code = _dbbetCouponCode(p);
+  if (COUPON_DEEPLINK_ENABLED && code) {
+    return DBBET_AFFILIATE_BASE + '&url=' + encodeURIComponent('/coupon?load=' + code);
+  }
+  return DBBET_AFFILIATE_BASE;
+}
+
+// Click handler — abre DBbet con el cupón (o link general si fallback)
+function betOnDBbetPick(pickRef) {
+  let p = null;
+  try {
+    // pickRef puede ser objeto serializado en data-attribute
+    p = typeof pickRef === 'string' ? JSON.parse(pickRef) : pickRef;
+  } catch(e) { p = null; }
+  const url = p ? buildDBbetCouponURL(p) : DBBET_AFFILIATE_BASE;
+  // tracking
+  try {
+    trackEvent('promo_click', {
+      promo: 'dbbet',
+      type: 'one_click_bet',
+      match: p && (p.home + ' vs ' + p.away),
+      pick: p && p.rec,
+      odds: p && p._bestOdds,
+      coupon: p ? _dbbetCouponCode(p) : null,
+      deeplink: COUPON_DEEPLINK_ENABLED
+    });
+  } catch(e) {}
+  window.open(url, '_blank', 'noopener');
+  return false;
+}
+
 
 // Determina el lado del pick ('home'|'away'|'draw'|null) con retrocompat para picks viejos
 function _recSideOf(p) {
