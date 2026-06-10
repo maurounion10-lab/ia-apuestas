@@ -22,6 +22,7 @@
  */
 
 import { WC_FUTURES, WC_FUTURES_PUBLISH_TS } from './wc-futures.js';
+import { WC_MATCHES, WC_MATCHES_PUBLISH_TS } from './wc-matches.js';
 
 const API_FOOTBALL_BASE = 'https://v3.football.api-sports.io';
 
@@ -1699,6 +1700,64 @@ async function runWcFuturesPublisher(env) {
   return stats;
 }
 
+// 🏆 WC2026 Matches Publisher
+// Inserta los picks REGULARES por partido del Mundial en historial_full del admin.
+// Solo lo hace una vez — usa los IDs de los picks para detectar si ya están publicados.
+async function runWcMatchesPublisher(env) {
+  const stats = { skip: null, published: 0, alreadyPublished: 0 };
+  try {
+    const now = Date.now();
+    if (now < WC_MATCHES_PUBLISH_TS) {
+      stats.skip = `aún no llegó la fecha de publicación (${new Date(WC_MATCHES_PUBLISH_TS).toISOString()})`;
+      return stats;
+    }
+    const hist = await fetchAdminHistorial(env);
+    if (!Array.isArray(hist)) {
+      stats.skip = 'historial no disponible';
+      return stats;
+    }
+    const existingIds = new Set(hist.map(p => p && p.id).filter(Boolean));
+    const toAdd = WC_MATCHES.filter(p => !existingIds.has(p.id));
+    stats.alreadyPublished = WC_MATCHES.length - toAdd.length;
+    if (toAdd.length === 0) {
+      stats.skip = 'todos los WC matches ya están en el historial';
+      return stats;
+    }
+    const newHist = [...toAdd, ...hist];
+    const key = env.SUPABASE_SERVICE_ROLE_KEY;
+    if (!key) {
+      stats.skip = 'SUPABASE_SERVICE_ROLE_KEY no configurado';
+      return stats;
+    }
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/acoin_users?email=eq.${encodeURIComponent(ADMIN_EMAIL)}&select=email`, {
+      method: 'PATCH',
+      headers: {
+        'apikey': key,
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=representation',
+      },
+      body: JSON.stringify({
+        historial_full: newHist,
+        updated_at: new Date().toISOString(),
+      }),
+    });
+    if (!r.ok) {
+      stats.skip = `PATCH HTTP ${r.status}: ${(await r.text()).slice(0, 200)}`;
+      return stats;
+    }
+    const body = await r.text();
+    if (body.trim() === '[]' || !body.trim()) {
+      stats.skip = 'PATCH no afectó ninguna fila';
+      return stats;
+    }
+    stats.published = toAdd.length;
+  } catch (e) {
+    stats.skip = `error: ${e.message}`;
+  }
+  return stats;
+}
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
@@ -1718,6 +1777,8 @@ export default {
       // Publicar WC2026 futures el 6-jun (sólo se inserta una vez)
       const wcStats = await runWcFuturesPublisher(env);
       console.log('[cron-wc-futures]', JSON.stringify(wcStats));
+      const wcMatchesStats = await runWcMatchesPublisher(env);
+      console.log('[cron-wc-matches]', JSON.stringify(wcMatchesStats));
     }
   },
   async fetch(request, env) {
