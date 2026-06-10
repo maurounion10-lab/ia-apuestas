@@ -2012,26 +2012,15 @@
     flex: 1;
     min-width: 0;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1px;
-    line-height: 1.1;
+    align-items: center;
     position: relative;
     z-index: 2;
   }
-  .pred-dbbet-1click .db-msg-top {
-    font-size: 0.66rem;
-    font-weight: 700;
-    letter-spacing: 1.2px;
-    text-transform: uppercase;
-    color: rgba(255,215,0,0.95);
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-  }
-  .pred-dbbet-1click .db-msg-bot {
-    font-size: 0.86rem;
+  .pred-dbbet-1click .db-msg-single {
+    font-size: 0.92rem;
     font-weight: 900;
     color: #fff;
-    letter-spacing: -0.2px;
+    letter-spacing: 0.2px;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     max-width: 100%;
     overflow: hidden;
@@ -2073,8 +2062,7 @@
     .pred-dbbet-1click { padding: 10px 12px; gap: 8px; }
     .pred-dbbet-1click .db-logo-svg { height: 18px; }
     .pred-dbbet-1click .db-sep { height: 20px; }
-    .pred-dbbet-1click .db-msg-top { font-size: 0.6rem; letter-spacing: 1px; }
-    .pred-dbbet-1click .db-msg-bot { font-size: 0.78rem; }
+    .pred-dbbet-1click .db-msg-single { font-size: 0.82rem; }
     .pred-dbbet-1click .db-odds { font-size: 0.86rem; padding: 4px 9px; }
     .pred-dbbet-1click .db-arrow { font-size: 0.9rem; }
   }
@@ -2088,7 +2076,7 @@
       0 -2px 12px rgba(255,215,0,0.15) inset,
       0 0 18px rgba(255,215,0,0.18);
   }
-  .pred-card-max .pred-dbbet-1click .db-msg-top {
+  .pred-card-max .pred-dbbet-1click .db-msg-single {
     color: #FFD700;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 0 8px rgba(255,215,0,0.4);
   }
@@ -2129,8 +2117,8 @@
   @media (max-width: 380px) {
     .pred-dbbet-1click { padding: 9px 10px; gap: 6px; }
     .pred-dbbet-1click .db-sep { display: none; }
-    .pred-dbbet-1click .db-msg-top { display: none; }
-    .pred-dbbet-1click .db-msg-bot { font-size: 0.74rem; }
+    
+    .pred-dbbet-1click .db-msg-single { font-size: 0.78rem; }
   }
 
   .pred-recommendation {
@@ -12557,8 +12545,7 @@ function renderPreds() {
           </svg>
           <span class="db-sep"></span>
           <span class="db-msg">
-            <span class="db-msg-top">${isMaxConf ? '💎 MEJOR CUOTA · 1-Click' : '🎰 Apostar 1-Click'}</span>
-            <span class="db-msg-bot">${_pickShort}</span>
+            <span class="db-msg-single">${isMaxConf ? '💎 MEJOR CUOTA · Apostar en 1 click' : '🎰 Apostar en 1 click'}</span>
           </span>
           ${_odds ? `<span class="db-odds">${_odds}</span>` : ''}
           <span class="db-arrow">→</span>
