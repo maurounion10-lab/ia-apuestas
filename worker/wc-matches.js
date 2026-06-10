@@ -26,12 +26,12 @@ export const WC_MATCHES = [
   // JUEVES 11-JUN — PARTIDO INAUGURAL
   // ════════════════════════════════════════════════════════════════════════
   {
-    id: 'wc2026_m_mex_sau_11jun',
-    home: 'México', away: 'Arabia Saudita',
+    id: 'wc2026_m_mex_saf_11jun',
+    home: 'México', away: 'Sudáfrica',
     rec: 'Gana Local', _recSide: 'home',
     conf: 'high', bvr: 6, bvrText: 'Máxima',
-    stake: 170, odds: 1.50,
-    _hO: 1.50, _dO: 4.10, _aO: 6.20, _bestOdds: 1.50,
+    stake: 170, odds: 1.45,
+    _hO: 1.45, _dO: 4.50, _aO: 7.50, _bestOdds: 1.45,
     _bookKey: 'dbbet', _bookLabel: 'DBbet',
     result: 'pending',
     league: '🏆 Mundial 2026',
@@ -39,8 +39,8 @@ export const WC_MATCHES = [
     commenceTs: ART_ts(2026, 5, 11, 13, 0), // Jue 11-jun 13:00 ART
     _sportKey: 'soccer_fifa_world_cup',
     _wcMatch: true,
-    probH: 62, probD: 23, probA: 15,
-    insight: 'Partido inaugural en el Estadio Azteca. México llega como anfitrión con plantel rodado y factor altitud (2240m). Arabia Saudita perdió a Salem Al-Dawsari por lesión, su mejor jugador. Aguirre prioriza posesión en casa. Estadística: México gana 8 de 10 partidos jugando en el Azteca con público a favor. El factor sede en partidos inaugurales del Mundial favorece al anfitrión históricamente (5 de últimos 7).',
+    probH: 65, probD: 22, probA: 13,
+    insight: 'Partido inaugural Mundial 2026 en el Estadio Azteca. México #15 FIFA vs Sudáfrica #61 — diferencia abismal en plantel. Aguirre con Edson Álvarez, Lozano, Henry Martín. Sudáfrica perdió Themba Zwane y depende de Mokoena. Factor altitud (2240m) + público local. Estadística: el anfitrión gana 5 de los últimos 7 partidos inaugurales del Mundial. Pick MAXIMA confianza.',
   },
 
   // ════════════════════════════════════════════════════════════════════════

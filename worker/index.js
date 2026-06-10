@@ -1795,6 +1795,54 @@ export default {
       return new Response(JSON.stringify({ keys }), { headers: CORS });
     }
 
+    // ── 🆕 /admin/replace-wc-matches — limpia todos los _wcMatch y reinserta los actuales ──
+    if (path === '/admin/replace-wc-matches') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      const stats = { removed: 0, published: 0, skip: null };
+      try {
+        const hist = await fetchAdminHistorial(env);
+        if (!Array.isArray(hist)) {
+          stats.skip = 'historial no disponible';
+          return new Response(JSON.stringify(stats), { headers: CORS });
+        }
+        // Eliminar todos los picks con _wcMatch: true
+        const remaining = hist.filter(p => !p || !p._wcMatch);
+        stats.removed = hist.length - remaining.length;
+        // Reinsertar los WC_MATCHES actuales al inicio
+        const newHist = [...WC_MATCHES, ...remaining];
+        const key = env.SUPABASE_SERVICE_ROLE_KEY;
+        if (!key) {
+          stats.skip = 'SUPABASE_SERVICE_ROLE_KEY no configurado';
+          return new Response(JSON.stringify(stats), { headers: CORS });
+        }
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/acoin_users?email=eq.${encodeURIComponent(ADMIN_EMAIL)}&select=email`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation',
+          },
+          body: JSON.stringify({
+            historial_full: newHist,
+            updated_at: new Date().toISOString(),
+          }),
+        });
+        if (!r.ok) {
+          stats.skip = `PATCH HTTP ${r.status}: ${(await r.text()).slice(0, 200)}`;
+          return new Response(JSON.stringify(stats), { headers: CORS });
+        }
+        stats.published = WC_MATCHES.length;
+      } catch (e) {
+        stats.skip = `error: ${e.message}`;
+      }
+      return new Response(JSON.stringify({ ok: true, ts: new Date().toISOString(), stats }, null, 2), { headers: CORS });
+    }
+
     // ── 🆕 /admin/publish-wc-matches — fuerza la publicación manual de los WC matches ──
     // Requiere ?token={ADMIN_TRIGGER_TOKEN} para evitar abuso público
     if (path === '/admin/publish-wc-matches') {
