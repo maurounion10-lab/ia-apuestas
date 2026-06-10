@@ -1653,6 +1653,42 @@ export default {
       } catch (e) { return J({ error: e.message }, 500); }
     }
 
-    return J({ error: 'ruta desconocida', rutas: ['/status', '/preview', '/card', '/run', '/seed-dedup', '/clear-dedup'] }, 404);
+    // 🆕 /admin/post-thread — postea un hilo nativo (T1 + replies)
+    // POST con JSON body { tweets: ["tweet1", "tweet2", ...] }
+    if (url.pathname === '/admin/post-thread' && request.method === 'POST') {
+      if (!env.TRIGGER_TOKEN || url.searchParams.get('token') !== env.TRIGGER_TOKEN) {
+        return J({ error: 'token inválido' }, 403);
+      }
+      let body;
+      try { body = await request.json(); }
+      catch (e) { return J({ error: 'JSON inválido', detail: e.message }, 400); }
+      const tweets = Array.isArray(body.tweets) ? body.tweets : null;
+      if (!tweets || tweets.length === 0) {
+        return J({ error: 'tweets vacío' }, 400);
+      }
+      // Validar largo de cada tweet
+      const tooLong = tweets.map((t, i) => ({ i, len: (t||'').length })).filter(x => x.len > 280);
+      if (tooLong.length) {
+        return J({ error: 'tweets exceden 280 chars', tooLong }, 400);
+      }
+      const results = [];
+      let prevId = null;
+      for (let i = 0; i < tweets.length; i++) {
+        try {
+          const id = await postTweet(tweets[i], env, prevId ? { replyToId: prevId } : {});
+          if (!id) { results.push({ i, error: 'postTweet devolvió null' }); break; }
+          results.push({ i, id, url: 'https://x.com/Gambeta_ai/status/' + id });
+          prevId = id;
+          if (i < tweets.length - 1) await new Promise(r => setTimeout(r, 1500));
+        } catch (e) {
+          results.push({ i, error: e.message });
+          break;
+        }
+      }
+      const ok = results.every(r => r.id);
+      return J({ ok, count: results.filter(r => r.id).length, total: tweets.length, results });
+    }
+
+    return J({ error: 'ruta desconocida', rutas: ['/status', '/preview', '/card', '/run', '/seed-dedup', '/clear-dedup', '/admin/post-thread'] }, 404);
   },
 };
