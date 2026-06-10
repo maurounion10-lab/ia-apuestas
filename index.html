@@ -2122,8 +2122,8 @@
   }
 
   .pred-recommendation {
-    background: rgba(0,200,83,0.08);
-    border: 1px solid rgba(0,200,83,0.2);
+    background: linear-gradient(135deg, rgba(255,215,0,0.10) 0%, rgba(255,170,0,0.06) 100%);
+    border: 1px solid rgba(255,215,0,0.32);
     border-radius: 10px;
     padding: 11px 14px;
     margin-bottom: 12px;
@@ -2131,6 +2131,7 @@
     align-items: center;
     justify-content: space-between;
     gap: 8px;
+    box-shadow: 0 0 0 1px rgba(255,215,0,0.05) inset;
   }
   .pred-rec-left {
     display: flex;
@@ -2141,14 +2142,16 @@
   }
   .pred-rec-label {
     font-size: 0.65rem;
-    color: var(--texto-sec);
+    color: rgba(255,215,0,0.75);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
+    font-weight: 700;
   }
   .pred-rec-value {
     font-size: 1rem;
-    font-weight: 700;
-    color: var(--verde);
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
     /* Permitir wrap si el texto es muy largo (picks Mundial con frases extendidas).
        Antes era white-space: nowrap → se solapaba con la cuota. */
     line-height: 1.25;
