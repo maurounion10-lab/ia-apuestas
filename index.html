@@ -2838,29 +2838,6 @@
     .dbbet-mid-cta { order: 3; width: 100%; text-align: center; padding: 10px; }
   }
   /* pred-card banner — 2 columnas: logo | [título + botón / subtítulo] */
-  .dbbet-pred-banner {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 13px;
-    background: linear-gradient(135deg,#1a0507,#0d1f3c);
-    border: 1px solid rgba(220, 30, 46,0.6);
-    border-radius: 10px; text-decoration: none;
-    position: relative; overflow: hidden;
-    transition: border-color .15s;
-  }
-  .dbbet-pred-banner:hover { border-color: rgba(220,30,46,0.9); }
-  .dbbet-pred-logo { height: 34px; width: 34px; object-fit: contain; flex-shrink: 0; border-radius: 6px; }
-  .dbbet-pred-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-  .dbbet-pred-top { display: flex; align-items: center; gap: 6px; }
-  .dbbet-pred-title { font-size: 0.78rem; font-weight: 900; color: #fff; letter-spacing: .1px; white-space: nowrap; }
-  .dbbet-pred-sub { font-size: 0.60rem; color: rgba(255,255,255,0.45); line-height: 1.3; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .dbbet-pred-cta {
-    background: linear-gradient(135deg,#8B6400,#C9A227 45%,#7A5200);
-    color: #fff; text-shadow: 0 1px 2px rgba(40,20,0,0.75);
-    font-size: 0.75rem; font-weight: 900;
-    animation: goldglow 2.5s ease-in-out infinite;
-    padding: 9px 18px; border-radius: 9px;
-    white-space: nowrap; flex-shrink: 0; letter-spacing: .3px;
-  }
 
   /* ── CHAT ── */
   #chat-section {
@@ -12298,19 +12275,8 @@ function renderPreds() {
   // Exponer predicciones al chat IA
   window._aiPreds = source;
 
-  // CTA fija — solo DBbet como único sponsor en las fichas
-  const affCtaHtml = `
-    <div style="margin:10px 0 6px">
-      <a href="${'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213'}" target="_blank" rel="noopener" class="dbbet-pred-banner" onclick="trackEvent('promo_click',{promo:'dbbet',type:'pred_card'})">
-        <div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(220,30,46,0.07),transparent);pointer-events:none"></div>
-        <img src="/img/casas/dbbet.svg" class="dbbet-pred-logo" onerror="this.style.display='none'">
-        <div class="dbbet-pred-body">
-          <span class="dbbet-pred-title">💎 DBbet</span>
-          <div class="dbbet-pred-sub">Duplica 1er depósito</div>
-        </div>
-        <span class="dbbet-pred-cta">Apostar aquí →</span>
-      </a>
-    </div>`;
+  // CTA banner DBbet eliminado — el botón 1-click ya cumple esa función
+  const affCtaHtml = '';
 
   // ── Pick del Finde: sólo el pick pinneado por admin (_estrellaOverride) ──
   const _dow = new Date().getDay();
@@ -12604,17 +12570,7 @@ function renderPreds() {
             <div style="font-size:1rem;font-weight:800;color:var(--rojo)">${p._aO ? parseFloat(p._aO).toFixed(2) : '—'}</div>
           </button>
         </div>
-      </div>` : (parseFloat(p._bestOdds) > 0 ? `
-      <!-- Cuota del pronóstico desde historial (fallback cuando no hay probs ni raw odds) -->
-      <div style="margin:10px 0 4px">
-        <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">📊 Cuota del pronóstico</div>
-        <div style="display:flex;justify-content:center">
-          <div style="min-width:80px;text-align:center;background:rgba(41,182,246,0.08);border:1px solid rgba(41,182,246,0.2);border-radius:8px;padding:8px 20px">
-            <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">${p.rec || 'Cuota'}</div>
-            <div style="font-size:1rem;font-weight:800;color:var(--azul)">${parseFloat(p._bestOdds).toFixed(2)}</div>
-          </div>
-        </div>
-      </div>` : ''))}
+      </div>` : '')}
       <!-- (Bloque de apuesta con Gambeta Coins removido) -->
       <!-- Sello de resultado (solo partidos terminados) -->
       ${isStarted ? `
@@ -12629,8 +12585,7 @@ function renderPreds() {
           ${finalScore ? `<span class="pred-result-stamp-sub">Resultado final: ${_translateMatchState(finalScore)}</span>` : ''}
         </div>
       </div>` : ''}
-      <!-- CTA casas afiliadas — solo para partidos no iniciados -->
-      ${!isStarted ? oddsHtml : ''}
+
       <!-- ── Fila de acciones: Compartir · Análisis · Comentar · Likes ── -->
       <div class="pred-action-row">
         <button class="pred-action-btn btn-share" onclick="sharePick('${p.home}','${p.away}','${p.rec}',${_bvr},'${p.league}')" title="Compartir este pick">
