@@ -1795,6 +1795,42 @@ export default {
       return new Response(JSON.stringify({ keys }), { headers: CORS });
     }
 
+    // ── 🆕 /admin/publish-wc-matches — fuerza la publicación manual de los WC matches ──
+    // Requiere ?token={ADMIN_TRIGGER_TOKEN} para evitar abuso público
+    if (path === '/admin/publish-wc-matches') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      const stats = await runWcMatchesPublisher(env);
+      return new Response(JSON.stringify({
+        ok: true,
+        ts: new Date().toISOString(),
+        publish_ts: new Date(WC_MATCHES_PUBLISH_TS).toISOString(),
+        now: new Date().toISOString(),
+        wc_matches_count: WC_MATCHES.length,
+        stats,
+      }, null, 2), { headers: CORS });
+    }
+
+    // ── 🆕 /admin/publish-wc-futures — fuerza la publicación manual de los WC futures ──
+    if (path === '/admin/publish-wc-futures') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      const stats = await runWcFuturesPublisher(env);
+      return new Response(JSON.stringify({
+        ok: true,
+        ts: new Date().toISOString(),
+        publish_ts: new Date(WC_FUTURES_PUBLISH_TS).toISOString(),
+        wc_futures_count: WC_FUTURES.length,
+        stats,
+      }, null, 2), { headers: CORS });
+    }
+
     // ── 🆕 /cup-context (Conmebol cups standings-aware preferences) ──────────
     if (path === '/cup-context') {
       const cacheKey = `cup_context_v2_${new Date().toISOString().slice(0,10)}`; // refresh daily
