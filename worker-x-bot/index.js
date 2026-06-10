@@ -1444,12 +1444,12 @@ function genHotTake(hist, pickOverride) {
 // ───────────────────────── Router de slot → pilar ─────────────────────────
 const SLOT_BY_CRON = {
   '17 * * * *':  'celebracion', // cada hora :17 — aciertos resueltos
-  '23 12 * * *': 'resultados',  // 09:23 ART
+  '23 12 * * *': 'resultados',  // 09:23 ART — cómo le fue ayer a los picks
   '30 12 * * *': 'picks',       // 09:30 ART — todos los picks del día
-  '47 17 * * *': 'educacion',   // 14:47 ART
-  '13 21 * * *': 'hottake',     // 18:13 ART
-  '23 23 * * *': 'comunidad',   // 20:23 ART
+  '13 21 * * *': 'hottake',     // 18:13 ART — opinión sobre un pick específico
 };
+// Slots desactivados (decisión Mauro 11-jun): 'educacion' (14:47) y 'comunidad' (20:23).
+// Contenido de educación general y comunidad no aportaba — el bot solo habla de pronósticos.
 
 async function generateText(slot, hist, pickOverride, env) {
   switch (slot) {
