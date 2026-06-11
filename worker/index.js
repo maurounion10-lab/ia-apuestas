@@ -1806,14 +1806,13 @@ export default {
         let sendxOk = false;
         let sendxError = null;
 
-        // Intentar SendX si está configurado
-        if (env.SENDX_API_TOKEN && env.SENDX_TEAM_ID) {
+        // Intentar SendX si está configurado (header correcto: X-Team-ApiKey)
+        if (env.SENDX_API_TOKEN) {
           try {
             const sendxRes = await fetch('https://api.sendx.io/api/v1/rest/contact', {
               method: 'POST',
               headers: {
-                'Team': env.SENDX_TEAM_ID,
-                'Api-Key': env.SENDX_API_TOKEN,
+                'X-Team-ApiKey': env.SENDX_API_TOKEN,
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
@@ -1823,7 +1822,10 @@ export default {
               })
             });
             sendxOk = sendxRes.ok;
-            if (!sendxOk) sendxError = `sendx_${sendxRes.status}`;
+            if (!sendxOk) {
+              const errText = await sendxRes.text().catch(() => '');
+              sendxError = `sendx_${sendxRes.status}: ${errText.slice(0, 200)}`;
+            }
           } catch (e) {
             sendxError = `sendx_exception: ${e.message}`;
           }
