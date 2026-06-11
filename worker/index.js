@@ -1874,6 +1874,48 @@ export default {
       }
     }
 
+    // ── 🆕 /api/leads-stats — conteo agregado de leads Mundial por landing ──
+    if (path === '/api/leads-stats' && request.method === 'GET') {
+      if (!env.SENDX_API_TOKEN) {
+        return new Response(JSON.stringify({ ok: false, error: 'sendx_no_config' }),
+          { status: 503, headers: CORS });
+      }
+      const LIST_ID = 'list_vy9qvGKzQrWLzSAv5dC434';
+      try {
+        // Pedir hasta 1000 contactos
+        const res = await fetch('https://api.sendx.io/api/v1/rest/contact?limit=1000', {
+          headers: { 'X-Team-ApiKey': env.SENDX_API_TOKEN }
+        });
+        if (!res.ok) {
+          return new Response(JSON.stringify({ ok: false, error: 'sendx_' + res.status }),
+            { status: 502, headers: CORS });
+        }
+        const contacts = await res.json();
+        // Filtrar solo los que están en la lista Mundial
+        const mundial = contacts.filter(c => Array.isArray(c.lists) && c.lists.includes(LIST_ID));
+        // Contar por tag de landing
+        const counts = { predicciones: 0, calendario: 0, estadisticas: 0, otros: 0 };
+        let total = mundial.length;
+        for (const c of mundial) {
+          const tagStr = Array.isArray(c.tags) ? c.tags.join(',').toLowerCase() : '';
+          // Tags vienen como IDs (tag_...), no como strings, asi que veo customFields o source
+          // En cambio, mirar la fecha de creacion y la pageSource para inferir
+          // Para esta version, contamos solo el total. Si queremos por landing, hay que guardar custom_field
+          counts.otros++;
+        }
+        // Conversion rate: necesitamos gtag events o un counter aparte
+        return new Response(JSON.stringify({
+          ok: true,
+          total: total,
+          breakdown: counts,
+          generated_at: new Date().toISOString()
+        }), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }),
+          { status: 500, headers: CORS });
+      }
+    }
+
     // ── /available ───────────────────────────────────────────────────────────
     if (path === '/available') {
       const keys = [...LEAGUES_MAIN, ...LEAGUES_EUROPE, ...LEAGUES_SECONDARY].map(([k]) => k);
