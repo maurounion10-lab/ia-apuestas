@@ -443,6 +443,50 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
 .cta-final-dual .btn-final-mail:hover { transform: translateY(-2px); }
 .cta-final-dual .free-tag { display: inline-block; font-size: 0.74rem; font-weight: 800; background: rgba(0,0,0,0.15); padding: 5px 14px; border-radius: 100px; margin-bottom: 14px; letter-spacing: 1.5px; }
 
+
+/* ─── INLINE CTAs entre secciones ─── */
+.inline-cta {
+  display: flex; gap: 20px; align-items: center; justify-content: space-between;
+  flex-wrap: wrap;
+  background: linear-gradient(135deg, rgba(34,158,217,0.10) 0%, rgba(255,215,0,0.06) 100%);
+  border: 1px solid rgba(34,158,217,0.35);
+  border-radius: 18px;
+  padding: 22px 28px;
+  margin-top: 32px;
+  position: relative; overflow: hidden;
+}
+.inline-cta::before {
+  content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+  background: linear-gradient(180deg, #229ED9, #ffd700);
+}
+.inline-cta-txt { flex: 1; min-width: 220px; }
+.inline-cta-txt strong { color: #fff; font-size: 1.05rem; font-weight: 800; display: block; margin-bottom: 4px; line-height: 1.3; }
+.inline-cta-txt small { color: rgba(255,255,255,0.55); font-size: 0.82rem; }
+.inline-cta-btns { display: flex; gap: 10px; flex-wrap: wrap; }
+.inline-cta-tg {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #229ED9, #0088cc);
+  color: #fff; padding: 11px 22px; border-radius: 10px;
+  font-weight: 800; text-decoration: none; font-size: 0.92rem;
+  transition: transform .15s, box-shadow .15s;
+  box-shadow: 0 4px 14px rgba(34,158,217,0.4);
+}
+.inline-cta-tg:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(34,158,217,0.55); }
+.inline-cta-mail {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: rgba(0,0,0,0.35); color: var(--gold);
+  padding: 11px 18px; border-radius: 10px;
+  font-weight: 800; text-decoration: none; font-size: 0.9rem;
+  border: 1.5px solid var(--gold);
+  transition: background .15s;
+}
+.inline-cta-mail:hover { background: rgba(255,215,0,0.1); }
+@media (max-width: 600px) {
+  .inline-cta { padding: 18px 22px; flex-direction: column; align-items: stretch; text-align: center; }
+  .inline-cta-btns { justify-content: center; }
+  .inline-cta-tg, .inline-cta-mail { flex: 1; justify-content: center; }
+}
+
 </style>
 </head>
 <body>
@@ -574,6 +618,18 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
       </div>
   </div>
 </section>
+
+<div class="inline-cta">
+  <div class="inline-cta-txt">
+    <strong>💎 Recibí estos análisis IA antes que nadie</strong>
+    <small>Pick del día + ranking actualizado al canal</small>
+  </div>
+  <div class="inline-cta-btns">
+    <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="inline-cta-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'inline_s1'})"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg><span>Canal Telegram</span></a>
+    <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="inline-cta-mail">✉️ Email</a>
+  </div>
+</div>
+
 <section class="block" id="estadisticas">
   <div class="section-head">
     <span class="kicker">Estadísticas IA</span>
@@ -695,6 +751,18 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
       </div>
   </div>
 </section>
+
+<div class="inline-cta">
+  <div class="inline-cta-txt">
+    <strong>⚡ El pick del día llega gratis al canal</strong>
+    <small>Análisis IA cada mañana · +15.000 adentro</small>
+  </div>
+  <div class="inline-cta-btns">
+    <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="inline-cta-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'inline_s2'})"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg><span>Canal Telegram</span></a>
+    <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="inline-cta-mail">✉️ Email</a>
+  </div>
+</div>
+
 <section class="block" id="guia">
   <div class="section-head">
     <span class="kicker">Guía 2026</span>
@@ -743,6 +811,18 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
     </div>
   </div>
 </section>
+
+<div class="inline-cta">
+  <div class="inline-cta-txt">
+    <strong>🎯 Sumate al canal y no te pierdas ninguno</strong>
+    <small>Cada partido del Mundial con la lectura IA</small>
+  </div>
+  <div class="inline-cta-btns">
+    <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="inline-cta-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'inline_s3'})"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg><span>Canal Telegram</span></a>
+    <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="inline-cta-mail">✉️ Email</a>
+  </div>
+</div>
+
 <section class="block" id="predicciones">
   <div class="section-head">
     <span class="kicker">Predicciones IA</span>
@@ -809,6 +889,18 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
       </div>
   </div>
 </section>
+
+<div class="inline-cta">
+  <div class="inline-cta-txt">
+    <strong>📊 +15.000 ya reciben este análisis</strong>
+    <small>Vos también, gratis y sin registro</small>
+  </div>
+  <div class="inline-cta-btns">
+    <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="inline-cta-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'inline_s4'})"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg><span>Canal Telegram</span></a>
+    <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="inline-cta-mail">✉️ Email</a>
+  </div>
+</div>
+
 <section class="block" id="premios">
   <div class="section-head">
     <span class="kicker">Premios individuales</span>
@@ -882,6 +974,18 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
       </div>
   </div>
 </section>
+
+<div class="inline-cta">
+  <div class="inline-cta-txt">
+    <strong>🤖 La IA te avisa cuando hay alta confianza</strong>
+    <small>BVR 6/6 directo a tu Telegram</small>
+  </div>
+  <div class="inline-cta-btns">
+    <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="inline-cta-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'inline_s5'})"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg><span>Canal Telegram</span></a>
+    <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="inline-cta-mail">✉️ Email</a>
+  </div>
+</div>
+
 
 <div class="cta-final">
   <h2>🤖 La IA Gambeta analiza todo el Mundial</h2>
