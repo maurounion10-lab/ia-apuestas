@@ -222,7 +222,7 @@ def draw_eyebrow(draw, text, y, color=GOLD_BRIGHT):
     draw_text_anchor(draw, (x, y), spaced, fnt, color, "lt")
 
 
-def draw_big_title(draw, lines, y, fnt_size=130, color=WHITE, line_h_factor=0.95):
+def draw_big_title(draw, lines, y, fnt_size=130, color=WHITE, line_h_factor=1.12):
     fnt = font(fnt_size, "anton")
     for i, line in enumerate(lines):
         tw, th = measure(line, fnt)
@@ -499,35 +499,35 @@ ADS = []
 ADS.append(("pred-1-bignumber",
             "render_with_photo",
             dict(photo_name="trofeo.jpg",
-                 eyebrow="PREDICCIÓN IA",
+                 eyebrow="ACCESO GRATIS · 2 IAS",
                  big_num="18.2%",
                  title_lines=["ESPAÑA CAMPEONA"],
-                 subtitle="La IA proyecta a España como favorita del Mundial 2026.",
-                 cta="VER PREDICCIONES →",
+                 subtitle="Desbloqueá GRATIS las 2 IAs que ya predijeron el Mundial.",
+                 cta="ACCEDER GRATIS →",
                  gold_tint=True,
                  photo_crop="center")))
 
 ADS.append(("pred-2-playerhero",
             "render_with_photo",
             dict(photo_name="mbappe.jpg",
-                 eyebrow="ANÁLISIS IA",
+                 eyebrow="2 IAS · ACCESO GRATIS",
                  title_lines=["FRANCIA SEGÚN", "EL MODELO"],
-                 subtitle="16.5% de probabilidad de levantar el trofeo en NJ.",
-                 cta="VER PROYECCIONES →",
+                 subtitle="Las 2 IAs del Mundial. Gratis. Desbloqueá tu acceso ya.",
+                 cta="QUIERO LAS 2 IAS →",
                  gold_tint=False,
                  photo_crop="face")))
 
 ADS.append(("pred-3-versus",
             "render_versus",
             dict(team_a="ESPAÑA", val_a=18.2, team_b="FRANCIA", val_b=16.5,
-                 eyebrow="DUELO IA",
+                 eyebrow="ACCESO GRATIS · 2 IAS",
                  title=["EL FAVORITO", "DEL MUNDIAL"],
-                 cta="VER TOP 5 →")))
+                 cta="ACCEDER GRATIS →")))
 
 ADS.append(("pred-4-data",
             "render_data_card",
             dict(title=["TOP 5", "AL TÍTULO"],
-                 eyebrow="RANKING IA",
+                 eyebrow="ACCESO GRATIS · 2 IAS",
                  rows=[
                      ("España", 18.2, None),
                      ("Francia", 16.5, None),
@@ -535,15 +535,15 @@ ADS.append(("pred-4-data",
                      ("Inglaterra", 11.8, None),
                      ("Brasil", 10.1, None),
                  ],
-                 cta="VER RANKING COMPLETO →")))
+                 cta="DESBLOQUEAR GRATIS →")))
 
 ADS.append(("pred-5-hottake",
             "render_with_photo",
             dict(photo_name="trofeo.jpg",
-                 eyebrow="HOT TAKE IA",
+                 eyebrow="2 IAS · GRATIS",
                  title_lines=["UN CAMPEÓN", "INESPERADO"],
-                 subtitle="El modelo IA detecta un favorito que nadie está mirando.",
-                 cta="DESCUBRILO →",
+                 subtitle="Desbloqueá GRATIS las 2 IAs y descubrí al favorito oculto.",
+                 cta="ACCEDER GRATIS →",
                  gold_tint=True,
                  photo_crop="center")))
 
@@ -551,35 +551,35 @@ ADS.append(("pred-5-hottake",
 ADS.append(("cal-1-bignumber",
             "render_with_photo",
             dict(photo_name="azteca.jpg",
-                 eyebrow="CALENDARIO MUNDIAL",
+                 eyebrow="ACCESO GRATIS · 2 IAS",
                  big_num="104",
                  title_lines=["PARTIDOS"],
-                 subtitle="Cada uno analizado por la IA desde la fase de grupos hasta la final.",
-                 cta="VER CALENDARIO →",
+                 subtitle="104 partidos + 2 IAs gratis para todo el torneo.",
+                 cta="ACCEDER GRATIS →",
                  gold_tint=False,
                  photo_crop="center")))
 
 ADS.append(("cal-2-playerhero",
             "render_with_photo",
             dict(photo_name="bellingham.jpg",
-                 eyebrow="DÍA A DÍA",
+                 eyebrow="2 IAS GRATIS",
                  title_lines=["CADA PARTIDO,", "UNA LECTURA IA"],
-                 subtitle="Probabilidades, favoritos y sorpresas previo a cada cruce.",
-                 cta="VER PRÓXIMOS PARTIDOS →",
+                 subtitle="Las 2 IAs leen cada partido del Mundial. Acceso gratis.",
+                 cta="QUIERO LAS 2 IAS →",
                  gold_tint=False,
                  photo_crop="face")))
 
 ADS.append(("cal-3-versus",
             "render_versus",
             dict(team_a="MÉXICO", val_a=42.1, team_b="ARG", val_b=31.4,
-                 eyebrow="APERTURA MUNDIAL",
+                 eyebrow="ACCESO GRATIS · 2 IAS",
                  title=["11 JUNIO", "AZTECA"],
-                 cta="VER ANÁLISIS →")))
+                 cta="ACCEDER GRATIS →")))
 
 ADS.append(("cal-4-data",
             "render_data_card",
             dict(title=["PRIMERA", "SEMANA"],
-                 eyebrow="JUN 11-17",
+                 eyebrow="2 IAS · ACCESO GRATIS",
                  rows=[
                      ("México vs ARG", 42, None),
                      ("España vs CRO", 64, None),
@@ -587,15 +587,15 @@ ADS.append(("cal-4-data",
                      ("Inglaterra vs SUI", 47, None),
                      ("Brasil vs Camerún", 71, None),
                  ],
-                 cta="VER CALENDARIO COMPLETO →")))
+                 cta="DESBLOQUEAR GRATIS →")))
 
 ADS.append(("cal-5-hottake",
             "render_with_photo",
             dict(photo_name="metlife.jpg",
-                 eyebrow="HOT TAKE IA",
+                 eyebrow="2 IAS · GRATIS",
                  title_lines=["16 SORPRESAS", "EN GRUPOS"],
-                 subtitle="El modelo señala los partidos donde el favorito puede caer.",
-                 cta="VER SORPRESAS →",
+                 subtitle="Desbloqueá GRATIS las 2 IAs y vé las sorpresas antes que todos.",
+                 cta="ACCEDER GRATIS →",
                  gold_tint=False,
                  photo_crop="center")))
 
@@ -603,35 +603,35 @@ ADS.append(("cal-5-hottake",
 ADS.append(("est-1-bignumber",
             "render_with_photo",
             dict(photo_name="trofeo.jpg",
-                 eyebrow="RANKING IA",
+                 eyebrow="ACCESO GRATIS · 2 IAS",
                  big_num="48",
                  title_lines=["SELECCIONES"],
-                 subtitle="Todas analizadas, todas rankeadas por probabilidad de éxito.",
-                 cta="VER RANKING →",
+                 subtitle="48 selecciones rankeadas por 2 IAs distintas. Gratis.",
+                 cta="ACCEDER GRATIS →",
                  gold_tint=True,
                  photo_crop="center")))
 
 ADS.append(("est-2-playerhero",
             "render_with_photo",
             dict(photo_name="haaland.jpg",
-                 eyebrow="TOP 8 IA",
+                 eyebrow="2 IAS · ACCESO GRATIS",
                  title_lines=["NORUEGA", "ENTRA AL TOP"],
-                 subtitle="Haaland y compañía sorprenden en la proyección IA del Mundial.",
-                 cta="VER TOP 8 →",
+                 subtitle="Top 8 del Mundial según las 2 IAs. Desbloqueá tu acceso gratis.",
+                 cta="QUIERO LAS 2 IAS →",
                  gold_tint=False,
                  photo_crop="face")))
 
 ADS.append(("est-3-versus",
             "render_versus",
             dict(team_a="ESPAÑA", val_a=18.2, team_b="BRA", val_b=10.1,
-                 eyebrow="TOP IA",
+                 eyebrow="ACCESO GRATIS · 2 IAS",
                  title=["RANKING DE", "LOS GRANDES"],
-                 cta="VER TOP COMPLETO →")))
+                 cta="ACCEDER GRATIS →")))
 
 ADS.append(("est-4-data",
             "render_data_card",
             dict(title=["TOP 5", "SEGÚN IA"],
-                 eyebrow="PROYECCIÓN MUNDIAL",
+                 eyebrow="2 IAS · ACCESO GRATIS",
                  rows=[
                      ("España", 18.2, None),
                      ("Francia", 16.5, None),
@@ -639,15 +639,15 @@ ADS.append(("est-4-data",
                      ("Inglaterra", 11.8, None),
                      ("Brasil", 10.1, None),
                  ],
-                 cta="VER LAS 48 →")))
+                 cta="DESBLOQUEAR GRATIS →")))
 
 ADS.append(("est-5-hottake",
             "render_with_photo",
             dict(photo_name="mbappe.jpg",
-                 eyebrow="DARK HORSE",
+                 eyebrow="2 IAS · GRATIS",
                  title_lines=["EL 9° FAVORITO", "QUE NADIE VE"],
-                 subtitle="Una selección con 7.8% de chance que el resto está subestimando.",
-                 cta="DESCUBRILO →",
+                 subtitle="Las 2 IAs te lo muestran. Desbloqueá tu acceso gratis ahora.",
+                 cta="ACCEDER GRATIS →",
                  gold_tint=False,
                  photo_crop="face")))
 

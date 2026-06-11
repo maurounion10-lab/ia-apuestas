@@ -64,17 +64,17 @@ body.gate-locked{overflow:hidden!important}\
     backdrop.innerHTML = '\
       <div class="gate-card">\
         <div class="gate-content">\
-          <span class="gate-badge">⚡ Acceso gratuito</span>\
-          <h2 class="gate-title">DESBLOQUEÁ LAS <span class="g">PREDICCIONES IA</span> DEL MUNDIAL</h2>\
-          <p class="gate-desc">Dejá tu mail y accedé GRATIS al ranking IA de las 48 selecciones, el calendario completo con pronósticos día a día, y los favoritos del torneo.</p>\
+          <span class="gate-badge">⚡ ACCESO GRATIS · 2 IAS</span>\
+          <h2 class="gate-title">DESBLOQUEÁ <span class="g">2 IAs GRATIS</span> DEL MUNDIAL</h2>\
+          <p class="gate-desc">Dejá tu mail y desbloqueá <strong>2 herramientas IA distintas</strong>: predicciones partido a partido + combinadas premium. 100% gratis.</p>\
           <div class="gate-features">\
-            <span>🏆 Ranking IA 48 selecciones</span>\
-            <span>📅 Calendario partido a partido</span>\
+            <span>🏆 IA #1: Predicciones</span>\
+            <span>💰 IA #2: Combinadas</span>\
             <span>⚡ Sin spam</span>\
           </div>\
           <form class="gate-form" id="gate-form" novalidate>\
             <input type="email" class="gate-input" id="gate-email" placeholder="tu@email.com" autocomplete="email" required>\
-            <button type="submit" class="gate-btn" id="gate-btn">VER LAS PREDICCIONES →</button>\
+            <button type="submit" class="gate-btn" id="gate-btn">DESBLOQUEAR LAS 2 IAs →</button>\
             <div class="gate-error" id="gate-error"></div>\
           </form>\
           <p class="gate-fineprint">Sin spam. Podés darte de baja cuando quieras.</p>\
@@ -121,12 +121,12 @@ body.gate-locked{overflow:hidden!important}\
         } else {
           showErr((data && data.error) ? 'Error: ' + data.error : 'No pudimos suscribirte. Probá de nuevo.');
           btn.disabled = false;
-          btn.textContent = 'VER LAS PREDICCIONES →';
+          btn.textContent = 'DESBLOQUEAR LAS 2 IAs →';
         }
       } catch (ex) {
         showErr('Error de conexion. Revisa tu internet y reintenta.');
         btn.disabled = false;
-        btn.textContent = 'VER LAS PREDICCIONES →';
+        btn.textContent = 'DESBLOQUEAR LAS 2 IAs →';
       }
     });
   }
