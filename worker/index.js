@@ -1864,7 +1864,7 @@ export default {
         return new Response(JSON.stringify({
           ok: true,
           sendx: sendxOk ? 'subscribed' : 'fallback_email_sent',
-          redirect: '/mundial/gracias'
+          redirect: '/mundial/eleccion'
         }), { headers: CORS });
       } catch (e) {
         console.error('lead-signup error:', e);

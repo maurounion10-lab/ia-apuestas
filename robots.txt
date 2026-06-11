@@ -8,6 +8,8 @@ Disallow: /*?q=*
 Disallow: /odds?*
 Disallow: /*?category=*
 Disallow: /available
+Disallow: /mundial/eleccion
+Disallow: /mundial/gracias
 Allow: /
 
 Sitemap: https://gambeta.ai/sitemap.xml

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<title>Acceso desbloqueado · Gambeta IA Mundial 2026</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0f;--gold:#d4af37;--gold-bright:#f5cd47;--red:#c8102e;--green:#14a368;--text:#fff;--text-dim:rgba(255,255,255,.65)}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'Poppins',system-ui,sans-serif;min-height:100vh;overflow-x:hidden}
+.bg-decor{position:fixed;inset:0;pointer-events:none;z-index:0;background:radial-gradient(ellipse at 20% 10%,rgba(212,175,55,.18) 0%,transparent 50%),radial-gradient(ellipse at 80% 90%,rgba(20,163,104,.15) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(200,16,46,.10) 0%,transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:1280px;margin:0 auto;padding:32px 24px 60px;min-height:100vh;display:flex;flex-direction:column}
+.header{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px}
+.logo{font-family:'Anton',sans-serif;font-size:28px;letter-spacing:1px;color:var(--gold-bright);text-decoration:none}
+.logo .dot{color:var(--text)}
+.badge-success{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(20,163,104,.15);border:1px solid rgba(20,163,104,.4);border-radius:100px;font-size:13px;font-weight:600;color:#4ade80}
+.badge-success::before{content:'✓';display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;background:var(--green);color:#fff;border-radius:50%;font-size:12px;font-weight:900}
+.hero{text-align:center;margin-bottom:64px;margin-top:20px}
+.hero h1{font-family:'Anton',sans-serif;font-size:clamp(38px,6vw,72px);line-height:.95;letter-spacing:1px;margin-bottom:16px;text-transform:uppercase}
+.hero h1 .gold{background:linear-gradient(135deg,var(--gold-bright) 0%,var(--gold) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:clamp(16px,2.2vw,20px);color:var(--text-dim);max-width:640px;margin:0 auto;font-weight:500}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:48px}
+.choice{position:relative;display:flex;flex-direction:column;padding:40px 32px;border-radius:24px;text-decoration:none;color:inherit;overflow:hidden;transition:transform .25s ease,box-shadow .25s ease;border:2px solid transparent;min-height:460px}
+.choice::before{content:'';position:absolute;inset:0;z-index:0;opacity:.28;transition:opacity .25s ease}
+.choice:hover{transform:translateY(-6px);box-shadow:0 30px 60px rgba(0,0,0,.5)}
+.choice:hover::before{opacity:.45}
+.choice.jugada{background:linear-gradient(135deg,#161620 0%,#1a1a28 100%);border-color:rgba(212,175,55,.35)}
+.choice.jugada::before{background:radial-gradient(ellipse at 70% 30%,rgba(212,175,55,.40) 0%,transparent 60%)}
+.choice.jugada:hover{border-color:var(--gold-bright)}
+.choice.billetes{background:linear-gradient(135deg,#1a0d12 0%,#220e15 100%);border-color:rgba(200,16,46,.35)}
+.choice.billetes::before{background:radial-gradient(ellipse at 30% 30%,rgba(200,16,46,.40) 0%,transparent 60%)}
+.choice.billetes:hover{border-color:var(--red)}
+.choice-inner{position:relative;z-index:1;display:flex;flex-direction:column;height:100%}
+.choice-icon{font-size:48px;margin-bottom:20px;line-height:1}
+.choice-eyebrow{font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;opacity:.7}
+.choice.jugada .choice-eyebrow{color:var(--gold-bright)}
+.choice.billetes .choice-eyebrow{color:#ff6b81}
+.choice-title{font-family:'Anton',sans-serif;font-size:clamp(36px,4.5vw,54px);line-height:.95;letter-spacing:1px;margin-bottom:20px;text-transform:uppercase;color:#fff}
+.choice-desc{font-size:15px;color:var(--text-dim);margin-bottom:24px;line-height:1.5}
+.choice-features{list-style:none;margin-bottom:32px;flex:1}
+.choice-features li{display:flex;align-items:flex-start;gap:10px;font-size:14px;padding:8px 0;font-weight:500}
+.choice-features li::before{content:'→';font-weight:900;flex-shrink:0}
+.choice.jugada .choice-features li::before{color:var(--gold-bright)}
+.choice.billetes .choice-features li::before{color:#ff6b81}
+.choice-cta{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-radius:14px;font-family:'Anton',sans-serif;font-size:22px;letter-spacing:1px;text-transform:uppercase;margin-top:auto;transition:transform .2s ease}
+.choice.jugada .choice-cta{background:linear-gradient(135deg,var(--gold-bright) 0%,var(--gold) 100%);color:#0a0a0f}
+.choice.billetes .choice-cta{background:linear-gradient(135deg,var(--red) 0%,#a10c24 100%);color:#fff}
+.choice:hover .choice-cta{transform:scale(1.02)}
+.footer-hint{text-align:center;margin-top:20px;font-size:13px;color:var(--text-dim)}
+.footer-hint a{color:var(--gold-bright);text-decoration:none}
+@media (max-width:768px){
+  .wrap{padding:20px 16px 40px}
+  .header{margin-bottom:24px}
+  .badge-success{font-size:12px;padding:6px 12px}
+  .hero{margin-bottom:36px}
+  .split{grid-template-columns:1fr;gap:16px;margin-bottom:32px}
+  .choice{padding:32px 24px;min-height:auto}
+  .choice-icon{font-size:40px}
+  .choice-features{margin-bottom:24px}
+  .choice-cta{padding:16px 20px;font-size:19px}
+}
+.choice{opacity:0;transform:translateY(20px);animation:slideUp .5s ease forwards}
+.choice.jugada{animation-delay:.1s}
+.choice.billetes{animation-delay:.25s}
+@keyframes slideUp{to{opacity:1;transform:translateY(0)}}
+.hero{opacity:0;transform:translateY(-10px);animation:slideDown .4s ease forwards}
+@keyframes slideDown{to{opacity:1;transform:translateY(0)}}
+</style>
+</head>
+<body>
+<div class="bg-decor"></div>
+<div class="wrap">
+  <div class="header">
+    <a href="/" class="logo">GAMBETA<span class="dot">.AI</span></a>
+    <span class="badge-success">Acceso desbloqueado</span>
+  </div>
+  <section class="hero">
+    <h1>ELEGÍ TU <span class="gold">CAMINO</span></h1>
+    <p>Tenés acceso a las dos IAs del Mundial 2026. ¿Con cuál arrancás?</p>
+  </section>
+  <div class="split">
+    <a href="https://gambeta.ai/" class="choice jugada" id="cta-jugada" rel="noopener">
+      <div class="choice-inner">
+        <div class="choice-icon">⚽</div>
+        <div class="choice-eyebrow">El pick del día</div>
+        <h2 class="choice-title">JUGADA<br>FUERTE</h2>
+        <p class="choice-desc">Un pronóstico diario seleccionado por la IA con máxima confianza. El que más probabilidades tiene de salir.</p>
+        <ul class="choice-features">
+          <li>Pick del día con análisis IA</li>
+          <li>Histórico verificable de aciertos</li>
+          <li>Picks Mundial 2026 día a día</li>
+          <li>Telegram con avisos en vivo</li>
+        </ul>
+        <div class="choice-cta"><span>Ver mi pick →</span></div>
+      </div>
+    </a>
+    <a href="https://masterprops.com.ar/" class="choice billetes" id="cta-billetes" rel="noopener">
+      <div class="choice-inner">
+        <div class="choice-icon">💰</div>
+        <div class="choice-eyebrow">Combinadas premium</div>
+        <h2 class="choice-title">BILLETES<br>GRANDES</h2>
+        <p class="choice-desc">Combinadas con cuotas altas armadas por una IA distinta. Para los que buscan multiplicar el ticket.</p>
+        <ul class="choice-features">
+          <li>Combinadas con cuotas elevadas</li>
+          <li>Selección IA de eventos sinérgicos</li>
+          <li>Ratio riesgo/recompensa optimizado</li>
+          <li>Una combinada del día</li>
+        </ul>
+        <div class="choice-cta"><span>Ver mi combinada →</span></div>
+      </div>
+    </a>
+  </div>
+  <p class="footer-hint">Vas a recibir las predicciones del Mundial en tu mail. Podés volver acá cuando quieras: <a href="/mundial-2026">/mundial-2026</a></p>
+</div>
+<script>
+(function(){
+  document.getElementById('cta-jugada').addEventListener('click',function(){try{localStorage.setItem('gambeta_choice','jugada')}catch(e){}if(window.gtag)gtag('event','eleccion_jugada',{event_category:'lead_split'})});
+  document.getElementById('cta-billetes').addEventListener('click',function(){try{localStorage.setItem('gambeta_choice','billetes')}catch(e){}if(window.gtag)gtag('event','eleccion_billetes',{event_category:'lead_split'})});
+})();
+</script>
+</body>
+</html>
