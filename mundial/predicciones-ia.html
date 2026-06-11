@@ -448,12 +448,14 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
 .inline-cta {
   display: flex; gap: 20px; align-items: center; justify-content: space-between;
   flex-wrap: wrap;
-  background: linear-gradient(135deg, rgba(34,158,217,0.10) 0%, rgba(255,215,0,0.06) 100%);
-  border: 1px solid rgba(34,158,217,0.35);
+  background: linear-gradient(135deg, rgba(34,158,217,0.30) 0%, rgba(34,158,217,0.10) 50%, rgba(255,215,0,0.18) 100%);
+  border: 2px solid rgba(34,158,217,0.75);
   border-radius: 18px;
-  padding: 22px 28px;
-  margin-top: 32px;
+  padding: 24px 30px;
+  margin: 40px auto;
   position: relative; overflow: hidden;
+  max-width: 1100px;
+  box-shadow: 0 10px 30px rgba(34,158,217,0.20), 0 0 0 1px rgba(255,255,255,0.04) inset;
 }
 .inline-cta::before {
   content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
