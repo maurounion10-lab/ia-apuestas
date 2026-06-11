@@ -1819,6 +1819,7 @@ export default {
                 email: email,
                 tag: ['mundial-2026', source, landing].filter(Boolean).join(','),
                 lists: ['list_vy9qvGKzQrWLzSAv5dC434'],
+                customFields: { landing: landing || 'unknown', source: source || 'unknown' },
                 source: 'gambeta-mundial-landing'
               })
             });
@@ -1894,20 +1895,29 @@ export default {
         // Filtrar solo los que están en la lista Mundial
         const mundial = contacts.filter(c => Array.isArray(c.lists) && c.lists.includes(LIST_ID));
         // Contar por tag de landing
-        const counts = { predicciones: 0, calendario: 0, estadisticas: 0, otros: 0 };
+        const byLanding = { 'predicciones-ia': 0, 'calendario-ia': 0, 'estadisticas-ia': 0, otros: 0 };
+        const now = Date.now();
+        const oneDay = 24 * 60 * 60 * 1000;
+        const last7Days = [0,0,0,0,0,0,0];  // dia 0 = hoy
         let total = mundial.length;
         for (const c of mundial) {
-          const tagStr = Array.isArray(c.tags) ? c.tags.join(',').toLowerCase() : '';
-          // Tags vienen como IDs (tag_...), no como strings, asi que veo customFields o source
-          // En cambio, mirar la fecha de creacion y la pageSource para inferir
-          // Para esta version, contamos solo el total. Si queremos por landing, hay que guardar custom_field
-          counts.otros++;
+          // Por landing (custom field)
+          const lan = c.customFields && c.customFields.landing;
+          if (lan && byLanding[lan] !== undefined) byLanding[lan]++;
+          else byLanding.otros++;
+          // Por fecha
+          if (c.created) {
+            const t = new Date(c.created).getTime();
+            const dayDiff = Math.floor((now - t) / oneDay);
+            if (dayDiff >= 0 && dayDiff < 7) last7Days[dayDiff]++;
+          }
         }
-        // Conversion rate: necesitamos gtag events o un counter aparte
         return new Response(JSON.stringify({
           ok: true,
           total: total,
-          breakdown: counts,
+          today: last7Days[0],
+          last7Days: last7Days,
+          byLanding: byLanding,
           generated_at: new Date().toISOString()
         }), { headers: CORS });
       } catch (e) {
