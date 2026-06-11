@@ -1789,6 +1789,88 @@ export default {
       return new Response(null, { status: 204, headers: CORS });
     }
 
+    // ── 🆕 /api/lead-signup — captura de leads desde landings Mundial ──
+    if (path === '/api/lead-signup' && request.method === 'POST') {
+      try {
+        const body = await request.json().catch(() => ({}));
+        const email = (body.email || '').trim().toLowerCase();
+        const source = (body.source || 'mundial-landing').toString().slice(0, 80);
+        const landing = (body.landing || '').toString().slice(0, 80);
+
+        // Validación básica de email
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          return new Response(JSON.stringify({ ok: false, error: 'email_invalido' }),
+            { status: 400, headers: CORS });
+        }
+
+        let sendxOk = false;
+        let sendxError = null;
+
+        // Intentar SendX si está configurado
+        if (env.SENDX_API_TOKEN && env.SENDX_TEAM_ID) {
+          try {
+            const sendxRes = await fetch('https://api.sendx.io/api/v1/rest/contact', {
+              method: 'POST',
+              headers: {
+                'Team': env.SENDX_TEAM_ID,
+                'Api-Key': env.SENDX_API_TOKEN,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                email: email,
+                tag: ['mundial-2026', source, landing].filter(Boolean).join(','),
+                source: 'gambeta-mundial-landing'
+              })
+            });
+            sendxOk = sendxRes.ok;
+            if (!sendxOk) sendxError = `sendx_${sendxRes.status}`;
+          } catch (e) {
+            sendxError = `sendx_exception: ${e.message}`;
+          }
+        } else {
+          sendxError = 'sendx_no_config';
+        }
+
+        // Backup: mandar email a Mauro con el lead vía Resend
+        if (env.RESEND_API_KEY) {
+          try {
+            await fetch('https://api.resend.com/emails', {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                from: 'gambeta.ai <no-reply@gambeta.ai>',
+                to: ['pronosticosarg@gmail.com'],
+                subject: `🎯 Nuevo lead Mundial: ${email}`,
+                html: `<div style="font-family:Arial,sans-serif">
+                  <h2>🎯 Nuevo lead desde landing Mundial</h2>
+                  <p><b>Email:</b> ${email}</p>
+                  <p><b>Landing:</b> ${landing || 'desconocida'}</p>
+                  <p><b>Source:</b> ${source}</p>
+                  <p><b>SendX status:</b> ${sendxOk ? '✅ agregado' : '⚠️ ' + (sendxError || 'fallo')}</p>
+                  <p style="color:#666;font-size:12px;margin-top:20px">Cargalo manualmente si SendX falló.</p>
+                </div>`
+              })
+            });
+          } catch (e) {
+            console.error('Resend backup error:', e);
+          }
+        }
+
+        return new Response(JSON.stringify({
+          ok: true,
+          sendx: sendxOk ? 'subscribed' : 'fallback_email_sent',
+          redirect: '/mundial/gracias'
+        }), { headers: CORS });
+      } catch (e) {
+        console.error('lead-signup error:', e);
+        return new Response(JSON.stringify({ ok: false, error: e.message }),
+          { status: 500, headers: CORS });
+      }
+    }
+
     // ── /available ───────────────────────────────────────────────────────────
     if (path === '/available') {
       const keys = [...LEAGUES_MAIN, ...LEAGUES_EUROPE, ...LEAGUES_SECONDARY].map(([k]) => k);

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>✅ Bienvenido a Gambeta · IA Mundial 2026</title>
+<meta name="robots" content="noindex, nofollow">
+<style>
+:root { --gold: #ffd700; --bg: #0a0a0f; --tg: #229ED9; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: #f0ece0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+.wrap { max-width: 620px; text-align: center; }
+.check {
+  width: 110px; height: 110px; margin: 0 auto 28px; border-radius: 50%;
+  background: linear-gradient(135deg, #00c853, #00e676);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 70px; color: #fff;
+  box-shadow: 0 20px 50px rgba(0,200,83,0.35);
+  animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes pop { from { transform: scale(0); } to { transform: scale(1); } }
+h1 { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 900; letter-spacing: -1px; margin-bottom: 14px; line-height: 1.15; }
+h1 .accent { color: var(--gold); }
+.sub { color: rgba(255,255,255,0.65); font-size: 1.1rem; line-height: 1.5; margin-bottom: 36px; max-width: 480px; margin-left: auto; margin-right: auto; }
+.cta-grid { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; margin-bottom: 32px; }
+.btn-cta { display: inline-flex; align-items: center; gap: 10px; padding: 17px 32px; border-radius: 14px; font-weight: 800; text-decoration: none; font-size: 1.05rem; transition: transform .15s, box-shadow .15s; }
+.btn-tg { background: linear-gradient(135deg, var(--tg), #0088cc); color: #fff; box-shadow: 0 10px 26px rgba(34,158,217,0.45); }
+.btn-tg:hover { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(34,158,217,0.6); }
+.btn-gambeta { background: var(--gold); color: #000; box-shadow: 0 10px 26px rgba(255,215,0,0.35); }
+.btn-gambeta:hover { transform: translateY(-2px); }
+.countdown {
+  margin-top: 28px; padding: 14px 20px; background: rgba(255,215,0,0.08);
+  border: 1px solid rgba(255,215,0,0.25); border-radius: 12px;
+  font-size: 0.92rem; color: rgba(255,255,255,0.7);
+  display: inline-block;
+}
+.countdown #cd-num { color: var(--gold); font-weight: 900; font-size: 1.2rem; font-variant-numeric: tabular-nums; }
+.tip { margin-top: 36px; padding: 18px 22px; background: rgba(255,255,255,0.03); border-left: 3px solid var(--gold); border-radius: 10px; text-align: left; font-size: 0.92rem; color: rgba(255,255,255,0.7); line-height: 1.55; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="check">✓</div>
+  <h1>¡Listo! Ya <span class="accent">sos parte</span></h1>
+  <p class="sub">Te vas a sumar al canal de Telegram para no perderte el pick del día IA del Mundial 2026. <strong style="color:#fff">+15.000 personas</strong> ya están adentro.</p>
+
+  <div class="cta-grid">
+    <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="btn-cta btn-tg">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
+      Sumate al canal Telegram
+    </a>
+    <a href="https://gambeta.ai/" class="btn-cta btn-gambeta">
+      ⚡ Entrar a Gambeta
+    </a>
+  </div>
+
+  <div class="countdown">
+    Redirigiendo a Gambeta en <span id="cd-num">5</span>s…
+  </div>
+
+  <div class="tip">
+    💡 <strong>Mientras tanto:</strong> hoy se juega el partido inaugural <strong>México vs Sudáfrica</strong> en el Azteca. La IA da <strong>64% favor México</strong>. El análisis completo en gambeta.ai.
+  </div>
+</div>
+
+<script>
+(function(){
+  var n = 5;
+  var el = document.getElementById('cd-num');
+  var t = setInterval(function(){
+    n--;
+    if (el) el.textContent = n;
+    if (n <= 0) {
+      clearInterval(t);
+      window.location.href = 'https://gambeta.ai/';
+    }
+  }, 1000);
+})();
+</script>
+</body>
+</html>

@@ -489,6 +489,39 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
   .inline-cta-tg, .inline-cta-mail { flex: 1; justify-content: center; }
 }
 
+
+/* ─── Form lead-capture inline ─── */
+.lead-form {
+  display: inline-flex; gap: 8px; align-items: stretch; vertical-align: top;
+  background: rgba(0,0,0,0.35); border: 1.5px solid var(--gold);
+  border-radius: 12px; padding: 4px 4px 4px 14px;
+  min-width: 280px; max-width: 380px; flex: 0 1 auto;
+  transition: border-color .15s, box-shadow .15s;
+}
+.lead-form:focus-within { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,215,0,0.2); }
+.lead-form input[type="email"] {
+  background: transparent; border: 0; outline: 0;
+  color: #fff; font-size: 0.92rem; font-weight: 500;
+  padding: 8px 0; flex: 1; min-width: 0;
+}
+.lead-form input::placeholder { color: rgba(255,255,255,0.45); }
+.lead-form button {
+  background: var(--gold); color: #000; border: 0; cursor: pointer;
+  padding: 10px 18px; border-radius: 9px; font-weight: 800;
+  font-size: 0.88rem; white-space: nowrap; transition: background .15s;
+}
+.lead-form button:hover:not(:disabled) { background: #ffe04a; }
+.lead-form button:disabled { opacity: 0.55; cursor: wait; }
+.lead-form.error { border-color: #e64a4a; }
+.lead-form-msg { font-size: 0.78rem; color: rgba(255,255,255,0.55); margin-top: 6px; min-height: 1.2em; }
+.lead-form-msg.error { color: #ff8585; }
+.lead-form-msg.ok { color: #00e676; }
+@media (max-width: 520px) {
+  .lead-form { width: 100%; max-width: 100%; flex-direction: column; padding: 8px; }
+  .lead-form input[type="email"] { padding: 12px 8px; }
+  .lead-form button { padding: 13px; }
+}
+
 </style>
 </head>
 <body>
@@ -516,9 +549,10 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
         <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
         <span>Sumate al canal gratis</span>
       </a>
-      <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="lead-btn-mail">
-        ✉️ Recibir por email
-      </a>
+      <form class="lead-form" data-location="hero">
+      <input type="email" placeholder="tu@email.com" required>
+      <button type="submit">Suscribirme</button>
+    </form>
     </div>
     <p class="lead-proof">✓ +15.000 en el canal · Análisis IA del Mundial gratis · Sin spam</p>
   </div>
@@ -628,7 +662,10 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
   </div>
   <div class="inline-cta-btns">
     <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="inline-cta-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'inline_s1'})"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg><span>Canal Telegram</span></a>
-    <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="inline-cta-mail">✉️ Email</a>
+    <form class="lead-form" data-location="inline_s1">
+      <input type="email" placeholder="tu@email.com" required>
+      <button type="submit">Suscribirme</button>
+    </form>
   </div>
 </div>
 
@@ -761,7 +798,10 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
   </div>
   <div class="inline-cta-btns">
     <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="inline-cta-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'inline_s2'})"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg><span>Canal Telegram</span></a>
-    <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="inline-cta-mail">✉️ Email</a>
+    <form class="lead-form" data-location="inline_s2">
+      <input type="email" placeholder="tu@email.com" required>
+      <button type="submit">Suscribirme</button>
+    </form>
   </div>
 </div>
 
@@ -821,7 +861,10 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
   </div>
   <div class="inline-cta-btns">
     <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="inline-cta-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'inline_s3'})"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg><span>Canal Telegram</span></a>
-    <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="inline-cta-mail">✉️ Email</a>
+    <form class="lead-form" data-location="inline_s3">
+      <input type="email" placeholder="tu@email.com" required>
+      <button type="submit">Suscribirme</button>
+    </form>
   </div>
 </div>
 
@@ -899,7 +942,10 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
   </div>
   <div class="inline-cta-btns">
     <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="inline-cta-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'inline_s4'})"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg><span>Canal Telegram</span></a>
-    <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="inline-cta-mail">✉️ Email</a>
+    <form class="lead-form" data-location="inline_s4">
+      <input type="email" placeholder="tu@email.com" required>
+      <button type="submit">Suscribirme</button>
+    </form>
   </div>
 </div>
 
@@ -984,7 +1030,10 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
   </div>
   <div class="inline-cta-btns">
     <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="inline-cta-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'inline_s5'})"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg><span>Canal Telegram</span></a>
-    <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="inline-cta-mail">✉️ Email</a>
+    <form class="lead-form" data-location="inline_s5">
+      <input type="email" placeholder="tu@email.com" required>
+      <button type="submit">Suscribirme</button>
+    </form>
   </div>
 </div>
 
@@ -1025,5 +1074,57 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
   <button class="sticky-close" onclick="document.getElementById('stickyBar').style.display='none';try{localStorage.setItem('stickyClosed','1')}catch(e){}">×</button>
 </div>
 <script>try{if(localStorage.getItem('stickyClosed')==='1'){var s=document.getElementById('stickyBar');if(s)s.style.display='none'}}catch(e){}</script>
+
+<script>
+(function(){
+  function attachLeadForms() {
+    document.querySelectorAll('.lead-form').forEach(function(form) {
+      if (form.dataset.bound) return;
+      form.dataset.bound = '1';
+      form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var input = form.querySelector('input[type="email"]');
+        var btn = form.querySelector('button');
+        var msg = form.parentNode.querySelector('.lead-form-msg') || (function(){
+          var m = document.createElement('div'); m.className = 'lead-form-msg';
+          form.parentNode.insertBefore(m, form.nextSibling); return m;
+        })();
+        var email = (input.value || '').trim();
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+          form.classList.add('error'); msg.className = 'lead-form-msg error';
+          msg.textContent = 'Email inválido. Revisá el formato.'; return;
+        }
+        btn.disabled = true; btn.textContent = 'Enviando...';
+        try {
+          var landing = (location.pathname.match(/\/mundial\/([a-z-]+)/) || [])[1] || 'unknown';
+          var loc = form.dataset.location || 'unknown';
+          var r = await fetch('https://apuestas-api.mauro-union10.workers.dev/api/lead-signup', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ email: email, source: 'mundial-landing-' + loc, landing: landing })
+          });
+          var d = await r.json();
+          if (d.ok) {
+            if (window.gtag) gtag('event', 'lead_signup', { location: loc, landing: landing });
+            msg.className = 'lead-form-msg ok';
+            msg.textContent = '✅ Listo, te redirigimos...';
+            setTimeout(function(){ location.href = '/mundial/gracias'; }, 800);
+          } else {
+            throw new Error(d.error || 'fail');
+          }
+        } catch (e) {
+          form.classList.add('error'); msg.className = 'lead-form-msg error';
+          msg.textContent = 'Error temporal. Probá Telegram mientras tanto.';
+          btn.disabled = false; btn.textContent = 'Suscribirme';
+        }
+      });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', attachLeadForms);
+  else attachLeadForms();
+  // Re-attach si se renderizan nuevos forms dinámicamente
+  new MutationObserver(attachLeadForms).observe(document.body, { childList: true, subtree: true });
+})();
+</script>
+
 </body>
 </html>
