@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>🧮 Calculadora de Valor Esperado (EV): cómo saber si una apuesta vale la pena</title>
+<meta content="Qué es el valor esperado (EV) en apuestas, cómo se calcula con la fórmula completa, ejemplos del Mundial 2026 y calculadora gratis para detectar apuestas con valor." name="description"/>
+<meta content="gambeta.ai" name="author"/>
+<meta content="index, follow" name="robots"/>
+<link href="https://gambeta.ai/blog/calculadora-valor-ev" rel="canonical"/>
+<meta content="article" property="og:type"/>
+<meta content="https://gambeta.ai/blog/calculadora-valor-ev" property="og:url"/>
+<meta content="🧮 Calculadora de Valor Esperado (EV): cómo saber si una apuesta vale la pena" property="og:title"/>
+<meta content="Qué es el valor esperado (EV) en apuestas, cómo se calcula, ejemplos del Mundial 2026 y calculadora gratis para detectar apuestas con valor." property="og:description"/>
+<meta content="https://gambeta.ai/blog/img/estadisticas-datos.jpg" property="og:image"/>
+<meta content="1200" property="og:image:width"/>
+<meta content="630" property="og:image:height"/>
+<meta content="es_AR" property="og:locale"/>
+<meta content="gambeta.ai" property="og:site_name"/>
+<meta content="summary_large_image" name="twitter:card"/>
+<meta content="@gambetaia" name="twitter:site"/>
+<meta content="🧮 Calculadora de Valor Esperado (EV): cómo saber si una apuesta vale la pena" name="twitter:title"/>
+<meta content="Qué es el valor esperado (EV) en apuestas, cómo se calcula, ejemplos del Mundial 2026 y calculadora gratis." name="twitter:description"/>
+<meta content="https://gambeta.ai/blog/img/estadisticas-datos.jpg" name="twitter:image"/>
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Calculadora de Valor Esperado (EV) en apuestas deportivas",
+    "description": "Qué es el valor esperado (EV), cómo se calcula con la fórmula completa, ejemplos reales del Mundial 2026 y calculadora gratuita.",
+    "url": "https://gambeta.ai/blog/calculadora-valor-ev",
+    "image": "https://gambeta.ai/blog/img/estadisticas-datos.jpg",
+    "datePublished": "2026-06-11T00:00:00-03:00",
+    "dateModified": "2026-06-11T00:00:00-03:00",
+    "author": {
+      "@type": "Organization",
+      "name": "gambeta.ai",
+      "url": "https://gambeta.ai"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "gambeta.ai",
+      "url": "https://gambeta.ai",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://gambeta.ai/logo.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https://gambeta.ai/blog/calculadora-valor-ev"
+    }
+  }
+</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"Calculadora de Valor Esperado (EV)","item":"https://gambeta.ai/blog/calculadora-valor-ev"}]}</script>
+<link href="/favicon.png" rel="icon" sizes="32x32" type="image/png"/>
+<style>
+:root{--verde:#00c853;--fondo:#0f0f0f;--texto:#e8e8e8;--texto-sec:#9e9e9e;--borde:rgba(255,255,255,0.08)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{padding-top:66px;background:var(--fondo);color:var(--texto);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.7}
+a{text-decoration:none;color:inherit}
+nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 28px;height:66px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:10000;box-shadow:0 1px 0 rgba(0,200,83,0.08);gap:16px}
+.nav-logo-wrap{display:flex;align-items:center;gap:11px;flex-shrink:0}
+.nav-icon-box{width:42px;height:42px;background:linear-gradient(135deg,#0d2a0d 0%,#112011 100%);border:1px solid rgba(0,200,83,0.35);border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:1.4rem}
+.nav-logo-text{font-size:1.08rem;font-weight:900;color:#fff;letter-spacing:-.5px;white-space:nowrap}
+.nav-logo-text span{color:#00c853}
+.nav-links{display:flex;gap:2px;flex:1;justify-content:center}
+.nav-links a{color:rgba(165,214,167,0.65);padding:7px 12px;border-radius:8px;font-size:.82rem;font-weight:500;white-space:nowrap}
+.nav-links a:hover{color:#fff;background:rgba(0,200,83,0.08)}
+.nav-cta-btn{background:linear-gradient(135deg,#00c853,#00a846)!important;color:#000!important;font-weight:700!important;padding:8px 18px;border-radius:8px}
+@media(max-width:640px){.nav-links{display:none}}
+.hero{background:linear-gradient(180deg,#071007 0%,#0c180c 100%);border-bottom:1px solid rgba(0,200,83,0.15);padding:52px 24px 44px;text-align:center}
+.badge{display:inline-block;background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-size:0.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:18px}
+.hero h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;line-height:1.25;max-width:760px;margin:0 auto 14px;letter-spacing:-0.5px}
+.hero p{font-size:1rem;color:rgba(255,255,255,0.5);max-width:620px;margin:0 auto;line-height:1.6}
+.container{max-width:760px;margin:0 auto;padding:48px 24px}
+.article-img{width:100%;border-radius:14px;margin:24px 0 8px;border:1px solid rgba(255,255,255,0.07);display:block;object-fit:cover;max-height:420px}
+.img-caption{font-size:0.78rem;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:28px;font-style:italic}
+.article h2{font-size:1.25rem;font-weight:800;color:#fff;margin:36px 0 12px;letter-spacing:-0.3px}
+.article h3{font-size:1.05rem;font-weight:700;color:rgba(255,255,255,0.85);margin:24px 0 10px}
+.article p{font-size:0.97rem;color:rgba(255,255,255,0.68);line-height:1.75;margin-bottom:18px}
+.article ul{padding-left:22px;margin-bottom:18px}
+.article li{font-size:0.95rem;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:6px}
+.article strong{color:rgba(255,255,255,0.9);font-weight:700}
+.article a{color:var(--verde);text-decoration:underline;text-underline-offset:3px}
+.formula-box{background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.25);border-radius:14px;padding:22px 24px;margin:24px 0;text-align:center;font-size:1.05rem;color:#fff;font-weight:700;letter-spacing:0.3px}
+.cta-box{background:linear-gradient(135deg,rgba(0,200,83,0.12),rgba(0,200,83,0.04));border:1px solid rgba(0,200,83,0.3);border-radius:18px;padding:32px 28px;text-align:center;margin:40px 0}
+.cta-box h3{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px}
+.cta-box p{font-size:0.9rem;color:rgba(255,255,255,0.5);margin-bottom:20px}
+.cta-box a.btn-cta{display:inline-block;background:var(--verde);color:#000;font-weight:800;font-size:0.95rem;padding:13px 30px;border-radius:10px;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease}.cta-box a.btn-cta:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(34,197,94,.35)}
+footer{border-top:1px solid var(--borde);padding:30px 24px;text-align:center;color:var(--texto-sec);font-size:0.85rem;margin-top:40px}
+</style>
+</head>
+<body>
+<nav class="nav">
+<a class="nav-logo-wrap" href="https://gambeta.ai">
+<div class="nav-icon-box">⚽</div>
+<div class="nav-logo-text">gambeta<span>.ai</span></div>
+</a>
+<div class="nav-links">
+<a href="https://gambeta.ai/#pronosticos">🔮 Pronósticos IA</a>
+<a href="https://gambeta.ai/#historial">📊 Historial</a>
+<a href="/blog">📰 Blog</a>
+</div>
+<a rel="nofollow" class="nav-cta-btn" href="https://gambeta.ai/?openauth=1">✦ Registro Gratis</a>
+</nav>
+<header class="hero">
+<div class="badge">📰 Blog gambeta.ai</div>
+<h1>Calculadora de Valor Esperado (EV): cómo saber si una apuesta vale la pena</h1>
+<p>La diferencia entre apostar por corazón y apostar con criterio se resume en dos letras: EV. Acá te explicamos qué es, cómo se calcula y te damos la calculadora gratis.</p>
+</header>
+<main class="container">
+<article class="article">
+<img alt="Datos y estadísticas de apuestas deportivas" class="article-img" loading="lazy" src="/blog/img/estadisticas-datos.jpg"/>
+<p class="img-caption">El EV traduce tu intuición a números: positivo = apuesta con valor</p>
+<h2>🧮 Qué es el valor esperado (EV)</h2>
+<p>El <strong>valor esperado</strong> (EV, por <em>expected value</em>) es cuánto ganás o perdés <strong>en promedio</strong> cada vez que repetís una misma apuesta infinitas veces. No te dice si esta apuesta puntual gana o pierde — te dice si la decisión es buena a largo plazo.</p>
+<p>Una apuesta tiene <strong>EV positivo (+EV)</strong> cuando la cuota paga más de lo que la probabilidad real justifica. Tiene <strong>EV negativo (–EV)</strong> cuando pagás de más por una probabilidad sobrevalorada. Los apostadores rentables no buscan "fijas": buscan +EV sistemáticamente.</p>
+<h2>📐 La fórmula</h2>
+<div class="formula-box">EV = (Probabilidad de ganar × Ganancia neta) – (Probabilidad de perder × Monto apostado)</div>
+<p>Con cuotas decimales se simplifica: <strong>EV = (probabilidad real × cuota) – 1</strong>. Si el resultado es mayor que 0, hay valor.</p>
+<h3>Ejemplo con el Mundial 2026</h3>
+<p>Supongamos que la cuota de <strong>Marruecos a cuartos de final</strong> paga 4.50. La probabilidad implícita de esa cuota es 1 ÷ 4.50 = <strong>22,2%</strong>. Si tu modelo (o la <a href="https://gambeta.ai">IA de gambeta.ai</a>) estima que la probabilidad real es <strong>25%</strong>:</p>
+<ul>
+<li>EV = (0,25 × 4.50) – 1 = <strong>+0,125 → +12,5% de valor</strong></li>
+<li>Cada $1.000 apostado a esa cuota vale en promedio $1.125. Eso es una apuesta +EV.</li>
+</ul>
+<p>Ahora al revés: si la cuota de <strong>Argentina campeón</strong> paga 7.00 (implícita 14,3%) pero estimás que la probabilidad real es 12%, EV = (0,12 × 7.00) – 1 = <strong>–0,16 → –16%</strong>. Por más que la ames, esa apuesta te hace perder plata a largo plazo.</p>
+<h2>🔢 Usá la calculadora gratis</h2>
+<p>Para no hacer la cuenta a mano cada vez, tenés la <a href="/herramientas/valor-esperado">calculadora de valor esperado de gambeta.ai</a>: ponés cuota y probabilidad estimada y te dice al instante si hay valor y cuánto. Y si querés saber <strong>cuánto apostar</strong> cuando encontrás +EV, usá la <a href="/herramientas/kelly">calculadora de Kelly</a> — las dos son gratis y van de la mano.</p>
+<ul>
+<li><strong>Paso 1:</strong> estimá la probabilidad real (modelo, stats, o los <a href="https://gambeta.ai/#pronosticos">pronósticos de la IA</a>).</li>
+<li><strong>Paso 2:</strong> cargá cuota y probabilidad en la <a href="/herramientas/valor-esperado">calculadora EV</a>.</li>
+<li><strong>Paso 3:</strong> si el EV es positivo, definí el stake con <a href="/herramientas/kelly">Kelly</a>. Si es negativo, pasás de largo. Sin excepciones.</li>
+</ul>
+<h2>⚠️ Los 3 errores más comunes con el EV</h2>
+<h3>1. Confundir +EV con "va a ganar"</h3>
+<p>Una apuesta +EV con 25% de probabilidad pierde 3 de cada 4 veces. El valor se cobra en volumen: decenas o cientos de apuestas, no una. Si no tenés <a href="/blog/gestion-bankroll">gestión de bankroll</a>, el +EV no te salva de la varianza.</p>
+<h3>2. Estimar probabilidades con el corazón</h3>
+<p>Si tu input de probabilidad es malo, el EV que calculás es ficción. Usá datos: forma reciente, xG, contexto, o directamente un modelo entrenado como el de <a href="https://gambeta.ai">gambeta.ai</a>, que publica sus probabilidades y su <a href="https://gambeta.ai/#historial">historial verificable</a>.</p>
+<h3>3. Ignorar el margen de la casa</h3>
+<p>Las cuotas ya traen comisión (el "vig"). En un mercado a dos salidas, las probabilidades implícitas suman más de 100%. Por eso el listón no es "le acierto a la implícita": tu estimación tiene que superar la implícita <strong>más el margen</strong>. Aprendé a leerlo en <a href="/blog/cuotas-y-probabilidades">cuotas y probabilidades</a>.</p>
+<h2>🤖 Cómo lo hace la IA de Gambeta</h2>
+<p>El modelo de gambeta.ai calcula probabilidades propias para cada partido (Elo + forma + contexto) y las compara contra las cuotas del mercado. Cuando la diferencia supera el umbral de valor, lo marca como pick. Es exactamente el flujo de esta nota — automatizado y con historial público para que lo audites.</p>
+<div class="cta-box">
+<h3>🤖 Probá la IA de Gambeta gratis</h3>
+<p>Pronósticos diarios con probabilidades y EV calculado + historial público. Sin pagar, sin trampa.</p>
+<a class="btn-cta" href="https://gambeta.ai/?openauth=1">Crear cuenta gratis →</a>
+</div>
+</article>
+</main>
+<footer>
+<p>© 2026 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar en Fútbol · +18 · <a href="/blog">Volver al blog</a></p>
+</footer>
+</body>
+</html>
