@@ -13359,41 +13359,100 @@ function _normRec(r) { return (r||'').replace('Visitante Gana','Gana Visitante')
 
 
 // ════════════════════════════════════════════════════════════
-// DBBET 1-CLICK BET — sistema de carga rápida de apuestas
-// Apunta al afiliado DBbet con coupon code deeplink (cuando API esté lista)
+// DBBET 1-CLICK BET — deep link al partido con afiliado
+// REGLA DE ORO: TODAS las URLs pasan por el afiliado, siempre.
 // ════════════════════════════════════════════════════════════
 const DBBET_AFFILIATE_BASE = 'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213';
-// Cuando DBbet active la API de coupon deeplink, cambiar a true.
-// Mientras tanto, el botón abre el afiliado y el usuario completa manualmente.
-const COUPON_DEEPLINK_ENABLED = false;
 
-// Genera un couponCode determinístico desde los datos del pick
-// Formato: GMB_{home3}_{away3}_{side}_{YYYYMMDD}
+// ── Mapa de sport_key → path de liga en DBbet ──
+// El &url= redirige al usuario a la página de la liga/partido después del tracking de afiliado.
+// IDs verificados desde refpa/DBbet. Agregar más a medida que se descubran.
+const DBBET_LEAGUE_MAP = {
+  // 🏆 Mundial 2026
+  'soccer_fifa_world_cup':           '/es/line/Football/2708736-World-Cup-2026',
+  'soccer_fifa_world_cup_2026':      '/es/line/Football/2708736-World-Cup-2026',
+  'soccer_world_cup':                '/es/line/Football/2708736-World-Cup-2026',
+  // 🌎 CONMEBOL
+  'soccer_conmebol_copa_libertadores': '/es/line/Football/2707805-Copa-Libertadores',
+  'soccer_conmebol_copa_sudamericana': '/es/line/Football/2707806-Copa-Sudamericana',
+  // 🇦🇷 Argentina
+  'soccer_argentina_primera_division': '/es/line/Football/2705381-Argentina-Liga-Profesional',
+  // 🇧🇷 Brasil
+  'soccer_brazil_campeonato':        '/es/line/Football/2705375-Brazil-Serie-A',
+  'soccer_brazil_serie_a':           '/es/line/Football/2705375-Brazil-Serie-A',
+  // 🇲🇽 México
+  'soccer_mexico_ligamx':            '/es/line/Football/2705385-Mexico-Liga-MX',
+  // 🇺🇸 MLS
+  'soccer_usa_mls':                  '/es/line/Football/2705389-USA-MLS',
+  // 🇺🇾 Uruguay
+  'soccer_uruguay_primera_division': '/es/line/Football/2706335-Uruguay-Primera-Division',
+  // 🏴󠁧󠁢󠁥󠁮󠁧󠁿 Europa
+  'soccer_epl':                      '/es/line/Football/2705325-England-Premier-League',
+  'soccer_england_premier_league':   '/es/line/Football/2705325-England-Premier-League',
+  'soccer_spain_la_liga':            '/es/line/Football/2705349-Spain-La-Liga',
+  'soccer_italy_serie_a':           '/es/line/Football/2705339-Italy-Serie-A',
+  'soccer_germany_bundesliga':       '/es/line/Football/2705337-Germany-Bundesliga',
+  'soccer_france_ligue_one':         '/es/line/Football/2705335-France-Ligue-1',
+  // ⭐ Champions
+  'soccer_uefa_champs_league':       '/es/line/Football/2709893-UEFA-Champions-League',
+  'soccer_uefa_europa_league':       '/es/line/Football/2709895-UEFA-Europa-League',
+};
+
+// Convierte nombre de equipo a slug URL (sin acentos, separado por guión)
+function _teamSlug(name) {
+  return (name || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+    .replace(/[^A-Za-z0-9\s]/g, '').trim().replace(/\s+/g, '-');
+}
+
+// Genera un couponCode determinístico (para tracking interno)
 function _dbbetCouponCode(p) {
   if (!p) return '';
   const s = (x) => (x||'').toString().replace(/[^A-Za-z0-9]/g,'').slice(0,3).toUpperCase();
   const side = _recSideOf(p) || 'X';
-  // datos del partido: prefiero ID del partido si existe
-  if (p.matchId)  return ('GMB_' + p.matchId + '_' + side).toUpperCase();
+  if (p.matchId) return ('GMB_' + p.matchId + '_' + side).toUpperCase();
   const home = s(p.homeRaw || p.home);
   const away = s(p.awayRaw || p.away);
   const date = (p.fecha || p.kickoff || '').toString().slice(0,10).replace(/-/g,'');
   return ['GMB', home, away, side, date].filter(Boolean).join('_').toUpperCase();
 }
 
+// ── buildDBbetCouponURL: SIEMPRE afiliado + deep link al partido ──
 function buildDBbetCouponURL(p) {
-  const code = _dbbetCouponCode(p);
-  if (COUPON_DEEPLINK_ENABLED && code) {
-    return DBBET_AFFILIATE_BASE + '&url=' + encodeURIComponent('/coupon?load=' + code);
+  if (!p) return DBBET_AFFILIATE_BASE;
+
+  const sk = (p._sportKey || '').toLowerCase();
+  const leaguePath = DBBET_LEAGUE_MAP[sk];
+
+  if (leaguePath) {
+    // Construir URL al partido: /es/line/Football/{leagueId}-{league}/0-{Home}-{Away}
+    // Si DBbet no encuentra el eventId 0, redirige a la liga (graceful fallback)
+    const home = _teamSlug(p.homeRaw || p.home);
+    const away = _teamSlug(p.awayRaw || p.away);
+    if (home && away) {
+      const matchPath = leaguePath + '/0-' + home + '-' + away;
+      return DBBET_AFFILIATE_BASE + '&url=' + encodeURIComponent(matchPath);
+    }
+    // Sin nombres → ir a la liga
+    return DBBET_AFFILIATE_BASE + '&url=' + encodeURIComponent(leaguePath);
   }
+
+  // Fallback: si es fútbol ir a la sección Football
+  if (sk.startsWith('soccer')) {
+    return DBBET_AFFILIATE_BASE + '&url=' + encodeURIComponent('/es/line/Football');
+  }
+  // Tenis
+  if (sk.includes('tennis')) {
+    return DBBET_AFFILIATE_BASE + '&url=' + encodeURIComponent('/es/line/Tennis');
+  }
+
+  // Último fallback: afiliado genérico (nunca pierde el tracking)
   return DBBET_AFFILIATE_BASE;
 }
 
-// Click handler — abre DBbet con el cupón (o link general si fallback)
+// Click handler — abre DBbet con deep link (siempre afiliado)
 function betOnDBbetPick(pickRef) {
   let p = null;
   try {
-    // pickRef puede ser objeto serializado en data-attribute
     p = typeof pickRef === 'string' ? JSON.parse(pickRef) : pickRef;
   } catch(e) { p = null; }
   const url = p ? buildDBbetCouponURL(p) : DBBET_AFFILIATE_BASE;
@@ -13406,7 +13465,8 @@ function betOnDBbetPick(pickRef) {
       pick: p && p.rec,
       odds: p && p._bestOdds,
       coupon: p ? _dbbetCouponCode(p) : null,
-      deeplink: COUPON_DEEPLINK_ENABLED
+      deeplink: true,
+      targetUrl: url
     });
   } catch(e) {}
   window.open(url, '_blank', 'noopener');
