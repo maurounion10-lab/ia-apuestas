@@ -365,6 +365,84 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
   .cta-final { padding: 44px 22px; }
   .mp-banner { flex-direction: column; text-align: center; }
 }
+
+/* ─── LEAD-CAPTURE CTAs ─── */
+.lead-hero-cta {
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+  margin-top: 30px; align-items: center;
+}
+.lead-btn-tg {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: linear-gradient(135deg, #229ED9, #0088cc);
+  color: #fff; padding: 16px 32px; border-radius: 14px;
+  font-weight: 800; text-decoration: none; font-size: 1.05rem;
+  box-shadow: 0 8px 28px rgba(34,158,217,0.45);
+  transition: transform .15s, box-shadow .15s;
+  border: 2px solid rgba(255,255,255,0.15);
+}
+.lead-btn-tg:hover { transform: translateY(-2px); box-shadow: 0 14px 36px rgba(34,158,217,0.6); }
+.lead-btn-tg svg { flex-shrink: 0; }
+.lead-btn-mail {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(0,0,0,0.4); color: var(--gold);
+  padding: 15px 26px; border-radius: 14px;
+  font-weight: 800; text-decoration: none; font-size: 0.98rem;
+  border: 2px solid var(--gold);
+  transition: background .15s;
+}
+.lead-btn-mail:hover { background: rgba(255,215,0,0.1); }
+.lead-proof {
+  font-size: 0.78rem; color: rgba(34,158,217,0.95); font-weight: 700;
+  margin-top: 12px; text-align: center; letter-spacing: 0.2px;
+}
+
+/* Sticky bottom bar */
+.sticky-cta-bar {
+  position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+  background: linear-gradient(135deg, #229ED9 0%, #0088cc 100%);
+  padding: 12px 16px; box-shadow: 0 -8px 30px rgba(0,0,0,0.4);
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  animation: slideUp .5s ease-out;
+}
+@keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+.sticky-cta-bar .sticky-txt { color: #fff; font-weight: 700; font-size: 0.92rem; flex: 1; min-width: 200px; }
+.sticky-cta-bar .sticky-txt small { display: block; font-size: 0.72rem; opacity: 0.85; font-weight: 500; margin-top: 2px; }
+.sticky-cta-bar .sticky-btn {
+  background: #fff; color: #0088cc; padding: 10px 22px; border-radius: 10px;
+  font-weight: 900; text-decoration: none; font-size: 0.92rem; white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.2);
+}
+.sticky-cta-bar .sticky-close {
+  background: rgba(0,0,0,0.2); color: #fff; border: none; cursor: pointer;
+  width: 26px; height: 26px; border-radius: 50%; font-size: 16px; line-height: 1;
+  font-weight: 900;
+}
+
+/* CTA final dual */
+.cta-final-dual {
+  background: linear-gradient(135deg, var(--gold) 0%, #ffaa00 100%);
+  color: #000; text-align: center; padding: 50px 28px;
+  border-radius: 22px; margin-top: 56px;
+  box-shadow: 0 24px 60px rgba(255,170,0,0.25);
+}
+.cta-final-dual h2 { color: #000; font-size: clamp(1.6rem, 4vw, 2.3rem); font-weight: 900; letter-spacing: -1px; margin-bottom: 10px; }
+.cta-final-dual p { color: rgba(0,0,0,0.78); margin-bottom: 28px; font-size: 1.06rem; max-width: 540px; margin-left: auto; margin-right: auto; }
+.cta-final-dual .dual-row { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+.cta-final-dual .btn-final-tg {
+  background: #0088cc; color: #fff; padding: 17px 36px; border-radius: 12px;
+  font-weight: 900; text-decoration: none; font-size: 1.05rem;
+  display: inline-flex; align-items: center; gap: 10px; transition: transform .15s;
+}
+.cta-final-dual .btn-final-tg:hover { transform: translateY(-2px); }
+.cta-final-dual .btn-final-mail {
+  background: #000; color: var(--gold); padding: 17px 36px; border-radius: 12px;
+  font-weight: 900; text-decoration: none; font-size: 1.05rem;
+  display: inline-flex; align-items: center; gap: 8px; transition: transform .15s;
+}
+.cta-final-dual .btn-final-mail:hover { transform: translateY(-2px); }
+.cta-final-dual .free-tag { display: inline-block; font-size: 0.74rem; font-weight: 800; background: rgba(0,0,0,0.15); padding: 5px 14px; border-radius: 100px; margin-bottom: 14px; letter-spacing: 1.5px; }
+
 </style>
 </head>
 <body>
@@ -387,10 +465,16 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
     <h1><span class="accent">104</span> partidos.<br>Empieza el 11 de junio.</h1>
     <div class="mega-num">104<small style="font-size:1.5rem;color:var(--text-mute);font-weight:600;display:block;margin-top:8px;letter-spacing:0">según la IA Gambeta</small></div>
     <p class="mega-sub">Cada día del Mundial con la lectura IA Gambeta de partido por partido.</p>
-    <div class="hero-cta">
-      <a href="/mundial-2026" class="btn btn-gold">Ver hub Mundial →</a>
-      <a href="#calendario" class="btn btn-ghost">Ver el análisis</a>
+    <div class="lead-hero-cta">
+      <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="lead-btn-tg" onclick="window.gtag&&gtag('event','telegram_click',{location:'hero'})">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
+        <span>Sumate al canal gratis</span>
+      </a>
+      <a href="mailto:hola@gambeta.ai?subject=Suscribirme%20a%20picks%20IA%20Mundial&body=Quiero%20recibir%20los%20picks%20IA%20del%20Mundial%202026%20por%20mail." class="lead-btn-mail">
+        ✉️ Recibir por email
+      </a>
     </div>
+    <p class="lead-proof">✓ +15.000 en el canal · Análisis IA del Mundial gratis · Sin spam</p>
   </div>
 </header>
 
@@ -829,5 +913,11 @@ footer.site-foot a { color: var(--gold); margin: 0 10px; text-decoration: none; 
   </p>
   <p style="opacity:0.55;font-size:0.76rem;margin-top:16px">© 2026 Gambeta · Modelo IA propio · Contenido editorial</p>
 </footer>
+<div class="sticky-cta-bar" id="stickyBar">
+  <div class="sticky-txt">⚡ Picks IA del Mundial gratis<small>+15.000 en el canal · análisis diario</small></div>
+  <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" class="sticky-btn" onclick="window.gtag&&gtag('event','telegram_click',{location:'sticky'})">Unirme →</a>
+  <button class="sticky-close" onclick="document.getElementById('stickyBar').style.display='none';try{localStorage.setItem('stickyClosed','1')}catch(e){}">×</button>
+</div>
+<script>try{if(localStorage.getItem('stickyClosed')==='1'){var s=document.getElementById('stickyBar');if(s)s.style.display='none'}}catch(e){}</script>
 </body>
 </html>
