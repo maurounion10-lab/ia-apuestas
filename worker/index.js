@@ -1818,6 +1818,7 @@ export default {
               body: JSON.stringify({
                 email: email,
                 tag: ['mundial-2026', source, landing].filter(Boolean).join(','),
+                lists: ['list_vy9qvGKzQrWLzSAv5dC434'],
                 source: 'gambeta-mundial-landing'
               })
             });
