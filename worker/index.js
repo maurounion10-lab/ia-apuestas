@@ -87,6 +87,9 @@ const LEAGUE_MAP = {
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type, Accept, Authorization',
+  'Access-Control-Max-Age': '86400',
   'Content-Type': 'application/json',
   'Cache-Control': 'public, max-age=300'
 };
