@@ -186,10 +186,12 @@
         btn.textContent = 'DESBLOQUEAR LAS 2 IAs →';
       }
     } catch (ex) {
-      err.textContent = 'Error de conexion. Revisa tu internet y reintenta.';
+      var detail = ex && (ex.name + ': ' + ex.message) || 'unknown';
+      err.textContent = 'Conexion bloqueada (' + detail + '). Probable causa: adblocker o extension bloquea workers.dev. Desactivá tu adblocker para este sitio.';
       err.classList.add('show');
       btn.disabled = false;
       btn.textContent = 'DESBLOQUEAR LAS 2 IAs →';
+      if (window.gtag) gtag('event','gate_fetch_error',{event_category:'mundial-gate', event_label: detail.slice(0,80)});
     }
   }
 
