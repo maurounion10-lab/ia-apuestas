@@ -1692,3 +1692,4 @@ export default {
     return J({ error: 'ruta desconocida', rutas: ['/status', '/preview', '/card', '/run', '/seed-dedup', '/clear-dedup', '/admin/post-thread'] }, 404);
   },
 };
+// build trigger: 20260611T000428
