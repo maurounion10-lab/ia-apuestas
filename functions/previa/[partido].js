@@ -14,6 +14,9 @@ export async function onRequest(context) {
     const pick = picks.find(p => pickSlug(p) === slug);
 
     if (!pick) {
+      // Fallback: servir previa estatica (ej. previas Mundial 2026 en /previa/*.html)
+      const assetResp = await context.env.ASSETS.fetch(context.request);
+      if (assetResp.status < 400) return assetResp;
       return new Response(notFoundHtml(slug), {
         status: 404,
         headers: { 'Content-Type': 'text/html; charset=utf-8' }
