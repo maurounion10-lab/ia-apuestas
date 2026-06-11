@@ -32,3 +32,4 @@ jobs:
           workingDirectory: worker-x-bot
           wranglerVersion: "3.107.0"
           packageManager: npm
+          command: deploy
