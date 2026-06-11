@@ -266,18 +266,23 @@ def base_canvas():
 
 def render_with_photo(photo_name, title_lines, eyebrow, subtitle, cta, big_num=None,
                        gold_tint=False, photo_crop="face", subtitle_color=(255,255,255,210)):
-    """Layout estándar Editorial: foto top 55% + texto bottom 45%."""
+    """Layout Editorial full-canvas: foto cubre 90%, texto sobre gradient."""
     img = base_canvas()
-    PH_H = int(H * 0.62)
+    PH_H = int(H * 0.92)
 
     photo = open_photo(photo_name, (W, PH_H), crop_focus=photo_crop)
     photo = apply_grading(photo, gold_tint=gold_tint, darken=0.18, contrast=1.18)
 
     img.paste(photo, (0, 0))
 
-    # Gradiente del medio hacia abajo (fade a negro)
+    # Gradiente fuerte desde 35% hacia abajo para que el texto se lea
     fade = Image.new("RGBA", (W, PH_H), (0, 0, 0, 0))
-    fade = gradient_overlay(fade, top_alpha=0, bot_alpha=255, color=BLACK)
+    fd = ImageDraw.Draw(fade)
+    fade_start = int(PH_H * 0.30)  # comienza al 30% de la foto
+    for y in range(fade_start, PH_H):
+        progress = (y - fade_start) / (PH_H - fade_start)
+        a = int(255 * (progress ** 1.2))
+        fd.line([(0, y), (W, y)], fill=(0, 0, 0, a))
     img.paste(fade, (0, 0), fade)
 
     # Top vignette suave para que el brand bagde se lea
@@ -314,14 +319,15 @@ def render_with_photo(photo_name, title_lines, eyebrow, subtitle, cta, big_num=N
 
     # Subtitle
     sub_y = title_y + len(title_lines) * 100 + 30
-    draw_subtitle(draw, subtitle, sub_y, fnt_size=36, color=subtitle_color)
+    sub_h = draw_subtitle(draw, subtitle, sub_y, fnt_size=36, color=subtitle_color)
+    if not sub_h: sub_h = 0
+    sub_end_y = sub_y + sub_h
 
-    # CTA
-    draw_cta(draw, cta, H - 280)
+    # CTA dinamico: justo despues del subtitle, cap arriba para no salirse
+    cta_y = min(sub_end_y + 130, H - 280)
 
-    # Footer URL
+    draw_cta(draw, cta, cta_y)
     draw_footer(draw)
-
     return img
 
 
@@ -400,8 +406,10 @@ def render_data_card(title, eyebrow, rows, cta, gold=True):
         draw_text_anchor(draw, (table_x + table_w - vw - 25, ry + 30), val_str, fnt_pct,
                          GOLD_BRIGHT if i == 0 else WHITE, "lt")
 
-    # CTA
-    draw_cta(draw, cta, H - 280)
+    # CTA dinamico justo despues de la tabla
+    table_end_y = table_y + len(rows) * row_h
+    cta_y = min(table_end_y + 80, H - 280)
+    draw_cta(draw, cta, cta_y)
 
     draw_footer(draw)
     return img
@@ -483,8 +491,9 @@ def render_versus(team_a, val_a, team_b, val_b, eyebrow, title, cta):
     iw, ih = measure(insight, insight_fnt)
     draw_text_anchor(draw, ((W - iw) // 2, 1330), insight, insight_fnt, (255, 255, 255, 200), "lt")
 
-    # CTA
-    draw_cta(draw, cta, H - 280)
+    # CTA dinamico, mas cerca del insight
+    cta_y = 1430
+    draw_cta(draw, cta, cta_y)
     draw_footer(draw)
     return img
 
