@@ -202,4 +202,13 @@
   } else {
     document.addEventListener('DOMContentLoaded', function(){ setTimeout(init, 300); });
   }
+
+  // Exponer API pública para abrir el gate desde otros elementos (banner sticky, CTAs, etc)
+  window.gambetaOpenGate = function(){
+    // Si ya entrego email, no abrir gate
+    try { if (localStorage.getItem('gambeta_lead_ok') === '1') return false; } catch(e){}
+    showGate();
+    if (window.gtag) gtag('event','gate_manual_open',{event_category:'mundial-gate', event_label: source});
+    return true;
+  };
 })();
