@@ -1820,10 +1820,9 @@ export default {
               },
               body: JSON.stringify({
                 email: email,
-                tag: ['mundial-2026', source, landing].filter(Boolean).join(','),
-                lists: ['list_vy9qvGKzQrWLzSAv5dC434'],
-                pageSource: landing || 'unknown',
-                source: 'gambeta-mundial-landing'
+                firstName: landing || 'mundial-lead',
+                tags: ['mundial-2026', source, landing].filter(Boolean),
+                lists: ['list_vy9qvGKzQrWLzSAv5dC434']
               })
             });
             sendxOk = sendxRes.ok;
@@ -1904,9 +1903,16 @@ export default {
         const last7Days = [0,0,0,0,0,0,0];  // dia 0 = hoy
         let total = mundial.length;
         for (const c of mundial) {
-          // Por landing (pageSource - no requiere custom fields preconfigurados)
-          const lan = c.pageSource;
-          if (lan && byLanding[lan] !== undefined) byLanding[lan]++;
+          // Por landing: leer de tags array (preferido) o firstName fallback
+          let lan = null;
+          if (Array.isArray(c.tags)) {
+            for (const t of c.tags) {
+              if (byLanding[t] !== undefined && t !== 'otros') { lan = t; break; }
+            }
+          }
+          if (!lan && c.firstName && byLanding[c.firstName] !== undefined) lan = c.firstName;
+          if (!lan && c.pageSource && byLanding[c.pageSource] !== undefined) lan = c.pageSource;
+          if (lan) byLanding[lan]++;
           else byLanding.otros++;
           // Por fecha
           if (c.created) {
