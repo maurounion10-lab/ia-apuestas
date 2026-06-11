@@ -1819,7 +1819,7 @@ export default {
                 email: email,
                 tag: ['mundial-2026', source, landing].filter(Boolean).join(','),
                 lists: ['list_vy9qvGKzQrWLzSAv5dC434'],
-                customFields: { landing: landing || 'unknown', source: source || 'unknown' },
+                pageSource: landing || 'unknown',
                 source: 'gambeta-mundial-landing'
               })
             });
@@ -1866,7 +1866,7 @@ export default {
         return new Response(JSON.stringify({
           ok: true,
           sendx: sendxOk ? 'subscribed' : 'fallback_email_sent',
-          redirect: '/mundial/eleccion'
+          redirect: '/eleccion'
         }), { headers: CORS });
       } catch (e) {
         console.error('lead-signup error:', e);
@@ -1901,8 +1901,8 @@ export default {
         const last7Days = [0,0,0,0,0,0,0];  // dia 0 = hoy
         let total = mundial.length;
         for (const c of mundial) {
-          // Por landing (custom field)
-          const lan = c.customFields && c.customFields.landing;
+          // Por landing (pageSource - no requiere custom fields preconfigurados)
+          const lan = c.pageSource;
           if (lan && byLanding[lan] !== undefined) byLanding[lan]++;
           else byLanding.otros++;
           // Por fecha
