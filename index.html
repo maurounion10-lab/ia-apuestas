@@ -13444,49 +13444,9 @@ const DBBET_LEAGUE_MAP = {
   'soccer_uefa_europa_league':       '/es/line/Football/2709895-UEFA-Europa-League',
 };
 
-// Mapa español → inglés para nombres de DBbet (selecciones y clubes frecuentes)
-const _DBBET_NAME_MAP = {
-  // Selecciones Mundial 2026
-  'méxico': 'Mexico', 'alemania': 'Germany', 'españa': 'Spain', 'francia': 'France',
-  'inglaterra': 'England', 'países bajos': 'Netherlands', 'bélgica': 'Belgium',
-  'croacia': 'Croatia', 'dinamarca': 'Denmark', 'suiza': 'Switzerland',
-  'sudáfrica': 'South Africa', 'corea del sur': 'South Korea', 'japón': 'Japan',
-  'arabia saudita': 'Saudi Arabia', 'irán': 'Iran', 'catar': 'Qatar',
-  'estados unidos': 'USA', 'ee.uu.': 'USA', 'canadá': 'Canada',
-  'argentina': 'Argentina', 'brasil': 'Brazil', 'colombia': 'Colombia',
-  'uruguay': 'Uruguay', 'ecuador': 'Ecuador', 'paraguay': 'Paraguay',
-  'perú': 'Peru', 'chile': 'Chile', 'venezuela': 'Venezuela', 'bolivia': 'Bolivia',
-  'portugal': 'Portugal', 'italia': 'Italy', 'escocia': 'Scotland',
-  'gales': 'Wales', 'irlanda': 'Ireland', 'grecia': 'Greece',
-  'turquía': 'Turkey', 'serbia': 'Serbia', 'polonia': 'Poland',
-  'chequia': 'Czech Republic', 'rep. checa': 'Czech Republic', 'república checa': 'Czech Republic',
-  'rumania': 'Romania', 'hungría': 'Hungary', 'austria': 'Austria',
-  'suecia': 'Sweden', 'noruega': 'Norway', 'finlandia': 'Finland',
-  'rusia': 'Russia', 'ucrania': 'Ukraine',
-  'marruecos': 'Morocco', 'nigeria': 'Nigeria', 'senegal': 'Senegal',
-  'camerún': 'Cameroon', 'ghana': 'Ghana', 'argelia': 'Algeria',
-  'egipto': 'Egypt', 'túnez': 'Tunisia', 'costa de marfil': 'Ivory Coast',
-  'rd congo': 'DR Congo', 'r.d. congo': 'DR Congo',
-  'australia': 'Australia', 'nueva zelanda': 'New Zealand',
-  'costa rica': 'Costa Rica', 'panamá': 'Panama', 'honduras': 'Honduras',
-  'jamaica': 'Jamaica', 'haití': 'Haiti', 'trinidad y tobago': 'Trinidad and Tobago',
-  'curazao': 'Curacao', 'curaçao': 'Curacao',
-  'bosnia y herzegovina': 'Bosnia and Herzegovina', 'bosnia': 'Bosnia and Herzegovina',
-  'cabo verde': 'Cape Verde', 'islas salomón': 'Solomon Islands',
-  'república dominicana': 'Dominican Republic',
-  // Clubes frecuentes
-  'river plate': 'River Plate', 'boca juniors': 'Boca Juniors',
-  'independiente': 'Independiente', 'racing': 'Racing Club',
-  'san lorenzo': 'San Lorenzo', 'vélez': 'Velez Sarsfield',
-  'flamengo': 'Flamengo', 'palmeiras': 'Palmeiras',
-};
-
-// Convierte nombre de equipo a slug URL para DBbet (traduce a inglés + limpia)
+// Convierte nombre de equipo a slug URL (español, sin acentos, separado por guión)
 function _teamSlug(name) {
-  const lower = (name || '').toLowerCase().trim();
-  // Buscar traducción exacta
-  const translated = _DBBET_NAME_MAP[lower] || name || '';
-  return translated.normalize('NFD').replace(/[̀-ͯ]/g, '')
+  return (name || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
     .replace(/[^A-Za-z0-9\s]/g, '').trim().replace(/\s+/g, '-');
 }
 
