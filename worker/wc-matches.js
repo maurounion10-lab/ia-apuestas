@@ -84,7 +84,7 @@ export const WC_MATCHES = [
   {
     id: 'wc2026_c1_bra_mar_13jun',
     home: 'Brasil', away: 'Marruecos',
-    rec: 'Empate sin apuesta (Brasil)',
+    rec: 'Gana Brasil (Empate no válido)',
     conf: 'med', bvr: 4, bvrText: 'Media-Alta',
     stake: 50, odds: 1.80,
     _bestOdds: 1.80,
