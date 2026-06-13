@@ -9779,6 +9779,48 @@ const WC2026_KNOWN_RESULTS = {
 };
 
 // Helper: resolver pick WC contra resultados conocidos
+// 🛡️ Fetch interceptor: aplicar resultados conocidos WC2026 a CUALQUIER respuesta del historial
+(function(){
+  if (window.__wcFetchPatched) return;
+  window.__wcFetchPatched = true;
+  const origFetch = window.fetch.bind(window);
+  window.fetch = async function(input, init) {
+    const url = typeof input === 'string' ? input : (input?.url || '');
+    const res = await origFetch(input, init);
+    // Solo interceptar /api/sb?type=historial
+    if (!url.includes('/api/sb') || !url.includes('historial')) return res;
+    try {
+      const cloned = res.clone();
+      const data = await cloned.json();
+      // Aplicar resolveWcLocal a los picks dentro del historial_full
+      function patch(list) {
+        if (!Array.isArray(list)) return list;
+        return list.map(p => (typeof resolveWcLocal === 'function' ? resolveWcLocal(p) : p));
+      }
+      let patched = data;
+      if (Array.isArray(data)) {
+        patched = data.map(item => {
+          if (item && Array.isArray(item.historial_full)) {
+            return { ...item, historial_full: patch(item.historial_full) };
+          }
+          return item;
+        });
+      } else if (data && Array.isArray(data.historial_full)) {
+        patched = { ...data, historial_full: patch(data.historial_full) };
+      }
+      return new Response(JSON.stringify(patched), {
+        status: res.status,
+        statusText: res.statusText,
+        headers: res.headers
+      });
+    } catch(e) {
+      console.warn('[WC fetch patch]', e.message);
+      return res;
+    }
+  };
+  console.log('[WC] fetch interceptor activo: resuelvo WC2026 al vuelo');
+})();
+
 // Lookup por id legacy (wc2026_a1_mex_saf_11jun → mapping a partido)
 const WC2026_RESULTS_BY_ID = {
   'wc2026_a1_mex_saf_11jun': { homeScore: 2, awayScore: 0 },
