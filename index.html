@@ -9740,7 +9740,8 @@ const WC2026_NATIONS = {
 // Map de resultados WC2026 ya jugados (UTC ISO date YYYY-MM-DD + home + away → home/away score)
 const WC2026_KNOWN_RESULTS = {
   // 11-jun
-  'wc2026_2026-06-11_México_Sudáfrica': { homeScore: null, awayScore: null }, // pendiente o ya jugado
+  'wc2026_2026-06-11_México_Sudáfrica': { homeScore: 2, awayScore: 0 },
+  'wc2026_2026-06-11_Mexico_Sudáfrica': { homeScore: 2, awayScore: 0 },
   // 12-jun
   'wc2026_2026-06-12_Canadá_Bosnia': { homeScore: 1, awayScore: 1 },
   'wc2026_2026-06-12_Canadá_Bosnia y Herzegovina': { homeScore: 1, awayScore: 1 },
@@ -9750,13 +9751,27 @@ const WC2026_KNOWN_RESULTS = {
 };
 
 // Helper: resolver pick WC contra resultados conocidos
+// Lookup por id legacy (wc2026_a1_mex_saf_11jun → mapping a partido)
+const WC2026_RESULTS_BY_ID = {
+  'wc2026_a1_mex_saf_11jun': { homeScore: 2, awayScore: 0 },
+  'wc2026_b1_can_bih_12jun': { homeScore: 1, awayScore: 1 },
+  'wc2026_d1_usa_par_12jun': { homeScore: 4, awayScore: 1 },
+  'wc2026_c1_usa_par_12jun': { homeScore: 4, awayScore: 1 }, // alias por si cambia
+  'wc2026_f1_bra_mar_13jun': null, // hoy 16:00 - aún jugando
+};
 function resolveWcLocal(pick) {
   if (!pick || pick.result !== 'pending') return pick;
   if (!(pick.league || '').includes('Mundial') && pick._sportKey !== 'soccer_fifa_world_cup') return pick;
-  const dateIso = (pick.date || '').slice(0, 10);
-  if (!dateIso) return pick;
-  const key = 'wc2026_' + dateIso + '_' + (pick.home || '') + '_' + (pick.away || '');
-  const r = WC2026_KNOWN_RESULTS[key];
+  // Primero intentar por ID legacy
+  let r = pick.id && WC2026_RESULTS_BY_ID[pick.id];
+  // Si no, intentar por la clave fecha+nombres
+  if (!r) {
+    const dateIso = (pick.date || '').slice(0, 10);
+    if (dateIso) {
+      const key = 'wc2026_' + dateIso + '_' + (pick.home || '') + '_' + (pick.away || '');
+      r = WC2026_KNOWN_RESULTS[key];
+    }
+  }
   if (!r || r.homeScore == null) return pick;
   // Aplicar resultado
   const out = { ...pick };
@@ -9811,6 +9826,22 @@ const _WC2026_NATIONS_PLACEHOLDER_DUMMY = {
   'Bosnia': { conf:'UEFA', iso:'ba' },
   'Bosnia':          { conf:'UEFA',     iso:'ba' },
   'Bosnia y Herzegovina':{ conf:'UEFA',     iso:'ba' },
+  'Bolivia':         { conf:'CONMEBOL', iso:'bo' },
+  'Catar':           { conf:'AFC',     iso:'qa' },
+  'Curaçao':         { conf:'CONCACAF', iso:'cw' },
+  'Corea del Sur':   { conf:'AFC',     iso:'kr' },
+  'Iraq':            { conf:'AFC',     iso:'iq' },
+  'Japón':           { conf:'AFC',     iso:'jp' },
+  'Arabia Saudí':    { conf:'AFC',     iso:'sa' },
+  'Australia':       { conf:'AFC',     iso:'au' },
+  'Nueva Zelanda':   { conf:'OFC',     iso:'nz' },
+  'Uzbekistán':      { conf:'AFC',     iso:'uz' },
+  'Costa Marfil':    { conf:'CAF',     iso:'ci' },
+  'Costa de Marfil': { conf:'CAF',     iso:'ci' },
+  'Irán':            { conf:'AFC',     iso:'ir' },
+  'Jordania':        { conf:'AFC',     iso:'jo' },
+  'RD Congo':        { conf:'CAF',     iso:'cd' },
+  'Haití':           { conf:'CONCACAF', iso:'ht' },
 };
 
 const WC2026_CONFEDS = {
