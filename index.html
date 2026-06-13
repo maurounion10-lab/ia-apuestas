@@ -9850,15 +9850,31 @@ function resolveWcLocal(pick) {
   out.marcador = r.homeScore + '-' + r.awayScore;
   // Determinar W/L
   const rec = (pick.rec || '').toLowerCase();
+  const totalGoals = r.homeScore + r.awayScore;
   let result = 'loss';
-  if (rec.includes('local') || rec.includes(pick.home || '__')) {
+  // Over/Under (priorizar sobre las otras detecciones, "más de X" tiene su propia lógica)
+  const overMatch = rec.match(/m[áa]s de ([\d.]+)/i) || rec.match(/over ([\d.]+)/i);
+  const underMatch = rec.match(/menos de ([\d.]+)/i) || rec.match(/under ([\d.]+)/i);
+  if (overMatch) {
+    const threshold = parseFloat(overMatch[1]);
+    result = totalGoals > threshold ? 'win' : 'loss';
+  } else if (underMatch) {
+    const threshold = parseFloat(underMatch[1]);
+    result = totalGoals < threshold ? 'win' : 'loss';
+  // Doble oportunidad
+  } else if (rec.includes('1x') || rec.includes('doble 1') || pick._recSide === '1x') {
+    result = (r.homeScore >= r.awayScore) ? 'win' : 'loss';
+  } else if (rec.includes('x2') || rec.includes('doble 2') || pick._recSide === 'x2') {
+    result = (r.awayScore >= r.homeScore) ? 'win' : 'loss';
+  } else if (rec.includes('12') || rec.includes('doble 12') || pick._recSide === '12') {
+    result = (r.homeScore !== r.awayScore) ? 'win' : 'loss';
+  // Local/Visitante/Empate
+  } else if (rec.includes('local') || pick._recSide === 'home') {
     result = r.homeScore > r.awayScore ? 'win' : 'loss';
-  } else if (rec.includes('visitante') || rec.includes(pick.away || '__')) {
+  } else if (rec.includes('visitante') || pick._recSide === 'away') {
     result = r.awayScore > r.homeScore ? 'win' : 'loss';
-  } else if (rec.includes('empate') || rec.includes('x')) {
+  } else if (rec.includes('empate') || pick._recSide === 'draw') {
     result = r.homeScore === r.awayScore ? 'win' : 'loss';
-  } else if (rec.includes('1x') || rec.includes('doble')) {
-    result = r.homeScore >= r.awayScore ? 'win' : 'loss';
   }
   out.result = result;
   out._wcLocalResolved = true;
