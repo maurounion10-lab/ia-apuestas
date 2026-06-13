@@ -9734,6 +9734,53 @@ const WC2026_NATIONS = {
   'Ghana':           { conf:'CAF', iso:'gh' },
   'Túnez':           { conf:'CAF', iso:'tn' },
   'Cabo Verde':      { conf:'CAF', iso:'cv' },
+  // ── ⚽ Resultados conocidos del Mundial 2026 (override client-side, fallback si el resolver del worker no actualizó) ──
+};
+
+// Map de resultados WC2026 ya jugados (UTC ISO date YYYY-MM-DD + home + away → home/away score)
+const WC2026_KNOWN_RESULTS = {
+  // 11-jun
+  'wc2026_2026-06-11_México_Sudáfrica': { homeScore: null, awayScore: null }, // pendiente o ya jugado
+  // 12-jun
+  'wc2026_2026-06-12_Canadá_Bosnia': { homeScore: 1, awayScore: 1 },
+  'wc2026_2026-06-12_Canadá_Bosnia y Herzegovina': { homeScore: 1, awayScore: 1 },
+  'wc2026_2026-06-12_Estados Unidos_Paraguay': { homeScore: 4, awayScore: 1 },
+  'wc2026_2026-06-12_USA_Paraguay': { homeScore: 4, awayScore: 1 },
+  // 13-jun (cuando se jueguen, actualizar)
+};
+
+// Helper: resolver pick WC contra resultados conocidos
+function resolveWcLocal(pick) {
+  if (!pick || pick.result !== 'pending') return pick;
+  if (!(pick.league || '').includes('Mundial') && pick._sportKey !== 'soccer_fifa_world_cup') return pick;
+  const dateIso = (pick.date || '').slice(0, 10);
+  if (!dateIso) return pick;
+  const key = 'wc2026_' + dateIso + '_' + (pick.home || '') + '_' + (pick.away || '');
+  const r = WC2026_KNOWN_RESULTS[key];
+  if (!r || r.homeScore == null) return pick;
+  // Aplicar resultado
+  const out = { ...pick };
+  out.homeScore = r.homeScore;
+  out.awayScore = r.awayScore;
+  out.marcador = r.homeScore + '-' + r.awayScore;
+  // Determinar W/L
+  const rec = (pick.rec || '').toLowerCase();
+  let result = 'loss';
+  if (rec.includes('local') || rec.includes(pick.home || '__')) {
+    result = r.homeScore > r.awayScore ? 'win' : 'loss';
+  } else if (rec.includes('visitante') || rec.includes(pick.away || '__')) {
+    result = r.awayScore > r.homeScore ? 'win' : 'loss';
+  } else if (rec.includes('empate') || rec.includes('x')) {
+    result = r.homeScore === r.awayScore ? 'win' : 'loss';
+  } else if (rec.includes('1x') || rec.includes('doble')) {
+    result = r.homeScore >= r.awayScore ? 'win' : 'loss';
+  }
+  out.result = result;
+  out._wcLocalResolved = true;
+  return out;
+}
+
+const _WC2026_NATIONS_PLACEHOLDER_DUMMY = {
   // AFC (Asia)
   'Japón':           { conf:'AFC', iso:'jp' },
   'Corea del Sur':   { conf:'AFC', iso:'kr' },
@@ -12424,6 +12471,10 @@ function renderPreds() {
     // Grupo L
     'Portugal|RD Congo','Portugal|Haití','Portugal|Escocia','RD Congo|Haití','RD Congo|Escocia','Haití|Escocia',
   ]);
+  // Aplicar override de resultados conocidos WC2026 antes del filtro
+  if (typeof resolveWcLocal === 'function') {
+    source = source.map(p => resolveWcLocal(p));
+  }
   source = source.filter(p => {
     if (p._sportKey !== 'soccer_fifa_world_cup') return true; // no es WC, dejar pasar
     const k1 = (p.home||'') + '|' + (p.away||'');
@@ -14247,6 +14298,12 @@ let _histLoading     = false;
 let _histLoadFailed  = false;
 let _histLoadedOnce  = false;
 
+// 🛡️ Aplicar resolveWcLocal a todos los picks recibidos
+function _applyWcLocalToList(list) {
+  if (!Array.isArray(list)) return list;
+  return list.map(p => (typeof resolveWcLocal === 'function' ? resolveWcLocal(p) : p));
+}
+
 async function sbLoadHistorial() {
   _histLoading = true;
   _histLoadFailed = false;
@@ -15248,6 +15305,11 @@ function histMarketKey(h) {
 }
 
 function renderHistorial(filter) {
+  // 🛡️ Aplicar override de resultados conocidos WC2026 a window._sbHist antes del render
+  if (typeof resolveWcLocal === 'function' && Array.isArray(window._sbHist)) {
+    window._sbHist = window._sbHist.map(p => resolveWcLocal(p));
+  }
+
   // Guard: si los elementos del DOM aún no existen, reprogramar
   const _summaryEl = document.getElementById('histSummary');
   const _tableEl   = document.getElementById('histTableBody');
