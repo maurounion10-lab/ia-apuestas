@@ -5805,53 +5805,79 @@ window.toggleHeroBubble = function(n) {
       }
     }
     if (d <= 0) {
-      // 🏆 Mundial ya empezó: mostrar el "Mejor Partido del Día"
+      // 🏆 Mundial en curso: leer pick REAL del día desde window._aiPreds (sin inventar nada)
       var head = document.getElementById('gbMundialHeadline');
       var tag  = document.getElementById('gbMundialTag');
       var sub  = document.getElementById('gbMundialSub');
       var ban  = document.getElementById('gbMundialBanner');
       
-      // Fixtures del Mundial 2026 + pick destacado de cada día (curado)
-      // Cuando un día tenga partido, marcar el "best" del día
-      var WC_DAILY = {
-        '2026-06-11': { home:'México', away:'Sudáfrica', hISO:'mx', aISO:'za', time:'19:00', pick:'Gana México', conf:'Máxima', emoji:'🏟️ Estadio Azteca' },
-        '2026-06-12': { home:'Estados Unidos', away:'Paraguay', hISO:'us', aISO:'py', time:'20:00', pick:'+ de 2.5 goles', conf:'Alta', emoji:'⚡' },
-        '2026-06-13': { home:'Brasil', away:'Marruecos', hISO:'br', aISO:'ma', time:'16:00', pick:'Gana Brasil', conf:'Alta', emoji:'🇧🇷' },
-        '2026-06-14': { home:'Países Bajos', away:'Japón', hISO:'nl', aISO:'jp', time:'19:00', pick:'Gana Países Bajos', conf:'Alta', emoji:'🟠' },
-        '2026-06-15': { home:'España', away:'Cabo Verde', hISO:'es', aISO:'cv', time:'19:00', pick:'+ de 2.5 goles', conf:'Máxima', emoji:'🔥' },
-        '2026-06-16': { home:'Argentina', away:'Argelia', hISO:'ar', aISO:'dz', time:'19:00', pick:'Gana Argentina', conf:'Máxima', emoji:'🐐' },
-        '2026-06-17': { home:'Inglaterra', away:'Croacia', hISO:'gb-eng', aISO:'hr', time:'19:00', pick:'Gana Inglaterra', conf:'Alta', emoji:'⚡' },
-        '2026-06-18': { home:'Uruguay', away:'Túnez', hISO:'uy', aISO:'tn', time:'13:00', pick:'Gana Uruguay', conf:'Alta', emoji:'🇺🇾' },
+      // Map ISO (para banderas) — solo selecciones del Mundial 2026
+      var ISO_MAP = {
+        'Alemania':'de','Curaçao':'cw','Curacao':'cw','Países Bajos':'nl','Paises Bajos':'nl',
+        'Japón':'jp','Japon':'jp','Bélgica':'be','Belgica':'be','Egipto':'eg',
+        'España':'es','Espana':'es','Cabo Verde':'cv','Argentina':'ar','Argelia':'dz',
+        'Estados Unidos':'us','USA':'us','Paraguay':'py','Canadá':'ca','Canada':'ca',
+        'Bosnia':'ba','Bosnia y Herzegovina':'ba','México':'mx','Mexico':'mx','Sudáfrica':'za','Sudafrica':'za',
+        'Brasil':'br','Marruecos':'ma','Suiza':'ch','Catar':'qa','Qatar':'qa','Haití':'ht','Haiti':'ht','Escocia':'gb-sct',
+        'Inglaterra':'gb-eng','Croacia':'hr','Uruguay':'uy','Túnez':'tn','Tunez':'tn',
+        'Francia':'fr','Italia':'it','Portugal':'pt','Polonia':'pl','Colombia':'co','Ecuador':'ec',
+        'Corea del Sur':'kr','Iraq':'iq','Bolivia':'bo','Jordania':'jo','RD Congo':'cd','Senegal':'sn',
+        'Costa de Marfil':'ci','Camerún':'cm','Camerun':'cm','Nigeria':'ng','Marruecos':'ma',
+        'Austria':'at','Noruega':'no','Dinamarca':'dk','Suecia':'se','Túnez':'tn',
+        'Australia':'au','Nueva Zelanda':'nz','Arabia Saudita':'sa','Irán':'ir','Iran':'ir',
+        'Costa Rica':'cr','Panamá':'pa','Panama':'pa','Honduras':'hn','Jamaica':'jm','Cuba':'cu'
       };
       
-      // Construir key de hoy (zona AR)
-      var now = new Date();
-      var artOffset = -3 * 60; // ART = UTC-3
-      var localOffset = now.getTimezoneOffset();
-      var todayArt = new Date(now.getTime() + (artOffset - localOffset) * 60000);
-      var keyToday = todayArt.getFullYear() + '-' + String(todayArt.getMonth()+1).padStart(2,'0') + '-' + String(todayArt.getDate()).padStart(2,'0');
-      var match = WC_DAILY[keyToday];
+      // Buscar el pick Mundial pendiente de mayor confianza
+      var picks = Array.isArray(window._aiPreds) ? window._aiPreds : [];
+      var todayMatch = null;
+      try {
+        var nowMs = Date.now();
+        var in24h = nowMs + 24 * 3600 * 1000;
+        var wcPending = picks.filter(function(p) {
+          return p && p._sportKey === 'soccer_fifa_world_cup'
+              && (!p.result || p.result === 'pending')
+              && p.commenceTs && p.commenceTs >= nowMs && p.commenceTs <= in24h
+              && p.home && p.away && ISO_MAP[p.home] && ISO_MAP[p.away];
+        });
+        // Ordenar por confianza (Máxima > Alta > Media) + hora más cercana
+        var confRank = { 'Máxima':3, 'Alta':2, 'Media':1 };
+        wcPending.sort(function(a,b) {
+          var ra = confRank[a.confLabel] || 0, rb = confRank[b.confLabel] || 0;
+          if (rb !== ra) return rb - ra;
+          return a.commenceTs - b.commenceTs;
+        });
+        todayMatch = wcPending[0] || null;
+      } catch(e) {}
       
       if (head) {
-        if (match) {
-          // Render con banderas + equipos + hora + pick IA
+        if (todayMatch) {
+          var hIso = ISO_MAP[todayMatch.home], aIso = ISO_MAP[todayMatch.away];
           head.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">'
-            + '<img src="https://flagcdn.com/h60/' + match.hISO + '.png" alt="' + match.home + '" style="width:38px;height:26px;border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4);object-fit:cover">'
-            + '<span style="font-weight:900">' + match.home + '</span>'
+            + '<img src="https://flagcdn.com/h60/' + hIso + '.png" alt="' + todayMatch.home + '" style="width:38px;height:26px;border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4);object-fit:cover">'
+            + '<span style="font-weight:900">' + todayMatch.home + '</span>'
             + '<span style="color:#FFD700;font-weight:800;font-size:0.85em;padding:0 4px">VS</span>'
-            + '<span style="font-weight:900">' + match.away + '</span>'
-            + '<img src="https://flagcdn.com/h60/' + match.aISO + '.png" alt="' + match.away + '" style="width:38px;height:26px;border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4);object-fit:cover">'
+            + '<span style="font-weight:900">' + todayMatch.away + '</span>'
+            + '<img src="https://flagcdn.com/h60/' + aIso + '.png" alt="' + todayMatch.away + '" style="width:38px;height:26px;border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4);object-fit:cover">'
             + '</span>';
         } else {
-          head.innerHTML = '🏆 MUNDIAL EN VIVO · Hoy sin partidos';
+          head.innerHTML = '🏆 MUNDIAL 2026 EN VIVO';
         }
       }
-      if (tag) tag.innerHTML = match ? '⚡ PARTIDO DEL DÍA · ' + match.time + ' ART' : '✨ Edición FIFA 2026';
+      // Hora ART desde commenceTs
+      var hhmm = '';
+      if (todayMatch && todayMatch.commenceTs) {
+        var dt = new Date(todayMatch.commenceTs);
+        var artMs = todayMatch.commenceTs + (-3*60 - dt.getTimezoneOffset()) * 60000;
+        var dtArt = new Date(artMs);
+        hhmm = String(dtArt.getHours()).padStart(2,'0') + ':' + String(dtArt.getMinutes()).padStart(2,'0');
+      }
+      if (tag) tag.innerHTML = todayMatch ? ('⚡ PICK IA DEL DÍA · ' + (hhmm ? hhmm + ' ART' : 'Mundial 2026')) : '✨ Picks IA en gambeta.ai';
       if (sub) {
-        if (match) {
-          sub.innerHTML = '🤖 <b>IA Gambeta:</b> <span style="color:#FFD700">' + match.pick + '</span> · Confianza <b>' + match.conf + '</b> · <a href="#predicciones" style="color:#fff;text-decoration:underline">Ver todos los picks →</a>';
+        if (todayMatch) {
+          sub.innerHTML = '🤖 <b>IA Gambeta:</b> <span style="color:#FFD700">' + (todayMatch.rec || '') + '</span> · Confianza <b>' + (todayMatch.confLabel || 'Alta') + '</b> · <a href="#predicciones" style="color:#fff;text-decoration:underline">Ver ficha →</a>';
         } else {
-          sub.innerHTML = 'Picks IA del Mundial en gambeta.ai';
+          sub.innerHTML = 'Ver todos los picks IA del Mundial →';
         }
       }
       if (ban) ban.classList.add('gbMundialToday');
