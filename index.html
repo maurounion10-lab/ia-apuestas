@@ -12409,7 +12409,7 @@ function renderPreds() {
   // WC Largo Plazo: subir el cap para que los 10 picks futures (Mbappé, España campeón,
   // Argentina semis, Marruecos cuartos, Noruega octavos, etc.) se muestren todos.
   const HOME_PICKS_LIMIT = window._predSportFilter === 'wcfutures' ? 20 : 9;
-  const source = _isPicksSubPage ? realPreds : realPreds.slice(0, HOME_PICKS_LIMIT);
+  let source = _isPicksSubPage ? realPreds : realPreds.slice(0, HOME_PICKS_LIMIT);
 
   // ── Banner de estado ──
   const statusBar = document.getElementById('predsStatusBar');
