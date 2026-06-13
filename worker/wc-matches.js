@@ -13,7 +13,7 @@ function ART_ts(year, monthIdx, day, hourART, minART = 0) {
 
 // GRUPOS OFICIALES:
 // A: México, Sudáfrica, Corea del Sur, República Checa
-// B: Canadá, Bosnia y Herzegovina, Catar, Suiza
+// B: Canadá, Bosnia, Catar, Suiza
 // C: Brasil, Marruecos, Haití, Escocia
 // D: Estados Unidos, Paraguay, Australia, Turquía
 // E: Alemania, Curaçao, Costa de Marfil, Ecuador
@@ -48,7 +48,7 @@ export const WC_MATCHES = [
   // ════ VIE 12-JUN — GRUPO B + GRUPO D (debut anfitriones Canadá y USA) ════
   {
     id: 'wc2026_b1_can_bih_12jun',
-    home: 'Canadá', away: 'Bosnia y Herzegovina',
+    home: 'Canadá', away: 'Bosnia',
     rec: 'Doble 1X', _recSide: '1x',
     conf: 'high', bvr: 5, bvrText: 'Alta',
     stake: 130, odds: 1.55,
