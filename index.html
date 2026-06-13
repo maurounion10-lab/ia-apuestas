@@ -9919,6 +9919,12 @@ function resolveWcLocal(pick) {
     result = r.homeScore === r.awayScore ? 'win' : 'loss';
   }
   out.result = result;
+  // 🩹 Recalcular P/L cuando convertimos pending → win/loss (sino el render muestra $NaN)
+  const _stk = parseFloat(out.stake) || 100;
+  const _odd = parseFloat(out.odds) || parseFloat(out._hO) || parseFloat(out._bestOdds) || 1.85;
+  if (result === 'win')       out.pl = +(((_odd - 1) * _stk)).toFixed(2);
+  else if (result === 'loss') out.pl = -_stk;
+  else                        out.pl = 0;
   out._wcLocalResolved = true;
   return out;
 }
@@ -15749,7 +15755,7 @@ function renderHistorial(filter) {
     ? pageData.map(h => {
         const plHtml = h.result==='pending'||h.result==='void'
           ? '<span style="color:#555">—</span>'
-          : `<span class="${h.pl>=0?'bet-profit-pos':'bet-profit-neg'}">${h.pl>=0?'+':''}$${Math.abs(h.pl)}</span>`;
+          : `<span class="${(+h.pl||0)>=0?'bet-profit-pos':'bet-profit-neg'}">${(+h.pl||0)>=0?'+':''}$${Math.abs(+h.pl||0).toFixed(2)}</span>`;
         const icon = h.sport==='tenis'?'🎾':'⚽';
         const recDisplay = _recLabel(h.rec, h.home, h.away);
         const isMax  = h.stake >= 150;
