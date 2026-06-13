@@ -12477,8 +12477,15 @@ function renderPreds() {
   }
   source = source.filter(p => {
     if (p._sportKey !== 'soccer_fifa_world_cup') return true; // no es WC, dejar pasar
-    const k1 = (p.home||'') + '|' + (p.away||'');
-    const k2 = (p.away||'') + '|' + (p.home||'');
+    // ⚠️ Permitir futures: away es "Grupo X", "Campeón Mundial", "Semifinales", "Bota de Oro", etc
+    // (no head-to-head)
+    const away = p.away || '';
+    const isFuture = /^(grupo |campe[óo]n |finalista|semifinal|cuartos|octavos|bota |gol[ea]ador|bal[óo]n|guante)/i.test(away)
+                     || /\b(campe[óo]n|gan[ae]\s+grupo|semis?|final|octavos|cuartos|goleador|bota|bal[óo]n|guante)\b/i.test(away);
+    if (isFuture) return true; // futures siempre pasan
+    // Para head-to-head: validar contra fixtures oficiales
+    const k1 = (p.home||'') + '|' + away;
+    const k2 = away + '|' + (p.home||'');
     const ok = _WC_VALID_FIXTURES.has(k1) || _WC_VALID_FIXTURES.has(k2);
     if (!ok) {
       console.warn('[WC HARD-FILTER] Descartado pick fantasma:', p.home, 'vs', p.away);
