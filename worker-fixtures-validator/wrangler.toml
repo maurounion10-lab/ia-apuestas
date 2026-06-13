@@ -1,0 +1,9 @@
+name = "wc-fixtures-validator"
+main = "index.js"
+compatibility_date = "2025-09-27"
+
+[triggers]
+crons = ["0 10 * * *"]   # 10:00 UTC = 07:00 ART todos los días
+
+[vars]
+# RESEND_API_KEY debe agregarse como secret en CF dashboard

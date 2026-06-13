@@ -1,0 +1,194 @@
+[
+  {
+    "h": "mx",
+    "H": "México",
+    "a": "za",
+    "A": "Sudáfrica",
+    "when": "Jue 11-jun · 19:00",
+    "grp": "A"
+  },
+  {
+    "h": "ca",
+    "H": "Canadá",
+    "a": "ba",
+    "A": "Bosnia",
+    "when": "Vie 12-jun · 16:00",
+    "grp": "B"
+  },
+  {
+    "h": "us",
+    "H": "Estados Unidos",
+    "a": "py",
+    "A": "Paraguay",
+    "when": "Vie 12-jun · 20:00",
+    "grp": "C"
+  },
+  {
+    "h": "br",
+    "H": "Brasil",
+    "a": "ma",
+    "A": "Marruecos",
+    "when": "Sáb 13-jun · 16:00",
+    "grp": "F"
+  },
+  {
+    "h": "ch",
+    "H": "Suiza",
+    "a": "qa",
+    "A": "Catar",
+    "when": "Sáb 13-jun · 13:00",
+    "grp": "B"
+  },
+  {
+    "h": "ht",
+    "H": "Haití",
+    "a": "gb-sct",
+    "A": "Escocia",
+    "when": "Sáb 13-jun · 19:00",
+    "grp": "L"
+  },
+  {
+    "h": "de",
+    "H": "Alemania",
+    "a": "cw",
+    "A": "Curaçao",
+    "when": "Dom 14-jun · 13:00",
+    "grp": "D"
+  },
+  {
+    "h": "nl",
+    "H": "Países Bajos",
+    "a": "jp",
+    "A": "Japón",
+    "when": "Dom 14-jun · 19:00",
+    "grp": "E"
+  },
+  {
+    "h": "co",
+    "H": "Colombia",
+    "a": "uz",
+    "A": "Uzbekistán",
+    "when": "Dom 14-jun · 16:00",
+    "grp": "H"
+  },
+  {
+    "h": "be",
+    "H": "Bélgica",
+    "a": "eg",
+    "A": "Egipto",
+    "when": "Lun 15-jun · 13:00",
+    "grp": "I"
+  },
+  {
+    "h": "es",
+    "H": "España",
+    "a": "cv",
+    "A": "Cabo Verde",
+    "when": "Lun 15-jun · 19:00",
+    "grp": "G"
+  },
+  {
+    "h": "ec",
+    "H": "Ecuador",
+    "a": "ci",
+    "A": "Costa Marfil",
+    "when": "Lun 15-jun · 16:00",
+    "grp": "J"
+  },
+  {
+    "h": "fr",
+    "H": "Francia",
+    "a": "sn",
+    "A": "Senegal",
+    "when": "Mar 16-jun · 13:00",
+    "grp": "K"
+  },
+  {
+    "h": "ar",
+    "H": "Argentina",
+    "a": "dz",
+    "A": "Argelia",
+    "when": "Mar 16-jun · 19:00",
+    "grp": "J"
+  },
+  {
+    "h": "at",
+    "H": "Austria",
+    "a": "jo",
+    "A": "Jordania",
+    "when": "Mar 16-jun · 16:00",
+    "grp": "J"
+  },
+  {
+    "h": "pt",
+    "H": "Portugal",
+    "a": "cd",
+    "A": "RD Congo",
+    "when": "Mié 17-jun · 13:00",
+    "grp": "L"
+  },
+  {
+    "h": "gb-eng",
+    "H": "Inglaterra",
+    "a": "hr",
+    "A": "Croacia",
+    "when": "Mié 17-jun · 19:00",
+    "grp": "C"
+  },
+  {
+    "h": "tr",
+    "H": "Turquía",
+    "a": "no",
+    "A": "Noruega",
+    "when": "Mié 17-jun · 16:00",
+    "grp": "F"
+  },
+  {
+    "h": "uy",
+    "H": "Uruguay",
+    "a": "tn",
+    "A": "Túnez",
+    "when": "Jue 18-jun · 13:00",
+    "grp": "K"
+  },
+  {
+    "h": "dz",
+    "H": "Argelia",
+    "a": "ir",
+    "A": "Irán",
+    "when": "Jue 18-jun · 16:00",
+    "grp": "I"
+  },
+  {
+    "h": "kr",
+    "H": "Corea del Sur",
+    "a": "iq",
+    "A": "Iraq",
+    "when": "Jue 18-jun · 19:00",
+    "grp": "D"
+  },
+  {
+    "h": "sa",
+    "H": "Arabia Saudí",
+    "a": "gh",
+    "A": "Ghana",
+    "when": "Vie 19-jun · 13:00",
+    "grp": "E"
+  },
+  {
+    "h": "au",
+    "H": "Australia",
+    "a": "nz",
+    "A": "Nueva Zelanda",
+    "when": "Vie 19-jun · 16:00",
+    "grp": "G"
+  },
+  {
+    "h": "pa",
+    "H": "Panamá",
+    "a": "sn",
+    "A": "Senegal",
+    "when": "Vie 19-jun · 19:00",
+    "grp": "L"
+  }
+]
