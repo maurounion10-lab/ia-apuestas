@@ -9734,7 +9734,35 @@ const WC2026_NATIONS = {
   'Ghana':           { conf:'CAF', iso:'gh' },
   'Túnez':           { conf:'CAF', iso:'tn' },
   'Cabo Verde':      { conf:'CAF', iso:'cv' },
-  // ── ⚽ Resultados conocidos del Mundial 2026 (override client-side, fallback si el resolver del worker no actualizó) ──
+  // ── 🌐 Resto de selecciones Mundial 2026 ──
+  'Japón':           { conf:'AFC',      iso:'jp' },
+  'Corea del Sur':   { conf:'AFC',      iso:'kr' },
+  'Australia':       { conf:'AFC',      iso:'au' },
+  'Nueva Zelanda':   { conf:'OFC',      iso:'nz' },
+  'Irán':            { conf:'AFC',      iso:'ir' },
+  'Arabia Saudí':    { conf:'AFC',      iso:'sa' },
+  'Arabia Saudita':  { conf:'AFC',      iso:'sa' },
+  'Catar':           { conf:'AFC',      iso:'qa' },
+  'Qatar':           { conf:'AFC',      iso:'qa' },
+  'Iraq':            { conf:'AFC',      iso:'iq' },
+  'Irak':            { conf:'AFC',      iso:'iq' },
+  'Jordania':        { conf:'AFC',      iso:'jo' },
+  'Uzbekistán':      { conf:'AFC',      iso:'uz' },
+  'Uzbekistan':      { conf:'AFC',      iso:'uz' },
+  'República Checa': { conf:'UEFA',     iso:'cz' },
+  'Chequia':         { conf:'UEFA',     iso:'cz' },
+  'Curaçao':         { conf:'CONCACAF', iso:'cw' },
+  'Curacao':         { conf:'CONCACAF', iso:'cw' },
+  'RD Congo':        { conf:'CAF',      iso:'cd' },
+  'R.D. Congo':      { conf:'CAF',      iso:'cd' },
+  'DR Congo':        { conf:'CAF',      iso:'cd' },
+  'Haití':           { conf:'CONCACAF', iso:'ht' },
+  'Haiti':           { conf:'CONCACAF', iso:'ht' },
+  'Bolivia':         { conf:'CONMEBOL', iso:'bo' },
+  'Bosnia':          { conf:'UEFA',     iso:'ba' },
+  'Bosnia y Herzegovina':{ conf:'UEFA', iso:'ba' },
+  'Costa Marfil':    { conf:'CAF',      iso:'ci' },
+  // ── ⚽ Resultados conocidos del Mundial 2026 (override client-side) ──
 };
 
 // Map de resultados WC2026 ya jugados (UTC ISO date YYYY-MM-DD + home + away → home/away score)
@@ -9795,54 +9823,8 @@ function resolveWcLocal(pick) {
   return out;
 }
 
-const _WC2026_NATIONS_PLACEHOLDER_DUMMY = {
-  // AFC (Asia)
-  'Japón':           { conf:'AFC', iso:'jp' },
-  'Corea del Sur':   { conf:'AFC', iso:'kr' },
-  'Australia':       { conf:'AFC', iso:'au' },
-  'Irán':            { conf:'AFC', iso:'ir' },
-  'Arabia Saudita':  { conf:'AFC', iso:'sa' },
-  'Qatar':           { conf:'AFC', iso:'qa' },
-  'Catar':           { conf:'AFC', iso:'qa' },
-  'República Checa': { conf:'UEFA', iso:'cz' },
-  'Chequia':         { conf:'UEFA', iso:'cz' },
-  // OFC (Oceanía)
-  'Nueva Zelanda':   { conf:'OFC', iso:'nz' },
-  // 🆕 Selecciones Mundial 2026 que faltaban
-  'Curaçao':         { conf:'CONCACAF', iso:'cw' },
-  'Curacao':         { conf:'CONCACAF', iso:'cw' },
-  'RD Congo':        { conf:'CAF',      iso:'cd' },
-  'R.D. Congo':      { conf:'CAF',      iso:'cd' },
-  'DR Congo':        { conf:'CAF',      iso:'cd' },
-  'Congo':           { conf:'CAF',      iso:'cd' },
-  'Haití':           { conf:'CONCACAF', iso:'ht' },
-  'Haiti':           { conf:'CONCACAF', iso:'ht' },
-  'Irak':            { conf:'AFC',      iso:'iq' },
-  'Iraq':            { conf:'AFC',      iso:'iq' },
-  'Jordania':        { conf:'AFC',      iso:'jo' },
-  'Jordan':          { conf:'AFC',      iso:'jo' },
-  'Uzbekistán':      { conf:'AFC',      iso:'uz' },
-  'Uzbekistan':      { conf:'AFC',      iso:'uz' },
-  'Bosnia': { conf:'UEFA', iso:'ba' },
-  'Bosnia':          { conf:'UEFA',     iso:'ba' },
-  'Bosnia y Herzegovina':{ conf:'UEFA',     iso:'ba' },
-  'Bolivia':         { conf:'CONMEBOL', iso:'bo' },
-  'Catar':           { conf:'AFC',     iso:'qa' },
-  'Curaçao':         { conf:'CONCACAF', iso:'cw' },
-  'Corea del Sur':   { conf:'AFC',     iso:'kr' },
-  'Iraq':            { conf:'AFC',     iso:'iq' },
-  'Japón':           { conf:'AFC',     iso:'jp' },
-  'Arabia Saudí':    { conf:'AFC',     iso:'sa' },
-  'Australia':       { conf:'AFC',     iso:'au' },
-  'Nueva Zelanda':   { conf:'OFC',     iso:'nz' },
-  'Uzbekistán':      { conf:'AFC',     iso:'uz' },
-  'Costa Marfil':    { conf:'CAF',     iso:'ci' },
-  'Costa de Marfil': { conf:'CAF',     iso:'ci' },
-  'Irán':            { conf:'AFC',     iso:'ir' },
-  'Jordania':        { conf:'AFC',     iso:'jo' },
-  'RD Congo':        { conf:'CAF',     iso:'cd' },
-  'Haití':           { conf:'CONCACAF', iso:'ht' },
-};
+// (dummy obsoleto removido — todos los países ya están en WC2026_NATIONS)
+
 
 const WC2026_CONFEDS = {
   UEFA:     'https://upload.wikimedia.org/wikipedia/en/thumb/3/3a/UEFA.svg/120px-UEFA.svg.png',
