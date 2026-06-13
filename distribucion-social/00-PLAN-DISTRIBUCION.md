@@ -10,7 +10,7 @@
 
 | Día | Hora | Plataforma | Acción |
 |---|---|---|---|
-| Lun 9 | 20:00 ART | Twitter @Gambeta_ai | Tweet DÍA 1 (Argentina vs Senegal) |
+| Lun 9 | 20:00 ART | Twitter @Gambeta_ai | Tweet DÍA 1 (Argentina vs Argelia) |
 | Mar 10 | 19:30 ART | Reddit r/futbolargentina | Post #1 (plantilla Argentina) |
 | Mié 11 | 10:00 ART | Twitter | Tweet DÍA 2 (hándicap asiático) |
 | Mié 11 | 21:00 ART | Quora | Respuesta #1 (mejor casa Argentina) |

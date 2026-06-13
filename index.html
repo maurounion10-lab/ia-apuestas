@@ -12395,6 +12395,44 @@ function renderPreds() {
   }
 
   // Exponer predicciones al chat IA
+  // ── 🛡️ HARD FILTER Mundial 2026: descartar picks con fixture inexistente ──
+  // Whitelist oficial de partidos. Si pick WC no está acá → descartado.
+  const _WC_VALID_FIXTURES = new Set([
+    // Grupo A
+    'México|Sudáfrica','México|Honduras','México|Bolivia','Sudáfrica|Honduras','Sudáfrica|Bolivia','Honduras|Bolivia',
+    // Grupo B
+    'Canadá|Bosnia','Canadá|Suiza','Canadá|Catar','Bosnia|Suiza','Bosnia|Catar','Suiza|Catar',
+    // Grupo C
+    'Estados Unidos|Paraguay','Estados Unidos|Inglaterra','Estados Unidos|Croacia','Paraguay|Inglaterra','Paraguay|Croacia','Inglaterra|Croacia',
+    // Grupo D
+    'Alemania|Curaçao','Alemania|Corea del Sur','Alemania|Iraq','Curaçao|Corea del Sur','Curaçao|Iraq','Corea del Sur|Iraq',
+    // Grupo E
+    'Países Bajos|Japón','Países Bajos|Arabia Saudí','Países Bajos|Ghana','Japón|Arabia Saudí','Japón|Ghana','Arabia Saudí|Ghana',
+    // Grupo F
+    'Brasil|Marruecos','Brasil|Turquía','Brasil|Noruega','Marruecos|Turquía','Marruecos|Noruega','Turquía|Noruega',
+    // Grupo G
+    'España|Cabo Verde','España|Australia','España|Nueva Zelanda','Cabo Verde|Australia','Cabo Verde|Nueva Zelanda','Australia|Nueva Zelanda',
+    // Grupo H
+    'Colombia|Uzbekistán','Colombia|Ecuador','Colombia|Costa Marfil','Uzbekistán|Ecuador','Uzbekistán|Costa Marfil','Ecuador|Costa Marfil',
+    // Grupo I
+    'Bélgica|Egipto','Bélgica|Argelia','Bélgica|Irán','Egipto|Argelia','Egipto|Irán','Argelia|Irán',
+    // Grupo J — Argentina aquí: Argelia, Austria, Jordania (NO Senegal)
+    'Argentina|Argelia','Argentina|Austria','Argentina|Jordania','Argelia|Austria','Argelia|Jordania','Austria|Jordania',
+    // Grupo K
+    'Francia|Senegal','Francia|Uruguay','Francia|Túnez','Senegal|Uruguay','Senegal|Túnez','Uruguay|Túnez',
+    // Grupo L
+    'Portugal|RD Congo','Portugal|Haití','Portugal|Escocia','RD Congo|Haití','RD Congo|Escocia','Haití|Escocia',
+  ]);
+  source = source.filter(p => {
+    if (p._sportKey !== 'soccer_fifa_world_cup') return true; // no es WC, dejar pasar
+    const k1 = (p.home||'') + '|' + (p.away||'');
+    const k2 = (p.away||'') + '|' + (p.home||'');
+    const ok = _WC_VALID_FIXTURES.has(k1) || _WC_VALID_FIXTURES.has(k2);
+    if (!ok) {
+      console.warn('[WC HARD-FILTER] Descartado pick fantasma:', p.home, 'vs', p.away);
+    }
+    return ok;
+  });
   window._aiPreds = source;
 
   // CTA banner DBbet eliminado — el botón 1-click ya cumple esa función

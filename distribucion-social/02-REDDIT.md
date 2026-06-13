@@ -61,7 +61,7 @@ Para los que no quieren pagar DirecTV/Flow:
 ✅ **App Mi Telefé**: también gratis.
 
 Horarios convertidos a ART:
-- 13-jun 16:00 — Argentina vs Senegal (MetLife, NJ)
+- 13-jun 16:00 — Argentina vs Argelia (MetLife, NJ)
 - 11-jun 13:00 — Inauguración México vs rival (Estadio Azteca)
 
 Calendario completo + horarios + canales de cable:
@@ -162,7 +162,7 @@ Para los que somos hispanohablantes y nos cuesta el cambio de huso horario:
 🇪🇸 España: UTC+1 (verano) — caen 21:00-00:00
 
 **11-jun**: Inauguración México vs rival en Estadio Azteca
-**13-jun**: Argentina vs Senegal en MetLife
+**13-jun**: Argentina vs Argelia en MetLife
 **19-jul**: FINAL en MetLife Stadium, NJ
 
 Calendario completo: https://gambeta.ai/blog/calendario-mundial-2026
