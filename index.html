@@ -12475,22 +12475,25 @@ function renderPreds() {
   if (typeof resolveWcLocal === 'function') {
     source = source.map(p => resolveWcLocal(p));
   }
+  // BLACKLIST de fantasmas confirmados (NO whitelist — el sistema necesita permitir futures + eliminatorias)
+  const _WC_GHOST_FIXTURES = new Set([
+    'Argentina|Senegal','Senegal|Argentina',
+    'Estados Unidos|Noruega','Noruega|Estados Unidos','USA|Noruega','Noruega|USA',
+    'Brasil|Portugal','Portugal|Brasil',
+    'Alemania|Túnez','Túnez|Alemania',
+    'Francia|Costa Rica','Costa Rica|Francia',
+    'Inglaterra|Polonia','Polonia|Inglaterra',
+    'Argentina|Brasil','Brasil|Argentina',
+    'Canadá|Japón','Japón|Canadá',
+  ]);
   source = source.filter(p => {
-    if (p._sportKey !== 'soccer_fifa_world_cup') return true; // no es WC, dejar pasar
-    // ⚠️ Permitir futures: away es "Grupo X", "Campeón Mundial", "Semifinales", "Bota de Oro", etc
-    // (no head-to-head)
-    const away = p.away || '';
-    const isFuture = /^(grupo |campe[óo]n |finalista|semifinal|cuartos|octavos|bota |gol[ea]ador|bal[óo]n|guante)/i.test(away)
-                     || /\b(campe[óo]n|gan[ae]\s+grupo|semis?|final|octavos|cuartos|goleador|bota|bal[óo]n|guante)\b/i.test(away);
-    if (isFuture) return true; // futures siempre pasan
-    // Para head-to-head: validar contra fixtures oficiales
-    const k1 = (p.home||'') + '|' + away;
-    const k2 = away + '|' + (p.home||'');
-    const ok = _WC_VALID_FIXTURES.has(k1) || _WC_VALID_FIXTURES.has(k2);
-    if (!ok) {
-      console.warn('[WC HARD-FILTER] Descartado pick fantasma:', p.home, 'vs', p.away);
+    if (p._sportKey !== 'soccer_fifa_world_cup') return true;
+    const key = (p.home||'') + '|' + (p.away||'');
+    if (_WC_GHOST_FIXTURES.has(key)) {
+      console.warn('[WC BLACKLIST] Descartado pick fantasma:', p.home, 'vs', p.away);
+      return false;
     }
-    return ok;
+    return true; // todo lo demás pasa (futures, eliminatorias, etc)
   });
   window._aiPreds = source;
 
