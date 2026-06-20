@@ -9843,7 +9843,11 @@ const WC2026_KNOWN_RESULTS = {
   'wc2026_2026-06-12_Canadá_Bosnia y Herzegovina': { homeScore: 1, awayScore: 1 },
   'wc2026_2026-06-12_Estados Unidos_Paraguay': { homeScore: 4, awayScore: 1 },
   'wc2026_2026-06-12_USA_Paraguay': { homeScore: 4, awayScore: 1 },
-  // 13-jun (cuando se jueguen, actualizar)
+  // 13-jun
+  'wc2026_2026-06-13_Brasil_Marruecos': { homeScore: 1, awayScore: 1 },
+  'wc2026_2026-06-13_Suiza_Catar': { homeScore: 1, awayScore: 1 },
+  'wc2026_2026-06-13_Haití_Escocia': { homeScore: 0, awayScore: 1 },
+  'wc2026_2026-06-13_Haiti_Escocia': { homeScore: 0, awayScore: 1 },
 };
 
 // Helper: resolver pick WC contra resultados conocidos
@@ -9895,7 +9899,7 @@ const WC2026_RESULTS_BY_ID = {
   'wc2026_b1_can_bih_12jun': { homeScore: 1, awayScore: 1 },
   'wc2026_d1_usa_par_12jun': { homeScore: 4, awayScore: 1 },
   'wc2026_c1_usa_par_12jun': { homeScore: 4, awayScore: 1 }, // alias por si cambia
-  'wc2026_f1_bra_mar_13jun': null, // hoy 16:00 - aún jugando
+  'wc2026_f1_bra_mar_13jun': { homeScore: 1, awayScore: 1 },
 };
 function resolveWcLocal(pick) {
   if (!pick || pick.result !== 'pending') return pick;
@@ -9920,6 +9924,32 @@ function resolveWcLocal(pick) {
   const rec = (pick.rec || '').toLowerCase();
   const totalGoals = r.homeScore + r.awayScore;
   let result = 'loss';
+  // 🛡️ Draw No Bet (DNB / "Empate no válido"): si empatan → VOID (devuelve plata, no win ni loss)
+  const _isDNB = /empate no v[áa]lido|empate sin apuesta|apuesta sin empate|draw no bet|\bdnb\b/i.test(rec);
+  if (_isDNB) {
+    if (r.homeScore === r.awayScore) {
+      // Empate → VOID
+      out.result = 'void';
+      out.pl = 0;
+      out._wcLocalResolved = true;
+      return out;
+    }
+    // No empate → evaluar quién gana (asumimos pick favorece al local salvo que diga lo contrario)
+    const favorsAway = /\bvisitante\b|\baway\b/i.test(rec) || pick._recSide === 'away';
+    if (favorsAway) {
+      result = r.awayScore > r.homeScore ? 'win' : 'loss';
+    } else {
+      result = r.homeScore > r.awayScore ? 'win' : 'loss';
+    }
+    out.result = result;
+    const _stk = parseFloat(out.stake) || 100;
+    const _odd = parseFloat(out.odds) || parseFloat(out._hO) || parseFloat(out._bestOdds) || 1.85;
+    if (result === 'win')       out.pl = +(((_odd - 1) * _stk)).toFixed(2);
+    else if (result === 'loss') out.pl = -_stk;
+    else                        out.pl = 0;
+    out._wcLocalResolved = true;
+    return out;
+  }
   // Over/Under (priorizar sobre las otras detecciones, "más de X" tiene su propia lógica)
   const overMatch = rec.match(/m[áa]s de ([\d.]+)/i) || rec.match(/over ([\d.]+)/i);
   const underMatch = rec.match(/menos de ([\d.]+)/i) || rec.match(/under ([\d.]+)/i);
