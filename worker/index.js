@@ -60,6 +60,7 @@ function normTeamName(name) {
 
 // ── Mapeo: sport_key → ID de liga en API-Football ────────────────────────────
 const LEAGUE_MAP = {
+  'soccer_fifa_world_cup':                  1,
   'soccer_argentina_primera_division':    128,
   'soccer_argentina_primera_nacional':    131,
   'soccer_conmebol_copa_libertadores':     13,
@@ -684,6 +685,7 @@ function isReserveTeam(name) {
 
 // ── Definición de categorías de ligas ────────────────────────────────────────
 const LEAGUES_MAIN = [
+  ['soccer_fifa_world_cup',                1],   // 🏆 Mundial 2026 — PRIORIDAD MÁXIMA
   ['soccer_argentina_primera_division',  128],
   ['soccer_conmebol_copa_libertadores',   13],
   ['soccer_conmebol_copa_sudamericana',   11],
