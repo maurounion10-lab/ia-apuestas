@@ -11883,6 +11883,25 @@ function renderPreds() {
 
   // Array vacío también cuenta como sin datos
   if (realPreds && realPreds.length === 0) realPreds = null;
+
+  // 🏆 WC_ONLY_MODE GLOBAL — aplicado a realPreds (afecta TODO: source, Pick Estrella del Finde, ticker, banner, chat IA, etc)
+  // Hasta 20-jul-2026 (día después de la final) solo se muestran picks del Mundial 2026.
+  if (realPreds && Array.isArray(realPreds)) {
+    const _WC_END_TS = new Date('2026-07-20T00:00:00-03:00').getTime();
+    const _beforeWC = realPreds.length;
+    realPreds = realPreds.filter(p => {
+      const isMundial = p._sportKey === 'soccer_fifa_world_cup'
+                     || (p.league || '').includes('Mundial');
+      if (!isMundial) return false;
+      if (p.commenceTs && p.commenceTs > _WC_END_TS) return false;
+      return true;
+    });
+    if (_beforeWC !== realPreds.length) {
+      console.log('[WC_ONLY_MODE realPreds] Bloqueados', _beforeWC - realPreds.length, 'picks no-Mundial / post-Mundial (incluye Pick Estrella del Finde)');
+    }
+    if (realPreds.length === 0) realPreds = null;
+  }
+
   const isLive = !!realPreds;
   // Guardar al historial TODOS los picks — incluyendo ya iniciados con resultado pendiente.
   // Esto garantiza que ningún pick desaparezca por un reload durante el partido.
