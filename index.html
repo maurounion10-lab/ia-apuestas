@@ -12640,6 +12640,26 @@ function renderPreds() {
     }
     return true; // todo lo demás pasa (futures, eliminatorias, etc)
   });
+
+  // 🏆 WC_ONLY_MODE — hasta que termine el Mundial (19-jul-2026) mostramos SOLO Mundial.
+  // Sacamos picks de otras ligas y picks que se juegan después del Mundial.
+  const WC_ONLY_MODE = true;
+  const WC_END_TS = new Date('2026-07-20T00:00:00-03:00').getTime();
+  if (WC_ONLY_MODE) {
+    const before = source.length;
+    source = source.filter(p => {
+      const isMundial = p._sportKey === 'soccer_fifa_world_cup'
+                     || (p.league || '').includes('Mundial');
+      if (!isMundial) return false;
+      // Bloquear picks después del Mundial (futures lejanos jul/ago/etc)
+      if (p.commenceTs && p.commenceTs > WC_END_TS) return false;
+      return true;
+    });
+    if (before !== source.length) {
+      console.log('[WC_ONLY_MODE] Filtrados', before - source.length, 'picks no-Mundial / post-Mundial');
+    }
+  }
+
   window._aiPreds = source;
 
   // CTA banner DBbet eliminado — el botón 1-click ya cumple esa función
