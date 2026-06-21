@@ -6388,31 +6388,7 @@ window.toggleHeroBubble = function(n) {
   </section>
 
   <!-- feed público eliminado -->
-  <section id="gFeedWrap" style="display:none !important">
-    <div class="section-title">
-      <div class="icon">📡</div>
-      En esto pusieron otros usuarios:
-    </div>
-    <div class="gfeed-list">
-      <table class="gfeed-table">
-        <thead>
-          <tr>
-            <th>Partido</th>
-            <th>Usuario</th>
-            <th>Hora</th>
-            <th style="text-align:center">Cuota</th>
-            <th style="text-align:right">G$</th>
-          </tr>
-        </thead>
-        <tbody id="gFeedList"></tbody>
-      </table>
-    </div>
-    <div id="gFeedNav" style="display:none;align-items:center;justify-content:center;gap:10px;margin-top:12px">
-      <button id="gFeedPrev" onclick="gFeedPage(-1)" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:5px 14px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='rgba(255,214,0,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">← Anterior</button>
-      <span id="gFeedPageInfo" style="font-size:0.72rem;color:rgba(255,255,255,0.35);font-weight:600"></span>
-      <button id="gFeedNext" onclick="gFeedPage(1)"  style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:8px;padding:5px 14px;font-size:0.75rem;font-weight:700;cursor:pointer;transition:background 0.15s" onmouseover="this.style.background='rgba(255,214,0,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">Siguiente →</button>
-    </div>
-  </section>
+  
 
   <!-- MI PANEL (visible solo para usuarios registrados) -->
   <div class="section-divider"></div>
@@ -6447,94 +6423,7 @@ window.toggleHeroBubble = function(n) {
     </div>
   </div>
 
-  <section id="ranking" style="display:none !important">
-    <div class="section-title"><div class="icon">🏆</div>Ranking Mensual · Gambeta Coins</div>
-
-    <!-- Prize banner -->
-    <div class="rk-prize-banner">
-      <div class="rk-prize-glow"></div>
-      <div style="display:flex;align-items:center;gap:14px;position:relative;z-index:1;flex-wrap:wrap">
-        <div style="font-size:2.2rem;flex-shrink:0">🥇</div>
-        <div style="flex:1;min-width:180px">
-          <div style="font-size:1rem;font-weight:900;color:#ffd600;letter-spacing:-0.2px">Top 10 del mes ganan $20 USD gratis</div>
-          <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);margin-top:3px">Banca libre en la casa de apuestas que elijas de nuestra lista</div>
-        </div>
-        <div style="text-align:right;flex-shrink:0">
-          <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">Cierra en</div>
-          <div id="rkCountdown" style="font-size:1.1rem;font-weight:800;color:#ffd600;font-variant-numeric:tabular-nums">—</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Historia navegable: mes actual / meses anteriores / anual -->
-    <div id="rkHistorySection" style="margin-bottom:24px">
-      <div style="font-size:0.72rem;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:rgba(255,214,0,0.55);margin-bottom:10px">🏆 Historial &amp; Ranking Anual</div>
-      <div id="rkHistoryTabs" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
-      <div id="rkHistoryContent"></div>
-    </div>
-
-    <!-- Month label + admin controls -->
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:8px;flex-wrap:wrap">
-      <div id="rkMonthLabel" style="font-size:0.82rem;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1.5px"></div>
-      <div style="display:flex;gap:6px;align-items:center">
-        <button id="rkCerrarMesBtn" onclick="rkCerrarMes()" style="display:none;background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.35);color:#ffd600;font-size:0.7rem;font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit">🏁 Cerrar mes</button>
-        <button onclick="loadRanking(true)" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:0.72rem;padding:5px 12px;border-radius:8px;cursor:pointer;font-family:inherit">↻ Actualizar</button>
-      </div>
-    </div>
-
-    <!-- Loading state -->
-    <div id="rkLoading" style="text-align:center;padding:40px 0;color:rgba(255,255,255,0.3);font-size:0.85rem">
-      <div style="font-size:2rem;margin-bottom:10px;animation:aiBounce 0.75s infinite;display:inline-block">⚽</div>
-      <div>Cargando ranking...</div>
-    </div>
-
-    <!-- Podium top 3 -->
-    <div id="rkPodium" style="display:none;margin-bottom:24px"></div>
-
-    <!-- List 4–10 -->
-    <div id="rkList" style="display:none;flex-direction:column;gap:7px;margin-bottom:24px"></div>
-
-    <!-- Mi posición (si está logueado) -->
-    <div id="rkMyPos" style="display:none"></div>
-
-    <!-- Empty state -->
-    <div id="rkEmpty" style="display:none;text-align:center;padding:40px 0;color:rgba(255,255,255,0.25);font-size:0.85rem">
-      Todavía no hay jugadores en el ranking. ¡Sé el primero!
-    </div>
-
-    <!-- CTA ranking completo -->
-    <div class="section-page-cta">
-      <a class="section-page-cta-btn" href="#historial">🏆 Ver historial y ranking anual →</a>
-    </div>
-
-    <!-- Cross-navigation -->
-    <div class="gb-cross-nav">
-      <div class="gb-cross-nav-label">Explorá también</div>
-      <div class="gb-cross-nav-btns">
-        <a class="gb-cross-nav-item" onclick="navTo('predictions')">
-          <span class="gb-cni-icon">🔮</span>
-          <span class="gb-cni-label">Pronósticos</span>
-          <span class="gb-cni-desc">Picks de hoy</span>
-        </a>
-        <a class="gb-cross-nav-item" onclick="navTo('historial')">
-          <span class="gb-cni-icon">📋</span>
-          <span class="gb-cni-label">Resultados</span>
-          <span class="gb-cni-desc">Picks finalizados</span>
-        </a>
-        <a class="gb-cross-nav-item" onclick="navTo('telegram')">
-          <span class="gb-cni-icon">📣</span>
-          <span class="gb-cni-label">Canales</span>
-          <span class="gb-cni-desc">Comunidad &amp; promos</span>
-        </a>
-        <a class="gb-cross-nav-item" href="/blog/">
-          <span class="gb-cni-icon">📰</span>
-          <span class="gb-cni-label">Blog</span>
-          <span class="gb-cni-desc">Guías y estrategias</span>
-        </a>
-      </div>
-    </div>
-
-  </section>
+  
 
 
   <!-- BOT DE ALERTA -->
@@ -6908,50 +6797,7 @@ window.toggleHeroBubble = function(n) {
     </div>
 
     <!-- Tab: Premios -->
-    <div class="mipanel-pane" id="panelPremios">
-
-      <!-- Banner header -->
-      <div style="background:linear-gradient(135deg,rgba(255,214,0,0.12),rgba(255,160,0,0.06));border:1px solid rgba(255,214,0,0.25);border-radius:18px;padding:22px 20px;text-align:center;margin-bottom:22px;position:relative;overflow:hidden">
-        <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,214,0,0.08),transparent 70%);pointer-events:none"></div>
-        <div style="font-size:2rem;margin-bottom:6px">🏆</div>
-        <div style="font-size:1.15rem;font-weight:900;color:#ffd600;letter-spacing:-0.3px">Canjea tus Gambeta Coins</div>
-        <div style="font-size:0.8rem;color:var(--texto-sec);margin-top:6px;line-height:1.5">Acumulá G$ apostando en los pronósticos y canjeá<br>por premios reales. ¡Hablanos por Telegram!</div>
-        <!-- Balance del usuario -->
-        <div style="margin-top:14px;display:inline-flex;align-items:center;gap:8px;background:rgba(0,0,0,0.35);border:1px solid rgba(255,214,0,0.3);border-radius:30px;padding:8px 18px">
-          <span class="acico" style="font-size:0.9rem;width:1.6em;height:1.6em">G$</span>
-          <span style="font-size:0.82rem;color:rgba(255,255,255,0.6)">Tu saldo:</span>
-          <span id="premiosBal" style="font-size:1rem;font-weight:800;color:#ffd600">—</span>
-          <span style="font-size:0.75rem;color:rgba(255,255,255,0.4)">G$</span>
-        </div>
-      </div>
-
-      <!-- Tier $20 USD -->
-      <div style="margin-bottom:8px;font-size:0.72rem;font-weight:800;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:2px;padding-left:2px">💵 Bono $20 USD</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:22px" id="premTier1"></div>
-
-      <!-- Tier $70 USD -->
-      <div style="margin-bottom:8px;font-size:0.72rem;font-weight:800;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:2px;padding-left:2px">💰 Bono $70 USD</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:22px" id="premTier2"></div>
-
-      <!-- Tier $230 USD -->
-      <div style="margin-bottom:8px;font-size:0.72rem;font-weight:800;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:2px;padding-left:2px">🤑 Bono $230 USD</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:22px" id="premTier3"></div>
-
-      <!-- Premios físicos -->
-      <div style="margin-bottom:8px;font-size:0.72rem;font-weight:800;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:2px;padding-left:2px">🍏 Premios especiales</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:10px;margin-bottom:22px" id="premTierApple"></div>
-
-      <!-- CTA canjear -->
-      <div style="background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.25);border-radius:16px;padding:18px 20px;text-align:center">
-        <div style="font-size:0.88rem;font-weight:700;color:#fff;margin-bottom:6px">¿Ya tenés los G$ para canjear?</div>
-        <div style="font-size:0.78rem;color:var(--texto-sec);margin-bottom:14px">Escribinos por Telegram y te hacemos el proceso en 24 horas.</div>
-        <a href="https://t.me/clubdewinners" target="_blank" rel="noopener"
-           style="display:inline-flex;align-items:center;gap:8px;background:var(--verde);color:#000;font-size:0.9rem;font-weight:800;padding:12px 28px;border-radius:30px;text-decoration:none">
-          💬 Canjear ahora en Telegram
-        </a>
-      </div>
-
-    </div>
+    
   </section>
 
 <!-- SECCIÓN: CANALES Y COMUNIDAD -->
@@ -19192,8 +19038,8 @@ function acRenderHist() {
   }).join('');
 }
 
-function openAcoinPanel()  { acUpdateUI(); document.getElementById('acoinPanel').classList.add('open'); }
-function closeAcoinPanel() { document.getElementById('acoinPanel').classList.remove('open'); }
+function openAcoinPanel()  { /* Gambeta Coins removido */ }
+function closeAcoinPanel() { /* Gambeta Coins removido */ }
 
 /* ── Toast ── */
 let _toastTimer = null;
@@ -22685,62 +22531,7 @@ function initBroadcastRealtime() {
 </script>
 
 <!-- $A-COIN PANEL MODAL -->
-<div class="acoin-panel" id="acoinPanel" onclick="if(event.target===this)closeAcoinPanel()">
-  <div class="acoin-panel-box">
-    <button class="acoin-panel-close" onclick="closeAcoinPanel()">✕</button>
-    <div style="text-align:center;margin-bottom:22px">
-      <!-- Moneda grande -->
-      <div style="display:flex;align-items:center;justify-content:center;margin-bottom:10px">
-        <span style="
-          display:inline-flex;align-items:center;justify-content:center;
-          width:68px;height:68px;
-          background:radial-gradient(circle at 35% 28%, #fff9b0 0%, #ffd600 28%, #ffb300 58%, #bb4400 100%);
-          border-radius:50%;
-          font-size:2rem;font-weight:900;color:#2d0f00;
-          box-shadow:0 0 28px rgba(255,210,0,0.65),0 4px 14px rgba(0,0,0,0.55),inset 0 2px 0 rgba(255,255,255,0.5);
-          border:2px solid rgba(255,170,0,0.9);
-          text-shadow:none;letter-spacing:-0.04em;line-height:1
-        ">G$</span>
-      </div>
-      <!-- Balance -->
-      <div style="font-size:2rem;font-weight:900;color:#ffd600;line-height:1;letter-spacing:-0.5px" id="acoinPanelBal">0</div>
-      <div style="font-size:0.72rem;font-weight:700;color:rgba(255,214,0,0.55);text-transform:uppercase;letter-spacing:1.5px;margin-top:4px">Gambeta Coins · Tu saldo</div>
-    </div>
-    <!-- Progreso hacia 100.000 -->
-    <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,214,0,0.2);border-radius:14px;padding:14px 16px;margin-bottom:16px">
-      <div style="display:flex;justify-content:space-between;font-size:0.76rem;color:var(--texto-sec);margin-bottom:4px">
-        <span>🎯 Progreso al canje</span>
-        <span id="acoinPanelPct">0%</span>
-      </div>
-      <div class="acoin-progress-bar-bg">
-        <div class="acoin-progress-bar-fill" id="acoinProgressFill" style="width:0%"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:rgba(255,255,255,0.3);margin-top:4px">
-        <span>0</span><span style="color:rgba(255,214,0,0.6);font-weight:700">100.000 = 🎁 Bono gratis</span>
-      </div>
-    </div>
-    <!-- CTA canje cuando llega a 100k -->
-    <div id="acoinRedeemBanner" style="display:none;background:linear-gradient(135deg,rgba(0,200,83,0.15),rgba(0,150,60,0.08));border:1px solid rgba(0,200,83,0.4);border-radius:14px;padding:14px 16px;text-align:center;margin-bottom:16px">
-      <div style="font-size:1.1rem;font-weight:800;color:var(--verde);margin-bottom:6px">🎉 ¡Llegaste a 100.000!</div>
-      <div style="font-size:0.78rem;color:var(--texto-sec);margin-bottom:12px">Podés canjear tus Gambeta Coins por dinero gratis en una casa de apuestas</div>
-      <a href="https://t.me/clubdewinners" target="_blank" rel="noopener"
-         style="display:inline-flex;align-items:center;gap:7px;background:var(--verde);color:#000;font-size:0.88rem;font-weight:800;padding:10px 22px;border-radius:30px;text-decoration:none">
-        💬 Canjear en Telegram
-      </a>
-    </div>
-    <!-- Reglas -->
-    <div style="background:rgba(255,255,255,0.03);border-radius:12px;padding:12px 14px;margin-bottom:16px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-      <div style="font-size:0.74rem;color:var(--texto-sec)">✅ Acierto <span style="color:var(--verde);font-weight:700">cuota × apuesta</span></div>
-      <div style="font-size:0.74rem;color:var(--texto-sec)">❌ Fallo <span style="color:#ff6b6b;font-weight:700">perdés lo apostado</span></div>
-      <div style="font-size:0.74rem;color:var(--texto-sec)">🌅 Bonus diario <span style="color:#ffd600;font-weight:700">+10.000</span></div>
-      <div style="font-size:0.74rem;color:var(--texto-sec)">🎁 Canje <span style="color:#ffd600;font-weight:700">100.000</span></div>
-    </div>
-    <div style="font-size:0.7rem;color:rgba(255,255,255,0.2);margin-bottom:10px">⚠ El bonus diario solo se otorga si tu saldo es menor a 500 G$</div>
-    <!-- Historial -->
-    <div style="font-size:0.78rem;font-weight:700;color:var(--texto-sec);margin-bottom:8px">Últimos movimientos</div>
-    <div id="acoinHistList" style="max-height:180px;overflow-y:auto;display:flex;flex-direction:column"></div>
-  </div>
-</div>
+
 
 <!-- ══════════════════════════════════════════════════════════════
      AI CHAT WIDGET — gambeta.ai
@@ -23745,13 +23536,7 @@ function aiGetMatchContext() {
 </div>
 
 <!-- $A-COIN TOAST -->
-<div class="acoin-toast" id="acoinToast">
-  <span class="acoin-toast-icon" id="acoinToastIcon"><span class="acico">G$</span></span>
-  <div class="acoin-toast-text">
-    <div class="at-title" id="acoinToastTitle">+1.000 G$</div>
-    <div class="at-sub"   id="acoinToastSub">¡Acertaste!</div>
-  </div>
-</div>
+
 
 </script>
 
