@@ -2018,15 +2018,20 @@
     z-index: 2;
   }
   .pred-dbbet-1click .db-msg-single {
-    font-size: 0.92rem;
+    font-size: 0.88rem;
     font-weight: 900;
     color: #fff;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.1px;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    /* Antes: nowrap + ellipsis cortaba "Apost... Mej...". Ahora wrap a 2 líneas. */
+    overflow: visible;
+    white-space: normal;
+    line-height: 1.15;
+    word-break: keep-all;
+  }
+  @media (max-width: 380px) {
+    .pred-dbbet-1click .db-msg-single { font-size: 0.78rem; }
   }
 
   /* Cuota destacada en badge */
