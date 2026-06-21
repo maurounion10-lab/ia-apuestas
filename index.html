@@ -12868,8 +12868,10 @@ function renderPreds() {
       <div class="pred-header">
         <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${(() => {
           const _lgRaw = (p._sportKey ? (sportKeyToLeague(p._sportKey, p.home, p.away) || p.league) : p.league) || '';
-          const lg = (_lgRaw && _lgRaw !== 'Fútbol' && _lgRaw !== 'Tenis' && _lgRaw !== 'Liga') ? leagueShort(_lgRaw) : '';
+          let lg = (_lgRaw && _lgRaw !== 'Fútbol' && _lgRaw !== 'Tenis' && _lgRaw !== 'Liga') ? leagueShort(_lgRaw) : '';
           // Calcular tiempo siempre desde commenceTs (evita strings "Hoy/Mañ." stale del caché)
+          // _dateIcon: ‼️ si es HOY, 🗓️ si es Mañ./futuro — reemplaza la pelota ⚽ del fallback de liga
+          let _dateIcon = '';
           const _fmtTs = (ts) => {
             if (!ts) return '';
             const _md = new Date(ts);
@@ -12877,11 +12879,18 @@ function renderPreds() {
             const _cd = new Date(_md); _cd.setHours(0,0,0,0);
             const _diff = Math.round((_cd - _td) / 86400000);
             const _ts = _md.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false});
+            if (_diff === 0)      _dateIcon = '‼️';
+            else if (_diff >= 1)  _dateIcon = '🗓️';
             return (_diff === -1 ? 'Ayer' : _diff === 0 ? 'Hoy' : _diff === 1 ? 'Mañ.' : _md.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})) + ' · ' + _ts;
           };
           const t  = isGameLive ? '🔴 EN VIVO'
                    : p.commenceTs ? _fmtTs(p.commenceTs)   // siempre dinámico si hay timestamp
                    : p.time || '';                           // fallback para picks muy viejos sin ts
+          // Reemplazar fallback ⚽ por icono de fecha si aplica; si no, prependear el icono a la liga real
+          if (_dateIcon && !isGameLive) {
+            if (lg === '⚽' || lg === '') lg = _dateIcon;
+            else lg = _dateIcon + ' ' + lg;
+          }
           return [lg, t].filter(Boolean).join(' · ');
         })()}</span>
         <div style="display:flex;align-items:center;gap:6px">
