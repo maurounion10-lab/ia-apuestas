@@ -5930,7 +5930,9 @@ window.toggleHeroBubble = function(n) {
       if (tag) tag.innerHTML = todayMatch ? ('⚡ PICK IA DEL DÍA · ' + (hhmm ? hhmm + ' ART' : 'Mundial 2026')) : '✨ Picks IA en gambeta.ai';
       if (sub) {
         if (todayMatch) {
-          sub.innerHTML = '🤖 <b>IA Gambeta:</b> <span style="color:#FFD700">' + (todayMatch.rec || '') + '</span> · Confianza <b>' + (todayMatch.confLabel || 'Alta') + '</b> · <a href="#predicciones" style="color:#fff;text-decoration:underline">Ver ficha →</a>';
+          var _vfHome = (todayMatch.home || '').replace(/'/g, "\\'");
+          var _vfAway = (todayMatch.away || '').replace(/'/g, "\\'");
+          sub.innerHTML = '🤖 <b>IA Gambeta:</b> <span style="color:#FFD700">' + (todayMatch.rec || '') + '</span> · Confianza <b>' + (todayMatch.confLabel || 'Alta') + '</b> · <a href="#predicciones" onclick="event.preventDefault();scrollToPickCard(\''+_vfHome+'\',\''+_vfAway+'\')" style="color:#fff;text-decoration:underline;cursor:pointer">Ver ficha →</a>';
         } else {
           sub.innerHTML = 'Ver todos los picks IA del Mundial →';
         }
@@ -9880,6 +9882,7 @@ function resolveWcLocal(pick) {
   out.homeScore = r.homeScore;
   out.awayScore = r.awayScore;
   out.marcador = r.homeScore + '-' + r.awayScore;
+  out.finalScore = r.homeScore + '-' + r.awayScore;
   // Determinar W/L
   const rec = (pick.rec || '').toLowerCase();
   const totalGoals = r.homeScore + r.awayScore;
@@ -15890,11 +15893,12 @@ function renderHistorial(filter) {
           : isHigh
           ? 'background:linear-gradient(90deg,rgba(255,214,0,0.09) 0%,rgba(255,214,0,0.04) 100%);border-left:2px solid rgba(255,214,0,0.45)'
           : '';
-        const marcador = h.finalScore
-          ? `<span style="font-weight:700;color:#e0e0e0;letter-spacing:0.5px">${h.finalScore}</span>`
+        const _scoreShow = h.finalScore || h.marcador || (h.homeScore != null && h.awayScore != null ? h.homeScore + '-' + h.awayScore : '');
+        const marcador = _scoreShow
+          ? `<span style="font-weight:700;color:#e0e0e0;letter-spacing:0.5px">${_scoreShow}</span>`
           : `<span style="color:#444">—</span>`;
         const mKey = encodeURIComponent(h.home + '|||' + h.away);
-        const mScore = encodeURIComponent(h.finalScore || '');
+        const mScore = encodeURIComponent(_scoreShow || '');
         const _admOk = (() => { try { const s = JSON.parse(sessionStorage.getItem(ADMIN_SESSION)||'null'); return !!(s && s.exp > Date.now()); } catch { return false; } })();
         const resultCell = _admOk
           ? `<span style="display:inline-flex;align-items:center;gap:3px">${rMap[h.result]||rMap.void}<span class="result-editable" style="cursor:pointer;font-size:0.6rem;opacity:0.45;margin-left:2px" title="Editar resultado y marcador" onclick="showResultPicker(this,'${mKey}','${h.result}','${mScore}')">✏</span></span>`
