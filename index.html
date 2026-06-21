@@ -659,7 +659,7 @@
     letter-spacing: 0.5px;
   }
 
-  /* ── FEED PÚBLICO G$ ── */
+  /* ── FEED PÚBLICO ── */
   #gFeedWrap {
     padding: 0 0 4px;
   }
@@ -2259,7 +2259,7 @@
     font-weight: 600;
     color: var(--amarillo);
   }
-  /* Cuota box convertida en botón de apuesta G$ */
+  /* Cuota box convertida en botón de apuesta */
   .cuota-bet-box {
     background: inherit;
     border: inherit;
@@ -3738,7 +3738,7 @@
   .pred-card { cursor:pointer; }
 
   /* ── $A-COIN SYSTEM ── */
-  /* Gambeta Coins icon — usada en toda la app */
+  /* icono moneda (legacy) */
   .acico {
     display: inline-flex;
     align-items: center;
@@ -5424,6 +5424,8 @@
     } catch(e){}
   })();
 </script>
+<style id="gb-hide-coins">/* Sistema Gambeta Coins / G$ discontinuado — UI ocultada (no romper JS) */
+#acoinPanel,#acoinToast,#acoinNavBal,.acoin-widget,.acoin-panel,.acoin-toast,.acoin-pick-section,.acoin-pick-btns,.acoin-pick-btn,.acico,#panelPremios,#ranking,#gFeedWrap,.gfeed-list,[id^="acoin"],[class^="acoin"]{display:none!important}</style>
 </head>
 <body>
 
@@ -6116,11 +6118,6 @@ window.toggleHeroBubble = function(n) {
           <span class="gb-cni-label">Resultados</span>
           <span class="gb-cni-desc">Picks finalizados</span>
         </a>
-        <a class="gb-cross-nav-item" onclick="navTo('ranking')">
-          <span class="gb-cni-icon">🏆</span>
-          <span class="gb-cni-label">Ranking</span>
-          <span class="gb-cni-desc">Top jugadores G$</span>
-        </a>
         <a class="gb-cross-nav-item" onclick="navTo('telegram')">
           <span class="gb-cni-icon">📣</span>
           <span class="gb-cni-label">Canales</span>
@@ -6228,11 +6225,6 @@ window.toggleHeroBubble = function(n) {
           <span class="gb-cni-icon">🔮</span>
           <span class="gb-cni-label">Pronósticos</span>
           <span class="gb-cni-desc">Picks de hoy</span>
-        </a>
-        <a class="gb-cross-nav-item" onclick="navTo('ranking')">
-          <span class="gb-cni-icon">🏆</span>
-          <span class="gb-cni-label">Ranking</span>
-          <span class="gb-cni-desc">Top jugadores G$</span>
         </a>
         <a class="gb-cross-nav-item" onclick="navTo('telegram')">
           <span class="gb-cni-icon">📣</span>
@@ -6395,11 +6387,11 @@ window.toggleHeroBubble = function(n) {
 
   </section>
 
-  <!-- FEED PÚBLICO G$ — eliminado (Gambeta Coins removido) -->
+  <!-- feed público eliminado -->
   <section id="gFeedWrap" style="display:none !important">
     <div class="section-title">
       <div class="icon">📡</div>
-      En esto pusieron sus G$ otros usuarios:
+      En esto pusieron otros usuarios:
     </div>
     <div class="gfeed-list">
       <table class="gfeed-table">
@@ -6861,11 +6853,6 @@ window.toggleHeroBubble = function(n) {
           <span class="gb-cni-icon">📋</span>
           <span class="gb-cni-label">Resultados</span>
           <span class="gb-cni-desc">Picks finalizados</span>
-        </a>
-        <a class="gb-cross-nav-item" onclick="navTo('ranking')">
-          <span class="gb-cni-icon">🏆</span>
-          <span class="gb-cni-label">Ranking</span>
-          <span class="gb-cni-desc">Top jugadores G$</span>
         </a>
         <a class="gb-cross-nav-item" onclick="navTo('telegram')">
           <span class="gb-cni-icon">📣</span>
@@ -7362,11 +7349,6 @@ window.toggleHeroBubble = function(n) {
           <span class="gb-cni-icon">📋</span>
           <span class="gb-cni-label">Resultados</span>
           <span class="gb-cni-desc">Picks finalizados</span>
-        </a>
-        <a class="gb-cross-nav-item" onclick="navTo('ranking')">
-          <span class="gb-cni-icon">🏆</span>
-          <span class="gb-cni-label">Ranking</span>
-          <span class="gb-cni-desc">Top jugadores G$</span>
         </a>
         <a class="gb-cross-nav-item" href="/blog/">
           <span class="gb-cni-icon">📰</span>
