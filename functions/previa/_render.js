@@ -264,7 +264,14 @@ export function renderPrevia(pick) {
   </div>
 
   <div class="related">
-    <h4>Más artículos</h4>
+    <h4>Dónde apostar</h4>
+    <div class="related-links">
+      <a href="/blog/mejor-casa-apuestas-mundial-2026-argentina">🏆 Mejor casa de apuestas</a>
+      <a href="/blog/bonos-mundial-2026-bet365">🎁 Bonos Bet365</a>
+      <a href="/blog/bonos-mundial-2026-betano">🎁 Bonos Betano</a>
+      <a href="/blog/calculadora-valor-ev">🧮 Calculadora de valor</a>
+    </div>
+    <h4 style="margin-top:20px">Más artículos</h4>
     <div class="related-links">
       <a href="https://gambeta.ai/#pronosticos">🔮 Pronósticos de hoy</a>
       <a href="https://gambeta.ai/#historial">📋 Historial completo</a>
