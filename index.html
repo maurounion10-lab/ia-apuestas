@@ -6146,7 +6146,7 @@ window.toggleHeroBubble = function(n) {
       <button class="sport-tab" style="font-size:0.72rem;padding:5px 12px" onclick="filterPredTime('upcoming',this)">⏳ PRÓXIMOS</button>
       <button class="sport-tab" style="font-size:0.72rem;padding:5px 12px" onclick="filterPredTime('finished',this)">✅ TERMINADOS</button>
     </div>
-    <div id="predsStatusBar" style="display:none;margin:0 0 12px;padding:8px 12px;border-radius:10px;font-size:0.72rem;display:flex;align-items:center;gap:8px;justify-content:space-between"></div>
+    <div id="predsStatusBar" style="display:none !important"></div>
     <!-- Pick Estrella del Finde (visible viernes–domingo) -->
     <div id="estrellaContainer" style="display:none"></div>
     <div class="pred-grid" id="predGrid"></div>
@@ -12606,7 +12606,7 @@ function renderPreds() {
         todos:'📋 Todos', soccer:'⚽ Fútbol', europe:'🌍 Fútbol Europeo', latam:'🌎 Latam'
       };
       const sfLabel = _sfLabels[window._predSportFilter] ? ' · ' + _sfLabels[window._predSportFilter] : '';
-      statusBar.innerHTML = `<span>📡 Datos en vivo · ${source.length} pronósticos${sfLabel}</span>`;
+      statusBar.style.display = 'none'; // ocultado por pedido de Mauro
     } else {
       // No mostrar banner de error a los visitantes
       statusBar.style.display = 'none';
