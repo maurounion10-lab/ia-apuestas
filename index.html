@@ -5003,8 +5003,13 @@
     transition: background .15s;
     user-select: none; -webkit-user-select: none;
   }
-  .fp-acc-hdr:hover { background: rgba(41,182,246,0.07); }
-  .fp-acc-hdr:active { background: rgba(41,182,246,0.13); }
+  .fp-acc-hdr:hover {
+    background: linear-gradient(135deg, rgba(41,182,246,0.10) 0%, rgba(41,182,246,0.04) 100%);
+    transform: translateX(2px);
+    box-shadow: inset 3px 0 0 rgba(41,182,246,0.6);
+  }
+  .fp-acc-hdr:active { background: rgba(41,182,246,0.16); transform: translateX(2px) scale(0.995); }
+  .fp-acc-hdr { transition: background .18s, transform .15s, box-shadow .15s; }
   /* Shields row */
   .fp-acc-shields {
     display: flex; align-items: center; gap: 6px; flex-shrink: 0;
@@ -5131,18 +5136,60 @@
 
   /* Reactions */
   .fp-reactions { display: flex; align-items: center; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  /* ═══ FORO 2.0 ─ likes/reacciones rediseñadas ═══ */
   .fp-react {
-    display: inline-flex; align-items: center; gap: 4px;
-    background: transparent; border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 20px; padding: 5px 12px;
-    font-size: 0.76rem; color: rgba(255,255,255,0.45);
-    cursor: pointer; transition: all .15s; font-family: inherit;
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 22px; padding: 6px 13px;
+    font-size: 0.78rem; font-weight: 600;
+    color: rgba(255,255,255,0.5);
+    cursor: pointer;
+    transition: transform .12s cubic-bezier(.34,1.56,.64,1), background .2s, border-color .2s, color .2s, box-shadow .2s;
+    font-family: inherit;
+    user-select: none;
   }
-  .fp-react:hover { background: rgba(255,255,255,0.07); color: #fff; }
-  .fp-react.r-liked { background: rgba(0,200,83,0.1); border-color: rgba(0,200,83,0.3); color: var(--verde); }
-  .fp-react.r-unliked { background: rgba(255,61,61,0.08); border-color: rgba(255,61,61,0.22); color: #ef5350; }
-  .fp-react-active { background: rgba(0,200,83,0.1); border-color: rgba(0,200,83,0.3); color: var(--verde); }
-  .fp-react-unlike-active { background: rgba(255,61,61,0.08) !important; border-color: rgba(255,61,61,0.22) !important; color: #ef5350 !important; }
+  .fp-react:hover {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
+  }
+  .fp-react:active { transform: translateY(0) scale(0.96); }
+  .fp-react.r-liked,
+  .fp-react-active {
+    background: linear-gradient(135deg, rgba(0,200,83,0.18) 0%, rgba(0,200,83,0.08) 100%);
+    border-color: rgba(0,200,83,0.4);
+    color: var(--verde);
+    box-shadow: 0 0 0 2px rgba(0,200,83,0.08), 0 2px 6px rgba(0,200,83,0.15);
+  }
+  .fp-react.r-liked:hover,
+  .fp-react-active:hover {
+    background: linear-gradient(135deg, rgba(0,200,83,0.28) 0%, rgba(0,200,83,0.14) 100%);
+  }
+  .fp-react.r-unliked,
+  .fp-react-unlike-active {
+    background: linear-gradient(135deg, rgba(255,61,61,0.14) 0%, rgba(255,61,61,0.05) 100%) !important;
+    border-color: rgba(255,61,61,0.32) !important;
+    color: #ef5350 !important;
+    box-shadow: 0 0 0 2px rgba(255,61,61,0.05), 0 2px 6px rgba(255,61,61,0.1) !important;
+  }
+  /* Animación pulse cuando alguien likea */
+  @keyframes fpLikePulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.18); }
+    100% { transform: scale(1); }
+  }
+  .fp-react.fp-just-liked { animation: fpLikePulse 0.42s cubic-bezier(.34,1.56,.64,1); }
+  /* Emoji dentro del botón un poco más grande */
+  .fp-react > span:first-child { font-size: 1.05em; line-height: 1; }
+  /* Contador con estilo numérico */
+  .fp-react > .fp-react-count {
+    font-variant-numeric: tabular-nums;
+    font-weight: 700;
+    min-width: 14px;
+    text-align: center;
+  }
   .fp-reply-btn {
     background: transparent; border: none; color: rgba(255,255,255,0.32);
     font-size: 0.76rem; cursor: pointer; padding: 4px 8px; border-radius: 8px;
@@ -12640,6 +12687,29 @@ function renderPreds() {
   }
 
   window._aiPreds = source;
+
+  // 🏆 FORO AUTO-GENERATE — para cada pick Mundial pending, crear thread del foro automáticamente
+  // (antes solo se creaba cuando el usuario clickeaba el botón de foro en una ficha)
+  try {
+    if (typeof forumEnsureThread === 'function' && Array.isArray(source)) {
+      const wcPickToOpen = source.filter(p =>
+        p &&
+        (p._sportKey === 'soccer_fifa_world_cup' || (p.league||'').includes('Mundial')) &&
+        p.home && p.away &&
+        (!p.result || p.result === 'pending') &&
+        p.commenceTs && p.commenceTs > Date.now() - 6*60*60*1000
+      );
+      // Crear threads silenciosamente — no bloquea render
+      (async () => {
+        for (const pick of wcPickToOpen) {
+          try { await forumEnsureThread(pick); } catch(e) {}
+        }
+        if (wcPickToOpen.length > 0) {
+          console.log('[Foro] Auto-generados', wcPickToOpen.length, 'threads Mundial');
+        }
+      })();
+    }
+  } catch(e) { console.warn('[Foro auto-gen]', e.message); }
 
   // CTA banner DBbet eliminado — el botón 1-click ya cumple esa función
   const affCtaHtml = '';
