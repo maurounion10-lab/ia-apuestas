@@ -10,7 +10,6 @@
  *   GET /stats?team=ID&league=ID → estadísticas de equipo (🧠 Algorithm)
  *   GET /h2h?h2h=ID1-ID2     → historial H2H (🧠 Algorithm)
  *   GET /predictions?fixture=ID → predicciones de API-Football
- *   POST /notify-redeem         → notifica canje G$ al admin (vía Resend)
  *
  * Variables de entorno requeridas:
  *   API_FOOTBALL_KEY  → api-football.com key
@@ -2155,65 +2154,7 @@ export default {
       return new Response(JSON.stringify({ data }), { headers: CORS });
     }
 
-    // ── /notify-redeem (POST) ────────────────────────────────────────────────
-    if (path === '/notify-redeem' && request.method === 'POST') {
-      try {
-        const body = await request.json();
-        const { casa, usd, costFmt, telegramUser, bettingId, userEmail } = body;
-
-        if (!casa || !telegramUser || !bettingId) {
-          return new Response(JSON.stringify({ ok: false, error: 'Faltan campos requeridos' }), { status: 400, headers: CORS });
-        }
-
-        const resendKey = env.RESEND_API_KEY;
-        if (!resendKey) {
-          return new Response(JSON.stringify({ ok: false, error: 'RESEND_API_KEY no configurada' }), { status: 500, headers: CORS });
-        }
-
-        const now = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
-
-        const htmlBody = `
-          <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0f0f1a;color:#f0f0f0;border-radius:12px;">
-            <h2 style="color:#facc15;margin-top:0;">🎁 Nuevo Canje G$ — gambeta.ai</h2>
-            <table style="width:100%;border-collapse:collapse;margin:16px 0;">
-              <tr><td style="padding:8px 12px;color:#aaa;width:40%;">Casa</td><td style="padding:8px 12px;font-weight:bold;">${casa}</td></tr>
-              <tr style="background:#1a1a2e;"><td style="padding:8px 12px;color:#aaa;">Premio</td><td style="padding:8px 12px;font-weight:bold;color:#4ade80;">$${usd} USD</td></tr>
-              <tr><td style="padding:8px 12px;color:#aaa;">Costo G$</td><td style="padding:8px 12px;">${costFmt} G$</td></tr>
-              <tr style="background:#1a1a2e;"><td style="padding:8px 12px;color:#aaa;">Telegram</td><td style="padding:8px 12px;color:#38bdf8;">@${telegramUser}</td></tr>
-              <tr><td style="padding:8px 12px;color:#aaa;">ID en ${casa}</td><td style="padding:8px 12px;font-family:monospace;font-size:15px;color:#facc15;">${bettingId}</td></tr>
-              <tr style="background:#1a1a2e;"><td style="padding:8px 12px;color:#aaa;">Email usuario</td><td style="padding:8px 12px;">${userEmail || '—'}</td></tr>
-              <tr><td style="padding:8px 12px;color:#aaa;">Fecha</td><td style="padding:8px 12px;">${now}</td></tr>
-            </table>
-            <p style="font-size:13px;color:#666;margin-top:20px;">Este canje fue procesado automáticamente por gambeta.ai. El usuario ya fue debitado sus G$.</p>
-          </div>
-        `;
-
-        const emailRes = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${resendKey}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            from: 'gambeta.ai <no-reply@gambeta.ai>',
-            to: ['pronosticosarg@gmail.com'],
-            subject: `🎁 Canje G$ — ${casa} $${usd} USD — @${telegramUser}`,
-            html: htmlBody
-          })
-        });
-
-        if (!emailRes.ok) {
-          const errText = await emailRes.text();
-          console.error('Resend error:', errText);
-          return new Response(JSON.stringify({ ok: false, error: `Resend: ${emailRes.status}` }), { status: 502, headers: CORS });
-        }
-
-        return new Response(JSON.stringify({ ok: true }), { headers: CORS });
-      } catch (e) {
-        console.error('notify-redeem error:', e);
-        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
-      }
-    }
+    // (endpoint de canje de monedas eliminado — función discontinuada)
 
     // ── /status ──────────────────────────────────────────────────────────────
     if (path === '/status') {
