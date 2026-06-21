@@ -5424,7 +5424,7 @@
     } catch(e){}
   })();
 </script>
-<style id="gb-hide-coins">/* Sistema Gambeta Coins / G$ discontinuado — UI ocultada (no romper JS) */
+<style id="gb-hide-coins">/* Sistema  /  discontinuado — UI ocultada (no romper JS) */
 #acoinPanel,#acoinToast,#acoinNavBal,.acoin-widget,.acoin-panel,.acoin-toast,.acoin-pick-section,.acoin-pick-btns,.acoin-pick-btn,.acico,#panelPremios,#ranking,#gFeedWrap,.gfeed-list,[id^="acoin"],[class^="acoin"]{display:none!important}</style>
 </head>
 <body>
@@ -5470,7 +5470,7 @@
     <a href="/blog/">📰 <span class="nav-text">Blog</span></a>
   </div>
 
-  <!-- (Gambeta Coins widget removido) -->
+  <!-- ( widget removido) -->
 
   <!-- Auth button (logged out) -->
   <button class="nav-auth-btn" id="navAuthBtn" onclick="openAuth()">
@@ -6393,7 +6393,7 @@ window.toggleHeroBubble = function(n) {
   <!-- MI PANEL (visible solo para usuarios registrados) -->
   <div class="section-divider"></div>
   <!-- ══════════════════════════════════════════════
-       RANKING MENSUAL G$ COINS
+       RANKING MENSUAL  COINS
   ══════════════════════════════════════════════ -->
   <!-- User stats popup -->
   <div id="rkUserPopup" onclick="if(event.target===this)rkClosePopup()">
@@ -6718,14 +6718,14 @@ window.toggleHeroBubble = function(n) {
 
   <div class="section-divider"></div>
 
-  <!-- MIS PICKS: PANEL PERSONAL DE STATS G$ -->
+  <!-- MIS PICKS: PANEL PERSONAL DE STATS  -->
   <section id="myPicksPanel" style="display:none">
     <div class="section-title"><div class="icon">📊</div>Mis Picks · Rendimiento Personal</div>
     <div class="mypicks-stats" id="myPicksStats"></div>
     <div class="mypicks-list" id="myPicksList"></div>
     <div id="myPicksEmpty" style="display:none;text-align:center;padding:28px 0;color:var(--texto-sec);font-size:0.88rem">
-      Todavía no pusiste G$ en ningún pronóstico.<br>
-      <span style="font-size:0.78rem;opacity:.6">Usá tus Gambeta Coins en los pronósticos para ver tu rendimiento acá.</span>
+      Todavía no pusiste  en ningún pronóstico.<br>
+      <span style="font-size:0.78rem;opacity:.6">Usá tus  en los pronósticos para ver tu rendimiento acá.</span>
     </div>
 
 
@@ -7478,11 +7478,11 @@ const AC_BAL  = 'acoin_balance';
 const AC_PICK = 'acoin_picks';
 const AC_HIST = 'acoin_history';
 const AC_DAY  = 'acoin_last_daily';
-const AC_BUST = 'acoin_bust_date';   // fecha en que el usuario quedó en G$0 sin picks pendientes
+const AC_BUST = 'acoin_bust_date';   // fecha en que el usuario quedó en 0 sin picks pendientes
 const AC_WINS = 'acoin_credited_wins'; // set de partidos ya acreditados (independiente del historial)
 const AC_GOAL = 100000;
 // Ícono moneda dorada — usar en template literals con ${AC_ICON}
-const AC_ICON = '<span class="acico">G$</span>';
+const AC_ICON = '<span class="acico"></span>';
 
 // ═══════════════════════════════════════════════
 //  SUPABASE CLIENT
@@ -7512,7 +7512,7 @@ const sbClient = supabase.createClient(_SB_URL, _SB_KEY, {
   }
 });
 
-// Cliente público (anon, sin JWT) — solo para lecturas públicas como el feed G$
+// Cliente público (anon, sin JWT) — solo para lecturas públicas como el feed 
 // Necesario porque la RLS policy "feed_public_read" cubre el rol anon, no authenticated
 const sbAnon = supabase.createClient(_SB_URL, _SB_KEY, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: 'sb-anon-public' }
@@ -7755,7 +7755,7 @@ async function acLoadFromDB(email) {
     await acSyncToDB();  // guarda directamente con balance=10.000
   }
   // Run daily bonus check on the now-accurate merged balance
-  _purgeNbaPicks();   // limpiar picks NBA del historial y G$ antes de renderizar
+  _purgeNbaPicks();   // limpiar picks NBA del historial y  antes de renderizar
   acPurgeOldPicks();  // limpiar picks evaluados >30 días para no inflar localStorage
   acCheckDaily();
   acUpdateUI();
@@ -12755,7 +12755,7 @@ function renderPreds() {
         </div>
       </div>` : '';
 
-    // ── Variables para apuesta G$ en cuotas ──
+    // ── Variables para apuesta  en cuotas ──
     const _cardMatchId = (p.homeRaw||p.home) + '__' + (p.awayRaw||p.away);
     const _cardOddsH = p._hO ? parseFloat(p._hO) : (p.probH > 0 ? parseFloat((100/p.probH).toFixed(2)) : 2);
     const _cardOddsD = p._dO ? parseFloat(p._dO) : (p.probD > 0 ? parseFloat((100/p.probD).toFixed(2)) : 0);
@@ -12937,7 +12937,7 @@ function renderPreds() {
           </button>
         </div>
       </div>` : '')}
-      <!-- (Bloque de apuesta con Gambeta Coins removido) -->
+      <!-- (Bloque de apuesta con  removido) -->
       <!-- Sello de resultado (solo partidos terminados) -->
       ${isStarted ? `
       <div class="pred-result-stamp ${isHighConfWin ? 'stamp-highconf' : isFinishedWin ? 'stamp-win' : isFinishedLoss ? 'stamp-loss' : 'stamp-pending'}">
@@ -14965,7 +14965,7 @@ const SPORT_KEY_MAP = {
   tenis:   ['tennis_atp_french_open', 'tennis_wta']
 };
 
-// Carga scores históricos para resolver predicciones y apuestas G$ pendientes
+// Carga scores históricos para resolver predicciones y apuestas  pendientes
 async function loadHistoricalScores() {
   // Guard: evitar ejecuciones concurrentes (puede llamarse desde renderHistorial en loop)
   if (window._loadHistScoresRunning) return;
@@ -14981,7 +14981,7 @@ async function loadHistoricalScores() {
     return true;
   });
 
-  // También verificar G$ picks no evaluados
+  // También verificar  picks no evaluados
   const pendingGPicks = (typeof acGetPicks === 'function' ? acGetPicks() : []).filter(p => !p.evaluated);
 
   // Entradas ya resueltas (win/loss) que podrían necesitar corrección de score (últimas 72h)
@@ -15016,13 +15016,13 @@ async function loadHistoricalScores() {
     else { (SPORT_KEY_MAP[h.sport] || SPORT_KEY_MAP.futbol).forEach(k => needed.add(k)); }
   });
 
-  // Para G$ picks pendientes, siempre incluir todas las ligas de fútbol
+  // Para  picks pendientes, siempre incluir todas las ligas de fútbol
   if (pendingGPicks.length) {
     SPORT_KEY_MAP.futbol.forEach(k => needed.add(k));
   }
 
   // Calcular daysFrom dinámicamente: el más antiguo de todos los picks pendientes
-  // G$ picks usan cap de 21 días (pueden quedar sin resolver si el usuario no entra varios días)
+  //  picks usan cap de 21 días (pueden quedar sin resolver si el usuario no entra varios días)
   // Historial global cap = 21 días (extendido — antes 7d dejaba huérfanos picks de Conmebol que tardan en resolverse)
   let daysFrom = 3;
   const histPendingTs  = needsResolve.map(h => h.commenceTs || null).filter(Boolean);
@@ -15035,7 +15035,7 @@ async function loadHistoricalScores() {
   if (gPickPendingTs.length) {
     const oldestMs    = now - Math.min(...gPickPendingTs);
     const daysElapsed = Math.ceil(oldestMs / (24 * 3600 * 1000));
-    // G$ picks: hasta 21 días atrás para no perder picks de usuarios inactivos
+    //  picks: hasta 21 días atrás para no perder picks de usuarios inactivos
     const gDays = Math.min(21, Math.max(3, daysElapsed + 1));
     daysFrom = Math.max(daysFrom, gDays);
   }
@@ -17495,7 +17495,7 @@ async function loadRealScores(retryCount = 0) {
 }
 
 // ═══════════════════════════════════════════════
-//  FEED PÚBLICO G$ — apuestas recientes de todos los usuarios
+//  FEED PÚBLICO  — apuestas recientes de todos los usuarios
 // ═══════════════════════════════════════════════
 const PICK_LABELS = { home: 'Local', draw: 'Empate', away: 'Visitante' };
 const GFEED_PAGE_SIZE = 5;
@@ -17599,7 +17599,7 @@ function _renderGFeedPage() {
       </td>
       <td><span class="gfeed-time">${_timeAgo(b.ts)}</span></td>
       <td><span class="gfeed-odds">${oddsDisp}</span></td>
-      <td><span class="gfeed-amount">G$${acFmt(b.betAmount)}</span></td>
+      <td><span class="gfeed-amount">${acFmt(b.betAmount)}</span></td>
     </tr>`;
   }).join('');
 
@@ -17628,7 +17628,7 @@ function _timeAgo(ts) {
 }
 
 async function fetchGFeed() {
-  // Sección "En esto pusieron sus G$ otros usuarios" desactivada (Gambeta Coins removido)
+  // Sección "En esto pusieron sus  otros usuarios" desactivada ( removido)
   return;
   // eslint-disable-next-line no-unreachable
   try {
@@ -17691,7 +17691,7 @@ async function fetchGFeed() {
       if (vip?.suffix) nick = nick + vip.suffix;
       if (!nick) return;
       const champBadge = typeof rkChampionBadge === 'function' ? rkChampionBadge(user.email) : '';
-      // Calcular racha de wins consecutivos desde los picks G$ del usuario
+      // Calcular racha de wins consecutivos desde los picks  del usuario
       const _evalPicks = (user.picks || [])
         .filter(p => p.evaluated)
         .sort((a, b) => (b.ts || 0) - (a.ts || 0));
@@ -17733,7 +17733,7 @@ async function fetchGFeed() {
 //  INIT
 // ═══════════════════════════════════════════════
 
-_purgeNbaPicks(); // eliminar picks NBA del historial y G$ al cargar la página
+_purgeNbaPicks(); // eliminar picks NBA del historial y  al cargar la página
 renderSkeletonScores(6); // mostrar skeleton mientras carga la API
 renderPreds();
 renderStats('futbol');
@@ -18414,7 +18414,7 @@ function updateNavAuth() {
   renderBetsList();
   renderMyPanel();
   applyUserProfile(); // apodo + escudo si ya completó el onboarding
-  renderMyPicks();   // panel de stats personales G$
+  renderMyPicks();   // panel de stats personales 
   initPushUI();      // mostrar card de notificaciones push
 }
 
@@ -18719,7 +18719,7 @@ function renderMyPanel() {
 }
 
 // ═══════════════════════════════════════════
-//  PREMIOS — Gambeta Coins rewards catalog
+//  PREMIOS —  rewards catalog
 // ═══════════════════════════════════════════
 const PREMIOS_DATA = [
   // Tier 1 — $20 USD
@@ -18774,7 +18774,7 @@ function renderPremios() {
       <img class="premio-logo" src="${p.sponsor ? '/img/casas/dbbet.svg' : p.logo}" alt="${p.casa}" onerror="this.src='https://www.google.com/s2/favicons?domain=${p.casa.toLowerCase().replace(/ /g,'')}.com&sz=64'" style="${p.sponsor ? 'filter:brightness(1.1)' : ''}">
       <div class="premio-name">${p.casa}</div>
       <div class="premio-usd">${p.usd ? `$${p.usd} USD` : p.desc}</div>
-      <div class="premio-cost"><span class="acico" style="font-size:0.55rem;width:1.5em;height:1.5em">G$</span> ${costFmt}${p.sponsor ? ' <span style="font-size:0.55rem;color:#FFD700;font-weight:900">★</span>' : ''}</div>
+      <div class="premio-cost"><span class="acico" style="font-size:0.55rem;width:1.5em;height:1.5em"></span> ${costFmt}${p.sponsor ? ' <span style="font-size:0.55rem;color:#FFD700;font-weight:900">★</span>' : ''}</div>
       <div class="premio-prog"><div class="premio-prog-fill" style="width:${pct}%;${p.sponsor ? 'background:linear-gradient(90deg,#dc1e2e,#FFD700)' : ''}"></div></div>
       <div class="premio-pct">${unlocked ? '✅ ¡Podés canjear!' : pct + '% completado'}</div>
     `;
@@ -18979,7 +18979,7 @@ function acPurgeOldPicks() {
   const fresh = picks.filter(p => !p.evaluated || !p.ts || p.ts > cutoff);
   if (fresh.length < before) {
     acSavePicks(fresh);
-    console.log(`[G$] Purged ${before - fresh.length} evaluated picks older than 30 days`);
+    console.log(`[] Purged ${before - fresh.length} evaluated picks older than 30 days`);
   }
 }
 function acFmt(n) {
@@ -19038,13 +19038,13 @@ function acRenderHist() {
   }).join('');
 }
 
-function openAcoinPanel()  { /* Gambeta Coins removido */ }
-function closeAcoinPanel() { /* Gambeta Coins removido */ }
+function openAcoinPanel()  { /*  removido */ }
+function closeAcoinPanel() { /*  removido */ }
 
 /* ── Toast ── */
 let _toastTimer = null;
 function acToast(icon, title, sub) {
-  // ── Gambeta Coins desactivado: silenciar cualquier toast que mencione coins/G$ ──
+  // ──  desactivado: silenciar cualquier toast que mencione coins/ ──
   const _txt = ((title || '') + ' ' + (sub || '')).toLowerCase();
   if (_txt.includes('coin') || _txt.includes('g$') || _txt.includes('recarga') || _txt.includes('saldo')) return;
   const t = document.getElementById('acoinToast');
@@ -19091,7 +19091,7 @@ function acCheckBust() {
   const today = new Date().toLocaleDateString('en-CA');
   localStorage.setItem(AC_BUST, today);
   acScheduleSync();
-  acToast('💸', 'Te quedaste sin G$', 'Mañana te recargamos G$ 10.000 para que vuelvas a jugar 💪');
+  acToast('💸', 'Te quedaste sin ', 'Mañana te recargamos  10.000 para que vuelvas a jugar 💪');
 }
 
 /* ── Daily bonus ── */
@@ -19110,8 +19110,8 @@ function acCheckDaily() {
       localStorage.setItem(AC_DAY, today);
       acScheduleSync();
       setTimeout(() => {
-        acToast('💸', `+${acFmt(topUp)} ${AC_ICON} Gambeta Coins`, '¡Recarga lista! Seguí apostando 🔥');
-        _addCoinNotif('💸', `+${acFmt(topUp)} G$ Gambeta Coins`, 'Recarga de emergencia — ¡dale de nuevo!');
+        acToast('💸', `+${acFmt(topUp)} ${AC_ICON} `, '¡Recarga lista! Seguí apostando 🔥');
+        _addCoinNotif('💸', `+${acFmt(topUp)}  `, 'Recarga de emergencia — ¡dale de nuevo!');
       }, 1200);
       return;
     }
@@ -19127,8 +19127,8 @@ function acCheckDaily() {
       localStorage.setItem(AC_DAY, today);
       acScheduleSync();
       setTimeout(() => {
-        acToast('💸', `+${acFmt(10000)} ${AC_ICON} Gambeta Coins`, '¡Recarga lista! Seguí apostando 🔥');
-        _addCoinNotif('💸', `+${acFmt(10000)} G$ Gambeta Coins`, 'Recarga de emergencia — ¡dale de nuevo!');
+        acToast('💸', `+${acFmt(10000)} ${AC_ICON} `, '¡Recarga lista! Seguí apostando 🔥');
+        _addCoinNotif('💸', `+${acFmt(10000)}  `, 'Recarga de emergencia — ¡dale de nuevo!');
       }, 1200);
       return;
     }
@@ -19144,7 +19144,7 @@ function acCheckDaily() {
   const topUp = 10000 - bal;
   acAdd(topUp, '🌅 Bonus diario');
   localStorage.setItem(AC_DAY, today);
-  setTimeout(() => { acToast('🌅', `+${acFmt(topUp)} ${AC_ICON} Gambeta Coins`, 'Bonus diario recibido'); _addCoinNotif('🌅', `+${acFmt(topUp)} G$ Gambeta Coins`, 'Bonus diario recibido'); }, 1200);
+  setTimeout(() => { acToast('🌅', `+${acFmt(topUp)} ${AC_ICON} `, 'Bonus diario recibido'); _addCoinNotif('🌅', `+${acFmt(topUp)}  `, 'Bonus diario recibido'); }, 1200);
 }
 
 /* ── Bet state ── */
@@ -19226,12 +19226,12 @@ function acConfirmBet(matchId, home, away) {
   }
   const state = window._acBetState[matchId];
   if (!state || !state.choice || !state.amount) {
-    acToast('⚠️', 'Seleccioná resultado y monto', 'Tocá una cuota y elegí cuántos G$ poner');
+    acToast('⚠️', 'Seleccioná resultado y monto', 'Tocá una cuota y elegí cuántos  poner');
     return;
   }
   const picks = acGetPicks();
   if (picks.find(p => p.id === matchId)) {
-    acToast('ℹ️', 'Ya pusiste G$ en este partido', 'Solo se permite un pronóstico por partido');
+    acToast('ℹ️', 'Ya pusiste  en este partido', 'Solo se permite un pronóstico por partido');
     return;
   }
   const bal = acGet();
@@ -19317,13 +19317,13 @@ function acEvaluatePicks(extraScores = []) {
           if (!wins.includes(winKey)) { wins.push(winKey); localStorage.setItem(AC_WINS, JSON.stringify(wins)); }
         } catch(_) {}
         acToast('✅', `+${acFmt(returnAmt)} ${AC_ICON}`, `¡Acertaste! ${matchLabel}`);
-        _addCoinNotif('✅', `+${acFmt(returnAmt)} G$ ganados`, `¡Acertaste! ${matchLabel}`);
+        _addCoinNotif('✅', `+${acFmt(returnAmt)}  ganados`, `¡Acertaste! ${matchLabel}`);
       }
       p.coinsChange = returnAmt;
     } else {
       // coins already deducted when bet was placed — no extra penalty
       acToast('❌', `Fallaste en ${matchLabel}`, `Perdiste ${acFmt(betAmt)} ${AC_ICON} apostados`);
-      _addCoinNotif('❌', `-${acFmt(betAmt)} G$ perdidos`, `Fallaste en ${matchLabel}`);
+      _addCoinNotif('❌', `-${acFmt(betAmt)}  perdidos`, `Fallaste en ${matchLabel}`);
       p.coinsChange = -betAmt;
     }
     p.evaluated = true; p.result = actual; p.correct = correct;
@@ -19334,7 +19334,7 @@ function acEvaluatePicks(extraScores = []) {
 
 /* ── Build pick HTML ── */
 function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
-  return ''; /* Gambeta Coins removido: sin seccion de apuesta por pick */
+  return ''; /*  removido: sin seccion de apuesta por pick */
   const matchId  = (homeRaw||home) + '__' + (awayRaw||away);
   const safeId   = matchId.replace(/'/g,"\\'");
   const safeHome = (homeRaw||home).replace(/'/g,"\\'");
@@ -19387,7 +19387,7 @@ function acPickHTML(home, away, homeRaw, awayRaw, oddsH, oddsD, oddsA) {
   // No pick yet — interactive bet UI
   const chips = [500, 1000, 2000, 5000];
   return `<div class="acoin-pick-section">
-    <div class="acoin-pick-label">${AC_ICON} Apostá tus Gambeta Coins</div>
+    <div class="acoin-pick-label">${AC_ICON} Apostá tus </div>
     <div class="acoin-pick-btns">
       ${['home','draw','away'].map(ch => {
         const o = oddsMap[ch];
@@ -19425,7 +19425,7 @@ function _isNbaTeam(name) {
   return _isNbaAvatar(url);
 }
 
-// Limpia picks NBA del historial de pronósticos (AC_HIST) y de los picks G$ (AC_PICK)
+// Limpia picks NBA del historial de pronósticos (AC_HIST) y de los picks  (AC_PICK)
 function _purgeNbaPicks() {
   try {
     const hist = JSON.parse(localStorage.getItem(AC_HIST) || '[]');
@@ -19473,7 +19473,7 @@ function _purgeNbaPicks() {
       </div>
       <div class="welcome-step">
         <div class="welcome-step-num">4</div>
-        <div>🏆 <strong>Competí en el ranking G$</strong> — acumulá monedas virtuales apostando en los picks y subí al top de la comunidad.</div>
+        <div>🏆 <strong>Competí en el ranking </strong> — acumulá monedas virtuales apostando en los picks y subí al top de la comunidad.</div>
       </div>
     </div>
 
@@ -19766,24 +19766,11 @@ function _purgeNbaPicks() {
         </div>
       </div>
 
-      <!-- G$ stats row -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-        <div style="background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:14px;text-align:center">
-          <div id="admGTotal" style="font-size:1.35rem;font-weight:800;color:#ffd600">–</div>
-          <div style="font-size:0.7rem;color:var(--texto-sec);margin-top:2px">G$ en circulación</div>
-        </div>
-        <div style="background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:14px;text-align:center">
-          <div id="admGAvg" style="font-size:1.35rem;font-weight:800;color:#ffd600">–</div>
-          <div style="font-size:0.7rem;color:var(--texto-sec);margin-top:2px">G$ promedio / usuario</div>
-        </div>
-      </div>
 
       <!-- Sort buttons -->
       <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
         <span style="font-size:0.72rem;color:var(--texto-sec)">Ordenar:</span>
         <button onclick="admSortUsers('date')" id="admSortDate" style="background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-weight:700;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.75rem">📅 Más recientes</button>
-        <button onclick="admSortUsers('bal_desc')" id="admSortBalD" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.75rem">🏆 Mayor G$</button>
-        <button onclick="admSortUsers('bal_asc')" id="admSortBalA" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;font-weight:600;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:0.75rem">📉 Menor G$</button>
       </div>
 
       <!-- Actions -->
@@ -20465,7 +20452,7 @@ function applyUserProfile() {
 }
 
 // ══════════════════════════════════════════════
-//  RANKING MENSUAL G$ COINS
+//  RANKING MENSUAL  COINS
 // ══════════════════════════════════════════════
 let _rkLoaded    = false;
 let _rkCountdownTimer = null;
@@ -20547,7 +20534,7 @@ function _rkupRenderPicks() {
   const list = document.getElementById('rkupPicksList');
   const { historial, picks } = _rkupData;
 
-  // Combinar pronósticos + G$ picks normalizados
+  // Combinar pronósticos +  picks normalizados
   const allPicks = [
     ...historial.map(h => ({
       type: 'prono',
@@ -20583,7 +20570,7 @@ function _rkupRenderPicks() {
 
   list.innerHTML = filtered.map(p => {
     const icon = p.result === 'win' ? '✅' : p.result === 'loss' ? '❌' : '⏳';
-    const typeTag = p.type === 'gpick' ? ' <span style="font-size:0.6rem;color:rgba(255,214,0,0.5);font-weight:700">G$</span>' : '';
+    const typeTag = p.type === 'gpick' ? ' <span style="font-size:0.6rem;color:rgba(255,214,0,0.5);font-weight:700"></span>' : '';
     const coinsHtml = p.coinsChange != null
       ? `<div class="rkup-pick-coins">${p.coinsChange >= 0 ? '+' : ''}${acFmt(p.coinsChange)}</div>`
       : (p.betAmount ? `<div class="rkup-pick-coins" style="color:rgba(255,255,255,0.3)">${acFmt(p.betAmount)}</div>` : '');
@@ -20609,7 +20596,7 @@ async function rkShowUserPopup(email, nickname, avatarUrl, balance) {
     avatarEl.innerHTML = `<div class="rkup-avatar-text">${(nickname||'?')[0].toUpperCase()}</div>`;
   }
   document.getElementById('rkupName').textContent = nickname || email?.split('@')[0] || '—';
-  document.getElementById('rkupBal').textContent = balance != null ? `${acFmt(balance)} G$` : '—';
+  document.getElementById('rkupBal').textContent = balance != null ? `${acFmt(balance)} ` : '—';
 
   // Reset stats
   ['rkupWins','rkupLosses','rkupPending','rkupPct'].forEach(id => document.getElementById(id).textContent = '—');
@@ -20723,7 +20710,7 @@ async function _loadRkStreaks(emails) {
 }
 
 async function loadRanking(force = false) {
-  return; /* Gambeta Coins/Ranking removido */
+  return; /* /Ranking removido */
   if (_rkLoaded && !force) return;
   _rkLoaded = true;
 
@@ -20805,7 +20792,7 @@ async function loadRanking(force = false) {
           <div class="rk-pod-rank">${podRankOrder[i]}</div>
           ${ava}
           <div class="rk-pod-nick">${name}</div>
-          <div class="rk-pod-bal">${acFmt(bal)} G$</div>
+          <div class="rk-pod-bal">${acFmt(bal)} </div>
           <div class="rk-pod-prize">🎁 $20 USD gratis</div>
         </div>`;
       }).join('')
@@ -20828,7 +20815,7 @@ async function loadRanking(force = false) {
         <div class="rk-row-num">${rank}</div>
         ${ava}
         <div class="rk-row-nick">${name}${isMe ? ' <span style="font-size:0.65rem;color:var(--verde);margin-left:4px">(vos)</span>' : ''}</div>
-        <div class="rk-row-bal">${acFmt(bal)} G$</div>
+        <div class="rk-row-bal">${acFmt(bal)} </div>
         <div class="rk-row-prize">🎁 $20 USD</div>
       </div>`;
     }).join('');
@@ -20852,12 +20839,12 @@ async function loadRanking(force = false) {
             <div style="flex:1;min-width:0">
               <div style="font-size:0.78rem;font-weight:700;color:var(--verde)">Tu posición: #${myIdx + 1}</div>
               <div style="font-size:0.72rem;color:rgba(255,255,255,0.45);margin-top:2px">
-                Te faltan <strong style="color:#ffd600">${missing.toLocaleString('es-AR')} G$</strong> para entrar al top 10
+                Te faltan <strong style="color:#ffd600">${missing.toLocaleString('es-AR')} </strong> para entrar al top 10
               </div>
             </div>
             <div style="text-align:right;flex-shrink:0">
               <div style="font-size:0.85rem;font-weight:800;color:#ffd600">${bal.toLocaleString('es-AR')}</div>
-              <div style="font-size:0.65rem;color:rgba(255,255,255,0.3)">G$</div>
+              <div style="font-size:0.65rem;color:rgba(255,255,255,0.3)"></div>
             </div>
           </div>`;
         myPosEl.style.display = 'block';
@@ -20996,7 +20983,7 @@ function _renderCurrentMonthCard() {
         return `<div style="display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;${i<3?'background:rgba(255,214,0,0.06)':''}">
           <span style="font-size:0.85rem;min-width:22px;text-align:center">${medal}</span>
           <div style="flex:1;font-size:0.82rem;font-weight:600;color:${i===0?'#ffd600':i<3?'rgba(255,214,0,0.75)':'rgba(255,255,255,0.7)'};">${name}</div>
-          <div style="font-size:0.75rem;color:rgba(255,255,255,0.35)">${acFmt(bal)} G$</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.35)">${acFmt(bal)} </div>
           <div style="font-size:0.68rem;background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.25);color:var(--verde);border-radius:6px;padding:2px 7px;white-space:nowrap">$20 USD</div>
         </div>`;
       }).join('')}
@@ -21063,7 +21050,7 @@ function _renderMonthCard(key, winners) {
           return `<div style="display:flex;align-items:center;gap:8px;padding:5px 6px;border-radius:8px;${i<3?'background:rgba(255,214,0,0.06)':''}">
             <span style="font-size:0.85rem;min-width:22px;text-align:center">${medal}</span>
             <div style="flex:1;font-size:0.82rem;font-weight:600;color:${i===0?'#ffd600':i<3?'rgba(255,214,0,0.75)':'rgba(255,255,255,0.7)'};">${name}${hofBadge}</div>
-            <div style="font-size:0.75rem;color:rgba(255,255,255,0.35)">${acFmt(bal)} G$</div>
+            <div style="font-size:0.75rem;color:rgba(255,255,255,0.35)">${acFmt(bal)} </div>
             <div style="font-size:0.68rem;background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.25);color:var(--verde);border-radius:6px;padding:2px 7px;white-space:nowrap">$20 USD</div>
           </div>`;
         }).join('')}
@@ -21073,7 +21060,7 @@ function _renderMonthCard(key, winners) {
 
 function _renderAnnualTable(allRows) {
   // allRows: array de { key, winners[] }
-  // Acumular G$ totales por email (suma de balances en todos los meses)
+  // Acumular  totales por email (suma de balances en todos los meses)
   const gMap = {}, names = {}, monthTags = {};
   for (const { key, winners } of allRows) {
     const [, , mm] = key.split('_');
@@ -21096,7 +21083,7 @@ function _renderAnnualTable(allRows) {
     <div style="background:rgba(255,214,0,0.04);border:1px solid rgba(255,214,0,0.25);border-radius:14px;overflow:hidden">
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;background:rgba(255,214,0,0.1);border-bottom:1px solid rgba(255,214,0,0.15)">
         <div style="font-size:0.82rem;font-weight:800;color:#ffd600">🏆 Ranking Anual 2026</div>
-        <div style="font-size:0.68rem;color:rgba(255,255,255,0.4)">${totalMonths} mes${totalMonths!==1?'es':''} · G$ acumulados</div>
+        <div style="font-size:0.68rem;color:rgba(255,255,255,0.4)">${totalMonths} mes${totalMonths!==1?'es':''} ·  acumulados</div>
       </div>
       <div style="padding:10px 12px;display:flex;flex-direction:column;gap:5px">
         ${sorted.map(([email, total], i) => {
@@ -21111,7 +21098,7 @@ function _renderAnnualTable(allRows) {
               <div style="font-size:0.82rem;font-weight:700;color:${i===0?'#ffd600':i<3?'rgba(255,214,0,0.8)':'rgba(255,255,255,0.75)'};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${name}</div>
               <div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:2px">${tags}</div>
             </div>
-            <div style="font-size:0.82rem;font-weight:800;color:#ffd600;white-space:nowrap">${acFmt(total)} G$</div>
+            <div style="font-size:0.82rem;font-weight:800;color:#ffd600;white-space:nowrap">${acFmt(total)} </div>
           </div>`;
         }).join('')}
       </div>
@@ -21408,15 +21395,9 @@ async function admLoadUsers() {
     const nuevosHoy    = _admAllUsers.filter(u => u.updated_at && new Date(u.updated_at) >= hoy).length;
     const nuevosSemana = _admAllUsers.filter(u => u.updated_at && new Date(u.updated_at) >= semanaAtras).length;
 
-    // G$ stats
-    const totalG = _admAllUsers.reduce((s, u) => s + (parseFloat(u.balance) || 0), 0);
-    const avgG   = total > 0 ? Math.round(totalG / total) : 0;
-
     document.getElementById('admUserTotal').textContent   = total;
     document.getElementById('admUserHoy').textContent     = nuevosHoy;
     document.getElementById('admUserSemana').textContent  = nuevosSemana;
-    document.getElementById('admGTotal').textContent      = totalG.toLocaleString('es-AR');
-    document.getElementById('admGAvg').textContent        = avgG.toLocaleString('es-AR');
 
     statusEl.textContent = total > 0 ? `✅ ${total} usuario${total !== 1 ? 's' : ''} registrado${total !== 1 ? 's' : ''}` : '📭 Sin usuarios todavía';
     admRenderUserList(_admAllUsers);
@@ -21436,14 +21417,7 @@ function admRenderUserList(users) {
     const fecha = u.updated_at ? new Date(u.updated_at).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' }) : '–';
     const bal   = typeof u.balance === 'number' ? u.balance : (parseFloat(u.balance) || 0);
     // Recargas admin: entradas del historial marcadas con admin:true
-    const adminRecharges = Array.isArray(u.history) ? u.history.filter(h => h.admin) : [];
-    const lastAdminDate  = adminRecharges.length
-      ? new Date(adminRecharges[0].ts).toLocaleDateString('es-AR', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
-      : '';
-    const adminBadge = adminRecharges.length
-      ? `<span title="Última recarga admin: ${lastAdminDate} · Total: G$ ${adminRecharges.reduce((s,h)=>s+(h.delta||0),0).toLocaleString('es-AR')}"
-               style="background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.45);border-radius:6px;padding:2px 7px;font-size:0.65rem;font-weight:800;color:#ffd600;cursor:default">🪙 ×${adminRecharges.length}</span>`
-      : '';
+    const adminBadge = "";
     return `
     <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px">
       <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.25);display:flex;align-items:center;justify-content:center;font-size:0.72rem;font-weight:700;color:var(--verde);flex-shrink:0">${i+1}</div>
@@ -21452,11 +21426,7 @@ function admRenderUserList(users) {
         <div style="font-size:0.68rem;color:var(--texto-sec);margin-top:1px">${fecha}</div>
       </div>
       <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-        <div style="text-align:right">
-          <div style="font-size:0.78rem;font-weight:700;color:${bal >= 0 ? '#ffd600' : 'var(--rojo)'}">G$ ${bal.toLocaleString('es-AR')}</div>
-        </div>
         <button onclick="admVerPicks('${u.email}')" title="Ver historial de picks" style="background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.25);color:var(--verde);width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">📋</button>
-        <button onclick="admOpenAddCoins('${u.email}', ${bal})" title="Dar G$ Coins" style="background:rgba(255,214,0,0.12);border:1px solid rgba(255,214,0,0.3);color:#ffd600;width:30px;height:30px;border-radius:8px;cursor:pointer;font-size:0.85rem;display:flex;align-items:center;justify-content:center;flex-shrink:0">🪙</button>
       </div>
     </div>`;
   }).join('');
@@ -21468,8 +21438,8 @@ function admFilterUsers() {
   admRenderUserList(filtered);
 }
 
-// ── Modal dar G$ a usuario ──────────────────────────────────────────────────
-function admOpenAddCoins(email, currentBal) {
+// ── Modal dar  a usuario ──────────────────────────────────────────────────
+function admOpenAddCoins(email, currentBal) { return; /* coins discontinuado */
   // Eliminar modal previo si existe
   const prev = document.getElementById('admAddCoinsModal');
   if (prev) prev.remove();
@@ -21483,14 +21453,14 @@ function admOpenAddCoins(email, currentBal) {
     <div style="background:#0f1a0f;border:1px solid rgba(255,214,0,0.4);border-radius:16px;padding:24px;width:100%;max-width:360px;box-shadow:0 0 40px rgba(255,214,0,0.15)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
         <div>
-          <div style="font-weight:800;font-size:1rem;color:#fff">🪙 Dar G$ Coins</div>
+          <div style="font-weight:800;font-size:1rem;color:#fff">🪙 Dar  Coins</div>
           <div style="font-size:0.72rem;color:var(--texto-sec);margin-top:2px;word-break:break-all">${email}</div>
         </div>
         <button onclick="document.getElementById('admAddCoinsModal').remove()" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1rem">✕</button>
       </div>
       <div style="background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:10px;padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
         <span style="font-size:0.78rem;color:var(--texto-sec)">Balance actual</span>
-        <span style="font-weight:800;color:#ffd600;font-size:1rem">G$ ${currentBal.toLocaleString('es-AR')}</span>
+        <span style="font-weight:800;color:#ffd600;font-size:1rem"> ${currentBal.toLocaleString('es-AR')}</span>
       </div>
       <div style="margin-bottom:8px">
         <label style="font-size:0.75rem;font-weight:700;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px">Monto a agregar (puede ser negativo para quitar)</label>
@@ -21546,7 +21516,7 @@ async function admConfirmAddCoins(email, currentBal) {
     if (error) throw error;
 
     msgEl.style.color = 'var(--verde)';
-    msgEl.textContent = `✅ Balance actualizado: G$ ${newBal.toLocaleString('es-AR')}`;
+    msgEl.textContent = `✅ Balance actualizado:  ${newBal.toLocaleString('es-AR')}`;
 
     // Actualizar lista en memoria (balance + historial para que el badge se refresque)
     const u = _admAllUsers.find(u => u.email === email);
@@ -21555,7 +21525,7 @@ async function admConfirmAddCoins(email, currentBal) {
     setTimeout(() => {
       document.getElementById('admAddCoinsModal')?.remove();
       admRenderUserList(_admAllUsers);
-      // Actualizar stats G$
+      // Actualizar stats 
       const totalG = _admAllUsers.reduce((s, u) => s + (parseFloat(u.balance) || 0), 0);
       const avgG   = _admAllUsers.length > 0 ? Math.round(totalG / _admAllUsers.length) : 0;
       document.getElementById('admGTotal').textContent = totalG.toLocaleString('es-AR');
@@ -21610,7 +21580,7 @@ function admCopyEmails() {
 
 function admExportCSV() {
   if (!_admAllUsers.length) { alert('Primero cargá los usuarios.'); return; }
-  const header = 'Email,Gambeta Coins (G$),Última actividad';
+  const header = 'Email, (),Última actividad';
   const rows = _admAllUsers.map(u => {
     const bal  = typeof u.balance === 'number' ? u.balance : (parseFloat(u.balance) || 0);
     const fecha = u.updated_at ? new Date(u.updated_at).toLocaleString('es-AR') : '';
@@ -21890,11 +21860,11 @@ function admSaveConfig() {
 // ═══════════════════════════════════════════════════
 const BROADCAST_EMAIL   = '__broadcast__';
 const BROADCAST_SEEN_KEY = 'gambeta_bcast_seen'; // localStorage: array de msg IDs vistos
-const COIN_NOTIFS_KEY    = 'gambeta_coin_notifs'; // localStorage: notificaciones G$ personales
+const COIN_NOTIFS_KEY    = 'gambeta_coin_notifs'; // localStorage: notificaciones  personales
 
-// Agrega una notificación G$ al inbox (sin popup, solo badge + inbox)
+// Agrega una notificación  al inbox (sin popup, solo badge + inbox)
 function _addCoinNotif(icon, title, sub) {
-  return; /* Gambeta Coins removido: sin notificaciones de coins */
+  return; /*  removido: sin notificaciones de coins */
   try {
     const notifs = JSON.parse('[]');
     notifs.unshift({ id: `cn_${Date.now()}`, icon, title, sub, ts: Date.now(), read: false });
@@ -22329,7 +22299,7 @@ function _renderInboxList() {
     const dateStr  = new Date(item.ts).toLocaleString('es-AR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
 
     if (item._type === 'coin') {
-      // Notificación G$ — acento dorado
+      // Notificación  — acento dorado
       const bg     = isUnread ? 'rgba(255,214,0,0.06)' : 'rgba(255,255,255,0.03)';
       const border = isUnread ? 'rgba(255,214,0,0.25)' : 'rgba(255,255,255,0.07)';
       const dot    = isUnread ? `<span style="position:absolute;top:10px;right:12px;width:8px;height:8px;background:#ffd600;border-radius:50%;box-shadow:0 0 6px #ffd600"></span>` : '';
@@ -22344,7 +22314,7 @@ function _renderInboxList() {
           </div>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:6px">
-          <span style="font-size:0.65rem;color:var(--texto-sec)">G$ Gambeta Coins · ${_bcastTimeAgo(item.ts)} · ${dateStr}</span>
+          <span style="font-size:0.65rem;color:var(--texto-sec)">  · ${_bcastTimeAgo(item.ts)} · ${dateStr}</span>
           ${isUnread ? `<span style="font-size:0.6rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.1);border:1px solid rgba(255,214,0,0.25);border-radius:6px;padding:1px 6px">NUEVO</span>` : ''}
         </div>
       </div>`;
@@ -22366,7 +22336,7 @@ function _renderInboxList() {
   }).join('');
 }
 
-// Marca una notificación G$ como leída
+// Marca una notificación  como leída
 function inboxMarkCoinRead(notifId) {
   try {
     const notifs = JSON.parse('[]');
@@ -22388,7 +22358,7 @@ function inboxMarkRead(msgId) {
   _renderInboxList();
 }
 
-// Marca todos como leídos (broadcasts + notifs G$)
+// Marca todos como leídos (broadcasts + notifs )
 function inboxMarkAllRead() {
   const msgs   = window._broadcastMsgs || [];
   const allIds = msgs.map(m => m.id);
@@ -23576,7 +23546,7 @@ function renderMyPicks() {
   const losses    = evaluated.filter(p => !p.correct);
   const winRate   = evaluated.length ? Math.round((wins.length / evaluated.length) * 100) : 0;
 
-  // Ganancia neta en G$
+  // Ganancia neta en 
   const netCoins  = evaluated.reduce((acc, p) => acc + (p.coinsChange || 0), 0);
   const totalBet  = picks.reduce((acc, p) => acc + (p.betAmount || 1000), 0);
   const roi       = totalBet > 0 ? ((netCoins / totalBet) * 100).toFixed(1) : '0.0';
@@ -23597,7 +23567,7 @@ function renderMyPicks() {
   const roiClass = parseFloat(roi) >= 0 ? 'roi-pos' : 'roi-neg';
   const roiColor = parseFloat(roi) >= 0 ? '#ffd600' : '#ef5350';
   const netColor = netCoins >= 0 ? '#00c853' : '#ef5350';
-  const AC_ICON  = 'G$';
+  const AC_ICON  = '';
 
   document.getElementById('myPicksStats').innerHTML = `
     <div class="mps-card">
@@ -23925,7 +23895,7 @@ async function admVerPicks(email) {
   const emailEl = document.getElementById('admPicksUserEmail');
   emailEl.textContent = email;
   modal.style.display = 'block';
-  // Arrancar en pestaña G$ Picks (más relevante para soporte)
+  // Arrancar en pestaña  Picks (más relevante para soporte)
   admPicksTab('gpicks');
   await _admLoadPicksData(email);
 }
@@ -23972,19 +23942,19 @@ function _admRenderPicksTab(tab) {
     </div>`;
 
   if (tab === 'gpicks') {
-    // ── G$ Picks (campo `picks` de acoin_users) ──
+    // ──  Picks (campo `picks` de acoin_users) ──
     const gpicks = (data.picks || []).slice().sort((a,b) => (b.ts||0)-(a.ts||0));
     const pend   = gpicks.filter(p => !p.evaluated);
     const wins   = gpicks.filter(p => p.evaluated && p.correct);
     const losses = gpicks.filter(p => p.evaluated && !p.correct);
     statsEl.innerHTML =
-      statCard('Total G$', gpicks.length, '#fff') +
+      statCard('Total ', gpicks.length, '#fff') +
       statCard('Pendientes', pend.length, pend.length > 0 ? '#ffd600' : 'var(--texto-sec)') +
       statCard('Ganados', wins.length, 'var(--verde)') +
       statCard('Perdidos', losses.length, 'var(--rojo)') +
       statCard('Saldo', (data.balance||0).toLocaleString('es-AR'), '#ffd600');
     if (!gpicks.length) {
-      listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--texto-sec);font-size:0.82rem">Sin pronósticos G$ registrados</div>';
+      listEl.innerHTML = '<div style="text-align:center;padding:24px;color:var(--texto-sec);font-size:0.82rem">Sin pronósticos  registrados</div>';
       return;
     }
     const pickLabels = { home:'Local', draw:'Empate', away:'Visitante' };
@@ -23992,8 +23962,8 @@ function _admRenderPicksTab(tab) {
       const fecha    = p.ts ? new Date(p.ts).toLocaleDateString('es-AR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '–';
       const partido  = `${p.home||'?'} vs ${p.away||'?'}`;
       const eleccion = pickLabels[p.pick] || p.pick || '–';
-      const apuesta  = p.betAmount ? `G$ ${Number(p.betAmount).toLocaleString('es-AR')}` : '–';
-      const retorno  = p.betAmount && p.odds ? `G$ ${Math.round(p.betAmount * p.odds).toLocaleString('es-AR')}` : '–';
+      const apuesta  = p.betAmount ? ` ${Number(p.betAmount).toLocaleString('es-AR')}` : '–';
+      const retorno  = p.betAmount && p.odds ? ` ${Math.round(p.betAmount * p.odds).toLocaleString('es-AR')}` : '–';
       const cuota    = p.odds ? `x${Number(p.odds).toFixed(2)}` : '–';
       if (!p.evaluated) {
         // Pendiente — mostrar botón de resolución manual
@@ -24031,7 +24001,7 @@ function _admRenderPicksTab(tab) {
           <div style="font-size:0.78rem;font-weight:600;color:#fff">⚽ ${partido}</div>
           <div style="font-size:0.68rem;color:var(--texto-sec);margin-top:3px">
             ${eleccion} · ${cuota} · ${apuesta}
-            <span style="color:${color};font-weight:700;margin-left:4px">${chg >= 0 ? '+' : ''}G$ ${Number(chg).toLocaleString('es-AR')}</span>
+            <span style="color:${color};font-weight:700;margin-left:4px">${chg >= 0 ? '+' : ''} ${Number(chg).toLocaleString('es-AR')}</span>
           </div>
           <div style="font-size:0.62rem;color:var(--texto-sec);margin-top:1px">${fecha}</div>
         </div>
@@ -24069,8 +24039,8 @@ function _admRenderPicksTab(tab) {
           <div style="font-size:0.67rem;color:var(--texto-sec);margin-top:2px">
             <span style="background:rgba(255,255,255,0.07);border-radius:4px;padding:1px 5px;color:#fff">${p.rec||'–'}</span>
             ${p.odds?`x${parseFloat(p.odds).toFixed(2)}`:''}
-            ${p.stake?`· G$ ${Number(p.stake).toLocaleString('es-AR')}`:''}
-            ${(isWin||isLoss)&&p.pl!=null?`<span style="color:${rColor(p.result)};font-weight:700;margin-left:3px">${isWin?'+':''}G$ ${Number(p.pl).toLocaleString('es-AR')}</span>`:''}
+            ${p.stake?`·  ${Number(p.stake).toLocaleString('es-AR')}`:''}
+            ${(isWin||isLoss)&&p.pl!=null?`<span style="color:${rColor(p.result)};font-weight:700;margin-left:3px">${isWin?'+':''} ${Number(p.pl).toLocaleString('es-AR')}</span>`:''}
             · ${fecha}
           </div>
         </div>
@@ -24080,7 +24050,7 @@ function _admRenderPicksTab(tab) {
   }
 }
 
-// Forzar resolución de un G$ pick pendiente (admin)
+// Forzar resolución de un  pick pendiente (admin)
 async function admForceGPick(email, pickIdx, outcome) {
   if (!_admPicksData) return;
   const picks = [...(_admPicksData.picks || [])].sort((a,b)=>(b.ts||0)-(a.ts||0));
@@ -24138,7 +24108,7 @@ async function admForceGPick(email, pickIdx, outcome) {
 
     // Toast de confirmación
     const msg = correct
-      ? `✅ Acreditados G$ ${returnAmt.toLocaleString('es-AR')} a ${email}`
+      ? `✅ Acreditados  ${returnAmt.toLocaleString('es-AR')} a ${email}`
       : `❌ Pick marcado como perdido para ${email}`;
     document.getElementById('admPicksStats').insertAdjacentHTML('beforebegin',
       `<div id="_admForceMsg" style="background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.4);color:var(--verde);padding:10px 14px;border-radius:10px;font-size:0.82rem;font-weight:700;margin-bottom:12px">${msg}</div>`);
@@ -24166,7 +24136,7 @@ async function admForceGPick(email, pickIdx, outcome) {
     <div id="admPicksTabs" style="display:flex;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:14px">
       <button data-tab="gpicks" onclick="admPicksTab('gpicks')" class="adm-tab-active"
         style="flex:1;padding:9px 6px;background:transparent;border:none;color:#fff;font-size:0.78rem;font-weight:700;cursor:pointer;border-bottom:2px solid var(--verde)">
-        🪙 G$ Apuestas
+        🪙  Apuestas
       </button>
       <button data-tab="pronosticos" onclick="admPicksTab('pronosticos')"
         style="flex:1;padding:9px 6px;background:transparent;border:none;color:var(--texto-sec);font-size:0.78rem;font-weight:700;cursor:pointer;border-bottom:2px solid transparent">
@@ -24861,7 +24831,6 @@ function _fpPostEl(p, isReply) {
     if (p.image_url) contentHtml += `<div class="fp-post-img"><img src="${p.image_url}" alt="img" loading="lazy" onclick="window.open('${p.image_url}','_blank')"></div>`;
     if (p.bet_data) {
       const bd = p.bet_data;
-      contentHtml += `<div class="fp-bet-chip">🪙 <b>${bd.betAmount||'?'} G$</b> · ${bd.pick||'?'} (${bd.odds||'?'})</div>`;
     }
   }
 
@@ -24995,7 +24964,7 @@ function _fpFormHtml() {
       <textarea class="fp-input" id="fpTextarea" placeholder="Comentar... (podés usar emojis 🎯)" rows="2"></textarea>
       <div class="fp-form-actions">
         <button class="fp-act-btn" onclick="forumUploadImage()" title="Adjuntar imagen">📷</button>
-        <button class="fp-act-btn" onclick="forumShareBet()" title="Compartir pronóstico G$">🪙</button>
+        <button class="fp-act-btn" onclick="forumShareBet()" title="Compartir pronóstico ">🪙</button>
         <button class="fp-act-btn" onclick="fpShowEmoji(null)" title="Emojis">😊</button>
         <button class="fp-send-btn" style="margin-left:auto" onclick="forumSubmitPost()">Enviar ➤</button>
       </div>
@@ -25191,7 +25160,7 @@ window.forumShareBet = function() {
   window._fpPendingBet = lastBet;
   const ta = $('fpTextarea');
   if (ta) ta.value = (ta.value ? ta.value + ' ' : '') +
-    `🪙 Aposté ${lastBet.betAmount||'?'} G$ en "${lastBet.pick||'?'}"`;
+    `🪙 Aposté ${lastBet.betAmount||'?'}  en "${lastBet.pick||'?'}"`;
 };
 
 /* ── Realtime subscription ── */
