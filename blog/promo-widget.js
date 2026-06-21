@@ -1,6 +1,8 @@
 /* gambeta.ai — widget de promo SOLO en /blog/.
    Diseño SEO-safe: tarjeta anclada en esquina, NO tapa el contenido, NO bloquea scroll,
-   sin backdrop. Solo se minimiza (no se cierra). Secuencia temporizada con persistencia.
+   sin backdrop. Solo se minimiza (no se cierra). Secuencia de 3 tarjetas.
+   Avance: al CAMBIAR de página dispara la siguiente al instante; si el visitante se queda
+   en la misma nota, igual avanza 2 min después de minimizar (respaldo).
    Cualquier error es silencioso y no afecta la página. */
 (function () {
   try {
@@ -8,9 +10,10 @@
     if (location.pathname.indexOf('/blog/img/') === 0) return;  // no en imágenes
     if (window.__gbPromo) return; window.__gbPromo = true;
 
-    var GAP = 120000;            // 2 minutos entre pop-ups
-    var FIRST_DELAY = 4000;      // 4s antes del primero (UX/SEO)
-    var KEY = 'gbPromoV1';
+    var GAP = 120000;            // respaldo: 2 min tras minimizar (si no navega)
+    var FIRST_DELAY = 4000;      // 4s antes del primero
+    var NAV_DELAY = 1200;        // al cambiar de página, casi inmediato
+    var KEY = 'gbPromoV2';
     var ORDER = ['picks', 'tg', 'db'];
     var DATA = {
       picks: {
@@ -36,11 +39,16 @@
     function read() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } }
     function write(s) { try { localStorage.setItem(KEY, JSON.stringify(s)); } catch (e) {} }
     var st = read();
-    st.state = st.state || {};   // key -> 'hidden' | 'open' | 'min'
-    st.minAt = st.minAt || {};   // key -> timestamp del minimizado
+    st.stage = st.stage || 0;    // cuántas tarjetas se mostraron (0..3)
+    st.state = st.state || {};   // key -> 'open' | 'min'
+    st.minAt = st.minAt || {};   // key -> ts de minimizado
     ORDER.forEach(function (k) { if (!st.state[k]) st.state[k] = 'hidden'; });
 
-    // ---- estilos (una sola vez) ----
+    var changedPage = !!(st.lastPath && st.lastPath !== location.pathname);
+    st.lastPath = location.pathname;
+    write(st);
+
+    // ---- estilos ----
     var css = document.createElement('style');
     css.textContent =
       '#gbPromo{position:fixed;right:16px;bottom:16px;z-index:99990;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:330px;pointer-events:none}' +
@@ -69,10 +77,10 @@
     document.body.appendChild(wrap);
 
     var timer = null;
+    function setTimer(fn, ms) { if (timer) clearTimeout(timer); timer = setTimeout(fn, ms); }
 
     function render() {
       wrap.innerHTML = '';
-      // tarjeta expandida (solo una a la vez)
       var openKey = ORDER.filter(function (k) { return st.state[k] === 'open'; }).pop();
       if (openKey) {
         var d = DATA[openKey];
@@ -86,55 +94,64 @@
           (d.note ? '<p class="gb-note">' + d.note + '</p>' : '') + '</div>';
         card.querySelector('.gb-min').addEventListener('click', function () { minimize(openKey); });
         card.querySelector('.gb-cta').addEventListener('click', function () {
-          if (d.href.charAt(0) === '/') { return; } // navegación interna normal
+          if (d.href.charAt(0) === '/') return;            // navegación interna normal
           window.open(d.href, '_blank', 'noopener');
-          // tras hacer click, lo dejamos minimizado
           setTimeout(function () { minimize(openKey); }, 50);
         });
         wrap.appendChild(card);
       }
-      // pills minimizados (acumulados)
       var mins = ORDER.filter(function (k) { return st.state[k] === 'min'; });
       if (mins.length) {
         var pills = document.createElement('div'); pills.className = 'gb-pills';
         mins.forEach(function (k) {
           var d = DATA[k];
           var p = document.createElement('button'); p.className = 'gb-pill';
-          p.innerHTML = '<span class="gb-dot" style="background:' + d.accent + '"></span>' + d.icon + ' ' + shortLabel(k);
-          p.addEventListener('click', function () { open(k); });
+          p.innerHTML = '<span class="gb-dot" style="background:' + d.accent + '"></span>' + d.icon + ' ' + label(k);
+          p.addEventListener('click', function () { reopen(k); });
           pills.appendChild(p);
         });
         wrap.appendChild(pills);
       }
     }
+    function label(k) { return k === 'picks' ? 'Picks IA' : k === 'tg' ? 'Telegram' : 'Bono'; }
 
-    function shortLabel(k) { return k === 'picks' ? 'Picks IA' : k === 'tg' ? 'Telegram' : 'Bono'; }
-
-    function open(k) {
-      ORDER.forEach(function (o) { if (o !== k && st.state[o] === 'open') { st.state[o] = 'min'; if (!st.minAt[o]) st.minAt[o] = Date.now(); } });
+    // abre una tarjeta minimizando (en silencio) cualquier otra abierta
+    function openCard(k) {
+      ORDER.forEach(function (o) {
+        if (o !== k && st.state[o] === 'open') { st.state[o] = 'min'; if (!st.minAt[o]) st.minAt[o] = Date.now(); }
+      });
       st.state[k] = 'open'; write(st); render();
     }
+    // muestra la próxima tarjeta de la secuencia
+    function showNext() {
+      var key = ORDER[st.stage];
+      if (!key) return;
+      openCard(key);
+      st.stage++; write(st);
+    }
+    // click del usuario en "—" : colapsa y arma el respaldo de 2 min para la siguiente
     function minimize(k) {
-      st.state[k] = 'min'; st.minAt[k] = Date.now(); write(st); render(); schedule();
+      st.state[k] = 'min'; st.minAt[k] = Date.now(); write(st); render();
+      if (st.stage < ORDER.length) setTimer(showNext, GAP);
     }
-
-    function schedule() {
-      if (timer) { clearTimeout(timer); timer = null; }
-      // próximo a abrir: primer 'hidden' cuyo predecesor esté 'min'
-      for (var i = 0; i < ORDER.length; i++) {
-        var k = ORDER[i];
-        if (st.state[k] !== 'hidden') continue;
-        if (i === 0) { timer = setTimeout(function () { open('picks'); schedule(); }, FIRST_DELAY); return; }
-        var prev = ORDER[i - 1];
-        if (st.state[prev] === 'min' && st.minAt[prev]) {
-          var wait = Math.max(0, st.minAt[prev] + GAP - Date.now());
-          (function (key) { timer = setTimeout(function () { open(key); schedule(); }, wait); })(k);
-        }
-        return; // solo programa el primero pendiente
-      }
-    }
+    // reabrir desde un pill
+    function reopen(k) { openCard(k); }
 
     render();
-    schedule();
+
+    // ---- decidir cuándo aparece la próxima ----
+    if (st.stage === 0) {
+      setTimer(showNext, FIRST_DELAY);                 // primera vez: tarjeta 1
+    } else if (st.stage < ORDER.length) {
+      if (changedPage) {
+        setTimer(showNext, NAV_DELAY);                 // cambió de página -> dispara ya
+      } else {
+        // misma página (recarga): reconstruye el respaldo si la previa está minimizada
+        var prev = ORDER[st.stage - 1];
+        if (st.state[prev] === 'min' && st.minAt[prev]) {
+          setTimer(showNext, Math.max(0, st.minAt[prev] + GAP - Date.now()));
+        }
+      }
+    }
   } catch (e) { /* silencioso */ }
 })();
