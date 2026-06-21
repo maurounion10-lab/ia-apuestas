@@ -2127,8 +2127,23 @@
     .pred-dbbet-1click .db-msg-single { font-size: 0.78rem; }
   }
 
-  .pred-saber-mas { display:inline-block; margin-left:10px; padding:3px 10px; background:rgba(0,200,83,0.12); border:1px solid rgba(0,200,83,0.35); border-radius:6px; font-size:0.72rem; font-weight:800; color:#00e676; letter-spacing:0.3px; text-decoration:none; vertical-align:middle; transition:all .15s; white-space:nowrap }
-  .pred-saber-mas:hover { background:rgba(0,200,83,0.22); border-color:rgba(0,200,83,0.6); transform:translateY(-1px); box-shadow:0 2px 8px rgba(0,200,83,0.25) }
+  .pred-saber-mas {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 6px;
+    padding: 3px 0;
+    font-size: 0.74rem; font-weight: 700; color: #66bb6a;
+    text-decoration: none; letter-spacing: 0.2px;
+    border-bottom: 1px dashed rgba(102,187,106,0.45);
+    transition: color .15s, border-color .15s, transform .15s;
+    line-height: 1.2;
+  }
+  .pred-saber-mas .sm-ico { font-size: 0.85rem; opacity: 0.85 }
+  .pred-saber-mas .sm-arrow { transition: transform .15s; display: inline-block }
+  .pred-saber-mas:hover { color: #00e676; border-bottom-color: rgba(0,230,118,0.7) }
+  .pred-saber-mas:hover .sm-arrow { transform: translateX(3px) }
+  @media (max-width: 480px) {
+    .pred-saber-mas { font-size: 0.7rem; margin-top: 4px }
+  }
   .pred-recommendation {
     background: linear-gradient(135deg, rgba(255,215,0,0.10) 0%, rgba(255,170,0,0.06) 100%);
     border: 1px solid rgba(255,215,0,0.32);
@@ -12940,7 +12955,8 @@ function renderPreds() {
       <div class="pred-recommendation">
         <div class="pred-rec-left">
           <div class="pred-rec-label">🤖 Recomendación IA</div>
-          <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '🎯'} ${_recLabel(p.rec, p.home, p.away)}${(()=>{ const _u = buildPickBlogUrl(p); return _u ? `<a href="${_u}" class="pred-saber-mas" title="Leer análisis completo del pick">Saber más →</a>` : ''; })()}</div>
+          <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '🎯'} ${_recLabel(p.rec, p.home, p.away)}</div>
+          ${(()=>{ const _u = buildPickBlogUrl(p); return _u ? `<a href="${_u}" class="pred-saber-mas" title="Leer análisis completo del pick"><span class="sm-ico">📖</span> Análisis completo <span class="sm-arrow">→</span></a>` : ''; })()}
         </div>
         <div class="pred-rec-right">
           ${(()=>{ const _s=_recSideOf(p); const _roRaw = _s==='home' ? (p._hO ? parseFloat(p._hO) : null) : _s==='away' ? (p._aO ? parseFloat(p._aO) : null) : _s==='draw' ? (p._dO ? parseFloat(p._dO) : null) : (p._bestOdds ? parseFloat(p._bestOdds) : null); if (!_roRaw) return ''; const _roShown = isMaxConf ? (_roRaw * 0.95).toFixed(2) : _roRaw.toFixed(2); return `<div class="pred-rec-odds">${_roShown}</div>`; })()}
@@ -16906,8 +16922,40 @@ const teamShortNames = {
   'Seattle Sounders': 'Seattle',
   'Vancouver Whitecaps': 'Vancouver',
 };
+// ── Mapeo de selecciones Mundial 2026: inglés → español (Odds API usa nombres en inglés) ──
+const WC_TEAM_ES_NAMES = {
+  'Belgium': 'Bélgica', 'Spain': 'España', 'France': 'Francia', 'Germany': 'Alemania',
+  'England': 'Inglaterra', 'Portugal': 'Portugal', 'Italy': 'Italia', 'Netherlands': 'Países Bajos',
+  'Switzerland': 'Suiza', 'Austria': 'Austria', 'Croatia': 'Croacia', 'Norway': 'Noruega',
+  'Sweden': 'Suecia', 'Denmark': 'Dinamarca', 'Poland': 'Polonia',
+  'Brazil': 'Brasil', 'Argentina': 'Argentina', 'Uruguay': 'Uruguay', 'Colombia': 'Colombia',
+  'Ecuador': 'Ecuador', 'Paraguay': 'Paraguay', 'Mexico': 'México', 'Canada': 'Canadá',
+  'United States': 'Estados Unidos', 'USA': 'Estados Unidos', 'Costa Rica': 'Costa Rica',
+  'Japan': 'Japón', 'South Korea': 'Corea del Sur', 'Korea Republic': 'Corea del Sur',
+  'Iran': 'Irán', 'Iraq': 'Irak', 'Saudi Arabia': 'Arabia Saudita',
+  'Australia': 'Australia', 'New Zealand': 'Nueva Zelanda', 'Qatar': 'Catar',
+  'Morocco': 'Marruecos', 'Senegal': 'Senegal', 'Algeria': 'Argelia', 'Tunisia': 'Túnez',
+  'Egypt': 'Egipto', 'Ivory Coast': 'Costa de Marfil', "Cote d'Ivoire": 'Costa de Marfil',
+  'Cape Verde': 'Cabo Verde', 'South Africa': 'Sudáfrica', 'DR Congo': 'RD Congo',
+  'Democratic Republic of Congo': 'RD Congo', 'Congo DR': 'RD Congo', 'Ghana': 'Ghana',
+  'Nigeria': 'Nigeria', 'Cameroon': 'Camerún', 'Curacao': 'Curaçao', 'Curaçao': 'Curaçao',
+  'Bosnia and Herzegovina': 'Bosnia', 'Bosnia & Herzegovina': 'Bosnia', 'Bosnia': 'Bosnia',
+  'Czech Republic': 'República Checa', 'Czechia': 'República Checa',
+  'Turkey': 'Turquía', 'Türkiye': 'Turquía', 'Russia': 'Rusia', 'Ukraine': 'Ucrania',
+  'Haiti': 'Haití', 'Scotland': 'Escocia', 'Wales': 'Gales', 'Ireland': 'Irlanda',
+  'Republic of Ireland': 'Irlanda', 'Jordan': 'Jordania', 'Uzbekistan': 'Uzbekistán',
+  'Panama': 'Panamá', 'Honduras': 'Honduras', 'Jamaica': 'Jamaica',
+};
+function translateWcTeam(name) {
+  if (!name) return name;
+  return WC_TEAM_ES_NAMES[name] || WC_TEAM_ES_NAMES[name.trim()] || name;
+}
+
 function shortName(name) {
   if (!name) return '';
+  // Primero traducir si es una selección WC con nombre en inglés
+  const _trans = translateWcTeam(name);
+  if (_trans !== name) name = _trans;
   if (teamShortNames[name]) return teamShortNames[name];
   // Si el nombre tiene "…" al final (truncado al guardarse), buscar en el mapa por prefijo
   if (name.endsWith('…') || name.endsWith('...')) {
