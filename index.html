@@ -9902,6 +9902,16 @@ const WC2026_RESULTS_BY_ID = {
   'wc2026_f1_bra_mar_13jun': { homeScore: 1, awayScore: 1 },
 };
 function resolveWcLocal(pick) {
+  // 🛡️ DEFENSA: si el partido aún no se jugó (commenceTs futuro - 4h), NUNCA puede estar resuelto
+  if (pick && pick._sportKey === 'soccer_fifa_world_cup' && pick.commenceTs) {
+    const nowSafe = Date.now();
+    const ended = pick.commenceTs + (4 * 60 * 60 * 1000); // 4h después del kick-off
+    if (nowSafe < ended && pick.result && pick.result !== 'pending' && pick.result !== 'void') {
+      // FORZAR a pending — alguien lo marcó como win/loss antes de tiempo (BUG)
+      console.warn('[WC] Pick marcado como', pick.result, 'pero no se jugó. Forzando a pending:', pick.home, 'vs', pick.away);
+      pick = { ...pick, result: 'pending', pl: 0, marcador: '', homeScore: undefined, awayScore: undefined };
+    }
+  }
   if (!pick || pick.result !== 'pending') return pick;
   if (!(pick.league || '').includes('Mundial') && pick._sportKey !== 'soccer_fifa_world_cup') return pick;
   // Primero intentar por ID legacy
