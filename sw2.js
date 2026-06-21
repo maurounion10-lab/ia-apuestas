@@ -1,5 +1,5 @@
 // gambeta.ai — Service Worker v1.8
-const CACHE_NAME = 'gambeta2-v10';
+const CACHE_NAME = 'gambeta2-v11';
 // NO cacheamos HTML — siempre se pide a la red para que los deploys sean inmediatos
 const STATIC_ASSETS = [
   '/manifest.json',
@@ -37,9 +37,12 @@ self.addEventListener('fetch', event => {
   const isBypass =
     url.hostname.includes('supabase.co') ||
     url.hostname.includes('workers.dev') ||
+    url.hostname.includes('accesoia.app') ||
     url.hostname.includes('api-sports.io') ||
     url.hostname.includes('thesportsdb.com') ||
     url.hostname.includes('espncdn.com') ||
+    url.hostname.includes('the-odds-api.com') ||
+    url.hostname.includes('cloudfunctions.net') ||
     url.pathname.startsWith('/api/');
 
   if (isBypass) {
