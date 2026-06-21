@@ -9848,6 +9848,22 @@ const WC2026_KNOWN_RESULTS = {
   'wc2026_2026-06-13_Suiza_Catar': { homeScore: 1, awayScore: 1 },
   'wc2026_2026-06-13_Haití_Escocia': { homeScore: 0, awayScore: 1 },
   'wc2026_2026-06-13_Haiti_Escocia': { homeScore: 0, awayScore: 1 },
+  // 14-jun
+  'wc2026_2026-06-14_Alemania_Curaçao': { homeScore: 7, awayScore: 1 },
+  'wc2026_2026-06-14_Alemania_Curazao': { homeScore: 7, awayScore: 1 },
+  'wc2026_2026-06-14_Países Bajos_Japón': { homeScore: 2, awayScore: 2 },
+  'wc2026_2026-06-14_Paises Bajos_Japon': { homeScore: 2, awayScore: 2 },
+  // 15-jun
+  'wc2026_2026-06-15_Bélgica_Egipto': { homeScore: 1, awayScore: 1 },
+  'wc2026_2026-06-15_Belgica_Egipto': { homeScore: 1, awayScore: 1 },
+  'wc2026_2026-06-15_España_Cabo Verde': { homeScore: 0, awayScore: 0 },
+  'wc2026_2026-06-15_Espana_Cabo Verde': { homeScore: 0, awayScore: 0 },
+  // 16-jun
+  'wc2026_2026-06-16_Francia_Senegal': { homeScore: 3, awayScore: 1 },
+  'wc2026_2026-06-16_Argentina_Argelia': { homeScore: 3, awayScore: 0 },
+  // 17-jun
+  'wc2026_2026-06-17_Portugal_RD Congo': { homeScore: 1, awayScore: 1 },
+  'wc2026_2026-06-17_Inglaterra_Croacia': { homeScore: 4, awayScore: 2 },
 };
 
 // Helper: resolver pick WC contra resultados conocidos
@@ -9900,6 +9916,18 @@ const WC2026_RESULTS_BY_ID = {
   'wc2026_d1_usa_par_12jun': { homeScore: 4, awayScore: 1 },
   'wc2026_c1_usa_par_12jun': { homeScore: 4, awayScore: 1 }, // alias por si cambia
   'wc2026_f1_bra_mar_13jun': { homeScore: 1, awayScore: 1 },
+  // 14-jun
+  'wc2026_e1_ale_cur_14jun': { homeScore: 7, awayScore: 1 },
+  'wc2026_f1_ned_jpn_14jun': { homeScore: 2, awayScore: 2 },
+  // 15-jun
+  'wc2026_g1_bel_egy_15jun': { homeScore: 1, awayScore: 1 },
+  'wc2026_h1_esp_cv_15jun': { homeScore: 0, awayScore: 0 },
+  // 16-jun
+  'wc2026_i1_fra_sen_16jun': { homeScore: 3, awayScore: 1 },
+  'wc2026_j1_arg_alg_16jun': { homeScore: 3, awayScore: 0 },
+  // 17-jun
+  'wc2026_k1_por_cod_17jun': { homeScore: 1, awayScore: 1 },
+  'wc2026_l1_eng_cro_17jun': { homeScore: 4, awayScore: 2 },
 };
 function resolveWcLocal(pick) {
   // 🛡️ DEFENSA: si el partido aún no se jugó (commenceTs futuro - 4h), NUNCA puede estar resuelto
