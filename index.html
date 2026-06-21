@@ -2127,6 +2127,8 @@
     .pred-dbbet-1click .db-msg-single { font-size: 0.78rem; }
   }
 
+  .pred-saber-mas { display:inline-block; margin-left:10px; padding:3px 10px; background:rgba(0,200,83,0.12); border:1px solid rgba(0,200,83,0.35); border-radius:6px; font-size:0.72rem; font-weight:800; color:#00e676; letter-spacing:0.3px; text-decoration:none; vertical-align:middle; transition:all .15s; white-space:nowrap }
+  .pred-saber-mas:hover { background:rgba(0,200,83,0.22); border-color:rgba(0,200,83,0.6); transform:translateY(-1px); box-shadow:0 2px 8px rgba(0,200,83,0.25) }
   .pred-recommendation {
     background: linear-gradient(135deg, rgba(255,215,0,0.10) 0%, rgba(255,170,0,0.06) 100%);
     border: 1px solid rgba(255,215,0,0.32);
@@ -12938,7 +12940,7 @@ function renderPreds() {
       <div class="pred-recommendation">
         <div class="pred-rec-left">
           <div class="pred-rec-label">🤖 Recomendación IA</div>
-          <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '🎯'} ${_recLabel(p.rec, p.home, p.away)}</div>
+          <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '🎯'} ${_recLabel(p.rec, p.home, p.away)}${(()=>{ const _u = buildPickBlogUrl(p); return _u ? `<a href="${_u}" class="pred-saber-mas" title="Leer análisis completo del pick">Saber más →</a>` : ''; })()}</div>
         </div>
         <div class="pred-rec-right">
           ${(()=>{ const _s=_recSideOf(p); const _roRaw = _s==='home' ? (p._hO ? parseFloat(p._hO) : null) : _s==='away' ? (p._aO ? parseFloat(p._aO) : null) : _s==='draw' ? (p._dO ? parseFloat(p._dO) : null) : (p._bestOdds ? parseFloat(p._bestOdds) : null); if (!_roRaw) return ''; const _roShown = isMaxConf ? (_roRaw * 0.95).toFixed(2) : _roRaw.toFixed(2); return `<div class="pred-rec-odds">${_roShown}</div>`; })()}
@@ -16439,6 +16441,31 @@ function closeModal() { document.getElementById('analysisModal').classList.remov
 document.addEventListener('keydown', e => { if(e.key==='Escape') closeModal(); });
 
 // ── Scroll al pred-card de la estrella del finde ──
+// ── Slug + URL del artículo del blog para cada pick ──
+function _slugifyTeam(s) {
+  if (!s) return '';
+  return s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase().replace(/^-|-$/g, '');
+}
+function buildPickBlogUrl(pick) {
+  if (!pick || !pick.home || !pick.away) return null;
+  let dm = '';
+  if (pick.commenceTs) {
+    const d = new Date(pick.commenceTs);
+    const dd = String(d.getUTCDate()).padStart(2,'0');
+    const mm = String(d.getUTCMonth()+1).padStart(2,'0');
+    dm = dd + '-' + mm;
+  } else if (pick.date) {
+    const d = new Date(pick.date);
+    const dd = String(d.getUTCDate()).padStart(2,'0');
+    const mm = String(d.getUTCMonth()+1).padStart(2,'0');
+    dm = dd + '-' + mm;
+  }
+  if (!dm) return null;
+  const slug = 'pronostico-' + _slugifyTeam(pick.home) + '-' + _slugifyTeam(pick.away) + '-' + dm;
+  return '/blog/' + slug;
+}
+
 function scrollToPickCard(home, away) {
   // Si estamos en home, navegar vía hash a picks (así gbGoHome siempre funciona)
   if (document.body.dataset.gbpage !== 'picks') {
