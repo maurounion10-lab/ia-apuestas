@@ -11420,6 +11420,31 @@ function renderPreds() {
   const _cachedPreds = loadDailyPredsCache(); // siempre leer caché para preservar conf bloqueadas
   realPreds = (window._rawOddsGames && window._rawOddsGames.length) ? null : _cachedPreds;
 
+  // 🏆 FALLBACK MUNDIAL: si no llegan odds Mundial vía Odds API (frecuente porque The Odds API no devuelve WC2026),
+  // levantar los picks Mundial pending desde el historial Supabase y agregarlos como fichas.
+  if (Array.isArray(window._sbHist) && window._sbHist.length) {
+    const _wcPendings = window._sbHist.filter(p =>
+      p &&
+      (p._sportKey === 'soccer_fifa_world_cup' || (p.league||'').includes('Mundial')) &&
+      (!p.result || p.result === 'pending') &&
+      p.commenceTs && p.commenceTs > Date.now() - 4*60*60*1000  // que no haya terminado hace más de 4h
+    );
+    if (_wcPendings.length) {
+      // Mergear evitando duplicados por id o por (home+away+date)
+      const existingIds = new Set((realPreds||[]).map(p => p.id).filter(Boolean));
+      const existingKeys = new Set((realPreds||[]).map(p => (p.home||'')+'|'+(p.away||'')+'|'+(p.date||'').slice(0,10)));
+      const toAdd = _wcPendings.filter(p => {
+        if (p.id && existingIds.has(p.id)) return false;
+        const k = (p.home||'')+'|'+(p.away||'')+'|'+(p.date||'').slice(0,10);
+        return !existingKeys.has(k);
+      });
+      if (toAdd.length) {
+        realPreds = [...toAdd, ...(realPreds||[])];
+        console.log('[WC fallback] Agregados', toAdd.length, 'picks Mundial pending desde el historial Supabase como fichas');
+      }
+    }
+  }
+
   // Guardar partidos ya iniciados ANTES de cualquier invalidación para no perderlos
   const _nowMs = Date.now();
   const _BKEYS_PS = ['soccer_chile_campeonato', 'soccer_portugal_primeira_liga'];
@@ -17874,7 +17899,10 @@ setTimeout(drawBankrollChart, 100);
     const _localOnlyFinal = keepLocal ? _localOnlyG : [];
     const _mergedG = [...g, ..._localOnlyFinal].sort((a,b)=>(b.commenceTs||0)-(a.commenceTs||0)).slice(0,1000000);
     try { localStorage.setItem(HIST_KEY, JSON.stringify(_mergedG)); } catch {}
+    window._sbHist = _mergedG;  // ← expuesto para que buildPredsFromOdds pueda levantar WC pending
     renderHistorial(histFilter);
+    // Re-disparar buildPredsFromOdds para que las fichas WC se levanten desde el historial
+    try { if (typeof renderPreds === 'function') renderPreds(); } catch(e){}
     console.log('[globalHist] ✓ Cargado desde Supabase:', g.length, 'globales +', _localOnlyFinal.length, 'locales =', _mergedG.length, 'total (keepLocal='+keepLocal+')');
   } else if (_localImmediate.length === 0) {
     // Proxy falló y localStorage vacío: re-renderizar igual para limpiar el estado de carga
