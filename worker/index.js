@@ -1329,7 +1329,7 @@ async function runOddsUpdater(env) {
     for (const cat of cats) {
       try {
         const leagues = cat === 'main' ? LEAGUES_MAIN : cat === 'europe' ? LEAGUES_EUROPE : LEAGUES_SECONDARY;
-        const cacheKey = `odds9_${cat}_${new Date().toISOString().slice(0, 13)}`;
+        const cacheKey = `odds10_${cat}_${new Date().toISOString().slice(0, 13)}`;
         const r = await cached(env, cacheKey, 3600, () => getLeagueData(env, leagues));
         allOdds.push(...(r.data || []));
       } catch (e) {
@@ -2093,7 +2093,7 @@ export default {
     if (path === '/odds') {
       const category = url.searchParams.get('category') || 'main';
       const hourKey  = new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
-      const cacheKey = `odds9_${category}_${hourKey}`;  // v9: incluye _round/_stage para detectar finales
+      const cacheKey = `odds10_${category}_${hourKey}`;  // v9: incluye _round/_stage para detectar finales
 
       const leagues = category === 'europe'    ? LEAGUES_EUROPE
                     : category === 'secondary' ? LEAGUES_SECONDARY
