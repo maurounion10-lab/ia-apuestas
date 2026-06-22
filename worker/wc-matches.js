@@ -3,6 +3,11 @@
 //
 // Calendario oficial Mundial 2026 (sorteo FIFA 5-dic-2025, Washington DC).
 // Picks regulares (no outright) para los primeros 7 días del Mundial.
+//
+// ⚠️  REGLA (22-jun-2026 — Mauro): NO agregar picks con cuota ≤ 1.20.
+//     Las cuotas ≤ 1.20 no rinden — el publisher (worker/index.js → runWcMatchesPublisher)
+//     las filtra automáticamente y loguea SKIP. Los ya publicados quedan intactos.
+//     Cuota mínima: 1.21.
 // ─────────────────────────────────────────────────────────────────────────────
 
 export const WC_MATCHES_PUBLISH_TS = Date.UTC(2026, 5, 9, 0, 0, 0); // publicación inmediata

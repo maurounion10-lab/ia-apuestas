@@ -1720,7 +1720,18 @@ async function runWcMatchesPublisher(env) {
       return stats;
     }
     const existingIds = new Set(hist.map(p => p && p.id).filter(Boolean));
-    const toAdd = WC_MATCHES.filter(p => !existingIds.has(p.id));
+    // 🆕 (22-jun-2026 — Mauro) Cuotas ≤ 1.20 no rinden: rechazar picks nuevos con cuota basura.
+    //    Los ya publicados (en existingIds) quedan intactos por la condición !existingIds.has(p.id).
+    const MIN_PICK_ODDS = 1.21;
+    const toAdd = WC_MATCHES.filter(p => {
+      if (existingIds.has(p.id)) return false;
+      const o = parseFloat(p.odds);
+      if (Number.isFinite(o) && o <= 1.20) {
+        console.warn(`[wc-publisher] SKIP ${p.id} — cuota ${o} ≤ 1.20 (regla MIN_PICK_ODDS=${MIN_PICK_ODDS})`);
+        return false;
+      }
+      return true;
+    });
     stats.alreadyPublished = WC_MATCHES.length - toAdd.length;
     if (toAdd.length === 0) {
       stats.skip = 'todos los WC matches ya están en el historial';
