@@ -15790,19 +15790,19 @@ function renderHistorial(filter) {
     const tsB = b.commenceTs || 0;
     const aPend = a.result === 'pending';
     const bPend = b.result === 'pending';
-    // Categorías (menor = más arriba)
+    // Categorías (menor = más arriba) — Mauro 23-jun: pendientes próximos PRIMERO
     const cat = (pend, ts) => {
-      if (!pend) {
-        return (NOW - ts) <= D14 ? 0 : 2;   // resuelto reciente=0, resuelto viejo=2
+      if (pend) {
+        return (ts - NOW) <= D14 ? 0 : 3;   // pendiente próximo=0 (arriba), future lejano=3
       }
-      return (ts - NOW) <= D14 ? 1 : 3;     // pendiente próximo=1, future lejano=3
+      return (NOW - ts) <= D14 ? 1 : 2;     // resuelto reciente=1, resuelto viejo=2
     };
     const ca = cat(aPend, tsA);
     const cb = cat(bPend, tsB);
     if (ca !== cb) return ca - cb;
     // Dentro de cada categoría:
-    if (ca === 0 || ca === 2) return tsB - tsA;   // resueltos: más reciente arriba
-    return tsA - tsB;                              // pendientes: más próximo arriba
+    if (ca === 0 || ca === 3) return tsA - tsB;   // pendientes: más próximo arriba
+    return tsB - tsA;                              // resueltos: más reciente arriba
   });
 
   // Filtro por fecha
