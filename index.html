@@ -15730,15 +15730,31 @@ function renderHistorial(filter) {
   const _useFilter = _validSports.has(filter) ? filter : 'all';
   let data = _useFilter === 'all' ? dedupedAll2 : dedupedAll2.filter(h => (h.sport || 'futbol') === _useFilter);
 
-  // ── Ordenar: pendientes primero (más próximo antes), luego resueltos (más reciente antes) ──
+  // ── Ordenar para UX correcta de página Resultados (Mauro 23-jun-2026): ──
+  //   1. RESUELTOS RECIENTES arriba (últimos 14 días) — lo que la gente entra a ver
+  //   2. PENDIENTES PRÓXIMOS al medio (próximos 14 días) — picks por jugarse
+  //   3. RESUELTOS VIEJOS después
+  //   4. FUTURES LEJANOS al fondo (>14 días, ej. 'México gana Grupo A')
   data.sort((a, b) => {
-    const pendA = a.result === 'pending' ? 0 : 1;
-    const pendB = b.result === 'pending' ? 0 : 1;
-    if (pendA !== pendB) return pendA - pendB;        // pendientes primero
+    const NOW = Date.now();
+    const D14 = 14 * 24 * 60 * 60 * 1000;
     const tsA = a.commenceTs || 0;
     const tsB = b.commenceTs || 0;
-    if (a.result === 'pending') return tsB - tsA;     // entre pendientes: más lejano primero
-    return tsB - tsA;                                 // entre resueltos: más reciente primero
+    const aPend = a.result === 'pending';
+    const bPend = b.result === 'pending';
+    // Categorías (menor = más arriba)
+    const cat = (pend, ts) => {
+      if (!pend) {
+        return (NOW - ts) <= D14 ? 0 : 2;   // resuelto reciente=0, resuelto viejo=2
+      }
+      return (ts - NOW) <= D14 ? 1 : 3;     // pendiente próximo=1, future lejano=3
+    };
+    const ca = cat(aPend, tsA);
+    const cb = cat(bPend, tsB);
+    if (ca !== cb) return ca - cb;
+    // Dentro de cada categoría:
+    if (ca === 0 || ca === 2) return tsB - tsA;   // resueltos: más reciente arriba
+    return tsA - tsB;                              // pendientes: más próximo arriba
   });
 
   // Filtro por fecha
