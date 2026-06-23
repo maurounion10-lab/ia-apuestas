@@ -6183,7 +6183,9 @@ window.toggleHeroBubble = function(n) {
       <button class="sport-tab"        data-league="scotland"     style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('scotland',this)">🏴󠁧󠁢󠁳󠁣󠁴󠁿 Escocia</button>
       <button class="sport-tab"        data-league="turkey"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('turkey',this)">🇹🇷 Süper Lig</button>
       <button class="sport-tab"        data-league="arg"          data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('arg',this)">🇦🇷 Argentina</button>
+      <button class="sport-tab"        data-league="argpn"        data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('argpn',this)">🇦🇷 Primera Nacional</button>
       <button class="sport-tab"        data-league="bra"          data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('bra',this)">🇧🇷 Brasil</button>
+      <button class="sport-tab"        data-league="brab"         data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('brab',this)">🇧🇷 Brasileirão B</button>
       <button class="sport-tab"        data-league="sudamericana" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('sudamericana',this)">🌎 Sudamericana</button>
       <button class="sport-tab"        data-league="mexico"       style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('mexico',this)">🇲🇽 Liga MX</button>
       <button class="sport-tab"        data-league="mls"          style="padding:6px 11px;font-size:0.75rem;white-space:nowrap" onclick="filterPredSport('mls',this)">🇺🇸 MLS</button>
@@ -10425,6 +10427,7 @@ function sportKeyToLeague(sk, home, away) {
     if (sk.includes('germany_bundesliga'))                  return '🇩🇪 Bundesliga';
     if (sk.includes('france_ligue_two'))                    return '🇫🇷 Ligue 2';
     if (sk.includes('france_ligue'))                        return '🇫🇷 Ligue 1';
+    if (sk.includes('brazil_serie_b'))                       return '🇧🇷 Brasileirão B';
     if (sk.includes('brazil') || sk.includes('brasileiro')) return '🇧🇷 Brasileirao';
     if (sk.includes('portugal'))                            return '🇵🇹 Liga Portugal';
     if (sk.includes('belgium'))                             return '🇧🇪 Pro League';
@@ -12267,9 +12270,19 @@ function renderPreds() {
     } else if (sf === 'sudamericana') {
       _leagueFilter(['copa_sudamericana']);
     } else if (sf === 'arg') {
-      _leagueFilter(['argentina']);
+      // 🆕 (23-jun-2026) Solo Primera División (no incluye Primera Nacional)
+      _leagueFilter(['argentina_primera_division']);
+    } else if (sf === 'argpn') {
+      // 🆕 (23-jun-2026) Primera Nacional Argentina — tab separado
+      _leagueFilter(['argentina_primera_nacional']);
     } else if (sf === 'bra') {
-      _leagueFilter(['brazil']);
+      // 🆕 (23-jun-2026) Solo Brasileirão Serie A (no incluye Serie B)
+      const _braFn = p => { const sk = p._sportKey||''; return sk.includes('brazil') && !sk.includes('serie_b'); };
+      upcoming = upcoming.filter(_braFn); finished = finished.filter(_braFn);
+      const _braAll = [...upcoming,...finished]; realPreds = _braAll.length ? _braAll : null;
+    } else if (sf === 'brab') {
+      // 🆕 (23-jun-2026) Brasileirão Serie B — tab separado
+      _leagueFilter(['brazil_serie_b']);
     } else if (sf === 'mexico') {
       _leagueFilter(['mexico_ligamx','ligamx']);
     } else if (sf === 'mls') {
