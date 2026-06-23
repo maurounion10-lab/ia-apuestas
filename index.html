@@ -11091,6 +11091,23 @@ function buildPredsFromOdds() {
       }
     } catch (e) { /* league override best-effort */ }
 
+    // 🆕 (23-jun-2026) EMPATE COMO PICK DE VALOR — Mauro pidió empezar a pronosticar empates.
+    //    Override del best si el partido es muy parejo y empate tiene cuota con valor.
+    //    Gates:
+    //      • probH < 48 AND probA < 48 (ningún favorito claro)
+    //      • probD >= 28 (probabilidad real de empate decente)
+    //      • dOP >= 3.00 (cuota empate mínimo, característico de partidos parejos)
+    //      • Valor esperado positivo: probD/100 * dOP >= 1.02 (margen >= 2%)
+    //    Solo cuando best NO sea ya empate, ni override por cup-context.
+    if (best._recSide !== 'draw' && !best._cupOverride && dOP && probD >= 28 && probH < 48 && probA < 48 && dOP >= 3.00) {
+      const _evDraw = (probD / 100) * dOP;
+      if (_evDraw >= 1.02) {
+        // Sustituir best por Empate
+        best = { rec: 'Empate', prob: probD, odds: dOP, _recSide: 'draw', _evOverride: true };
+        console.log(`[draw-pick] Override → Empate (probD=${probD}%, dOP=${dOP}, EV=${_evDraw.toFixed(2)})`);
+      }
+    }
+
     const rec      = best.rec;
     const maxProb  = best.prob || probH;
     const bestOdds = best.odds;
@@ -12760,7 +12777,10 @@ function renderPreds() {
 
   // 🏆 WC_ONLY_MODE — hasta que termine el Mundial (19-jul-2026) mostramos SOLO Mundial.
   // Sacamos picks de otras ligas y picks que se juegan después del Mundial.
-  const WC_ONLY_MODE = true;
+  // 🆕 (23-jun-2026) Mauro pidió empezar a pronosticar Primera Nacional Argentina + empates.
+  //    Desactivamos el filtro WC_ONLY que solo mostraba picks del Mundial.
+  //    Si querés volver a solo Mundial: cambiar a true.
+  const WC_ONLY_MODE = false;
   const WC_END_TS = new Date('2026-07-20T00:00:00-03:00').getTime();
   if (WC_ONLY_MODE) {
     const before = source.length;
