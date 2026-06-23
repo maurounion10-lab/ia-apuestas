@@ -25834,19 +25834,19 @@ setTimeout(_fpBadgeInit, 1200);
 <!-- ─── /Banner sticky VIP Mundial ─── -->
 
 <!-- ═══════════════════════════════════════════════════════════════════════
-  🎁 POPUP STICKY DBBET — Jordania vs Argentina (28-jun-2026)
-  - Aparece a los 5 segundos UNA SOLA VEZ (localStorage)
+  🎁 POPUP STICKY DBBET — Jordania vs Argentina (Sáb 27-jun-2026 · 23:00 ART)
+  - Aparece a los 5 segundos UNA SOLA VEZ por día (localStorage por fecha)
   - NO se puede cerrar, solo MINIMIZAR
-  - Sticky en toda la navegación
-  - 3 estados según fecha:
+  - Minimizado = chip discreto apilado ARRIBA del chat AI (no le tapa)
+  - 3 estados según fecha (zona ART):
       Mar 23 + Mié 24-jun: TEASER (anuncio próximo)
       Jue 25 + Vie 26-jun: DETALLES (tabla freebets)
-      Sáb 27 + Dom 28-jun: HOY ES EL DÍA
+      Sáb 27-jun: HOY JUEGA ARGENTINA · DÍA DE LA FREEBET
 ═══════════════════════════════════════════════════════════════════════ -->
 <style>
-#dbbPromo, #dbbPromoBubble { font-family: 'Segoe UI', system-ui, sans-serif }
+#dbbPromo, #dbbPromoChip { font-family: 'Segoe UI', system-ui, sans-serif }
 #dbbPromo {
-  position: fixed; right: 24px; bottom: 24px; z-index: 99998;
+  position: fixed; right: 24px; bottom: 24px; z-index: 99996;
   width: min(380px, calc(100vw - 32px));
   background: linear-gradient(180deg, #14110a 0%, #1d1407 100%);
   border: 1.5px solid rgba(255,215,0,0.45);
@@ -25886,12 +25886,9 @@ setTimeout(_fpBadgeInit, 1200);
 }
 #dbbPromo .vs img { width: 22px; height: 14px; border-radius: 2px; box-shadow: 0 1px 3px rgba(0,0,0,0.5); object-fit: cover }
 #dbbPromo .vs .vsLbl { color: #FFD700; font-weight: 900; font-size: .78rem }
-#dbbPromo .promoTable {
-  width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: .82rem;
-}
+#dbbPromo .promoTable { width: 100%; border-collapse: collapse; margin: 10px 0 14px; font-size: .82rem }
 #dbbPromo .promoTable td {
-  padding: 6px 9px; border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(0,0,0,0.18);
+  padding: 6px 9px; border: 1px solid rgba(255,255,255,0.10); background: rgba(0,0,0,0.18);
 }
 #dbbPromo .promoTable td:first-child { color: rgba(255,255,255,0.78); font-weight: 600 }
 #dbbPromo .promoTable td:last-child { color: #FFD700; font-weight: 900; text-align: right }
@@ -25911,37 +25908,35 @@ setTimeout(_fpBadgeInit, 1200);
   padding: 2px 8px; border-radius: 4px; font-size: .65rem; letter-spacing: 1px;
   text-transform: uppercase; margin-right: 8px; animation: dbbPulse 1.2s ease-in-out infinite;
 }
-@keyframes dbbPulse {
-  0%, 100% { opacity: 1; transform: scale(1) }
-  50%      { opacity: .7; transform: scale(1.05) }
-}
-/* Burbuja minimizada (clickeable para reabrir) */
-#dbbPromoBubble {
-  position: fixed; right: 24px; bottom: 24px; z-index: 99998;
-  width: 60px; height: 60px; border-radius: 50%;
+@keyframes dbbPulse { 0%,100% { opacity:1; transform:scale(1) } 50% { opacity:.7; transform:scale(1.05) } }
+
+/* ── CHIP MINIMIZADO: arriba del chat AI, discreto, no se impone ── */
+#dbbPromoChip {
+  position: fixed; right: 14px;
+  /* En desktop apila arriba del chat AI launcher (~64px alto + 24px gap = ~95px) */
+  bottom: 95px;
+  z-index: 99996;
+  display: none; align-items: center; gap: 6px;
+  padding: 6px 12px 6px 8px; border-radius: 999px;
   background: linear-gradient(135deg, #c8102e 0%, #8a0b1f 100%);
-  border: 2px solid #FFD700;
-  box-shadow: 0 6px 22px rgba(200,16,46,0.55), 0 0 18px rgba(255,215,0,0.35);
-  display: none; align-items: center; justify-content: center;
-  cursor: pointer; transition: transform .2s;
-  animation: dbbBubblePulse 2s ease-in-out infinite;
+  border: 1px solid rgba(255,215,0,0.55);
+  color: #fff; font-weight: 800; font-size: .72rem; letter-spacing: .3px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.5), 0 0 10px rgba(255,215,0,0.20);
+  cursor: pointer; user-select: none;
+  transition: transform .18s, box-shadow .18s, background .18s;
+  white-space: nowrap;
 }
-#dbbPromoBubble.show { display: flex }
-#dbbPromoBubble:hover { transform: scale(1.08) }
-#dbbPromoBubble .gift { font-size: 1.8rem; filter: drop-shadow(0 0 4px rgba(0,0,0,0.5)) }
-#dbbPromoBubble .badge {
-  position: absolute; top: -4px; right: -4px; background: #FFD700; color: #1a1006;
-  font-weight: 900; font-size: .65rem; min-width: 18px; height: 18px; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
-  border: 2px solid #14110a;
+#dbbPromoChip.show { display: inline-flex }
+#dbbPromoChip:hover {
+  background: linear-gradient(135deg, #e01237 0%, #a30d24 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.6), 0 0 16px rgba(255,215,0,0.35);
 }
-@keyframes dbbBubblePulse {
-  0%, 100% { box-shadow: 0 6px 22px rgba(200,16,46,0.55), 0 0 18px rgba(255,215,0,0.35) }
-  50%      { box-shadow: 0 6px 26px rgba(200,16,46,0.75), 0 0 28px rgba(255,215,0,0.55) }
-}
+#dbbPromoChip .gift { font-size: .95rem; filter: drop-shadow(0 0 3px rgba(0,0,0,0.4)) }
+#dbbPromoChip .star { color: #FFD700; font-weight: 900 }
 @media (max-width: 480px) {
   #dbbPromo { right: 12px; bottom: 12px; width: calc(100vw - 24px) }
-  #dbbPromoBubble { right: 14px; bottom: 14px; width: 52px; height: 52px }
+  #dbbPromoChip { right: 10px; bottom: 82px; font-size: .68rem; padding: 5px 10px 5px 7px }
 }
 </style>
 
@@ -25952,45 +25947,45 @@ setTimeout(_fpBadgeInit, 1200);
   </div>
   <div class="body" id="dbbPromoBody"></div>
 </div>
-<div id="dbbPromoBubble" role="button" aria-label="Reabrir promo DBbet">
+<button id="dbbPromoChip" aria-label="Abrir promo DBbet">
   <span class="gift">🎁</span>
-  <span class="badge">!</span>
-</div>
+  <span><span class="star">★</span> DBbet · <span id="dbbPromoChipLbl">FreeBet</span></span>
+</button>
 
 <script>
 (function(){
-  // Link de afiliado DBbet (mantiene el sponsor + landing principal)
   var DBBET_REF = 'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213';
 
-  // Determinar estado según fecha actual (zona ART = UTC-3)
+  // Determinar estado según fecha (zona ART = UTC-3)
   function getState() {
     var now = new Date();
-    var artMs = now.getTime() - (3 * 60 * 60 * 1000);
-    var art = new Date(artMs);
+    var art = new Date(now.getTime() - (3 * 60 * 60 * 1000));
     var y = art.getUTCFullYear(), m = art.getUTCMonth(), d = art.getUTCDate();
-    // 23-jun (Mar) y 24-jun (Mié) → TEASER
-    if (y === 2026 && m === 5 && (d === 23 || d === 24)) return 'teaser';
-    // 25-jun (Jue) y 26-jun (Vie) → DETAILS
-    if (y === 2026 && m === 5 && (d === 25 || d === 26)) return 'details';
-    // 27-jun (Sáb) y 28-jun (Dom) → HOY
-    if (y === 2026 && m === 5 && (d === 27 || d === 28)) return 'today';
-    // Antes/después → no mostrar
+    if (y !== 2026 || m !== 5) return 'off';
+    // Mar 23 + Mié 24 → TEASER
+    if (d === 23 || d === 24) return 'teaser';
+    // Jue 25 + Vie 26 → DETAILS
+    if (d === 25 || d === 26) return 'details';
+    // Sáb 27 → HOY ES EL DÍA (partido 23:00 ART)
+    if (d === 27) return 'today';
     return 'off';
   }
 
   var STATE_TEMPLATES = {
     teaser: {
       tag: 'PRÓXIMA PROMO',
+      chip: 'Promo SÁB',
       title: '🎁 Se viene una GRAN promo para Jordania vs Argentina',
-      body: '<p class="subtitle">DBbet va a regalar <strong style="color:#FFD700">FreeBets</strong> para el partido del domingo 28 de junio. Andá registrándote con el link oficial Gambeta — los freebets son solo para usuarios verificados.</p>'
+      body: '<p class="subtitle">DBbet va a regalar <strong style="color:#FFD700">FreeBets</strong> para el partido del <strong>sábado 27 de junio a las 23:00 ART</strong>. Andá registrándote con el link oficial Gambeta — los freebets son solo para usuarios verificados.</p>'
           + '<div class="vs"><img src="https://flagcdn.com/h60/jo.png" alt="Jordania"><span>Jordania</span><span class="vsLbl">VS</span><span>Argentina</span><img src="https://flagcdn.com/h60/ar.png" alt="Argentina"></div>',
       cta: '🎯 Registrarme en DBbet',
-      foot: 'Cuanto antes te registres + verifiques cuenta y teléfono, más fácil que entres a la promo del finde.'
+      foot: 'Cuanto antes te registres + verifiques cuenta y teléfono, más fácil que entres a la promo del sábado.'
     },
     details: {
       tag: 'PROMO ACTIVA · LISTA',
+      chip: 'FreeBet SÁB',
       title: '🎁 FreeBet DBbet: hasta $100 USD',
-      body: '<p class="subtitle">Para el partido <strong>Jordania vs Argentina (Dom 28/6)</strong>. Hacé tu depósito el <strong style="color:#FFD700">28-jun</strong> y recibís FreeBet acreditada el 29-jun:</p>'
+      body: '<p class="subtitle">Para el partido <strong>Jordania vs Argentina (Sáb 27/6 · 23:00 ART)</strong>. Hacé tu depósito el <strong style="color:#FFD700">sábado 27</strong> y recibís FreeBet:</p>'
           + '<table class="promoTable"><tbody>'
           + '<tr><td>Depositás $20</td><td>→ $10 FreeBet</td></tr>'
           + '<tr><td>Depositás $50</td><td>→ $25 FreeBet</td></tr>'
@@ -25998,14 +25993,15 @@ setTimeout(_fpBadgeInit, 1200);
           + '<tr><td>Depositás $200</td><td>→ $100 FreeBet</td></tr>'
           + '</tbody></table>'
           + '<div class="vs"><img src="https://flagcdn.com/h60/jo.png" alt="Jordania"><span>Jordania</span><span class="vsLbl">VS</span><span>Argentina</span><img src="https://flagcdn.com/h60/ar.png" alt="Argentina"></div>'
-          + '<div class="fine">Solo para 2do depósito o posteriores · Cuenta verificada (email + teléfono) · 1 vez por usuario · FreeBet válida solo para múltiples de 3+ partidos con cuota mín 1.50 c/u · Solo mercados Gana Local (P1) o Gana Visitante (P2) · Promo válida 7 días.</div>',
+          + '<div class="fine">Solo 2do depósito o posteriores · Cuenta verificada (email + teléfono) · 1 vez por usuario · FreeBet válida solo para combinada de 3+ partidos con cuota mín 1.50 c/u · Solo mercados Gana Local (P1) o Gana Visitante (P2) · Promo válida 7 días.</div>',
       cta: '🎯 Activar promo en DBbet',
-      foot: 'Promoción oficial DBbet · Acreditación 29-jun-2026'
+      foot: 'Promoción oficial DBbet · Acreditación al día siguiente'
     },
     today: {
       tag: 'HOY ES EL DÍA',
-      title: '⚡ HOY JUEGA ARGENTINA · DÍA DE FREEBET',
-      body: '<p class="subtitle"><span class="liveBadge">🔥 HOY</span>Depositá HOY 28-jun en DBbet y te devuelven hasta <strong style="color:#FFD700">$100 USD en FreeBet</strong> para apostar Jordania vs Argentina. Acreditación mañana 29-jun.</p>'
+      chip: 'HOY · FreeBet',
+      title: '⚡ HOY JUEGA ARGENTINA · DÍA DE LA FREEBET',
+      body: '<p class="subtitle"><span class="liveBadge">🔥 HOY</span>Depositá <strong>HOY sábado 27-jun</strong> en DBbet y te devuelven hasta <strong style="color:#FFD700">$100 USD en FreeBet</strong> para apostar Jordania vs Argentina (23:00 ART).</p>'
           + '<table class="promoTable"><tbody>'
           + '<tr><td>Depositás $20</td><td>→ $10 FreeBet</td></tr>'
           + '<tr><td>Depositás $50</td><td>→ $25 FreeBet</td></tr>'
@@ -26015,7 +26011,7 @@ setTimeout(_fpBadgeInit, 1200);
           + '<div class="vs"><img src="https://flagcdn.com/h60/jo.png" alt="Jordania"><span>Jordania</span><span class="vsLbl">VS</span><span>Argentina</span><img src="https://flagcdn.com/h60/ar.png" alt="Argentina"></div>'
           + '<div class="fine">Solo 2do depósito+ · Cuenta verificada · 1 vez por usuario · FreeBet válida para combinada de 3+ patas, cuota mín 1.50 cada una, mercados Gana Local/Visitante.</div>',
       cta: '🚀 Depositar y reclamar FreeBet',
-      foot: 'Última jornada de la promo · Acreditación 29-jun'
+      foot: '¡Última jornada! · Acreditación 28-jun'
     }
   };
 
@@ -26023,6 +26019,7 @@ setTimeout(_fpBadgeInit, 1200);
     var tpl = STATE_TEMPLATES[state];
     if (!tpl) return false;
     document.getElementById('dbbPromoTag').textContent = tpl.tag;
+    document.getElementById('dbbPromoChipLbl').textContent = tpl.chip;
     var body = document.getElementById('dbbPromoBody');
     body.innerHTML = '<div class="title" id="dbbPromoTitle">' + tpl.title + '</div>'
                    + tpl.body
@@ -26036,58 +26033,49 @@ setTimeout(_fpBadgeInit, 1200);
     if (state === 'off') return;
     if (!render(state)) return;
     var pop = document.getElementById('dbbPromo');
-    var bub = document.getElementById('dbbPromoBubble');
-    // Si el usuario ya minimizó en esta sesión, mostrar burbuja en vez del popup
+    var chip = document.getElementById('dbbPromoChip');
     var minimized = sessionStorage.getItem('dbbPromoMinimized') === '1';
-    if (minimized) {
-      pop.classList.add('minimized');
-      bub.classList.add('show');
-    } else {
-      pop.classList.add('show');
-    }
+    if (minimized) { pop.classList.add('minimized'); chip.classList.add('show'); }
+    else { pop.classList.add('show'); }
   }
 
   function minimize() {
     document.getElementById('dbbPromo').classList.add('minimized');
-    document.getElementById('dbbPromoBubble').classList.add('show');
+    document.getElementById('dbbPromoChip').classList.add('show');
     sessionStorage.setItem('dbbPromoMinimized', '1');
   }
-
   function reopen() {
     sessionStorage.removeItem('dbbPromoMinimized');
-    document.getElementById('dbbPromoBubble').classList.remove('show');
+    document.getElementById('dbbPromoChip').classList.remove('show');
     document.getElementById('dbbPromo').classList.remove('minimized');
     document.getElementById('dbbPromo').classList.add('show');
   }
 
-  // Inicializar
   document.getElementById('dbbPromoMinBtn').addEventListener('click', minimize);
-  document.getElementById('dbbPromoBubble').addEventListener('click', reopen);
+  document.getElementById('dbbPromoChip').addEventListener('click', reopen);
 
-  // Solo aparecer 1 vez por dispositivo+día (localStorage por día)
+  // Solo aparecer 1 vez por día (localStorage por fecha ART)
   var todayKey = (function(){
     var n = new Date();
-    var ms = n.getTime() - (3 * 60 * 60 * 1000);
-    var a = new Date(ms);
+    var a = new Date(n.getTime() - (3 * 60 * 60 * 1000));
     return 'dbbPromoShown_' + a.getUTCFullYear() + '-' + (a.getUTCMonth()+1) + '-' + a.getUTCDate();
   })();
+
   if (localStorage.getItem(todayKey) === '1') {
-    // Ya se mostró HOY — pero si el usuario minimizó, sigue como burbuja sticky
+    // Ya se mostró HOY — si el usuario lo había minimizado, dejar el chip sticky
     if (sessionStorage.getItem('dbbPromoMinimized') === '1') {
-      var state = getState();
-      if (state !== 'off' && render(state)) {
-        document.getElementById('dbbPromoBubble').classList.add('show');
-      }
+      var s = getState();
+      if (s !== 'off' && render(s)) document.getElementById('dbbPromoChip').classList.add('show');
     }
     return;
   }
-  // Mostrar a los 5 segundos
   setTimeout(function(){
     showPopup();
     localStorage.setItem(todayKey, '1');
   }, 5000);
 })();
 </script>
+
 
 </body>
 </html>
