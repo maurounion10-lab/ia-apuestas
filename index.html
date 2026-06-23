@@ -10989,7 +10989,8 @@ function buildPredsFromOdds() {
     const hN = shortName(g.home_team), aN = shortName(g.away_team);
 
     // ── Selección de la MEJOR apuesta ──
-    const MIN_ODDS = 1.40;
+    // 🆕 (23-jun-2026) Subido de 1.40 → 1.60: con 61% acierto, break-even era 1.64; cuotas <1.60 producían ROI -1.5%.
+    const MIN_ODDS = 1.60;
     // Liga argentina: prohibido pronosticar overs (Más de X.5). Solo 1X2 + Ambos/No Marcan.
     const _isArgentina = (g.sport_key || '').includes('argentina');
 
@@ -11007,7 +11008,7 @@ function buildPredsFromOdds() {
     const probX2 = probA + probD;
     const odds1X = (hO > 0 && dO > 0) ? +((hO * dO) / (hO + dO)).toFixed(2) : null;
     const oddsX2 = (aO > 0 && dO > 0) ? +((aO * dO) / (aO + dO)).toFixed(2) : null;
-    const MIN_DO_ODDS = 1.40;  // 🔧 (28-may-2026) subido de 1.25 — picks a 1.05-1.25 no tienen valor real
+    const MIN_DO_ODDS = 1.60;  // 🔧 (23-jun-2026) subido de 1.40 — alineado con MIN_ODDS
 
     const candidates2 = [
       { rec: 'Gana ' + hN, prob: probH, odds: hOP, _recSide: 'home' },
@@ -11157,6 +11158,9 @@ function buildPredsFromOdds() {
     // 🔒 FILTRO POST-MORTEM (27-may-2026): "Gana Local" rinde -80% ROI con bvr<5 (1/8 en 14 días).
     //    Solo se publica si conf=high con BVR≥5. Si el mejor candidato es Gana Local y no llega, descartamos el partido.
     if (best._recSide === 'home' && bvr < 5) return null;
+    // 🆕 (23-jun-2026) FILTRO POST-MORTEM extra: Gana Local con cuota < 1.60 sigue dando ROI negativo.
+    //    Exigimos cuota ≥ 1.60 SIEMPRE para Gana Local (excepto si bvr=6 Máxima donde el modelo confía más).
+    if (best._recSide === 'home' && parseFloat(best.odds) < 1.60 && bvr < 6) return null;
 
     // 🆕 (29-may-2026) PARCHE FIN-DE-TEMPORADA — protege contra "asimetría de motivación".
     //    Caso Monza vs Catanzaro (Serie B Italia, mayo): Monza ya ascendido jugaba relajado y perdió 0-2.
@@ -14998,7 +15002,18 @@ function savePredictions(preds) {
 
     // Stake según confianza/bvr: Máxima(6)=$170, Alta(5)=$130, Media-Alta(4)=$50, Media(3)=$30
     const _bvrS = p.bvr || (p.conf === 'high' ? 5 : 3);
-    const stake = _bvrS >= 6 ? 170 : _bvrS === 5 ? 130 : _bvrS === 4 ? 50 : 30;
+    const _baseStake = _bvrS >= 6 ? 170 : _bvrS === 5 ? 130 : _bvrS === 4 ? 50 : 30;
+    // 🆕 (23-jun-2026) Stake variable por cuota — penaliza cuotas bajas que históricamente dan ROI negativo.
+    //   ≥1.80 → 100% del base    (premio cuota jugosa)
+    //   1.65-1.80 → 85% del base  (cuota correcta)
+    //   1.55-1.65 → 60% del base  (cuota límite)
+    //   <1.55 → 40% del base      (riesgo alto, stake protectivo)
+    const _odd = parseFloat(impliedOdds) || 1.6;
+    const _oddMult = _odd >= 1.80 ? 1.0
+                  : _odd >= 1.65 ? 0.85
+                  : _odd >= 1.55 ? 0.60
+                  : 0.40;
+    const stake = Math.max(10, Math.round(_baseStake * _oddMult));
 
     // Normalizar nombres de equipos inconsistentes del Odds API
     const _normHome = (n, sk) => (n === 'Barcelona' && sk?.includes('conmebol')) ? 'Barcelona SC' : n;
