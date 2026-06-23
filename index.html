@@ -4665,10 +4665,10 @@
      mismo lenguaje visual — solo cambia el color temático.
   ─────────────────────────────────────────────────────────── */
 
-  /* Foro: apilado encima del chat (20px bottom + 54px chat + 10px gap = 84px) */
+  /* 🆕 (23-jun) Foro: apilado encima del chat AI que ahora está en bottom:80 (80 + 54 + 10 = 144) */
   #forum-section {
     position: fixed;
-    bottom: 84px;
+    bottom: 144px;
     right: 20px;
     z-index: 9002;
     display: flex;
@@ -4677,7 +4677,7 @@
     gap: 0;
   }
   @media (max-width: 600px) {
-    #forum-section { bottom: 84px; right: 16px; }
+    #forum-section { bottom: 120px; right: 16px; }  /* 🆕 (23-jun) encima del chat mobile en 72 */
   }
 
   /* Burbuja del foro — mismas dimensiones que #aiChatBtn */
@@ -25913,8 +25913,8 @@ setTimeout(_fpBadgeInit, 1200);
 /* ── CHIP MINIMIZADO: arriba del chat AI, discreto, no se impone ── */
 #dbbPromoChip {
   position: fixed; right: 14px;
-  /* 🆕 (23-jun) banner VIP (~64px) + chat AI launcher (54px + 80 bottom = 134 top) + 11px gap = 145 */
-  bottom: 145px;
+  /* 🆕 (23-jun v2) apilado encima del foro (144) + 54px foro + 10px gap = 208 */
+  bottom: 208px;
   z-index: 99996;
   display: none; align-items: center; gap: 6px;
   padding: 6px 12px 6px 8px; border-radius: 999px;
@@ -25936,7 +25936,7 @@ setTimeout(_fpBadgeInit, 1200);
 #dbbPromoChip .star { color: #FFD700; font-weight: 900 }
 @media (max-width: 480px) {
   #dbbPromo { right: 12px; bottom: 72px; width: calc(100vw - 24px) }
-  #dbbPromoChip { right: 10px; bottom: 130px; font-size: .68rem; padding: 5px 10px 5px 7px }
+  #dbbPromoChip { right: 10px; bottom: 168px; font-size: .68rem; padding: 5px 10px 5px 7px }
 }
 </style>
 
