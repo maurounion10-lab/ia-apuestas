@@ -6030,30 +6030,76 @@ window.toggleHeroBubble = function(n) {
 </style>
 <script>
 (function(){
-  // Fixtures reales primeros días Mundial 2026 (fase de grupos).
-  // home, away, fecha-hora ART (UTC-3), sede.
-  var FIXTURES = [
-    { h:'mx',     H:'México',         a:'za',     A:'Sudáfrica',        when:'Jue 11-jun · 19:00' },
-    { h:'ca',     H:'Canadá',         a:'ba',     A:'Bosnia',           when:'Vie 12-jun · 16:00' },
-    { h:'us',     H:'Estados Unidos', a:'py',     A:'Paraguay',         when:'Vie 12-jun · 20:00' },
-    { h:'ch',     H:'Suiza',          a:'qa',     A:'Catar',            when:'Sáb 13-jun · 13:00' },
-    { h:'br',     H:'Brasil',         a:'ma',     A:'Marruecos',        when:'Sáb 13-jun · 16:00' },
-    { h:'ht',     H:'Haití',          a:'gb-sct', A:'Escocia',          when:'Sáb 13-jun · 19:00' },
-    { h:'de',     H:'Alemania',       a:'cw',     A:'Curaçao',          when:'Dom 14-jun · 13:00' },
-    { h:'co',     H:'Colombia',       a:'uz',     A:'Uzbekistán',       when:'Dom 14-jun · 16:00' },
-    { h:'nl',     H:'Países Bajos',   a:'jp',     A:'Japón',            when:'Dom 14-jun · 19:00' },
-    { h:'be',     H:'Bélgica',        a:'eg',     A:'Egipto',           when:'Lun 15-jun · 13:00' },
-    { h:'ec',     H:'Ecuador',        a:'ci',     A:'Costa Marfil',     when:'Lun 15-jun · 16:00' },
-    { h:'es',     H:'España',         a:'cv',     A:'Cabo Verde',       when:'Lun 15-jun · 19:00' },
-    { h:'fr',     H:'Francia',        a:'sn',     A:'Senegal',          when:'Mar 16-jun · 13:00' },
-    { h:'at',     H:'Austria',        a:'jo',     A:'Jordania',         when:'Mar 16-jun · 16:00' },
-    { h:'ar',     H:'Argentina',      a:'dz',     A:'Argelia',          when:'Mar 16-jun · 19:00' },
-    { h:'pt',     H:'Portugal',       a:'cd',     A:'RD Congo',         when:'Mié 17-jun · 13:00' },
-    { h:'tr',     H:'Turquía',        a:'no',     A:'Noruega',          when:'Mié 17-jun · 16:00' },
-    { h:'gb-eng', H:'Inglaterra',     a:'hr',     A:'Croacia',          when:'Mié 17-jun · 19:00' },
-    { h:'uy',     H:'Uruguay',        a:'tn',     A:'Túnez',            when:'Jue 18-jun · 13:00' },
-    { h:'kr',     H:'Corea del Sur',  a:'iq',     A:'Iraq',             when:'Jue 18-jun · 19:00' },
+  // Fixtures Mundial 2026 — todos los partidos restantes (fase grupos final + octavos + cuartos+).
+  // ts = Date.UTC del kickoff. El ticker filtra los pasados automáticamente.
+  // Hora ART (UTC-3) → para Date.UTC sumamos 3.
+  var _U = function(y,mo,d,hART){ return Date.UTC(y, mo-1, d, hART+3, 0, 0); };
+  var _DOW = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  var _MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  var _fmtWhen = function(ts){
+    var dt = new Date(ts);
+    // Convertir a ART (UTC-3)
+    var artMs = ts - (3*60*60*1000);
+    var d = new Date(artMs);
+    var hhmm = String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
+    return _DOW[d.getUTCDay()]+' '+d.getUTCDate()+'-'+_MES[d.getUTCMonth()]+' · '+hhmm;
+  };
+  var FIXTURES_ALL = [
+    // Fase de grupos final
+    { h:'mx',     H:'México',         a:'za',     A:'Sudáfrica',        ts: _U(2026,6,11,19) },
+    { h:'ca',     H:'Canadá',         a:'ba',     A:'Bosnia',           ts: _U(2026,6,12,16) },
+    { h:'us',     H:'Estados Unidos', a:'py',     A:'Paraguay',         ts: _U(2026,6,12,20) },
+    { h:'ch',     H:'Suiza',          a:'qa',     A:'Catar',            ts: _U(2026,6,13,13) },
+    { h:'br',     H:'Brasil',         a:'ma',     A:'Marruecos',        ts: _U(2026,6,13,16) },
+    { h:'ht',     H:'Haití',          a:'gb-sct', A:'Escocia',          ts: _U(2026,6,13,19) },
+    { h:'de',     H:'Alemania',       a:'cw',     A:'Curaçao',          ts: _U(2026,6,14,13) },
+    { h:'co',     H:'Colombia',       a:'uz',     A:'Uzbekistán',       ts: _U(2026,6,14,16) },
+    { h:'nl',     H:'Países Bajos',   a:'jp',     A:'Japón',            ts: _U(2026,6,14,19) },
+    { h:'be',     H:'Bélgica',        a:'eg',     A:'Egipto',           ts: _U(2026,6,15,13) },
+    { h:'ec',     H:'Ecuador',        a:'ci',     A:'Costa Marfil',     ts: _U(2026,6,15,16) },
+    { h:'es',     H:'España',         a:'cv',     A:'Cabo Verde',       ts: _U(2026,6,15,19) },
+    { h:'fr',     H:'Francia',        a:'sn',     A:'Senegal',          ts: _U(2026,6,16,13) },
+    { h:'at',     H:'Austria',        a:'jo',     A:'Jordania',         ts: _U(2026,6,16,16) },
+    { h:'ar',     H:'Argentina',      a:'dz',     A:'Argelia',          ts: _U(2026,6,16,19) },
+    { h:'pt',     H:'Portugal',       a:'cd',     A:'RD Congo',         ts: _U(2026,6,17,13) },
+    { h:'tr',     H:'Turquía',        a:'no',     A:'Noruega',          ts: _U(2026,6,17,16) },
+    { h:'gb-eng', H:'Inglaterra',     a:'hr',     A:'Croacia',          ts: _U(2026,6,17,19) },
+    { h:'uy',     H:'Uruguay',        a:'tn',     A:'Túnez',            ts: _U(2026,6,18,13) },
+    { h:'kr',     H:'Corea del Sur',  a:'iq',     A:'Iraq',             ts: _U(2026,6,18,19) },
+    // 2da fecha grupos
+    { h:'tn',     H:'Túnez',          a:'jp',     A:'Japón',            ts: _U(2026,6,21,1) },
+    { h:'es',     H:'España',         a:'sa',     A:'Arabia Saudita',   ts: _U(2026,6,21,13) },
+    { h:'be',     H:'Bélgica',        a:'ir',     A:'Irán',             ts: _U(2026,6,21,16) },
+    { h:'uy',     H:'Uruguay',        a:'cv',     A:'Cabo Verde',       ts: _U(2026,6,21,19) },
+    { h:'nz',     H:'Nueva Zelanda',  a:'eg',     A:'Egipto',           ts: _U(2026,6,21,22) },
+    { h:'ar',     H:'Argentina',      a:'at',     A:'Austria',          ts: _U(2026,6,22,14) },
+    { h:'fr',     H:'Francia',        a:'iq',     A:'Irak',             ts: _U(2026,6,22,17) },
+    { h:'no',     H:'Noruega',        a:'sn',     A:'Senegal',          ts: _U(2026,6,22,20) },
+    // 3ra fecha grupos (próximos 24-26 jun)
+    { h:'mx',     H:'México',         a:'kr',     A:'Corea del Sur',    ts: _U(2026,6,24,13) },
+    { h:'za',     H:'Sudáfrica',      a:'cz',     A:'Rep. Checa',       ts: _U(2026,6,24,13) },
+    { h:'ca',     H:'Canadá',         a:'au',     A:'Australia',        ts: _U(2026,6,24,16) },
+    { h:'us',     H:'Estados Unidos', a:'tr',     A:'Turquía',          ts: _U(2026,6,25,13) },
+    { h:'br',     H:'Brasil',         a:'sct',    A:'Escocia',          ts: _U(2026,6,25,16) },
+    { h:'de',     H:'Alemania',       a:'co',     A:'Colombia',         ts: _U(2026,6,26,13) },
+    { h:'pt',     H:'Portugal',       a:'gb-eng', A:'Inglaterra',       ts: _U(2026,6,26,16) },
+    // Octavos (27 jun - 2 jul, partidos TBD por grupos)
+    // Cuartos, semis, final placeholders se mostrarán cuando se aproximen
   ];
+  // Filtrar partidos pasados — solo mostrar los que aún no empezaron
+  var nowTs = Date.now();
+  var FIXTURES = FIXTURES_ALL.filter(function(f){ return f.ts > nowTs; });
+  // Si no hay futuros (post-Mundial), mostrar los próximos 7 días o vacío
+  if (FIXTURES.length === 0) {
+    // Fallback: si todo pasó, no mostrar el ticker
+    var _t = document.getElementById('gbWcTicker');
+    if (_t) _t.style.display = 'none';
+    return;
+  }
+  // Asignar string 'when' calculado en runtime
+  FIXTURES.forEach(function(f){ f.when = _fmtWhen(f.ts); });
+  // Limitar a 10 próximos para que no sea infinito
+  FIXTURES = FIXTURES.slice(0, 10);
 
   function buildItem(f) {
     return '<span class="gb-ticker-item">'
@@ -10016,6 +10062,11 @@ function nationalTeamBadge(name, size=48) {
 }
 
 function logoHtml(name, size=48) {
+  // 🔧 Asegurar traducción WC EN→ES antes del lookup (Odds API trae nombres en inglés)
+  if (name && typeof translateWcTeam === 'function') {
+    const _t = translateWcTeam(name);
+    if (_t && _t !== name) name = _t;
+  }
   // ─ WC2026 fallback: jugadores estrella (Mbappé, Messi, CR7) — foto + banderita
   if (name && WC2026_STARS[name]) {
     const sb = wcStarBadge(name, size);
