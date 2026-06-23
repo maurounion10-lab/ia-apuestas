@@ -13076,42 +13076,7 @@ function renderPreds() {
           <div class="pred-bar-pct">${p.probA}%</div>
         </div>
       </div>
-      <!-- Cuotas desde probabilidades -->
-      <div style="margin:10px 0 4px">
-        <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">📊 Cuotas</div>
-        <div style="display:flex;gap:6px">
-          <button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="home" onclick="acSelectOutcome('${_cardMatchId}','home',${_cardOddsH})" style="flex:1;text-align:center;background:rgba(41,182,246,0.08);border:1px solid rgba(41,182,246,0.2);border-radius:8px;padding:6px 4px">
-            <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Local</div>
-            <div style="font-size:1rem;font-weight:800;color:var(--azul)">${p._hO ? parseFloat(p._hO).toFixed(2) : (p.probH > 0 ? (100/p.probH).toFixed(2) : '—')}</div>
-          </button>
-          ${(p.probD > 0 || p._dO) ? `<button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="draw" onclick="acSelectOutcome('${_cardMatchId}','draw',${_cardOddsD||3})" style="flex:1;text-align:center;background:rgba(255,214,0,0.08);border:1px solid rgba(255,214,0,0.2);border-radius:8px;padding:6px 4px">
-            <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Empate</div>
-            <div style="font-size:1rem;font-weight:800;color:var(--amarillo)">${p._dO ? parseFloat(p._dO).toFixed(2) : (p.probD > 0 ? (100/p.probD).toFixed(2) : '—')}</div>
-          </button>` : ''}
-          <button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="away" onclick="acSelectOutcome('${_cardMatchId}','away',${_cardOddsA})" style="flex:1;text-align:center;background:rgba(255,61,61,0.08);border:1px solid rgba(255,61,61,0.2);border-radius:8px;padding:6px 4px">
-            <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Visitante</div>
-            <div style="font-size:1rem;font-weight:800;color:var(--rojo)">${p._aO ? parseFloat(p._aO).toFixed(2) : (p.probA > 0 ? (100/p.probA).toFixed(2) : '—')}</div>
-          </button>
-        </div>
-      </div>` : ((p._hO || p._aO) ? `
-      <!-- Cuotas desde API directa (sin probabilidades) -->
-      <div style="margin:10px 0 4px">
-        <div style="font-size:0.62rem;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px">📊 Cuotas</div>
-        <div style="display:flex;gap:6px">
-          <button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="home" onclick="acSelectOutcome('${_cardMatchId}','home',${_cardOddsH})" style="flex:1;text-align:center;background:rgba(41,182,246,0.08);border:1px solid rgba(41,182,246,0.2);border-radius:8px;padding:6px 4px">
-            <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Local</div>
-            <div style="font-size:1rem;font-weight:800;color:var(--azul)">${p._hO ? parseFloat(p._hO).toFixed(2) : '—'}</div>
-          </button>
-          ${p._dO ? `<button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="draw" onclick="acSelectOutcome('${_cardMatchId}','draw',${_cardOddsD||3})" style="flex:1;text-align:center;background:rgba(255,214,0,0.08);border:1px solid rgba(255,214,0,0.2);border-radius:8px;padding:6px 4px">
-            <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Empate</div>
-            <div style="font-size:1rem;font-weight:800;color:var(--amarillo)">${parseFloat(p._dO).toFixed(2)}</div>
-          </button>` : ''}
-          <button class="cuota-bet-box" data-pick-match="${_cardMatchId}" data-pick-choice="away" onclick="acSelectOutcome('${_cardMatchId}','away',${_cardOddsA})" style="flex:1;text-align:center;background:rgba(255,61,61,0.08);border:1px solid rgba(255,61,61,0.2);border-radius:8px;padding:6px 4px">
-            <div style="font-size:0.6rem;color:var(--texto-sec);margin-bottom:2px">Visitante</div>
-            <div style="font-size:1rem;font-weight:800;color:var(--rojo)">${p._aO ? parseFloat(p._aO).toFixed(2) : '—'}</div>
-          </button>
-        </div>
-      </div>` : '')}
+` : ''}
 
       ${!isFinishedWin && !isFinishedLoss ? (()=>{
         const _pickShort = _recLabel(p.rec, p.home, p.away);
