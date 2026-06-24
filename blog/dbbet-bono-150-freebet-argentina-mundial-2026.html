@@ -123,6 +123,38 @@ nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 
 .cta-final a.btn:hover{transform:translateY(-1px)}
 .cta-final .terms{font-size:.7rem;color:rgba(255,255,255,0.4);margin-top:14px;position:relative}
 
+/* ── BANNER INLINE recurrente ── */
+.cta-inline{display:flex;align-items:center;justify-content:space-between;gap:14px;background:linear-gradient(135deg,#1d1407 0%,#14110a 100%);border:1px solid rgba(255,215,0,0.32);border-radius:12px;padding:14px 18px;margin:24px 0;position:relative;overflow:hidden}
+.cta-inline::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at right,rgba(255,215,0,0.10),transparent 60%);pointer-events:none}
+.cta-inline .cta-txt{font-size:.92rem;color:#fff;font-weight:600;line-height:1.4;flex:1}
+.cta-inline .cta-txt strong{color:#FFD700}
+.cta-inline a.cta-btn{display:inline-block;background:linear-gradient(135deg,#FFD700,#c9a227);color:#1a1006;font-weight:900;font-size:.78rem;padding:8px 16px;border-radius:8px;letter-spacing:.5px;text-decoration:none;text-transform:uppercase;white-space:nowrap;box-shadow:0 4px 12px rgba(255,215,0,0.25);transition:transform .15s}
+.cta-inline a.cta-btn:hover{transform:translateY(-1px)}
+@media (max-width:520px){.cta-inline{flex-direction:column;align-items:stretch;text-align:center}.cta-inline a.cta-btn{width:100%}}
+
+/* ── CAPTURA HOME DBbet (con logo) ── */
+.cap-home{max-width:520px;margin:24px auto;border-radius:18px;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.5),0 0 0 1px rgba(255,215,0,0.20);background:#0a0a0a}
+.cap-bar{background:#1a1a1a;height:24px;display:flex;align-items:center;gap:6px;padding:0 12px;border-bottom:1px solid #222}
+.cap-bar span{width:9px;height:9px;border-radius:50%;background:#444}
+.cap-bar span:nth-child(1){background:#ff5f56}
+.cap-bar span:nth-child(2){background:#ffbd2e}
+.cap-bar span:nth-child(3){background:#27c93f}
+.cap-bar .url{margin-left:auto;font-size:.65rem;color:#888;font-family:monospace}
+.cap-nav{background:#0e0a05;padding:14px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,215,0,0.18)}
+.cap-nav-logo{height:22px;display:block}
+.cap-nav-right{display:flex;gap:8px;align-items:center}
+.cap-nav-btn{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.78);font-size:.7rem;font-weight:700;padding:6px 12px;border-radius:6px;letter-spacing:.3px}
+.cap-nav-btn.gold{background:linear-gradient(135deg,#FFD700,#c9a227);color:#1a1006}
+.cap-hero{background:linear-gradient(135deg,#c8102e 0%,#3a0610 50%,#1a0a05 100%);padding:38px 24px 32px;text-align:center;position:relative}
+.cap-hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top,rgba(255,215,0,0.18),transparent 65%);pointer-events:none}
+.cap-hero-badge{display:inline-block;background:rgba(255,215,0,0.15);color:#FFD700;font-size:.65rem;font-weight:800;letter-spacing:1.5px;padding:4px 12px;border-radius:20px;margin-bottom:14px;text-transform:uppercase;border:1px solid rgba(255,215,0,0.35);position:relative}
+.cap-hero h3{font-size:1.5rem;font-weight:900;color:#fff;margin-bottom:8px;line-height:1.2;position:relative}
+.cap-hero .gold-num{color:#FFD700;font-size:2.2rem;display:block;margin:4px 0;line-height:1;text-shadow:0 2px 12px rgba(255,215,0,0.3)}
+.cap-hero p{font-size:.82rem;color:rgba(255,255,255,0.8);max-width:380px;margin:0 auto 14px;position:relative}
+.cap-hero-cta{display:inline-block;background:linear-gradient(135deg,#FFD700,#c9a227);color:#1a1006;font-weight:900;font-size:.8rem;padding:11px 28px;border-radius:8px;letter-spacing:.6px;text-transform:uppercase;box-shadow:0 6px 18px rgba(255,215,0,0.3);position:relative}
+.cap-strip{background:#13110a;padding:14px 20px;display:flex;justify-content:space-around;gap:12px;font-size:.7rem;color:rgba(255,255,255,0.7);font-weight:600;border-top:1px solid rgba(255,215,0,0.1)}
+.cap-strip span{display:flex;align-items:center;gap:5px}
+
 footer{border-top:1px solid var(--borde);padding:30px 24px;text-align:center;color:var(--texto-sec);font-size:0.85rem;margin-top:30px}
 </style>
 </head>
@@ -149,6 +181,30 @@ footer{border-top:1px solid var(--borde);padding:30px 24px;text-align:center;col
 <main class="container">
 <article class="article">
 
+<div class="cap-home">
+<div class="cap-bar"><span></span><span></span><span></span><span class="url">dbbet.com</span></div>
+<div class="cap-nav">
+  <img class="cap-nav-logo" src="https://gambeta.ai/img/casas/dbbet.svg" alt="DBbet logo">
+  <div class="cap-nav-right">
+    <span class="cap-nav-btn">Iniciar sesión</span>
+    <span class="cap-nav-btn gold">Registro</span>
+  </div>
+</div>
+<div class="cap-hero">
+  <span class="cap-hero-badge">⭐ Sponsor Mundial 2026</span>
+  <h3>Bono de Bienvenida</h3>
+  <span class="gold-num">+150%</span>
+  <p>En tu primer depósito · hasta USD 150 + FreeBet semanal para el partido del sábado</p>
+  <span class="cap-hero-cta">REGISTRARME →</span>
+</div>
+<div class="cap-strip">
+  <span>🔒 Pago seguro</span>
+  <span>⚡ Retiros en 24h</span>
+  <span>📱 App iOS / Android</span>
+</div>
+</div>
+<p class="mock-caption">Así se ve la home de DBbet en este momento</p>
+
 <div class="disclosure">
 <strong>Transparencia:</strong> DBbet es sponsor oficial del Mundial 2026 en gambeta.ai. Si te registrás desde nuestros links recibimos una comisión sin costo extra para vos. Eso no cambia lo que decimos — abajo te mostramos también lo que NO nos gusta de la promo. La idea es que decidas con toda la info.
 </div>
@@ -160,6 +216,11 @@ footer{border-top:1px solid var(--borde);padding:30px 24px;text-align:center;col
 <li><strong>FreeBet semanal</strong> para el partido de Argentina del sábado 27/6 vs Jordania. Si depositás ese día, te devuelven hasta 50% en apuesta gratis.</li>
 </ul>
 <p>Lo importante: <strong>el orden importa.</strong> Si ya tenés cuenta en DBbet y nunca activaste el bono de bienvenida, te lo perdés para siempre. Si recién te registrás, podés activarlo ahora y además aprovechar la FreeBet del sábado.</p>
+
+<div class="cta-inline">
+<div class="cta-txt">⚡ <strong>El bono es solo para nuevos usuarios.</strong> Una sola vez por persona.</div>
+<a class="cta-btn" href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213" target="_blank" rel="noopener">Activarlo →</a>
+</div>
 
 <h2>🎁 Bono 1: Bienvenida 150%</h2>
 
@@ -184,6 +245,11 @@ Saldo total para jugar: <span class="verde">$250 USD</span>
 <li><strong>Plazo:</strong> el bono suele tener 30 días para usarse. Si no lo activás, lo perdés.</li>
 <li><strong>Depósito mínimo:</strong> $10 USD suele ser el piso para activar el bono.</li>
 </ul>
+
+<div class="cta-inline">
+<div class="cta-txt">🎁 <strong>Depositás $100, jugás con $250.</strong> Sin requisitos raros.</div>
+<a class="cta-btn" href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213" target="_blank" rel="noopener">Empezar →</a>
+</div>
 
 <h2>⚡ Bono 2: FreeBet del sábado · Argentina vs Jordania</h2>
 
@@ -228,6 +294,11 @@ Si Argentina pierde:<br>
 <li style="margin-bottom:8px">La FreeBet se acredita en las horas siguientes y vence apenas termina el partido.</li>
 <li style="margin-bottom:8px">Apostala en el partido de Argentina (o el mercado que la promo permita).</li>
 </ol>
+
+<div class="cta-inline">
+<div class="cta-txt">📆 <strong>La FreeBet del sábado se activa con el depósito.</strong> No te olvides el día.</div>
+<a class="cta-btn" href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213" target="_blank" rel="noopener">Registro →</a>
+</div>
 
 <h2>🚀 La estrategia óptima: combinar las dos promos</h2>
 <p>Si te registrás esta semana, hacés el primer depósito el <strong>sábado 27 de junio</strong>, activás las dos promos al mismo tiempo. El depósito sirve para ambas:</p>
