@@ -10049,6 +10049,86 @@ function resolveWcLocal(pick) {
 // y causaba parpadeo de imágenes rotas. Cero requests HTTP ahora.
 // 🛡️ Logos confederaciones FIFA — SVGs locales (sin requests externos)
 // Hospedados en /escudos/confeds/ porque Wikimedia bloquea hotlinking
+// 🆕 (25-jun-2026) Logo de FEDERACION NACIONAL (no confederacion)
+// IDs verificados via API-Football /teams?league=1&season=2026 (48 selecciones WC 2026)
+// Fallback: si no esta en este mapeo, usar WC2026_CONFEDS
+const WC2026_NATION_LOGOS = {
+  'Alemania': 'https://media.api-sports.io/football/teams/25.png',
+  'Arabia': 'https://media.api-sports.io/football/teams/23.png',
+  'Arabia Saudita': 'https://media.api-sports.io/football/teams/23.png',
+  'Argelia': 'https://media.api-sports.io/football/teams/1532.png',
+  'Argentina': 'https://media.api-sports.io/football/teams/26.png',
+  'Australia': 'https://media.api-sports.io/football/teams/20.png',
+  'Austria': 'https://media.api-sports.io/football/teams/775.png',
+  'Belgica': 'https://media.api-sports.io/football/teams/1.png',
+  'Bosnia': 'https://media.api-sports.io/football/teams/1113.png',
+  'Bosnia y Herzegovina': 'https://media.api-sports.io/football/teams/1113.png',
+  'Brasil': 'https://media.api-sports.io/football/teams/6.png',
+  'Bélgica': 'https://media.api-sports.io/football/teams/1.png',
+  'Cabo Verde': 'https://media.api-sports.io/football/teams/1533.png',
+  'Canada': 'https://media.api-sports.io/football/teams/5529.png',
+  'Canadá': 'https://media.api-sports.io/football/teams/5529.png',
+  'Catar': 'https://media.api-sports.io/football/teams/1569.png',
+  'Chequia': 'https://media.api-sports.io/football/teams/770.png',
+  'Colombia': 'https://media.api-sports.io/football/teams/8.png',
+  'Corea': 'https://media.api-sports.io/football/teams/17.png',
+  'Corea del Sur': 'https://media.api-sports.io/football/teams/17.png',
+  'Costa Marfil': 'https://media.api-sports.io/football/teams/1501.png',
+  'Costa de Marfil': 'https://media.api-sports.io/football/teams/1501.png',
+  'Croacia': 'https://media.api-sports.io/football/teams/3.png',
+  'Curacao': 'https://media.api-sports.io/football/teams/5530.png',
+  'Curaçao': 'https://media.api-sports.io/football/teams/5530.png',
+  'DR Congo': 'https://media.api-sports.io/football/teams/1508.png',
+  'Ecuador': 'https://media.api-sports.io/football/teams/2382.png',
+  'Egipto': 'https://media.api-sports.io/football/teams/32.png',
+  'Escocia': 'https://media.api-sports.io/football/teams/1108.png',
+  'España': 'https://media.api-sports.io/football/teams/9.png',
+  'Estados Unidos': 'https://media.api-sports.io/football/teams/2384.png',
+  'Francia': 'https://media.api-sports.io/football/teams/2.png',
+  'Ghana': 'https://media.api-sports.io/football/teams/1504.png',
+  'Haiti': 'https://media.api-sports.io/football/teams/2386.png',
+  'Haití': 'https://media.api-sports.io/football/teams/2386.png',
+  'Holanda': 'https://media.api-sports.io/football/teams/1118.png',
+  'Inglaterra': 'https://media.api-sports.io/football/teams/10.png',
+  'Irak': 'https://media.api-sports.io/football/teams/1567.png',
+  'Iran': 'https://media.api-sports.io/football/teams/22.png',
+  'Iraq': 'https://media.api-sports.io/football/teams/1567.png',
+  'Irán': 'https://media.api-sports.io/football/teams/22.png',
+  'Japon': 'https://media.api-sports.io/football/teams/12.png',
+  'Japón': 'https://media.api-sports.io/football/teams/12.png',
+  'Jordania': 'https://media.api-sports.io/football/teams/1548.png',
+  'Marruecos': 'https://media.api-sports.io/football/teams/31.png',
+  'Mexico': 'https://media.api-sports.io/football/teams/16.png',
+  'México': 'https://media.api-sports.io/football/teams/16.png',
+  'Noruega': 'https://media.api-sports.io/football/teams/1090.png',
+  'Nueva Zelanda': 'https://media.api-sports.io/football/teams/4673.png',
+  'Paises Bajos': 'https://media.api-sports.io/football/teams/1118.png',
+  'Panama': 'https://media.api-sports.io/football/teams/11.png',
+  'Panamá': 'https://media.api-sports.io/football/teams/11.png',
+  'Paraguay': 'https://media.api-sports.io/football/teams/2380.png',
+  'Países Bajos': 'https://media.api-sports.io/football/teams/1118.png',
+  'Portugal': 'https://media.api-sports.io/football/teams/27.png',
+  'Qatar': 'https://media.api-sports.io/football/teams/1569.png',
+  'R.D. Congo': 'https://media.api-sports.io/football/teams/1508.png',
+  'RD Congo': 'https://media.api-sports.io/football/teams/1508.png',
+  'Rep. Checa': 'https://media.api-sports.io/football/teams/770.png',
+  'Republica Checa': 'https://media.api-sports.io/football/teams/770.png',
+  'República Checa': 'https://media.api-sports.io/football/teams/770.png',
+  'Senegal': 'https://media.api-sports.io/football/teams/13.png',
+  'Sudafrica': 'https://media.api-sports.io/football/teams/1531.png',
+  'Sudáfrica': 'https://media.api-sports.io/football/teams/1531.png',
+  'Suecia': 'https://media.api-sports.io/football/teams/5.png',
+  'Suiza': 'https://media.api-sports.io/football/teams/15.png',
+  'Tunez': 'https://media.api-sports.io/football/teams/28.png',
+  'Turquia': 'https://media.api-sports.io/football/teams/777.png',
+  'Turquía': 'https://media.api-sports.io/football/teams/777.png',
+  'Túnez': 'https://media.api-sports.io/football/teams/28.png',
+  'USA': 'https://media.api-sports.io/football/teams/2384.png',
+  'Uruguay': 'https://media.api-sports.io/football/teams/7.png',
+  'Uzbekistan': 'https://media.api-sports.io/football/teams/1568.png',
+  'Uzbekistán': 'https://media.api-sports.io/football/teams/1568.png',
+};
+
 const WC2026_CONFEDS = {
   UEFA:     '/escudos/confeds/UEFA.svg',
   CONMEBOL: '/escudos/confeds/CONMEBOL.svg',
@@ -10084,11 +10164,16 @@ function nationalTeamBadge(name, size=48) {
   const info = WC2026_NATIONS[name];
   if (!info) return null;
   const flagUrl = `https://flagcdn.com/w160/${info.iso}.png`;
-  const confUrl = WC2026_CONFEDS[info.conf];
+  // 🆕 Prioridad: logo de FEDERACION nacional (AFA, CBF, DFB...) → fallback confederacion
+  const subUrl = WC2026_NATION_LOGOS[name] || WC2026_CONFEDS[info.conf];
   const confSize = Math.max(14, Math.round(size * 0.38));
+  const subTitle = WC2026_NATION_LOGOS[name] ? name : info.conf;
+  // Fallback chain: federacion → confederacion → ocultar
+  const fallbackConfed = (WC2026_CONFEDS[info.conf] || '').replace(/'/g, "\\'");
+  const onerrorJs = fallbackConfed ? `this.onerror=null;this.src='${fallbackConfed}'` : `this.style.display='none'`;
   return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:visible;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.5);background:#fff">`
        + `<img src="${flagUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:50%;display:block">`
-       + `<img src="${confUrl}" alt="${info.conf}" width="${confSize}" height="${confSize}" style="position:absolute;top:-3px;left:-3px;width:${confSize}px;height:${confSize}px;border-radius:50%;background:#fff;padding:2px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.4)" onerror="this.style.display='none'">`
+       + `<img src="${subUrl}" alt="${subTitle}" width="${confSize}" height="${confSize}" style="position:absolute;top:-3px;left:-3px;width:${confSize}px;height:${confSize}px;border-radius:50%;background:#fff;padding:2px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.4)" onerror="${onerrorJs}">`
        + `</span>`;
 }
 
