@@ -2375,6 +2375,113 @@ export default {
       }
     }
 
+    // ── 🆕 (25-jun-2026) /push/subscribe — guardar subscription en KV
+    if (path === '/push/subscribe' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const sub = body.subscription;
+        if (!sub || !sub.endpoint) return new Response(JSON.stringify({ error: 'missing subscription' }), { status: 400, headers: CORS });
+        // Key = hash del endpoint (corto, único)
+        const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(sub.endpoint));
+        const id = [...new Uint8Array(hash)].slice(0, 12).map(b => b.toString(16).padStart(2,'0')).join('');
+        const record = {
+          subscription: sub,
+          userAgent: (body.userAgent || '').slice(0, 200),
+          lang: body.lang || 'es',
+          createdAt: new Date().toISOString()
+        };
+        await env.CACHE_KV.put(`push_sub_${id}`, JSON.stringify(record), { expirationTtl: 365 * 24 * 3600 });
+        return new Response(JSON.stringify({ ok: true, id }), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    // ── /push/list — admin: ver cuántas subs hay (no devuelve datos)
+    if (path === '/push/list') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
+      const list = await env.CACHE_KV.list({ prefix: 'push_sub_' });
+      return new Response(JSON.stringify({ count: list.keys.length, complete: list.list_complete }), { headers: CORS });
+    }
+
+    // ── /push/send — admin: enviar notif a todas las subs activas
+    // Body: { title, body, url, image? }
+    if (path === '/push/send' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
+      try {
+        const payload = await request.json();
+        if (!payload.title || !payload.body) return new Response(JSON.stringify({ error: 'title and body required' }), { status: 400, headers: CORS });
+        const list = await env.CACHE_KV.list({ prefix: 'push_sub_' });
+        const stats = { total: list.keys.length, sent: 0, failed: 0, expired: 0 };
+        const payloadStr = JSON.stringify(payload);
+
+        // Para firma VAPID JWT (P-256 ECDSA SHA-256)
+        const VAPID_PRIVATE = env.VAPID_PRIVATE_KEY || '1EkL2cZSb4bxMamAJF5QgYpEB22eHsseGPFMt0BlhKg';
+        const VAPID_PUBLIC = env.VAPID_PUBLIC_KEY || 'BEFve5dHpprXm4_8XprLJsyFz6yOHDAGPrEUtfMeuho9NPv_mxlgX6oKepYb0omlDprkieAH8lBRe91HRVkRN1s';
+        const VAPID_SUBJECT = 'mailto:mauro@gambeta.ai';
+
+        // Helpers Base64URL
+        const b64uEncode = (buf) => btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/, '');
+        const b64uDecode = (str) => {
+          const pad = '='.repeat((4 - str.length % 4) % 4);
+          const s = (str + pad).replace(/-/g, '+').replace(/_/g, '/');
+          return Uint8Array.from(atob(s), c => c.charCodeAt(0));
+        };
+
+        // Importar VAPID private key (raw 32 bytes → JWK)
+        const privBytes = b64uDecode(VAPID_PRIVATE);
+        const pubBytes = b64uDecode(VAPID_PUBLIC);
+        const jwk = {
+          kty: 'EC', crv: 'P-256',
+          d: VAPID_PRIVATE,
+          x: b64uEncode(pubBytes.slice(1, 33)),
+          y: b64uEncode(pubBytes.slice(33, 65))
+        };
+        const cryptoKey = await crypto.subtle.importKey('jwk', jwk, { name:'ECDSA', namedCurve:'P-256' }, false, ['sign']);
+
+        async function buildVapidJwt(audience) {
+          const header = { typ: 'JWT', alg: 'ES256' };
+          const claims = { aud: audience, exp: Math.floor(Date.now()/1000) + 12*3600, sub: VAPID_SUBJECT };
+          const signedInput = b64uEncode(new TextEncoder().encode(JSON.stringify(header))) + '.' + b64uEncode(new TextEncoder().encode(JSON.stringify(claims)));
+          const sig = await crypto.subtle.sign({ name:'ECDSA', hash:'SHA-256' }, cryptoKey, new TextEncoder().encode(signedInput));
+          return signedInput + '.' + b64uEncode(sig);
+        }
+
+        for (const k of list.keys) {
+          try {
+            const rec = JSON.parse(await env.CACHE_KV.get(k.name));
+            const endpoint = rec.subscription.endpoint;
+            const audOrigin = new URL(endpoint).origin;
+            const jwt = await buildVapidJwt(audOrigin);
+            // Header VAPID format. NO encryption (mvp) → payload se manda sin cifrar
+            // Si el push service rechaza por payload sin cifrar, hay que implementar AES-128-GCM (más trabajo).
+            // Workaround MVP: notification SIN payload — el SW usa contenido por defecto
+            const resp = await fetch(endpoint, {
+              method: 'POST',
+              headers: {
+                'TTL': '86400',
+                'Authorization': `vapid t=${jwt}, k=${VAPID_PUBLIC}`,
+                'Content-Length': '0'
+              }
+            });
+            if (resp.status === 201 || resp.status === 200) stats.sent++;
+            else if (resp.status === 404 || resp.status === 410) {
+              // Subscription expirada → borrar
+              await env.CACHE_KV.delete(k.name);
+              stats.expired++;
+            } else stats.failed++;
+          } catch (e) { stats.failed++; }
+        }
+        return new Response(JSON.stringify({ ok: true, stats, payload }), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message, stack: e.stack }), { status: 500, headers: CORS });
+      }
+    }
+
     return new Response(JSON.stringify({ error: 'Not found', path }), { status: 404, headers: CORS });
   }
 };
