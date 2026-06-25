@@ -16726,6 +16726,32 @@ function _slugifyTeam(s) {
   return s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase().replace(/^-|-$/g, '');
 }
+// 🆕 (25-jun-2026) Whitelist de articulos de pronostico que existen en /blog/
+// Para evitar 404 cuando el pick es nuevo y no tiene articulo todavia.
+// Update: cuando crees un nuevo articulo, agregarlo aca.
+const _PICK_BLOG_SLUGS = new Set([
+  'pronostico-alemania-curacao-14-06',
+  'pronostico-argentina-argelia-16-06',
+  'pronostico-argentina-austria-22-06',
+  'pronostico-belgica-egipto-15-06',
+  'pronostico-belgica-iran-21-06',
+  'pronostico-brasil-marruecos-13-06',
+  'pronostico-canada-bosnia-12-06',
+  'pronostico-espana-arabia-saudita-21-06',
+  'pronostico-espana-cabo-verde-15-06',
+  'pronostico-estados-unidos-paraguay-12-06',
+  'pronostico-francia-irak-22-06',
+  'pronostico-francia-senegal-16-06',
+  'pronostico-inglaterra-croacia-17-06',
+  'pronostico-mexico-sudafrica-11-06',
+  'pronostico-noruega-senegal-23-06',
+  'pronostico-nueva-zelanda-egipto-22-06',
+  'pronostico-paises-bajos-japon-14-06',
+  'pronostico-portugal-rd-congo-17-06',
+  'pronostico-tunez-japon-21-06',
+  'pronostico-uruguay-cabo-verde-21-06'
+]);
+
 function buildPickBlogUrl(pick) {
   if (!pick || !pick.home || !pick.away) return null;
   let dm = '';
@@ -16742,6 +16768,8 @@ function buildPickBlogUrl(pick) {
   }
   if (!dm) return null;
   const slug = 'pronostico-' + _slugifyTeam(pick.home) + '-' + _slugifyTeam(pick.away) + '-' + dm;
+  // 🛡️ Solo devolver URL si el articulo EXISTE — evita 404 en picks nuevos
+  if (!_PICK_BLOG_SLUGS.has(slug)) return null;
   return '/blog/' + slug;
 }
 
