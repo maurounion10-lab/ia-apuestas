@@ -2351,6 +2351,30 @@ export default {
       return new Response(JSON.stringify(stats, null, 2), { headers: CORS });
     }
 
+    // ── 🆕 (25-jun-2026) /wc-teams — devuelve team_ids + logos de TODAS las selecciones del WC 2026
+    // Cachea en KV 30 dias. Usado por cliente para sub-escudito federacion en nationalTeamBadge.
+    if (path === '/wc-teams') {
+      const cacheKey = 'wc_teams_2026_v1';
+      const cached = await env.CACHE_KV.get(cacheKey);
+      if (cached) return new Response(cached, { headers: CORS });
+      try {
+        const r = await apf('/teams?league=1&season=2026', env);
+        const teams = r.response || [];
+        const dict = {};
+        for (const t of teams) {
+          const name = t.team?.name;
+          const logo = t.team?.logo;
+          const id = t.team?.id;
+          if (name && logo) dict[name] = { id, logo };
+        }
+        const body = JSON.stringify({ count: Object.keys(dict).length, teams: dict, fetchedAt: new Date().toISOString() });
+        await env.CACHE_KV.put(cacheKey, body, { expirationTtl: 30 * 24 * 3600 });
+        return new Response(body, { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
     return new Response(JSON.stringify({ error: 'Not found', path }), { status: 404, headers: CORS });
   }
 };
