@@ -26278,6 +26278,119 @@ setTimeout(_fpBadgeInit, 1200);
   } catch(e) {}
 })();
 </script>
+
+<script>
+// 🆕 (25-jun-2026) Web Push opt-in — anti 0% retención
+(function() {
+  const VAPID_PUBLIC = 'BEFve5dHpprXm4_8XprLJsyFz6yOHDAGPrEUtfMeuho9NPv_mxlgX6oKepYb0omlDprkieAH8lBRe91HRVkRN1s';
+  const STORAGE_KEY = 'gb_push_state'; // 'asked' | 'subscribed' | 'denied'
+  const SUBSCRIBE_URL = 'https://api.accesoia.app/push/subscribe';
+
+  function urlBase64ToUint8Array(b64) {
+    const padding = '='.repeat((4 - b64.length % 4) % 4);
+    const base = (b64 + padding).replace(/-/g, '+').replace(/_/g, '/');
+    const raw = atob(base);
+    return new Uint8Array([...raw].map(c => c.charCodeAt(0)));
+  }
+
+  async function subscribeUser() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) return false;
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      const existing = await reg.pushManager.getSubscription();
+      if (existing) {
+        localStorage.setItem(STORAGE_KEY, 'subscribed');
+        return true;
+      }
+      const sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
+      });
+      // Enviar al backend
+      await fetch(SUBSCRIBE_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          subscription: sub.toJSON(),
+          userAgent: navigator.userAgent.slice(0, 200),
+          lang: navigator.language
+        })
+      });
+      localStorage.setItem(STORAGE_KEY, 'subscribed');
+      if (window.clarity) window.clarity('set', 'push_opted_in', 'true');
+      return true;
+    } catch(e) {
+      console.warn('[push] sub failed:', e.message);
+      return false;
+    }
+  }
+
+  function showOptIn() {
+    if (document.getElementById('gbPushPrompt')) return;
+    const div = document.createElement('div');
+    div.id = 'gbPushPrompt';
+    div.style.cssText = 'position:fixed;bottom:130px;right:18px;left:18px;max-width:380px;margin-left:auto;background:linear-gradient(135deg,#1a1a1a,#0d2a0d);border:1px solid rgba(0,200,83,0.5);border-radius:14px;padding:14px 16px;box-shadow:0 8px 32px rgba(0,0,0,0.5);z-index:9998;color:#fff;font-family:system-ui,sans-serif;font-size:.88rem;line-height:1.4;animation:gbPushSlide 0.35s ease-out';
+    div.innerHTML = `
+      <style>@keyframes gbPushSlide{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}</style>
+      <div style="display:flex;gap:10px;align-items:flex-start">
+        <div style="font-size:1.6rem;flex-shrink:0">🔔</div>
+        <div style="flex:1">
+          <div style="font-weight:800;color:#fff;margin-bottom:3px">¿Querés enterarte primero?</div>
+          <div style="color:rgba(255,255,255,0.75);font-size:.82rem">Te aviso cuando salga un pick de máxima confianza ⭐⭐⭐⭐⭐⭐</div>
+          <div style="display:flex;gap:8px;margin-top:10px">
+            <button id="gbPushYes" style="background:linear-gradient(135deg,#00c853,#00a846);color:#000;font-weight:800;border:none;padding:7px 14px;border-radius:7px;cursor:pointer;font-size:.82rem;flex:1">Sí, avisame</button>
+            <button id="gbPushNo" style="background:transparent;color:rgba(255,255,255,0.6);font-weight:600;border:1px solid rgba(255,255,255,0.2);padding:7px 14px;border-radius:7px;cursor:pointer;font-size:.82rem">Después</button>
+          </div>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(div);
+    document.getElementById('gbPushYes').onclick = async () => {
+      div.remove();
+      const ok = await subscribeUser();
+      if (ok && window.clarity) window.clarity('event', 'push_subscribed');
+    };
+    document.getElementById('gbPushNo').onclick = () => {
+      div.remove();
+      localStorage.setItem(STORAGE_KEY, 'asked');
+      // Re-preguntar en 7 días
+      localStorage.setItem('gb_push_next_ask', String(Date.now() + 7*24*60*60*1000));
+    };
+  }
+
+  function shouldAsk() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) return false;
+    if (Notification.permission === 'granted' || Notification.permission === 'denied') return false;
+    const state = localStorage.getItem(STORAGE_KEY);
+    if (state === 'subscribed' || state === 'denied') return false;
+    if (state === 'asked') {
+      const nextAsk = parseInt(localStorage.getItem('gb_push_next_ask') || '0');
+      if (Date.now() < nextAsk) return false;
+    }
+    return true;
+  }
+
+  // Trigger con engagement: 25s en la página O scroll >40%
+  function init() {
+    if (!shouldAsk()) return;
+    let shown = false;
+    const trigger = () => { if (!shown) { shown = true; showOptIn(); } };
+    setTimeout(trigger, 25000); // 25s
+    const onScroll = () => {
+      const pct = (window.scrollY + window.innerHeight) / document.body.scrollHeight * 100;
+      if (pct > 40) trigger();
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    setTimeout(init, 500);
+  }
+})();
+</script>
+
 </body>
 </html>
 
