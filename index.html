@@ -15759,19 +15759,26 @@ function renderHistorial(filter) {
     const tsB = b.commenceTs || 0;
     const aPend = a.result === 'pending';
     const bPend = b.result === 'pending';
-    // Categorías (menor = más arriba) — Mauro 23-jun: pendientes próximos PRIMERO
+    // Categorías (menor = más arriba) — Mauro 25-jun:
+    //   0 → PENDIENTES PRÓXIMOS (los que van a jugar pronto) — top
+    //   1 → RESUELTOS RECIENTES (últimos 14 días)
+    //   2 → RESUELTOS VIEJOS
+    //   3 → PENDIENTES PASADOS sin resolver (huérfanos visibles para resolver)
+    //   4 → FUTURES LEJANOS (>14 días)
     const cat = (pend, ts) => {
       if (pend) {
-        return (ts - NOW) <= D14 ? 0 : 3;   // pendiente próximo=0 (arriba), future lejano=3
+        if (ts < NOW) return 3;                       // pendiente pasado huérfano → cerca del fondo
+        return (ts - NOW) <= D14 ? 0 : 4;             // próximo=0 (arriba), future lejano=4 (fondo)
       }
-      return (NOW - ts) <= D14 ? 1 : 2;     // resuelto reciente=1, resuelto viejo=2
+      return (NOW - ts) <= D14 ? 1 : 2;               // resuelto reciente=1, resuelto viejo=2
     };
     const ca = cat(aPend, tsA);
     const cb = cat(bPend, tsB);
     if (ca !== cb) return ca - cb;
     // Dentro de cada categoría:
-    if (ca === 0 || ca === 3) return tsA - tsB;   // pendientes: más próximo arriba
-    return tsB - tsA;                              // resueltos: más reciente arriba
+    if (ca === 0 || ca === 4) return tsA - tsB;       // pendientes próximos / futures: más cercano arriba
+    if (ca === 3) return tsB - tsA;                   // pendientes huérfanos: más reciente primero
+    return tsB - tsA;                                  // resueltos: más reciente arriba
   });
 
   // Filtro por fecha
