@@ -12318,6 +12318,27 @@ function renderPreds() {
     }
   } catch(eStr) { console.warn('[estrella]', eStr); }
 
+  // 🛡️ (25-jun-2026 v3) OVERRIDE FINAL picks WC2026 envenenados por Supabase
+  // shared_cache. Se aplica al FINAL del pipeline para asegurar que ningún paso
+  // posterior pise los valores correctos del repo wc-matches.js.
+  if (realPreds && Array.isArray(realPreds)) {
+    const WC_FINAL_OVERRIDE = {
+      'wc2026_g5_egy_irn_26jun': {
+        rec: 'Empate', _recSide: 'draw',
+        bvr: 5, bvrText: 'Alta', conf: 'high', confLabel: 'Alta',
+        odds: 2.74, _bestOdds: 2.74, _hO: 2.55, _dO: 2.74, _aO: 3.87,
+        probH: 32, probD: 36, probA: 32,
+      },
+    };
+    realPreds.forEach(p => {
+      if (p && p.id && WC_FINAL_OVERRIDE[p.id]) {
+        const ov = WC_FINAL_OVERRIDE[p.id];
+        for (const k in ov) p[k] = ov[k];
+        p._confLocked = true;
+      }
+    });
+  }
+
   // Guardar picks completos y actualizar visibilidad de tabs de liga
   window._allAvailablePicks = realPreds ? realPreds.slice() : [];
   refreshLeagueTabs(window._allAvailablePicks);
