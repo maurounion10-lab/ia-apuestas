@@ -251,3 +251,7 @@
 /blog/dbbet-bono-150-freebet-argentina-mundial-2026.html  /blog/dbbet-bono-100-freebet-argentina-mundial-2026  301
 
 # HUB landing bonos
+
+# Sub-rutas semánticas /bonos/* → blog DBbet
+/bonos/dbbet  /blog/dbbet-bono-100-freebet-argentina-mundial-2026  301
+/bonos/dbbet/  /blog/dbbet-bono-100-freebet-argentina-mundial-2026  301
