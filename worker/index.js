@@ -2107,6 +2107,79 @@ export default {
       return new Response(JSON.stringify(out), { headers: { ...CORS, 'Cache-Control': 'public, max-age=300' } });
     }
 
+    // ── 🆕 (25-jun-2026 ETAPA 3 MP) POST /mp/subscribe — lead capture MasterProps a SendX ──
+    if (path === '/mp/subscribe' && request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const email = (body.email || '').toLowerCase().trim();
+        const source = (body.source || 'home').slice(0, 40);
+        if (!email || !email.includes('@') || email.length < 5) {
+          return new Response(JSON.stringify({ ok: false, error: 'email invalido' }), { status: 400, headers: CORS });
+        }
+        const sendxToken = env.SENDX_API_TOKEN;
+        const teamId = env.SENDX_TEAM_ID;
+        if (!sendxToken || !teamId) {
+          return new Response(JSON.stringify({ ok: false, error: 'sendx no configurado' }), { status: 500, headers: CORS });
+        }
+        // Crear/actualizar contacto en SendX con tag "masterprops-leads" + tag de source
+        const tags = ['masterprops-leads', 'mp-source-' + source.replace(/[^a-z0-9-]/gi, '')];
+        const sendxRes = await fetch('https://api.sendx.io/api/v1/contact', {
+          method: 'POST',
+          headers: {
+            'team': teamId,
+            'apiKey': sendxToken,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            email: email,
+            tags: tags,
+            customFields: { signup_source: 'masterprops', signup_url: source },
+          }),
+        });
+        const txt = await sendxRes.text();
+        if (!sendxRes.ok) {
+          return new Response(JSON.stringify({ ok: false, error: 'sendx error', detail: txt.slice(0, 200) }), { status: 502, headers: CORS });
+        }
+        return new Response(JSON.stringify({ ok: true, email: email }), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    // ── 🆕 (25-jun-2026 ETAPA 3 MP) POST /mp/push/subscribe — push notif MP ──
+    if (path === '/mp/push/subscribe' && request.method === 'POST') {
+      try {
+        const sub = await request.json();
+        if (!sub || !sub.endpoint) {
+          return new Response(JSON.stringify({ ok: false, error: 'subscription invalida' }), { status: 400, headers: CORS });
+        }
+        // SHA-256 corto del endpoint para key estable
+        const encoder = new TextEncoder();
+        const buf = await crypto.subtle.digest('SHA-256', encoder.encode(sub.endpoint));
+        const hash = Array.from(new Uint8Array(buf)).slice(0, 12).map(b => b.toString(16).padStart(2, '0')).join('');
+        const key = 'mp_push_sub_' + hash;
+        await env.CACHE_KV.put(key, JSON.stringify({ ...sub, registered_at: Date.now() }), { expirationTtl: 365 * 24 * 3600 });
+        return new Response(JSON.stringify({ ok: true, id: hash }), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    // ── 🆕 (25-jun-2026 ETAPA 3 MP) GET /mp/push/list — count suscriptores MP ──
+    if (path === '/mp/push/list') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      try {
+        const list = await env.CACHE_KV.list({ prefix: 'mp_push_sub_' });
+        return new Response(JSON.stringify({ count: list.keys.length, complete: list.list_complete }), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
     // ── 🆕 (25-jun-2026 FIX RAÍZ #3) /admin/clear-wc-locks ──
     // Borra entries WC envenenadas del shared_cache locked_picks de hoy y ayer.
     if (path === '/admin/clear-wc-locks') {
