@@ -5417,6 +5417,14 @@
     .bonos-cal-tab-day { font-size:0.6rem;letter-spacing:0.5px; }
     .bonos-cal-tab-mini { font-size:0.58rem; }
   }
+
+/* 🆕 (25-jun-2026) Mobile UX + retención tracking — post-Clarity */
+* { touch-action: manipulation; }  /* elimina delay 300ms double-tap mobile */
+html { -webkit-tap-highlight-color: rgba(0,200,83,0.15); }
+@media (hover: none) {
+  /* Reduce animaciones costosas en mobile (mejora INP) */
+  .pred-card, .estrella-card { transition: none !important; }
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script type="application/ld+json">
@@ -26252,6 +26260,24 @@ setTimeout(_fpBadgeInit, 1200);
 </script>
 
 
+<script>
+// 🆕 (25-jun-2026) Retención light: detectar usuarios que vuelven (sin push)
+(function() {
+  try {
+    const KEY = 'gb_last_visit';
+    const last = parseInt(localStorage.getItem(KEY) || '0');
+    const now = Date.now();
+    const HOURS_24 = 24 * 60 * 60 * 1000;
+    if (last && (now - last) >= HOURS_24 && (now - last) <= 30 * 24 * 60 * 60 * 1000) {
+      // Volvió entre 1 día y 30 días → marcar como returning para Clarity
+      if (window.clarity) window.clarity('set', 'user_returning', 'true');
+      const daysAway = Math.round((now - last) / HOURS_24);
+      if (window.clarity) window.clarity('set', 'days_away', String(daysAway));
+    }
+    localStorage.setItem(KEY, String(now));
+  } catch(e) {}
+})();
+</script>
 </body>
 </html>
 
