@@ -23,13 +23,23 @@ export async function onRequest(context) {
       });
     }
 
-    // 301 redirect para previas muy viejas (>30 días). Google saca estas URLs
-    // del reporte "Descubierta sin indexar" cuando ve el 301 permanente.
-    // GSC tenía 161 URLs viejas marcadas como "Descubierta sin indexar"; con
-    // este redirect deberían limpiarse en 2-4 semanas.
+    // 🆕 (25-jun-2026) 410 Gone para previas muy viejas (>30 días).
+    // Google saca estas URLs del índice más rápido cuando ve 410 (vs 301).
+    // GSC tenía 52 URLs marcadas como "Página con redirección" — con 410
+    // deberían limpiarse en 1-2 semanas en vez de 4-8.
     const THIRTY_DAYS_MS = 30 * 24 * 3600 * 1000;
     if (pick.commenceTs && (Date.now() - pick.commenceTs) > THIRTY_DAYS_MS) {
-      return Response.redirect('https://gambeta.ai/previas', 301);
+      return new Response(
+        `<!DOCTYPE html><html><head><meta name="robots" content="noindex,follow"><title>Previa expirada</title></head><body><p>Esta previa ya no está disponible. <a href="https://gambeta.ai/previas">Ver previas actuales</a>.</p></body></html>`,
+        {
+          status: 410,  // Gone — permanent removal signal a Google
+          headers: {
+            'Content-Type': 'text/html; charset=utf-8',
+            'X-Robots-Tag': 'noindex,follow',
+            'Cache-Control': 'public, max-age=3600, s-maxage=86400'
+          }
+        }
+      );
     }
 
     const html = renderPrevia(pick);
@@ -62,3 +72,5 @@ function notFoundHtml(slug) {
 <p><a href="/previas">Ver todas las previas disponibles →</a><br><a href="https://gambeta.ai">Volver al inicio</a></p>
 </body></html>`;
 }
+
+
