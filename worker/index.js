@@ -1850,12 +1850,12 @@ async function runWcMatchesPublisher(env) {
       stats.skip = 'historial no disponible';
       return stats;
     }
-    const existingIds = new Set(hist.map(p => p && p.id).filter(Boolean));
+    const existingById = new Map(hist.map(p => [p && p.id, p]).filter(([id]) => id));
     // 🆕 (22-jun-2026 — Mauro) Cuotas ≤ 1.20 no rinden: rechazar picks nuevos con cuota basura.
-    //    Los ya publicados (en existingIds) quedan intactos por la condición !existingIds.has(p.id).
+    //    Los ya publicados quedan intactos por la condición !existingById.has(p.id) en toAdd.
     const MIN_PICK_ODDS = 1.21;
     const toAdd = WC_MATCHES.filter(p => {
-      if (existingIds.has(p.id)) return false;
+      if (existingById.has(p.id)) return false;
       const o = parseFloat(p.odds);
       if (Number.isFinite(o) && o <= 1.20) {
         console.warn(`[wc-publisher] SKIP ${p.id} — cuota ${o} ≤ 1.20 (regla MIN_PICK_ODDS=${MIN_PICK_ODDS})`);
@@ -1863,9 +1863,30 @@ async function runWcMatchesPublisher(env) {
       }
       return true;
     });
+    // 🆕 (25-jun-2026 FIX RAÍZ #2) Detectar picks YA en historial cuyo rec/odds/bvr/conf
+    // difieren del repo wc-matches.js (porque los editaste). Aplicar UPDATE in-place SIN
+    // tocar el campo `result` ni `score` ya resueltos. Esto hace que cada edición del repo
+    // se propague automáticamente vía el cron horario, sin necesidad de /admin/replace-wc-matches.
+    const TRACKED_FIELDS = ['rec','_recSide','odds','_hO','_dO','_aO','_bestOdds','bvr','bvrText','conf','confLabel','probH','probD','probA','insight','stake','_bookKey','_bookLabel'];
+    let updated = 0;
+    for (const repoP of WC_MATCHES) {
+      const existing = existingById.get(repoP.id);
+      if (!existing) continue;
+      // Solo updatear si el partido sigue PENDING (no machar resultados ya cargados)
+      if (existing.result && existing.result !== 'pending') continue;
+      let changed = false;
+      for (const f of TRACKED_FIELDS) {
+        if (repoP[f] !== undefined && existing[f] !== repoP[f]) {
+          existing[f] = repoP[f];
+          changed = true;
+        }
+      }
+      if (changed) updated++;
+    }
+    stats.updated = updated;
     stats.alreadyPublished = WC_MATCHES.length - toAdd.length;
-    if (toAdd.length === 0) {
-      stats.skip = 'todos los WC matches ya están en el historial';
+    if (toAdd.length === 0 && updated === 0) {
+      stats.skip = 'todos los WC matches ya están en el historial y nada cambió';
       return stats;
     }
     const newHist = [...toAdd, ...hist];
