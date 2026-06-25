@@ -1569,8 +1569,9 @@ async function fetchApfScore(pick, env) {
     for (const fx of fixtures) {
       const fxHome = fx.teams?.home?.name || '';
       const fxAway = fx.teams?.away?.name || '';
-      if ((teamsMatch(fxHome, pick.home) && teamsMatch(fxAway, pick.away)) ||
-          (teamsMatch(fxHome, pick.away) && teamsMatch(fxAway, pick.home))) {
+      const directMatch  = teamsMatch(fxHome, pick.home) && teamsMatch(fxAway, pick.away);
+      const swappedMatch = teamsMatch(fxHome, pick.away) && teamsMatch(fxAway, pick.home);
+      if (directMatch || swappedMatch) {
         const status = fx.fixture?.status?.short || '';
         const finished = ['FT', 'AET', 'PEN'].includes(status);
         const voidLike = ['PST', 'CANC', 'ABD', 'AWD'].includes(status);
@@ -1581,11 +1582,15 @@ async function fetchApfScore(pick, env) {
         const goalsH = fx.goals?.home;
         const goalsA = fx.goals?.away;
         if (goalsH == null || goalsA == null) return null;
+        // 🛡️ Si los equipos vienen al reves en APF respecto al pick, invertir scores
+        // para que scoreH siempre corresponda a pick.home (lo que la rec espera).
+        const sH = swappedMatch ? parseInt(goalsA) : parseInt(goalsH);
+        const sA = swappedMatch ? parseInt(goalsH) : parseInt(goalsA);
         return {
           home: pick.home,
           away: pick.away,
-          scoreH: parseInt(goalsH),
-          scoreA: parseInt(goalsA),
+          scoreH: sH,
+          scoreA: sA,
           src: 'apf'
         };
       }
