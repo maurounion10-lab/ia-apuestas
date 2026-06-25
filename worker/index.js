@@ -2107,6 +2107,23 @@ export default {
       return new Response(JSON.stringify(out), { headers: { ...CORS, 'Cache-Control': 'public, max-age=300' } });
     }
 
+    // ── 🆕 (25-jun-2026) GET /mp/debug — diagnostico SendX secrets ──
+    if (path === '/mp/debug') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({error:'unauthorized'}), {status:401, headers:CORS});
+      const sxToken = env.SENDX_API_TOKEN || '';
+      const sxTeam = env.SENDX_TEAM_ID || '';
+      return new Response(JSON.stringify({
+        sendx_token_present: !!sxToken,
+        sendx_token_length: sxToken.length,
+        sendx_token_prefix: sxToken.slice(0, 8),
+        sendx_team_present: !!sxTeam,
+        sendx_team_length: sxTeam.length,
+        sendx_team_value: sxTeam, // team_id es publico, ok exponer
+      }, null, 2), { headers: CORS });
+    }
+
     // ── 🆕 (25-jun-2026 ETAPA 3 MP) POST /mp/subscribe — lead capture MasterProps a SendX ──
     if (path === '/mp/subscribe' && request.method === 'POST') {
       try {
