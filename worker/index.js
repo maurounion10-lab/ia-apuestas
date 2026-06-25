@@ -2084,58 +2084,63 @@ export default {
     }
 
     // ── 🆕 (25-jun-2026 FIX RAÍZ #3) /admin/clear-wc-locks ──
-    // Borra entries WC envenenadas del shared_cache locked_picks de hoy.
-    // El fix #1 (skip WC en sbSaveLockedPicks cliente) impide que se re-envenenen.
+    // Borra entries WC envenenadas del shared_cache locked_picks de hoy y ayer.
     if (path === '/admin/clear-wc-locks') {
       const token = url.searchParams.get('token');
       const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
       if (token !== expected) {
         return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
       }
-      const key = env.SUPABASE_SERVICE_ROLE_KEY;
-      if (!key) {
-        return new Response(JSON.stringify({ error: 'SUPABASE_SERVICE_ROLE_KEY no configurado' }), { status: 500, headers: CORS });
+      const skey = env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!skey) {
+        return new Response(JSON.stringify({ error: 'no service key' }), { status: 500, headers: CORS });
       }
       const today = new Date();
-      const prev = new Date(); prev.setDate(prev.getDate() - 1);
-      const keys = [
-        'locked_picks_v1_' + today.toISOString().slice(0,10),
-        'locked_picks_v1_' + prev.toISOString().slice(0,10),
+      const prev = new Date();
+      prev.setDate(prev.getDate() - 1);
+      const cacheKeys = [
+        'locked_picks_v1_' + today.toISOString().slice(0, 10),
+        'locked_picks_v1_' + prev.toISOString().slice(0, 10),
       ];
       const log = [];
-      for (const k of keys) {
+      for (const ck of cacheKeys) {
         try {
-          // GET actual
-          const getRes = await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.${encodeURIComponent(k)}&select=data`, {
-            headers: { 'apikey': key, 'Authorization': `Bearer ${key}` }
+          const getRes = await fetch(SUPABASE_URL + '/rest/v1/shared_cache?key=eq.' + encodeURIComponent(ck) + '&select=data', {
+            headers: { 'apikey': skey, 'Authorization': 'Bearer ' + skey }
           });
           const arr = await getRes.json();
-          if (!Array.isArray(arr) || !arr.length || !arr[0].data) { log.push(`${k}: empty`); continue; }
+          if (!Array.isArray(arr) || arr.length === 0 || !arr[0].data) {
+            log.push(ck + ': empty');
+            continue;
+          }
           const data = arr[0].data;
           const before = Object.keys(data).length;
           const cleaned = {};
           let removed = 0;
           for (const mk in data) {
             const v = data[mk];
-            if (v && (v.sportKey === 'soccer_fifa_world_cup' || (v.home && /egipto|ir[áa]n|p[aá]ises bajos|t[uú]nez|alemania|ecuador|uruguay|espa[ñn]a|noruega|francia|paraguay|australia|argentina|jordania|portugal|colombia|brasil|m[eé]xico|usa|canad[aá]|inglaterra|ghana|panam[aá]|croacia|marruecos|hait[ií]|congo|nueva zelanda|cabo verde|austria|argelia|uzbekist[aá]n|catar|qatar|escocia|suiza|cura[çc]ao/i.test(v.home) || /egipto|ir[áa]n|t[uú]nez|ecuador|espa[ñn]a|francia|australia|jordania|colombia|m[eé]xico|canad[aá]|ghana|panam[aá]|croacia|hait[ií]|congo|nueva zelanda|cabo verde|austria|argelia|uzbekist[aá]n|catar|qatar|escocia|cura[çc]ao/i.test(v.away || ''))) {
+            if (v && v.sportKey === 'soccer_fifa_world_cup') {
               removed++;
             } else {
               cleaned[mk] = v;
             }
           }
-          // PATCH actualizado
           if (removed > 0) {
-            const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.${encodeURIComponent(k)}`, {
+            const patchRes = await fetch(SUPABASE_URL + '/rest/v1/shared_cache?key=eq.' + encodeURIComponent(ck), {
               method: 'PATCH',
-              headers: { 'apikey': key, 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+              headers: {
+                'apikey': skey,
+                'Authorization': 'Bearer ' + skey,
+                'Content-Type': 'application/json',
+              },
               body: JSON.stringify({ data: cleaned, fetched_at: new Date().toISOString() }),
             });
-            log.push(`${k}: removed ${removed} de ${before} (${patchRes.ok ? 'OK' : 'FAIL ' + patchRes.status})`);
+            log.push(ck + ': removed ' + removed + ' de ' + before + ' (' + (patchRes.ok ? 'OK' : 'FAIL ' + patchRes.status) + ')');
           } else {
-            log.push(`${k}: nada a limpiar (${before} entries OK)`);
+            log.push(ck + ': clean (' + before + ' entries non-WC)');
           }
         } catch (e) {
-          log.push(`${k}: ERROR ${e.message}`);
+          log.push(ck + ': ERROR ' + e.message);
         }
       }
       return new Response(JSON.stringify({ ok: true, ts: new Date().toISOString(), log }, null, 2), { headers: CORS });
