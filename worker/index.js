@@ -683,7 +683,7 @@ function isReserveTeam(name) {
 
 // ── Definición de categorías de ligas ────────────────────────────────────────
 const LEAGUES_MAIN = [
-  ['soccer_fifa_world_cup',             null],   // 🏆 Mundial 2026 — solo Odds API (APF puede no tener este leagueId)
+  ['soccer_fifa_world_cup',                1],   // 🏆 Mundial 2026 — APF leagueId=1 (FIFA World Cup), calendar year
   ['soccer_argentina_primera_division',  128],
   ['soccer_conmebol_copa_libertadores',   13],
   ['soccer_conmebol_copa_sudamericana',   11],
@@ -886,6 +886,124 @@ const TEAM_ALIASES_RESOLVER = {
   'ol':                 'lyon',
   'olympiquelyon':      'lyon',
   'olympiquelyonnais':  'lyon',
+  // 🏆 Selecciones Mundial 2026: ES (repo) <-> EN (API-Football)
+  // CONMEBOL
+  'argentina':          'argentina',  // mismo
+  'brasil':             'brazil',
+  'brazil':             'brasil',
+  'colombia':           'colombia',
+  'uruguay':            'uruguay',
+  'paraguay':           'paraguay',
+  'ecuador':            'ecuador',
+  'venezuela':          'venezuela',
+  'chile':              'chile',
+  'peru':               'peru',
+  'bolivia':            'bolivia',
+  // UEFA
+  'alemania':           'germany',
+  'germany':            'alemania',
+  'inglaterra':         'england',
+  'england':            'inglaterra',
+  'paisesbajos':        'netherlands',
+  'netherlands':        'paisesbajos',
+  'holanda':            'netherlands',
+  'espana':             'spain',
+  'spain':              'espana',
+  'italia':             'italy',
+  'italy':              'italia',
+  'francia':            'france',
+  'france':             'francia',
+  'belgica':            'belgium',
+  'belgium':            'belgica',
+  'portugal':           'portugal',  // mismo
+  'croacia':            'croatia',
+  'croatia':            'croacia',
+  'suiza':              'switzerland',
+  'switzerland':        'suiza',
+  'austria':            'austria',  // mismo
+  'dinamarca':          'denmark',
+  'denmark':            'dinamarca',
+  'noruega':            'norway',
+  'norway':             'noruega',
+  'suecia':             'sweden',
+  'sweden':             'suecia',
+  'polonia':            'poland',
+  'poland':             'polonia',
+  'turquia':            'turkey',
+  'turkey':             'turquia',
+  'rumania':            'romania',
+  'romania':            'rumania',
+  'gales':              'wales',
+  'wales':              'gales',
+  'escocia':            'scotland',
+  'scotland':           'escocia',
+  'serbia':             'serbia',  // mismo
+  'ucrania':            'ukraine',
+  'ukraine':            'ucrania',
+  'rusia':              'russia',
+  'russia':             'rusia',
+  'bosnia':             'bosniaherzegovina',
+  'bosniayherzegovina': 'bosniaherzegovina',
+  'republicacheca':     'czechrepublic',
+  'czechrepublic':      'republicacheca',
+  'repcheca':           'czechrepublic',
+  'czechia':            'republicacheca',
+  // CONCACAF
+  'mexico':             'mexico',  // mismo
+  'usa':                'unitedstates',
+  'estadosunidos':      'unitedstates',
+  'unitedstates':       'usa',
+  'canada':             'canada',  // mismo
+  'costarica':          'costarica',  // mismo
+  'panama':             'panama',  // mismo
+  'jamaica':            'jamaica',  // mismo
+  'honduras':           'honduras',  // mismo
+  'haiti':              'haiti',  // mismo
+  'curacao':            'curacao',  // mismo
+  // CAF
+  'marruecos':          'morocco',
+  'morocco':            'marruecos',
+  'egipto':             'egypt',
+  'egypt':              'egipto',
+  'argelia':            'algeria',
+  'algeria':            'argelia',
+  'tunez':              'tunisia',
+  'tunisia':            'tunez',
+  'senegal':            'senegal',  // mismo
+  'nigeria':            'nigeria',  // mismo
+  'ghana':              'ghana',    // mismo
+  'camerun':            'cameroon',
+  'cameroon':           'camerun',
+  'costademarfil':      'ivorycoast',
+  'ivorycoast':         'costademarfil',
+  'costadivoire':       'ivorycoast',
+  'sudafrica':          'southafrica',
+  'southafrica':        'sudafrica',
+  'cabovere':           'capeverde',
+  'capeverde':          'cabovere',
+  'rdcongo':            'drcongo',
+  'drcongo':            'rdcongo',
+  'congodemocratico':   'drcongo',
+  // AFC
+  'japon':              'japan',
+  'japan':              'japon',
+  'coreadelsur':        'southkorea',
+  'southkorea':         'coreadelsur',
+  'corea':              'southkorea',
+  'australia':          'australia',  // mismo
+  'iran':               'iran',  // mismo
+  'iraq':               'iraq',  // mismo
+  'arabiasaudita':      'saudiarabia',
+  'saudiarabia':        'arabiasaudita',
+  'arabia':             'saudiarabia',
+  'qatar':              'qatar',  // mismo
+  'catar':              'qatar',
+  'jordania':           'jordan',
+  'jordan':             'jordania',
+  'uzbekistan':         'uzbekistan',  // mismo
+  // OFC
+  'nuevazelanda':       'newzealand',
+  'newzealand':         'nuevazelanda',
 };
 
 function teamsMatch(a, b) {
