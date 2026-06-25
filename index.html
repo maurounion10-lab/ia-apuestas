@@ -11665,8 +11665,24 @@ function renderPreds() {
       // Fuentes de bloqueo (en orden de prioridad):
       //   1. Supabase shared_cache (global — igual para TODOS los usuarios)
       //   2. Caché local del navegador (fallback si Supabase no respondió aún)
+      // 🛡️ (25-jun-2026 v2) HARDCODED OVERRIDE picks WC2026: el shared_cache de
+      // Supabase está envenenado con valores incorrectos (Egipto-Irán "Doble X2"
+      // en vez de "Empate"). Forzar valores correctos del repo wc-matches.js
+      // ANTES de cualquier procesamiento.
+      const WC_PICK_REPO_OVERRIDE = {
+        'wc2026_g5_egy_irn_26jun': { rec: 'Empate', _recSide: 'draw', bvr: 5, bvrText: 'Alta', conf: 'high', confLabel: 'Alta', odds: 2.74, _bestOdds: 2.74, _hO: 2.55, _dO: 2.74, _aO: 3.87, probH: 32, probD: 36, probA: 32 },
+        'wc2026_h5_uru_esp_26jun': { rec: 'Más de 2.5 goles', _recSide: 'over', bvr: 5, bvrText: 'Alta', conf: 'high', confLabel: 'Alta' },
+        'wc2026_h_ned_tun_25jun': { rec: 'Gana Local', _recSide: 'home', bvr: 6, bvrText: 'Máxima', conf: 'high', confLabel: 'Máxima' },
+        'wc2026_alemania_ecuador_25jun': { rec: 'Más de 2.5 goles', _recSide: 'over', bvr: 5, bvrText: 'Alta', conf: 'high', confLabel: 'Alta' },
+      };
       if (realPreds) {
         realPreds.forEach(p => {
+          // Aplicar override hardcoded ANTES de cualquier lock para picks WC
+          if (p.id && WC_PICK_REPO_OVERRIDE[p.id]) {
+            const ov = WC_PICK_REPO_OVERRIDE[p.id];
+            Object.keys(ov).forEach(k => { p[k] = ov[k]; });
+            p._confLocked = true; // marcar locked para que no se pise
+          }
           const mk = _matchKeyLP(p.home, p.away);
           // 🛡️ (25-jun-2026) SKIP lock para picks WC2026: el shared_cache tiene
           // valores viejos del pick recalculado (Doble X2 2.74) de antes del fix.
@@ -11704,10 +11720,6 @@ function renderPreds() {
             return;
           }
           // 2. Fallback: caché local del navegador
-          // 🛡️ (25-jun-2026) SKIP WC: cache local también tiene picks viejos con rec invertido
-          if (p._sportKey === 'soccer_fifa_world_cup' || p._wcMatch === true) {
-            return; // dejar pick WC como vino del repo, no aplicar cache local
-          }
           if (_cachedPreds?.length) {
             const prev = _cachedPreds.find(c => teamsMatch(c.home, p.home) && teamsMatch(c.away, p.away));
             if (prev?._confLocked) {
