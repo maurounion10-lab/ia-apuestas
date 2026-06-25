@@ -2083,6 +2083,30 @@ export default {
       return new Response(JSON.stringify({ keys }), { headers: CORS });
     }
 
+    // ── 🆕 (25-jun-2026) GET /wc-pick?id=X ──
+    // Endpoint público que devuelve el pick actual del wc-matches.js para que
+    // los blogs lo lean en tiempo real (anti-desync). CORS habilitado.
+    if (path === '/wc-pick') {
+      const id = url.searchParams.get('id');
+      if (!id) return new Response(JSON.stringify({ error: 'id required' }), { status: 400, headers: CORS });
+      const pick = WC_MATCHES.find(p => p && p.id === id);
+      if (!pick) return new Response(JSON.stringify({ error: 'pick not found', id }), { status: 404, headers: CORS });
+      // Sólo los campos públicos relevantes para el blog (no exponemos stake/_recSide/etc internos)
+      const out = {
+        id: pick.id,
+        home: pick.home,
+        away: pick.away,
+        rec: pick.rec,
+        odds: pick.odds,
+        bvr: pick.bvr,
+        bvrText: pick.bvrText,
+        conf: pick.conf,
+        insight: pick.insight,
+        commenceTs: pick.commenceTs,
+      };
+      return new Response(JSON.stringify(out), { headers: { ...CORS, 'Cache-Control': 'public, max-age=300' } });
+    }
+
     // ── 🆕 (25-jun-2026 FIX RAÍZ #3) /admin/clear-wc-locks ──
     // Borra entries WC envenenadas del shared_cache locked_picks de hoy y ayer.
     if (path === '/admin/clear-wc-locks') {
