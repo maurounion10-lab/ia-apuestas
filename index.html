@@ -10175,12 +10175,11 @@ function nationalTeamBadge(name, size=48) {
          + `<img src="${WC2026_CONFEDS[info.conf]}" alt="${info.conf}" width="${subSize}" height="${subSize}" style="position:absolute;top:-3px;left:-3px;width:${subSize}px;height:${subSize}px;border-radius:50%;background:#fff;padding:2px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.4)" onerror="this.style.display='none'">`
          + `</span>`;
   }
-  // Caso normal: escudo de federacion (PRINCIPAL) + bandera chica (esquina sup izq)
+  // Caso normal: SOLO escudo de federacion (sin sub-bandera) — Mauro lo pidio limpio
   // onerror del logo principal: fallback a bandera con tamaño grande
   const fallbackBig = flagUrl.replace(/'/g, "\\'");
   return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:visible;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.5);background:#fff">`
        + `<img src="${mainLogoUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:contain;border-radius:50%;display:block;background:#fff;padding:3px;box-sizing:border-box" onerror="this.onerror=null;this.src='${fallbackBig}';this.style.objectFit='cover';this.style.padding='0'">`
-       + `<img src="${flagUrl}" alt="${name} flag" width="${subSize}" height="${subSize}" style="position:absolute;top:-3px;left:-3px;width:${subSize}px;height:${subSize}px;border-radius:50%;background:#fff;object-fit:cover;box-shadow:0 1px 4px rgba(0,0,0,0.4);border:1.5px solid #fff" onerror="this.style.display='none'">`
        + `</span>`;
 }
 
