@@ -25669,9 +25669,9 @@ setTimeout(_fpBadgeInit, 1200);
   /* ── Banner ── */
   #gbVipSticky {
     position: fixed; left: 0; right: 0; bottom: 0; z-index: 9998;
-    background: linear-gradient(90deg,#0d1f0d 0%,#1a3a1a 50%,#0d1f0d 100%);
-    border-top: 1.5px solid #d4af37;
-    box-shadow: 0 -4px 18px rgba(0,0,0,0.4), 0 -1px 0 rgba(212,175,55,0.15);
+    background: linear-gradient(90deg, #1a0507 0%, #c8102e 40%, #e01237 50%, #c8102e 60%, #1a0507 100%);
+    border-top: 1.5px solid #FFD700;
+    box-shadow: 0 -4px 18px rgba(0,0,0,0.5), 0 -1px 0 rgba(255,215,0,0.30), 0 0 30px rgba(200,16,46,0.20);
     padding: 10px 14px; display: flex; align-items: center; gap: 12px;
     transform: translateY(0); font-family: inherit;
     overflow: hidden;
@@ -25769,27 +25769,27 @@ setTimeout(_fpBadgeInit, 1200);
     }
   }
 </style>
-<div id="gbVipSticky" class="gb-hidden" role="complementary" aria-label="Servicio VIP del Mundial">
-  <span class="gb-vip-trophy">🏆</span>
+<div id="gbVipSticky" class="gb-hidden" role="complementary" aria-label="Promo DBbet">
+  <span class="gb-vip-trophy">🎁</span>
   <div class="gb-vip-txt">
-    <span class="gb-vip-hl">VIP Mundial 2026</span> · <span class="gb-vip-sub">picks premium + análisis directo</span>
+    <span class="gb-vip-hl">DBbet · Bono +100%</span> · <span class="gb-vip-sub">hasta $179K ARS + FreeBet Mundial</span>
   </div>
-  <a href="https://t.me/AtencionVipProArg" target="_blank" rel="noopener" class="gb-vip-cta" onclick="try{localStorage.setItem('gb_vip_clicked','1')}catch(e){}">Contratar <span class="gb-vip-cta-arrow">→</span></a>
-  <button class="gb-vip-close" type="button" aria-label="Cerrar" onclick="(function(){try{localStorage.setItem('gb_vip_dismissed_ts',String(Date.now()))}catch(e){}var el=document.getElementById('gbVipSticky');if(el)el.classList.add('gb-hidden')})();return false;">×</button>
+  <a href="/bonos?utm_source=home_sticky&utm_medium=banner" class="gb-vip-cta" onclick="try{localStorage.setItem('gb_vip_clicked','1')}catch(e){}">Activar <span class="gb-vip-cta-arrow">→</span></a>
+  <button class="gb-vip-close" type="button" aria-label="Cerrar" onclick="(function(){try{localStorage.setItem('dbb_promo_dismissed_ts',String(Date.now()))}catch(e){}var el=document.getElementById('gbVipSticky');if(el)el.classList.add('gb-hidden')})();return false;">×</button>
 </div>
 <script>
 (function(){
   // Banner sticky VIP Mundial — visible hasta el final del torneo (19-jul-2026).
   // Dismiss persiste 72h en localStorage para no molestar al usuario que ya lo cerró.
   var WC_FINAL_MS = Date.UTC(2026, 6, 19, 23, 59, 59); // 19-jul-2026
-  var DISMISS_TTL_MS = 72 * 3600 * 1000;
+  var DISMISS_TTL_MS = 24 * 3600 * 1000; // 24h (antes 72h)
   var el = document.getElementById('gbVipSticky');
   if (!el) return;
   try {
     // Si ya pasó el Mundial → no mostrar
     if (Date.now() > WC_FINAL_MS) return;
     // Si el usuario lo cerró hace <72h → no mostrar
-    var ts = parseInt(localStorage.getItem('gb_vip_dismissed_ts') || '0', 10);
+    var ts = parseInt(localStorage.getItem('dbb_promo_dismissed_ts') || '0', 10);
     if (ts && (Date.now() - ts) < DISMISS_TTL_MS) return;
   } catch(e){}
   // Mostrar con pequeño delay para no competir con la carga inicial.
@@ -25814,6 +25814,9 @@ setTimeout(_fpBadgeInit, 1200);
 ═══════════════════════════════════════════════════════════════════════ -->
 <style>
 #dbbPromo, #dbbPromoChip { font-family: 'Segoe UI', system-ui, sans-serif }
+/* 🆕 (25-jun) chip flotante OCULTO: ahora el estado minimizado lo asume el banner sticky inferior #gbVipSticky */
+#dbbPromoChip { display: none !important }
+#dbbPromoChip.show { display: none !important }
 #dbbPromo {
   position: fixed; right: 24px; bottom: 80px; z-index: 99996;  /* 🆕 (23-jun) encima del banner VIP */
   width: min(380px, calc(100vw - 32px));
