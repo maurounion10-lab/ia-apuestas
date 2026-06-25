@@ -11704,6 +11704,10 @@ function renderPreds() {
             return;
           }
           // 2. Fallback: caché local del navegador
+          // 🛡️ (25-jun-2026) SKIP WC: cache local también tiene picks viejos con rec invertido
+          if (p._sportKey === 'soccer_fifa_world_cup' || p._wcMatch === true) {
+            return; // dejar pick WC como vino del repo, no aplicar cache local
+          }
           if (_cachedPreds?.length) {
             const prev = _cachedPreds.find(c => teamsMatch(c.home, p.home) && teamsMatch(c.away, p.away));
             if (prev?._confLocked) {
