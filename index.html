@@ -12078,11 +12078,48 @@ function renderPreds() {
           teamsMatch(p.home, ov.home) && teamsMatch(p.away, ov.away)
         ) || null;
       }
-      // Fallback automático: pick Alta sin iniciar con mayor bvr/prob
+      // Fallback automático: pick Alta sin iniciar
+      // Tie-breaker: si empatan en bvr, elegir el más mediático (Mauro 25-jun-2026)
+      // Ej: 2 picks Alta hoy → preferir Alemania-Ecuador (más prensa) sobre PB-Túnez.
       if (!star) {
+        // Score "mediático" basado en cuán reconocido es el partido por la prensa.
+        // Tier 1 (10): potencias mundialistas top
+        // Tier 2 (6):  selecciones grandes habituales en cuartos/octavos
+        // Tier 3 (3):  participantes habituales con seguimiento medio
+        // Default (1): selecciones de baja prensa internacional
+        const _MEDIATIC_TIER = {
+          // Tier 1
+          'brasil':10,'brazil':10,'argentina':10,'alemania':10,'germany':10,
+          'francia':10,'france':10,'inglaterra':10,'england':10,'espana':10,'spain':10,
+          'italia':10,'italy':10,'portugal':10,'paisesbajos':10,'netherlands':10,'holanda':10,
+          'belgica':10,'belgium':10,
+          // Tier 2
+          'mexico':6,'uruguay':6,'colombia':6,'croacia':6,'croatia':6,'usa':6,'unitedstates':6,
+          'estadosunidos':6,'marruecos':6,'morocco':6,'japon':6,'japan':6,'suiza':6,'switzerland':6,
+          // Tier 3
+          'dinamarca':3,'denmark':3,'polonia':3,'poland':3,'senegal':3,'ecuador':3,
+          'coreadelsur':3,'southkorea':3,'corea':3,'australia':3,'serbia':3,'turquia':3,'turkey':3,
+          'austria':3,'paraguay':3,'chile':3,'peru':3,'ghana':3,'nigeria':3,'iran':3,
+          'gales':3,'wales':3,'escocia':3,'scotland':3,'noruega':3,'norway':3,
+        };
+        function _medScore(name) {
+          if (!name) return 1;
+          const n = String(name).toLowerCase()
+            .replace(/ø/g,'o').replace(/æ/g,'ae').replace(/å/g,'a')
+            .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+            .replace(/[^a-z0-9]/g,'');
+          return _MEDIATIC_TIER[n] || 1;
+        }
+        function _matchMediaticScore(p) {
+          return _medScore(p.home) + _medScore(p.away);
+        }
         const candidates = predsForEstrella
           .filter(p => p.conf === 'high' && !p._started)
-          .sort((a,b) => (b.bvr||0)-(a.bvr||0) || (b.prob||0)-(a.prob||0));
+          .sort((a,b) =>
+            (b.bvr||0)-(a.bvr||0)                          // 1. mayor bvr
+            || _matchMediaticScore(b)-_matchMediaticScore(a) // 2. más mediático
+            || (b.prob||0)-(a.prob||0)                      // 3. mayor prob
+          );
         star = candidates[0] || null;
       }
       if (star) {
