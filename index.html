@@ -14320,6 +14320,14 @@ async function sbSaveLockedPicks(preds, force = false) {
   if (!preds?.length) return;
   const map = {};
   preds.forEach(p => {
+    // 🛡️ (25-jun-2026 FIX RAÍZ) SKIP WC2026: NUNCA grabar picks WC en
+    // shared_cache. La fuente de verdad es wc-matches.js → historial_full.
+    // Cualquier cliente que grabara aquí envenenaba el lock global (bug
+    // Egipto-Irán "Doble X2" recurrente). Los picks WC se actualizan
+    // exclusivamente via runWcMatchesPublisher cron del worker.
+    if (p._sportKey === 'soccer_fifa_world_cup' || p._wcMatch === true || p._wcFuture === true) {
+      return; // skip — no contaminar shared_cache
+    }
     map[_matchKeyLP(p.home, p.away)] = {
       conf: p.conf, bvr: p.bvr, bvrText: p.bvrText,
       rec: p.rec,
