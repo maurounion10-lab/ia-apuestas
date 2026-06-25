@@ -364,5 +364,141 @@ Total para jugar:            <span class="verde">~$460.000 ARS</span><br>
 <footer>
 <p>© 2026 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar en Fútbol · +18 · <a href="/blog">Volver al blog</a></p>
 </footer>
+
+<!-- ═══════════════════════════════════════════════════════════════════
+  🎁 POPUP STICKY DBbet — Bono 100% + FreeBet Argentina
+  Estilo fiel a la identidad DBbet (rojo/dorado/blanco premium)
+  - Aparece a los 5 segundos, una sola vez por sesión
+  - Se cierra con X, click en backdrop o Escape
+  - Persiste en localStorage si el usuario lo cierra
+═══════════════════════════════════════════════════════════════════ -->
+<style>
+#dbbBlogPop, #dbbBlogPop *{box-sizing:border-box;font-family:'Segoe UI','Inter',system-ui,-apple-system,sans-serif}
+#dbbBlogPop{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;background:rgba(8,4,4,0.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);padding:18px;opacity:0;transition:opacity .35s ease}
+#dbbBlogPop.show{display:flex;opacity:1}
+#dbbBlogPop .pop-card{position:relative;width:100%;max-width:440px;background:linear-gradient(180deg,#1a0507 0%,#11020a 100%);border:1.5px solid #c8102e;border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.7),0 0 60px rgba(200,16,46,0.25);transform:translateY(30px) scale(0.95);transition:transform .45s cubic-bezier(.34,1.56,.64,1),opacity .35s ease;opacity:0}
+#dbbBlogPop.show .pop-card{transform:translateY(0) scale(1);opacity:1}
+#dbbBlogPop .pop-card::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at top right,rgba(255,215,0,0.18),transparent 65%),radial-gradient(ellipse at bottom left,rgba(200,16,46,0.25),transparent 60%);pointer-events:none}
+
+/* HEADER rojo intenso con logo DBbet */
+#dbbBlogPop .pop-hdr{position:relative;background:linear-gradient(135deg,#e01237 0%,#c8102e 50%,#7a0b1f 100%);padding:18px 22px 16px;border-bottom:2px solid rgba(255,215,0,0.40);display:flex;align-items:center;justify-content:space-between;gap:12px}
+#dbbBlogPop .pop-hdr::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent 0%,#FFD700 50%,transparent 100%)}
+#dbbBlogPop .pop-hdr-l{display:flex;align-items:center;gap:10px}
+#dbbBlogPop .pop-logo{height:26px;display:block;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.4))}
+#dbbBlogPop .pop-tag{color:#FFD700;font-weight:900;font-size:.72rem;letter-spacing:1.8px;text-transform:uppercase;text-shadow:0 1px 4px rgba(0,0,0,0.4);padding-left:8px;border-left:1px solid rgba(255,215,0,0.35)}
+#dbbBlogPop .pop-close{background:rgba(0,0,0,0.30);border:1px solid rgba(255,255,255,0.18);color:#fff;width:30px;height:30px;border-radius:50%;cursor:pointer;font-size:1.1rem;font-weight:300;line-height:0;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s;flex-shrink:0}
+#dbbBlogPop .pop-close:hover{background:rgba(255,215,0,0.25);transform:rotate(90deg)}
+
+/* BODY */
+#dbbBlogPop .pop-body{padding:22px 22px 16px;position:relative;color:#fff}
+#dbbBlogPop .pop-badge{display:inline-block;background:rgba(255,215,0,0.15);color:#FFD700;font-weight:900;font-size:.66rem;letter-spacing:1.8px;padding:5px 12px;border-radius:100px;border:1px solid rgba(255,215,0,0.45);text-transform:uppercase;margin-bottom:14px;text-shadow:0 1px 4px rgba(0,0,0,0.3)}
+#dbbBlogPop .pop-title{font-size:1.55rem;font-weight:900;color:#fff;line-height:1.15;margin-bottom:8px;letter-spacing:-.3px}
+#dbbBlogPop .pop-title .y{color:#FFD700;text-shadow:0 2px 12px rgba(255,215,0,0.4)}
+#dbbBlogPop .pop-sub{font-size:.92rem;color:rgba(255,255,255,0.78);line-height:1.45;margin-bottom:18px}
+#dbbBlogPop .pop-sub strong{color:#FFD700;font-weight:800}
+
+/* CAJA DE OFERTA con número GIGANTE */
+#dbbBlogPop .pop-offer{background:linear-gradient(135deg,rgba(255,215,0,0.10) 0%,rgba(200,16,46,0.08) 100%);border:1px solid rgba(255,215,0,0.35);border-radius:14px;padding:16px 18px;margin-bottom:16px;text-align:center;position:relative;overflow:hidden}
+#dbbBlogPop .pop-offer::before{content:'';position:absolute;top:-50%;left:-50%;right:-50%;bottom:-50%;background:radial-gradient(ellipse,rgba(255,215,0,0.15),transparent 65%);pointer-events:none;animation:popOfferGlow 3s ease-in-out infinite}
+@keyframes popOfferGlow{0%,100%{opacity:0.6}50%{opacity:1}}
+#dbbBlogPop .pop-num{font-size:3rem;font-weight:900;background:linear-gradient(135deg,#FFD700 0%,#fff5b0 50%,#FFD700 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;line-height:1;letter-spacing:-1px;position:relative;text-shadow:0 4px 14px rgba(255,215,0,0.5)}
+#dbbBlogPop .pop-num-sub{font-size:.78rem;color:rgba(255,255,255,0.8);font-weight:700;letter-spacing:.5px;margin-top:4px;position:relative}
+#dbbBlogPop .pop-num-sub strong{color:#FFD700}
+
+/* TABLA FREEBET */
+#dbbBlogPop .pop-fb-label{font-size:.66rem;color:#FFD700;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+#dbbBlogPop .pop-fb-label::before{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.4))}
+#dbbBlogPop .pop-fb-label::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,rgba(255,215,0,0.4),transparent)}
+#dbbBlogPop .pop-fb{width:100%;border-collapse:collapse;font-size:.84rem;margin-bottom:18px}
+#dbbBlogPop .pop-fb td{padding:8px 12px;background:rgba(0,0,0,0.30);border:1px solid rgba(255,255,255,0.06)}
+#dbbBlogPop .pop-fb td:first-child{color:rgba(255,255,255,0.78);font-weight:600}
+#dbbBlogPop .pop-fb td:last-child{color:#FFD700;font-weight:900;text-align:right;text-shadow:0 1px 4px rgba(0,0,0,0.4)}
+
+/* CTA gigante */
+#dbbBlogPop a.pop-cta{display:block;background:linear-gradient(135deg,#FFD700 0%,#ffe680 50%,#c9a227 100%);color:#1a0a05!important;font-weight:900;font-size:1rem;padding:15px 24px;border-radius:11px;text-decoration:none!important;text-align:center;letter-spacing:1px;text-transform:uppercase;box-shadow:0 8px 24px rgba(255,215,0,0.35),inset 0 1px 0 rgba(255,255,255,0.4);transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden}
+#dbbBlogPop a.pop-cta::after{content:'';position:absolute;top:0;left:-100%;bottom:0;width:40%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.5),transparent);transform:skewX(-20deg);animation:popCtaShine 2.5s ease-in-out infinite}
+@keyframes popCtaShine{0%{left:-100%}55%,100%{left:130%}}
+#dbbBlogPop a.pop-cta:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(255,215,0,0.50),inset 0 1px 0 rgba(255,255,255,0.5)}
+
+#dbbBlogPop .pop-fine{font-size:.66rem;color:rgba(255,255,255,0.45);text-align:center;margin-top:12px;line-height:1.45}
+#dbbBlogPop .pop-fine strong{color:rgba(255,215,0,0.7)}
+
+@media (max-width:480px){
+  #dbbBlogPop{padding:12px}
+  #dbbBlogPop .pop-card{border-radius:14px}
+  #dbbBlogPop .pop-title{font-size:1.3rem}
+  #dbbBlogPop .pop-num{font-size:2.4rem}
+  #dbbBlogPop a.pop-cta{font-size:.92rem;padding:14px 18px}
+  #dbbBlogPop .pop-hdr{padding:14px 18px 12px}
+  #dbbBlogPop .pop-body{padding:18px 18px 14px}
+}
+</style>
+
+<div id="dbbBlogPop" role="dialog" aria-labelledby="dbbPopTitle" aria-modal="true">
+  <div class="pop-card">
+    <div class="pop-hdr">
+      <div class="pop-hdr-l">
+        <img class="pop-logo" src="https://gambeta.ai/img/casas/dbbet.svg" alt="DBbet"/>
+        <span class="pop-tag">★ Promo Mundial</span>
+      </div>
+      <button type="button" class="pop-close" id="dbbBlogPopClose" aria-label="Cerrar">×</button>
+    </div>
+    <div class="pop-body">
+      <span class="pop-badge">⚡ Solo nuevos usuarios</span>
+      <h3 class="pop-title" id="dbbPopTitle">Bono de Bienvenida <span class="y">DBbet</span></h3>
+      <p class="pop-sub">Duplicá tu primer depósito y sumá la <strong>FreeBet del partido de Argentina</strong> del sábado.</p>
+
+      <div class="pop-offer">
+        <div class="pop-num">+100%</div>
+        <div class="pop-num-sub">Hasta <strong>$179.000 ARS</strong> · Código de gambeta</div>
+      </div>
+
+      <div class="pop-fb-label">🎁 FreeBet Sábado 27</div>
+      <table class="pop-fb">
+        <tr><td>Depositás $20K</td><td>$10K FreeBet</td></tr>
+        <tr><td>Depositás $50K</td><td>$25K FreeBet</td></tr>
+        <tr><td>Depositás $100K</td><td>$50K FreeBet</td></tr>
+      </table>
+
+      <a class="pop-cta" href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213" target="_blank" rel="noopener" onclick="try{localStorage.setItem('dbbBlogPopClicked','1')}catch(e){}">Registrarme en DBbet →</a>
+      <div class="pop-fine">+18 · Juega con responsabilidad · Sujeto a <strong>T&C</strong> de DBbet · Solo nuevos usuarios</div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  var KEY = 'dbbBlogPopSeen';
+  try { if (localStorage.getItem(KEY) === '1') return; } catch(e){}
+
+  var pop = document.getElementById('dbbBlogPop');
+  if (!pop) return;
+  var closed = false;
+
+  function show(){
+    if (closed) return;
+    pop.classList.add('show');
+    document.body.style.overflow = 'hidden';
+  }
+  function hide(){
+    closed = true;
+    pop.classList.remove('show');
+    document.body.style.overflow = '';
+    try { localStorage.setItem(KEY, '1'); } catch(e){}
+  }
+
+  document.getElementById('dbbBlogPopClose').addEventListener('click', hide);
+  pop.addEventListener('click', function(ev){
+    if (ev.target === pop) hide();
+  });
+  document.addEventListener('keydown', function(ev){
+    if (ev.key === 'Escape' && pop.classList.contains('show')) hide();
+  });
+
+  // Aparece a los 5 segundos
+  setTimeout(show, 5000);
+})();
+</script>
+
 </body>
 </html>
