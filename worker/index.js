@@ -1850,12 +1850,12 @@ async function runWcMatchesPublisher(env) {
       stats.skip = 'historial no disponible';
       return stats;
     }
-    const existingById = new Map(hist.map(p => [p && p.id, p]).filter(([id]) => id));
+    const existingIds = new Set(hist.map(p => p && p.id).filter(Boolean));
     // 🆕 (22-jun-2026 — Mauro) Cuotas ≤ 1.20 no rinden: rechazar picks nuevos con cuota basura.
-    //    Los ya publicados quedan intactos por la condición !existingById.has(p.id) en toAdd.
+    //    Los ya publicados (en existingIds) quedan intactos por la condición !existingIds.has(p.id).
     const MIN_PICK_ODDS = 1.21;
     const toAdd = WC_MATCHES.filter(p => {
-      if (existingById.has(p.id)) return false;
+      if (existingIds.has(p.id)) return false;
       const o = parseFloat(p.odds);
       if (Number.isFinite(o) && o <= 1.20) {
         console.warn(`[wc-publisher] SKIP ${p.id} — cuota ${o} ≤ 1.20 (regla MIN_PICK_ODDS=${MIN_PICK_ODDS})`);
@@ -1863,30 +1863,9 @@ async function runWcMatchesPublisher(env) {
       }
       return true;
     });
-    // 🆕 (25-jun-2026 FIX RAÍZ #2) Detectar picks YA en historial cuyo rec/odds/bvr/conf
-    // difieren del repo wc-matches.js (porque los editaste). Aplicar UPDATE in-place SIN
-    // tocar el campo `result` ni `score` ya resueltos. Esto hace que cada edición del repo
-    // se propague automáticamente vía el cron horario, sin necesidad de /admin/replace-wc-matches.
-    const TRACKED_FIELDS = ['rec','_recSide','odds','_hO','_dO','_aO','_bestOdds','bvr','bvrText','conf','confLabel','probH','probD','probA','insight','stake','_bookKey','_bookLabel'];
-    let updated = 0;
-    for (const repoP of WC_MATCHES) {
-      const existing = existingById.get(repoP.id);
-      if (!existing) continue;
-      // Solo updatear si el partido sigue PENDING (no machar resultados ya cargados)
-      if (existing.result && existing.result !== 'pending') continue;
-      let changed = false;
-      for (const f of TRACKED_FIELDS) {
-        if (repoP[f] !== undefined && existing[f] !== repoP[f]) {
-          existing[f] = repoP[f];
-          changed = true;
-        }
-      }
-      if (changed) updated++;
-    }
-    stats.updated = updated;
     stats.alreadyPublished = WC_MATCHES.length - toAdd.length;
-    if (toAdd.length === 0 && updated === 0) {
-      stats.skip = 'todos los WC matches ya están en el historial y nada cambió';
+    if (toAdd.length === 0) {
+      stats.skip = 'todos los WC matches ya están en el historial';
       return stats;
     }
     const newHist = [...toAdd, ...hist];
@@ -2102,6 +2081,64 @@ export default {
     if (path === '/available') {
       const keys = [...LEAGUES_MAIN, ...LEAGUES_EUROPE, ...LEAGUES_SECONDARY].map(([k]) => k);
       return new Response(JSON.stringify({ keys }), { headers: CORS });
+    }
+
+    // ── 🆕 (25-jun-2026 FIX RAÍZ #3) /admin/clear-wc-locks ──
+    // Borra entries WC envenenadas del shared_cache locked_picks de hoy.
+    // El fix #1 (skip WC en sbSaveLockedPicks cliente) impide que se re-envenenen.
+    if (path === '/admin/clear-wc-locks') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      const key = env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!key) {
+        return new Response(JSON.stringify({ error: 'SUPABASE_SERVICE_ROLE_KEY no configurado' }), { status: 500, headers: CORS });
+      }
+      const today = new Date();
+      const prev = new Date(); prev.setDate(prev.getDate() - 1);
+      const keys = [
+        'locked_picks_v1_' + today.toISOString().slice(0,10),
+        'locked_picks_v1_' + prev.toISOString().slice(0,10),
+      ];
+      const log = [];
+      for (const k of keys) {
+        try {
+          // GET actual
+          const getRes = await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.${encodeURIComponent(k)}&select=data`, {
+            headers: { 'apikey': key, 'Authorization': `Bearer ${key}` }
+          });
+          const arr = await getRes.json();
+          if (!Array.isArray(arr) || !arr.length || !arr[0].data) { log.push(`${k}: empty`); continue; }
+          const data = arr[0].data;
+          const before = Object.keys(data).length;
+          const cleaned = {};
+          let removed = 0;
+          for (const mk in data) {
+            const v = data[mk];
+            if (v && (v.sportKey === 'soccer_fifa_world_cup' || (v.home && /egipto|ir[áa]n|p[aá]ises bajos|t[uú]nez|alemania|ecuador|uruguay|espa[ñn]a|noruega|francia|paraguay|australia|argentina|jordania|portugal|colombia|brasil|m[eé]xico|usa|canad[aá]|inglaterra|ghana|panam[aá]|croacia|marruecos|hait[ií]|congo|nueva zelanda|cabo verde|austria|argelia|uzbekist[aá]n|catar|qatar|escocia|suiza|cura[çc]ao/i.test(v.home) || /egipto|ir[áa]n|t[uú]nez|ecuador|espa[ñn]a|francia|australia|jordania|colombia|m[eé]xico|canad[aá]|ghana|panam[aá]|croacia|hait[ií]|congo|nueva zelanda|cabo verde|austria|argelia|uzbekist[aá]n|catar|qatar|escocia|cura[çc]ao/i.test(v.away || ''))) {
+              removed++;
+            } else {
+              cleaned[mk] = v;
+            }
+          }
+          // PATCH actualizado
+          if (removed > 0) {
+            const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.${encodeURIComponent(k)}`, {
+              method: 'PATCH',
+              headers: { 'apikey': key, 'Authorization': `Bearer ${key}`, 'Content-Type': 'application/json' },
+              body: JSON.stringify({ data: cleaned, fetched_at: new Date().toISOString() }),
+            });
+            log.push(`${k}: removed ${removed} de ${before} (${patchRes.ok ? 'OK' : 'FAIL ' + patchRes.status})`);
+          } else {
+            log.push(`${k}: nada a limpiar (${before} entries OK)`);
+          }
+        } catch (e) {
+          log.push(`${k}: ERROR ${e.message}`);
+        }
+      }
+      return new Response(JSON.stringify({ ok: true, ts: new Date().toISOString(), log }, null, 2), { headers: CORS });
     }
 
     // ── 🆕 /admin/replace-wc-matches — limpia todos los _wcMatch y reinserta los actuales ──
