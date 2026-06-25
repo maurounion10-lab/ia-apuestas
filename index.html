@@ -25673,12 +25673,12 @@ setTimeout(_fpBadgeInit, 1200);
     border-top: 1.5px solid #FFD700;
     box-shadow: 0 -4px 18px rgba(0,0,0,0.5), 0 -1px 0 rgba(255,215,0,0.30), 0 0 30px rgba(200,16,46,0.20);
     padding: 10px 14px; display: flex; align-items: center; gap: 12px;
-    transform: translateY(0); font-family: inherit;
+    transform: none; font-family: inherit;
     overflow: hidden;
-    animation: gbVipAttention 18s ease-in-out infinite;
+    /* 🆕 (25-jun) sin animación de movimiento — solo el brillo dorado del border-top y la banda shine */
   }
   #gbVipSticky.gb-hidden { transform: translateY(105%); animation: none; transition: transform 0.28s ease; }
-  #gbVipSticky.gb-show { animation: gbVipSlideUp 0.7s cubic-bezier(.34,1.56,.64,1) 1, gbVipAttention 18s 1.5s ease-in-out infinite; }
+  #gbVipSticky.gb-show { /* 🆕 (25-jun) sin slide-up ni animación periódica */ }
 
   /* ── Línea dorada animada en el borde superior ── */
   #gbVipSticky::before {
@@ -25775,7 +25775,6 @@ setTimeout(_fpBadgeInit, 1200);
     <span class="gb-vip-hl">DBbet · Bono +100%</span> · <span class="gb-vip-sub">hasta $179K ARS + FreeBet Mundial</span>
   </div>
   <a href="/bonos?utm_source=home_sticky&utm_medium=banner" class="gb-vip-cta" onclick="try{localStorage.setItem('gb_vip_clicked','1')}catch(e){}">Activar <span class="gb-vip-cta-arrow">→</span></a>
-  <button class="gb-vip-close" type="button" aria-label="Cerrar" onclick="(function(){try{localStorage.setItem('dbb_promo_dismissed_ts',String(Date.now()))}catch(e){}var el=document.getElementById('gbVipSticky');if(el)el.classList.add('gb-hidden')})();return false;">×</button>
 </div>
 <script>
 (function(){
@@ -25785,13 +25784,8 @@ setTimeout(_fpBadgeInit, 1200);
   var DISMISS_TTL_MS = 24 * 3600 * 1000; // 24h (antes 72h)
   var el = document.getElementById('gbVipSticky');
   if (!el) return;
-  try {
-    // Si ya pasó el Mundial → no mostrar
-    if (Date.now() > WC_FINAL_MS) return;
-    // Si el usuario lo cerró hace <72h → no mostrar
-    var ts = parseInt(localStorage.getItem('dbb_promo_dismissed_ts') || '0', 10);
-    if (ts && (Date.now() - ts) < DISMISS_TTL_MS) return;
-  } catch(e){}
+  // El banner ya no se puede cerrar — siempre visible hasta el final del Mundial
+  if (Date.now() > WC_FINAL_MS) return;
   // Mostrar con pequeño delay para no competir con la carga inicial.
   // gb-show dispara la animación de slide-up con bounce.
   setTimeout(function(){
@@ -26044,7 +26038,7 @@ setTimeout(_fpBadgeInit, 1200);
   setTimeout(function(){
     showPopup();
     localStorage.setItem(todayKey, '1');
-  }, 5000);
+  }, 120000); // 🆕 (25-jun) 2 minutos (antes 5 seg)
 })();
 </script>
 
