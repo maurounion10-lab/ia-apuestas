@@ -153,5 +153,17 @@ footer{padding:24px;text-align:center;color:var(--sec);font-size:.8rem;border-to
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"Pronóstico Colombia vs RD Congo","item":"https://gambeta.ai/blog/pronostico-colombia-rd-congo-23-06"}]}
 </script>
 <footer>© 2026 gambeta.ai · IA para apuestas deportivas</footer>
+<script>
+(function(){
+  var PICK_ID="wc2026_k3_col_cod_23jun";
+  var HOME="Colombia", AWAY="RD Congo";
+  function dis(r){if(!r)return r;if(r==="Gana Local")return "Gana "+HOME;if(r==="Gana Visitante")return "Gana "+AWAY;return r;}
+  fetch("https://api.accesoia.app/wc-pick?id="+encodeURIComponent(PICK_ID)).then(function(r){return r.ok?r.json():null;}).then(function(p){
+    if(!p||!p.rec)return;
+    var re=document.querySelector(".pick-card .rec");if(re)re.textContent="🎯 "+dis(p.rec);
+    var od=document.querySelector(".pick-card .meta b");if(od&&p.odds!=null)od.textContent=(Math.round(p.odds*100)/100).toFixed(2);
+  }).catch(function(){});
+})();
+</script>
 </body>
 </html>
