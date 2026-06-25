@@ -153,5 +153,30 @@ footer{padding:24px;text-align:center;color:var(--sec);font-size:.8rem;border-to
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"Pronóstico Brasil vs Marruecos","item":"https://gambeta.ai/blog/pronostico-brasil-marruecos-13-06"}]}
 </script>
 <footer>© 2026 gambeta.ai · IA para apuestas deportivas</footer>
+<script>
+// 🔄 (25-jun-2026) Sync dinámico: lee pick actual del worker y actualiza DOM si difiere
+(function() {
+  var PICK_ID = 'wc2026_c1_bra_mar_13jun';
+  var HOME = "Brasil";
+  var AWAY = "Marruecos";
+  // Etiqueta del equipo según _recSide
+  function recDisplay(rec) {
+    if (!rec) return rec;
+    if (rec === 'Gana Local') return 'Gana ' + HOME;
+    if (rec === 'Gana Visitante') return 'Gana ' + AWAY;
+    return rec;
+  }
+  fetch('https://api.accesoia.app/wc-pick?id=' + encodeURIComponent(PICK_ID))
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(p) {
+      if (!p || !p.rec) return;
+      var recEl = document.querySelector('.pick-card .rec');
+      if (recEl) recEl.textContent = '🎯 ' + recDisplay(p.rec);
+      var oddsEl = document.querySelector('.pick-card .meta b');
+      if (oddsEl && p.odds != null) oddsEl.textContent = (Math.round(p.odds * 100) / 100).toFixed(2);
+    })
+    .catch(function() { /* fallback al hardcoded — no-op */ });
+})();
+</script>
 </body>
 </html>
