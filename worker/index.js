@@ -2107,24 +2107,8 @@ export default {
       return new Response(JSON.stringify(out), { headers: { ...CORS, 'Cache-Control': 'public, max-age=300' } });
     }
 
-    // ── 🆕 (25-jun-2026) GET /mp/debug — diagnostico SendX secrets ──
-    if (path === '/mp/debug') {
-      const token = url.searchParams.get('token');
-      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
-      if (token !== expected) return new Response(JSON.stringify({error:'unauthorized'}), {status:401, headers:CORS});
-      const sxToken = env.SENDX_API_TOKEN || '';
-      const sxTeam = env.SENDX_TEAM_ID || '';
-      return new Response(JSON.stringify({
-        sendx_token_present: !!sxToken,
-        sendx_token_length: sxToken.length,
-        sendx_token_prefix: sxToken.slice(0, 8),
-        sendx_team_present: !!sxTeam,
-        sendx_team_length: sxTeam.length,
-        sendx_team_value: sxTeam, // team_id es publico, ok exponer
-      }, null, 2), { headers: CORS });
-    }
-
-    // ── 🆕 (25-jun-2026 ETAPA 3 MP) POST /mp/subscribe — lead capture MasterProps a SendX ──
+    // ── 🆕 (25-jun-2026 ETAPA 3 MP v2) POST /mp/subscribe — lead capture MP a SendX ──
+    // Usa MISMO formato que Gambeta (X-Team-ApiKey + /rest/contact + tags + lists)
     if (path === '/mp/subscribe' && request.method === 'POST') {
       try {
         const body = await request.json();
@@ -2133,29 +2117,25 @@ export default {
         if (!email || !email.includes('@') || email.length < 5) {
           return new Response(JSON.stringify({ ok: false, error: 'email invalido' }), { status: 400, headers: CORS });
         }
-        const sendxToken = env.SENDX_API_TOKEN;
-        const teamId = env.SENDX_TEAM_ID;
-        if (!sendxToken || !teamId) {
-          return new Response(JSON.stringify({ ok: false, error: 'sendx no configurado' }), { status: 500, headers: CORS });
+        if (!env.SENDX_API_TOKEN) {
+          return new Response(JSON.stringify({ ok: false, error: 'sendx_no_config' }), { status: 500, headers: CORS });
         }
-        // Crear/actualizar contacto en SendX con tag "masterprops-leads" + tag de source
         const tags = ['masterprops-leads', 'mp-source-' + source.replace(/[^a-z0-9-]/gi, '')];
-        const sendxRes = await fetch('https://api.sendx.io/api/v1/contact', {
+        const sendxRes = await fetch('https://api.sendx.io/api/v1/rest/contact', {
           method: 'POST',
           headers: {
-            'team': teamId,
-            'apiKey': sendxToken,
+            'X-Team-ApiKey': env.SENDX_API_TOKEN,
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
             email: email,
+            firstName: 'masterprops-lead',
             tags: tags,
-            customFields: { signup_source: 'masterprops', signup_url: source },
           }),
         });
-        const txt = await sendxRes.text();
         if (!sendxRes.ok) {
-          return new Response(JSON.stringify({ ok: false, error: 'sendx error', detail: txt.slice(0, 200) }), { status: 502, headers: CORS });
+          const errText = await sendxRes.text().catch(() => '');
+          return new Response(JSON.stringify({ ok: false, error: 'sendx_' + sendxRes.status, detail: errText.slice(0, 200) }), { status: 502, headers: CORS });
         }
         return new Response(JSON.stringify({ ok: true, email: email }), { headers: CORS });
       } catch (e) {
