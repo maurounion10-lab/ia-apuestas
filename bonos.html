@@ -276,61 +276,6 @@ footer{border-top:1px solid var(--borde);padding:34px 24px;text-align:center;col
   </div>
 </section>
 
-<!-- CALCULADORA 2 -->
-<section class="section">
-  <span class="kicker">Calculadora 2</span>
-  <h2>¿Cuánto vale <span class="gold">elegir bien la cuota?</span></h2>
-  <p>La misma apuesta paga distinto en cada casa.</p>
-  <p>Diferencia de unos centésimos. Multiplicada por 250 apuestas al año:</p>
-
-  <div class="calc-wrap">
-    <div class="calc-title">📊 Valor de comparar cuotas</div>
-    <div class="calc-h">Cuánto cambia tu ganancia anual</div>
-
-    <div class="calc-row">
-      <span class="calc-label">¿Cuánto apostás por jugada? (ARS)</span>
-      <div class="calc-slider-row">
-        <input type="range" min="1000" max="50000" step="1000" value="10000" class="calc-slider" id="calcStake">
-        <span class="calc-slider-val" id="calcStakeVal">$10K</span>
-      </div>
-    </div>
-
-    <div class="calc-row">
-      <span class="calc-label">¿Cuántas apuestas por semana?</span>
-      <div class="calc-slider-row">
-        <input type="range" min="1" max="20" value="5" class="calc-slider" id="calcBetsWeek">
-        <span class="calc-slider-val" id="calcBetsWeekVal">5</span>
-      </div>
-    </div>
-
-    <div class="calc-row">
-      <span class="calc-label">Diferencia promedio de cuota al comparar 3 casas</span>
-      <div class="calc-slider-row">
-        <input type="range" min="0.03" max="0.15" step="0.01" value="0.06" class="calc-slider" id="calcOddDiff">
-        <span class="calc-slider-val" id="calcOddDiffVal">+0.06</span>
-      </div>
-    </div>
-
-    <div class="calc-result">
-      <div class="calc-result-lbl">Plata extra que ganás en un año</div>
-      <div class="calc-result-num" id="calcResult2">$0</div>
-      <div class="calc-result-sub" id="calcResult2Sub">Solo por elegir la casa con mejor cuota cada vez</div>
-    </div>
-  </div>
-
-  <table class="comp-tbl">
-    <thead>
-      <tr><th>Escenario</th><th>Cuota</th><th>Pago por $10K</th></tr>
-    </thead>
-    <tbody>
-      <tr><td>Casa A (la que primero ves)</td><td>1.85</td><td class="bad">$18.500</td></tr>
-      <tr><td>Casa B (después de comparar)</td><td>1.91</td><td class="good">$19.100</td></tr>
-      <tr><td><strong>Diferencia por apuesta</strong></td><td>+0.06</td><td class="good"><strong>+$600</strong></td></tr>
-    </tbody>
-  </table>
-  <p style="font-size:.85rem;color:rgba(255,255,255,0.5);margin-top:10px;text-align:center"><em>Multiplicá por 250 apuestas al año = $150.000 extra solo por mover el dedo. Sin acertar más, sin arriesgar más.</em></p>
-</section>
-
 <!-- DÓNDE EMPEZAR (CASO SPONSOR) -->
 <section class="section">
   <span class="kicker">Por dónde empezar</span>
@@ -464,26 +409,6 @@ function updateCalc1(){
 [caEl, dpEl, exEl].forEach(function(el){ el.addEventListener('input', updateCalc1); });
 updateCalc1();
 
-// ── Calculadora 2: valor de comparar cuotas ──
-var stEl = document.getElementById('calcStake');
-var bwEl = document.getElementById('calcBetsWeek');
-var odEl = document.getElementById('calcOddDiff');
-
-function updateCalc2(){
-  var stake = parseInt(stEl.value);
-  var betsWeek = parseInt(bwEl.value);
-  var oddDiff = parseFloat(odEl.value);
-  document.getElementById('calcStakeVal').textContent = fmtARS(stake);
-  document.getElementById('calcBetsWeekVal').textContent = betsWeek;
-  document.getElementById('calcOddDiffVal').textContent = '+' + oddDiff.toFixed(2);
-
-  // Ganancia anual extra = stake × oddDiff × betsWeek × 52
-  var annualExtra = stake * oddDiff * betsWeek * 52;
-  document.getElementById('calcResult2').textContent = fmtARSfull(annualExtra);
-  document.getElementById('calcResult2Sub').innerHTML = '<strong>' + betsWeek + '</strong> apuestas semanales × <strong>52 semanas</strong> × <strong>+' + oddDiff.toFixed(2) + '</strong> cuota extra';
-}
-[stEl, bwEl, odEl].forEach(function(el){ el.addEventListener('input', updateCalc2); });
-updateCalc2();
 </script>
 
 <!-- ═══════════════════════════════════════════════════════════════════
