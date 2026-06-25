@@ -11660,6 +11660,13 @@ function renderPreds() {
       if (realPreds) {
         realPreds.forEach(p => {
           const mk = _matchKeyLP(p.home, p.away);
+          // 🛡️ (25-jun-2026) SKIP lock para picks WC2026: el shared_cache tiene
+          // valores viejos del pick recalculado (Doble X2 2.74) de antes del fix.
+          // Para WC, los datos del repo wc-matches.js (via historial_full) son la
+          // unica fuente de verdad. NO aplicar shared_cache lock.
+          if (p._sportKey === 'soccer_fifa_world_cup' || p._wcMatch === true) {
+            return; // dejar pick como vino del repo
+          }
           // 1. Lock global desde Supabase — HOY y AYER (exacto primero, luego fuzzy)
           // Combinar picks de hoy y de ayer para cubrir Libertadores/Sudamericana nocturnos
           const _allLP = { ...window._sbLockedPicksPrev, ...window._sbLockedPicks };
@@ -11725,6 +11732,8 @@ function renderPreds() {
             // _ghist solo aplica si el pick NO está ya bloqueado por Supabase lock.
             // Un pick bloqueado (_confLocked) ya tiene su valor definitivo — no sobreescribir.
             if (_gp && !p._confLocked) {
+              // 🛡️ SKIP override para WC: el ghist cache tambien tiene rec viejo
+              if (p._sportKey === 'soccer_fifa_world_cup' || p._wcMatch === true) return;
               if (_gp.rec)     p.rec      = _gp.rec;
               if (_gp.conf)    p.conf     = _gp.conf;
               if (_gp.bvr)     p.bvr      = _gp.bvr;
