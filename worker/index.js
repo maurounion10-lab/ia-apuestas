@@ -1475,6 +1475,14 @@ async function runOddsUpdater(env) {
       if (result && result !== 'pending') continue;
       if (pick.oddsFrozen) continue;
 
+      // 🛡️ (25-jun-2026) Skip picks WC2026: las cuotas vienen del repo wc-matches.js
+      // (cuotas DBbet curadas a mano). Odds API es promedio de bookies UE/UK y NO
+      // refleja DBbet — pisaba rec, _hO, _dO, _aO y rompía picks (ej Egipto-Irán).
+      // Cuando tengamos API DBbet, sacar este skip y poblar desde DBbet feed.
+      if (pick._sportKey === 'soccer_fifa_world_cup' || pick._wcMatch === true || pick._wcFuture === true) {
+        continue;
+      }
+
       stats.checked++;
 
       // Freeze odds if match starts in < 2h
