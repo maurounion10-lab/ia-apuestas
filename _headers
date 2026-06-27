@@ -1,5 +1,15 @@
 # Cloudflare Pages custom headers
 
+# ── SECURITY HEADERS GLOBALES (aplica a todas las URLs) ──
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), interest-cohort=()
+  X-XSS-Protection: 1; mode=block
+  Cross-Origin-Opener-Policy: same-origin-allow-popups
+
 # ── HTML principal: revalidar en cada visita pero cachear en el CDN edge ──
 /
   Cache-Control: public, max-age=0, s-maxage=300, stale-while-revalidate=60
