@@ -255,3 +255,33 @@
 # Sub-rutas semánticas /bonos/* → blog DBbet
 /bonos/dbbet  /blog/dbbet-bono-100-freebet-argentina-mundial-2026  301
 /bonos/dbbet/  /blog/dbbet-bono-100-freebet-argentina-mundial-2026  301
+
+# Lote 27-jun: 25 Nivel Básico + 3 pronósticos WC
+/blog/que-es-una-apuesta-deportiva  /blog/que-es-una-apuesta-deportiva.html  200
+/blog/que-es-una-cuota  /blog/que-es-una-cuota.html  200
+/blog/apuesta-simple-vs-combinada  /blog/apuesta-simple-vs-combinada.html  200
+/blog/que-son-apuestas-en-vivo  /blog/que-son-apuestas-en-vivo.html  200
+/blog/probabilidad-implicita  /blog/probabilidad-implicita.html  200
+/blog/que-es-un-bono-de-apuestas  /blog/que-es-un-bono-de-apuestas.html  200
+/blog/que-es-bono-bienvenida  /blog/que-es-bono-bienvenida.html  200
+/blog/que-es-freebet  /blog/que-es-freebet.html  200
+/blog/que-es-rollover  /blog/que-es-rollover.html  200
+/blog/cashback-vs-freebet-vs-bono  /blog/cashback-vs-freebet-vs-bono.html  200
+/blog/bonos-letra-chica  /blog/bonos-letra-chica.html  200
+/blog/1x2-mercado-simple  /blog/1x2-mercado-simple.html  200
+/blog/doble-oportunidad  /blog/doble-oportunidad.html  200
+/blog/over-under-25-goles  /blog/over-under-25-goles.html  200
+/blog/ambos-equipos-marcan-btts  /blog/ambos-equipos-marcan-btts.html  200
+/blog/handicap-asiatico  /blog/handicap-asiatico.html  200
+/blog/como-ganar-apuestas-deportivas-101  /blog/como-ganar-apuestas-deportivas-101.html  200
+/blog/que-es-bankroll  /blog/que-es-bankroll.html  200
+/blog/stake-fijo-vs-variable  /blog/stake-fijo-vs-variable.html  200
+/blog/value-betting  /blog/value-betting.html  200
+/blog/errores-apostador-nuevo  /blog/errores-apostador-nuevo.html  200
+/blog/elegir-casa-apuestas  /blog/elegir-casa-apuestas.html  200
+/blog/casa-apuestas-regulada-argentina  /blog/casa-apuestas-regulada-argentina.html  200
+/blog/retirar-ganancias-casa-apuestas  /blog/retirar-ganancias-casa-apuestas.html  200
+/blog/apostar-con-responsabilidad  /blog/apostar-con-responsabilidad.html  200
+/blog/pronostico-argentina-jordania-27-06  /blog/pronostico-argentina-jordania-27-06.html  200
+/blog/pronostico-colombia-portugal-27-06  /blog/pronostico-colombia-portugal-27-06.html  200
+/blog/pronostico-panama-inglaterra-27-06  /blog/pronostico-panama-inglaterra-27-06.html  200
