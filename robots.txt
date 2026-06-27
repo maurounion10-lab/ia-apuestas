@@ -10,6 +10,11 @@ Disallow: /*?category=*
 Disallow: /available
 Disallow: /mundial/eleccion
 Disallow: /mundial/gracias
+Disallow: /es/line/
+Disallow: /cup-context
+Disallow: /coupon
+Disallow: /ranking
+Disallow: /nba/500
 Allow: /
 
 Sitemap: https://gambeta.ai/sitemap.xml
