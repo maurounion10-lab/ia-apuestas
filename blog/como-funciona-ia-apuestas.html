@@ -1,43 +1,60 @@
 <!DOCTYPE html>
+
 <html lang="es">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Cómo funciona la IA en las apuestas deportivas</title>
-<meta content="Cómo funciona la inteligencia artificial aplicada a las apuestas deportivas: qué datos usa, cómo calcula probabilidades y dónde están sus límites." name="description"/>
+<title>Cómo funciona una IA de apuestas deportivas, explicado simple | gambeta.ai</title>
+<meta content="Cómo funciona una IA de apuestas paso a paso. Qué datos usa, cómo calcula probabilidades, qué es el edge y por qué algunos modelos rinden mejor que otros." name="description"/>
 <meta content="gambeta.ai" name="author"/>
 <meta content="index, follow" name="robots"/>
 <link href="https://gambeta.ai/blog/como-funciona-ia-apuestas" rel="canonical"/>
+<!-- Open Graph -->
 <meta content="article" property="og:type"/>
 <meta content="https://gambeta.ai/blog/como-funciona-ia-apuestas" property="og:url"/>
-<meta content="Cómo funciona la IA en las apuestas deportivas" property="og:title"/>
-<meta content="Cómo funciona la inteligencia artificial aplicada a las apuestas deportivas: qué datos usa, cómo calcula probabilidades y dónde están sus límites." property="og:description"/>
-<meta content="https://gambeta.ai/og-image.png" property="og:image"/>
+<meta content="¿Cómo funciona una IA de apuestas? Explicado simple" property="og:title"/>
+<meta content="Cómo funciona una IA de apuestas paso a paso. Qué datos usa, cómo calcula probabilidades, qué es el edge y por qué algunos modelos rinden mejor que otros." property="og:description"/>
+<meta content="https://gambeta.ai/blog/og/og-como-funciona-ia-apuestas.png" property="og:image"/>
 <meta content="1200" property="og:image:width"/>
 <meta content="630" property="og:image:height"/>
 <meta content="es_AR" property="og:locale"/>
 <meta content="gambeta.ai" property="og:site_name"/>
+<!-- Twitter Card -->
 <meta content="summary_large_image" name="twitter:card"/>
 <meta content="@gambetaia" name="twitter:site"/>
-<meta content="Cómo funciona la IA en las apuestas deportivas" name="twitter:title"/>
-<meta content="Cómo funciona la inteligencia artificial aplicada a las apuestas deportivas: qué datos usa, cómo calcula probabilidades y dónde están sus límites." name="twitter:description"/>
-<meta content="https://gambeta.ai/og-image.png" name="twitter:image"/>
+<meta content="¿Cómo funciona una IA de apuestas? Explicado simple" name="twitter:title"/>
+<meta content="Cómo funciona una IA de apuestas paso a paso. Qué datos usa, cómo calcula probabilidades, qué es el edge y por qué algunos modelos rinden mejor que otros." name="twitter:description"/>
+<meta content="https://gambeta.ai/blog/og/og-como-funciona-ia-apuestas.png" name="twitter:image"/>
+<!-- Schema.org Article -->
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "Article",
-    "headline": "Cómo funciona la IA en las apuestas deportivas: explicado simple",
-    "description": "Cómo funciona la inteligencia artificial aplicada a las apuestas deportivas: qué datos usa, cómo calcula probabilidades y dónde están sus límites.",
+    "headline": "¿Cómo funciona una IA de apuestas? Explicado simple",
+    "description": "Introducción completa a la inteligencia artificial aplicada a las apuestas deportivas. Cómo funciona, qué ventajas da y cómo empezar con gambeta.ai.",
     "url": "https://gambeta.ai/blog/como-funciona-ia-apuestas",
-    "publisher": {"@type": "Organization", "name": "gambeta.ai", "url": "https://gambeta.ai"},
-    "mainEntityOfPage": "https://gambeta.ai/blog/como-funciona-ia-apuestas"
+    "publisher": {
+      "@type": "Organization",
+      "name": "gambeta.ai",
+      "url": "https://gambeta.ai"
+    },
+    "mainEntityOfPage": "https://gambeta.ai/blog/como-funciona-ia-apuestas.html"
   }
   </script>
 <link href="/favicon.png" rel="icon" sizes="32x32" type="image/png"/>
 <style>
-    :root{--verde:#00c853;--fondo:#0f0f0f;--fondo2:#1a1a2e;--texto:#e8e8e8;--texto-sec:#9e9e9e;--borde:rgba(255,255,255,0.08)}
-    *{margin:0;padding:0;box-sizing:border-box}
-    body{padding-top:66px;background:var(--fondo);color:var(--texto);font-family:'Segoe UI',system-ui,sans-serif;line-height:1.7}
+    :root {
+      --verde: #00c853;
+      --fondo: #0f0f0f;
+      --fondo2: #1a1a2e;
+      --texto: #e8e8e8;
+      --texto-sec: #9e9e9e;
+      --borde: rgba(255,255,255,0.08);
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {padding-top:66px; background:var(--fondo); color:var(--texto); font-family:'Segoe UI',system-ui,sans-serif; line-height:1.7; }
+
+    /* NAV */
     a{text-decoration:none;color:inherit}
     nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 28px;height:66px;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:10000;box-shadow:0 1px 0 rgba(0,200,83,0.08),0 8px 32px rgba(0,0,0,0.6);gap:16px}
     .nav-logo-wrap{display:flex;align-items:center;gap:11px;text-decoration:none;flex-shrink:0}
@@ -51,44 +68,40 @@
     .nav-cta-btn{background:linear-gradient(135deg,#00c853,#00a846)!important;color:#000!important;font-weight:700!important;padding:8px 18px;border-radius:8px;font-size:.82rem!important;white-space:nowrap;box-shadow:0 2px 12px rgba(0,200,83,0.3)}
     .nav-cta-btn:hover{opacity:.9}
     @media(max-width:640px){.nav-links{display:none}}
+    /* HERO */
     .hero{background:linear-gradient(180deg,#071007 0%,#0c180c 100%);border-bottom:1px solid rgba(0,200,83,0.15);padding:52px 24px 44px;text-align:center}
     .badge{display:inline-block;background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-size:0.7rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:4px 14px;border-radius:20px;margin-bottom:18px}
     .hero h1{font-size:clamp(1.5rem,4vw,2.2rem);font-weight:900;color:#fff;line-height:1.25;max-width:760px;margin:0 auto 14px;letter-spacing:-0.5px}
     .hero p{font-size:1rem;color:rgba(255,255,255,0.5);max-width:620px;margin:0 auto;line-height:1.6}
+    .hero-img{display:block;max-width:800px;width:100%;margin:28px auto 0;border-radius:14px;box-shadow:0 4px 32px rgba(0,0,0,0.5);border:1px solid rgba(0,200,83,0.15)}
+
+    /* CONTENT */
     .container{max-width:760px;margin:0 auto;padding:48px 24px}
     .article h2{font-size:1.25rem;font-weight:800;color:#fff;margin:36px 0 12px;letter-spacing:-0.3px}
     .article h3{font-size:1.05rem;font-weight:700;color:rgba(255,255,255,0.85);margin:24px 0 10px}
     .article p{font-size:0.97rem;color:rgba(255,255,255,0.68);line-height:1.75;margin-bottom:18px}
     .article ul,.article ol{padding-left:22px;margin-bottom:18px}
-    .article li{font-size:0.95rem;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:8px}
+    .article li{font-size:0.95rem;color:rgba(255,255,255,0.65);line-height:1.7;margin-bottom:6px}
     .article strong{color:rgba(255,255,255,0.9);font-weight:700}
     .article a{color:var(--verde);text-decoration:underline;text-underline-offset:3px}
-    .article-img{width:100%;border-radius:14px;margin:24px 0 8px;border:1px solid rgba(255,255,255,0.07);display:block;object-fit:cover;max-height:420px}
-    .article-img-cap{font-size:0.78rem;color:rgba(255,255,255,0.3);text-align:center;margin-bottom:28px;font-style:italic}
-    .info-box{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-left:3px solid var(--verde);border-radius:0 10px 10px 0;padding:16px 20px;margin:24px 0}
-    .info-box p{margin:0;font-size:0.9rem;color:rgba(255,255,255,0.55)}
-    .feature-table{width:100%;border-collapse:collapse;margin:24px 0 28px}
-    .feature-table th{background:rgba(0,200,83,0.12);color:#00c853;font-size:0.82rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;padding:10px 14px;text-align:left;border-bottom:1px solid rgba(0,200,83,0.2)}
-    .feature-table td{padding:10px 14px;font-size:0.9rem;color:rgba(255,255,255,0.65);border-bottom:1px solid rgba(255,255,255,0.06)}
-    .feature-table tr:last-child td{border-bottom:none}
-    .feature-table .check{color:#00c853;font-weight:700}
+    /* CTA BOX */
     .cta-box{background:linear-gradient(135deg,rgba(0,200,83,0.12),rgba(0,200,83,0.04));border:1px solid rgba(0,200,83,0.3);border-radius:18px;padding:32px 28px;text-align:center;margin:40px 0}
     .cta-box h3{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px}
     .cta-box p{font-size:0.9rem;color:rgba(255,255,255,0.5);margin-bottom:20px}
-    .btn-cta{display:inline-block;background:var(--verde);color:#000;font-weight:800;font-size:0.95rem;padding:13px 30px;border-radius:10px;text-decoration:none;transition:opacity .18s;margin:4px}
+    .btn-cta{display:inline-block;background:var(--verde);color:#000;font-weight:800;font-size:0.95rem;padding:13px 30px;border-radius:10px;text-decoration:none;transition:opacity .18s}
     .btn-cta:hover{opacity:.85}
-    .btn-cta-sec{display:inline-block;background:transparent;color:var(--verde);font-weight:700;font-size:0.88rem;padding:10px 24px;border-radius:10px;border:1px solid rgba(0,200,83,0.4);text-decoration:none;transition:all .18s;margin-top:10px}
-    .btn-cta-sec:hover{background:rgba(0,200,83,0.08)}
+    /* RELATED */
     .related{border-top:1px solid rgba(255,255,255,0.06);padding-top:28px;margin-top:12px}
     .related h4{font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.35);letter-spacing:1px;text-transform:uppercase;margin-bottom:14px}
     .related-links{display:flex;flex-wrap:wrap;gap:10px}
     .related-links a{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);font-size:0.82rem;padding:7px 14px;border-radius:8px;text-decoration:none;transition:all .18s}
     .related-links a:hover{background:rgba(0,200,83,0.1);border-color:rgba(0,200,83,0.3);color:#fff}
+    /* FOOTER */
     .footer{background:#060d06;border-top:1px solid rgba(0,200,83,0.12);padding:24px;text-align:center;font-size:0.82rem;color:rgba(255,255,255,0.3)}
     .footer a{color:var(--verde);text-decoration:none}
   </style>
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"Cómo funciona la IA en las apuestas deportivas","item":"https://gambeta.ai/blog/como-funciona-ia-apuestas"}]}
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"Cómo funciona una IA de apuestas","item":"https://gambeta.ai/blog/como-funciona-ia-apuestas"}]}
 </script>
 </head>
 <body>
@@ -118,65 +131,52 @@
 <a href="https://gambeta.ai/#telegram">🎁 <span class="nav-text">Promos</span></a>
 <a href="/blog/">📰 <span class="nav-text">Blog</span></a>
 </div>
-<a rel="nofollow" class="nav-links nav-cta-btn" href="https://gambeta.ai/?openauth=1&amp;returnTo=/blog/como-funciona-ia-apuestas">✦ Entrar / Registro Gratis</a>
+<a rel="nofollow" class="nav-links nav-cta-btn" href="https://gambeta.ai/?openauth=1&amp;returnTo=/blog/ia-para-apostar">✦ Entrar / Registro Gratis</a>
 </nav>
 <header class="hero">
-<div class="badge">Conocimiento</div>
-<h1>Cómo funciona la <strong>IA</strong> en las apuestas deportivas: explicado simple</h1>
-<p>Cada vez más apostadores usan inteligencia artificial. Pero, ¿qué hace realmente una IA de pronósticos? Te lo explicamos sin tecnicismos.</p>
+<div class="badge">Fundamentos</div>
+<h1><strong>Inteligencia artificial</strong> para apostar: qué es y cómo usarla</h1>
+<p>Introducción completa a la <strong>inteligencia artificial</strong> aplicada a las apuestas deportivas. Cómo funciona, qué ventajas da y cómo empezar con gambeta.ai.</p>
+<!-- <img src="/blog/og/og-ia-para-apostar.png" alt="" class="hero-img" loading="lazy"> -->
 </header>
 <main class="container">
 <article class="article">
-<img alt="Cómo funciona la IA en apuestas" class="article-img" loading="lazy" src="/blog/img/estadisticas-datos.jpg"/>
-<p class="article-img-cap">Una IA de pronósticos no adivina: procesa datos y calcula probabilidades.</p>
-<h2>Qué es (y qué no es) una IA de apuestas</h2>
-<p>Una <strong>IA de pronósticos</strong> no es una bola de cristal ni un sistema infalible. Es un programa que analiza grandes cantidades de datos y calcula la <strong>probabilidad</strong> de cada resultado posible. Después compara esa probabilidad con la cuota de la casa para ver si hay valor.</p>
-<p>No predice el futuro: estima qué es más probable. Es exactamente lo que hace un buen analista humano, pero más rápido y sobre muchísimos más partidos.</p>
-<h2>Paso 1: recolectar datos</h2>
-<p>Todo arranca con los datos. Una IA de apuestas se alimenta de:</p>
-<ul>
-<li>Resultados históricos de miles de partidos</li>
-<li>Estadísticas de equipo: goles, remates, corners, xG</li>
-<li>Datos de jugador: forma, minutos, lesiones</li>
-<li>Contexto: local/visitante, descanso, valor de plantilla</li>
-<li>Cuotas del mercado en tiempo real</li>
-</ul>
-<h2>Paso 2: encontrar patrones</h2>
-<p>Con esos datos, la IA busca <strong>patrones</strong>: combinaciones de factores que históricamente terminaron de cierta forma. Por ejemplo, cómo rinde un equipo local que viene de dos derrotas contra un rival que llega cansado de competición internacional.</p>
-<img alt="Procesamiento de datos por IA" class="article-img" loading="lazy" src="/blog/img/jugador-accion-4.jpg"/>
-<p class="article-img-cap">La IA cruza miles de variables que un humano no podría procesar en el mismo tiempo.</p>
-<h2>Paso 3: calcular probabilidades</h2>
-<p>El resultado del análisis es una probabilidad: "local gana 54%, empate 26%, visitante 20%". Eso se traduce en una cuota justa. Si la casa ofrece una cuota más alta que esa cuota justa, hay <strong>valor</strong> — y ahí está la apuesta interesante.</p>
-<h2>Paso 4: buscar valor, no certezas</h2>
-<p>Acá está la clave que muchos no entienden: una buena IA no busca acertar todos los partidos, busca <strong>apostar con valor</strong> a largo plazo. Puede recomendar un pick que pierde y seguir teniendo razón, si la probabilidad estaba bien calculada.</p>
-<div class="info-box">
-<p>💡 Ninguna IA gana siempre. Lo que hace una buena IA es tener razón <em>en promedio</em>: apostar cuando la cuota paga más de lo que vale el riesgo. El resultado se mide en cientos de apuestas, no en una.</p>
-</div>
-<h2>Los límites de la IA</h2>
-<p>La IA no ve todo. No sabe de una pelea de vestuario, una decisión de último momento del técnico o la motivación de un clásico. Por eso los mejores resultados salen de combinar el cálculo de la IA con sentido común.</p>
-<h2>Cómo lo hace gambeta.ai</h2>
-<p>La IA de gambeta.ai sigue exactamente este proceso: procesa datos, calcula probabilidades y entrega un pick con su nivel de confianza, con el historial 100% público para que puedas verificar cómo viene. Si querés elegir herramienta, leé <a href="/blog/mejores-ia-para-apostar">mejores IA para apostar</a>.</p>
+<h2>¿Qué hace una IA de apuestas, exactamente?</h2>
+<p>Una IA de apuestas hace una sola cosa con seriedad: estima la probabilidad real de cada resultado posible en un partido. Después compara esa probabilidad real con la probabilidad implícita en la cuota de la casa (1 dividido por la cuota). Si la real es mayor que la implícita, hay <em>edge</em> positivo. Ese pick va al feed. Si no hay edge, descarta.</p>
+<h2>¿Qué datos usa una IA para estimar?</h2>
+<p>Los modelos serios cruzan al menos 5 fuentes: forma reciente (últimos 5-10 partidos), head-to-head histórico, sharp odds de Pinnacle como referencia de mercado, contexto del partido (rival directo en tabla, condición de visitante) y datos micro (xG, posesión efectiva). Cuanto más diversas las fuentes, menos chance de overfitting.</p>
+<h2>Mitos sobre cómo trabajan los modelos</h2>
+<p>"Es magia negra que no se puede explicar": no, los buenos modelos son auditables y muestran por qué tomaron cada decisión. "Necesita supercomputadoras": no, modelos modernos corren en hardware modesto. "Aprende sola y se hace cada vez mejor": parcialmente, los modelos sin supervisión se degradan rápido si no se reentrenan periódicamente con datos nuevos.</p>
+<h2>Qué hace bien y qué no</h2>
+<p>Hace bien: procesar grandes volúmenes sin cansarse, identificar correlaciones sutiles, mantener consistencia sin sesgo emocional. No hace bien: predecir el azar puro (un gol de pelota parada en el 93), interpretar contexto humano (un entrenador que rota porque su hijo está enfermo), ni aprender de un solo evento espectacular.</p>
+<h2>La IA de gambeta.ai en práctica</h2>
+<p>En gambeta.ai usamos un modelo que cruza Odds API + API-Football PRO + Pinnacle como referencia sharp. Cada pick muestra el nivel de confianza (★1 a ★6), el edge calculado y un análisis textual de por qué la IA lo eligió. El historial completo es público — podés ver hit rate y ROI de cualquier período pasado.</p>
+<h2>La IA es una herramienta, no un oráculo</h2>
+<p>Lo más sano es usar la IA como un colaborador que ve cosas que vos no podés ver, no como un infalible que seguís sin pensar. Si la IA dice un pick y vos tenés información puntual que contradice (un titular lesionado anunciado tarde), tu información local tiene valor. La combinación humano-máquina suele rendir más que cualquiera por separado.</p>
 </article>
 <div class="cta-box">
-<h3>🤖 Probá la IA de gambeta.ai</h3>
-<p>Pronósticos de fútbol calculados por IA, gratis y con historial público. Sin grupos VIP, sin promesas mágicas.</p>
-<a class="btn-cta" href="https://gambeta.ai">Ver pronósticos de la IA →</a>
-<a class="btn-cta-sec" href="/blog/mejores-ia-para-apostar">Mejores IA para apostar →</a>
+<h3>⚡️ Probá la IA gratis ahora</h3>
+<p>Picks diarios con análisis de <strong>inteligencia artificial</strong>. Champions, Premier, Libertadores y más — 100% gratis.</p>
+<a class="btn-cta" href="https://gambeta.ai">Ver picks de hoy →</a>
+</div>
+<div class="info-box" style="margin-top:28px">
+<p>🧮 Herramientas relacionadas: <a href="/herramientas/kelly">calculadora Kelly</a> · <a href="/herramientas/valor-esperado">calculadora EV</a> · <a href="/herramientas/conversor-cuotas">conversor de cuotas</a>.</p>
 </div>
 <div class="related">
-<h4>Más sobre IA y apuestas</h4>
+<h4>Más artículos</h4>
 <div class="related-links">
 <a href="/blog/">📰 Ver todos los artículos</a>
-<a href="/blog/mejores-ia-para-apostar">🏆 Mejores IA para apostar</a>
-<a href="/blog/ia-estadisticas-futbol">📊 IA y estadísticas de fútbol</a>
-<a href="/blog/ia-vs-tipster">⚔️ IA vs tipster</a>
-<a href="/blog/donde-encontrar-valor">💎 Dónde encontrar valor</a>
+<a href="/blog/gestion-bankroll">💰 Gestión de bankroll</a>
+<a href="/blog/cuotas-y-probabilidades">📊 Cuotas y probabilidades</a>
+<a href="/blog/ia-para-apostar">🤖 IA para apostar</a>
+<a href="/blog/ia-vs-tipster">⚔️ IA vs Tipster</a>
 </div>
 </div>
 </main>
 <footer class="footer">
-<p>© 2025 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar en Fútbol · 18+</p>
+<p>© 2025 <a href="https://gambeta.ai">gambeta.ai</a> · <strong>Inteligencia Artificial</strong> para Apostar en Fútbol · 18+</p>
 </footer>
+<!-- Blog Auth: sesión Supabase → muestra escudo + nombre igual al sitio principal -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 (function() {
@@ -190,14 +190,26 @@
     var meta = session.user.user_metadata || {};
     var rawName = nick || meta.full_name || meta.name || session.user.email.split('@')[0];
     var firstName = rawName.replace(/[._-]/g,' ').replace(/\b\w/g, function(c){return c.toUpperCase();}).split(' ')[0];
-    var btn = document.querySelector('.nav-cta-btn');
-    if (btn) {
-      btn.textContent = '✦ ' + firstName;
-      btn.style.background = 'rgba(0,200,83,0.15)';
-      btn.style.color = '#00c853';
-      btn.style.border = '1px solid rgba(0,200,83,0.3)';
-      btn.href = 'https://gambeta.ai';
+    var avaRaw = localStorage.getItem('gambeta_avatar');
+    var ava = null;
+    try { ava = avaRaw ? JSON.parse(avaRaw) : null; } catch(e) {}
+    var ctaBtn = document.querySelector('.nav-cta-btn');
+    if (!ctaBtn) return;
+    var avatarHtml;
+    if (ava && ava.logo) {
+      avatarHtml = '<img src="' + ava.logo + '" alt="' + (ava.name||'') + '" style="width:28px;height:28px;object-fit:contain;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5));border-radius:4px;">';
+    } else {
+      var initials = firstName.slice(0,2).toUpperCase();
+      avatarHtml = '<span style="display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:50%;background:rgba(0,200,83,0.2);border:1px solid rgba(0,200,83,0.4);font-size:0.75rem;font-weight:800;color:#00c853;">' + initials + '</span>';
     }
+    ctaBtn.innerHTML = avatarHtml + '<span style="margin-left:7px;">' + firstName + '</span>';
+    ctaBtn.href = 'https://gambeta.ai/#mipanel';
+    ctaBtn.style.setProperty('background','rgba(0,200,83,0.1)','important');
+    ctaBtn.style.setProperty('color','#e8e8e8','important');
+    ctaBtn.style.setProperty('border','1px solid rgba(0,200,83,0.3)','important');
+    ctaBtn.style.setProperty('box-shadow','none','important');
+    ctaBtn.style.setProperty('display','inline-flex','important');
+    ctaBtn.style.setProperty('align-items','center','important');
   });
 })();
 </script>
