@@ -2,6 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><!-- v3 -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://api.accesoia.app">
+<link rel="dns-prefetch" href="https://www.clarity.ms">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pronósticos de Fútbol con IA Gratis · 38 Ligas + Mundial 2026</title>
 
@@ -5506,7 +5510,9 @@ html { -webkit-tap-highlight-color: rgba(0,200,83,0.15); }
 #acoinPanel,#acoinToast,#acoinNavBal,.acoin-widget,.acoin-panel,.acoin-toast,.acoin-pick-section,.acoin-pick-btns,.acoin-pick-btn,.acico,#panelPremios,#ranking,#gFeedWrap,.gfeed-list,[id^="acoin"],[class^="acoin"]{display:none!important}</style>
 <!-- Microsoft Clarity -->
 <script type="text/javascript">
-(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","xchm70crnd");
+setTimeout(function(){
+      (function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","xchm70crnd");
+    }, 2500);
 </script>
 </head>
 <body>
@@ -5938,11 +5944,11 @@ window.toggleHeroBubble = function(n) {
         if (todayMatch) {
           var hIso = ISO_MAP[todayMatch.home], aIso = ISO_MAP[todayMatch.away];
           head.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">'
-            + '<img src="https://flagcdn.com/h60/' + hIso + '.png" alt="' + todayMatch.home + '" style="width:38px;height:26px;border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4);object-fit:cover">'
+            + '<img loading="lazy" decoding="async" src="https://flagcdn.com/h60/' + hIso + '.png" alt="' + todayMatch.home + '" style="width:38px;height:26px;border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4);object-fit:cover">'
             + '<span style="font-weight:900">' + todayMatch.home + '</span>'
             + '<span style="color:#FFD700;font-weight:800;font-size:0.85em;padding:0 4px">VS</span>'
             + '<span style="font-weight:900">' + todayMatch.away + '</span>'
-            + '<img src="https://flagcdn.com/h60/' + aIso + '.png" alt="' + todayMatch.away + '" style="width:38px;height:26px;border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4);object-fit:cover">'
+            + '<img loading="lazy" decoding="async" src="https://flagcdn.com/h60/' + aIso + '.png" alt="' + todayMatch.away + '" style="width:38px;height:26px;border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4);object-fit:cover">'
             + '</span>';
         } else {
           head.innerHTML = '🏆 MUNDIAL 2026 EN VIVO';
@@ -6123,10 +6129,10 @@ window.toggleHeroBubble = function(n) {
 
   function buildItem(f) {
     return '<span class="gb-ticker-item">'
-      + '<img class="gb-tk-flag" src="https://flagcdn.com/w40/'+f.h+'.png" alt="'+f.H+'">'
+      + '<img loading="lazy" decoding="async" class="gb-tk-flag" src="https://flagcdn.com/w40/'+f.h+'.png" alt="'+f.H+'">'
       + '<span class="gb-tk-team">'+f.H+'</span>'
       + '<span class="gb-tk-vs">VS</span>'
-      + '<img class="gb-tk-flag" src="https://flagcdn.com/w40/'+f.a+'.png" alt="'+f.A+'">'
+      + '<img loading="lazy" decoding="async" class="gb-tk-flag" src="https://flagcdn.com/w40/'+f.a+'.png" alt="'+f.A+'">'
       + '<span class="gb-tk-team">'+f.A+'</span>'
       + '<span class="gb-tk-meta">'+f.when+'</span>'
       + '</span>';
@@ -6163,7 +6169,7 @@ window.toggleHeroBubble = function(n) {
       <video autoplay loop muted playsinline preload="metadata" poster="/img/hero-mascot-poster.jpg" aria-label="gambeta.ai Bot animado">
         <source src="/img/hero-mascot.webm" type="video/webm">
         <source src="/img/hero-mascot.mp4" type="video/mp4">
-        <img src="/img/hero-mascot-poster.jpg" alt="gambeta.ai Bot">
+        <img loading="lazy" decoding="async" src="/img/hero-mascot-poster.jpg" alt="gambeta.ai Bot">
       </video>
     </div>
   </div>
@@ -6950,7 +6956,7 @@ window.toggleHeroBubble = function(n) {
     <!-- Hero banner -->
     <div style="position:relative;border-radius:20px;overflow:hidden;margin-bottom:24px;border:1px solid rgba(0,180,255,0.3);box-shadow:0 0 40px rgba(0,150,255,0.2)">
       <!-- Imagen del banner -->
-      <img src="https://lh3.googleusercontent.com/d/1eLAdCSjLRycxnNAXemI6UZfP97Qz9ynK"
+      <img loading="lazy" decoding="async" src="https://lh3.googleusercontent.com/d/1eLAdCSjLRycxnNAXemI6UZfP97Qz9ynK"
            alt="Bot de Alerta"
            style="width:100%;display:block;max-height:340px;object-fit:cover;object-position:center"
            onerror="this.style.display='none';document.getElementById('botHeroFallback').style.display='flex'"
@@ -7043,7 +7049,7 @@ window.toggleHeroBubble = function(n) {
 
         <!-- Avatar -->
         <div style="flex-shrink:0;position:relative">
-          <img src="https://pbs.twimg.com/media/HDBbXBxaMAAYpse?format=png&name=small" alt="Apuestas LATAM" style="width:90px;height:90px;border-radius:50%;border:3px solid rgba(34,158,217,0.7);box-shadow:0 0 24px rgba(34,158,217,0.5);object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div style="display:none;width:90px;height:90px;border-radius:50%;border:3px solid rgba(34,158,217,0.7);box-shadow:0 0 24px rgba(34,158,217,0.5);background:linear-gradient(135deg,#229ED9,#1A6FAF);align-items:center;justify-content:center;font-size:2.8rem">✈️</div>
+          <img loading="lazy" decoding="async" src="https://pbs.twimg.com/media/HDBbXBxaMAAYpse?format=png&name=small" alt="Apuestas LATAM" style="width:90px;height:90px;border-radius:50%;border:3px solid rgba(34,158,217,0.7);box-shadow:0 0 24px rgba(34,158,217,0.5);object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div style="display:none;width:90px;height:90px;border-radius:50%;border:3px solid rgba(34,158,217,0.7);box-shadow:0 0 24px rgba(34,158,217,0.5);background:linear-gradient(135deg,#229ED9,#1A6FAF);align-items:center;justify-content:center;font-size:2.8rem">✈️</div>
           <!-- Badge seguidores -->
           <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#229ED9,#0e5fa0);color:#fff;font-size:0.65rem;font-weight:900;padding:3px 10px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.4)">👥 15K</div>
         </div>
@@ -7083,7 +7089,7 @@ window.toggleHeroBubble = function(n) {
       <!-- Canal 1: Club de Ganadores -->
       <div style="display:flex;flex-direction:column;gap:16px">
         <div style="flex:1;background:linear-gradient(135deg,rgba(34,158,217,0.12),rgba(26,122,181,0.06));border:1px solid rgba(34,158,217,0.35);border-radius:20px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
-          <img src="https://unavatar.io/telegram/clubdewinners"
+          <img loading="lazy" decoding="async" src="https://unavatar.io/telegram/clubdewinners"
                alt="Club de Ganadores"
                style="width:72px;height:72px;border-radius:50%;object-fit:cover;box-shadow:0 4px 20px rgba(34,158,217,0.4)"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
@@ -7127,7 +7133,7 @@ window.toggleHeroBubble = function(n) {
       <!-- Canal 2: Destraba Bonos -->
       <div style="display:flex;flex-direction:column;gap:16px">
         <div style="flex:1;background:linear-gradient(135deg,rgba(0,200,83,0.10),rgba(0,150,60,0.05));border:1px solid rgba(0,200,83,0.30);border-radius:20px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
-          <img src="https://lh3.googleusercontent.com/d/1lDRsd2ArvmAFjxzVlkT9NPthqabPn4i5"
+          <img loading="lazy" decoding="async" src="https://lh3.googleusercontent.com/d/1lDRsd2ArvmAFjxzVlkT9NPthqabPn4i5"
                alt="Destraba Bonos"
                style="width:72px;height:72px;border-radius:50%;object-fit:cover;box-shadow:0 4px 20px rgba(0,200,83,0.4)"
                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
@@ -7522,7 +7528,7 @@ window.toggleHeroBubble = function(n) {
   <div class="chat-window hidden" id="chatWindow">
     <div class="chat-header">
       <div class="chat-header-info">
-        <div class="chat-avatar"><img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot"></div>
+        <div class="chat-avatar"><img loading="lazy" decoding="async" src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot"></div>
         <div>
           <h4>gambeta.ai</h4>
           <div class="chat-online">
@@ -7549,7 +7555,7 @@ window.toggleHeroBubble = function(n) {
       🔥 ¡Tengo el mejor pronóstico para hoy!
     </div>
     <button class="chat-bubble" onclick="toggleChat()" id="chatBubble">
-      <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot">
+      <img loading="lazy" decoding="async" src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot">
       <div class="chat-notify" id="chatNotify">1</div>
     </button>
   </div>
@@ -9750,8 +9756,8 @@ function wcStarBadge(name, size=48) {
   if (!info) return null;
   const flagSize = Math.max(14, Math.round(size * 0.42));
   return `<span title="${info.name}" style="position:relative;display:inline-block;width:${size}px;height:${size}px;flex-shrink:0">`
-       + `<img src="${info.photo}" alt="${info.name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;object-position:center top;border-radius:50%;display:block;border:2px solid #FFD700;box-shadow:0 2px 8px rgba(255,215,0,0.4)" onerror="this.outerHTML=teamInitialsBadge('${info.name}',${size})">`
-       + `<img src="https://flagcdn.com/w40/${info.iso}.png" alt="${info.iso}" width="${flagSize}" height="${flagSize}" style="position:absolute;bottom:-2px;right:-2px;width:${flagSize}px;height:${flagSize}px;border-radius:50%;object-fit:cover;border:1.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.5)">`
+       + `<img loading="lazy" decoding="async" src="${info.photo}" alt="${info.name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;object-position:center top;border-radius:50%;display:block;border:2px solid #FFD700;box-shadow:0 2px 8px rgba(255,215,0,0.4)" onerror="this.outerHTML=teamInitialsBadge('${info.name}',${size})">`
+       + `<img loading="lazy" decoding="async" src="https://flagcdn.com/w40/${info.iso}.png" alt="${info.iso}" width="${flagSize}" height="${flagSize}" style="position:absolute;bottom:-2px;right:-2px;width:${flagSize}px;height:${flagSize}px;border-radius:50%;object-fit:cover;border:1.5px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,0.5)">`
        + `</span>`;
 }
 
@@ -10167,7 +10173,7 @@ function wcEventBadge(name, size=48) {
   // 🏆 Pelota Trionda flotando sin fondo cuando el theming Mundial está activo (solo donde habría ⚽)
   const _isMundial = (typeof document !== 'undefined' && document.body && document.body.classList && document.body.classList.contains('wc2026-theme'));
   if (emoji === '⚽' && _isMundial) {
-    return `<img src="/img/trionda-float.png" alt="${(name||'').replace(/"/g,'&quot;')}" title="${(name||'').replace(/"/g,'&quot;')}" style="width:${size}px;height:${size}px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.45)) drop-shadow(0 0 8px rgba(255,215,0,0.25));animation:gbTriondaFloat 3.5s ease-in-out infinite" onerror="this.outerHTML='⚽'">`;
+    return `<img loading="lazy" decoding="async" src="/img/trionda-float.png" alt="${(name||'').replace(/"/g,'&quot;')}" title="${(name||'').replace(/"/g,'&quot;')}" style="width:${size}px;height:${size}px;object-fit:contain;flex-shrink:0;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.45)) drop-shadow(0 0 8px rgba(255,215,0,0.25));animation:gbTriondaFloat 3.5s ease-in-out infinite" onerror="this.outerHTML='⚽'">`;
   }
   return `<span title="${(name||'').replace(/"/g,'&quot;')}" style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:#fff;font-size:${fsz}px;line-height:1;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.4);border:2px solid rgba(255,215,0,0.5)">${emoji}</span>`;
 }
@@ -10184,8 +10190,8 @@ function nationalTeamBadge(name, size=48) {
   // Si no hay logo federacion (ej. seleccion que no esta en el dict), usar bandera como principal
   if (!mainLogoUrl) {
     return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:visible;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.5);background:#fff">`
-         + `<img src="${flagUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:50%;display:block">`
-         + `<img src="${WC2026_CONFEDS[info.conf]}" alt="${info.conf}" width="${subSize}" height="${subSize}" style="position:absolute;top:-3px;left:-3px;width:${subSize}px;height:${subSize}px;border-radius:50%;background:#fff;padding:2px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.4)" onerror="this.style.display='none'">`
+         + `<img loading="lazy" decoding="async" src="${flagUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:50%;display:block">`
+         + `<img loading="lazy" decoding="async" src="${WC2026_CONFEDS[info.conf]}" alt="${info.conf}" width="${subSize}" height="${subSize}" style="position:absolute;top:-3px;left:-3px;width:${subSize}px;height:${subSize}px;border-radius:50%;background:#fff;padding:2px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.4)" onerror="this.style.display='none'">`
          + `</span>`;
   }
   // Caso normal: SOLO escudo de federacion (sin sub-bandera) — Mauro lo pidio limpio
@@ -10256,7 +10262,7 @@ function logoHtml(name, size=48) {
     const imgStyle = needsWhiteBg
       ? `object-fit:contain;background:#c8102e;border-radius:50%;padding:5px;box-sizing:border-box`
       : `object-fit:contain;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5))`;
-    return `<img src="${url}" alt="${name}" width="${size}" height="${size}"
+    return `<img loading="lazy" decoding="async" src="${url}" alt="${name}" width="${size}" height="${size}"
       style="${imgStyle}"
       onerror="this.outerHTML=teamInitialsBadge(this.alt,${size})">`;
   }
@@ -10276,7 +10282,7 @@ function logoHtml(name, size=48) {
   const photoClass = cached ? 'pa-photo loaded' : 'pa-photo';
   return `<div class="player-avatar" style="width:${size}px;height:${size}px">
     <span class="pa-initials" style="font-size:${Math.round(size*0.32)}px">${initials}</span>
-    <img class="${photoClass}" data-wiki="${wikiKey}" ${photoSrc} alt="${name}" style="${photoStyle}">
+    <img loading="lazy" decoding="async" class="${photoClass}" data-wiki="${wikiKey}" ${photoSrc} alt="${name}" style="${photoStyle}">
   </div>`;
 }
 
@@ -10397,7 +10403,7 @@ function renderScores(filter) {
           ">
             <!-- FOTO lateral -->
             <div style="position:relative;width:160px;flex-shrink:0;background:${ch.color};overflow:hidden;">
-              <img src="${ch.photo}" alt="${ch.nombre}"
+              <img loading="lazy" decoding="async" src="${ch.photo}" alt="${ch.nombre}"
                 style="width:100%;height:100%;object-fit:cover;opacity:0.65;display:block;"
                 onerror="this.style.display='none'"
               />
@@ -13665,7 +13671,7 @@ function renderStats(sport) {
   const lbl3 = sport==='tenis'?'Pts Ranking':'Puntos';
   document.getElementById('statsGrid').innerHTML = data.length ? data.map(t => {
     const logoEl = t.badgeUrl
-      ? `<img src="${t.badgeUrl}" style="width:54px;height:54px;object-fit:contain;border-radius:6px" onerror="this.style.display='none'">`
+      ? `<img loading="lazy" decoding="async" src="${t.badgeUrl}" style="width:54px;height:54px;object-fit:contain;border-radius:6px" onerror="this.style.display='none'">`
       : logoHtml(t.name, 54);
     return `
     <div class="stat-card">
@@ -18086,7 +18092,7 @@ function _renderGFeedPage() {
     const plainNick = (b.nickText || b.nick || '').replace(/<[^>]*>/g, '');
     const _poolUrl  = gbFallbackAvatarUrl(plainNick);
     const _pool2Url = gbFallbackAvatarUrl2(plainNick);
-    let avatarHtml = `<img src="${_poolUrl}" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:0;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5))" onerror="this.src='${_pool2Url}'">`;
+    let avatarHtml = `<img loading="lazy" decoding="async" src="${_poolUrl}" alt="" style="width:100%;height:100%;object-fit:contain;border-radius:0;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5))" onerror="this.src='${_pool2Url}'">`;
     if (b.ava) {
       let logoUrl = b.ava;
       try {
@@ -18893,14 +18899,14 @@ function updateNavAuth() {
       const _lurl = _vipData?.avatar?.logo;
       const _lname = _vipData?.avatar?.name || '';
       if (_ael && _lurl) {
-        _ael.innerHTML = `<img src="${_lurl}" alt="${_lname}" style="width:75%;height:75%;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.5))">`;
+        _ael.innerHTML = `<img loading="lazy" decoding="async" src="${_lurl}" alt="${_lname}" style="width:75%;height:75%;object-fit:contain;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.5))">`;
         _ael.style.background = 'transparent';
         _ael.style.border = 'none';
         _ael.style.borderRadius = '0';
       }
       const _dua = document.getElementById('drawerUserAvatar');
       if (_dua && _lurl) {
-        _dua.innerHTML = `<img src="${_lurl}" alt="${_lname}" style="width:80%;height:80%;object-fit:contain;">`;
+        _dua.innerHTML = `<img loading="lazy" decoding="async" src="${_lurl}" alt="${_lname}" style="width:80%;height:80%;object-fit:contain;">`;
         _dua.style.background = 'transparent';
       }
     } catch(_e) { console.warn('[VIP] avatar inline error:', _e); }
@@ -20015,7 +20021,7 @@ function _purgeNbaPicks() {
     <div class="auth-step active" id="authStep1">
       <div class="auth-brand">
         <div style="width:52px;height:52px;border-radius:50%;overflow:hidden;border:2px solid var(--verde);flex-shrink:0">
-          <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot" style="width:100%;height:100%;object-fit:cover;object-position:50% 20%">
+          <img loading="lazy" decoding="async" src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="Bot" style="width:100%;height:100%;object-fit:cover;object-position:50% 20%">
         </div>
         <span class="auth-brand-name">gam<span style="color:#fff">BETA</span><span>.ai</span></span>
       </div>
@@ -20335,7 +20341,7 @@ function _purgeNbaPicks() {
           <button onclick="admBcastPreviewImage()" title="Previsualizar" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:var(--texto-sec);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:0.8rem">👁️</button>
         </div>
         <div id="admBcastImagePreview" style="display:none;border-radius:10px;overflow:hidden;max-height:140px">
-          <img id="admBcastImagePreviewImg" src="" style="width:100%;max-height:140px;object-fit:cover;display:block">
+          <img loading="lazy" decoding="async" id="admBcastImagePreviewImg" src="" style="width:100%;max-height:140px;object-fit:cover;display:block">
         </div>
 
         <!-- Pick adjunto -->
@@ -20944,14 +20950,14 @@ function applyUserProfile() {
     _fbImg.onload = () => {
       const avatarEl = document.getElementById('navUserAvatar');
       if (avatarEl) {
-        avatarEl.innerHTML = `<img src="${_fbUrl}" alt="" style="${_imgStyle}">`;
+        avatarEl.innerHTML = `<img loading="lazy" decoding="async" src="${_fbUrl}" alt="" style="${_imgStyle}">`;
         avatarEl.style.background = 'transparent';
         avatarEl.style.border = 'none';
         avatarEl.style.borderRadius = '0';
       }
       const dua = document.getElementById('drawerUserAvatar');
       if (dua) {
-        dua.innerHTML = `<img src="${_fbUrl}" alt="" style="width:80%;height:80%;object-fit:contain;">`;
+        dua.innerHTML = `<img loading="lazy" decoding="async" src="${_fbUrl}" alt="" style="width:80%;height:80%;object-fit:contain;">`;
         dua.style.background = 'transparent';
       }
     };
@@ -20959,7 +20965,7 @@ function applyUserProfile() {
       // segundo intento con el siguiente escudo del pool
       const avatarEl = document.getElementById('navUserAvatar');
       if (avatarEl) {
-        avatarEl.innerHTML = `<img src="${_fbUrl2}" alt="" style="${_imgStyle}">`;
+        avatarEl.innerHTML = `<img loading="lazy" decoding="async" src="${_fbUrl2}" alt="" style="${_imgStyle}">`;
         avatarEl.style.background = 'transparent';
         avatarEl.style.border = 'none';
         avatarEl.style.borderRadius = '0';
@@ -21000,7 +21006,7 @@ function rkAvatarHTML(u, size = 38, textClass = '') {
   const nick = displayName || u.email || '?';
   const fallbackUrl  = gbFallbackAvatarUrl(nick);
   const fallbackUrl2 = gbFallbackAvatarUrl2(nick);
-  const fallbackImg  = `<img src='${fallbackUrl}' data-fb='${fallbackUrl2}' style='width:${size}px;height:${size}px;object-fit:contain;border-radius:0;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5));flex-shrink:0' onerror='this.src=this.dataset.fb'>`;
+  const fallbackImg  = `<img loading="lazy" decoding="async" src='${fallbackUrl}' data-fb='${fallbackUrl2}' style='width:${size}px;height:${size}px;object-fit:contain;border-radius:0;filter:drop-shadow(0 1px 3px rgba(0,0,0,0.5));flex-shrink:0' onerror='this.src=this.dataset.fb'>`;
   try {
     const vip = u.email ? GAMBETA_VIP[u.email] : null;
     const ava = vip?.avatar || (u.avatar ? JSON.parse(u.avatar) : null);
@@ -21111,7 +21117,7 @@ async function rkShowUserPopup(email, nickname, avatarUrl, balance) {
   // Header
   const avatarEl = document.getElementById('rkupAvatar');
   if (avatarUrl) {
-    avatarEl.innerHTML = `<img src="${avatarUrl}" class="rkup-avatar" onerror="this.outerHTML='<div class=\\'rkup-avatar-text\\'>${(nickname||'?')[0].toUpperCase()}</div>'">`;
+    avatarEl.innerHTML = `<img loading="lazy" decoding="async" src="${avatarUrl}" class="rkup-avatar" onerror="this.outerHTML='<div class=\\'rkup-avatar-text\\'>${(nickname||'?')[0].toUpperCase()}</div>'">`;
   } else {
     avatarEl.innerHTML = `<div class="rkup-avatar-text">${(nickname||'?')[0].toUpperCase()}</div>`;
   }
@@ -22421,7 +22427,7 @@ async function admLoadBroadcastHistory() {
     }
     box.innerHTML = msgs.map(m => {
       const imgThumb = m.imageUrl
-        ? `<img src="${m.imageUrl}" style="width:100%;max-height:90px;object-fit:cover;border-radius:7px;margin-top:7px;display:block" onerror="this.style.display='none'">`
+        ? `<img loading="lazy" decoding="async" src="${m.imageUrl}" style="width:100%;max-height:90px;object-fit:cover;border-radius:7px;margin-top:7px;display:block" onerror="this.style.display='none'">`
         : '';
       const pickBvr = m.pick?.bvr ? '💰'.repeat(Math.min(6, m.pick.bvr)) : '';
       const pickThumb = (m.pick?.home && m.pick?.away)
@@ -22690,7 +22696,7 @@ function showBroadcastModal() {
   content.innerHTML = msgs.map(m => {
     const isNew   = !seen.includes(m.id);
     const imgHtml = m.imageUrl
-      ? `<img src="${m.imageUrl}" class="bcast-msg-image" onerror="this.style.display='none'" alt="imagen">`
+      ? `<img loading="lazy" decoding="async" src="${m.imageUrl}" class="bcast-msg-image" onerror="this.style.display='none'" alt="imagen">`
       : '';
     const pickBvr  = m.pick?.bvr ? '💰'.repeat(Math.min(6, m.pick.bvr)) : '';
     const pickHtml = (m.pick?.home && m.pick?.away) ? `
@@ -23345,7 +23351,7 @@ function initBroadcastRealtime() {
 
 <!-- Botón flotante -->
 <button id="aiChatBtn" onclick="aiToggleChat()">
-  <img class="chat-btn-avatar" src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA">
+  <img loading="lazy" decoding="async" class="chat-btn-avatar" src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA">
   <span class="chat-btn-label">Chat IA</span>
   <span class="chat-btn-dot"></span>
   <span id="aiChatBadge">1</span>
@@ -23356,7 +23362,7 @@ function initBroadcastRealtime() {
   <!-- Header -->
   <div class="ai-header">
     <div class="ai-header-avatar">
-      <img src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA" style="width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:center top">
+      <img loading="lazy" decoding="async" src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA" style="width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:center top">
     </div>
     <div class="ai-header-info">
       <div class="ai-header-name">gambeta.ai <span style="font-size:0.58rem;font-weight:700;letter-spacing:0.8px;background:rgba(255,214,0,0.15);color:#ffd600;border:1px solid rgba(255,214,0,0.35);border-radius:4px;padding:1px 5px;vertical-align:middle;position:relative;top:-1px">BETA</span></div>
@@ -23382,7 +23388,7 @@ function initBroadcastRealtime() {
 
   <!-- Preview imagen seleccionada -->
   <div id="aiImgPreview">
-    <img id="aiImgThumb" src="" alt="preview">
+    <img loading="lazy" decoding="async" id="aiImgThumb" src="" alt="preview">
     <button id="aiImgRemove" onclick="aiClearImage()">✕ Quitar imagen</button>
   </div>
 
@@ -23588,7 +23594,7 @@ function getDailyPromoCta() {
   };
   const faviconImg = (nombre) => {
     const src = BOOK_FAVICONS[nombre];
-    return src ? `<img src="${src}" style="width:16px;height:16px;border-radius:3px;vertical-align:middle;margin-right:5px;background:#fff;padding:1px" onerror="this.style.display='none'">` : '';
+    return src ? `<img loading="lazy" decoding="async" src="${src}" style="width:16px;height:16px;border-radius:3px;vertical-align:middle;margin-right:5px;background:#fff;padding:1px" onerror="this.style.display='none'">` : '';
   };
   const p = promos[day] || promos[1];
   const btns = p.link2
@@ -23768,7 +23774,7 @@ function _showPromoDirecta() {
   const dbbetHero =
     `<a href="https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213&utm_source=home_dbbet&utm_medium=site" target="_blank" rel="noopener" onclick="trackEvent('promo_click',{promo:'dbbet',type:'ai_promo'})" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg,#1a0507,#1a0408);border:1px solid rgba(220,30,46,0.5);border-radius:12px;text-decoration:none;margin-bottom:10px;position:relative;overflow:hidden">` +
     `<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(220,30,46,0.08),transparent);pointer-events:none"></div>` +
-    `<img src="/img/casas/dbbet.svg" style="height:32px;object-fit:contain;flex-shrink:0;filter:brightness(1.1)" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:1.1rem;color:#FFD700\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">` +
+    `<img loading="lazy" decoding="async" src="/img/casas/dbbet.svg" style="height:32px;object-fit:contain;flex-shrink:0;filter:brightness(1.1)" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:1.1rem;color:#FFD700\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">` +
     `<div style="flex:1;min-width:0">` +
     `<div style="font-size:0.85rem;font-weight:900;color:#fff;margin-bottom:2px">Main Sponsor de gambeta.ai</div>` +
     `<div style="font-size:0.7rem;color:rgba(255,255,255,0.6)">100% bono en tu primer depósito · Hacés posible que esto sea gratis</div>` +
@@ -23894,7 +23900,7 @@ async function aiSend() {
 
   // Mostrar mensaje del usuario — siempre la etiqueta corta (displayLabel)
   const displayMsg = hasImg
-    ? `${displayLabel ? displayLabel + '<br>' : ''}<img src="data:${sendMime};base64,${sendB64}" style="max-height:120px;border-radius:8px;margin-top:4px;display:block">`
+    ? `${displayLabel ? displayLabel + '<br>' : ''}<img loading="lazy" decoding="async" src="data:${sendMime};base64,${sendB64}" style="max-height:120px;border-radius:8px;margin-top:4px;display:block">`
     : displayLabel;
   // Activar promo para la próxima respuesta del bot (1ra vez)
   if (!_aiPromoReady && aiHistory.filter(h => h.role === 'user').length === 0) {
@@ -23947,7 +23953,7 @@ async function aiSend() {
       const ad = document.createElement('div');
       ad.style.cssText = 'margin-top:9px;background:linear-gradient(135deg,rgba(220,30,46,0.13),rgba(60,8,12,0.18));border:1px solid rgba(220,30,46,0.4);border-radius:10px;padding:8px 11px;display:flex;align-items:center;gap:9px;';
       ad.innerHTML = `
-        <img src="/img/casas/dbbet.svg"
+        <img loading="lazy" decoding="async" src="/img/casas/dbbet.svg"
              style="height:22px;object-fit:contain;flex-shrink:0;filter:brightness(1.1)"
              onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:1rem;color:#FFD700;letter-spacing:-0.5px\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">
         <div style="flex:1;min-width:0">
@@ -25490,7 +25496,7 @@ function _fpFormHtml() {
       </div>
       <input type="file" id="fpImgInput" accept="image/*" style="display:none" onchange="fpHandleImgUpload(event)">
       <div id="fpImgPreview" style="display:none;margin-top:6px">
-        <img id="fpImgPreviewImg" style="max-height:80px;border-radius:8px">
+        <img loading="lazy" decoding="async" id="fpImgPreviewImg" style="max-height:80px;border-radius:8px">
         <button onclick="fpClearImg()" style="background:rgba(255,50,50,0.15);border:none;color:#ff5555;cursor:pointer;border-radius:50%;width:22px;height:22px;margin-left:4px">✕</button>
       </div>
     </div>
@@ -26209,7 +26215,7 @@ setTimeout(_fpBadgeInit, 1200);
       chip: 'Promo SÁB',
       title: '🎁 Se viene una GRAN promo para Jordania vs Argentina',
       body: '<p class="subtitle">DBbet va a regalar <strong style="color:#FFD700">FreeBets</strong> para el partido del <strong>sábado 27 de junio a las 23:00 ART</strong>. Andá registrándote con el link oficial Gambeta — los freebets son solo para usuarios verificados.</p>'
-          + '<div class="vs"><img src="https://flagcdn.com/h60/jo.png" alt="Jordania"><span>Jordania</span><span class="vsLbl">VS</span><span>Argentina</span><img src="https://flagcdn.com/h60/ar.png" alt="Argentina"></div>',
+          + '<div class="vs"><img loading="lazy" decoding="async" src="https://flagcdn.com/h60/jo.png" alt="Jordania"><span>Jordania</span><span class="vsLbl">VS</span><span>Argentina</span><img loading="lazy" decoding="async" src="https://flagcdn.com/h60/ar.png" alt="Argentina"></div>',
       cta: '🎯 Registrarme en DBbet',
       foot: 'Cuanto antes te registres + verifiques cuenta y teléfono, más fácil que entres a la promo del sábado.'
     },
@@ -26224,7 +26230,7 @@ setTimeout(_fpBadgeInit, 1200);
           + '<tr><td>Depositás $100</td><td>→ $50 FreeBet</td></tr>'
           + '<tr><td>Depositás $200</td><td>→ $100 FreeBet</td></tr>'
           + '</tbody></table>'
-          + '<div class="vs"><img src="https://flagcdn.com/h60/jo.png" alt="Jordania"><span>Jordania</span><span class="vsLbl">VS</span><span>Argentina</span><img src="https://flagcdn.com/h60/ar.png" alt="Argentina"></div>'
+          + '<div class="vs"><img loading="lazy" decoding="async" src="https://flagcdn.com/h60/jo.png" alt="Jordania"><span>Jordania</span><span class="vsLbl">VS</span><span>Argentina</span><img loading="lazy" decoding="async" src="https://flagcdn.com/h60/ar.png" alt="Argentina"></div>'
           + '<div class="fine">Solo 2do depósito o posteriores · Cuenta verificada (email + teléfono) · 1 vez por usuario · FreeBet válida solo para combinada de 3+ partidos con cuota mín 1.50 c/u · Solo mercados Gana Local (P1) o Gana Visitante (P2) · Promo válida 7 días.</div>',
       cta: '🎯 Activar promo en DBbet',
       foot: 'Promoción oficial DBbet · Acreditación al día siguiente'
@@ -26240,7 +26246,7 @@ setTimeout(_fpBadgeInit, 1200);
           + '<tr><td>Depositás $100</td><td>→ $50 FreeBet</td></tr>'
           + '<tr><td>Depositás $200</td><td>→ $100 FreeBet</td></tr>'
           + '</tbody></table>'
-          + '<div class="vs"><img src="https://flagcdn.com/h60/jo.png" alt="Jordania"><span>Jordania</span><span class="vsLbl">VS</span><span>Argentina</span><img src="https://flagcdn.com/h60/ar.png" alt="Argentina"></div>'
+          + '<div class="vs"><img loading="lazy" decoding="async" src="https://flagcdn.com/h60/jo.png" alt="Jordania"><span>Jordania</span><span class="vsLbl">VS</span><span>Argentina</span><img loading="lazy" decoding="async" src="https://flagcdn.com/h60/ar.png" alt="Argentina"></div>'
           + '<div class="fine">Solo 2do depósito+ · Cuenta verificada · 1 vez por usuario · FreeBet válida para combinada de 3+ patas, cuota mín 1.50 cada una, mercados Gana Local/Visitante.</div>',
       cta: '🚀 Depositar y reclamar FreeBet',
       foot: '¡Última jornada! · Acreditación 28-jun'
