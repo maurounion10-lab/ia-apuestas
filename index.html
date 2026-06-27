@@ -12633,11 +12633,10 @@ function renderPreds() {
         return false; // sin fecha → no incluir en próximos
       });
     } else if (tf === 'finished') {
-      // TERMINADOS = todos los que tienen resultado (win + loss + void)
-      realPreds = realPreds.filter(p => {
-        const res = p._histResult || 'pending';
-        return !!p._started && res !== 'pending';
-      });
+      // TERMINADOS = todos los que ya empezaron (incluye EN VIVO + win + loss + void)
+      // 🛡️ (26-jun-2026) Antes excluíamos pending → fichas EN JUEGO desaparecían.
+      // Ahora se ven con badge "EN VIVO" (isPending logic ya está en el render)
+      realPreds = realPreds.filter(p => !!p._started);
     }
     if (!realPreds.length) realPreds = null;
   }
@@ -26326,6 +26325,28 @@ setTimeout(_fpBadgeInit, 1200);
     }
     localStorage.setItem(KEY, String(now));
   } catch(e) {}
+})();
+</script>
+<script>
+
+// 🆕 (26-jun-2026) Auto-refresh fichas cada 90s cuando hay partidos próximos a empezar
+// Detecta transición pending → started y re-renderiza para mostrar "EN VIVO" sin reload
+(function() {
+  setInterval(function() {
+    if (typeof renderPreds !== 'function') return;
+    const all = window._allAvailablePicks || [];
+    const nowMs = Date.now();
+    // Solo re-renderizar si hay picks cuyo commenceTs está cerca (±10 min de transición)
+    const transitioning = all.some(p => {
+      if (!p.commenceTs) return false;
+      const diff = nowMs - p.commenceTs;
+      // partidos que arrancaron en los últimos 10 min o arrancan en los próximos 10 min
+      return diff > -10 * 60 * 1000 && diff < 10 * 60 * 1000;
+    });
+    if (transitioning) {
+      try { renderPreds(); } catch(e) {}
+    }
+  }, 90 * 1000); // cada 90s
 })();
 </script>
 </body>
