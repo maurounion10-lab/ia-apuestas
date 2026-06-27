@@ -614,7 +614,7 @@ export const WC_MATCHES = [
   {
     id: 'wc2026_j3_arg_jor_27jun',
     home: 'Argentina', away: 'Jordania',
-    rec: 'Gana Argentina sin recibir', _recSide: 'home',
+    rec: 'Gana Argentina a 0', _recSide: 'home',
     conf: 'high', bvr: 5, bvrText: 'Alta',
     stake: 110, odds: 1.78,
     _hO: 1.22, _dO: 6.50, _aO: 18.00, _bestOdds: 1.78,
