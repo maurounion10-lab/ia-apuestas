@@ -102,7 +102,23 @@
     /* FOOTER */
     .footer{background:#060d06;border-top:1px solid rgba(0,200,83,0.12);padding:24px;text-align:center;font-size:0.82rem;color:rgba(255,255,255,0.3)}
     .footer a{color:var(--verde);text-decoration:none}
-  </style>
+  
+.veredict-box{margin:32px 0;padding:24px;background:linear-gradient(135deg,#0d2a0d,#1a3a1a);border:2px solid rgba(0,200,83,0.45);border-radius:14px}
+.veredict-box h3{color:#00c853;font-size:1rem;font-weight:900;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+.veredict-box p{margin-bottom:10px;color:rgba(255,255,255,0.92);font-size:.95rem;line-height:1.7}
+.veredict-box .verdict-final{margin-top:14px;padding:14px;background:rgba(255,215,0,0.08);border-left:3px solid #FFD700;border-radius:0 8px 8px 0;color:#FFD700;font-weight:700;font-size:.95rem}
+.cmp-table{width:100%;border-collapse:collapse;margin:20px 0;background:rgba(255,255,255,0.02);border-radius:10px;overflow:hidden}
+.cmp-table th,.cmp-table td{padding:11px 13px;text-align:left;font-size:.88rem;border-bottom:1px solid rgba(255,255,255,0.08)}
+.cmp-table th{background:rgba(0,200,83,0.1);color:#00c853;font-weight:800;letter-spacing:0.3px}
+.cmp-table tr:last-child td{border-bottom:none}
+.cmp-table .yes{color:#00c853;font-weight:700}
+.cmp-table .no{color:#ff5252;font-weight:700}
+.cmp-table .mid{color:#FFD700;font-weight:700}
+.when-section{margin:24px 0;padding:18px;background:rgba(33,150,243,0.06);border:1px solid rgba(33,150,243,0.25);border-radius:12px}
+.when-section h4{color:#64b5f6;font-size:.85rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.when-section ul{margin:0 0 0 18px}
+.when-section li{margin-bottom:6px;color:rgba(255,255,255,0.85)}
+</style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"Cómo hablar con la IA de gambeta.ai para sacarle el máximo","item":"https://gambeta.ai/blog/como-hablar-con-la-ia"}]}
 </script>
@@ -162,6 +178,34 @@
 <p>La IA siempre explica el razonamiento detrás de cada recomendación. Cuando dice "el equipo X tiene ventaja de local sólida (72% de victorias en casa en los últimos 20 partidos) y enfrenta a un rival con baja de rendimiento (3 derrotas en 5)", ese es el análisis que respalda la confianza del pick. Entender ese razonamiento te hace mejor apostador.</p>
 <h2>Convertí la consulta en una rutina</h2>
 <p>Sacarle el máximo a la IA no es cuestión de una pregunta suelta, sino de una rutina. Antes de cada jornada, revisá los picks del día, pedile a la IA que te explique los dos o tres de mayor confianza, contrastá con tu propio criterio y recién ahí decidí. Esa conversación de cinco minutos te ordena la cabeza y te aleja de las apuestas impulsivas.</p>
+
+<h2 style="margin-top:34px">🎯 Las 5 preguntas que SÍ funcionan</h2>
+<ol style="margin:0 0 16px 22px;color:rgba(255,255,255,0.85)">
+<li><strong>"¿Cuál es tu pick de mayor confianza para hoy?"</strong> — mejor pick del día con análisis.</li>
+<li><strong>"¿Hay value en X vs Y?"</strong> — compara probabilidad vs cuota.</li>
+<li><strong>"¿Cómo viene el equipo X en sus últimos 5?"</strong> — datos directos.</li>
+<li><strong>"¿Qué confianza le das al BTTS en X vs Y?"</strong> — análisis de mercado.</li>
+<li><strong>"¿Cuál es tu hot take del finde?"</strong> — pick más arriesgado con value.</li>
+</ol>
+<h2>❌ Las 5 preguntas que NO funcionan</h2>
+<table class="cmp-table">
+<thead><tr><th>Pregunta vaga</th><th>Por qué falla</th><th>Pregunta mejor</th></tr></thead>
+<tbody>
+<tr><td>"¿Quién va a ganar?"</td><td>Sin contexto</td><td>"¿Quién gana en Real Madrid vs Barcelona?"</td></tr>
+<tr><td>"¿Cuál es tu pick?"</td><td>Sin partido</td><td>"¿Cuál es tu pick #1 para hoy 18hs?"</td></tr>
+<tr><td>"¿Apuesto seguro?"</td><td>No hay seguros</td><td>"¿Cuál es el pick de máxima confianza?"</td></tr>
+<tr><td>"Decime cómo ganar"</td><td>Demasiado amplio</td><td>"¿Cómo administro bankroll para combinadas?"</td></tr>
+</tbody>
+</table>
+<div class="when-section"><h4>💡 Trucos avanzados</h4><ul>
+<li><strong>Da contexto temporal</strong>: "para los partidos de mañana" mejor que "para mañana".</li>
+<li><strong>Pedile alternativas</strong>: "dame 3 opciones de pick con value alto".</li>
+<li><strong>Pregunta por confianza específica</strong>: "muestrame solo picks confianza Alta+".</li>
+</ul></div>
+<div class="veredict-box"><h3>🤖 Veredicto: cómo hablarle a la IA</h3>
+<p>La IA funciona mejor con <strong>preguntas específicas, con partido/fecha/mercado claros</strong>. Cuanto más contexto le das, mejor el output.</p>
+<div class="verdict-final">🎯 Tip estrella: empezá pidiéndole "los 3 picks de mayor confianza para hoy" y trabajá desde ahí.</div></div>
+
 </article>
 
   <div class="cta-box">
