@@ -301,3 +301,14 @@
 /blog/machine-learning-apuestas-deportivas.html  /blog/machine-learning-apuestas-deportivas  308
 /blog/predicciones-deportivas-ia-gratis-vs-pago.html  /blog/predicciones-deportivas-ia-gratis-vs-pago  308
 /blog/deep-learning-apuestas-futbol.html  /blog/deep-learning-apuestas-futbol  308
+
+# GSC Fix 27-jun: 8 URLs 404 → redirect 308 a equivalentes vivos
+/blog/sofascore-para-apuestas  /blog/que-es-sofascore  308
+/blog/que-es-tennisstats  /blog/tennisstats-para-apostar  308
+/blog/tennisstats-vs-tennis-metrics  /blog/que-es-tennis-metrics  308
+/blog/como-leer-picks  /blog/como-usar-pronosticos-ia  308
+/coupon  /  308
+/cup-context  /  308
+/nba/500/*  /  308
+/ranking  /  308
+/ranking/  /  308
