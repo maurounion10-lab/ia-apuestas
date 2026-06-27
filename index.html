@@ -14194,7 +14194,7 @@ window._estrellaOverride  = null; // {home,away} — pick estrella del finde for
 // ══════════════════════════════════════════════════════════════
 // LEAGUE TAB VISIBILITY — oculta tabs sin picks disponibles
 // ══════════════════════════════════════════════════════════════
-const LEAGUE_FILTER_PATTERNS = {
+var LEAGUE_FILTER_PATTERNS = {
   champions:    ['champs_league','champions'],
   europa:       ['europa_league'],
   conference:   ['conference_league'],
@@ -18579,8 +18579,8 @@ function sbTranslateError(msg) {
   return msg;
 }
 
-let _authOpenTime = 0;
-let _authScrollY = 0;
+var _authOpenTime = 0;
+var _authScrollY = 0;
 // ── Modal de bienvenida ──────────────────────────────────────────
 function showWelcome(name) {
   const el = document.getElementById('welcomeOverlay');
