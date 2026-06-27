@@ -32,3 +32,8 @@ enabled = true
 [[kv_namespaces]]
 binding = "CACHE_KV"
 id = "1d4b161e78db4de9a9b806f369c73ceb"
+
+# Workaround Wrangler 3.107 regresión: declarar [assets] para que NO use el root como assets dir.
+# Apunta a public/ — un directory vacío con solo .gitkeep.
+[assets]
+directory = "public"
