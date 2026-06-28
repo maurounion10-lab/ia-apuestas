@@ -1903,6 +1903,150 @@ async function runWcMatchesPublisher(env) {
   return stats;
 }
 
+
+// ─── 🤖 AUTO-GENERADOR DE PICKS WC2026 ───────────────────────────────────────
+// Genera picks automáticamente desde /odds para próximos partidos del Mundial
+// Evita la necesidad de armar picks manualmente cada día.
+async function runWcAutoGenerate(env) {
+  const stats = { generated: 0, skippedCount: 0, errors: [], reasons: [] };
+  try {
+    // 1. Obtener partidos próximos via /odds (self-fetch)
+    const oddsRes = await fetch('https://apuestas-api.mauro-union10.workers.dev/odds?category=main');
+    if (!oddsRes.ok) {
+      stats.errors.push(`/odds HTTP ${oddsRes.status}`);
+      return stats;
+    }
+    const oddsData = await oddsRes.json();
+    const matches = oddsData.data || [];
+
+    // 2. Filtrar WC2026 entre +12h y +96h (no muy cerca, no muy lejos)
+    const now = Date.now();
+    const minLead = now + 12 * 60 * 60 * 1000;
+    const maxLead = now + 96 * 60 * 60 * 1000;
+
+    const upcoming = matches.filter(m => {
+      if (!m.sport_key || !m.sport_key.includes('fifa_world_cup')) return false;
+      const ct = new Date(m.commence_time).getTime();
+      return ct > minLead && ct < maxLead;
+    });
+
+    // 3. Obtener historial
+    const hist = await fetchAdminHistorial(env);
+    if (!Array.isArray(hist)) {
+      stats.errors.push('historial no disponible');
+      return stats;
+    }
+
+    const newPicks = [];
+    for (const m of upcoming) {
+      try {
+        const home = m.home_team;
+        const away = m.away_team;
+        const ct = new Date(m.commence_time).getTime();
+        const dateStr = new Date(ct).toISOString().slice(0, 10).replace(/-/g, '');
+        const slug = (home + '_' + away).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 24);
+        const pickId = `wc2026_auto_${slug}_${dateStr}`;
+
+        // Dedup: por id o por nombres+fecha (±12h)
+        const exists = hist.some(p =>
+          p && p._wcMatch && (
+            p.id === pickId ||
+            ((p.home === home || p.away === home) &&
+             (p.away === away || p.home === away) &&
+             Math.abs((p.commenceTs || 0) - ct) < 12 * 60 * 60 * 1000)
+          )
+        );
+        if (exists) {
+          stats.skippedCount++;
+          continue;
+        }
+
+        // 4. Construir pick desde cuotas
+        const bookmaker = (m.bookmakers || [])[0];
+        if (!bookmaker) { stats.skippedCount++; continue; }
+        const h2h = (bookmaker.markets || []).find(mk => mk.key === 'h2h');
+        if (!h2h || !h2h.outcomes) { stats.skippedCount++; continue; }
+        const hO = h2h.outcomes.find(o => o.name === home)?.price;
+        const aO = h2h.outcomes.find(o => o.name === away)?.price;
+        const dO = h2h.outcomes.find(o => o.name === 'Draw')?.price;
+        if (!hO || !aO) { stats.skippedCount++; continue; }
+
+        const MIN_ODDS = 1.21;
+        let rec, recSide, odds;
+
+        if (hO < 1.50 && hO >= MIN_ODDS) { rec = `Gana ${home}`; recSide = 'home'; odds = hO; }
+        else if (aO < 1.50 && aO >= MIN_ODDS) { rec = `Gana ${away}`; recSide = 'away'; odds = aO; }
+        else if (hO < aO && hO < 1.85 && hO >= MIN_ODDS) {
+          rec = `Doble 1X`; recSide = '1x';
+          const doubleProb = 1/hO + 1/(dO || 5);
+          odds = Math.max(MIN_ODDS, Math.round((1 / doubleProb) * 0.95 * 100) / 100);
+        }
+        else if (aO < hO && aO < 1.85 && aO >= MIN_ODDS) {
+          rec = `Doble X2`; recSide = 'x2';
+          const doubleProb = 1/aO + 1/(dO || 5);
+          odds = Math.max(MIN_ODDS, Math.round((1 / doubleProb) * 0.95 * 100) / 100);
+        }
+        else { stats.skippedCount++; continue; }
+
+        let conf, bvr, bvrText, stake;
+        if (odds <= 1.50) { conf = 'high'; bvr = 6; bvrText = 'Máxima'; stake = 170; }
+        else if (odds <= 1.75) { conf = 'high'; bvr = 5; bvrText = 'Alta'; stake = 130; }
+        else if (odds <= 2.00) { conf = 'high'; bvr = 4; bvrText = 'Media-Alta'; stake = 110; }
+        else { conf = 'med'; bvr = 3; bvrText = 'Media'; stake = 80; }
+
+        const totalProb = (1/hO + 1/(dO||5) + 1/aO);
+        const probH = Math.round((1/hO/totalProb)*100);
+        const probD = Math.round((1/(dO||5)/totalProb)*100);
+        const probA = Math.round((1/aO/totalProb)*100);
+
+        newPicks.push({
+          id: pickId,
+          home, away,
+          rec, _recSide: recSide,
+          conf, bvr, bvrText,
+          stake, odds: Math.round(odds*100)/100,
+          _hO: hO, _dO: dO, _aO: aO, _bestOdds: odds,
+          _bookKey: 'dbbet', _bookLabel: 'DBbet',
+          result: 'pending',
+          league: '🏆 Mundial 2026',
+          date: m.commence_time,
+          commenceTs: ct,
+          _sportKey: 'soccer_fifa_world_cup',
+          _wcMatch: true,
+          probH, probD, probA,
+          insight: `Pick generado automáticamente desde cuotas reales. Recomendación: ${rec} a cuota ${odds.toFixed(2)}. Probabilidades implícitas: ${probH}% local · ${probD}% empate · ${probA}% visitante.`,
+          _autoGenerated: true,
+          _autoGeneratedAt: new Date().toISOString(),
+        });
+        stats.generated++;
+        stats.reasons.push(`✓ ${home} vs ${away}: ${rec} @ ${odds.toFixed(2)}`);
+      } catch (e) {
+        stats.errors.push(`${m.home_team} vs ${m.away_team}: ${e.message}`);
+      }
+    }
+
+    if (newPicks.length > 0) {
+      const newHist = [...newPicks, ...hist];
+      const key = env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!key) { stats.errors.push('SUPABASE_SERVICE_ROLE_KEY no configurado'); return stats; }
+      const r = await fetch(`${SUPABASE_URL}/rest/v1/acoin_users?email=eq.${encodeURIComponent(ADMIN_EMAIL)}`, {
+        method: 'PATCH',
+        headers: {
+          'apikey': key,
+          'Authorization': `Bearer ${key}`,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=representation',
+        },
+        body: JSON.stringify({ historial_full: newHist, updated_at: new Date().toISOString() }),
+      });
+      if (!r.ok) stats.errors.push(`PATCH HTTP ${r.status}: ${(await r.text()).slice(0, 200)}`);
+    }
+  } catch (e) {
+    stats.errors.push(`fatal: ${e.message}`);
+  }
+  return stats;
+}
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
@@ -1924,6 +2068,9 @@ export default {
       console.log('[cron-wc-futures]', JSON.stringify(wcStats));
       const wcMatchesStats = await runWcMatchesPublisher(env);
       console.log('[cron-wc-matches]', JSON.stringify(wcMatchesStats));
+      // 🤖 Auto-generar picks WC para próximas 12-96h desde /odds
+      const wcAutoGenStats = await runWcAutoGenerate(env);
+      console.log('[cron-wc-auto-gen]', JSON.stringify(wcAutoGenStats));
     }
   },
   async fetch(request, env) {
@@ -2308,6 +2455,17 @@ export default {
     }
 
     // ── 🆕 /admin/publish-wc-futures — fuerza la publicación manual de los WC futures ──
+    
+    if (path === '/admin/run-wc-auto-generate') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      const stats = await runWcAutoGenerate(env);
+      return new Response(JSON.stringify({ ok: true, ts: new Date().toISOString(), stats }), { headers: CORS });
+    }
+
     if (path === '/admin/publish-wc-futures') {
       const token = url.searchParams.get('token');
       const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
