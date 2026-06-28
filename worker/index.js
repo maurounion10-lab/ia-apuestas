@@ -1946,7 +1946,7 @@ async function runWcAutoGenerate(env) {
     const oddsKey = env.ODDS_API_KEY;
     if (!oddsKey) { stats.errors.push('ODDS_API_KEY no configurado'); return stats; }
 
-    const oddsUrl = `https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/odds/?apiKey=${oddsKey}&regions=us,eu,uk&markets=h2h&oddsFormat=decimal`;
+    const oddsUrl = `https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/odds/?apiKey=${oddsKey}&regions=us,eu,uk&markets=h2h,totals,btts&oddsFormat=decimal`;
     const oddsRes = await fetch(oddsUrl);
     if (!oddsRes.ok) { stats.errors.push(`Odds API HTTP ${oddsRes.status}`); return stats; }
     const matches = await oddsRes.json();
@@ -2001,23 +2001,53 @@ async function runWcAutoGenerate(env) {
         const MIN_ODDS = 1.21;
         let rec, recSide, odds;
 
+        // Paso 1: probar 1X2 (Gana X o Doble) — lógica original
         if (hO < 1.50 && hO >= MIN_ODDS) { rec = `Gana ${home}`; recSide = 'home'; odds = hO; }
         else if (aO < 1.50 && aO >= MIN_ODDS) { rec = `Gana ${away}`; recSide = 'away'; odds = aO; }
         else if (hO < aO && hO < 1.85 && hO >= MIN_ODDS) {
           rec = `Doble 1X`; recSide = '1x';
           const dp = 1/hO + 1/(dO || 5);
           const rawOdds = Math.round((1 / dp) * 0.95 * 100) / 100;
-          if (rawOdds < MIN_ODDS) { stats.skippedCount++; continue; }
-          odds = rawOdds;
+          if (rawOdds >= MIN_ODDS) { odds = rawOdds; }
+          else { rec = null; }  // no califica, probar siguientes mercados
         }
         else if (aO < hO && aO < 1.85 && aO >= MIN_ODDS) {
           rec = `Doble X2`; recSide = 'x2';
           const dp = 1/aO + 1/(dO || 5);
           const rawOdds = Math.round((1 / dp) * 0.95 * 100) / 100;
-          if (rawOdds < MIN_ODDS) { stats.skippedCount++; continue; }
-          odds = rawOdds;
+          if (rawOdds >= MIN_ODDS) { odds = rawOdds; }
+          else { rec = null; }  // no califica, probar siguientes mercados
         }
-        else { stats.skippedCount++; continue; }
+
+        // Paso 2: si 1X2 no dio pick, probar Over 2.5 goles
+        if (!rec) {
+          const totals = (bookmaker.markets || []).find(mk => mk.key === 'totals');
+          if (totals && Array.isArray(totals.outcomes)) {
+            // Buscar línea 2.5 exactamente
+            const over25 = totals.outcomes.find(o => o.name === 'Over' && Number(o.point) === 2.5);
+            if (over25 && over25.price && over25.price >= 1.45 && over25.price <= 1.85) {
+              rec = 'Más de 2.5 goles';
+              recSide = 'over25';
+              odds = over25.price;
+            }
+          }
+        }
+
+        // Paso 3: si nada calificó, probar BTTS (Ambos Equipos Marcan)
+        if (!rec) {
+          const btts = (bookmaker.markets || []).find(mk => mk.key === 'btts');
+          if (btts && Array.isArray(btts.outcomes)) {
+            const yes = btts.outcomes.find(o => o.name === 'Yes');
+            if (yes && yes.price && yes.price >= 1.50 && yes.price <= 1.85) {
+              rec = 'Ambos Equipos Marcan';
+              recSide = 'btts';
+              odds = yes.price;
+            }
+          }
+        }
+
+        // Sin pick válido → skip
+        if (!rec) { stats.skippedCount++; continue; }
 
         let conf, bvr, bvrText, stake;
         if (odds <= 1.50) { conf='high'; bvr=6; bvrText='Máxima'; stake=170; }
