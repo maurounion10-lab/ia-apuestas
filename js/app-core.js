@@ -4999,7 +4999,33 @@ function renderPreds() {
     if (realPreds && realPreds.length === 0) realPreds = null;
   }
 
-  // ── Sub-filtro de tiempo (HOY / PRÓXIMOS / EN JUEGO / TERMINADOS) ──  try{const _liveC=(realPreds||[]).filter(p=>!!p._started&&(!p._histResult||p._histResult==='pending')).length;const _liveT=document.getElementById('predLiveTab');if(_liveT){if(_liveC>0){_liveT.style.display='inline-block';_liveT.innerHTML='🔴 EN JUEGO ('+_liveC+')';}else{_liveT.style.display='none';if(window._predTimeFilter==='live'){window._predTimeFilter='all';document.querySelectorAll('#predTimeTabs button').forEach(b=>b.classList.remove('active'));const _at=document.querySelector('#predTimeTabs button.sport-tab');if(_at)_at.classList.add('active');}}}}catch(_){}
+  // ── Sub-filtro de tiempo (HOY / PRÓXIMOS / EN JUEGO / TERMINADOS) ──
+  // 🆕 (28-jun-2026) Tab EN JUEGO SIEMPRE visible. Cuando hay live: rojo+animación+contador. Cuando no: gris+atenuado.
+  try{
+    const _liveC=(realPreds||[]).filter(p=>!!p._started&&(!p._histResult||p._histResult==='pending')).length;
+    const _liveT=document.getElementById('predLiveTab');
+    if(_liveT){
+      _liveT.style.display='inline-block';
+      if(_liveC>0){
+        _liveT.innerHTML='🔴 EN JUEGO ('+_liveC+')';
+        _liveT.style.opacity='1';
+        _liveT.style.animation='gambeta-live-blink 1.5s ease-in-out infinite';
+        _liveT.style.cursor='pointer';
+        _liveT.disabled=false;
+      } else {
+        _liveT.innerHTML='⚫ EN JUEGO';
+        _liveT.style.opacity='0.45';
+        _liveT.style.animation='none';
+        _liveT.style.cursor='default';
+        if(window._predTimeFilter==='live'){
+          window._predTimeFilter='all';
+          document.querySelectorAll('#predTimeTabs button').forEach(b=>b.classList.remove('active'));
+          const _at=document.querySelector('#predTimeTabs button.sport-tab');
+          if(_at)_at.classList.add('active');
+        }
+      }
+    }
+  }catch(_){}
   if (realPreds) {
     const tf = window._predTimeFilter || 'all';
     if (tf === 'today') {
