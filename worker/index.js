@@ -1935,7 +1935,7 @@ const TEAM_ES_MAP = {
   'Haiti': 'Haití', 'Scotland': 'Escocia', 'Bosnia & Herzegovina': 'Bosnia',
   'Bosnia and Herzegovina': 'Bosnia',
 };
-function normTeam(name) {
+function normWcTeam(name) {
   if (!name) return '';
   return TEAM_ES_MAP[name] || name;
 }
@@ -1974,8 +1974,8 @@ async function runWcAutoGenerate(env) {
         const slug = (home + '_' + away).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 24);
         const pickId = `wc2026_auto_${slug}_${dateStr}`;
 
-        const homeEs = normTeam(home);
-        const awayEs = normTeam(away);
+        const homeEs = normWcTeam(home);
+        const awayEs = normWcTeam(away);
         const exists = hist.some(p => {
           if (!p || !p._wcMatch) return false;
           if (p.id === pickId) return true;
