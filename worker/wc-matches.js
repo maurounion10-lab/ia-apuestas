@@ -677,7 +677,11 @@ export const WC_MATCHES = [
     stake: 110, odds: 1.65,
     _hO: 4.50, _dO: 3.30, _aO: 1.65, _bestOdds: 1.65,
     _bookKey: 'dbbet', _bookLabel: 'DBbet',
-    result: 'pending',
+    result: 'win',
+    finalScore: '0-1',
+    pl: 71.5,
+    scoreH: 0,
+    scoreA: 1,
     league: '🏆 Mundial 2026',
     date: '2026-06-28T19:00:00.000Z',
     commenceTs: ART_ts(2026, 5, 28, 16, 0),
@@ -757,3 +761,4 @@ export const WC_MATCHES = [
     insight: 'Octavo de final. Francia 1° Grupo I (Mbappé, Camavinga, Tchouameni, Saliba) vs Suecia 2° (Isak + Gyökeres + Kulusevski). Suecia ofensiva pero defensa media — Francia con plantel superior y forma. Mbappé suele aparecer en eliminatorias del Mundial.',
   },
 ];
+
