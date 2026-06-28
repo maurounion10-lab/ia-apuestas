@@ -668,7 +668,7 @@ export const WC_MATCHES = [
     insight: 'Inglaterra 8 goles en últimos 5 partidos (Kane doblete + Bellingham + Rashford vs Croacia 4-2). Panamá 0 goles a favor en el Mundial, 2 recibidos, ya eliminada. Inglaterra necesita ganar holgado para asegurar el 1° del grupo. Mercado pronostica 0-3 (Inglaterra -1.5 a cuota 1.77).',
   },
 
-  // ════ DOM 28-JUN — Cierre Grupo A ════
+  // ════ DOM 28-JUN — Dieciseisavos de Final ════
   {
     id: 'wc2026_a4_saf_can_28jun',
     home: 'Sudáfrica', away: 'Canadá',
@@ -688,7 +688,7 @@ export const WC_MATCHES = [
     _sportKey: 'soccer_fifa_world_cup',
     _wcMatch: true,
     probH: 22, probD: 28, probA: 50,
-    insight: 'Cierre de Grupo A. Canadá necesita ganar para asegurar el 1° lugar y mejor cruce en octavos. Sudáfrica ya eliminada con 1 punto en el torneo. Canadá vs equipos sin nada en juego históricamente domina: 4 de las últimas 5 victorias por margen claro. Alphonso Davies recuperado.',
+    insight: 'Dieciseisavos de Final del Mundial 2026. Canadá llega como uno de los anfitriones con plantel sólido (Eustáquio, Jonathan David, Buchanan, Larin) y Alphonso Davies recuperado. Sudáfrica clasificó como mejor 3° de grupo. Jerarquía + nivel del Big 5 europeo donde milita el grueso del plantel canadiense inclinan la balanza.',
   },
   // ════ LUN 29-JUN — Cierre Grupo C + Grupo E ════
   {
@@ -761,4 +761,5 @@ export const WC_MATCHES = [
     insight: 'Octavo de final. Francia 1° Grupo I (Mbappé, Camavinga, Tchouameni, Saliba) vs Suecia 2° (Isak + Gyökeres + Kulusevski). Suecia ofensiva pero defensa media — Francia con plantel superior y forma. Mbappé suele aparecer en eliminatorias del Mundial.',
   },
 ];
+
 
