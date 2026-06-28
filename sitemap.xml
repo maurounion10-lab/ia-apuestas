@@ -1141,12 +1141,6 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/mexico-vs-sudafrica-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/corea-del-sur-vs-republica-checa-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
@@ -1160,12 +1154,6 @@
   </url>
   <url>
     <loc>https://gambeta.ai/previa/republica-checa-vs-sudafrica-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/republica-checa-vs-mexico-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
@@ -1213,12 +1201,6 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/brasil-vs-marruecos-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/haiti-vs-escocia-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
@@ -1238,18 +1220,6 @@
   </url>
   <url>
     <loc>https://gambeta.ai/previa/escocia-vs-brasil-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/marruecos-vs-haiti-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/estados-unidos-vs-paraguay-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
@@ -1285,12 +1255,6 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/alemania-vs-curacao-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/costa-de-marfil-vs-ecuador-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
@@ -1309,19 +1273,7 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/ecuador-vs-alemania-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/curacao-vs-costa-de-marfil-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/paises-bajos-vs-japon-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
@@ -1339,25 +1291,7 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/tunez-vs-japon-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/tunez-vs-paises-bajos-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/japon-vs-suecia-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/belgica-vs-egipto-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
@@ -1369,31 +1303,7 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/belgica-vs-iran-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/nueva-zelanda-vs-egipto-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/nueva-zelanda-vs-belgica-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/egipto-vs-iran-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/espana-vs-cabo-verde-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
@@ -1405,49 +1315,13 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/espana-vs-arabia-saudita-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/uruguay-vs-cabo-verde-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/uruguay-vs-espana-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/cabo-verde-vs-arabia-saudita-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/francia-vs-senegal-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/irak-vs-noruega-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/francia-vs-irak-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/noruega-vs-senegal-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
@@ -1465,19 +1339,7 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/argentina-vs-argelia-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/austria-vs-jordania-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/argentina-vs-austria-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
@@ -1489,19 +1351,7 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/jordania-vs-argentina-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/argelia-vs-austria-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/portugal-vs-rd-congo-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
@@ -1513,55 +1363,13 @@
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/portugal-vs-uzbekistan-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/colombia-vs-rd-congo-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/colombia-vs-portugal-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/rd-congo-vs-uzbekistan-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
   </url>
   <url>
-    <loc>https://gambeta.ai/previa/inglaterra-vs-croacia-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
     <loc>https://gambeta.ai/previa/ghana-vs-panama-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/inglaterra-vs-ghana-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/panama-vs-croacia-mundial-2026</loc>
-    <lastmod>2026-06-10</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.75</priority>
-  </url>
-  <url>
-    <loc>https://gambeta.ai/previa/panama-vs-inglaterra-mundial-2026</loc>
     <lastmod>2026-06-10</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.75</priority>
