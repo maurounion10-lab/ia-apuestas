@@ -126,6 +126,20 @@
     .cta-box p{color:rgba(255,255,255,0.7);margin-bottom:14px}
     .cta-btn{display:inline-block;background:var(--verde);color:#000;font-weight:800;padding:12px 28px;border-radius:10px;font-size:0.95rem;letter-spacing:0.2px}
     .cta-btn:hover{opacity:0.9}
+
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+
 </style>
 </head>
 <body>
@@ -216,6 +230,16 @@
 <li><a href="/blog/bonos-letra-chica">Bonos de bienvenida: la letra chica que se ignora</a></li>
 <li><a href="/blog/cashback-vs-freebet-vs-bono">Cashback vs FreeBet vs Bono: diferencias claras</a></li>
 </ul>
+
+
+<h2>❓ Preguntas frecuentes</h2>
+<div class="faq-accordion">
+<details><summary>¿Qué son las apuestas deportivas?</summary><div class="faq-answer"><p>Son acuerdos de dinero entre el usuario y una casa sobre el resultado de un evento deportivo. La casa fija una cuota; si acertás, cobrás stake × cuota.</p></div></details>
+<details><summary>¿Cómo empezar a apostar siendo principiante?</summary><div class="faq-answer"><p>Elegí una casa legal en tu país, verificá tu cuenta, depositá un monto chico, empezá apostando 1-2% de la banca por jugada y usá IA gratuita para identificar valor.</p></div></details>
+<details><summary>¿Cuáles son los mercados de apuestas más comunes?</summary><div class="faq-answer"><p>1X2 (gana local, empate, visitante), Hándicap asiático, Over/Under (más de N goles), Doble oportunidad y BTTS (ambos equipos marcan).</p></div></details>
+<details><summary>¿Dónde encuentro mejor cuota para una apuesta?</summary><div class="faq-answer"><p>Comparando 3-4 casas reguladas para el mismo mercado. En Latinoamérica DBbet, Codere y Betano suelen tener cuotas competitivas. Nunca apostés en la primera que se te aparezca.</p></div></details>
+<details><summary>¿Es legal apostar online en Argentina, México, Perú o Colombia?</summary><div class="faq-answer"><p>Sí en todos esos países, con casas reguladas localmente. Argentina opera por provincia (Bplay, Casino Buenos Aires). México con SEGOB. Perú con Mincetur. Colombia con Coljuegos.</p></div></details>
+</div>
 
 <div class="cta-box">
 <h3>🤖 Picks con valor esperado positivo — gratis</h3>

@@ -144,6 +144,20 @@ nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 
 .cta-box h3{color:var(--verde);font-size:1.15rem;font-weight:800;margin-bottom:8px}
 .cta-box p{color:rgba(255,255,255,0.7);margin-bottom:14px}
 .cta-btn{display:inline-block;background:var(--verde);color:#000;font-weight:800;padding:12px 28px;border-radius:10px;font-size:0.95rem}
+
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+
 </style>
 </head>
 <body>
@@ -188,6 +202,16 @@ nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 
 <li><a href="/blog/calculadora-valor-ev">Calculadora de Valor (EV+)</a></li>
 <li><a href="/blog/elegir-casa-apuestas">Cómo elegir casa de apuestas</a></li>
 </ul>
+
+<h2>❓ Preguntas frecuentes</h2>
+<div class="faq-accordion">
+<details><summary>¿Mercado Pago me deja apostar en cualquier casa?</summary><div class="faq-answer"><p>No. Solo en casas reguladas argentinas que tengan integración oficial: Bplay, Bet365 AR, Codere AR y Casino Buenos Aires Online. Las internacionales no lo soportan oficialmente.</p></div></details>
+<details><summary>¿Cuánto tarda el depósito con Mercado Pago?</summary><div class="faq-answer"><p>Inmediato. Si tu MP tiene saldo o tarjeta de débito asociada, el saldo aparece en la casa en menos de 2 minutos.</p></div></details>
+<details><summary>¿Puedo retirar mis ganancias a Mercado Pago?</summary><div class="faq-answer"><p>Sí en Bplay y Codere (gratuito, hasta $200K-$500K ARS por día). En las otras tenés que retirar vía CBU.</p></div></details>
+<details><summary>¿Mercado Pago cobra comisión por apostar?</summary><div class="faq-answer"><p>Para el usuario, no. Las casas argentinas absorben la comisión. Solo pagás interés si usás tarjeta de crédito en cuotas (decisión tuya).</p></div></details>
+<details><summary>¿Es legal apostar online en Argentina?</summary><div class="faq-answer"><p>Sí, con las casas reguladas a nivel provincial (Buenos Aires LOTBA, CABA, Mendoza, Córdoba, etc). Cada provincia tiene su listado de operadores autorizados.</p></div></details>
+</div>
+
 <div class="cta-box">
 <h3>🤖 Picks con valor esperado positivo — gratis</h3>
 <p>La IA de gambeta.ai publica solo partidos con EV+ y nivel de confianza, gratis.</p>
