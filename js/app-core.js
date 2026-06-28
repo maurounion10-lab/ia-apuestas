@@ -6412,7 +6412,7 @@ function _normRec(r) { return (r||'').replace('Visitante Gana','Gana Visitante')
 // DBBET 1-CLICK BET — deep link al partido con afiliado
 // REGLA DE ORO: TODAS las URLs pasan por el afiliado, siempre.
 // ════════════════════════════════════════════════════════════
-const DBBET_AFFILIATE_BASE = 'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213&utm_source=home_dbbet&utm_medium=site';
+const DBBET_AFFILIATE_BASE = 'https://refpa96317.com/L?tag=d_5777587m_11213c_&site=5777587&ad=11213&utm_source=home_dbbet&utm_medium=site';
 
 // ── Mapa de sport_key → path de liga en DBbet ──
 // El &url= redirige al usuario a la página de la liga/partido después del tracking de afiliado.
@@ -8896,8 +8896,8 @@ const BOOK_AFFILIATE = {
   megapari:  'https://proarg.megapari-003572.in/',
   melbet:    'https://refpa3665.com/L?tag=d_5377076m_2170c_&site=5377076&ad=2170&r=registration',
   betwinner: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM',
-  dbbet_aff:  'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213&utm_source=home_dbbet&utm_medium=site',
-  dbbet:  'https://refpa96317.com/L?tag=d_5382769m_11213c_&site=5382769&ad=11213&utm_source=home_dbbet&utm_medium=site&r=email',
+  dbbet_aff:  'https://refpa96317.com/L?tag=d_5777587m_11213c_&site=5777587&ad=11213&utm_source=home_dbbet&utm_medium=site',
+  dbbet:  'https://refpa96317.com/L?tag=d_5777587m_11213c_&site=5777587&ad=11213&utm_source=home_dbbet&utm_medium=site&r=email',
 };
 function getBookLink(key) {
   if (!key) return null;
