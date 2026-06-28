@@ -1905,6 +1905,41 @@ async function runWcMatchesPublisher(env) {
 
 
 // ─── 🤖 AUTO-GENERADOR DE PICKS WC2026 ───────────────────────────────────────
+// Tabla de traducción EN→ES para nombres de equipos (Mundial 2026)
+const TEAM_ES_MAP = {
+  'Brazil': 'Brasil', 'Argentina': 'Argentina',
+  'England': 'Inglaterra', 'France': 'Francia', 'Germany': 'Alemania',
+  'Spain': 'España', 'Italy': 'Italia', 'Portugal': 'Portugal',
+  'Netherlands': 'Países Bajos', 'Belgium': 'Bélgica',
+  'Croatia': 'Croacia', 'Switzerland': 'Suiza', 'Sweden': 'Suecia',
+  'Norway': 'Noruega', 'Denmark': 'Dinamarca', 'Poland': 'Polonia',
+  'Czech Republic': 'República Checa', 'Austria': 'Austria',
+  'Turkey': 'Turquía', 'Türkiye': 'Turquía', 'Hungary': 'Hungría',
+  'Mexico': 'México', 'United States': 'Estados Unidos', 'USA': 'Estados Unidos',
+  'Canada': 'Canadá', 'Costa Rica': 'Costa Rica', 'Panama': 'Panamá',
+  'Honduras': 'Honduras', 'Jamaica': 'Jamaica', 'Cuba': 'Cuba',
+  'Colombia': 'Colombia', 'Uruguay': 'Uruguay', 'Paraguay': 'Paraguay',
+  'Peru': 'Perú', 'Ecuador': 'Ecuador', 'Chile': 'Chile', 'Bolivia': 'Bolivia',
+  'Venezuela': 'Venezuela',
+  'Japan': 'Japón', 'South Korea': 'Corea del Sur', 'Korea Republic': 'Corea del Sur',
+  'Australia': 'Australia', 'New Zealand': 'Nueva Zelanda',
+  'Iran': 'Irán', 'Iraq': 'Irak', 'Saudi Arabia': 'Arabia Saudita',
+  'Qatar': 'Catar', 'United Arab Emirates': 'EAU', 'Jordan': 'Jordania',
+  'Uzbekistan': 'Uzbekistán',
+  'Senegal': 'Senegal', 'Morocco': 'Marruecos', 'Egypt': 'Egipto',
+  'Tunisia': 'Túnez', 'Algeria': 'Argelia', 'Cameroon': 'Camerún',
+  'Ivory Coast': 'Costa de Marfil', "Côte d'Ivoire": 'Costa de Marfil',
+  'Nigeria': 'Nigeria', 'Ghana': 'Ghana', 'South Africa': 'Sudáfrica',
+  'DR Congo': 'RD Congo', 'Democratic Republic of Congo': 'RD Congo',
+  'Cape Verde': 'Cabo Verde', 'Curacao': 'Curaçao', 'Curaçao': 'Curaçao',
+  'Haiti': 'Haití', 'Scotland': 'Escocia', 'Bosnia & Herzegovina': 'Bosnia',
+  'Bosnia and Herzegovina': 'Bosnia',
+};
+function normTeam(name) {
+  if (!name) return '';
+  return TEAM_ES_MAP[name] || name;
+}
+
 async function runWcAutoGenerate(env) {
   const stats = { generated: 0, skippedCount: 0, errors: [], reasons: [] };
   try {
@@ -1939,14 +1974,19 @@ async function runWcAutoGenerate(env) {
         const slug = (home + '_' + away).toLowerCase().replace(/[^a-z0-9]/g, '').slice(0, 24);
         const pickId = `wc2026_auto_${slug}_${dateStr}`;
 
-        const exists = hist.some(p =>
-          p && p._wcMatch && (
-            p.id === pickId ||
-            ((p.home === home || p.away === home) &&
-             (p.away === away || p.home === away) &&
-             Math.abs((p.commenceTs || 0) - ct) < 12 * 60 * 60 * 1000)
-          )
-        );
+        const homeEs = normTeam(home);
+        const awayEs = normTeam(away);
+        const exists = hist.some(p => {
+          if (!p || !p._wcMatch) return false;
+          if (p.id === pickId) return true;
+          const ph = p.home || '';
+          const pa = p.away || '';
+          const sameMatch =
+            (ph === home || ph === homeEs || ph === away || ph === awayEs) &&
+            (pa === home || pa === homeEs || pa === away || pa === awayEs);
+          if (!sameMatch) return false;
+          return Math.abs((p.commenceTs || 0) - ct) < 12 * 60 * 60 * 1000;
+        });
         if (exists) { stats.skippedCount++; continue; }
 
         const bookmaker = (m.bookmakers || [])[0];
@@ -1966,12 +2006,16 @@ async function runWcAutoGenerate(env) {
         else if (hO < aO && hO < 1.85 && hO >= MIN_ODDS) {
           rec = `Doble 1X`; recSide = '1x';
           const dp = 1/hO + 1/(dO || 5);
-          odds = Math.max(MIN_ODDS, Math.round((1 / dp) * 0.95 * 100) / 100);
+          const rawOdds = Math.round((1 / dp) * 0.95 * 100) / 100;
+          if (rawOdds < MIN_ODDS) { stats.skippedCount++; continue; }
+          odds = rawOdds;
         }
         else if (aO < hO && aO < 1.85 && aO >= MIN_ODDS) {
           rec = `Doble X2`; recSide = 'x2';
           const dp = 1/aO + 1/(dO || 5);
-          odds = Math.max(MIN_ODDS, Math.round((1 / dp) * 0.95 * 100) / 100);
+          const rawOdds = Math.round((1 / dp) * 0.95 * 100) / 100;
+          if (rawOdds < MIN_ODDS) { stats.skippedCount++; continue; }
+          odds = rawOdds;
         }
         else { stats.skippedCount++; continue; }
 
@@ -1987,8 +2031,10 @@ async function runWcAutoGenerate(env) {
         const probA = Math.round((1/aO/tp)*100);
 
         newPicks.push({
-          id: pickId, home, away,
-          rec, _recSide: recSide,
+          id: pickId,
+          home: homeEs, away: awayEs,
+          rec: rec.replace(home, homeEs).replace(away, awayEs),
+          _recSide: recSide,
           conf, bvr, bvrText,
           stake, odds: Math.round(odds*100)/100,
           _hO: hO, _dO: dO, _aO: aO, _bestOdds: odds,
