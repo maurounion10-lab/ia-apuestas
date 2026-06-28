@@ -98,6 +98,21 @@
   
 .answer-first{margin:0 0 20px;padding:18px 22px;background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(255,215,0,0.04));border-left:4px solid #00c853;border-radius:0 10px 10px 0;font-size:1.02rem;line-height:1.65;color:#fff}
 .answer-first strong{color:#FFD700;font-weight:800}
+
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+.faq-accordion .faq-answer p{margin:8px 0}
+
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"Pronósticos Champions League con IA","item":"https://gambeta.ai/blog/pronosticos-champions-league"}]}
@@ -164,18 +179,15 @@
 <h2>Cómo seguir los pronósticos de Champions de gambeta.ai</h2>
 <p>Los días de Champions, la IA publica sus picks de la competencia con su nivel de confianza y su análisis. Entrá a <a href="https://gambeta.ai">gambeta.ai</a> y filtrá por Champions League para verlos. Es gratis y no necesitás registrarte. Si querés entender la metodología completa, leé la guía de <a href="/blog/pronosticos-futbol-ia">pronósticos de fútbol con IA</a> y el artículo sobre <a href="/blog/ia-champions-league">cómo la IA analiza la Champions</a>.</p>
 <h2>Preguntas frecuentes</h2>
-<h3>¿Cada cuánto hay pronósticos de Champions?</h3>
-<p>Cada vez que se juega la competencia: durante las semanas de Champions, la IA genera picks para los partidos de esa fecha.</p>
-<h3>¿La IA acierta más en Champions que en otras ligas?</h3>
-<p>El sistema tiene uno de sus mejores desempeños históricos en Champions, porque las rotaciones de la fase de liga generan ineficiencias predecibles. Aun así, ningún torneo está exento de azar.</p>
-<h3>¿Qué mercado conviene seguir en Champions?</h3>
-<p>Depende del partido. La IA recomienda para cada cruce el mercado donde detecta más valor; muchas veces es el hándicap asiático o el over/under antes que el 1X2.</p>
+<div class="faq-accordion">
+<details><summary>¿Cada cuánto hay pronósticos de Champions?</summary><div class="faq-answer"><p>Cada vez que se juega la competencia: durante las semanas de Champions, la IA genera picks para los partidos de esa fecha.</p></div></details>
+<details><summary>¿La IA acierta más en Champions que en otras ligas?</summary><div class="faq-answer"><p>El sistema tiene uno de sus mejores desempeños históricos en Champions, porque las rotaciones de la fase de liga generan ineficiencias predecibles. Aun así, ningún torneo está exento de azar.</p></div></details>
+<details><summary>¿Qué mercado conviene seguir en Champions?</summary><div class="faq-answer"><p>Depende del partido. La IA recomienda para cada cruce el mercado donde detecta más valor; muchas veces es el hándicap asiático o el over/under antes que el 1X2.</p>
 <p>Apostá siempre con responsabilidad y solo con dinero que puedas permitirte perder.</p>
   </article>
 
-  <div class="cta-box">
-    <h3>⚡️ Probá la IA gratis ahora</h3>
-    <p>Picks diarios con análisis de inteligencia artificial. Champions, Premier, Libertadores y más — 100% gratis.</p>
+  <div class="cta-box"></div></details>
+<details><summary>⚡️ Probá la IA gratis ahora</summary><div class="faq-answer"><p>Picks diarios con análisis de inteligencia artificial. Champions, Premier, Libertadores y más — 100% gratis.</p>
     <a href="https://gambeta.ai" class="btn-cta">Ver picks de hoy →</a>
   </div>
 
@@ -188,7 +200,8 @@
       <a href="/blog/pronosticos-libertadores">🏅 Pronósticos Libertadores</a>
       <a href="/blog/mercados-rentables">📊 Mercados más rentables</a>
     </div>
-  </div>
+  </div></div></details>
+</div>
 </main>
 
 <footer class="footer">

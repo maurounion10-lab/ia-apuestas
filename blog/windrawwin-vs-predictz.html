@@ -92,6 +92,21 @@ nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 
 .related-links a:hover{background:rgba(0,200,83,0.1);border-color:rgba(0,200,83,0.3);color:#fff}
 .footer{background:#060d06;border-top:1px solid rgba(0,200,83,0.12);padding:24px;text-align:center;font-size:0.82rem;color:rgba(255,255,255,0.3)}
 .footer a{color:var(--verde);text-decoration:none}
+
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+.faq-accordion .faq-answer p{margin:8px 0}
+
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"WinDrawWin vs PredictZ","item":"https://gambeta.ai/blog/windrawwin-vs-predictz"}]}
@@ -180,14 +195,13 @@ nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 
 </div>
 <section>
 <h2>❓ Preguntas frecuentes</h2>
-<h3>¿Cuál es mejor, WinDrawWin o PredictZ?</h3>
-<p>Son muy parecidos: ambos son sitios gratuitos de predicciones de fútbol con estadísticas y tips. PredictZ suele enfocarse en forma y tablas; WinDrawWin cubre más ligas. Conviene usar los dos y comparar.</p>
-<h3>¿Cuál acierta más, WinDrawWin o PredictZ?</h3>
-<p>Ninguno acierta consistentemente más; varía por liga y temporada. Lo útil es ver dónde coinciden ambos: esa coincidencia es una señal más fuerte.</p>
-<h3>¿Son gratis los dos?</h3>
-<p>Sí, tanto WinDrawWin como PredictZ son gratuitos.</p>
+<div class="faq-accordion">
+<details><summary>¿Cuál es mejor, WinDrawWin o PredictZ?</summary><div class="faq-answer"><p>Son muy parecidos: ambos son sitios gratuitos de predicciones de fútbol con estadísticas y tips. PredictZ suele enfocarse en forma y tablas; WinDrawWin cubre más ligas. Conviene usar los dos y comparar.</p></div></details>
+<details><summary>¿Cuál acierta más, WinDrawWin o PredictZ?</summary><div class="faq-answer"><p>Ninguno acierta consistentemente más; varía por liga y temporada. Lo útil es ver dónde coinciden ambos: esa coincidencia es una señal más fuerte.</p></div></details>
+<details><summary>¿Son gratis los dos?</summary><div class="faq-answer"><p>Sí, tanto WinDrawWin como PredictZ son gratuitos.</p>
 <p style="font-size:0.85rem;opacity:0.5;margin-top:14px">⚠️ Las herramientas de predicción son una guía estadística, no una garantía. Apostá con responsabilidad: solo para mayores de 18 años y apostá solo lo que puedas permitirte perder.</p>
-</section>
+</section></div></details>
+</div>
 </main>
 <footer class="footer">
 <p>© 2025 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar en Fútbol · 18+</p>

@@ -95,7 +95,22 @@
     /* FOOTER */
     .footer{background:#060d06;border-top:1px solid rgba(0,200,83,0.12);padding:24px;text-align:center;font-size:0.82rem;color:rgba(255,255,255,0.3)}
     .footer a{color:var(--verde);text-decoration:none}
-  </style>
+  
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+.faq-accordion .faq-answer p{margin:8px 0}
+
+</style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"Pronósticos de la Liga Argentina con IA","item":"https://gambeta.ai/blog/pronosticos-liga-argentina"}]}
 </script>
@@ -157,18 +172,15 @@
 <h2>Cómo seguir los pronósticos de la Liga Argentina</h2>
 <p>Cada fecha del torneo local, la IA publica sus picks con el nivel de confianza y el análisis de cada partido. Entrá a <a href="https://gambeta.ai">gambeta.ai</a> y filtrá por Liga Argentina. Es gratis y sin registro. Para entender la metodología, leé la guía de <a href="/blog/pronosticos-futbol-ia">pronósticos de fútbol con IA</a>.</p>
 <h2>Preguntas frecuentes</h2>
-<h3>¿La IA cubre toda la Liga Profesional?</h3>
-<p>Sí, el sistema analiza los partidos del torneo argentino y genera picks para aquellos donde detecta valor.</p>
-<h3>¿Por qué a veces no hay pick para un partido?</h3>
-<p>Si la IA no encuentra una diferencia clara entre su probabilidad estimada y la cuota, prefiere no recomendar nada. No apostar también es una decisión.</p>
-<h3>¿Conviene apostar al favorito en el fútbol argentino?</h3>
-<p>No por defecto. En un torneo tan parejo, el favorito muchas veces paga menos de lo que debería. La IA apuesta al valor, no al nombre.</p>
+<div class="faq-accordion">
+<details><summary>¿La IA cubre toda la Liga Profesional?</summary><div class="faq-answer"><p>Sí, el sistema analiza los partidos del torneo argentino y genera picks para aquellos donde detecta valor.</p></div></details>
+<details><summary>¿Por qué a veces no hay pick para un partido?</summary><div class="faq-answer"><p>Si la IA no encuentra una diferencia clara entre su probabilidad estimada y la cuota, prefiere no recomendar nada. No apostar también es una decisión.</p></div></details>
+<details><summary>¿Conviene apostar al favorito en el fútbol argentino?</summary><div class="faq-answer"><p>No por defecto. En un torneo tan parejo, el favorito muchas veces paga menos de lo que debería. La IA apuesta al valor, no al nombre.</p>
 <p>Apostá siempre con responsabilidad y solo con dinero que puedas permitirte perder.</p>
   </article>
 
-  <div class="cta-box">
-    <h3>⚡️ Probá la IA gratis ahora</h3>
-    <p>Picks diarios con análisis de inteligencia artificial. Champions, Premier, Libertadores y más — 100% gratis.</p>
+  <div class="cta-box"></div></details>
+<details><summary>⚡️ Probá la IA gratis ahora</summary><div class="faq-answer"><p>Picks diarios con análisis de inteligencia artificial. Champions, Premier, Libertadores y más — 100% gratis.</p>
     <a href="https://gambeta.ai" class="btn-cta">Ver picks de hoy →</a>
   </div>
 
@@ -181,7 +193,8 @@
       <a href="/blog/gestion-bankroll">💰 Gestión de bankroll</a>
       <a href="/blog/cuotas-y-probabilidades">📊 Cuotas y probabilidades</a>
     </div>
-  </div>
+  </div></div></details>
+</div>
 </main>
 
 <footer class="footer">

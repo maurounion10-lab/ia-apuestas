@@ -39,6 +39,21 @@ section h3 { color: #fff; margin: 18px 0 8px; font-size: 1.1rem; }
 .back:hover { color: #ffd700; }
 .article-img { width: 100%; height: auto; border-radius: 14px; margin: 6px 0 6px; display: block; border: 1px solid rgba(255,215,0,0.15); }
 .img-caption { font-size: 0.8rem; color: rgba(240,236,224,0.45); text-align: center; margin: 0 0 6px; font-style: italic; }
+
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+.faq-accordion .faq-answer p{margin:8px 0}
+
 </style></head><body>
 <div class="top">
   <div class="tag">⚡ Bonos Mundial 2026 · Análisis honesto</div>
@@ -118,20 +133,17 @@ section h3 { color: #fff; margin: 18px 0 8px; font-size: 1.1rem; }
 
 <section>
 <h2>❓ Preguntas frecuentes</h2>
-<h3>¿Conviene el bono de bienvenida de Megapari para el Mundial 2026?</h3>
-<p>Solo si entendés la letra chica. El monto es alto, pero el rollover exige apuestas combinadas de 3+ selecciones, que tienen EV negativo. Conviene únicamente si ya ibas a hacer combinadas; si no, el valor real es bajo.</p>
-<h3>¿Cuánto es el rollover del bono de Megapari?</h3>
-<p>Suele ser x5, pero cumplido con apuestas combinadas de 3 o más selecciones, lo que lo hace más difícil que un x5 simple. El monto y la moneda varían por país. Verificá los términos vigentes en el sitio oficial.</p>
-<h3>¿Megapari es confiable y está regulada en Latinoamérica?</h3>
-<p>Megapari opera con licencia de Curazao (offshore) y, en la mayoría de los países de la región, no está regulada localmente. No es ilegal usarla, pero exige más due diligence: revisá métodos de pago, tiempos de retiro y reputación, y empezá con montos chicos.</p>
-<h3>¿La apuesta gratis de Megapari devuelve el dinero apostado?</h3>
-<p>No. Como en casi todas las casas, una apuesta gratis paga solo la ganancia, no el stake apostado.</p>
-<h3>¿Cuánto tarda Megapari en pagar los retiros?</h3>
-<p>Al ser un operador offshore, los tiempos y métodos pueden variar más que en casas reguladas localmente. Conviene probar primero con un retiro chico y revisar opiniones recientes antes de mover montos grandes.</p>
+<div class="faq-accordion">
+<details><summary>¿Conviene el bono de bienvenida de Megapari para el Mundial 2026?</summary><div class="faq-answer"><p>Solo si entendés la letra chica. El monto es alto, pero el rollover exige apuestas combinadas de 3+ selecciones, que tienen EV negativo. Conviene únicamente si ya ibas a hacer combinadas; si no, el valor real es bajo.</p></div></details>
+<details><summary>¿Cuánto es el rollover del bono de Megapari?</summary><div class="faq-answer"><p>Suele ser x5, pero cumplido con apuestas combinadas de 3 o más selecciones, lo que lo hace más difícil que un x5 simple. El monto y la moneda varían por país. Verificá los términos vigentes en el sitio oficial.</p></div></details>
+<details><summary>¿Megapari es confiable y está regulada en Latinoamérica?</summary><div class="faq-answer"><p>Megapari opera con licencia de Curazao (offshore) y, en la mayoría de los países de la región, no está regulada localmente. No es ilegal usarla, pero exige más due diligence: revisá métodos de pago, tiempos de retiro y reputación, y empezá con montos chicos.</p></div></details>
+<details><summary>¿La apuesta gratis de Megapari devuelve el dinero apostado?</summary><div class="faq-answer"><p>No. Como en casi todas las casas, una apuesta gratis paga solo la ganancia, no el stake apostado.</p></div></details>
+<details><summary>¿Cuánto tarda Megapari en pagar los retiros?</summary><div class="faq-answer"><p>Al ser un operador offshore, los tiempos y métodos pueden variar más que en casas reguladas localmente. Conviene probar primero con un retiro chico y revisar opiniones recientes antes de mover montos grandes.</p>
 <div class="alert" style="margin-top:18px">⚠️ <strong>Juego responsable</strong>: las apuestas implican riesgo de pérdida y pueden generar adicción. Solo para mayores de 18 años. Ningún bono garantiza ganancias. Apostá solo lo que puedas permitirte perder.</div>
 </section>
 
-<section>
+<section></div></details>
+</div>
 <h2>🔗 Más Mundial 2026</h2>
 <div class="linking">
 <a href="/mundial-2026">🏆 Hub Mundial 2026</a>

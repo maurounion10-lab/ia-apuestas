@@ -95,6 +95,21 @@ nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 
 
 .answer-first{margin:0 0 20px;padding:18px 22px;background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(255,215,0,0.04));border-left:4px solid #00c853;border-radius:0 10px 10px 0;font-size:1.02rem;line-height:1.65;color:#fff}
 .answer-first strong{color:#FFD700;font-weight:800}
+
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+.faq-accordion .faq-answer p{margin:8px 0}
+
 </style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"Forebet Argentina","item":"https://gambeta.ai/blog/forebet-argentina"}]}
@@ -180,15 +195,13 @@ nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 
 </div>
 <section>
 <h2>❓ Preguntas frecuentes</h2>
-<h3>¿Forebet cubre el fútbol argentino?</h3>
-<p>Sí, Forebet cubre la Liga Profesional Argentina y otras categorías, con probabilidades y predicciones. La profundidad de datos puede variar según la categoría.</p>
-<h3>¿Sirve Forebet para apostar en el fútbol argentino?</h3>
-<p>Como guía, sí; pero el fútbol argentino es volátil. Combiná Forebet con las cuotas y con análisis de valor (EV+).</p>
-<h3>¿Forebet está en español?</h3>
-<p>Sí, la interfaz de Forebet está disponible en varios idiomas, incluido el español.</p>
+<div class="faq-accordion">
+<details><summary>¿Forebet cubre el fútbol argentino?</summary><div class="faq-answer"><p>Sí, Forebet cubre la Liga Profesional Argentina y otras categorías, con probabilidades y predicciones. La profundidad de datos puede variar según la categoría.</p></div></details>
+<details><summary>¿Sirve Forebet para apostar en el fútbol argentino?</summary><div class="faq-answer"><p>Como guía, sí; pero el fútbol argentino es volátil. Combiná Forebet con las cuotas y con análisis de valor (EV+).</p></div></details>
+<details><summary>¿Forebet está en español?</summary><div class="faq-answer"><p>Sí, la interfaz de Forebet está disponible en varios idiomas, incluido el español.</p>
 <p style="font-size:0.85rem;opacity:0.5;margin-top:14px">⚠️ Las herramientas de predicción son una guía estadística, no una garantía. Apostá con responsabilidad: solo para mayores de 18 años y apostá solo lo que puedas permitirte perder.</p>
-</section>
-
+</section></div></details>
+</div>
 <h2 id="actualizacion-2026">🔥 Actualización 2026: cluster completo de IA</h2>
 <p>El panorama de la IA para apuestas evolucionó mucho en 2026. Mapeamos las herramientas más usadas y armamos comparativas. Estos son los análisis que complementan esta guía:</p>
 <ul style="margin: 18px 0; padding-left: 22px; line-height: 1.9;">

@@ -42,6 +42,21 @@ section h3 { color: #fff; margin: 18px 0 8px; font-size: 1.1rem; }
 
 .answer-first{margin:0 0 20px;padding:18px 22px;background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(255,215,0,0.04));border-left:4px solid #00c853;border-radius:0 10px 10px 0;font-size:1.02rem;line-height:1.65;color:#fff}
 .answer-first strong{color:#FFD700;font-weight:800}
+
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+.faq-accordion .faq-answer p{margin:8px 0}
+
 </style></head><body>
 <div class="top">
   <div class="tag">⚡ Bonos Mundial 2026 · Análisis honesto</div>
@@ -141,24 +156,20 @@ section h3 { color: #fff; margin: 18px 0 8px; font-size: 1.1rem; }
 
 <section>
 <h2>❓ Preguntas frecuentes</h2>
-<h3>¿El bono de bienvenida de Bet365 conviene para el Mundial 2026?</h3>
-<p>Depende de cuánto pienses apostar. El bono de bienvenida suele ser 100% del primer depósito y queda sujeto a rollover (apostar el monto varias veces antes de poder retirarlo). Conviene si ibas a apostar durante todo el Mundial de todas formas; no conviene si buscás depositar y retirar rápido. Mirá siempre la cuota mínima exigida y el plazo para cumplir el requisito.</p>
-<h3>¿Cuánto es el rollover del bono de Bet365 y cómo se calcula?</h3>
-<p>Varía por país. En Argentina suele ser x5 sobre depósito más bono, con cuota mínima en torno a 1.80 y 30 días de plazo. En México el bono deportivo de Bet365 normalmente no exige rollover para retirar las ganancias. Un rollover x5 sobre $10.000 significa apostar $50.000 acumulados en cuotas válidas antes de liberar el saldo. Verificá los términos vigentes en el sitio oficial de tu país.</p>
-<h3>¿En qué países de Latinoamérica está disponible Bet365?</h3>
-<p>A 2026 Bet365 opera con licencia local en Argentina (CABA y Provincia de Buenos Aires), Brasil (autorización del Ministerio de Hacienda) y Perú (licencia de Mincetur). En Colombia todavía está en proceso de licencia. La disponibilidad y las condiciones cambian según la regulación de cada país, así que confirmá siempre desde el sitio oficial.</p>
-<h3>¿La apuesta gratis de Bet365 devuelve el dinero apostado?</h3>
-<p>No. Una apuesta gratis (free bet) paga solo la ganancia, no el stake. Si usás una free bet de $10 a cuota 3.00 y ganás, cobrás $20 (la ganancia), no $30. Es valor real, pero menor de lo que parece a primera vista.</p>
-<h3>¿Hace falta un código promocional para activar el bono?</h3>
-<p>Por lo general hay que cargar un código al registrarte o en el primer depósito, y esos códigos cambian seguido y dependen del país. Lo importante no es el código en sí, sino las condiciones que activa: monto, depósito mínimo, rollover y cuota mínima. Revisá esas condiciones antes de depositar.</p>
-<h3>¿Cuánto tarda Bet365 en pagar los retiros?</h3>
-<p>Bet365 es de las casas con retiros más rápidos: según el método (billetera, transferencia o tarjeta) suele ir de minutos a unos pocos días hábiles. El primer retiro puede requerir verificación de identidad (KYC), así que conviene validar la cuenta antes para no demorar el cobro.</p>
+<div class="faq-accordion">
+<details><summary>¿El bono de bienvenida de Bet365 conviene para el Mundial 2026?</summary><div class="faq-answer"><p>Depende de cuánto pienses apostar. El bono de bienvenida suele ser 100% del primer depósito y queda sujeto a rollover (apostar el monto varias veces antes de poder retirarlo). Conviene si ibas a apostar durante todo el Mundial de todas formas; no conviene si buscás depositar y retirar rápido. Mirá siempre la cuota mínima exigida y el plazo para cumplir el requisito.</p></div></details>
+<details><summary>¿Cuánto es el rollover del bono de Bet365 y cómo se calcula?</summary><div class="faq-answer"><p>Varía por país. En Argentina suele ser x5 sobre depósito más bono, con cuota mínima en torno a 1.80 y 30 días de plazo. En México el bono deportivo de Bet365 normalmente no exige rollover para retirar las ganancias. Un rollover x5 sobre $10.000 significa apostar $50.000 acumulados en cuotas válidas antes de liberar el saldo. Verificá los términos vigentes en el sitio oficial de tu país.</p></div></details>
+<details><summary>¿En qué países de Latinoamérica está disponible Bet365?</summary><div class="faq-answer"><p>A 2026 Bet365 opera con licencia local en Argentina (CABA y Provincia de Buenos Aires), Brasil (autorización del Ministerio de Hacienda) y Perú (licencia de Mincetur). En Colombia todavía está en proceso de licencia. La disponibilidad y las condiciones cambian según la regulación de cada país, así que confirmá siempre desde el sitio oficial.</p></div></details>
+<details><summary>¿La apuesta gratis de Bet365 devuelve el dinero apostado?</summary><div class="faq-answer"><p>No. Una apuesta gratis (free bet) paga solo la ganancia, no el stake. Si usás una free bet de $10 a cuota 3.00 y ganás, cobrás $20 (la ganancia), no $30. Es valor real, pero menor de lo que parece a primera vista.</p></div></details>
+<details><summary>¿Hace falta un código promocional para activar el bono?</summary><div class="faq-answer"><p>Por lo general hay que cargar un código al registrarte o en el primer depósito, y esos códigos cambian seguido y dependen del país. Lo importante no es el código en sí, sino las condiciones que activa: monto, depósito mínimo, rollover y cuota mínima. Revisá esas condiciones antes de depositar.</p></div></details>
+<details><summary>¿Cuánto tarda Bet365 en pagar los retiros?</summary><div class="faq-answer"><p>Bet365 es de las casas con retiros más rápidos: según el método (billetera, transferencia o tarjeta) suele ir de minutos a unos pocos días hábiles. El primer retiro puede requerir verificación de identidad (KYC), así que conviene validar la cuenta antes para no demorar el cobro.</p>
 <div class="alert" style="margin-top:18px">
 ⚠️ <strong>Juego responsable</strong>: las apuestas implican riesgo de pérdida y pueden generar adicción. Solo para mayores de 18 años. Ningún bono garantiza ganancias. Apostá solo lo que puedas permitirte perder.
 </div>
 </section>
 
-<section>
+<section></div></details>
+</div>
 <h2>🔗 Más Mundial 2026</h2>
 <div class="linking">
 <a href="/mundial-2026">🏆 Hub Mundial 2026</a>

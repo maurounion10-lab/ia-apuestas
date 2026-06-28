@@ -134,6 +134,21 @@ nav.nav{background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);padding:0 
 .related-posts a.related-card{display:block;padding:10px 14px;margin:6px 0;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:rgba(255,255,255,0.85);font-size:0.85rem;transition:all .15s}
 .related-posts a.related-card:hover{background:rgba(0,200,83,0.08);border-color:rgba(0,200,83,0.35);color:#fff}
 footer{padding:24px;text-align:center;color:var(--sec);font-size:.8rem;border-top:1px solid rgba(255,255,255,0.06);margin-top:40px}
+
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+.faq-accordion .faq-answer p{margin:8px 0}
+
 </style>
 </head>
 <body>
@@ -285,20 +300,17 @@ footer{padding:24px;text-align:center;color:var(--sec);font-size:.8rem;border-to
 <p>Por eso no hay VIP, no hay "grupo premium" y nadie te va a escribir por DM ofreciendo combinadas mágicas. Si alguien dice ser de Gambeta y te pide plata, es estafa.</p>
 
 <h2>📋 Preguntas frecuentes sobre la IA para apuestas</h2>
-<h3>¿Se puede vivir de apostar con IA?</h3>
-<p>Pocas personas viven exclusivamente de apuestas, incluso usando IA. Lo realista es <strong>generar un retorno positivo consistente</strong> a largo plazo, complementario a tu ingreso principal. La disciplina de stake y la paciencia son críticas: el ROI esperado de un sistema serio está entre <strong>5% y 15% anual</strong> sobre el bankroll, no 200%.</p>
-<h3>¿La IA de Gambeta funciona para tenis, básquet u otros deportes?</h3>
-<p>Actualmente el foco es <strong>fútbol</strong> (todos los torneos: Mundial 2026, Champions, Premier, Libertadores, Sudamericana, ligas locales, etc) más algo de tenis ATP/WTA. Otros deportes están en evaluación pero requieren modelos específicos.</p>
-<h3>¿Qué casa de apuestas es mejor para usar con los picks de Gambeta?</h3>
-<p>DBbet (sponsor oficial) tiene apuesta en 1-click directa desde la ficha. Pero podés usar cualquier casa legal de tu país. Lo importante es que <strong>tengas cuenta en 2-3 casas</strong> y compares cuotas: una diferencia de 0.05 en una cuota es un 3-5% más de ROI a largo plazo.</p>
-<h3>¿Cuánto tiempo necesito para ver resultados?</h3>
-<p>Mínimo <strong>3 a 6 meses</strong> con stake fijo y disciplina. Cualquier ventana más corta es ruido estadístico. Si en 50 picks te va mal, no significa nada matemáticamente. La varianza es real.</p>
-<h3>¿Puedo confiar en una IA que no veo cómo está programada?</h3>
-<p>Es la pregunta correcta. La respuesta de Gambeta: te publicamos el <a class="in-link" href="https://gambeta.ai/#historial">historial completo</a>. Cada pick antes del partido. Cada resultado después. Verificable contra cualquier base de datos pública (FlashScore, FotMob, ESPN). Si los números no cierran, te enterás.</p>
+<div class="faq-accordion">
+<details><summary>¿Se puede vivir de apostar con IA?</summary><div class="faq-answer"><p>Pocas personas viven exclusivamente de apuestas, incluso usando IA. Lo realista es <strong>generar un retorno positivo consistente</strong> a largo plazo, complementario a tu ingreso principal. La disciplina de stake y la paciencia son críticas: el ROI esperado de un sistema serio está entre <strong>5% y 15% anual</strong> sobre el bankroll, no 200%.</p></div></details>
+<details><summary>¿La IA de Gambeta funciona para tenis, básquet u otros deportes?</summary><div class="faq-answer"><p>Actualmente el foco es <strong>fútbol</strong> (todos los torneos: Mundial 2026, Champions, Premier, Libertadores, Sudamericana, ligas locales, etc) más algo de tenis ATP/WTA. Otros deportes están en evaluación pero requieren modelos específicos.</p></div></details>
+<details><summary>¿Qué casa de apuestas es mejor para usar con los picks de Gambeta?</summary><div class="faq-answer"><p>DBbet (sponsor oficial) tiene apuesta en 1-click directa desde la ficha. Pero podés usar cualquier casa legal de tu país. Lo importante es que <strong>tengas cuenta en 2-3 casas</strong> y compares cuotas: una diferencia de 0.05 en una cuota es un 3-5% más de ROI a largo plazo.</p></div></details>
+<details><summary>¿Cuánto tiempo necesito para ver resultados?</summary><div class="faq-answer"><p>Mínimo <strong>3 a 6 meses</strong> con stake fijo y disciplina. Cualquier ventana más corta es ruido estadístico. Si en 50 picks te va mal, no significa nada matemáticamente. La varianza es real.</p></div></details>
+<details><summary>¿Puedo confiar en una IA que no veo cómo está programada?</summary><div class="faq-answer"><p>Es la pregunta correcta. La respuesta de Gambeta: te publicamos el <a class="in-link" href="https://gambeta.ai/#historial">historial completo</a>. Cada pick antes del partido. Cada resultado después. Verificable contra cualquier base de datos pública (FlashScore, FotMob, ESPN). Si los números no cierran, te enterás.</p>
 
 <a class="cta-box btn-cta" style="display:block;padding:24px;text-align:center" href="https://gambeta.ai/?openauth=1">🚀 Crear cuenta gratis y ver los picks IA de hoy →</a>
 
-<div class="related-posts">
+<div class="related-posts"></div></details>
+</div>
 <h2>🔗 Seguí leyendo en Gambeta</h2>
 <a href="/blog/pronosticos-futbol-ia" class="related-card">📖 Pronósticos de Fútbol con IA: cómo funcionan y por qué importan</a>
 <a href="/blog/ia-estadisticas-futbol" class="related-card">📊 IA + estadísticas de fútbol: las 40 variables que usa el modelo</a>

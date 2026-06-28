@@ -116,7 +116,22 @@
     /* FOOTER */
     .footer{background:#060d06;border-top:1px solid rgba(0,200,83,0.12);padding:24px;text-align:center;font-size:0.82rem;color:rgba(255,255,255,0.3)}
     .footer a{color:var(--verde);text-decoration:none}
-  </style>
+  
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+.faq-accordion .faq-answer p{margin:8px 0}
+
+</style>
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},{"@type":"ListItem","position":2,"name":"Blog","item":"https://gambeta.ai/blog/"},{"@type":"ListItem","position":3,"name":"Forebet + IA en fútbol","item":"https://gambeta.ai/blog/forebet-mas-ia-futbol"}]}
 </script>
@@ -234,14 +249,13 @@
 </div>
 <section>
 <h2>❓ Preguntas frecuentes</h2>
-<h3>¿Forebet usa inteligencia artificial?</h3>
-<p>Forebet se apoya en modelos estadísticos y matemáticos. La IA moderna (como la de Gambeta) suma más variables y aprende de los datos. Se pueden combinar: la predicción de Forebet más el análisis de valor de la IA.</p>
-<h3>¿Conviene combinar Forebet con una IA de apuestas?</h3>
-<p>Sí: Forebet te da una probabilidad base y la IA te dice si la cuota la infravalora (EV+). Dato más valor.</p>
-<h3>¿Cuál es más preciso, Forebet o una IA?</h3>
-<p>Depende de la liga, y ninguno es infalible. Por eso lo robusto es cruzar fuentes en lugar de confiar en una sola.</p>
+<div class="faq-accordion">
+<details><summary>¿Forebet usa inteligencia artificial?</summary><div class="faq-answer"><p>Forebet se apoya en modelos estadísticos y matemáticos. La IA moderna (como la de Gambeta) suma más variables y aprende de los datos. Se pueden combinar: la predicción de Forebet más el análisis de valor de la IA.</p></div></details>
+<details><summary>¿Conviene combinar Forebet con una IA de apuestas?</summary><div class="faq-answer"><p>Sí: Forebet te da una probabilidad base y la IA te dice si la cuota la infravalora (EV+). Dato más valor.</p></div></details>
+<details><summary>¿Cuál es más preciso, Forebet o una IA?</summary><div class="faq-answer"><p>Depende de la liga, y ninguno es infalible. Por eso lo robusto es cruzar fuentes en lugar de confiar en una sola.</p>
 <p style="font-size:0.85rem;opacity:0.5;margin-top:14px">⚠️ Las herramientas de predicción son una guía estadística, no una garantía. Apostá con responsabilidad: solo para mayores de 18 años y apostá solo lo que puedas permitirte perder.</p>
-</section>
+</section></div></details>
+</div>
 </main>
 <footer class="footer">
 <p>© 2025 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar en Fútbol · 18+</p>

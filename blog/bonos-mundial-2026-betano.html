@@ -42,6 +42,21 @@ section h3 { color: #fff; margin: 18px 0 8px; font-size: 1.1rem; }
 
 .answer-first{margin:0 0 20px;padding:18px 22px;background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(255,215,0,0.04));border-left:4px solid #00c853;border-radius:0 10px 10px 0;font-size:1.02rem;line-height:1.65;color:#fff}
 .answer-first strong{color:#FFD700;font-weight:800}
+
+/* Acordeón FAQ */
+.faq-accordion{margin:24px 0 32px;border-radius:12px;overflow:hidden;border:1px solid rgba(0,200,83,0.18)}
+.faq-accordion details{background:rgba(13,26,13,0.4);border-bottom:1px solid rgba(0,200,83,0.10);transition:background 0.18s}
+.faq-accordion details:last-child{border-bottom:none}
+.faq-accordion details[open]{background:rgba(0,200,83,0.06)}
+.faq-accordion summary{padding:16px 22px;cursor:pointer;font-weight:700;font-size:0.98rem;color:#fff;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:color 0.18s}
+.faq-accordion summary:hover{color:#00c853}
+.faq-accordion summary::-webkit-details-marker{display:none}
+.faq-accordion summary::after{content:"+";font-size:1.4rem;font-weight:300;color:#00c853;transition:transform 0.22s;flex-shrink:0;line-height:1}
+.faq-accordion details[open] summary::after{transform:rotate(45deg)}
+.faq-accordion .faq-answer{padding:0 22px 18px;color:var(--texto-sec, #9e9e9e);font-size:0.93rem;line-height:1.65}
+.faq-accordion .faq-answer p:first-child{margin-top:0}
+.faq-accordion .faq-answer p{margin:8px 0}
+
 </style></head><body>
 <div class="top">
   <div class="tag">⚡ Bonos Mundial 2026 · Análisis honesto</div>
@@ -122,22 +137,18 @@ section h3 { color: #fff; margin: 18px 0 8px; font-size: 1.1rem; }
 
 <section>
 <h2>❓ Preguntas frecuentes</h2>
-<h3>¿Conviene el bono de bienvenida de Betano para el Mundial 2026?</h3>
-<p>Sí, si vas a apostar durante el torneo. El rollover x3 de Betano (en Argentina) es de los más bajos del mercado, así que es más fácil de liberar que la mayoría de los bonos. Igual mirá la cuota mínima (1.80) y el plazo de 30 días.</p>
-<h3>¿Cuánto es el rollover del bono de Betano?</h3>
-<p>En Argentina es x3 sobre depósito más bono, con cuota mínima 1.80 y 30 días de plazo. Es de los requisitos más accesibles del mercado. En otros países el monto y las condiciones varían, así que verificá el sitio oficial.</p>
-<h3>¿En qué países está disponible Betano?</h3>
-<p>Betano está regulada en Brasil (donde es una de las líderes), opera en Portugal y en varios mercados de Latinoamérica como Argentina. La disponibilidad y la moneda dependen de tu país; confirmá siempre desde el sitio oficial.</p>
-<h3>¿La apuesta gratis de Betano devuelve el dinero apostado?</h3>
-<p>No. Una apuesta gratis paga solo la ganancia, no el stake. Si usás una free bet de $10 a cuota 3.00 y ganás, cobrás $20 (la ganancia), no $30.</p>
-<h3>¿Hace falta un código promocional para activar el bono de Betano?</h3>
-<p>Por lo general sí, se carga al registrarte o en el primer depósito, y los códigos cambian seguido según el país. Lo decisivo no es el código sino las condiciones que activa: monto, depósito mínimo, rollover y cuota mínima.</p>
-<h3>¿Cuánto tarda Betano en pagar los retiros?</h3>
-<p>Betano suele tener retiros ágiles según el método elegido. El primer retiro puede requerir verificación de identidad (KYC), así que conviene validar la cuenta con anticipación para no demorar el cobro.</p>
+<div class="faq-accordion">
+<details><summary>¿Conviene el bono de bienvenida de Betano para el Mundial 2026?</summary><div class="faq-answer"><p>Sí, si vas a apostar durante el torneo. El rollover x3 de Betano (en Argentina) es de los más bajos del mercado, así que es más fácil de liberar que la mayoría de los bonos. Igual mirá la cuota mínima (1.80) y el plazo de 30 días.</p></div></details>
+<details><summary>¿Cuánto es el rollover del bono de Betano?</summary><div class="faq-answer"><p>En Argentina es x3 sobre depósito más bono, con cuota mínima 1.80 y 30 días de plazo. Es de los requisitos más accesibles del mercado. En otros países el monto y las condiciones varían, así que verificá el sitio oficial.</p></div></details>
+<details><summary>¿En qué países está disponible Betano?</summary><div class="faq-answer"><p>Betano está regulada en Brasil (donde es una de las líderes), opera en Portugal y en varios mercados de Latinoamérica como Argentina. La disponibilidad y la moneda dependen de tu país; confirmá siempre desde el sitio oficial.</p></div></details>
+<details><summary>¿La apuesta gratis de Betano devuelve el dinero apostado?</summary><div class="faq-answer"><p>No. Una apuesta gratis paga solo la ganancia, no el stake. Si usás una free bet de $10 a cuota 3.00 y ganás, cobrás $20 (la ganancia), no $30.</p></div></details>
+<details><summary>¿Hace falta un código promocional para activar el bono de Betano?</summary><div class="faq-answer"><p>Por lo general sí, se carga al registrarte o en el primer depósito, y los códigos cambian seguido según el país. Lo decisivo no es el código sino las condiciones que activa: monto, depósito mínimo, rollover y cuota mínima.</p></div></details>
+<details><summary>¿Cuánto tarda Betano en pagar los retiros?</summary><div class="faq-answer"><p>Betano suele tener retiros ágiles según el método elegido. El primer retiro puede requerir verificación de identidad (KYC), así que conviene validar la cuenta con anticipación para no demorar el cobro.</p>
 <div class="alert" style="margin-top:18px">⚠️ <strong>Juego responsable</strong>: las apuestas implican riesgo de pérdida y pueden generar adicción. Solo para mayores de 18 años. Ningún bono garantiza ganancias. Apostá solo lo que puedas permitirte perder.</div>
 </section>
 
-<section>
+<section></div></details>
+</div>
 <h2>🔗 Más Mundial 2026</h2>
 <div class="linking">
 <a href="/mundial-2026">🏆 Hub Mundial 2026</a>
