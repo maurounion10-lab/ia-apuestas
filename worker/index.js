@@ -1851,14 +1851,14 @@ async function runWcMatchesPublisher(env) {
       return stats;
     }
     const existingIds = new Set(hist.map(p => p && p.id).filter(Boolean));
-    // 🆕 (22-jun-2026 — Mauro) Cuotas ≤ 1.20 no rinden: rechazar picks nuevos con cuota basura.
+    // 🆕 (28-jun-2026 — Mauro) Cuota mínima NUEVA: 1.30. JAMÁS bajar de eso.
     //    Los ya publicados (en existingIds) quedan intactos por la condición !existingIds.has(p.id).
-    const MIN_PICK_ODDS = 1.21;
+    const MIN_PICK_ODDS = 1.30;
     const toAdd = WC_MATCHES.filter(p => {
       if (existingIds.has(p.id)) return false;
       const o = parseFloat(p.odds);
-      if (Number.isFinite(o) && o <= 1.20) {
-        console.warn(`[wc-publisher] SKIP ${p.id} — cuota ${o} ≤ 1.20 (regla MIN_PICK_ODDS=${MIN_PICK_ODDS})`);
+      if (Number.isFinite(o) && o < MIN_PICK_ODDS) {
+        console.warn(`[wc-publisher] SKIP ${p.id} — cuota ${o} < ${MIN_PICK_ODDS} (regla NUEVA)`);
         return false;
       }
       return true;
@@ -2011,7 +2011,7 @@ async function runWcAutoGenerate(env) {
         const dO = h2h.outcomes.find(o => o.name === 'Draw')?.price;
         if (!hO || !aO) { stats.skippedCount++; continue; }
 
-        const MIN_ODDS = 1.21;
+        const MIN_ODDS = 1.30;  // 🔧 (28-jun-2026 Mauro) JAMÁS bajar de 1.30
         let rec, recSide, odds;
 
         // Paso 1: probar 1X2 (Gana X o Doble) — lógica original
