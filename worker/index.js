@@ -2504,6 +2504,62 @@ export default {
       return new Response(JSON.stringify({ ok: true, ts: new Date().toISOString(), stats }, null, 2), { headers: CORS });
     }
 
+// ── 🆕 (28-jun-2026) /admin/purge-low-odds-pending — borra picks pending con cuota < 1.30 ──
+    // Mauro: "JAMÁS bajar de 1.30". Excepción única autorizada para limpiar picks viejos.
+    // Solo afecta picks con result='pending' (no toca resueltos).
+    if (path === '/admin/purge-low-odds-pending') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      const stats = { removed: 0, kept: 0, removedDetail: [], skip: null };
+      try {
+        const hist = await fetchAdminHistorial(env);
+        if (!Array.isArray(hist)) {
+          stats.skip = 'historial no disponible';
+          return new Response(JSON.stringify(stats), { headers: CORS });
+        }
+        const MIN = 1.30;
+        const newHist = hist.filter(p => {
+          if (!p) return false;
+          const o = parseFloat(p.odds || p._bestOdds || 0);
+          const isPending = !p.result || p.result === 'pending';
+          if (isPending && o > 0 && o < MIN) {
+            stats.removed++;
+            stats.removedDetail.push({ id: p.id, home: p.home, away: p.away, rec: p.rec, odds: o });
+            return false;
+          }
+          return true;
+        });
+        stats.kept = newHist.length;
+        if (stats.removed === 0) {
+          return new Response(JSON.stringify({ ok: true, ts: new Date().toISOString(), stats }, null, 2), { headers: CORS });
+        }
+        const key = env.SUPABASE_SERVICE_ROLE_KEY;
+        if (!key) {
+          stats.skip = 'SUPABASE_SERVICE_ROLE_KEY no configurado';
+          return new Response(JSON.stringify(stats), { headers: CORS });
+        }
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/acoin_users?email=eq.${encodeURIComponent(ADMIN_EMAIL)}`, {
+          method: 'PATCH',
+          headers: {
+            'apikey': key,
+            'Authorization': `Bearer ${key}`,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation',
+          },
+          body: JSON.stringify({ historial_full: newHist, updated_at: new Date().toISOString() }),
+        });
+        if (!r.ok) {
+          stats.skip = `PATCH HTTP ${r.status}: ${(await r.text()).slice(0, 200)}`;
+        }
+      } catch (e) {
+        stats.skip = `error: ${e.message}`;
+      }
+      return new Response(JSON.stringify({ ok: true, ts: new Date().toISOString(), stats }, null, 2), { headers: CORS });
+    }
+
     // ── 🆕 /admin/publish-wc-matches — fuerza la publicación manual de los WC matches ──
     // Requiere ?token={ADMIN_TRIGGER_TOKEN} para evitar abuso público
     if (path === '/admin/publish-wc-matches') {
