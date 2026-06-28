@@ -1946,10 +1946,23 @@ async function runWcAutoGenerate(env) {
     const oddsKey = env.ODDS_API_KEY;
     if (!oddsKey) { stats.errors.push('ODDS_API_KEY no configurado'); return stats; }
 
-    const oddsUrl = `https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/odds/?apiKey=${oddsKey}&regions=us,eu,uk&markets=h2h,totals,btts&oddsFormat=decimal`;
-    const oddsRes = await fetch(oddsUrl);
-    if (!oddsRes.ok) { stats.errors.push(`Odds API HTTP ${oddsRes.status}`); return stats; }
-    const matches = await oddsRes.json();
+    // Probar con fallback: algunos markets no están disponibles para todos los sports
+    // 422 = market no soportado por este sport → retry con menos markets
+    const marketCombos = ['h2h,totals,btts', 'h2h,totals', 'h2h'];
+    let matches = null;
+    let lastErr = null;
+    for (const markets of marketCombos) {
+      const url = `https://api.the-odds-api.com/v4/sports/soccer_fifa_world_cup/odds/?apiKey=${oddsKey}&regions=us,eu,uk&markets=${markets}&oddsFormat=decimal`;
+      const res = await fetch(url);
+      if (res.ok) {
+        matches = await res.json();
+        stats.reasons.push(`✓ markets usados: ${markets}`);
+        break;
+      } else {
+        lastErr = `HTTP ${res.status} con markets=${markets}`;
+      }
+    }
+    if (!matches) { stats.errors.push(`Odds API: ${lastErr}`); return stats; }
     if (!Array.isArray(matches)) { stats.errors.push('Odds API: respuesta inválida'); return stats; }
 
     const now = Date.now();
