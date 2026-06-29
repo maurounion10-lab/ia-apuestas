@@ -699,14 +699,17 @@ export const WC_MATCHES = [
     stake: 110, odds: 1.55,
     _hO: 1.55, _dO: 3.80, _aO: 5.50, _bestOdds: 1.55,
     _bookKey: 'dbbet', _bookLabel: 'DBbet',
-    result: 'pending',
+    result: 'win',
+    finalScore: '2-1',
+    pl: 60.50,
+    scoreH: 2, scoreA: 1,
     league: '🏆 Mundial 2026',
     date: '2026-06-29T17:00:00.000Z',
     commenceTs: ART_ts(2026, 5, 29, 14, 0),
     _sportKey: 'soccer_fifa_world_cup',
     _wcMatch: true,
     probH: 56, probD: 24, probA: 20,
-    insight: 'Brasil de Ancelotti necesita la victoria para 1° del Grupo C. Vinicius Jr, Rodrygo y Endrick vs defensa japonesa (Endo + Mt Itakura) que ya cedió ante PB. Japón con un punto y motivado pero plantel inferior. Brasil llega de empate vs Marruecos — pleno trabajo ofensivo.',
+    insight: 'Dieciseisavos del Mundial 2026. Brasil llega de empate vs Marruecos y necesita avanzar. Vinicius Jr, Rodrygo y Endrick frente a defensa japonesa que ya cedió ante PB. Modelo da 56% Brasil, 24% empate, 20% Japón.',
   },
   {
     id: 'wc2026_e4_ger_par_29jun',
@@ -761,5 +764,6 @@ export const WC_MATCHES = [
     insight: 'Octavo de final. Francia 1° Grupo I (Mbappé, Camavinga, Tchouameni, Saliba) vs Suecia 2° (Isak + Gyökeres + Kulusevski). Suecia ofensiva pero defensa media — Francia con plantel superior y forma. Mbappé suele aparecer en eliminatorias del Mundial.',
   },
 ];
+
 
 
