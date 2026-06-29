@@ -3911,10 +3911,31 @@ function _updateHeroProStats() {
       }
     }
 
-    // KPI 3: en vivo ahora — usa _isPickLive si disponible
+    // KPI 3: en vivo ahora — combinar _aiPreds + hist (cobertura amplia)
+    // Bug previo: solo miraba _aiPreds. Si pick estaba solo en hist (como WC2026
+    // recien terminado/en juego) marcaba 0. Ahora une ambos y dedup por id+home+away.
     var liveCount = 0;
     if (typeof _isPickLive === 'function') {
-      liveCount = preds.filter(function(p){ return !!_isPickLive(p); }).length;
+      var seen = new Set();
+      var allCandidates = preds.concat(hist || []);
+      for (var i = 0; i < allCandidates.length; i++) {
+        var p = allCandidates[i];
+        if (!p) continue;
+        var key = (p.id || '') + '|' + (p.home || '') + '|' + (p.away || '');
+        if (seen.has(key)) continue;
+        seen.add(key);
+        // Heuristica extendida: si commenceTs entre -15min (recien empieza) y +160min (fin + delay APF)
+        // y todavia es pending, contarlo como live
+        var lv = _isPickLive(p);
+        if (lv) { liveCount++; continue; }
+        // Fallback ampliado para WC con timestamps raros: si pending + age 0-160min, considerar live
+        if (p && (!p.result || p.result === 'pending') && p.commenceTs) {
+          var age = Date.now() - p.commenceTs;
+          if (age >= -15 * 60 * 1000 && age <= 160 * 60 * 1000) {
+            liveCount++;
+          }
+        }
+      }
     }
     var elLiveNum = document.getElementById('gbStatLiveNum');
     if (elLiveNum) elLiveNum.textContent = liveCount;
@@ -3947,7 +3968,7 @@ function _updateHeroProStats() {
     setTimeout(_updateHeroProStats, 800);
   }
   // Refresh periódico
-  setInterval(_updateHeroProStats, 30000);
+  setInterval(_updateHeroProStats, 10000); // refresh cada 10s (#574)
 })();
 
 // ─── Gambeta 1.1 (#573): Self-healing resolver ───
@@ -12665,6 +12686,7 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
 
