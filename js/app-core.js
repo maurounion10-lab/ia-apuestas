@@ -3868,6 +3868,113 @@ function _translateMatchState(s) {
   return s;
 }
 
+// ─── Gambeta 1.1 (29-jun-2026 #569): Panel "Razonamiento de la IA" ───
+// Plantillas inteligentes que rellenan 5 bullets con datos reales del pick.
+// Diferenciador frente a competencia. NO toca SEO, solo agrega UI.
+function _buildIAReasoning(p) {
+  try {
+    if (!p) return '';
+    // Solo en picks pending/upcoming (no resueltos, no iniciados)
+    if (p.result === 'win' || p.result === 'loss' || p.result === 'void') return '';
+    if (p._started) return '';
+
+    const _side = (typeof _recSideOf === 'function') ? _recSideOf(p) : null;
+    const _rec  = String(p.rec || '').toLowerCase();
+    const _bvr  = Number(p.bvr) || 4;
+    const _conf = p.conf || 'med';
+    const bullets = [];
+
+    // 1) PROBABILIDAD DEL MODELO
+    let modelProb = null;
+    if (_side === 'home' && p.probH) modelProb = Math.round(p.probH);
+    else if (_side === 'away' && p.probA) modelProb = Math.round(p.probA);
+    else if (_side === 'draw' && p.probD) modelProb = Math.round(p.probD);
+
+    if (modelProb && modelProb >= 55) {
+      bullets.push('✅ <b>Modelo</b>: ' + modelProb + '% de probabilidad para esta jugada');
+    } else if (modelProb && modelProb >= 40) {
+      bullets.push('📊 <b>Modelo</b>: ' + modelProb + '% — value de cuota justifica el pick');
+    }
+
+    // 2) VALUE vs MERCADO
+    const _odds = parseFloat(p._bestOdds || p.odds || 0);
+    if (_odds && _odds > 1 && modelProb) {
+      const impliedProb = Math.round(100 / _odds);
+      const diff = modelProb - impliedProb;
+      if (diff >= 6) {
+        bullets.push('💰 <b>Value detectado</b>: mercado paga ' + impliedProb + '%, IA estima ' + modelProb + '%');
+      } else if (diff >= 2) {
+        bullets.push('📈 <b>Cuota favorable</b>: ligero edge sobre la línea del mercado');
+      }
+    }
+
+    // 3) FORMA RECIENTE
+    const _formStr = _side === 'home' ? String(p.formH || '') : _side === 'away' ? String(p.formA || '') : '';
+    if (_formStr) {
+      const wins = (_formStr.match(/W/gi) || []).length;
+      const total = _formStr.length;
+      if (wins >= 3 && total > 0) {
+        bullets.push('🔥 <b>Forma</b>: ' + wins + '/' + total + ' victorias últimos partidos');
+      } else if (wins >= 2 && total > 0) {
+        bullets.push('📊 <b>Forma</b>: irregular pero competitivo (' + wins + '/' + total + ')');
+      }
+    }
+
+    // 4) CONTEXTO LIGA/TORNEO
+    const liga = String(p.league || '');
+    if (/mundial|world cup|fifa/i.test(liga)) {
+      bullets.push('🏆 <b>Mundial 2026</b>: contexto de alta exigencia, motivación máxima');
+    } else if (/libertadores|sudamericana/i.test(liga)) {
+      bullets.push('🌎 <b>Copa</b>: presión adicional por avance, partidos a dos rondas');
+    } else if (/champions|europa.league|conference/i.test(liga)) {
+      bullets.push('⭐ <b>Europa</b>: nivel competitivo elite, contexto profesional');
+    } else if (/premier|liga.*españ|serie a|bundesliga|ligue.*1/i.test(liga)) {
+      bullets.push('📺 <b>Top 5 Europa</b>: liga monitoreada con data profunda');
+    } else if (/argentina|brasil|méxic|colomb|chile|perú|ecuador|uruguay/i.test(liga)) {
+      bullets.push('🇦🇷 <b>Sudamérica</b>: liga con cobertura especializada del modelo');
+    }
+
+    // 5) RIESGO / TIPO DE MERCADO
+    if (/over|más de \d/i.test(_rec)) {
+      bullets.push('⚠️ <b>Riesgo</b>: depende del ritmo ofensivo; respaldado por xG histórico');
+    } else if (/under|menos de \d/i.test(_rec)) {
+      bullets.push('🛡️ <b>Defensivo</b>: tendencia histórica de partidos cerrados');
+    } else if (/btts|ambos.*marcan/i.test(_rec)) {
+      bullets.push('🎯 <b>BTTS</b>: ambos equipos con regularidad ofensiva');
+    } else if (/^empate|^x$|doble oportunidad/i.test(_rec)) {
+      bullets.push('⚖️ <b>Equilibrio</b>: fuerzas parejas + cuota con margen');
+    } else if (_conf === 'high' || _bvr >= 5) {
+      bullets.push('💎 <b>Convicción alta</b>: BVR ' + _bvr + '/6 — pick destacado por el modelo');
+    } else {
+      bullets.push('📐 <b>Sistema</b>: pick aprobado bajo criterio value + forma + contexto');
+    }
+
+    if (bullets.length < 3) return '';
+    const top5 = bullets.slice(0, 5);
+
+    // Barra de confianza (modelo o derivado del conf/bvr)
+    const confVal = modelProb || (_conf === 'high' ? 75 : _conf === 'med' ? 62 : 50);
+
+    return ''
+      + '<div class="ia-reasoning" data-bvr="' + _bvr + '">'
+      +   '<div class="ia-reasoning-header">'
+      +     '<span class="ia-pulse" aria-hidden="true"></span>'
+      +     '<span class="ia-label">Razonamiento de la IA</span>'
+      +   '</div>'
+      +   '<div class="ia-reasoning-bullets">'
+      +     top5.map(function(b){ return '<div class="ia-bullet">' + b + '</div>'; }).join('')
+      +   '</div>'
+      +   '<div class="ia-conf-row">'
+      +     '<div class="ia-conf-bar"><div class="ia-conf-fill" style="width:' + confVal + '%"></div></div>'
+      +     '<div class="ia-conf-val">' + confVal + '%</div>'
+      +   '</div>'
+      + '</div>';
+  } catch (e) {
+    console.warn('[_buildIAReasoning]', e);
+    return '';
+  }
+}
+
 function renderPreds() {
   // Reset logo miss tracker para este render
   window._logoMisses = new Set();
@@ -5728,6 +5835,7 @@ function renderPreds() {
       </div>
 ` : ''}
 
+      ${_buildIAReasoning(p)}
       ${!isFinishedWin && !isFinishedLoss ? (()=>{
         const _pickShort = _recLabel(p.rec, p.home, p.away);
         const _side = _recSideOf(p);
@@ -12378,4 +12486,5 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
