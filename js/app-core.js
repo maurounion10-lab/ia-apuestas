@@ -3868,6 +3868,88 @@ function _translateMatchState(s) {
   return s;
 }
 
+// ─── Gambeta 1.1 (29-jun-2026 #571): Hero PRO live stats ───
+// Alimenta los 4 KPIs del hero estilo red social/app.
+function _updateHeroProStats() {
+  try {
+    var hist = (typeof loadHistorial === 'function') ? loadHistorial() : [];
+    if (!Array.isArray(hist)) hist = [];
+    var preds = window._aiPreds || [];
+    var now = Date.now();
+    var DAY = 24 * 3600 * 1000;
+
+    // KPI 1: picks hoy (commenceTs entre 00:00 y 23:59 de hoy ART)
+    var todayStart = new Date(); todayStart.setHours(0,0,0,0);
+    var todayEnd   = new Date(); todayEnd.setHours(23,59,59,999);
+    var picksHoyCount = preds.filter(function(p){
+      return p && p.commenceTs && p.commenceTs >= todayStart.getTime() && p.commenceTs <= todayEnd.getTime();
+    }).length;
+    // Si no hay realPreds yet pero sí hist con picks de hoy, contarlos también
+    if (picksHoyCount === 0) {
+      picksHoyCount = hist.filter(function(h){
+        return h && h.commenceTs && h.commenceTs >= todayStart.getTime() && h.commenceTs <= todayEnd.getTime();
+      }).length;
+    }
+    var elHoy = document.getElementById('gbStatHoy');
+    if (elHoy) elHoy.textContent = picksHoyCount > 0 ? picksHoyCount : '–';
+
+    // KPI 2: acierto últimos 30 días
+    var ago30 = now - 30 * DAY;
+    var resolved30 = hist.filter(function(h){
+      var ts = h && (h.commenceTs || (h.date ? new Date(h.date).getTime() : 0));
+      return ts >= ago30 && (h.result === 'win' || h.result === 'loss');
+    });
+    var wins30 = resolved30.filter(function(h){ return h.result === 'win'; }).length;
+    var totalRes30 = resolved30.length;
+    var elAc = document.getElementById('gbStatAcierto');
+    if (elAc) {
+      if (totalRes30 >= 3) {
+        var pct = Math.round(wins30 / totalRes30 * 100);
+        elAc.textContent = pct + '%';
+      } else {
+        elAc.textContent = '–';
+      }
+    }
+
+    // KPI 3: en vivo ahora — usa _isPickLive si disponible
+    var liveCount = 0;
+    if (typeof _isPickLive === 'function') {
+      liveCount = preds.filter(function(p){ return !!_isPickLive(p); }).length;
+    }
+    var elLiveNum = document.getElementById('gbStatLiveNum');
+    if (elLiveNum) elLiveNum.textContent = liveCount;
+    var liveCard = document.getElementById('gbStatLiveCard');
+    if (liveCard) liveCard.setAttribute('data-active', liveCount > 0 ? '1' : '0');
+
+    // KPI 4: total picks (mantener compat con heroStatPicks viejo)
+    // Si _updateHeroStatsPicks ya corrió, este nodo tiene el valor —
+    // si no, mostrar guion.
+    var elTotal = document.getElementById('heroStatPicks');
+    if (elTotal && (elTotal.textContent === '–' || elTotal.textContent === '')) {
+      var totalCount = hist.length || preds.length;
+      if (totalCount > 500) elTotal.textContent = '+' + Math.round(totalCount / 100) * 100;
+      else if (totalCount > 0) elTotal.textContent = totalCount;
+    }
+  } catch(_e) {
+    console.warn('[_updateHeroProStats]', _e);
+  }
+}
+
+// Auto-refresh cada 30s + en eventos clave
+(function(){
+  if (typeof window === 'undefined') return;
+  // Initial run after DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function(){
+      setTimeout(_updateHeroProStats, 800);
+    });
+  } else {
+    setTimeout(_updateHeroProStats, 800);
+  }
+  // Refresh periódico
+  setInterval(_updateHeroProStats, 30000);
+})();
+
 // ─── Gambeta 1.1 (#573): Self-healing resolver ───
 // Si vemos un pick pending cuyo partido terminó hace >100min, llamamos al
 // endpoint /admin/resolve-pick UNA VEZ por sesión por id. El worker resuelve
@@ -12583,6 +12665,7 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
 
