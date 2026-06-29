@@ -1707,6 +1707,90 @@
     animation: shimmer 1.4s infinite linear;
     border-radius: 6px;
   }
+
+  /* ─── Gambeta 1.1 (#569) — Panel "Razonamiento de la IA" ─── */
+  .ia-reasoning {
+    background: rgba(0,180,255,0.05);
+    border: 1px solid rgba(0,180,255,0.20);
+    border-radius: 12px;
+    padding: 12px 14px;
+    margin: 12px 0 14px;
+  }
+  .ia-reasoning-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .ia-pulse {
+    width: 7px;
+    height: 7px;
+    background: #00c853;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(0,200,83,0.55);
+    animation: ia-pulse 1.6s ease-in-out infinite;
+    flex-shrink: 0;
+  }
+  @keyframes ia-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.45); }
+  }
+  .ia-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.9px;
+    color: #64b5f6;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .ia-reasoning-bullets {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ia-bullet {
+    font-size: 0.78rem;
+    color: #cfd8dc;
+    line-height: 1.55;
+    letter-spacing: 0.1px;
+  }
+  .ia-bullet b {
+    color: #fff;
+    font-weight: 600;
+  }
+  .ia-conf-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .ia-conf-bar {
+    flex: 1;
+    height: 5px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .ia-conf-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00c853, #9fcf26);
+    border-radius: 3px;
+    transition: width 0.6s ease;
+  }
+  .ia-conf-val {
+    font-size: 0.73rem;
+    color: #00c853;
+    font-weight: 700;
+    min-width: 38px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  @media (max-width: 600px) {
+    .ia-reasoning { padding: 10px 12px; margin: 10px 0 12px; }
+    .ia-bullet { font-size: 0.74rem; }
+  }
+
   .pred-card-skeleton {
     background: var(--gris-card);
     border: 1px solid var(--borde);
@@ -14037,6 +14121,7 @@ setTimeout(_fpBadgeInit, 1200);
 </html>
 
 <!-- redeploy 2026-05-20T21:42Z: re-sync tras rollback de tarea escudos -->
+
 
 
 
