@@ -5049,10 +5049,27 @@ function renderPreds() {
         return false; // sin fecha → no incluir en próximos
       });
     } else if (tf === 'finished') {
-      // TERMINADOS = todos los que ya empezaron (incluye EN VIVO + win + loss + void)
+      // TERMINADOS = todos los que ya empezaron + resueltos (win/loss/void)
       // 🛡️ (26-jun-2026) Antes excluíamos pending → fichas EN JUEGO desaparecían.
-      // Ahora se ven con badge "EN VIVO" (isPending logic ya está en el render)
-      realPreds = realPreds.filter(p => !!p._started && p._histResult && p._histResult !== 'pending');    } else if (tf === 'live') {      realPreds = realPreds.filter(p => !!p._started && (!p._histResult || p._histResult === 'pending'));
+      // 🆕 (28-jun-2026) Garantizar mínimo 6 últimas fichas resueltas usando historial local
+      //                   (el feed odds rara vez trae partidos ya jugados)
+      let _finished = realPreds.filter(p => !!p._started && p._histResult && p._histResult !== 'pending');
+      if (_finished.length < 6) {
+        try {
+          const _hist = (typeof loadHistorial === 'function') ? loadHistorial() : [];
+          const _sortedHist = _hist
+            .filter(h => h && h.result && h.result !== 'pending')
+            .sort((a, b) => (b.commenceTs || new Date(b.date||0).getTime() || 0) - (a.commenceTs || new Date(a.date||0).getTime() || 0));
+          const _existingIds = new Set(_finished.map(p => p.id).filter(Boolean));
+          const _toAdd = _sortedHist
+            .filter(h => h.id && !_existingIds.has(h.id))
+            .slice(0, Math.max(6 - _finished.length, 0))
+            .map(h => ({ ...h, _started: true, _histResult: h.result }));
+          _finished = [..._finished, ..._toAdd];
+        } catch(_e) {}
+      }
+      realPreds = _finished;
+    } else if (tf === 'live') {      realPreds = realPreds.filter(p => !!p._started && (!p._histResult || p._histResult === 'pending'));
     }
     if (!realPreds.length) realPreds = null;
   }
@@ -12361,3 +12378,4 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
