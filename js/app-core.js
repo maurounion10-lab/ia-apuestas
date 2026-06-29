@@ -3868,6 +3868,65 @@ function _translateMatchState(s) {
   return s;
 }
 
+// ─── Gambeta 1.1 (29-jun-2026 #570): Helper EN VIVO ───
+// Resuelve si un pick está EN VIVO usando 2 fuentes:
+//   1) scoresData con flag='live' (autoritativo del API)
+//   2) Fallback temporal estricto: kickoff <= now AND kickoff > now - 2.5h
+// Excluye picks ya resueltos (win/loss/void) o "stale" (kickoff pasó hace mucho).
+function _isPickLive(p) {
+  try {
+    if (!p) return null;
+    if (p._histResult === 'win' || p._histResult === 'loss' || p._histResult === 'void') return null;
+    if (p.result === 'win' || p.result === 'loss' || p.result === 'void') return null;
+
+    // 1) scoresData autoritativo
+    if (typeof scoresData !== 'undefined' && Array.isArray(scoresData) && typeof teamsMatch === 'function') {
+      const le = scoresData.find(function(s){
+        return s && s.flag === 'live' &&
+          (teamsMatch(s.home, p.home) || teamsMatch(s.homeRaw||s.home, p.home)) &&
+          (teamsMatch(s.away, p.away) || teamsMatch(s.awayRaw||s.away, p.away));
+      });
+      if (le) {
+        // minuto del partido (preferir time del API; si no, derivar de commenceTs)
+        var minute = '';
+        if (le.time && typeof le.time === 'string') {
+          minute = le.time.replace(/[^0-9]/g, '');
+          if (minute) minute = minute + "'";
+        }
+        if (!minute && p.commenceTs) {
+          var m = Math.floor((Date.now() - p.commenceTs) / 60000);
+          if (m >= 0 && m <= 120) minute = m + "'";
+        }
+        return {
+          live: true,
+          scoreH: (le.scoreH != null ? le.scoreH : 0),
+          scoreA: (le.scoreA != null ? le.scoreA : 0),
+          minute: minute || 'LIVE',
+          source: 'api'
+        };
+      }
+    }
+
+    // 2) Fallback temporal: kickoff <= now AND kickoff > now - 2.5h
+    if (p.commenceTs) {
+      var now = Date.now();
+      var elapsed = now - p.commenceTs;
+      if (elapsed >= 0 && elapsed <= 2.5 * 3600 * 1000) {
+        var mins = Math.min(Math.floor(elapsed / 60000), 95);
+        return {
+          live: true,
+          scoreH: null,
+          scoreA: null,
+          minute: mins + "'",
+          source: 'fallback'
+        };
+      }
+    }
+
+    return null;
+  } catch(_) { return null; }
+}
+
 // ─── Gambeta 1.1 (29-jun-2026 #569): Panel "Razonamiento de la IA" ───
 // Plantillas inteligentes que rellenan 5 bullets con datos reales del pick.
 // Diferenciador frente a competencia. NO toca SEO, solo agrega UI.
@@ -5109,7 +5168,7 @@ function renderPreds() {
   // ── Sub-filtro de tiempo (HOY / PRÓXIMOS / EN JUEGO / TERMINADOS) ──
   // 🆕 (28-jun-2026) Tab EN JUEGO SIEMPRE visible. Cuando hay live: rojo+animación+contador. Cuando no: gris+atenuado.
   try{
-    const _liveC=(realPreds||[]).filter(p=>!!p._started&&(!p._histResult||p._histResult==='pending')).length;
+    const _liveC=(realPreds||[]).filter(p=>!!_isPickLive(p)).length;
     const _liveT=document.getElementById('predLiveTab');
     if(_liveT){
       _liveT.style.display='inline-block';
@@ -5176,7 +5235,7 @@ function renderPreds() {
         } catch(_e) {}
       }
       realPreds = _finished;
-    } else if (tf === 'live') {      realPreds = realPreds.filter(p => !!p._started && (!p._histResult || p._histResult === 'pending'));
+    } else if (tf === 'live') {      realPreds = realPreds.filter(p => !!_isPickLive(p));
     }
     if (!realPreds.length) realPreds = null;
   }
@@ -5782,14 +5841,17 @@ function renderPreds() {
           <div class="pred-emoji">${logoHtml((p._sportKey?.includes('conmebol') && (p.homeRaw||p.home)==='Barcelona') ? 'Barcelona SC' : (p.homeRaw||p.home), 64)}</div>
           <div class="pred-tname">${shortName(p.home)}</div>
         </div>
-        ${(!isPending && isGameLive)
-          ? `<div style="text-align:center">
-               <div style="font-size:1.4rem;font-weight:900;color:#ef5350;
-                 background:rgba(229,57,53,0.12);border:1px solid rgba(229,57,53,0.35);
-                 border-radius:8px;padding:4px 14px;letter-spacing:3px;line-height:1">
-                 ${liveEntry.scoreH} - ${liveEntry.scoreA}
-               </div>
-             </div>`
+        ${isGameLive
+          ? (()=>{
+              const _lv = (typeof _isPickLive === 'function') ? _isPickLive(p) : null;
+              const _sh = (liveEntry && liveEntry.scoreH != null) ? liveEntry.scoreH : (_lv && _lv.scoreH != null ? _lv.scoreH : '-');
+              const _sa = (liveEntry && liveEntry.scoreA != null) ? liveEntry.scoreA : (_lv && _lv.scoreA != null ? _lv.scoreA : '-');
+              const _min = (_lv && _lv.minute) ? _lv.minute : "LIVE";
+              return `<div class="pred-live-block">
+                <div class="pred-live-min"><span class="pred-live-dot"></span>${_min}</div>
+                <div class="pred-live-score">${_sh}<span class="pred-live-dash">·</span>${_sa}</div>
+              </div>`;
+            })()
           : (!isPending && isStarted && finalScore)
           ? `<div style="text-align:center">
                <div class="pred-final-score ${isHighConfWin ? 'score-gold-win' : isFinishedWin ? 'score-win' : isFinishedLoss ? 'score-loss' : 'score-void'}">
@@ -12486,5 +12548,6 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
