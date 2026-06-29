@@ -5,6 +5,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.accesoia.app">
+<!-- 🆕 #578 Gambeta 1.1 — Tipografía premium Inter + Geist Mono -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&display=swap">
 <link rel="dns-prefetch" href="https://www.clarity.ms">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pronósticos de Fútbol con IA Gratis · 38 Ligas + Mundial 2026</title>
@@ -179,7 +181,11 @@
   body {
     background: var(--negro);
     color: var(--texto);
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    /* 🆕 #578 Inter como font default — tracking ajustado para look pro */
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    letter-spacing: -0.01em;
     min-height: 100vh;
     width: 100%;
     padding-top: 110px;
@@ -1911,6 +1917,93 @@
     .gb-pstat-num { font-size: 1.2rem; }
     .gb-pstat-lbl { font-size: 0.56rem; letter-spacing: 0.6px; }
     .gb-pill { padding: 9px 14px; font-size: 0.78rem; }
+  }
+
+
+
+  /* ─── Gambeta 1.1 (#578) — Sistema de diseño premium ─── */
+  /* Tipografía: Inter para UI + Geist Mono para números */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', -apple-system, sans-serif;
+    letter-spacing: -0.025em;
+    font-weight: 700;
+  }
+  .gb-mono, .pred-live-score, .pred-final-score,
+  .gb-pstat-mono, .ia-conf-val,
+  .pred-rec-odds, .db-odds {
+    font-family: 'Geist Mono', 'SF Mono', Menlo, Monaco, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+  }
+
+  /* Hover lift sutil + transición suave en pred-card */
+  .pred-card {
+    transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.22s ease;
+    will-change: transform;
+  }
+  .pred-card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 16px 40px rgba(0, 0, 0, 0.45),
+      0 0 0 1px rgba(0, 200, 83, 0.12);
+  }
+
+  /* Fade-in escalonado al cargar cards (staggered) */
+  @keyframes gb-card-fadein {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  #predGrid .pred-card {
+    animation: gb-card-fadein 0.45s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+  #predGrid .pred-card:nth-child(1)  { animation-delay: 0.02s; }
+  #predGrid .pred-card:nth-child(2)  { animation-delay: 0.06s; }
+  #predGrid .pred-card:nth-child(3)  { animation-delay: 0.10s; }
+  #predGrid .pred-card:nth-child(4)  { animation-delay: 0.14s; }
+  #predGrid .pred-card:nth-child(5)  { animation-delay: 0.18s; }
+  #predGrid .pred-card:nth-child(6)  { animation-delay: 0.22s; }
+  #predGrid .pred-card:nth-child(7)  { animation-delay: 0.26s; }
+  #predGrid .pred-card:nth-child(8)  { animation-delay: 0.30s; }
+  #predGrid .pred-card:nth-child(n+9){ animation-delay: 0.34s; }
+
+  /* Respeto preferencia reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    #predGrid .pred-card,
+    .pred-card { animation: none !important; transition: none !important; }
+    .pred-card:hover { transform: none; }
+  }
+
+  /* Focus rings premium (accesibilidad) */
+  button:focus-visible,
+  a:focus-visible,
+  .gb-pill:focus-visible {
+    outline: 2px solid rgba(0, 200, 83, 0.6);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  /* Botones y pills: micro-interacción premium */
+  .gb-pill,
+  .pred-action-btn,
+  .pred-dbbet-1click {
+    transition: transform 0.16s ease, box-shadow 0.18s ease, background 0.18s ease;
+  }
+  .pred-action-btn:hover { transform: translateY(-1px); }
+  .pred-action-btn:active { transform: translateY(0); }
+
+  /* Section titles más premium */
+  .section-title {
+    letter-spacing: -0.015em;
+  }
+
+  /* Spacing coherente en main */
+  main > section + section {
+    margin-top: 32px;
+  }
+  @media (max-width: 600px) {
+    main > section + section { margin-top: 24px; }
   }
 
 
@@ -14460,6 +14553,7 @@ setTimeout(_fpBadgeInit, 1200);
 </html>
 
 <!-- redeploy 2026-05-20T21:42Z: re-sync tras rollback de tarea escudos -->
+
 
 
 
