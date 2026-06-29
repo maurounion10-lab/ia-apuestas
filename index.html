@@ -1251,15 +1251,18 @@
   }
 
   /* ── PREDICTIONS ── */
+  /* 🆕 (#575v2) Layout masonry real con CSS multi-column.
+     Los huecos del grid clásico se eliminan: cada card queda pegada a la
+     siguiente en su columna, sin esperar a la fila más alta. */
   #predictions .pred-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 16px;
-    /* 🆕 (#575) align-items: start + grid-auto-rows asegura altura natural
-       cuando hay cards con panel "Razonamiento IA" más alto que otras */
-    align-items: start !important;
-    grid-auto-rows: min-content;
+    column-count: auto;
+    column-width: 320px;
+    column-gap: 16px;
+    /* Desktop: 3-4 columnas según viewport */
   }
+  @media (min-width: 1100px) { #predictions .pred-grid { column-count: 3; } }
+  @media (min-width: 1500px) { #predictions .pred-grid { column-count: 4; } }
+  @media (max-width: 700px)  { #predictions .pred-grid { column-count: 1; column-width: auto; } }
 
   .pred-card {
     background: var(--gris-card);
@@ -1270,9 +1273,13 @@
     transition: all 0.2s;
     position: relative;
     overflow: hidden;
-    /* 🆕 (#575) cada card crece a su contenido sin estirarse al row */
-    align-self: start;
-    height: fit-content;
+    /* 🆕 (#575v2) masonry: card no se parte entre columnas */
+    break-inside: avoid;
+    page-break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+    display: block;
+    margin-bottom: 16px;
+    width: 100%;
   }
   .pred-card:hover {
     border-color: rgba(0,200,83,0.5);
@@ -14453,6 +14460,7 @@ setTimeout(_fpBadgeInit, 1200);
 </html>
 
 <!-- redeploy 2026-05-20T21:42Z: re-sync tras rollback de tarea escudos -->
+
 
 
 
