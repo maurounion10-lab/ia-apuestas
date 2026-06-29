@@ -10124,8 +10124,9 @@ async function admLoadBroadcastHistory() {
 }
 
 // ── Admin elimina un mensaje permanentemente ──
-// 🆕 (29-jun-2026) Fix #567: capturar error del upsert (antes lo silenciaba)
-//  + log diagnóstico + validación de msgId + verificación post-write
+// 🆕 (29-jun-2026) Fix #568: bypass RLS via worker /admin/delete-broadcast
+//  El upsert directo cliente fallaba silenciosamente por RLS. Ahora vamos al
+//  worker que usa SUPABASE_SERVICE_ROLE_KEY (bypassa RLS).
 async function admDeleteBroadcast(msgId) {
   // 🔒 SEGURIDAD: solo admin puede borrar broadcasts.
   if (!authUser || authUser.email !== ADMIN_EMAIL) {
@@ -10135,49 +10136,28 @@ async function admDeleteBroadcast(msgId) {
   if (!msgId) { alert('Error: msgId vacío'); return; }
   if (!confirm('¿Eliminás este mensaje para todos los usuarios?')) return;
   try {
-    // 1) Read current list
-    const sel = await sbClient.from('acoin_users').select('picks').eq('email', BROADCAST_EMAIL).maybeSingle();
-    if (sel.error) {
-      console.error('[admDeleteBroadcast] SELECT error:', sel.error);
-      alert('Error leyendo mensajes: ' + sel.error.message);
+    const WORKER = 'https://apuestas-api.mauro-union10.workers.dev';
+    const TOKEN  = 'gambeta_wc_2026_trigger';
+    const r = await fetch(WORKER + '/admin/delete-broadcast?token=' + encodeURIComponent(TOKEN), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ msgId })
+    });
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok || j.error) {
+      console.error('[admDeleteBroadcast] worker error:', r.status, j);
+      alert('Error al eliminar: ' + (j.error || ('HTTP ' + r.status)));
       return;
     }
-    const existing = sel.data?.picks || [];
-    const before = existing.length;
-    const updated  = existing.filter(m => m.id !== msgId);
-    if (updated.length === before) {
-      console.warn('[admDeleteBroadcast] No se encontró mensaje con id', msgId);
-      alert('No se encontró el mensaje (id: ' + msgId + ')');
-      return;
-    }
-    // 2) Write back — CAPTURAR ERROR (antes se ignoraba → fix #567)
-    const upd = await sbClient.from('acoin_users').upsert(
-      { email: BROADCAST_EMAIL, picks: updated, updated_at: new Date().toISOString() },
-      { onConflict: 'email' }
-    );
-    if (upd.error) {
-      console.error('[admDeleteBroadcast] UPSERT error:', upd.error);
-      const hint = upd.error.message.includes('row-level') || upd.error.code === '42501'
-        ? '\n\n⚠️ Permiso denegado por RLS. Verificá que la cuenta admin tenga policy UPDATE sobre acoin_users para email=__broadcast__.'
-        : '';
-      alert('Error al eliminar: ' + upd.error.message + hint);
-      return;
-    }
-    // 3) Verify the write actually happened (re-read)
-    const verify = await sbClient.from('acoin_users').select('picks').eq('email', BROADCAST_EMAIL).maybeSingle();
-    const stillThere = (verify.data?.picks || []).some(m => m.id === msgId);
-    if (stillThere) {
-      console.error('[admDeleteBroadcast] Mensaje sigue en DB tras upsert — probable RLS write-blocked');
-      alert('El mensaje no se borró del servidor (probable problema de permisos). Revisá la consola.');
-      return;
-    }
-    // 4) Update local cache + re-render
-    window._broadcastMsgs = updated;
+    console.log('[admDeleteBroadcast] ✅ Eliminado vía worker:', j);
+    // Invalidar caché local + re-render
     try { localStorage.removeItem(_SB_CACHE_PREFIX + 'bcast'); } catch {}
+    if (Array.isArray(window._broadcastMsgs)) {
+      window._broadcastMsgs = window._broadcastMsgs.filter(m => m && m.id !== msgId);
+    }
     admLoadBroadcastHistory();
     if (typeof _renderBcastStack === 'function') _renderBcastStack();
     if (typeof _updateInboxBadge === 'function') _updateInboxBadge();
-    console.log('[admDeleteBroadcast] ✅ Mensaje eliminado:', msgId);
   } catch(e) {
     console.error('[admDeleteBroadcast] exception:', e);
     alert('Error al eliminar: ' + (e?.message || e));
@@ -14057,5 +14037,6 @@ setTimeout(_fpBadgeInit, 1200);
 </html>
 
 <!-- redeploy 2026-05-20T21:42Z: re-sync tras rollback de tarea escudos -->
+
 
 
