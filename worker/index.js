@@ -2456,6 +2456,64 @@ export default {
       return new Response(JSON.stringify({ ok: true, ts: new Date().toISOString(), log }, null, 2), { headers: CORS });
     }
 
+    // ── 🆕 (29-jun-2026 #568) /admin/delete-broadcast — borra msg del broadcast (bypass RLS) ──
+    // Causa raíz fix #567: el upsert directo de cliente fallaba silenciosamente
+    // (probable RLS). Este endpoint usa service_role, que bypassa RLS.
+    if (path === '/admin/delete-broadcast') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      const skey = env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!skey) {
+        return new Response(JSON.stringify({ error: 'no service key' }), { status: 500, headers: CORS });
+      }
+      let body;
+      try { body = await request.json(); } catch { return new Response(JSON.stringify({ error: 'bad json' }), { status: 400, headers: CORS }); }
+      const msgId = body?.msgId;
+      if (!msgId) return new Response(JSON.stringify({ error: 'msgId required' }), { status: 400, headers: CORS });
+      const BCAST_EMAIL = '__broadcast__';
+      try {
+        // 1) Read current picks
+        const getRes = await fetch(SUPABASE_URL + '/rest/v1/acoin_users?email=eq.' + encodeURIComponent(BCAST_EMAIL) + '&select=picks', {
+          headers: { 'apikey': skey, 'Authorization': 'Bearer ' + skey }
+        });
+        if (!getRes.ok) {
+          const t = await getRes.text();
+          return new Response(JSON.stringify({ error: 'SELECT failed', status: getRes.status, body: t }), { status: 500, headers: CORS });
+        }
+        const rows = await getRes.json();
+        if (!Array.isArray(rows) || rows.length === 0) {
+          return new Response(JSON.stringify({ error: 'broadcast row not found' }), { status: 404, headers: CORS });
+        }
+        const existing = rows[0]?.picks || [];
+        const before = existing.length;
+        const updated = existing.filter(m => m && m.id !== msgId);
+        if (updated.length === before) {
+          return new Response(JSON.stringify({ error: 'msgId not found in list', existing_ids: existing.map(m => m?.id).filter(Boolean) }), { status: 404, headers: CORS });
+        }
+        // 2) PATCH (UPDATE) — service_role bypassa RLS
+        const patchRes = await fetch(SUPABASE_URL + '/rest/v1/acoin_users?email=eq.' + encodeURIComponent(BCAST_EMAIL), {
+          method: 'PATCH',
+          headers: {
+            'apikey': skey,
+            'Authorization': 'Bearer ' + skey,
+            'Content-Type': 'application/json',
+            'Prefer': 'return=representation'
+          },
+          body: JSON.stringify({ picks: updated, updated_at: new Date().toISOString() })
+        });
+        if (!patchRes.ok) {
+          const t = await patchRes.text();
+          return new Response(JSON.stringify({ error: 'PATCH failed', status: patchRes.status, body: t }), { status: 500, headers: CORS });
+        }
+        return new Response(JSON.stringify({ ok: true, msgId, before, after: updated.length, removed: before - updated.length }), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message, stack: e.stack?.slice(0, 500) }), { status: 500, headers: CORS });
+      }
+    }
+
     // ── 🆕 /admin/replace-wc-matches — limpia todos los _wcMatch y reinserta los actuales ──
     if (path === '/admin/replace-wc-matches') {
       const token = url.searchParams.get('token');
@@ -2925,3 +2983,4 @@ export default {
     return new Response(JSON.stringify({ error: 'Not found', path }), { status: 404, headers: CORS });
   }
 };
+
