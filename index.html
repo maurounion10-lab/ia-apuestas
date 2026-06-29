@@ -10124,29 +10124,63 @@ async function admLoadBroadcastHistory() {
 }
 
 // ── Admin elimina un mensaje permanentemente ──
+// 🆕 (29-jun-2026) Fix #567: capturar error del upsert (antes lo silenciaba)
+//  + log diagnóstico + validación de msgId + verificación post-write
 async function admDeleteBroadcast(msgId) {
   // 🔒 SEGURIDAD: solo admin puede borrar broadcasts.
   if (!authUser || authUser.email !== ADMIN_EMAIL) {
     console.warn('[admDeleteBroadcast] Bloqueado: no admin');
     return;
   }
+  if (!msgId) { alert('Error: msgId vacío'); return; }
   if (!confirm('¿Eliminás este mensaje para todos los usuarios?')) return;
   try {
-    const { data } = await sbClient.from('acoin_users').select('picks').eq('email', BROADCAST_EMAIL).maybeSingle();
-    const existing = data?.picks || [];
+    // 1) Read current list
+    const sel = await sbClient.from('acoin_users').select('picks').eq('email', BROADCAST_EMAIL).maybeSingle();
+    if (sel.error) {
+      console.error('[admDeleteBroadcast] SELECT error:', sel.error);
+      alert('Error leyendo mensajes: ' + sel.error.message);
+      return;
+    }
+    const existing = sel.data?.picks || [];
+    const before = existing.length;
     const updated  = existing.filter(m => m.id !== msgId);
-    await sbClient.from('acoin_users').upsert(
+    if (updated.length === before) {
+      console.warn('[admDeleteBroadcast] No se encontró mensaje con id', msgId);
+      alert('No se encontró el mensaje (id: ' + msgId + ')');
+      return;
+    }
+    // 2) Write back — CAPTURAR ERROR (antes se ignoraba → fix #567)
+    const upd = await sbClient.from('acoin_users').upsert(
       { email: BROADCAST_EMAIL, picks: updated, updated_at: new Date().toISOString() },
       { onConflict: 'email' }
     );
-    // Actualizar caché local y re-renderizar
+    if (upd.error) {
+      console.error('[admDeleteBroadcast] UPSERT error:', upd.error);
+      const hint = upd.error.message.includes('row-level') || upd.error.code === '42501'
+        ? '\n\n⚠️ Permiso denegado por RLS. Verificá que la cuenta admin tenga policy UPDATE sobre acoin_users para email=__broadcast__.'
+        : '';
+      alert('Error al eliminar: ' + upd.error.message + hint);
+      return;
+    }
+    // 3) Verify the write actually happened (re-read)
+    const verify = await sbClient.from('acoin_users').select('picks').eq('email', BROADCAST_EMAIL).maybeSingle();
+    const stillThere = (verify.data?.picks || []).some(m => m.id === msgId);
+    if (stillThere) {
+      console.error('[admDeleteBroadcast] Mensaje sigue en DB tras upsert — probable RLS write-blocked');
+      alert('El mensaje no se borró del servidor (probable problema de permisos). Revisá la consola.');
+      return;
+    }
+    // 4) Update local cache + re-render
     window._broadcastMsgs = updated;
     try { localStorage.removeItem(_SB_CACHE_PREFIX + 'bcast'); } catch {}
     admLoadBroadcastHistory();
-    _renderBcastStack();
-    _updateInboxBadge();
+    if (typeof _renderBcastStack === 'function') _renderBcastStack();
+    if (typeof _updateInboxBadge === 'function') _updateInboxBadge();
+    console.log('[admDeleteBroadcast] ✅ Mensaje eliminado:', msgId);
   } catch(e) {
-    alert('Error al eliminar: ' + e.message);
+    console.error('[admDeleteBroadcast] exception:', e);
+    alert('Error al eliminar: ' + (e?.message || e));
   }
 }
 
@@ -14023,4 +14057,5 @@ setTimeout(_fpBadgeInit, 1200);
 </html>
 
 <!-- redeploy 2026-05-20T21:42Z: re-sync tras rollback de tarea escudos -->
+
 
