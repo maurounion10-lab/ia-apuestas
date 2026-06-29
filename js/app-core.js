@@ -4081,69 +4081,78 @@ function _buildIAReasoning(p) {
     const _conf = p.conf || 'med';
     const bullets = [];
 
-    // 1) PROBABILIDAD DEL MODELO
+    // 🆕 #576 — Solo bullets ALENTADORES. No duplicar % probabilidad (ya está en barras).
+    // Calculamos modelProb solo para detectar value, NO lo mostramos al usuario.
     let modelProb = null;
     if (_side === 'home' && p.probH) modelProb = Math.round(p.probH);
     else if (_side === 'away' && p.probA) modelProb = Math.round(p.probA);
     else if (_side === 'draw' && p.probD) modelProb = Math.round(p.probD);
 
-    if (modelProb && modelProb >= 55) {
-      bullets.push('✅ <b>Modelo</b>: ' + modelProb + '% de probabilidad para esta jugada');
-    } else if (modelProb && modelProb >= 40) {
-      bullets.push('📊 <b>Modelo</b>: ' + modelProb + '% — value de cuota justifica el pick');
-    }
-
-    // 2) VALUE vs MERCADO
+    // 1) VALUE vs MERCADO (alentador cuando hay edge)
     const _odds = parseFloat(p._bestOdds || p.odds || 0);
     if (_odds && _odds > 1 && modelProb) {
       const impliedProb = Math.round(100 / _odds);
       const diff = modelProb - impliedProb;
-      if (diff >= 6) {
-        bullets.push('💰 <b>Value detectado</b>: mercado paga ' + impliedProb + '%, IA estima ' + modelProb + '%');
-      } else if (diff >= 2) {
-        bullets.push('📈 <b>Cuota favorable</b>: ligero edge sobre la línea del mercado');
+      if (diff >= 8) {
+        bullets.push('💰 <b>Value alto detectado</b>: el mercado subestima este escenario');
+      } else if (diff >= 4) {
+        bullets.push('📈 <b>Cuota con edge</b>: el modelo ve más probable que el mercado');
       }
     }
 
-    // 3) FORMA RECIENTE
+    // 2) FORMA RECIENTE (solo cuando es buena)
     const _formStr = _side === 'home' ? String(p.formH || '') : _side === 'away' ? String(p.formA || '') : '';
     if (_formStr) {
       const wins = (_formStr.match(/W/gi) || []).length;
       const total = _formStr.length;
-      if (wins >= 3 && total > 0) {
-        bullets.push('🔥 <b>Forma</b>: ' + wins + '/' + total + ' victorias últimos partidos');
-      } else if (wins >= 2 && total > 0) {
-        bullets.push('📊 <b>Forma</b>: irregular pero competitivo (' + wins + '/' + total + ')');
+      if (wins >= 4 && total >= 5) {
+        bullets.push('🔥 <b>Racha caliente</b>: ' + wins + ' victorias en los últimos ' + total);
+      } else if (wins >= 3 && total >= 5) {
+        bullets.push('📊 <b>Buen presente</b>: ' + wins + ' victorias recientes');
       }
     }
 
-    // 4) CONTEXTO LIGA/TORNEO
+    // 3) FAVORITISMO CLARO (solo cuando es contundente)
+    if (modelProb && modelProb >= 65) {
+      bullets.push('✅ <b>Favorito claro</b> del modelo en este escenario');
+    } else if (modelProb && modelProb >= 55 && _odds && _odds >= 1.6) {
+      bullets.push('🎯 <b>Escenario más probable</b> con cuota interesante');
+    }
+
+    // 4) CONTEXTO LIGA / TORNEO (siempre informativo positivo)
     const liga = String(p.league || '');
     if (/mundial|world cup|fifa/i.test(liga)) {
-      bullets.push('🏆 <b>Mundial 2026</b>: contexto de alta exigencia, motivación máxima');
+      bullets.push('🏆 <b>Mundial 2026</b>: contexto profesional, modelo en plena exigencia');
     } else if (/libertadores|sudamericana/i.test(liga)) {
-      bullets.push('🌎 <b>Copa</b>: presión adicional por avance, partidos a dos rondas');
+      bullets.push('🌎 <b>Copa</b>: partido de alto interés, datos profundos disponibles');
     } else if (/champions|europa.league|conference/i.test(liga)) {
-      bullets.push('⭐ <b>Europa</b>: nivel competitivo elite, contexto profesional');
+      bullets.push('⭐ <b>Europa</b>: nivel elite, cobertura completa del modelo');
     } else if (/premier|liga.*españ|serie a|bundesliga|ligue.*1/i.test(liga)) {
-      bullets.push('📺 <b>Top 5 Europa</b>: liga monitoreada con data profunda');
+      bullets.push('📺 <b>Top 5 Europa</b>: liga con data profunda y estable');
     } else if (/argentina|brasil|méxic|colomb|chile|perú|ecuador|uruguay/i.test(liga)) {
       bullets.push('🇦🇷 <b>Sudamérica</b>: liga con cobertura especializada del modelo');
     }
 
-    // 5) RIESGO / TIPO DE MERCADO
-    if (/over|más de \d/i.test(_rec)) {
-      bullets.push('⚠️ <b>Riesgo</b>: depende del ritmo ofensivo; respaldado por xG histórico');
-    } else if (/under|menos de \d/i.test(_rec)) {
-      bullets.push('🛡️ <b>Defensivo</b>: tendencia histórica de partidos cerrados');
+    // 5) MERCADO/TIPO (en clave alentadora)
+    if (/over 2\.5|m[aá]s de 2\.5/i.test(_rec)) {
+      bullets.push('⚽ <b>Promedio ofensivo</b>: ambos equipos suelen marcar con regularidad');
+    } else if (/over 1\.5|m[aá]s de 1\.5/i.test(_rec)) {
+      bullets.push('⚽ <b>Cuota segura</b>: histórico muy favorable a más de 1.5 goles');
+    } else if (/under|menos de/i.test(_rec)) {
+      bullets.push('🛡️ <b>Defensa sólida</b>: ambos vienen con bajos promedios de gol');
     } else if (/btts|ambos.*marcan/i.test(_rec)) {
-      bullets.push('🎯 <b>BTTS</b>: ambos equipos con regularidad ofensiva');
-    } else if (/^empate|^x$|doble oportunidad/i.test(_rec)) {
-      bullets.push('⚖️ <b>Equilibrio</b>: fuerzas parejas + cuota con margen');
-    } else if (_conf === 'high' || _bvr >= 5) {
-      bullets.push('💎 <b>Convicción alta</b>: BVR ' + _bvr + '/6 — pick destacado por el modelo');
-    } else {
-      bullets.push('📐 <b>Sistema</b>: pick aprobado bajo criterio value + forma + contexto');
+      bullets.push('🎯 <b>Ambos marcan</b>: regularidad ofensiva en los últimos partidos');
+    } else if (/doble oportunidad|^1x|x2/i.test(_rec)) {
+      bullets.push('⚖️ <b>Doble cobertura</b>: dos escenarios a favor por la misma cuota');
+    } else if (/^empate/i.test(_rec)) {
+      bullets.push('⚖️ <b>Fuerzas parejas</b>: cuota atractiva para el escenario probable');
+    }
+
+    // 6) CONVICCIÓN DEL MODELO (sello final cuando es alta)
+    if (_bvr >= 6) {
+      bullets.push('💎 <b>Máxima convicción</b>: BVR 6/6 — pick destacado del día');
+    } else if (_bvr >= 5 || _conf === 'high') {
+      bullets.push('💎 <b>Alta convicción</b>: BVR ' + _bvr + '/6 — uno de los preferidos');
     }
 
     if (bullets.length < 3) return '';
@@ -12686,6 +12695,7 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
 
