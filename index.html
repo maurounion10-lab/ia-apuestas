@@ -1709,6 +1709,198 @@
   }
 
 
+
+  /* ─── Gambeta 1.1 (#571) — Hero PRO vibe red social/app ─── */
+  /* Profile row: handle + verified + online */
+  .gb-profile-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 0 0 8px;
+    flex-wrap: wrap;
+  }
+  .gb-handle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .gb-handle-name {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.2px;
+  }
+  .gb-verified {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  .gb-handle-tag {
+    font-size: 0.82rem;
+    color: var(--texto-sec);
+    font-weight: 500;
+    margin-left: 2px;
+  }
+  .gb-online {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: rgba(0,200,83,0.08);
+    border: 1px solid rgba(0,200,83,0.2);
+    border-radius: 999px;
+    font-size: 0.7rem;
+    color: #9fcf26;
+    font-weight: 600;
+  }
+  .gb-online-dot {
+    width: 6px;
+    height: 6px;
+    background: #00c853;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(0,200,83,0.7);
+    animation: gb-online-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes gb-online-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .gb-online-text {
+    letter-spacing: 0.3px;
+  }
+
+  /* Profile stats: 4 contadores horizontales con dividers */
+  .gb-profile-stats {
+    display: flex;
+    align-items: stretch;
+    gap: 0;
+    margin: 22px 0 18px;
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 14px 4px;
+    overflow: hidden;
+  }
+  .gb-pstat {
+    flex: 1;
+    text-align: center;
+    padding: 2px 8px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+    position: relative;
+    transition: background 0.2s ease;
+  }
+  .gb-pstat:last-child { border-right: 0; }
+  .gb-pstat-num {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .gb-pstat-mono {
+    font-family: 'Geist Mono','SF Mono','Roboto Mono',Menlo,Monaco,Consolas,monospace;
+    font-size: 1.35rem;
+  }
+  .gb-pstat-success { color: #00e676; }
+  .gb-pstat-danger  { color: #ef5350; }
+  .gb-pstat-lbl {
+    font-size: 0.62rem;
+    color: var(--texto-sec);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-top: 4px;
+    font-weight: 600;
+  }
+
+  /* Live pulse dot dentro de stat "En vivo" */
+  .gb-live-pulse {
+    width: 8px;
+    height: 8px;
+    background: #ef5350;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(239,83,80,0.75);
+    animation: gb-live-pulse-anim 1.2s ease-in-out infinite;
+  }
+  @keyframes gb-live-pulse-anim {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.35; transform: scale(1.5); }
+  }
+  /* Cuando hay live > 0 — hover suave en card */
+  #gbStatLiveCard[data-active="1"] {
+    background: rgba(229,57,53,0.06);
+  }
+  #gbStatLiveCard[data-active="1"] .gb-pstat-num {
+    color: #ef5350;
+  }
+  #gbStatLiveCard[data-active="0"] .gb-live-pulse {
+    background: rgba(255,255,255,0.2);
+    box-shadow: none;
+    animation: none;
+  }
+
+  /* CTA row pills */
+  .gb-cta-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .gb-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.18s ease;
+    border: 1px solid transparent;
+    letter-spacing: 0.1px;
+    cursor: pointer;
+  }
+  .gb-pill-primary {
+    background: linear-gradient(180deg, var(--verde) 0%, #00b048 100%);
+    color: #000;
+    box-shadow: 0 4px 14px rgba(0,200,83,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  .gb-pill-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(0,200,83,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+  }
+  .gb-pill-primary svg { color: #000; }
+  .gb-pill-ghost {
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    border-color: rgba(255,255,255,0.12);
+  }
+  .gb-pill-ghost:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.22);
+    transform: translateY(-1px);
+  }
+  .gb-pill svg { flex-shrink: 0; }
+
+  /* Responsive — mobile stack */
+  @media (max-width: 600px) {
+    .gb-profile-row { gap: 10px; }
+    .gb-handle-name { font-size: 0.85rem; }
+    .gb-online { padding: 3px 8px; font-size: 0.65rem; }
+    .gb-profile-stats {
+      padding: 10px 2px;
+      margin: 18px 0 14px;
+    }
+    .gb-pstat-num { font-size: 1.2rem; }
+    .gb-pstat-lbl { font-size: 0.56rem; letter-spacing: 0.6px; }
+    .gb-pill { padding: 9px 14px; font-size: 0.78rem; }
+  }
+
+
   /* ─── Gambeta 1.1 (#570) — Marcador EN VIVO premium Bloomberg ─── */
   .pred-live-block {
     text-align: center;
@@ -6333,18 +6525,60 @@ window.toggleHeroBubble = function(n) {
 <!-- HERO -->
 <div class="hero" id="gbHero">
   <div class="hero-text">
-    <div class="hero-tag">⚡ IA Actualizada en Tiempo Real<span class="live-dot" style="margin-left:7px;margin-right:0"></span></div>
+    <!-- 🆕 (29-jun-2026 #571) Profile header tipo X/Discord/Strava -->
+    <div class="gb-profile-row">
+      <div class="gb-handle">
+        <span class="gb-handle-name">gambeta.ai</span>
+        <svg class="gb-verified" viewBox="0 0 22 22" aria-label="Verificado" title="Cuenta verificada"><g><path fill="#00C853" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.138.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path></g></svg>
+        <span class="gb-handle-tag">@gambeta_ai</span>
+      </div>
+      <div class="gb-online">
+        <span class="gb-online-dot"></span>
+        <span class="gb-online-text">En línea · IA activa 24/7</span>
+      </div>
+    </div>
+
     <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apuestas de Fútbol <span class="hero-emoji-btn" id="heroEmoji1" onclick="toggleHeroBubble(1)" title="Más info">🌎<sup class="hero-emoji-hint">✦</sup></span></span></h1>
     <p>Soy una IA que pronostica Fútbol automáticamente, configurada por un experto y gratis para todo mundo <span class="hero-emoji-btn" id="heroEmoji2" onclick="toggleHeroBubble(2)" title="Más info">💚<sup class="hero-emoji-hint">✦</sup></span></p>
-    <div class="hero-stats">
-      <div class="hero-stat"><span class="num" id="heroStatPicks">–</span><span class="lbl">Picks realizados</span></div>
-      <a class="hero-stat" href="https://x.com/Gambeta_ai" target="_blank" rel="noopener" style="text-decoration:none;cursor:pointer" title="Seguinos en X @Gambeta_ai">
-        <span class="num" style="color:#fff;line-height:1;display:flex;align-items:center;justify-content:center;height:2.4rem">
-          <svg width="34" height="34" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.629 5.905-5.629zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-        </span>
-        <span class="lbl">Pronósticos diarios</span>
+
+    <!-- 🆕 Stat row tipo perfil app: 4 contadores horizontales con dividers verticales -->
+    <div class="gb-profile-stats" id="gbProfileStats">
+      <div class="gb-pstat" data-stat="hoy">
+        <div class="gb-pstat-num" id="gbStatHoy">–</div>
+        <div class="gb-pstat-lbl">Picks hoy</div>
+      </div>
+      <div class="gb-pstat" data-stat="acierto">
+        <div class="gb-pstat-num gb-pstat-success" id="gbStatAcierto">–</div>
+        <div class="gb-pstat-lbl">Acierto 30d</div>
+      </div>
+      <div class="gb-pstat" data-stat="live" id="gbStatLiveCard">
+        <div class="gb-pstat-num" id="gbStatLive">
+          <span class="gb-live-pulse"></span><span id="gbStatLiveNum">0</span>
+        </div>
+        <div class="gb-pstat-lbl">En vivo</div>
+      </div>
+      <div class="gb-pstat" data-stat="total">
+        <div class="gb-pstat-num gb-pstat-mono" id="heroStatPicks">–</div>
+        <div class="gb-pstat-lbl">Total picks</div>
+      </div>
+    </div>
+
+    <!-- 🆕 CTA row pill buttons tipo app móvil -->
+    <div class="gb-cta-row">
+      <a class="gb-pill gb-pill-primary" href="#predictions" onclick="document.getElementById('predictions')?.scrollIntoView({behavior:'smooth'});return false;">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+        Ver picks del día
+      </a>
+      <a class="gb-pill gb-pill-ghost" href="https://x.com/Gambeta_ai" target="_blank" rel="noopener" title="Seguinos en X">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.259 5.629 5.905-5.629zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        Seguir
+      </a>
+      <a class="gb-pill gb-pill-ghost" href="https://t.me/+gambeta_canal" target="_blank" rel="noopener" title="Telegram">
+        <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.464.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.231-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+        Canal
       </a>
     </div>
+
   </div>
   <div class="hero-mascot-wrap" style="flex-shrink:0;position:relative">
     <div class="hero-bubble hero-bubble--mascot" id="heroBubble1">Somos de Argentina pero ya recibimos visitas de todo el mundo 🌍</div>
@@ -14213,6 +14447,7 @@ setTimeout(_fpBadgeInit, 1200);
 </html>
 
 <!-- redeploy 2026-05-20T21:42Z: re-sync tras rollback de tarea escudos -->
+
 
 
 
