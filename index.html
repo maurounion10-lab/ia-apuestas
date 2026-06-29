@@ -2033,6 +2033,39 @@
     letter-spacing: 0.4px;
   }
 
+
+  /* 🆕 (#585) Separadores de zona del home */
+  .gb-zone-divider {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    max-width: 1100px;
+    margin: 36px auto 4px;
+    padding: 0 24px;
+  }
+  .gb-zone-line {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0,200,83,0.18), transparent);
+  }
+  .gb-zone-label {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    padding: 4px 10px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 999px;
+  }
+  @media (max-width: 600px) {
+    .gb-zone-divider { gap: 10px; margin: 24px auto 2px; padding: 0 16px; }
+    .gb-zone-label { font-size: 0.62rem; letter-spacing: 1px; padding: 3px 8px; }
+  }
+
   /* ─── Gambeta 1.1 (#578) — Sistema de diseño premium ─── */
   /* Tipografía: Inter para UI + Geist Mono para números */
   h1, h2, h3, h4, h5, h6 {
@@ -6943,7 +6976,138 @@ window.toggleHeroBubble = function(n) {
   <div class="section-divider"></div>
 
   <!-- HISTORIAL DE PREDICCIONES -->
-  <section id="historial">
+  <section id="gbMpPickDelDia" style="padding:48px 20px 64px;background:radial-gradient(ellipse at center top,rgba(255,214,0,0.07),transparent 60%)">
+  <div style="max-width:920px;margin:0 auto">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,214,0,0.12);border:1px solid rgba(255,214,0,0.38);border-radius:30px;padding:5px 18px;font-size:0.72rem;font-weight:700;color:#ffd600;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px">⭐ Máxima Confianza · IA Gambeta</div>
+    <h2 style="font-size:clamp(1.4rem,4.2vw,1.85rem);font-weight:900;color:#fff;margin:0 0 8px;letter-spacing:-0.4px;text-align:left">El pick que la IA Gambeta más banca hoy</h2>
+    <p style="color:rgba(255,255,255,0.55);font-size:0.92rem;margin:0 0 22px;text-align:left">Es el de mayor confianza del modelo (BVR 6/6). Si querés <strong style="color:#d4a520">combinadas con cuotas altas</strong> sobre este mismo partido, las arma MasterProps.</p>
+
+    <div id="mpPickCard" style="background:linear-gradient(135deg,#111118 0%,#16161f 100%);border:1px solid rgba(255,214,0,0.32);border-radius:18px;padding:22px;box-shadow:0 12px 32px rgba(0,0,0,0.35);min-height:200px;display:flex;align-items:center;justify-content:center">
+      <div style="color:rgba(255,255,255,0.45);font-size:0.92rem">Cargando pick de máxima confianza…</div>
+    </div>
+  </div>
+
+  <style>
+    #mpPickCard .gb-pick-header { display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,214,0,0.15) }
+    #mpPickCard .gb-pick-league { font-size:0.72rem;font-weight:900;color:#ffd600;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:6px }
+    #mpPickCard .gb-pick-match { font-size:1.25rem;font-weight:800;color:#f0ece0;line-height:1.25 }
+    #mpPickCard .gb-pick-cuota { background:linear-gradient(135deg,#ffd600,#ffaa00);color:#000;font-weight:900;font-size:1.7rem;padding:10px 18px;border-radius:12px;line-height:1;letter-spacing:-0.5px;box-shadow:0 6px 18px rgba(255,214,0,0.35);white-space:nowrap }
+    #mpPickCard .gb-pick-rec-row { display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:14px 18px;margin-bottom:14px }
+    #mpPickCard .gb-pick-rec-label { font-size:0.7rem;font-weight:800;color:rgba(255,214,0,0.7);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px }
+    #mpPickCard .gb-pick-rec-value { font-size:1.2rem;font-weight:900;color:#ffd600;letter-spacing:-0.3px }
+    #mpPickCard .gb-pick-rec-book { font-size:0.78rem;color:rgba(255,255,255,0.55);font-weight:600;margin-top:4px }
+    #mpPickCard .gb-pick-bvr { display:flex;gap:5px }
+    #mpPickCard .gb-pick-bvr-gem { font-size:1.1rem;filter:sepia(1) saturate(5) brightness(1.25);text-shadow:0 0 10px rgba(255,214,0,0.95) }
+    #mpPickCard .gb-pick-insight { font-size:0.85rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:18px;padding:0 4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden }
+    #mpPickCard .gb-pick-cta { display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06) }
+    #mpPickCard .gb-pick-meta { font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.5 }
+    #mpPickCard .gb-pick-meta strong { color:#d4a520 }
+    #mpPickCard .gb-pick-btn { background:linear-gradient(135deg,#d4a520,#f0c850);color:#000;font-weight:800;font-size:0.9rem;padding:13px 24px;border-radius:10px;text-decoration:none;transition:transform .15s,box-shadow .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap }
+    #mpPickCard .gb-pick-btn:hover { transform:translateY(-2px);box-shadow:0 10px 26px rgba(212,165,32,0.45) }
+    @media(max-width:600px){
+      #mpPickCard .gb-pick-cuota { font-size:1.35rem;padding:8px 14px }
+      #mpPickCard .gb-pick-match { font-size:1.05rem }
+      #mpPickCard .gb-pick-rec-value { font-size:1.05rem }
+      #mpPickCard .gb-pick-cta { flex-direction:column;align-items:stretch }
+      #mpPickCard .gb-pick-btn { justify-content:center;text-align:center }
+    }
+  </style>
+
+  <script>
+  (function(){
+    var el = document.getElementById('mpPickCard');
+    if (!el) return;
+
+    function escapeHtml(s){
+      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function fmtDate(iso){
+      try {
+        var d = new Date(iso);
+        return d.toLocaleString('es-AR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZone:'America/Argentina/Buenos_Aires' });
+      } catch(e) { return ''; }
+    }
+    function recLabel(p){
+      // Traduce el "rec" al equipo concreto
+      var r = p.rec || '';
+      if (r === 'Gana Local' || r === 'gana_local') return 'Gana ' + (p.home || 'Local');
+      if (r === 'Gana Visitante' || r === 'gana_visit' || r === 'gana_visitante') return 'Gana ' + (p.away || 'Visitante');
+      if (r === 'Empate' || r === 'empate' || r === 'X') return 'Empate';
+      return r || '—';
+    }
+
+    fetch('/api/sb?type=historial', { cache: 'default' })
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        var hist = (Array.isArray(d) && d[0] && Array.isArray(d[0].historial_full)) ? d[0].historial_full : [];
+        if (!hist.length) {
+          el.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.9rem;text-align:center">No hay picks de máxima confianza disponibles ahora. <a href="https://gambeta.ai/#gbPredsList" style="color:#ffd600">Ver picks de hoy →</a></div>';
+          return;
+        }
+
+        // Filtrar bvr=6 + result=pending + commenceTs en el futuro
+        var now = Date.now();
+        var maxPicks = hist.filter(function(p){
+          if (p.bvr !== 6) return false;
+          if (p.result && p.result !== 'pending') return false;
+          var ts = p.commenceTs || (p.date ? new Date(p.date).getTime() : 0);
+          return ts > now - 3*3600*1000; // permite picks que arrancaron hace <3h
+        });
+
+        if (!maxPicks.length) {
+          el.innerHTML = '<div style="color:rgba(255,255,255,0.55);font-size:0.95rem;text-align:center;padding:8px 12px"><strong style="color:#ffd600">No hay máxima confianza activa.</strong><br><span style="font-size:0.85rem;color:rgba(255,255,255,0.45);margin-top:6px;display:inline-block">La IA solo marca BVR 6/6 cuando hay alta certeza. <a href="https://gambeta.ai/#gbPredsList" style="color:#ffd600">Ver los picks de hoy →</a></span></div>';
+          return;
+        }
+
+        // Ordenar por commenceTs ascendente (el más cercano primero)
+        maxPicks.sort(function(a,b){
+          return (a.commenceTs||0) - (b.commenceTs||0);
+        });
+        var p = maxPicks[0];
+
+        var rec = recLabel(p);
+        var book = p._bookLabel || 'cuota actual';
+        var insight = p.insight || '';
+        var when = fmtDate(p.date);
+        var league = p.league || '';
+        var match = (p.home || 'Local') + ' vs ' + (p.away || 'Visitante');
+
+        // BVR=6 = 6 gemas doradas
+        var gems = '';
+        for (var i=0; i<6; i++) gems += '<span class="gb-pick-bvr-gem">💎</span>';
+
+        el.innerHTML =
+          '<div style="width:100%">' +
+          '  <div class="gb-pick-header">' +
+          '    <div style="flex:1;min-width:200px">' +
+          '      <div class="gb-pick-league">' + escapeHtml(league) + (when ? ' · ' + escapeHtml(when) : '') + '</div>' +
+          '      <div class="gb-pick-match">' + escapeHtml(match) + '</div>' +
+          '    </div>' +
+          '    <div class="gb-pick-cuota">@' + Number(p.odds||0).toFixed(2) + '</div>' +
+          '  </div>' +
+          '  <div class="gb-pick-rec-row">' +
+          '    <div>' +
+          '      <div class="gb-pick-rec-label">Pronóstico IA</div>' +
+          '      <div class="gb-pick-rec-value">' + escapeHtml(rec) + '</div>' +
+          '      <div class="gb-pick-rec-book">Mejor cuota en ' + escapeHtml(book) + '</div>' +
+          '    </div>' +
+          '    <div class="gb-pick-bvr" title="BVR 6/6 - Máxima Confianza">' + gems + '</div>' +
+          '  </div>' +
+          (insight ? '<div class="gb-pick-insight">' + escapeHtml(insight) + '</div>' : '') +
+          '  <div class="gb-pick-cta">' +
+          '    <div class="gb-pick-meta">⭐ Pick de máxima confianza · IA Gambeta<br><strong>¿Querés combinadas con cuotas altas para este partido?</strong></div>' +
+          '    <a class="gb-pick-btn" href="https://masterpropsai.github.io/?utm_source=gambeta&utm_medium=maxconf&utm_campaign=home" target="_blank" rel="noopener" onclick="if(window.trackEvent)trackEvent(\'promo_click\',{promo:\'masterprops\',type:\'max_conf_card\'})">Ver MasterProps →</a>' +
+          '  </div>' +
+          '</div>';
+      })
+      .catch(function(e){
+        console.log('[gb-max-conf]', e && e.message);
+        el.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.9rem;text-align:center">No pudimos cargar el pick ahora. <a href="https://gambeta.ai/" style="color:#ffd600">Ver picks de hoy →</a></div>';
+      });
+  })();
+  </script>
+</section>
+<section id="historial">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
       <div class="section-title" style="margin:0"><div class="icon">📋</div>Resultados de Pronósticos</div>
       <button id="btnResolveManual" onclick="manualResolveResults()" style="display:none;align-items:center;gap:7px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.3);color:var(--verde);padding:8px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem;font-weight:700;transition:background .2s;white-space:nowrap">
@@ -7047,6 +7211,242 @@ window.toggleHeroBubble = function(n) {
       </div>
     </div>
   </section>
+
+<!-- 🆕 (#585) Separador zona PRODUCTO → HERRAMIENTAS -->
+<div class="gb-zone-divider" aria-hidden="true">
+  <span class="gb-zone-line"></span>
+  <span class="gb-zone-label">🧮 Herramientas de la IA</span>
+  <span class="gb-zone-line"></span>
+</div>
+
+<section id="calculator">
+    <div class="section-title">
+      <div class="icon">🧮</div>
+      Calculadora de Apuestas
+    </div>
+    <div class="calc-container">
+      <div class="calc-form card">
+        <div class="form-group">
+          <label>Tipo de Apuesta</label>
+          <select id="betType" onchange="updateCalc()">
+            <option value="simple">Apuesta Simple</option>
+            <option value="doble">Doble Oportunidad</option>
+            <option value="sistema">Sistema</option>
+            <option value="combinada">Combinada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Monto a Apostar ($)</label>
+          <input type="number" id="betAmount" value="100" min="1" oninput="updateCalc()" placeholder="Ej: 100">
+        </div>
+        <div class="form-group">
+          <label>Cuota / Odds</label>
+          <input type="number" id="betOdds" value="1.85" min="1.01" step="0.01" oninput="updateCalc()" placeholder="Ej: 1.85">
+        </div>
+        <div class="form-group">
+          <label>Probabilidad Real Estimada (%)</label>
+          <input type="number" id="betProb" value="55" min="1" max="99" oninput="updateCalc()" placeholder="Ej: 55">
+        </div>
+        <div class="form-group">
+          <label>Bankroll Total ($)</label>
+          <input type="number" id="betBankroll" value="1000" min="1" oninput="updateCalc()" placeholder="Ej: 1000">
+        </div>
+        <button class="btn-primary" onclick="updateCalc()">⚡ Calcular</button>
+      </div>
+
+      <div class="calc-result">
+        <h3>📊 Resultados del Análisis</h3>
+        <div class="result-rows">
+          <div class="result-row">
+            <span class="label">Ganancia Potencial</span>
+            <span class="value" id="r-ganancia">$85.00</span>
+          </div>
+          <div class="result-row highlight-row">
+            <span class="label">Retorno Total</span>
+            <span class="value" id="r-retorno">$185.00</span>
+          </div>
+          <div class="result-row">
+            <span class="label">ROI</span>
+            <span class="value" id="r-roi">85%</span>
+          </div>
+          <div class="result-row">
+            <span class="label">Valor Esperado (EV)</span>
+            <span class="value" id="r-ev" style="color: var(--verde)">+$1.75</span>
+          </div>
+        </div>
+        <div class="ev-meter">
+          <span style="font-size:0.78rem;color:var(--texto-sec)">Valor de la apuesta</span>
+          <div class="ev-bar-bg">
+            <div class="ev-bar-fill" id="evBar" style="width:62%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:#555;margin-top:3px">
+            <span>Sin valor</span>
+            <span>Valor óptimo</span>
+          </div>
+        </div>
+        <div id="calc-tip" style="background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.2);border-radius:10px;padding:10px 12px;font-size:0.82rem;color:var(--texto-sec);line-height:1.5;"></div>
+      </div>
+    </div>
+  </section>
+
+
+<!-- 🆕 (29-jun-2026 #582) FOOTER RICH SEO — estilo Flashscore/Forebet -->
+<section id="gbRichFooter" aria-label="Mapa del sitio Gambeta IA">
+  <div class="gb-rf-inner">
+    <div class="gb-rf-grid">
+
+      <!-- Col 1: PICKS POR LIGA -->
+      <div class="gb-rf-col">
+        <div class="gb-rf-title">Picks de la IA</div>
+        <a href="/#predictions">Pronósticos del día</a>
+        <a href="/mundial/predicciones-ia">Pronósticos Mundial 2026</a>
+        <a href="/blog/pronosticos-champions-league">Champions League</a>
+        <a href="/blog/pronosticos-libertadores">Libertadores</a>
+        <a href="/blog/pronosticos-premier-league">Premier League</a>
+        <a href="/blog/pronosticos-liga-argentina">Liga Argentina</a>
+        <a href="/blog/pronosticos-primera-nacional">Primera Nacional</a>
+        <a href="/blog/pronosticos-futbol-ia">Pronósticos fútbol IA</a>
+        <a href="/#historial">Historial verificable</a>
+      </div>
+
+      <!-- Col 2: MUNDIAL 2026 -->
+      <div class="gb-rf-col">
+        <div class="gb-rf-title gb-rf-title-wc">Mundial 2026</div>
+        <a href="/mundial-2026">Hub Mundial 2026</a>
+        <a href="/mundial/predicciones-ia">Predicciones IA del Mundial</a>
+        <a href="/mundial/calendario-ia">Calendario Mundial</a>
+        <a href="/mundial/estadisticas-ia">Estadísticas Mundial</a>
+        <a href="/blog/quien-gana-mundial-2026">¿Quién gana el Mundial?</a>
+        <a href="/blog/argentina-campeon-mundial-2026">Argentina campeón</a>
+        <a href="/blog/argentina-llega-a-semifinales-mundial-2026">Argentina a semifinales</a>
+        <a href="/blog/calendario-mundial-2026">Calendario completo</a>
+        <a href="/blog/como-apostar-mundial-2026-argentina">Cómo apostar el Mundial</a>
+      </div>
+
+      <!-- Col 3: MEJORES CASAS POR PAÍS -->
+      <div class="gb-rf-col">
+        <div class="gb-rf-title">Mejor casa por país</div>
+        <a href="/blog/mejor-casa-apuestas-mundial-2026-argentina">🇦🇷 Argentina</a>
+        <a href="/blog/mejor-casa-apuestas-mundial-2026-mexico">🇲🇽 México</a>
+        <a href="/blog/mejor-casa-apuestas-mundial-2026-colombia">🇨🇴 Colombia</a>
+        <a href="/blog/mejor-casa-apuestas-mundial-2026-chile">🇨🇱 Chile</a>
+        <a href="/blog/mejor-casa-apuestas-mundial-2026-peru">🇵🇪 Perú</a>
+        <a href="/blog/mejor-casa-apuestas-mundial-2026-espana">🇪🇸 España</a>
+        <a href="/blog/mejor-casa-apuestas-mundial-2026-uruguay">🇺🇾 Uruguay</a>
+        <a href="/blog/mejor-casa-apuestas-mundial-2026-ecuador">🇪🇨 Ecuador</a>
+        <a href="/blog/mejor-casa-apuestas-mundial-2026-bolivia">🇧🇴 Bolivia</a>
+        <a href="/blog/mejor-casa-apuestas-mundial-2026-paraguay">🇵🇾 Paraguay</a>
+      </div>
+
+      <!-- Col 4: BONOS -->
+      <div class="gb-rf-col">
+        <div class="gb-rf-title">Bonos Mundial 2026</div>
+        <a href="/bonos">Hub de bonos</a>
+        <a href="/blog/dbbet-bono-100-freebet-argentina-mundial-2026">Bono DBbet 100%</a>
+        <a href="/blog/bonos-mundial-2026-dbbet">Bonos DBbet</a>
+        <a href="/blog/bonos-mundial-2026-megapari">Bonos Megapari</a>
+        <a href="/blog/bonos-mundial-2026-bet365">Bonos Bet365</a>
+        <a href="/blog/bonos-mundial-2026-betano">Bonos Betano</a>
+        <a href="/blog/bonos-mundial-2026-codere">Bonos Codere</a>
+        <a href="/blog/elegir-casa-apuestas">Cómo elegir casa</a>
+        <a href="/blog/casa-apuestas-regulada-argentina">Casas reguladas</a>
+      </div>
+
+      <!-- Col 5: HERRAMIENTAS IA -->
+      <div class="gb-rf-col">
+        <div class="gb-rf-title">Herramientas IA</div>
+        <a href="/herramientas/kelly">Calculadora Kelly</a>
+        <a href="/herramientas/valor-esperado">Valor Esperado (EV+)</a>
+        <a href="/herramientas/conversor-cuotas">Conversor de cuotas</a>
+        <a href="/blog/ia-para-apostar">IA para apostar</a>
+        <a href="/blog/ia-apostar-futbol-valor">IA + value en apuestas</a>
+        <a href="/blog/como-usar-pronosticos-ia">Cómo usar la IA</a>
+        <a href="/blog/como-hablar-con-la-ia">Cómo hablar con la IA</a>
+        <a href="/blog/que-es-forebet">¿Qué es Forebet?</a>
+        <a href="/blog/que-es-windrawwin">¿Qué es WinDrawWin?</a>
+        <a href="/blog/que-es-flashscore">¿Qué es Flashscore?</a>
+      </div>
+
+      <!-- Col 6: SOBRE GAMBETA -->
+      <div class="gb-rf-col">
+        <div class="gb-rf-title">Sobre Gambeta</div>
+        <a href="/#predictions">Pronósticos en vivo</a>
+        <a href="/#historial">Resultados verificables</a>
+        <a href="/blog/apuestas-deportivas">¿Qué son las apuestas?</a>
+        <a href="/blog/apostar-con-responsabilidad">Apostar con responsabilidad</a>
+        <a href="/blog/que-es-scores24">¿Qué es Scores24?</a>
+        <a href="/blog/mejores-tipsters-gratuitos">Mejores tipsters gratis</a>
+        <a href="/blog/">Blog completo</a>
+        <a href="https://x.com/Gambeta_ai" target="_blank" rel="noopener">Twitter @gambeta_ai</a>
+        <a href="https://t.me/+gambeta_canal" target="_blank" rel="noopener">Telegram</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SECCIÓN: BANKROLL -->
+  <section id="bankroll">
+    <div class="section-title"><div class="icon">💰</div>Bankroll Manager</div>
+
+    <!-- Lock CTA (guests only) -->
+    <div class="bk-lock-overlay" id="bkLockOverlay">
+      <div class="bk-lock-icon">🔒</div>
+      <div class="bk-lock-title">Tu Bankroll Personal</div>
+      <div class="bk-lock-sub">Registrate gratis así la IA lleva un control de cómo te fue con los pronósticos de nuestra App desde tu registro!</div>
+      <div class="bk-lock-perks">
+        <div class="bk-lock-perk"><span>📊</span> Seguimiento de ganancias y pérdidas</div>
+        <div class="bk-lock-perk"><span>🤖</span> Consejos IA personalizados según tu historial</div>
+        <div class="bk-lock-perk"><span>📈</span> Gráfico de evolución de tu bankroll</div>
+        <div class="bk-lock-perk"><span>⚖️</span> Calculadora de valor esperado automática</div>
+        <div class="bk-lock-perk"><span>⭐</span> Estas cuentas (por ahora) son GRATIS</div>
+      </div>
+      <button class="bk-lock-btn" onclick="openAuth()">Crear cuenta gratuita →</button>
+      <button class="bk-lock-secondary" onclick="openAuth()">Ya tengo cuenta · Iniciar sesión</button>
+    </div>
+
+    <!-- Bankroll content (logged-in users only) -->
+    <div id="bankrollContent" class="bankroll-layout" style="display:none">
+      <div>
+        <div class="bankroll-summary" id="bankrollSummary"></div>
+        <div class="card bankroll-form">
+          <div style="font-size:0.9rem;font-weight:700;margin-bottom:8px">➕ Registrar Apuesta</div>
+          <div class="form-group"><label>Partido / Evento</label><input type="text" id="bk-match" placeholder="Ej: Real Madrid vs Man City"></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="form-group"><label>Cuota</label><input type="number" id="bk-odds" step="0.01" min="1.01" placeholder="1.85"></div>
+            <div class="form-group"><label>Stake ($)</label><input type="number" id="bk-stake" min="1" placeholder="50"></div>
+          </div>
+          <div class="form-group"><label>Resultado</label>
+            <select id="bk-result">
+              <option value="win">✅ Ganada</option>
+              <option value="loss">❌ Perdida</option>
+              <option value="void">⚪ Nula/Devuelta</option>
+              <option value="pending">🟡 Pendiente</option>
+            </select>
+          </div>
+          <button class="btn-primary" onclick="addBet()">Registrar Apuesta</button>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="margin-bottom:16px">
+          <div style="font-size:0.85rem;font-weight:600;color:var(--texto-sec);margin-bottom:10px">📈 Evolución del Bankroll</div>
+          <canvas id="bankrollChart" style="width:100%;max-width:100%;height:200px;display:block"></canvas>
+        </div>
+        <div class="card">
+          <div style="font-size:0.85rem;font-weight:600;color:var(--texto-sec);margin-bottom:10px">📝 Apuestas Recientes</div>
+          <div class="bets-list" id="betsList"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<!-- 🆕 (#585) Separador zona HERRAMIENTAS → MONETIZACIÓN -->
+<div class="gb-zone-divider" aria-hidden="true">
+  <span class="gb-zone-line"></span>
+  <span class="gb-zone-label">💰 Promociones, blog y comunidad</span>
+  <span class="gb-zone-line"></span>
+</div>
+
 
   <!-- BANNER DB SPONSOR -->
   <section id="gbDBbetMid" style="padding:0 20px">
@@ -7253,137 +7653,6 @@ window.toggleHeroBubble = function(n) {
 
 
 <!-- SECCIÓN: MÁXIMA CONFIANZA IA GAMBETA + CROSS-PROMO MASTERPROPS -->
-<section id="gbMpPickDelDia" style="padding:48px 20px 64px;background:radial-gradient(ellipse at center top,rgba(255,214,0,0.07),transparent 60%)">
-  <div style="max-width:920px;margin:0 auto">
-    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,214,0,0.12);border:1px solid rgba(255,214,0,0.38);border-radius:30px;padding:5px 18px;font-size:0.72rem;font-weight:700;color:#ffd600;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px">⭐ Máxima Confianza · IA Gambeta</div>
-    <h2 style="font-size:clamp(1.4rem,4.2vw,1.85rem);font-weight:900;color:#fff;margin:0 0 8px;letter-spacing:-0.4px;text-align:left">El pick que la IA Gambeta más banca hoy</h2>
-    <p style="color:rgba(255,255,255,0.55);font-size:0.92rem;margin:0 0 22px;text-align:left">Es el de mayor confianza del modelo (BVR 6/6). Si querés <strong style="color:#d4a520">combinadas con cuotas altas</strong> sobre este mismo partido, las arma MasterProps.</p>
-
-    <div id="mpPickCard" style="background:linear-gradient(135deg,#111118 0%,#16161f 100%);border:1px solid rgba(255,214,0,0.32);border-radius:18px;padding:22px;box-shadow:0 12px 32px rgba(0,0,0,0.35);min-height:200px;display:flex;align-items:center;justify-content:center">
-      <div style="color:rgba(255,255,255,0.45);font-size:0.92rem">Cargando pick de máxima confianza…</div>
-    </div>
-  </div>
-
-  <style>
-    #mpPickCard .gb-pick-header { display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid rgba(255,214,0,0.15) }
-    #mpPickCard .gb-pick-league { font-size:0.72rem;font-weight:900;color:#ffd600;letter-spacing:1.4px;text-transform:uppercase;margin-bottom:6px }
-    #mpPickCard .gb-pick-match { font-size:1.25rem;font-weight:800;color:#f0ece0;line-height:1.25 }
-    #mpPickCard .gb-pick-cuota { background:linear-gradient(135deg,#ffd600,#ffaa00);color:#000;font-weight:900;font-size:1.7rem;padding:10px 18px;border-radius:12px;line-height:1;letter-spacing:-0.5px;box-shadow:0 6px 18px rgba(255,214,0,0.35);white-space:nowrap }
-    #mpPickCard .gb-pick-rec-row { display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:14px 18px;margin-bottom:14px }
-    #mpPickCard .gb-pick-rec-label { font-size:0.7rem;font-weight:800;color:rgba(255,214,0,0.7);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px }
-    #mpPickCard .gb-pick-rec-value { font-size:1.2rem;font-weight:900;color:#ffd600;letter-spacing:-0.3px }
-    #mpPickCard .gb-pick-rec-book { font-size:0.78rem;color:rgba(255,255,255,0.55);font-weight:600;margin-top:4px }
-    #mpPickCard .gb-pick-bvr { display:flex;gap:5px }
-    #mpPickCard .gb-pick-bvr-gem { font-size:1.1rem;filter:sepia(1) saturate(5) brightness(1.25);text-shadow:0 0 10px rgba(255,214,0,0.95) }
-    #mpPickCard .gb-pick-insight { font-size:0.85rem;color:rgba(255,255,255,0.65);line-height:1.5;margin-bottom:18px;padding:0 4px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden }
-    #mpPickCard .gb-pick-cta { display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06) }
-    #mpPickCard .gb-pick-meta { font-size:0.78rem;color:rgba(255,255,255,0.5);line-height:1.5 }
-    #mpPickCard .gb-pick-meta strong { color:#d4a520 }
-    #mpPickCard .gb-pick-btn { background:linear-gradient(135deg,#d4a520,#f0c850);color:#000;font-weight:800;font-size:0.9rem;padding:13px 24px;border-radius:10px;text-decoration:none;transition:transform .15s,box-shadow .15s;display:inline-flex;align-items:center;gap:6px;white-space:nowrap }
-    #mpPickCard .gb-pick-btn:hover { transform:translateY(-2px);box-shadow:0 10px 26px rgba(212,165,32,0.45) }
-    @media(max-width:600px){
-      #mpPickCard .gb-pick-cuota { font-size:1.35rem;padding:8px 14px }
-      #mpPickCard .gb-pick-match { font-size:1.05rem }
-      #mpPickCard .gb-pick-rec-value { font-size:1.05rem }
-      #mpPickCard .gb-pick-cta { flex-direction:column;align-items:stretch }
-      #mpPickCard .gb-pick-btn { justify-content:center;text-align:center }
-    }
-  </style>
-
-  <script>
-  (function(){
-    var el = document.getElementById('mpPickCard');
-    if (!el) return;
-
-    function escapeHtml(s){
-      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-    function fmtDate(iso){
-      try {
-        var d = new Date(iso);
-        return d.toLocaleString('es-AR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit', timeZone:'America/Argentina/Buenos_Aires' });
-      } catch(e) { return ''; }
-    }
-    function recLabel(p){
-      // Traduce el "rec" al equipo concreto
-      var r = p.rec || '';
-      if (r === 'Gana Local' || r === 'gana_local') return 'Gana ' + (p.home || 'Local');
-      if (r === 'Gana Visitante' || r === 'gana_visit' || r === 'gana_visitante') return 'Gana ' + (p.away || 'Visitante');
-      if (r === 'Empate' || r === 'empate' || r === 'X') return 'Empate';
-      return r || '—';
-    }
-
-    fetch('/api/sb?type=historial', { cache: 'default' })
-      .then(function(r){ return r.ok ? r.json() : null; })
-      .then(function(d){
-        var hist = (Array.isArray(d) && d[0] && Array.isArray(d[0].historial_full)) ? d[0].historial_full : [];
-        if (!hist.length) {
-          el.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.9rem;text-align:center">No hay picks de máxima confianza disponibles ahora. <a href="https://gambeta.ai/#gbPredsList" style="color:#ffd600">Ver picks de hoy →</a></div>';
-          return;
-        }
-
-        // Filtrar bvr=6 + result=pending + commenceTs en el futuro
-        var now = Date.now();
-        var maxPicks = hist.filter(function(p){
-          if (p.bvr !== 6) return false;
-          if (p.result && p.result !== 'pending') return false;
-          var ts = p.commenceTs || (p.date ? new Date(p.date).getTime() : 0);
-          return ts > now - 3*3600*1000; // permite picks que arrancaron hace <3h
-        });
-
-        if (!maxPicks.length) {
-          el.innerHTML = '<div style="color:rgba(255,255,255,0.55);font-size:0.95rem;text-align:center;padding:8px 12px"><strong style="color:#ffd600">No hay máxima confianza activa.</strong><br><span style="font-size:0.85rem;color:rgba(255,255,255,0.45);margin-top:6px;display:inline-block">La IA solo marca BVR 6/6 cuando hay alta certeza. <a href="https://gambeta.ai/#gbPredsList" style="color:#ffd600">Ver los picks de hoy →</a></span></div>';
-          return;
-        }
-
-        // Ordenar por commenceTs ascendente (el más cercano primero)
-        maxPicks.sort(function(a,b){
-          return (a.commenceTs||0) - (b.commenceTs||0);
-        });
-        var p = maxPicks[0];
-
-        var rec = recLabel(p);
-        var book = p._bookLabel || 'cuota actual';
-        var insight = p.insight || '';
-        var when = fmtDate(p.date);
-        var league = p.league || '';
-        var match = (p.home || 'Local') + ' vs ' + (p.away || 'Visitante');
-
-        // BVR=6 = 6 gemas doradas
-        var gems = '';
-        for (var i=0; i<6; i++) gems += '<span class="gb-pick-bvr-gem">💎</span>';
-
-        el.innerHTML =
-          '<div style="width:100%">' +
-          '  <div class="gb-pick-header">' +
-          '    <div style="flex:1;min-width:200px">' +
-          '      <div class="gb-pick-league">' + escapeHtml(league) + (when ? ' · ' + escapeHtml(when) : '') + '</div>' +
-          '      <div class="gb-pick-match">' + escapeHtml(match) + '</div>' +
-          '    </div>' +
-          '    <div class="gb-pick-cuota">@' + Number(p.odds||0).toFixed(2) + '</div>' +
-          '  </div>' +
-          '  <div class="gb-pick-rec-row">' +
-          '    <div>' +
-          '      <div class="gb-pick-rec-label">Pronóstico IA</div>' +
-          '      <div class="gb-pick-rec-value">' + escapeHtml(rec) + '</div>' +
-          '      <div class="gb-pick-rec-book">Mejor cuota en ' + escapeHtml(book) + '</div>' +
-          '    </div>' +
-          '    <div class="gb-pick-bvr" title="BVR 6/6 - Máxima Confianza">' + gems + '</div>' +
-          '  </div>' +
-          (insight ? '<div class="gb-pick-insight">' + escapeHtml(insight) + '</div>' : '') +
-          '  <div class="gb-pick-cta">' +
-          '    <div class="gb-pick-meta">⭐ Pick de máxima confianza · IA Gambeta<br><strong>¿Querés combinadas con cuotas altas para este partido?</strong></div>' +
-          '    <a class="gb-pick-btn" href="https://masterpropsai.github.io/?utm_source=gambeta&utm_medium=maxconf&utm_campaign=home" target="_blank" rel="noopener" onclick="if(window.trackEvent)trackEvent(\'promo_click\',{promo:\'masterprops\',type:\'max_conf_card\'})">Ver MasterProps →</a>' +
-          '  </div>' +
-          '</div>';
-      })
-      .catch(function(e){
-        console.log('[gb-max-conf]', e && e.message);
-        el.innerHTML = '<div style="color:rgba(255,255,255,0.4);font-size:0.9rem;text-align:center">No pudimos cargar el pick ahora. <a href="https://gambeta.ai/" style="color:#ffd600">Ver picks de hoy →</a></div>';
-      });
-  })();
-  </script>
-</section>
 
 <!-- SECCIÓN: BLOG -->
 <section id="gbBlog" style="background:linear-gradient(180deg,#071007 0%,#0a150a 100%);border-top:1px solid rgba(0,200,83,0.15);padding:56px 20px 52px;text-align:center">
@@ -8017,227 +8286,7 @@ window.toggleHeroBubble = function(n) {
   </section>
 
 <!-- SECCIÓN: CALCULADORA -->
-  <section id="calculator">
-    <div class="section-title">
-      <div class="icon">🧮</div>
-      Calculadora de Apuestas
-    </div>
-    <div class="calc-container">
-      <div class="calc-form card">
-        <div class="form-group">
-          <label>Tipo de Apuesta</label>
-          <select id="betType" onchange="updateCalc()">
-            <option value="simple">Apuesta Simple</option>
-            <option value="doble">Doble Oportunidad</option>
-            <option value="sistema">Sistema</option>
-            <option value="combinada">Combinada</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Monto a Apostar ($)</label>
-          <input type="number" id="betAmount" value="100" min="1" oninput="updateCalc()" placeholder="Ej: 100">
-        </div>
-        <div class="form-group">
-          <label>Cuota / Odds</label>
-          <input type="number" id="betOdds" value="1.85" min="1.01" step="0.01" oninput="updateCalc()" placeholder="Ej: 1.85">
-        </div>
-        <div class="form-group">
-          <label>Probabilidad Real Estimada (%)</label>
-          <input type="number" id="betProb" value="55" min="1" max="99" oninput="updateCalc()" placeholder="Ej: 55">
-        </div>
-        <div class="form-group">
-          <label>Bankroll Total ($)</label>
-          <input type="number" id="betBankroll" value="1000" min="1" oninput="updateCalc()" placeholder="Ej: 1000">
-        </div>
-        <button class="btn-primary" onclick="updateCalc()">⚡ Calcular</button>
-      </div>
-
-      <div class="calc-result">
-        <h3>📊 Resultados del Análisis</h3>
-        <div class="result-rows">
-          <div class="result-row">
-            <span class="label">Ganancia Potencial</span>
-            <span class="value" id="r-ganancia">$85.00</span>
-          </div>
-          <div class="result-row highlight-row">
-            <span class="label">Retorno Total</span>
-            <span class="value" id="r-retorno">$185.00</span>
-          </div>
-          <div class="result-row">
-            <span class="label">ROI</span>
-            <span class="value" id="r-roi">85%</span>
-          </div>
-          <div class="result-row">
-            <span class="label">Valor Esperado (EV)</span>
-            <span class="value" id="r-ev" style="color: var(--verde)">+$1.75</span>
-          </div>
-        </div>
-        <div class="ev-meter">
-          <span style="font-size:0.78rem;color:var(--texto-sec)">Valor de la apuesta</span>
-          <div class="ev-bar-bg">
-            <div class="ev-bar-fill" id="evBar" style="width:62%"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:#555;margin-top:3px">
-            <span>Sin valor</span>
-            <span>Valor óptimo</span>
-          </div>
-        </div>
-        <div id="calc-tip" style="background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.2);border-radius:10px;padding:10px 12px;font-size:0.82rem;color:var(--texto-sec);line-height:1.5;"></div>
-      </div>
-    </div>
-  </section>
-
-
-<!-- 🆕 (29-jun-2026 #582) FOOTER RICH SEO — estilo Flashscore/Forebet -->
-<section id="gbRichFooter" aria-label="Mapa del sitio Gambeta IA">
-  <div class="gb-rf-inner">
-    <div class="gb-rf-grid">
-
-      <!-- Col 1: PICKS POR LIGA -->
-      <div class="gb-rf-col">
-        <div class="gb-rf-title">Picks de la IA</div>
-        <a href="/#predictions">Pronósticos del día</a>
-        <a href="/mundial/predicciones-ia">Pronósticos Mundial 2026</a>
-        <a href="/blog/pronosticos-champions-league">Champions League</a>
-        <a href="/blog/pronosticos-libertadores">Libertadores</a>
-        <a href="/blog/pronosticos-premier-league">Premier League</a>
-        <a href="/blog/pronosticos-liga-argentina">Liga Argentina</a>
-        <a href="/blog/pronosticos-primera-nacional">Primera Nacional</a>
-        <a href="/blog/pronosticos-futbol-ia">Pronósticos fútbol IA</a>
-        <a href="/#historial">Historial verificable</a>
-      </div>
-
-      <!-- Col 2: MUNDIAL 2026 -->
-      <div class="gb-rf-col">
-        <div class="gb-rf-title gb-rf-title-wc">Mundial 2026</div>
-        <a href="/mundial-2026">Hub Mundial 2026</a>
-        <a href="/mundial/predicciones-ia">Predicciones IA del Mundial</a>
-        <a href="/mundial/calendario-ia">Calendario Mundial</a>
-        <a href="/mundial/estadisticas-ia">Estadísticas Mundial</a>
-        <a href="/blog/quien-gana-mundial-2026">¿Quién gana el Mundial?</a>
-        <a href="/blog/argentina-campeon-mundial-2026">Argentina campeón</a>
-        <a href="/blog/argentina-llega-a-semifinales-mundial-2026">Argentina a semifinales</a>
-        <a href="/blog/calendario-mundial-2026">Calendario completo</a>
-        <a href="/blog/como-apostar-mundial-2026-argentina">Cómo apostar el Mundial</a>
-      </div>
-
-      <!-- Col 3: MEJORES CASAS POR PAÍS -->
-      <div class="gb-rf-col">
-        <div class="gb-rf-title">Mejor casa por país</div>
-        <a href="/blog/mejor-casa-apuestas-mundial-2026-argentina">🇦🇷 Argentina</a>
-        <a href="/blog/mejor-casa-apuestas-mundial-2026-mexico">🇲🇽 México</a>
-        <a href="/blog/mejor-casa-apuestas-mundial-2026-colombia">🇨🇴 Colombia</a>
-        <a href="/blog/mejor-casa-apuestas-mundial-2026-chile">🇨🇱 Chile</a>
-        <a href="/blog/mejor-casa-apuestas-mundial-2026-peru">🇵🇪 Perú</a>
-        <a href="/blog/mejor-casa-apuestas-mundial-2026-espana">🇪🇸 España</a>
-        <a href="/blog/mejor-casa-apuestas-mundial-2026-uruguay">🇺🇾 Uruguay</a>
-        <a href="/blog/mejor-casa-apuestas-mundial-2026-ecuador">🇪🇨 Ecuador</a>
-        <a href="/blog/mejor-casa-apuestas-mundial-2026-bolivia">🇧🇴 Bolivia</a>
-        <a href="/blog/mejor-casa-apuestas-mundial-2026-paraguay">🇵🇾 Paraguay</a>
-      </div>
-
-      <!-- Col 4: BONOS -->
-      <div class="gb-rf-col">
-        <div class="gb-rf-title">Bonos Mundial 2026</div>
-        <a href="/bonos">Hub de bonos</a>
-        <a href="/blog/dbbet-bono-100-freebet-argentina-mundial-2026">Bono DBbet 100%</a>
-        <a href="/blog/bonos-mundial-2026-dbbet">Bonos DBbet</a>
-        <a href="/blog/bonos-mundial-2026-megapari">Bonos Megapari</a>
-        <a href="/blog/bonos-mundial-2026-bet365">Bonos Bet365</a>
-        <a href="/blog/bonos-mundial-2026-betano">Bonos Betano</a>
-        <a href="/blog/bonos-mundial-2026-codere">Bonos Codere</a>
-        <a href="/blog/elegir-casa-apuestas">Cómo elegir casa</a>
-        <a href="/blog/casa-apuestas-regulada-argentina">Casas reguladas</a>
-      </div>
-
-      <!-- Col 5: HERRAMIENTAS IA -->
-      <div class="gb-rf-col">
-        <div class="gb-rf-title">Herramientas IA</div>
-        <a href="/herramientas/kelly">Calculadora Kelly</a>
-        <a href="/herramientas/valor-esperado">Valor Esperado (EV+)</a>
-        <a href="/herramientas/conversor-cuotas">Conversor de cuotas</a>
-        <a href="/blog/ia-para-apostar">IA para apostar</a>
-        <a href="/blog/ia-apostar-futbol-valor">IA + value en apuestas</a>
-        <a href="/blog/como-usar-pronosticos-ia">Cómo usar la IA</a>
-        <a href="/blog/como-hablar-con-la-ia">Cómo hablar con la IA</a>
-        <a href="/blog/que-es-forebet">¿Qué es Forebet?</a>
-        <a href="/blog/que-es-windrawwin">¿Qué es WinDrawWin?</a>
-        <a href="/blog/que-es-flashscore">¿Qué es Flashscore?</a>
-      </div>
-
-      <!-- Col 6: SOBRE GAMBETA -->
-      <div class="gb-rf-col">
-        <div class="gb-rf-title">Sobre Gambeta</div>
-        <a href="/#predictions">Pronósticos en vivo</a>
-        <a href="/#historial">Resultados verificables</a>
-        <a href="/blog/apuestas-deportivas">¿Qué son las apuestas?</a>
-        <a href="/blog/apostar-con-responsabilidad">Apostar con responsabilidad</a>
-        <a href="/blog/que-es-scores24">¿Qué es Scores24?</a>
-        <a href="/blog/mejores-tipsters-gratuitos">Mejores tipsters gratis</a>
-        <a href="/blog/">Blog completo</a>
-        <a href="https://x.com/Gambeta_ai" target="_blank" rel="noopener">Twitter @gambeta_ai</a>
-        <a href="https://t.me/+gambeta_canal" target="_blank" rel="noopener">Telegram</a>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- SECCIÓN: BANKROLL -->
-  <section id="bankroll">
-    <div class="section-title"><div class="icon">💰</div>Bankroll Manager</div>
-
-    <!-- Lock CTA (guests only) -->
-    <div class="bk-lock-overlay" id="bkLockOverlay">
-      <div class="bk-lock-icon">🔒</div>
-      <div class="bk-lock-title">Tu Bankroll Personal</div>
-      <div class="bk-lock-sub">Registrate gratis así la IA lleva un control de cómo te fue con los pronósticos de nuestra App desde tu registro!</div>
-      <div class="bk-lock-perks">
-        <div class="bk-lock-perk"><span>📊</span> Seguimiento de ganancias y pérdidas</div>
-        <div class="bk-lock-perk"><span>🤖</span> Consejos IA personalizados según tu historial</div>
-        <div class="bk-lock-perk"><span>📈</span> Gráfico de evolución de tu bankroll</div>
-        <div class="bk-lock-perk"><span>⚖️</span> Calculadora de valor esperado automática</div>
-        <div class="bk-lock-perk"><span>⭐</span> Estas cuentas (por ahora) son GRATIS</div>
-      </div>
-      <button class="bk-lock-btn" onclick="openAuth()">Crear cuenta gratuita →</button>
-      <button class="bk-lock-secondary" onclick="openAuth()">Ya tengo cuenta · Iniciar sesión</button>
-    </div>
-
-    <!-- Bankroll content (logged-in users only) -->
-    <div id="bankrollContent" class="bankroll-layout" style="display:none">
-      <div>
-        <div class="bankroll-summary" id="bankrollSummary"></div>
-        <div class="card bankroll-form">
-          <div style="font-size:0.9rem;font-weight:700;margin-bottom:8px">➕ Registrar Apuesta</div>
-          <div class="form-group"><label>Partido / Evento</label><input type="text" id="bk-match" placeholder="Ej: Real Madrid vs Man City"></div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-            <div class="form-group"><label>Cuota</label><input type="number" id="bk-odds" step="0.01" min="1.01" placeholder="1.85"></div>
-            <div class="form-group"><label>Stake ($)</label><input type="number" id="bk-stake" min="1" placeholder="50"></div>
-          </div>
-          <div class="form-group"><label>Resultado</label>
-            <select id="bk-result">
-              <option value="win">✅ Ganada</option>
-              <option value="loss">❌ Perdida</option>
-              <option value="void">⚪ Nula/Devuelta</option>
-              <option value="pending">🟡 Pendiente</option>
-            </select>
-          </div>
-          <button class="btn-primary" onclick="addBet()">Registrar Apuesta</button>
-        </div>
-      </div>
-      <div>
-        <div class="card" style="margin-bottom:16px">
-          <div style="font-size:0.85rem;font-weight:600;color:var(--texto-sec);margin-bottom:10px">📈 Evolución del Bankroll</div>
-          <canvas id="bankrollChart" style="width:100%;max-width:100%;height:200px;display:block"></canvas>
-        </div>
-        <div class="card">
-          <div style="font-size:0.85rem;font-weight:600;color:var(--texto-sec);margin-bottom:10px">📝 Apuestas Recientes</div>
-          <div class="bets-list" id="betsList"></div>
-        </div>
-      </div>
-    </div>
-  </section>
-
+  
 <!-- SEO: HUB DE ENLACES INTERNOS MUNDIAL 2026 -->
 <section id="seo-hub-mundial" style="max-width:1100px;margin:0 auto;padding:56px 20px 8px">
   <h2 style="font-size:clamp(1.3rem,3vw,1.8rem);font-weight:900;color:#fff;text-align:center;margin-bottom:8px">⚽ Mundial 2026: dónde apostar</h2>
@@ -14769,6 +14818,7 @@ setTimeout(_fpBadgeInit, 1200);
 </html>
 
 <!-- redeploy 2026-05-20T21:42Z: re-sync tras rollback de tarea escudos -->
+
 
 
 
