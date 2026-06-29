@@ -3868,6 +3868,37 @@ function _translateMatchState(s) {
   return s;
 }
 
+// ─── Gambeta 1.1 (#573): Self-healing resolver ───
+// Si vemos un pick pending cuyo partido terminó hace >100min, llamamos al
+// endpoint /admin/resolve-pick UNA VEZ por sesión por id. El worker resuelve
+// inmediatamente y la próxima visita ve el resultado.
+(function(){
+  if (typeof window === 'undefined') return;
+  window._gambetaSelfHeal = window._gambetaSelfHeal || { tried: new Set() };
+  window._maybeSelfHealResolve = function(pick) {
+    try {
+      if (!pick || !pick.id) return;
+      if (pick.result && pick.result !== 'pending') return;
+      if (!pick.commenceTs) return;
+      const age = Date.now() - pick.commenceTs;
+      // Solo si el partido lleva >100 min y <24h (después es void)
+      if (age < 100 * 60 * 1000 || age > 24 * 3600 * 1000) return;
+      if (window._gambetaSelfHeal.tried.has(pick.id)) return;
+      window._gambetaSelfHeal.tried.add(pick.id);
+      const URL = 'https://apuestas-api.mauro-union10.workers.dev/admin/resolve-pick?id=' + encodeURIComponent(pick.id);
+      fetch(URL).then(function(r){ return r.json().catch(function(){return null;}); }).then(function(j){
+        if (j && j.ok && j.pick && j.pick.result) {
+          console.log('[self-heal] resolved', pick.id, '→', j.pick.result, j.pick.finalScore);
+          // Force re-fetch del historial en el próximo render
+          try { localStorage.removeItem('gb_sb_historial_v1'); } catch(_){}
+        } else {
+          console.log('[self-heal] not yet', pick.id, j && j.status);
+        }
+      }).catch(function(e){ console.warn('[self-heal] fetch err', e); });
+    } catch(_) {}
+  };
+})();
+
 // ─── Gambeta 1.1 (29-jun-2026 #570): Helper EN VIVO ───
 // Resuelve si un pick está EN VIVO usando 2 fuentes:
 //   1) scoresData con flag='live' (autoritativo del API)
@@ -3920,6 +3951,10 @@ function _isPickLive(p) {
           minute: mins + "'",
           source: 'fallback'
         };
+      }
+      // 🆕 #573 Self-heal: si pasó la ventana viva pero sigue pending, trigger resolver
+      if (elapsed > 2.5 * 3600 * 1000 && typeof window._maybeSelfHealResolve === 'function') {
+        try { window._maybeSelfHealResolve(p); } catch(_){}
       }
     }
 
@@ -12548,6 +12583,7 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
 
