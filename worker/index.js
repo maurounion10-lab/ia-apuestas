@@ -1619,7 +1619,9 @@ async function runScheduledResolver(env) {
     }
 
     const now = Date.now();
-    const TWO_H = 2 * 3600 * 1000;
+    // 🆕 (29-jun-2026 #573) Bajado a 90 min para resolver picks ni bien terminan.
+    // Antes 2h causaba que picks recién terminados esperaran 1h+ extra.
+    const NINETY_MIN = 90 * 60 * 1000;
     const TWENTY_ONE_D = 21 * 24 * 3600 * 1000;
 
     // Picks resolvables: pendientes + "a medio resolver" — picks con result
@@ -1630,7 +1632,7 @@ async function runScheduledResolver(env) {
       if (p._wcFuture) return false;
       if (!p.commenceTs) return false;
       const age = now - p.commenceTs;
-      if (age < TWO_H || age > TWENTY_ONE_D) return false;
+      if (age < NINETY_MIN || age > TWENTY_ONE_D) return false;
       const halfResolved = (p.result === 'win' || p.result === 'loss')
         && (!p.finalScore || p.pl === 0);
       return p.result === 'pending' || halfResolved;
@@ -2841,7 +2843,110 @@ export default {
       return new Response(JSON.stringify(stats), { headers: CORS });
     }
 
-    // ── /cron-resolve ────────────────────────────────────────────────────────
+    // ── 🆕 (29-jun-2026 #573) /admin/resolve-pick?id=X ────────────────────────
+    // Resuelve UN pick específico sin esperar al cron. Usa fetchApfScore +
+    // fetchTsdbEvent + ESPN. Sin gate de tiempo (90min) — el caller decide.
+    // Usado por el cliente self-healing (Gambeta 1.1 madurez).
+    if (path === '/admin/resolve-pick') {
+      const pickId = url.searchParams.get('id');
+      if (!pickId) return new Response(JSON.stringify({ error: 'id required' }), { status: 400, headers: CORS });
+      try {
+        const hist = await fetchAdminHistorial(env);
+        const pick = hist.find(p => p.id === pickId);
+        if (!pick) return new Response(JSON.stringify({ error: 'pick not found', id: pickId }), { status: 404, headers: CORS });
+        if (pick.result && pick.result !== 'pending') {
+          return new Response(JSON.stringify({ ok: true, status: 'already resolved', pick: { id: pick.id, result: pick.result, finalScore: pick.finalScore, pl: pick.pl } }), { headers: CORS });
+        }
+        if (!pick.commenceTs) return new Response(JSON.stringify({ error: 'no commenceTs' }), { status: 400, headers: CORS });
+
+        // Probar APF (fixtures por liga + fecha)
+        let matched = null;
+        try {
+          const apfMatch = await fetchApfScore(pick, env);
+          if (apfMatch) { matched = apfMatch; }
+        } catch(_) {}
+
+        // Fallback TSDB
+        if (!matched) {
+          try {
+            const tsdb = await fetchTsdbEvent(pick.home, pick.away);
+            if (tsdb) matched = tsdb;
+          } catch(_) {}
+        }
+
+        if (!matched) {
+          return new Response(JSON.stringify({ ok: false, status: 'no score available yet', sources_tried: ['apf','tsdb'] }), { headers: CORS });
+        }
+        if (matched.voidReason) {
+          return new Response(JSON.stringify({ ok: false, status: 'void detected', reason: matched.voidReason }), { headers: CORS });
+        }
+
+        // Resolver según rec (lógica simplificada igual a runScheduledResolver)
+        const scoreH = matched.scoreH, scoreA = matched.scoreA;
+        const totalGoals = scoreH + scoreA;
+        const homeWin = scoreH > scoreA, awayWin = scoreA > scoreH, draw = scoreH === scoreA;
+        const bttsMet = scoreH > 0 && scoreA > 0;
+        const rec = pick.rec || '';
+        const side = pick._recSide || '';
+        let result = null;
+        if (side === 'home' || /gana local|gana.*home/i.test(rec)) result = homeWin ? 'win' : 'loss';
+        else if (side === 'away' || /gana visitante|gana.*away/i.test(rec)) result = awayWin ? 'win' : 'loss';
+        else if (side === 'draw' || /^empate/i.test(rec)) result = draw ? 'win' : 'loss';
+        else if (/over 2\.5|m[aá]s de 2\.5/i.test(rec)) result = totalGoals > 2.5 ? 'win' : 'loss';
+        else if (/over 1\.5|m[aá]s de 1\.5/i.test(rec)) result = totalGoals > 1.5 ? 'win' : 'loss';
+        else if (/under 2\.5|menos de 2\.5/i.test(rec)) result = totalGoals < 2.5 ? 'win' : 'loss';
+        else if (/btts|ambos.*marcan/i.test(rec)) result = bttsMet ? 'win' : 'loss';
+        // Doble oportunidad
+        else if (/(1x|local.*empate|gana local o empate)/i.test(rec)) result = (homeWin || draw) ? 'win' : 'loss';
+        else if (/(x2|empate.*visitante|empate o gana visitante)/i.test(rec)) result = (draw || awayWin) ? 'win' : 'loss';
+        else if (/^gana brasil|^gana argentina|^gana alemania|^gana francia|^gana espa/i.test(rec)) {
+          // Pick por nombre de equipo en home → home win
+          result = homeWin ? 'win' : 'loss';
+        }
+
+        if (!result) {
+          return new Response(JSON.stringify({ ok: false, status: 'cannot determine result from rec', rec, score: scoreH + '-' + scoreA }), { headers: CORS });
+        }
+
+        // Llamar al endpoint de UPDATE existente para escribir
+        const stake = Number(pick.stake) || 100;
+        const odds = Number(pick.odds) || 1.5;
+        const pl = result === 'win' ? Number(((odds - 1) * stake).toFixed(2))
+                 : result === 'loss' ? -stake : 0;
+
+        // Update directo en Supabase via service_role
+        const skey = env.SUPABASE_SERVICE_ROLE_KEY;
+        if (!skey) return new Response(JSON.stringify({ error: 'no service key' }), { status: 500, headers: CORS });
+
+        // Persistir update — usar el mismo path que runScheduledResolver al final
+        pick.result = result;
+        pick.finalScore = scoreH + '-' + scoreA;
+        pick.pl = pl;
+        pick.scoreH = scoreH;
+        pick.scoreA = scoreA;
+        pick.resolvedAt = Date.now();
+        pick._resolvedBy = 'resolve-pick-endpoint';
+
+        // Write back: usar writeAdminHistorial helper si existe
+        if (typeof writeAdminHistorial === 'function') {
+          await writeAdminHistorial(hist, env);
+        } else {
+          // Fallback: PATCH directo
+          const newHistorial = hist;
+          await fetch(SUPABASE_URL + '/rest/v1/acoin_users?email=eq.__historial_full__', {
+            method: 'PATCH',
+            headers: { 'apikey': skey, 'Authorization': 'Bearer ' + skey, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ picks: newHistorial, updated_at: new Date().toISOString() })
+          });
+        }
+
+        return new Response(JSON.stringify({ ok: true, status: 'resolved', pick: { id: pick.id, result, finalScore: pick.finalScore, pl, source: matched.src } }), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message, stack: e.stack?.slice(0, 400) }), { status: 500, headers: CORS });
+      }
+    }
+
+        // ── /cron-resolve ────────────────────────────────────────────────────────
     // Trigger manual del resolver (mismo código que corre en el cron cada hora).
     // Útil para testear / forzar resolución sin esperar al cron.
     if (path === '/cron-resolve') {
@@ -2983,4 +3088,5 @@ export default {
     return new Response(JSON.stringify({ error: 'Not found', path }), { status: 404, headers: CORS });
   }
 };
+
 
