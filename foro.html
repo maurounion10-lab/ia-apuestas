@@ -13,7 +13,8 @@
 <meta property="og:url" content="https://gambeta.ai/foro">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@Gambeta_ai">
-<link rel="icon" href="/favicon.ico">
+<link id="gbForoFavicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="0.3" cy="0.3"><stop offset="0" stop-color="%2300e85a"/><stop offset="1" stop-color="%2300a846"/></radialGradient></defs><circle cx="32" cy="32" r="30" fill="url(%23g)" stroke="%23000" stroke-width="2"/><text x="32" y="44" font-family="Inter,Arial,sans-serif" font-size="36" font-weight="900" text-anchor="middle" fill="%23FFD700">G</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="0.3" cy="0.3"><stop offset="0" stop-color="%2300e85a"/><stop offset="1" stop-color="%2300a846"/></radialGradient></defs><circle cx="32" cy="32" r="30" fill="url(%23g)" stroke="%23000" stroke-width="2"/><text x="32" y="44" font-family="Inter,Arial,sans-serif" font-size="36" font-weight="900" text-anchor="middle" fill="%23FFD700">G</text></svg>">
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 @font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('/fonts/inter-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
@@ -622,8 +623,13 @@ function openProfile(name) {
   const firstTs = userPosts.length ? userPosts[userPosts.length-1].created_at : null;
   document.getElementById('profileSince').textContent = firstTs ? 'En el foro desde ' + new Date(firstTs).toLocaleDateString('es-AR',{month:'short',year:'numeric'}) : 'Nuevo en el foro';
   // Actions — IA no se sigue
+  const myOwnAlias = (localStorage.getItem('gb_forum_alias') || '').trim();
+  const isOwnProfile = myOwnAlias && myOwnAlias === name;
   if (isAiUser(name)) {
     document.getElementById('profileActions').innerHTML = '<span class="rank-badge" style="background:rgba(255,215,0,0.15);color:#FFD700;border:1px solid rgba(255,215,0,0.4)">🤖 Modelo de Gambeta IA</span>';
+  } else if (isOwnProfile) {
+    // Tu propio perfil: en lugar de "Seguir", link al tracker personal en gambeta
+    document.getElementById('profileActions').innerHTML = `<a href="https://gambeta.ai/#stats" class="follow-btn is-following" style="text-decoration:none;display:inline-flex;align-items:center;gap:4px" title="Ver tu tracker personal">📊 Mi tracker en Gambeta</a>`;
   } else {
     const following = isFollowing(name);
     document.getElementById('profileActions').innerHTML = `<button class="follow-btn ${following ? 'is-following' : ''}" data-follow="${safe(name)}" type="button">${following ? '<span class="follow-text-on">★ Sigues</span><span class="follow-text-unfollow">Dejar de seguir</span>' : '☆ Seguir tipster'}</button>`;
@@ -860,7 +866,10 @@ async function openTopicPanel(tid) {
   panel.classList.add('is-open');
   panel.scrollIntoView({ behavior:'smooth', block:'start' });
   // Restaurar alias si ya posteó antes
-  const savedName = localStorage.getItem('gb_forum_alias') || '';
+  // Bridge perfil unificado: si hay email gambeta logged, sugerir alias derivado
+  const gbEmail = localStorage.getItem('gb_email_notif_v1') || '';
+  const gbDerivedAlias = gbEmail ? gbEmail.split('@')[0].slice(0, 20) : '';
+  const savedName = localStorage.getItem('gb_forum_alias') || gbDerivedAlias || '';
   document.getElementById('tpName').value = savedName;
   document.getElementById('tpText').value = '';
   document.getElementById('tpCharCount').textContent = '0';
@@ -1149,6 +1158,51 @@ function renderThreads() {
 }
 
 loadAll();
+
+
+// ── 🆕 (30-jun-2026 #630) FAVICON DINÁMICO + DOCUMENT TITLE con badge ──
+const _SVG_CLEAN = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="0.3" cy="0.3"><stop offset="0" stop-color="%2300e85a"/><stop offset="1" stop-color="%2300a846"/></radialGradient></defs><circle cx="32" cy="32" r="30" fill="url(%23g)" stroke="%23000" stroke-width="2"/><text x="32" y="44" font-family="Inter,Arial,sans-serif" font-size="36" font-weight="900" text-anchor="middle" fill="%23FFD700">G</text></svg>';
+const _SVG_BADGE = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><radialGradient id="g" cx="0.3" cy="0.3"><stop offset="0" stop-color="%2300e85a"/><stop offset="1" stop-color="%2300a846"/></radialGradient></defs><circle cx="32" cy="32" r="30" fill="url(%23g)" stroke="%23000" stroke-width="2"/><text x="32" y="44" font-family="Inter,Arial,sans-serif" font-size="36" font-weight="900" text-anchor="middle" fill="%23FFD700">G</text><circle cx="50" cy="14" r="12" fill="%23FF3366" stroke="%23000" stroke-width="2"/><circle cx="50" cy="14" r="6" fill="%23fff"><animate attributeName="opacity" values="1;0.3;1" dur="1.4s" repeatCount="indefinite"/></circle></svg>';
+const _BASE_TITLE = 'Foro Gambeta · Comunidad de apostadores con IA';
+
+function _setFaviconNotif(hasUnread, count) {
+  const link = document.getElementById('gbForoFavicon');
+  if (link) link.href = hasUnread ? _SVG_BADGE : _SVG_CLEAN;
+  document.title = hasUnread ? `(${count}) ${_BASE_TITLE}` : _BASE_TITLE;
+}
+
+function _markForumVisited() {
+  localStorage.setItem('gb_forum_lastVisit', new Date().toISOString());
+  _setFaviconNotif(false, 0);
+}
+
+async function _checkUnreadPosts() {
+  const lastVisit = localStorage.getItem('gb_forum_lastVisit') || new Date(Date.now() - 24*3600*1000).toISOString();
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/forum_posts?created_at=gt.${lastVisit}&select=id&limit=20`, { headers: H });
+    if (!r.ok) return;
+    const posts = await r.json();
+    // No contar mis propios posts
+    const myAlias = localStorage.getItem('gb_forum_alias') || '';
+    // Sin user_name en la query — simplificado: cuenta todos
+    const count = posts.length;
+    _setFaviconNotif(count > 0 && document.visibilityState === 'hidden', count);
+  } catch (e) {}
+}
+
+// Cuando la pestaña vuelve a visible → resetear badge (vio los posts)
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') _markForumVisited();
+});
+
+// Poll cada 60s solo si pestaña no está visible
+setInterval(() => {
+  if (document.visibilityState === 'hidden') _checkUnreadPosts();
+}, 60000);
+
+// Mark visited en load
+window.addEventListener('load', _markForumVisited);
+
 </script>
 </body>
 </html>
