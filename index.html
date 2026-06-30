@@ -766,7 +766,7 @@
   }
 
   /* ── Secciones fuera de <main>: restaurar padding y centrado ── */
-  #bot-alerta, #telegram, #calculator, #bankroll {
+  #bot-alerta, #telegram, #calculator, #bankroll, #myPicksPanel, #myPicksDivider {
     padding: 32px 20px;
     box-sizing: border-box;
     max-width: 1280px;
@@ -774,6 +774,8 @@
     margin-right: auto;
     width: 100%;
   }
+  /* myPicksDivider es un <div> de 1px de alto, no necesita padding vertical */
+  #myPicksDivider { padding: 0 20px; }
 
   .section-title {
     font-size: 1.3rem;
