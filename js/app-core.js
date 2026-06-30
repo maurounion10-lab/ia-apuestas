@@ -3879,11 +3879,17 @@ function _updateHeroProStats() {
     var DAY = 24 * 3600 * 1000;
 
     // KPI 1: picks hoy (commenceTs entre 00:00 y 23:59 de hoy ART)
-    // #622: bug previo sólo miraba preds; si había 1 pendiente en preds + 1
-    // resuelto en hist contaba 1 (debería ser 2). Ahora une ambos con dedup.
+    // #622: bug previo sólo miraba preds; ahora une preds+hist con dedup.
+    // #623: dedup robusto por home|away|fecha-día normalizado (no por id, que
+    // puede diferir entre cache pendiente y hist resuelto).
     var todayStart = new Date(); todayStart.setHours(0,0,0,0);
     var todayEnd   = new Date(); todayEnd.setHours(23,59,59,999);
     var todayStartMs = todayStart.getTime(), todayEndMs = todayEnd.getTime();
+    function _normTeamKey(s) {
+      return String(s||'').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // sacar tildes
+        .replace(/[^a-z0-9]/g,''); // sólo alfanumérico
+    }
     var hoySeen = new Set();
     var picksHoyCount = 0;
     var todayAll = preds.concat(hist || []);
@@ -3891,7 +3897,10 @@ function _updateHeroProStats() {
       var hp = todayAll[hi];
       if (!hp || !hp.commenceTs) continue;
       if (hp.commenceTs < todayStartMs || hp.commenceTs > todayEndMs) continue;
-      var hk = (hp.id || '') + '|' + (hp.home || '') + '|' + (hp.away || '');
+      // Key: home+away normalizados + día YYYY-MM-DD (ignora hora exacta)
+      var hpDate = new Date(hp.commenceTs);
+      var dayKey = hpDate.getFullYear() + '-' + (hpDate.getMonth()+1) + '-' + hpDate.getDate();
+      var hk = _normTeamKey(hp.home) + '|' + _normTeamKey(hp.away) + '|' + dayKey;
       if (hoySeen.has(hk)) continue;
       hoySeen.add(hk);
       picksHoyCount++;
