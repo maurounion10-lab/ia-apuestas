@@ -2832,6 +2832,163 @@ setInterval(refresh, 60000);
 }
 
 
+
+
+// ════════════════════════════════════════════════════════════════════════
+// 🆕 (30-jun-2026 #437) FORUM BET RESOLVER
+// Resuelve apuestas publicadas en /foro (forum_posts.bet_data) leyendo
+// scores de TheSportsDB (universal, no requiere league mapping).
+// Reglas soportadas: Gana Local/Visitante/Empate, Doble 1X/X2/12,
+// Más/Menos de N goles, Ambos marcan SÍ/NO.
+// "Otro pick personalizado" queda en pending (resolución manual).
+// ════════════════════════════════════════════════════════════════════════
+
+const FORUM_PICK_RULES = {
+  resolve(scoreH, scoreA, pickText) {
+    if (typeof scoreH !== 'number' || typeof scoreA !== 'number') return null;
+    const p = String(pickText || '').toLowerCase().trim();
+    if (!p) return null;
+
+    // Resultado 1X2
+    if (p === 'gana local')                  return scoreH >  scoreA ? 'win' : 'loss';
+    if (p === 'gana visitante')              return scoreA >  scoreH ? 'win' : 'loss';
+    if (p === 'empate')                      return scoreH === scoreA ? 'win' : 'loss';
+
+    // Doble oportunidad
+    if (p === 'doble 1x')                    return scoreH >= scoreA ? 'win' : 'loss';
+    if (p === 'doble 12')                    return scoreH !== scoreA ? 'win' : 'loss';
+    if (p === 'doble x2')                    return scoreA >= scoreH ? 'win' : 'loss';
+
+    // Goles totales
+    const totales = scoreH + scoreA;
+    let m;
+    if ((m = p.match(/^m[áa]s de (\d+(?:\.\d+)?)\s*goles?$/))) {
+      const N = parseFloat(m[1]);
+      return totales > N ? 'win' : 'loss';
+    }
+    if ((m = p.match(/^menos de (\d+(?:\.\d+)?)\s*goles?$/))) {
+      const N = parseFloat(m[1]);
+      return totales < N ? 'win' : 'loss';
+    }
+
+    // BTTS
+    if (p === 'ambos marcan sí' || p === 'ambos marcan si')
+      return (scoreH >= 1 && scoreA >= 1) ? 'win' : 'loss';
+    if (p === 'ambos marcan no')
+      return (scoreH === 0 || scoreA === 0) ? 'win' : 'loss';
+
+    // Custom u otros — no resolver auto
+    return null;
+  }
+};
+
+// ── Buscar score en TheSportsDB por nombres de equipos ──
+async function _searchScoreTheSportsDB(home, away) {
+  if (!home || !away) return null;
+  const key = '3'; // public free key
+  const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+  const nH = norm(home), nA = norm(away);
+  // Tres queries: "home vs away", "away vs home", "home_vs_away"
+  const queries = [
+    `${home} vs ${away}`,
+    `${away} vs ${home}`,
+    `${home.replace(/\s+/g,'_')}_vs_${away.replace(/\s+/g,'_')}`,
+  ];
+  for (const q of queries) {
+    try {
+      const url = `https://www.thesportsdb.com/api/v1/json/${key}/searchevents.php?e=${encodeURIComponent(q)}&s=Soccer`;
+      const r = await fetch(url, { headers: { 'User-Agent': 'Gambeta-Worker/1.0' } });
+      if (!r.ok) continue;
+      const data = await r.json().catch(() => ({}));
+      const events = data.event || [];
+      // Buscar match más reciente con scores finalizados
+      for (const ev of events) {
+        const evH = ev.strHomeTeam || '', evA = ev.strAwayTeam || '';
+        const directMatch  = norm(evH) === nH && norm(evA) === nA;
+        const swappedMatch = norm(evH) === nA && norm(evA) === nH;
+        if (!directMatch && !swappedMatch) continue;
+        const sH = parseInt(ev.intHomeScore, 10);
+        const sA = parseInt(ev.intAwayScore, 10);
+        if (Number.isNaN(sH) || Number.isNaN(sA)) continue;
+        const status = (ev.strStatus || '').toLowerCase();
+        const isFinished = ['ft','match finished','finished','aet','pen'].some(s => status.includes(s)) || status === '';
+        if (!isFinished) continue;
+        const out = {
+          home: directMatch ? evH : evA,
+          away: directMatch ? evA : evH,
+          scoreH: directMatch ? sH : sA,
+          scoreA: directMatch ? sA : sH,
+          src: 'tsdb',
+          date: ev.dateEvent || null,
+        };
+        return out;
+      }
+    } catch (e) { /* try next query */ }
+  }
+  return null;
+}
+
+async function runForumBetResolver(env) {
+  const stats = { ts: new Date().toISOString(), checked: 0, resolved: 0, void: 0, no_score: 0, custom_skipped: 0, errors: [] };
+  const skey = env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!skey) { stats.errors.push('SUPABASE_SERVICE_ROLE_KEY missing'); return stats; }
+
+  // 1) Fetch posts con bet_data.is_bet=true && result=pending, posteados hace >2h y <30d
+  const cutoffMin = new Date(Date.now() - 30 * 24 * 3600 * 1000).toISOString(); // máx 30 días atrás
+  const cutoffMax = new Date(Date.now() - 2 * 3600 * 1000).toISOString(); // mínimo 2h atrás
+  try {
+    const q = `${SUPABASE_URL}/rest/v1/forum_posts?bet_data->>is_bet=eq.true&bet_data->>result=eq.pending&created_at=gte.${cutoffMin}&created_at=lte.${cutoffMax}&select=id,thread_id,user_name,bet_data,created_at&limit=200`;
+    const r = await fetch(q, { headers: { apikey: skey, Authorization: `Bearer ${skey}` } });
+    if (!r.ok) {
+      stats.errors.push(`fetch ${r.status}`);
+      return stats;
+    }
+    const posts = await r.json();
+    stats.checked = posts.length;
+
+    for (const post of posts) {
+      const bd = post.bet_data || {};
+      const { home, away, pick } = bd;
+      if (!home || !away || !pick) { stats.errors.push(`post ${post.id} missing fields`); continue; }
+
+      // Custom picks: no se resuelven auto
+      if (pick === '__custom__' || !FORUM_PICK_RULES.resolve(0, 0, pick) === null && !pick.match(/gana|empate|doble|m[áa]s de|menos de|ambos marcan/i)) {
+        stats.custom_skipped++;
+        continue;
+      }
+
+      const score = await _searchScoreTheSportsDB(home, away);
+      if (!score) { stats.no_score++; continue; }
+
+      const result = FORUM_PICK_RULES.resolve(score.scoreH, score.scoreA, pick);
+      if (result === null) { stats.custom_skipped++; continue; }
+
+      // PATCH forum_posts: actualizar bet_data.result
+      const newBetData = {
+        ...bd,
+        result,
+        score_home: score.scoreH,
+        score_away: score.scoreA,
+        resolved_at: new Date().toISOString(),
+        resolved_src: score.src,
+      };
+      const patch = await fetch(`${SUPABASE_URL}/rest/v1/forum_posts?id=eq.${post.id}`, {
+        method: 'PATCH',
+        headers: { apikey: skey, Authorization: `Bearer ${skey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ bet_data: newBetData }),
+      });
+      if (patch.ok) {
+        stats.resolved++;
+      } else {
+        stats.errors.push(`patch ${post.id} ${patch.status}`);
+      }
+    }
+  } catch (e) {
+    stats.errors.push(`exception: ${e.message}`);
+  }
+  return stats;
+}
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
@@ -2883,6 +3040,9 @@ export default {
       console.log('[cron-wc-matches]', JSON.stringify(wcMatchesStats));
       const wcAutoGenStats = await runWcAutoGenerate(env);
       console.log('[cron-wc-auto-gen]', JSON.stringify(wcAutoGenStats));
+      // 🆕 (30-jun-2026 #437) Forum bet resolver
+      const fbStats = await runForumBetResolver(env);
+      console.log('[cron-forum-bets]', JSON.stringify(fbStats));
     }
   },
   async fetch(request, env) {
@@ -3316,6 +3476,83 @@ export default {
           alert: result.alert,
           findings: result.findings,
         }, null, 2), {
+          status: 200, headers: { ...CORS, 'Content-Type': 'application/json' }
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+
+    // ── 🆕 (30-jun-2026 #437) /admin/forum-resolver/* — bet auto-resolver ──
+    if (path === '/admin/forum-resolver/status' && request.method === 'GET') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      const skey = env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!skey) {
+        return new Response(JSON.stringify({ ok: false, error: 'no_service_key' }), { status: 500, headers: CORS });
+      }
+      try {
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/forum_posts?bet_data->>is_bet=eq.true&select=id,user_name,bet_data,created_at&order=created_at.desc&limit=50`, {
+          headers: { apikey: skey, Authorization: `Bearer ${skey}` }
+        });
+        const posts = await r.json();
+        const totals = { pending: 0, win: 0, loss: 0, custom: 0 };
+        for (const p of posts) {
+          const res = p.bet_data?.result || 'pending';
+          if (res === 'win') totals.win++;
+          else if (res === 'loss') totals.loss++;
+          else totals.pending++;
+        }
+        return new Response(JSON.stringify({ ok: true, sample_size: posts.length, totals, recent: posts.slice(0, 10).map(p => ({
+          id: p.id, user: p.user_name, pick: p.bet_data?.pick, match: `${p.bet_data?.home} vs ${p.bet_data?.away}`, result: p.bet_data?.result || 'pending', created_at: p.created_at
+        })) }, null, 2), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    if (path === '/admin/forum-resolver/run' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      try {
+        const result = await runForumBetResolver(env);
+        return new Response(JSON.stringify({ ok: true, ...result }, null, 2), {
+          status: 200, headers: { ...CORS, 'Content-Type': 'application/json' }
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    // Test sin tocar BD: ?home=X&away=Y&pick=Z (URL-encoded)
+    if (path === '/admin/forum-resolver/test' && request.method === 'GET') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      const home = url.searchParams.get('home') || '';
+      const away = url.searchParams.get('away') || '';
+      const pick = url.searchParams.get('pick') || '';
+      if (!home || !away) {
+        return new Response(JSON.stringify({ ok: false, error: 'home y away requeridos' }), { status: 400, headers: CORS });
+      }
+      try {
+        const score = await _searchScoreTheSportsDB(home, away);
+        if (!score) {
+          return new Response(JSON.stringify({ ok: true, score: null, hint: 'TheSportsDB no encontró el partido' }, null, 2), {
+            status: 200, headers: { ...CORS, 'Content-Type': 'application/json' }
+          });
+        }
+        const result = pick ? FORUM_PICK_RULES.resolve(score.scoreH, score.scoreA, pick) : null;
+        return new Response(JSON.stringify({ ok: true, score, pick, result, hint: result === null && pick ? 'pick custom o no reconocido' : 'OK' }, null, 2), {
           status: 200, headers: { ...CORS, 'Content-Type': 'application/json' }
         });
       } catch (e) {
