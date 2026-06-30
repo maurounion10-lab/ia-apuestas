@@ -570,6 +570,7 @@ function getFollowing() {
 }
 function isFollowing(name) { return getFollowing().includes(name); }
 function toggleFollow(name) {
+  if (!name || isAiUser(name)) return false;
   let list = getFollowing();
   if (list.includes(name)) {
     list = list.filter(n => n !== name);
@@ -620,9 +621,13 @@ function openProfile(name) {
   const userPosts = allPosts.filter(p => (p.user_name||'').trim() === name);
   const firstTs = userPosts.length ? userPosts[userPosts.length-1].created_at : null;
   document.getElementById('profileSince').textContent = firstTs ? 'En el foro desde ' + new Date(firstTs).toLocaleDateString('es-AR',{month:'short',year:'numeric'}) : 'Nuevo en el foro';
-  // Actions
-  const following = isFollowing(name);
-  document.getElementById('profileActions').innerHTML = `<button class="follow-btn ${following ? 'is-following' : ''}" data-follow="${safe(name)}" type="button">${following ? '<span class="follow-text-on">★ Sigues</span><span class="follow-text-unfollow">Dejar de seguir</span>' : '☆ Seguir tipster'}</button>`;
+  // Actions — IA no se sigue
+  if (isAiUser(name)) {
+    document.getElementById('profileActions').innerHTML = '<span class="rank-badge" style="background:rgba(255,215,0,0.15);color:#FFD700;border:1px solid rgba(255,215,0,0.4)">🤖 Modelo de Gambeta IA</span>';
+  } else {
+    const following = isFollowing(name);
+    document.getElementById('profileActions').innerHTML = `<button class="follow-btn ${following ? 'is-following' : ''}" data-follow="${safe(name)}" type="button">${following ? '<span class="follow-text-on">★ Sigues</span><span class="follow-text-unfollow">Dejar de seguir</span>' : '☆ Seguir tipster'}</button>`;
+  }
   // Stats
   document.getElementById('profStatTotal').textContent = stats.total;
   document.getElementById('profStatWins').textContent = stats.wins;
