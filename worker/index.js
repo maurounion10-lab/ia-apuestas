@@ -2126,6 +2126,84 @@ async function runWcAutoGenerate(env) {
 // 3 controles independientes (grep + HTTP + semántico) sobre muestra del sitio.
 // Resultado guardado en KV. Endpoints /admin/schema-monitor/status (GET) y /run (POST).
 // ═══════════════════════════════════════════════════════════════════════════
+
+// ── Schema Monitor: notificación email cuando hay críticos nuevos ──
+async function _sendSchemaMonitorAlert(env, result) {
+  if (!env.RESEND_API_KEY) {
+    console.log('[schema-monitor] RESEND_API_KEY no configurada, skip email');
+    return false;
+  }
+  const criticals = result.new_vs_baseline.filter(b => b.severity === 'critical');
+  if (criticals.length === 0) return false;
+
+  // Agrupar por issue para no repetir
+  const byIssue = {};
+  for (const b of result.new_vs_baseline) {
+    const k = `${b.severity}|${b.issue}`;
+    if (!byIssue[k]) byIssue[k] = { severity: b.severity, issue: b.issue, urls: [] };
+    byIssue[k].urls.push(b.url);
+  }
+  const groups = Object.values(byIssue).sort((a, b) => {
+    const ord = { critical: 0, medium: 1, low: 2 };
+    return ord[a.severity] - ord[b.severity];
+  });
+
+  const rows = groups.map(g => {
+    const sevEmoji = { critical: '🔴', medium: '🟡', low: '🟢' }[g.severity];
+    const sevColor = { critical: '#c81030', medium: '#d9a800', low: '#0a8a3a' }[g.severity];
+    const urlList = g.urls.slice(0, 5).map(u => `<li style="font-size:12px;color:#666">${u.replace('https://gambeta.ai', '')}</li>`).join('');
+    const more = g.urls.length > 5 ? `<li style="font-size:12px;color:#999">+${g.urls.length - 5} más</li>` : '';
+    return `<tr>
+      <td style="padding:10px;border-bottom:1px solid #eee;vertical-align:top">
+        <div style="font-weight:bold;color:${sevColor}">${sevEmoji} ${g.severity.toUpperCase()}</div>
+        <div style="font-family:monospace;font-size:13px;color:#222;margin-top:4px">${g.issue}</div>
+        <ul style="margin:8px 0 0 0;padding-left:20px">${urlList}${more}</ul>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+    <h2 style="color:#c81030">⚠️ Schema Monitor — bugs nuevos detectados</h2>
+    <p style="color:#444">El audit semanal del <b>${result.ts.slice(0, 10)}</b> encontró <b>${result.new_count} bug(s) nuevos</b> vs el baseline anterior, de los cuales <b>${criticals.length} son críticos</b> que Google Search Console probablemente reporte como errores.</p>
+    <table style="width:100%;border-collapse:collapse;margin:20px 0;background:#fafafa;border-radius:8px;overflow:hidden">
+      ${rows}
+    </table>
+    <p style="font-size:13px;color:#666">
+      Ver audit completo:<br>
+      <a href="https://apuestas-api.mauro-union10.workers.dev/admin/schema-monitor/status" style="color:#0066cc">apuestas-api.mauro-union10.workers.dev/admin/schema-monitor/status</a>
+    </p>
+    <p style="font-size:12px;color:#999;border-top:1px solid #eee;padding-top:14px;margin-top:24px">
+      Auto-generado por gambeta-schema-monitor cron (lunes 06:00 UTC).<br>
+      Baseline NO se actualiza mientras haya críticos abiertos, así que si no fixeás, no llega otro mail por el mismo bug.
+    </p>
+  </div>`;
+
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${env.RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: 'Schema Monitor <no-reply@gambeta.ai>',
+        to: ['pronosticosarg@gmail.com'],
+        subject: `⚠️ Schema Monitor: ${criticals.length} bug${criticals.length > 1 ? 's' : ''} crítico${criticals.length > 1 ? 's' : ''} nuevo${criticals.length > 1 ? 's' : ''} en gambeta.ai`,
+        html
+      })
+    });
+    const ok = r.ok;
+    if (!ok) {
+      const text = await r.text().catch(() => '');
+      console.error('[schema-monitor] resend error', r.status, text.slice(0, 200));
+    }
+    return ok;
+  } catch (e) {
+    console.error('[schema-monitor] resend exception', e.message);
+    return false;
+  }
+}
+
 async function runSchemaMonitor(env) {
   const SAMPLES = [
     'https://gambeta.ai/',
@@ -2275,7 +2353,12 @@ async function runSchemaMonitor(env) {
   if (!result.alert) {
     await env.CACHE_KV.put('schema_monitor:baseline', JSON.stringify(result), { expirationTtl: 86400 * 90 });
   }
-  if (result.alert) console.log('[SCHEMA_MONITOR_ALERT]', JSON.stringify({ count: newBugs.length, sample: newBugs.slice(0,5) }));
+  if (result.alert) {
+    console.log('[SCHEMA_MONITOR_ALERT]', JSON.stringify({ count: newBugs.length, sample: newBugs.slice(0,5) }));
+    // Cierra el loop: email proactivo a Mauro solo si hay crítico nuevo
+    const mailSent = await _sendSchemaMonitorAlert(env, result);
+    result.email_sent = mailSent;
+  }
   return result;
 }
 
