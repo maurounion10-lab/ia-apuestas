@@ -125,6 +125,20 @@ nav.nav{position:fixed;top:44px;left:0;right:0;height:66px;background:#060d06;bo
 .gb-x-follow .gb-x-icon svg{display:block;color:#fff}
 .gb-x-follow .gb-x-label{padding:8px 8px 8px 12px;color:#fff;font-weight:800}
 .gb-x-follow .gb-x-count{padding:8px 14px 8px 6px;color:#cfcfcf;font-weight:600;font-variant-numeric:tabular-nums;font-family:'Geist Mono','SF Mono',ui-monospace,monospace;font-size:12px}
+.gb-reactions{display:inline-flex;align-items:stretch;background:#0f0f0f;border:1px solid #1f1f1f;border-radius:999px;height:38px;font-family:'Inter','Segoe UI',system-ui,sans-serif;-webkit-tap-highlight-color:transparent;user-select:none;vertical-align:middle}
+.gb-reactions__btn{display:inline-flex;align-items:center;gap:7px;min-width:44px;height:38px;padding:0 13px;background:transparent;border:0;color:#8a8a8a;cursor:pointer;border-radius:999px;transition:background 160ms ease,color 160ms ease;font-family:inherit}
+.gb-reactions__btn:first-child{border-radius:999px 0 0 999px}
+.gb-reactions__btn:last-child{border-radius:0 999px 999px 0}
+.gb-reactions__btn:hover{background:#161616;color:#e6e6e6}
+.gb-reactions__btn:focus-visible{outline:2px solid #00D964;outline-offset:2px}
+.gb-reactions__icon{width:17px;height:17px;flex-shrink:0;transition:transform 180ms cubic-bezier(.34,1.56,.64,1)}
+.gb-reactions__btn:active .gb-reactions__icon{transform:scale(1.15)}
+.gb-reactions__count{font-family:'Geist Mono','SF Mono',ui-monospace,monospace;font-size:12px;font-weight:600;letter-spacing:-0.01em;line-height:1;color:inherit;font-variant-numeric:tabular-nums}
+.gb-reactions__divider{width:1px;background:#1f1f1f;margin:7px 0}
+.gb-reactions__btn[data-action="like"][aria-pressed="true"],.gb-reactions__btn[data-action="like"].is-active{color:#FF3366}
+.gb-reactions__btn[data-action="like"][aria-pressed="true"] .gb-reactions__icon,.gb-reactions__btn[data-action="like"].is-active .gb-reactions__icon{fill:#FF3366;stroke:#FF3366}
+@media (max-width:480px){.gb-reactions__btn{padding:0 11px;gap:6px}.gb-reactions__count{font-size:11px}}
+
 
 header,.hero{padding:32px 20px;text-align:center;background:linear-gradient(180deg,#0d1a0d,#0f0f0f)}
 main{max-width:1280px;margin:0 auto;padding:32px 20px}
