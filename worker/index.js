@@ -2493,11 +2493,172 @@ async function _sendBillingAlert(env, result) {
 }
 
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UPTIME MONITOR — chequea targets críticos cada 15min. Anti-flap (2 fails).
+// ═══════════════════════════════════════════════════════════════════════════
+const UPTIME_DEFAULTS = [
+  { name: 'gambeta.ai',         url: 'https://gambeta.ai/' },
+  { name: 'accesoia.app',       url: 'https://accesoia.app/' },
+  { name: 'masterprops (GH Pages)', url: 'https://maurounion10-lab.github.io/masterprops/' },
+  { name: 'worker apuestas-api', url: 'https://apuestas-api.mauro-union10.workers.dev/admin/schema-monitor/status' },
+];
+
+async function runUptimeMonitor(env) {
+  let targets = null;
+  try { targets = await env.CACHE_KV.get('uptime:targets', { type: 'json' }); } catch(e) {}
+  if (!targets || !Array.isArray(targets) || targets.length === 0) {
+    targets = UPTIME_DEFAULTS;
+    await env.CACHE_KV.put('uptime:targets', JSON.stringify(targets));
+  }
+
+  let previous = null;
+  try { previous = await env.CACHE_KV.get('uptime:state', { type: 'json' }) || {}; } catch(e) { previous = {}; }
+
+  const current = {};
+  const events = []; // [{name, url, type: OUTAGE_CONFIRMED|RECOVERY, code, ms, consecutive}]
+  const ts = new Date().toISOString();
+
+  for (const t of targets) {
+    const start = Date.now();
+    let code = 0, status = 'UP', error = null;
+    try {
+      // GET en lugar de HEAD porque algunos servidores no soportan HEAD bien
+      const r = await fetch(t.url, {
+        method: 'GET',
+        headers: { 'User-Agent': 'GambetaUptimeMonitor/1.0' },
+        redirect: 'follow',
+        cf: { cacheTtl: 0 },
+      });
+      code = r.status;
+      status = (code >= 200 && code < 400) ? 'UP' : 'DOWN';
+      // Drain body para no contar como response time vacío
+      await r.text().catch(() => '');
+    } catch (e) {
+      status = 'DOWN';
+      error = e.message.slice(0, 100);
+    }
+    const ms = Date.now() - start;
+
+    const prev = previous[t.url] || { status: 'UP', consecutive_down: 0, since: ts };
+    const newState = {
+      status,
+      code,
+      ms,
+      ts,
+      consecutive_down: status === 'DOWN' ? (prev.consecutive_down || 0) + 1 : 0,
+      since: (prev.status !== status) ? ts : prev.since,
+      error,
+    };
+    current[t.url] = newState;
+
+    // Anti-flap: solo alertar cuando consecutive_down == 2 (segunda confirmación)
+    if (status === 'DOWN' && newState.consecutive_down === 2) {
+      events.push({ name: t.name, url: t.url, type: 'OUTAGE_CONFIRMED', code, ms, error, consecutive: 2 });
+    }
+    // Recovery: si estaba con >=2 fallas y ahora UP
+    if (status === 'UP' && (prev.consecutive_down || 0) >= 2) {
+      const downSince = prev.since || prev.ts;
+      events.push({ name: t.name, url: t.url, type: 'RECOVERY', code, ms, down_since: downSince });
+    }
+  }
+
+  await env.CACHE_KV.put('uptime:state', JSON.stringify(current));
+
+  const result = {
+    ts,
+    targets_count: targets.length,
+    current,
+    events,
+    alert: events.length > 0,
+  };
+  if (result.alert && env.RESEND_API_KEY) {
+    const sent = await _sendUptimeAlert(env, result);
+    result.email_sent = sent;
+  }
+  return result;
+}
+
+async function _sendUptimeAlert(env, result) {
+  const outages = result.events.filter(e => e.type === 'OUTAGE_CONFIRMED');
+  const recoveries = result.events.filter(e => e.type === 'RECOVERY');
+
+  const buildRow = (e) => {
+    const isOutage = e.type === 'OUTAGE_CONFIRMED';
+    const color = isOutage ? '#c81030' : '#0a8a3a';
+    const emoji = isOutage ? '🔴' : '🟢';
+    const label = isOutage ? 'CAÍDO (confirmado)' : 'RECUPERADO';
+    return `<tr>
+      <td style="padding:14px;border-bottom:1px solid #eee;vertical-align:top">
+        <div style="font-weight:700;color:#222;font-size:15px">${emoji} ${e.name}</div>
+        <div style="font-size:12px;color:#666;margin-top:4px;font-family:monospace">${e.url}</div>
+        ${e.error ? `<div style="font-size:12px;color:#c81030;margin-top:6px">Error: ${e.error}</div>` : ''}
+        ${e.down_since ? `<div style="font-size:12px;color:#0a8a3a;margin-top:6px">Estuvo caído desde: ${e.down_since}</div>` : ''}
+      </td>
+      <td style="padding:14px;border-bottom:1px solid #eee;text-align:right;vertical-align:top">
+        <div style="font-weight:700;font-size:14px;color:${color}">${label}</div>
+        <div style="font-size:12px;color:#666;margin-top:4px">HTTP ${e.code || 'err'} · ${e.ms}ms</div>
+      </td>
+    </tr>`;
+  };
+
+  let subject = '';
+  if (outages.length > 0 && recoveries.length > 0) {
+    subject = `🚨 ${outages.length} caída(s) + ${recoveries.length} recuperación(es)`;
+  } else if (outages.length > 0) {
+    subject = `🚨 CAÍDA confirmada: ${outages.map(o => o.name).join(', ')}`;
+  } else {
+    subject = `🟢 RECUPERADO: ${recoveries.map(o => o.name).join(', ')}`;
+  }
+
+  const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+    <h2 style="color:${outages.length > 0 ? '#c81030' : '#0a8a3a'}">${outages.length > 0 ? '🚨' : '🟢'} Uptime Monitor</h2>
+    <p style="color:#444">Eventos detectados a las <b>${result.ts.slice(11, 19)} UTC</b>:</p>
+    <table style="width:100%;border-collapse:collapse;margin:20px 0;background:#fafafa;border-radius:8px;overflow:hidden">
+      ${result.events.map(buildRow).join('')}
+    </table>
+    <p style="font-size:13px;color:#666">
+      Estado completo:<br>
+      <a href="https://apuestas-api.mauro-union10.workers.dev/admin/uptime/status" style="color:#0066cc">apuestas-api.mauro-union10.workers.dev/admin/uptime/status</a>
+    </p>
+    <p style="font-size:12px;color:#999;border-top:1px solid #eee;padding-top:14px;margin-top:24px">
+      Auto-generado por uptime-monitor cron (cada 15min). Anti-flap: confirmación tras 2 fallas seguidas para evitar falsos positivos.
+    </p>
+  </div>`;
+
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'Uptime Monitor <no-reply@gambeta.ai>',
+        to: ['pronosticosarg@gmail.com'],
+        subject,
+        html,
+      })
+    });
+    return r.ok;
+  } catch (e) {
+    console.error('[uptime-monitor] resend exception', e.message);
+    return false;
+  }
+}
+
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
     const cronExpr = controller.cron;
-    if (cronExpr === '0 12 * * *') {
+    if (cronExpr === '*/15 * * * *') {
+      // ── Cada 15min: Uptime Monitor (anti-flap, 2 fallas confirma OUTAGE) ──
+      const stats = await runUptimeMonitor(env);
+      console.log('[cron-uptime-monitor]', JSON.stringify({
+        ts: stats.ts,
+        targets: stats.targets_count,
+        events: stats.events.length,
+        alert: stats.alert,
+      }));
+    } else if (cronExpr === '0 12 * * *') {
       // ── Diario 12:00 UTC (09:00 ART): Billing Monitor pre-vencimiento ──
       const stats = await runBillingMonitor(env);
       console.log('[cron-billing-monitor]', JSON.stringify({
@@ -2975,7 +3136,70 @@ export default {
       }
     }
 
-    // ── 🆕 (30-jun-2026 #604) /admin/billing/* — billing monitor ──
+    // ── 🆕 (30-jun-2026 #605) /admin/uptime/* — uptime monitor ──
+    if (path === '/admin/uptime/status' && request.method === 'GET') {
+      try {
+        const targets = await env.CACHE_KV.get('uptime:targets', { type: 'json' }) || [];
+        const state = await env.CACHE_KV.get('uptime:state', { type: 'json' }) || {};
+        return new Response(JSON.stringify({
+          targets_count: targets.length,
+          targets,
+          current_state: state,
+        }, null, 2), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    if (path === '/admin/uptime/upsert-target' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      try {
+        const body = await request.json().catch(() => ({}));
+        if (!body.name || !body.url) return new Response(JSON.stringify({ ok: false, error: 'name_url_required' }), { status: 400, headers: CORS });
+        let targets = await env.CACHE_KV.get('uptime:targets', { type: 'json' }) || [];
+        const i = targets.findIndex(t => t.url === body.url);
+        if (i >= 0) targets[i] = { ...targets[i], ...body };
+        else targets.push(body);
+        await env.CACHE_KV.put('uptime:targets', JSON.stringify(targets));
+        return new Response(JSON.stringify({ ok: true, action: i >= 0 ? 'updated' : 'added', total: targets.length }, null, 2),
+          { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    if (path === '/admin/uptime/delete-target' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      try {
+        const body = await request.json().catch(() => ({}));
+        let targets = await env.CACHE_KV.get('uptime:targets', { type: 'json' }) || [];
+        const before = targets.length;
+        targets = targets.filter(t => t.url !== body.url);
+        await env.CACHE_KV.put('uptime:targets', JSON.stringify(targets));
+        return new Response(JSON.stringify({ ok: true, removed: before - targets.length, total: targets.length }, null, 2),
+          { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    if (path === '/admin/uptime/run' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      try {
+        const result = await runUptimeMonitor(env);
+        return new Response(JSON.stringify(result, null, 2), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+        // ── 🆕 (30-jun-2026 #604) /admin/billing/* — billing monitor ──
     if (path === '/admin/billing/list' && request.method === 'GET') {
       try {
         const subs = await env.CACHE_KV.get('billing:subscriptions', { type: 'json' }) || [];
