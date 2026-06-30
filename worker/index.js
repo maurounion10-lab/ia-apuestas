@@ -2787,7 +2787,32 @@ export default {
       }
     }
 
-    if (path === '/admin/schema-monitor/run' && request.method === 'POST') {
+    if (path === '/admin/schema-monitor/test-alert' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      // Mock result con 1 critico FAKE para probar email
+      const mockResult = {
+        ts: new Date().toISOString(),
+        samples_audited: 12,
+        findings_count: 2,
+        findings_by_severity: { critical: 1, medium: 1, low: 0 },
+        new_count: 2,
+        new_vs_baseline: [
+          { control: 3, severity: 'critical', url: 'https://gambeta.ai/blog/test-mock', issue: 'TEST_FAKE_critico_para_probar_email' },
+          { control: 2, severity: 'medium', url: 'https://gambeta.ai/test-mock-2', issue: 'TEST_FAKE_medium' }
+        ],
+        alert: true,
+      };
+      const sent = await _sendSchemaMonitorAlert(env, mockResult);
+      return new Response(JSON.stringify({ ok: true, email_sent: sent, mock_used: true, hint: 'Si email_sent=true, revisa pronosticosarg@gmail.com' }, null, 2), {
+        status: 200, headers: { ...CORS, 'Content-Type': 'application/json' }
+      });
+    }
+
+        if (path === '/admin/schema-monitor/run' && request.method === 'POST') {
       const token = url.searchParams.get('token');
       const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
       if (token !== expected) {
