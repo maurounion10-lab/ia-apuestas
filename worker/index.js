@@ -2363,11 +2363,150 @@ async function runSchemaMonitor(env) {
 }
 
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BILLING MONITOR — alerta pre-vencimiento de suscripciones pagas
+// Corre diariamente vía cron (09:00 ART = 12:00 UTC).
+// Lee lista de KV billing:subscriptions, alerta si algún cobro está a ≤7 días.
+// ═══════════════════════════════════════════════════════════════════════════
+
+// Lista PROVISIONAL pre-cargada — basada en sesiones #155/#158/#364
+// Mauro debe confirmar/corregir billing_day exactos en cada uno
+const BILLING_DEFAULTS = [
+  { name: 'Odds API', amount: 119, currency: 'USD', billing_day: 1,  payment_method: 'Stripe', dashboard_url: 'https://the-odds-api.com/account/', notes: 'Plan 5M req/mo — decisión #156' },
+  { name: 'API-Football', amount: 19, currency: 'USD', billing_day: 1, payment_method: 'Stripe', dashboard_url: 'https://dashboard.api-football.com/billing', notes: 'Plan PRO — decisión #154' },
+  { name: 'Cloudflare Workers Paid', amount: 5, currency: 'USD', billing_day: 1, payment_method: 'Card', dashboard_url: 'https://dash.cloudflare.com/?to=/:account/billing', notes: 'Workers + Pages — observado #364' },
+  { name: 'Supabase', amount: 25, currency: 'USD', billing_day: 1, payment_method: 'Card', dashboard_url: 'https://supabase.com/dashboard/org/_/billing', notes: 'Plan Pro (asumido)' },
+  { name: 'SendX', amount: 15, currency: 'USD', billing_day: 1, payment_method: 'Card', dashboard_url: 'https://app.sendx.io/billing', notes: 'Plan starter (asumido — confirmar)' },
+  { name: 'Resend', amount: 0, currency: 'USD', billing_day: 1, payment_method: 'Card', dashboard_url: 'https://resend.com/settings/billing', notes: 'Free tier asumido — confirmar' },
+  { name: 'Dominio gambeta.ai', amount: 50, currency: 'USD', billing_day: 1, payment_method: 'Card', dashboard_url: 'https://dash.cloudflare.com', notes: 'Anual — confirmar mes' },
+  { name: 'Dominio accesoia.app', amount: 30, currency: 'USD', billing_day: 1, payment_method: 'Card', dashboard_url: 'https://dash.cloudflare.com', notes: 'Anual — confirmar mes' },
+];
+
+function _nextChargeDate(billing_day, todayUTC) {
+  // Próximo billing_day del mes actual; si ya pasó, mes siguiente
+  const d = new Date(todayUTC);
+  const day = Math.min(billing_day, 28); // safe-cap para meses cortos
+  const candidate = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), day));
+  if (candidate < d) {
+    candidate.setUTCMonth(candidate.getUTCMonth() + 1);
+  }
+  return candidate;
+}
+
+async function runBillingMonitor(env) {
+  let subs = null;
+  try { subs = await env.CACHE_KV.get('billing:subscriptions', { type: 'json' }); } catch(e) {}
+  if (!subs || !Array.isArray(subs) || subs.length === 0) {
+    // Primera vez: cargar defaults
+    subs = BILLING_DEFAULTS;
+    await env.CACHE_KV.put('billing:subscriptions', JSON.stringify(subs));
+  }
+
+  const now = new Date();
+  const upcoming = [];
+  let totalMonthly = 0;
+  for (const s of subs) {
+    if (!s.amount) continue;
+    totalMonthly += s.amount;
+    if (!s.billing_day) continue;
+    const next = _nextChargeDate(s.billing_day, now);
+    const daysUntil = Math.ceil((next - now) / 86400000);
+    if (daysUntil <= 7 && daysUntil >= 0) {
+      upcoming.push({ ...s, next_charge: next.toISOString().slice(0, 10), days_until: daysUntil });
+    }
+  }
+  upcoming.sort((a, b) => a.days_until - b.days_until);
+
+  const result = {
+    ts: now.toISOString(),
+    subscriptions_count: subs.length,
+    monthly_total: totalMonthly,
+    upcoming_in_7d: upcoming,
+    alert: upcoming.length > 0,
+  };
+
+  // Email solo si hay upcoming
+  if (result.alert && env.RESEND_API_KEY) {
+    const sent = await _sendBillingAlert(env, result);
+    result.email_sent = sent;
+  }
+
+  await env.CACHE_KV.put('billing:latest', JSON.stringify(result), { expirationTtl: 86400 * 60 });
+  return result;
+}
+
+async function _sendBillingAlert(env, result) {
+  const rows = result.upcoming_in_7d.map(s => {
+    const urgencyColor = s.days_until <= 2 ? '#c81030' : s.days_until <= 4 ? '#d9a800' : '#0a8a3a';
+    const urgencyEmoji = s.days_until <= 2 ? '🔴' : s.days_until <= 4 ? '🟡' : '🟢';
+    return `<tr>
+      <td style="padding:14px;border-bottom:1px solid #eee">
+        <div style="font-weight:700;color:#222;font-size:15px">${urgencyEmoji} ${s.name}</div>
+        <div style="font-size:13px;color:#666;margin-top:4px">${s.notes || ''}</div>
+      </td>
+      <td style="padding:14px;border-bottom:1px solid #eee;text-align:right;vertical-align:top">
+        <div style="font-weight:700;font-size:16px;color:#222">${s.currency} ${s.amount}</div>
+        <div style="font-size:12px;color:${urgencyColor};margin-top:4px">en ${s.days_until} día${s.days_until !== 1 ? 's' : ''}</div>
+        <div style="font-size:11px;color:#999;margin-top:2px">${s.next_charge}</div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  const totalUpcoming = result.upcoming_in_7d.reduce((sum, s) => sum + s.amount, 0);
+
+  const html = `<div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto">
+    <h2 style="color:#0066cc">💳 Billing Monitor — cobros próximos</h2>
+    <p style="color:#444">Detecté <b>${result.upcoming_in_7d.length} cobro(s) en los próximos 7 días</b> por un total de <b>USD ${totalUpcoming}</b>.</p>
+    <table style="width:100%;border-collapse:collapse;margin:20px 0;background:#fafafa;border-radius:8px;overflow:hidden">
+      ${rows}
+    </table>
+    <div style="background:#f0f8ff;border:1px solid #b3d9ff;border-radius:8px;padding:14px;margin:20px 0">
+      <div style="font-size:13px;color:#444"><b>Total mensual estimado:</b> USD ${result.monthly_total}</div>
+      <div style="font-size:13px;color:#444;margin-top:6px"><b>Suscripciones activas:</b> ${result.subscriptions_count}</div>
+    </div>
+    <p style="font-size:13px;color:#666">
+      Gestionar lista:<br>
+      <a href="https://apuestas-api.mauro-union10.workers.dev/admin/billing/list" style="color:#0066cc">apuestas-api.mauro-union10.workers.dev/admin/billing/list</a>
+    </p>
+    <p style="font-size:12px;color:#999;border-top:1px solid #eee;padding-top:14px;margin-top:24px">
+      Auto-generado por billing-monitor cron (diario 09:00 ART). Solo recibís mail si hay cobros próximos.
+    </p>
+  </div>`;
+
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'Billing Monitor <no-reply@gambeta.ai>',
+        to: ['pronosticosarg@gmail.com'],
+        subject: `💳 ${result.upcoming_in_7d.length} cobro${result.upcoming_in_7d.length > 1 ? 's' : ''} en próximos 7 días (USD ${totalUpcoming})`,
+        html
+      })
+    });
+    return r.ok;
+  } catch (e) {
+    console.error('[billing-monitor] resend exception', e.message);
+    return false;
+  }
+}
+
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
     const cronExpr = controller.cron;
-    if (cronExpr === '0 6 * * 1') {
+    if (cronExpr === '0 12 * * *') {
+      // ── Diario 12:00 UTC (09:00 ART): Billing Monitor pre-vencimiento ──
+      const stats = await runBillingMonitor(env);
+      console.log('[cron-billing-monitor]', JSON.stringify({
+        ts: stats.ts,
+        upcoming: stats.upcoming_in_7d.length,
+        monthly_total: stats.monthly_total,
+        alert: stats.alert,
+      }));
+    } else if (cronExpr === '0 6 * * 1') {
       // ── Lunes 06:00 UTC (03:00 ART): Schema Monitor anti-regresión ──
       const stats = await runSchemaMonitor(env);
       console.log('[cron-schema-monitor]', JSON.stringify({
@@ -2836,7 +2975,70 @@ export default {
       }
     }
 
-    // ── 🆕 /admin/replace-wc-matches — limpia todos los _wcMatch y reinserta los actuales ──
+    // ── 🆕 (30-jun-2026 #604) /admin/billing/* — billing monitor ──
+    if (path === '/admin/billing/list' && request.method === 'GET') {
+      try {
+        const subs = await env.CACHE_KV.get('billing:subscriptions', { type: 'json' }) || [];
+        const latest = await env.CACHE_KV.get('billing:latest', { type: 'json' });
+        return new Response(JSON.stringify({
+          subscriptions_count: subs.length,
+          subscriptions: subs,
+          last_run: latest,
+        }, null, 2), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    if (path === '/admin/billing/upsert' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      try {
+        const body = await request.json().catch(() => ({}));
+        if (!body.name) return new Response(JSON.stringify({ ok: false, error: 'name_required' }), { status: 400, headers: CORS });
+        let subs = await env.CACHE_KV.get('billing:subscriptions', { type: 'json' }) || [];
+        const i = subs.findIndex(s => s.name === body.name);
+        if (i >= 0) subs[i] = { ...subs[i], ...body };
+        else subs.push(body);
+        await env.CACHE_KV.put('billing:subscriptions', JSON.stringify(subs));
+        return new Response(JSON.stringify({ ok: true, action: i >= 0 ? 'updated' : 'added', total: subs.length, item: body }, null, 2),
+          { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    if (path === '/admin/billing/delete' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      try {
+        const body = await request.json().catch(() => ({}));
+        let subs = await env.CACHE_KV.get('billing:subscriptions', { type: 'json' }) || [];
+        const before = subs.length;
+        subs = subs.filter(s => s.name !== body.name);
+        await env.CACHE_KV.put('billing:subscriptions', JSON.stringify(subs));
+        return new Response(JSON.stringify({ ok: true, removed: before - subs.length, total: subs.length }, null, 2),
+          { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    if (path === '/admin/billing/run' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      try {
+        const result = await runBillingMonitor(env);
+        return new Response(JSON.stringify(result, null, 2), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+        // ── 🆕 /admin/replace-wc-matches — limpia todos los _wcMatch y reinserta los actuales ──
     if (path === '/admin/replace-wc-matches') {
       const token = url.searchParams.get('token');
       const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
