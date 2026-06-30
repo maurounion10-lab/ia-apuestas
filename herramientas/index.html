@@ -1,127 +1,455 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Herramientas gratis para apostadores | gambeta.ai</title>
-<meta name="description" content="Calculadoras gratuitas para apostadores: Kelly Criterion, valor esperado (EV), conversor de cuotas. Sin registro, sin ads."/>
-<meta name="author" content="gambeta.ai"/>
-<meta name="robots" content="index, follow"/>
-<link rel="canonical" href="https://gambeta.ai/herramientas"/>
-<meta property="og:type" content="website"/>
-<meta property="og:url" content="https://gambeta.ai/herramientas"/>
-<meta property="og:title" content="Herramientas gratis para apostadores | gambeta.ai"/>
-<meta property="og:description" content="Calculadoras gratuitas: Kelly Criterion, valor esperado, conversor de cuotas."/>
-<meta property="og:image" content="https://gambeta.ai/og-image.png"/>
-<meta property="og:locale" content="es_AR"/>
-<meta property="og:site_name" content="gambeta.ai"/>
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon.png"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herramientas gratis para apostadores · Kelly, EV+ y Conversor — Gambeta AI</title>
+<meta name="description" content="3 calculadoras gratis para apostar mejor: Calculadora Kelly (stake óptimo), Valor Esperado (EV+) y Conversor de cuotas. Sin registro, sin ads. Más Bankroll Manager.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://gambeta.ai/herramientas">
+<meta name="author" content="gambeta.ai">
+
+<meta property="og:title" content="Herramientas gratis para apostadores — Gambeta AI">
+<meta property="og:description" content="Calculadora Kelly + Valor Esperado + Conversor de cuotas + Bankroll Manager. Gratis y sin registro.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://gambeta.ai/herramientas">
+<meta property="og:image" content="https://gambeta.ai/og-image.png">
+<meta property="og:locale" content="es_AR">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Herramientas gratis para apostadores · Gambeta AI">
+<meta name="twitter:description" content="Calculadora Kelly + EV+ + Conversor. Gratis y sin registro.">
+
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/favicon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&display=swap">
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "CollectionPage",
+      "@id": "https://gambeta.ai/herramientas",
+      "url": "https://gambeta.ai/herramientas",
+      "name": "Herramientas gratis para apostadores",
+      "description": "Calculadora Kelly, Valor Esperado y Conversor de cuotas — herramientas profesionales para apostar con criterio matemático.",
+      "isPartOf": {"@id": "https://gambeta.ai/#website"},
+      "inLanguage": "es"
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type":"ListItem","position":1,"name":"Inicio","item":"https://gambeta.ai/"},
+        {"@type":"ListItem","position":2,"name":"Herramientas","item":"https://gambeta.ai/herramientas"}
+      ]
+    },
+    {
+      "@type": "ItemList",
+      "name": "Herramientas para apostadores",
+      "numberOfItems": 4,
+      "itemListElement": [
+        {"@type":"ListItem","position":1,"name":"Calculadora Kelly","url":"https://gambeta.ai/herramientas/kelly"},
+        {"@type":"ListItem","position":2,"name":"Valor Esperado (EV+)","url":"https://gambeta.ai/herramientas/valor-esperado"},
+        {"@type":"ListItem","position":3,"name":"Conversor de cuotas","url":"https://gambeta.ai/herramientas/conversor-cuotas"},
+        {"@type":"ListItem","position":4,"name":"Bankroll Manager","url":"https://gambeta.ai/#bankroll"}
+      ]
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Calculadora Kelly Gambeta",
+      "url": "https://gambeta.ai/herramientas/kelly",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "offers": {"@type":"Offer","price":"0","priceCurrency":"USD"},
+      "description": "Calcula el stake óptimo según el criterio Kelly: cuánto apostar dado tu bankroll, la cuota y la probabilidad estimada."
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Calculadora de Valor Esperado",
+      "url": "https://gambeta.ai/herramientas/valor-esperado",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "offers": {"@type":"Offer","price":"0","priceCurrency":"USD"},
+      "description": "Calcula el EV (valor esperado) de una apuesta a largo plazo según cuota y probabilidad real."
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Conversor de cuotas",
+      "url": "https://gambeta.ai/herramientas/conversor-cuotas",
+      "applicationCategory": "FinanceApplication",
+      "operatingSystem": "Web",
+      "offers": {"@type":"Offer","price":"0","priceCurrency":"USD"},
+      "description": "Convierte cuotas entre formato decimal, fraccional, americano y probabilidad implícita."
+    }
+  ]
+}
+</script>
+
 <style>
-  :root { --verde:#00c853; --fondo:#0f0f0f; --fondo2:#1a1a2e; --texto:#e8e8e8; --texto-sec:#9e9e9e; --borde:rgba(255,255,255,0.08); }
-  * { margin:0; padding:0; box-sizing:border-box; }
-  body { padding-top:66px; background:var(--fondo); color:var(--texto); font-family:'Segoe UI',system-ui,sans-serif; line-height:1.7; }
-  a { text-decoration:none; color:inherit; }
-  nav.nav { background:#060d06; border-bottom:1px solid rgba(0,200,83,0.2); padding:0 28px; height:66px; display:flex; align-items:center; justify-content:space-between; position:fixed; top:0; left:0; right:0; z-index:10000; gap:16px; }
-  .nav-logo-text { font-size:1.08rem; font-weight:900; color:#fff; }
-  .nav-logo-text span { color:#00c853; }
-  .nav-links { display:flex; gap:2px; flex:1; justify-content:center; }
-  .nav-links a { color:rgba(165,214,167,0.65); padding:7px 12px; border-radius:8px; font-size:.82rem; }
-  .nav-cta-btn { background:linear-gradient(135deg,#00c853,#00a846); color:#000; font-weight:700; padding:8px 18px; border-radius:8px; font-size:.82rem; }
-  @media(max-width:640px) { .nav-links { display:none; } }
-  .hero { background:linear-gradient(180deg,#071007 0%,#0c180c 100%); border-bottom:1px solid rgba(0,200,83,0.15); padding:52px 24px 44px; text-align:center; }
-  .badge { display:inline-block; background:rgba(0,200,83,0.12); border:1px solid rgba(0,200,83,0.3); color:var(--verde); font-size:0.7rem; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; padding:4px 14px; border-radius:20px; margin-bottom:18px; }
-  .hero h1 { font-size:clamp(1.5rem,4vw,2.2rem); font-weight:900; color:#fff; max-width:760px; margin:0 auto 14px; }
-  .hero p { font-size:1rem; color:rgba(255,255,255,0.5); max-width:620px; margin:0 auto; }
-  .container { max-width:760px; margin:0 auto; padding:36px 24px; }
-  .calc-card { background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(0,200,83,0.02)); border:1px solid rgba(0,200,83,0.3); border-radius:18px; padding:32px 28px; margin-bottom:32px; }
-  .calc-row { margin-bottom:18px; }
-  .calc-row label { display:block; font-size:0.78rem; color:rgba(255,255,255,0.65); font-weight:700; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:6px; }
-  .calc-row input[type="number"], .calc-row select { width:100%; padding:12px 14px; background:rgba(0,0,0,0.4); border:1px solid rgba(255,255,255,0.12); border-radius:10px; color:#fff; font-size:1rem; font-family:inherit; }
-  .calc-row input[type="number"]:focus, .calc-row select:focus { outline:none; border-color:rgba(0,200,83,0.5); background:rgba(0,0,0,0.5); }
-  .calc-row .hint { font-size:0.75rem; color:rgba(255,255,255,0.35); margin-top:4px; }
-  .calc-output { margin-top:24px; padding-top:22px; border-top:1px solid rgba(255,255,255,0.08); }
-  .out-headline { font-size:0.72rem; color:#00c853; font-weight:800; letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; }
-  .out-main { font-size:2.2rem; font-weight:900; color:#fff; margin-bottom:6px; }
-  .out-sub { font-size:0.92rem; color:rgba(255,255,255,0.6); }
-  .out-warning { background:rgba(229,115,115,0.1); border:1px solid rgba(229,115,115,0.3); border-radius:10px; padding:14px 18px; margin-top:18px; color:#ef9a9a; font-size:0.88rem; }
-  .out-positive { background:rgba(0,200,83,0.08); border:1px solid rgba(0,200,83,0.3); border-radius:10px; padding:14px 18px; margin-top:18px; color:#a5d6a7; font-size:0.88rem; }
-  .article h2 { font-size:1.25rem; font-weight:800; color:#fff; margin:36px 0 12px; }
-  .article p { font-size:0.97rem; color:rgba(255,255,255,0.68); margin-bottom:18px; }
-  .article ul,.article ol { padding-left:22px; margin-bottom:18px; }
-  .article li { font-size:0.95rem; color:rgba(255,255,255,0.65); margin-bottom:6px; }
-  .article strong { color:rgba(255,255,255,0.9); }
-  .article a { color:var(--verde); text-decoration:underline; text-underline-offset:3px; }
-  .info-box { background:rgba(255,255,255,0.03); border-left:3px solid var(--verde); padding:16px 20px; margin:24px 0; }
-  .info-box p { margin:0; font-size:0.9rem; color:rgba(255,255,255,0.55); }
-  .cta-box { background:linear-gradient(135deg,rgba(0,200,83,0.12),rgba(0,200,83,0.04)); border:1px solid rgba(0,200,83,0.3); border-radius:18px; padding:28px 24px; text-align:center; margin:32px 0; }
-  .cta-box h3 { color:#fff; margin-bottom:8px; font-size:1.05rem; }
-  .cta-box p { color:rgba(255,255,255,0.5); margin-bottom:18px; }
-  .btn-cta { display:inline-block; background:var(--verde); color:#000; font-weight:800; padding:12px 26px; border-radius:10px; }
-  .tool-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:14px; margin-top:20px; }
-  .tool-card { background:rgba(255,255,255,0.04); border:1px solid rgba(0,200,83,0.15); border-radius:12px; padding:18px 20px; transition:border-color .2s,background .2s; display:block; }
-  .tool-card:hover { border-color:rgba(0,200,83,0.4); background:rgba(0,200,83,0.05); }
-  .tool-card-icon { font-size:1.4rem; margin-bottom:8px; }
-  .tool-card-title { font-size:0.97rem; font-weight:700; color:#fff; margin-bottom:6px; }
-  .tool-card-desc { font-size:0.82rem; color:rgba(255,255,255,0.5); }
-  .footer { background:#060d06; border-top:1px solid rgba(0,200,83,0.12); padding:24px; text-align:center; font-size:0.82rem; color:rgba(255,255,255,0.3); }
-  .footer a { color:var(--verde); }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    background: #050505;
+    color: #e8eef0;
+    line-height: 1.65;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: 'Geist Mono','SF Mono', Menlo, monospace; font-variant-numeric: tabular-nums; }
+  a { color: #00e676; text-decoration: none; transition: color 0.15s; }
+  a:hover { color: #9fcf26; }
+
+  .topnav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(5,5,5,0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 14px 24px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .topnav-logo {
+    font-weight: 800; font-size: 1.05rem; color: #fff;
+    text-decoration: none; letter-spacing: -0.5px;
+  }
+  .topnav-logo span { color: #00c853; }
+  .topnav-back {
+    font-size: 0.82rem; color: rgba(255,255,255,0.7);
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .topnav-back:hover { color: #00e676; }
+
+  .hero {
+    padding: 70px 24px 50px;
+    max-width: 880px; margin: 0 auto;
+    text-align: center;
+  }
+  .hero-eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 14px;
+    background: rgba(0,200,83,0.08);
+    border: 1px solid rgba(0,200,83,0.22);
+    border-radius: 999px;
+    font-size: 0.7rem; font-weight: 700;
+    color: #9fcf26; letter-spacing: 1.4px; text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+  .hero-dot {
+    width: 6px; height: 6px; background: #00c853; border-radius: 50%;
+    box-shadow: 0 0 6px rgba(0,200,83,0.7);
+    animation: dot-pulse 1.8s ease-in-out infinite;
+  }
+  @keyframes dot-pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+  .hero h1 {
+    font-size: clamp(1.9rem, 5vw, 2.9rem);
+    line-height: 1.05; font-weight: 800; letter-spacing: -0.03em;
+    color: #fff; margin-bottom: 18px;
+  }
+  .hero h1 .accent { color: #00e676; }
+  .hero p.lead {
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    color: rgba(255,255,255,0.7); max-width: 640px; margin: 0 auto 12px;
+  }
+  .hero-meta {
+    display: inline-flex; align-items: center; gap: 16px;
+    margin-top: 14px;
+    font-size: 0.82rem; color: rgba(255,255,255,0.5);
+  }
+  .hero-meta span { display: inline-flex; align-items: center; gap: 6px; }
+  .hero-meta .pill {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    padding: 3px 10px; border-radius: 999px;
+  }
+
+  /* Tool cards grid */
+  .tools-section { max-width: 1100px; margin: 0 auto; padding: 30px 24px 50px; }
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 18px;
+  }
+  .tool-card {
+    background: rgba(255,255,255,0.025);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 18px;
+    padding: 24px 24px 22px;
+    display: flex; flex-direction: column;
+    transition:
+      transform 0.25s cubic-bezier(0.4,0,0.2,1),
+      border-color 0.25s ease,
+      box-shadow 0.25s ease,
+      background 0.25s ease;
+    position: relative;
+    text-decoration: none;
+    color: inherit;
+    overflow: hidden;
+  }
+  .tool-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #00c853, transparent);
+    opacity: 0; transition: opacity 0.3s ease;
+  }
+  .tool-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0,200,83,0.35);
+    background: rgba(255,255,255,0.04);
+    box-shadow: 0 12px 32px rgba(0,200,83,0.08);
+  }
+  .tool-card:hover::before { opacity: 1; }
+  .tool-icon-wrap {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 46px; height: 46px; border-radius: 12px;
+    background: rgba(0,200,83,0.10);
+    border: 1px solid rgba(0,200,83,0.25);
+    margin-bottom: 14px;
+    transition: background 0.25s ease, transform 0.25s ease;
+  }
+  .tool-card:hover .tool-icon-wrap {
+    background: rgba(0,200,83,0.16);
+    transform: scale(1.04);
+  }
+  .tool-icon-wrap svg {
+    width: 22px; height: 22px;
+    stroke: #00e676; stroke-width: 1.8;
+    fill: none; stroke-linecap: round; stroke-linejoin: round;
+  }
+  .tool-card h3 {
+    font-size: 1.1rem; font-weight: 700; color: #fff;
+    margin-bottom: 8px; letter-spacing: -0.015em;
+  }
+  .tool-card p {
+    font-size: 0.88rem; color: rgba(255,255,255,0.62);
+    line-height: 1.6; margin-bottom: 16px;
+    flex: 1;
+  }
+  .tool-tag-row {
+    display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px;
+  }
+  .tool-tag {
+    font-family: 'Geist Mono', monospace;
+    font-size: 0.66rem; font-weight: 500;
+    padding: 3px 8px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 999px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: 0.3px;
+  }
+  .tool-cta {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 0.85rem; font-weight: 600;
+    color: #00e676;
+    margin-top: auto;
+  }
+  .tool-cta-arrow { transition: transform 0.25s cubic-bezier(0.4,0,0.2,1); }
+  .tool-card:hover .tool-cta-arrow { transform: translateX(4px); }
+  .tool-card[data-featured="1"] {
+    border-color: rgba(0,200,83,0.3);
+    background: rgba(0,200,83,0.04);
+  }
+  .tool-card[data-featured="1"]::before { opacity: 0.6; }
+
+  /* Section divider */
+  .section-divider {
+    max-width: 1100px;
+    margin: 32px auto;
+    padding: 0 24px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .section-divider-line { flex: 1; height: 1px; background: rgba(255,255,255,0.06); }
+  .section-divider-label {
+    font-size: 0.7rem; color: rgba(255,255,255,0.5);
+    text-transform: uppercase; letter-spacing: 1.4px; font-weight: 700;
+  }
+
+  /* Why-it-matters */
+  .why-section { max-width: 1080px; margin: 0 auto; padding: 16px 24px 70px; }
+  .why-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+  }
+  .why-card {
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+  .why-card .num {
+    font-family: 'Geist Mono', monospace;
+    font-size: 1.6rem; font-weight: 700; color: #00e676;
+    line-height: 1;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .why-card h4 { font-size: 0.95rem; color: #fff; margin-bottom: 6px; font-weight: 700; }
+  .why-card p { font-size: 0.84rem; color: rgba(255,255,255,0.6); line-height: 1.6; }
+
+  /* CTA final */
+  .cta-final {
+    max-width: 880px; margin: 0 auto 64px;
+    padding: 36px 28px;
+    background: linear-gradient(180deg, rgba(0,200,83,0.06), transparent);
+    border: 1px solid rgba(0,200,83,0.2);
+    border-radius: 16px; text-align: center;
+  }
+  .cta-final h2 {
+    font-size: 1.5rem; font-weight: 800; color: #fff;
+    margin-bottom: 10px; letter-spacing: -0.02em;
+  }
+  .cta-final p { color: rgba(255,255,255,0.65); max-width: 560px; margin: 0 auto 22px; }
+  .btn-primary, .btn-ghost {
+    padding: 12px 22px; border-radius: 999px;
+    font-weight: 700; font-size: 0.88rem;
+    transition: all 0.18s ease;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary {
+    background: linear-gradient(180deg, #00c853, #00a045);
+    color: #000;
+    box-shadow: 0 4px 16px rgba(0,200,83,0.25);
+  }
+  .btn-primary:hover { transform: translateY(-2px); color: #000; }
+  .btn-ghost {
+    background: rgba(255,255,255,0.04);
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.08); color: #fff; }
+
+  footer { text-align: center; padding: 32px 24px; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.78rem; color: rgba(255,255,255,0.45); }
+  footer a { color: rgba(255,255,255,0.6); }
+
+  @media (max-width: 600px) {
+    .hero { padding: 44px 18px 30px; }
+    .tools-section { padding: 20px 18px 36px; }
+    .tool-card { padding: 20px 20px 18px; }
+    .tools-grid { gap: 14px; }
+    .hero-meta { flex-wrap: wrap; gap: 10px; justify-content: center; }
+  }
 </style>
 </head>
 <body>
-<nav class="nav">
-  <a class="nav-logo-text" href="https://gambeta.ai">gambeta<span>.ai</span></a>
-  <div class="nav-links">
-    <a href="https://gambeta.ai/#pronosticos">🔮 Pronósticos</a>
-    <a href="/blog/">📰 Blog</a>
-    <a href="/herramientas">🧮 Herramientas</a>
-  </div>
-  <a class="nav-cta-btn" href="https://gambeta.ai">✦ Ver picks</a>
+
+<nav class="topnav">
+  <a href="/" class="topnav-logo">gambeta<span>.ai</span></a>
+  <a href="/" class="topnav-back">← Volver al inicio</a>
 </nav>
+
 <header class="hero">
-  <div class="badge">Gratis · sin registro</div>
-  <h1>Herramientas para <strong>apostadores</strong></h1>
-  <p>Calculadoras matemáticas para tomar mejores decisiones. Calculan en el navegador, no guardamos nada.</p>
-</header>
-<main class="container">
-
-<div class="tool-grid">
-  <a href="/herramientas/kelly" class="tool-card">
-    <div class="tool-card-icon">💰</div>
-    <div class="tool-card-title">Calculadora Kelly Criterion</div>
-    <div class="tool-card-desc">Stake óptimo según cuota, probabilidad y bankroll. Modos full / half / quarter Kelly.</div>
-  </a>
-  <a href="/herramientas/valor-esperado" class="tool-card">
-    <div class="tool-card-icon">📊</div>
-    <div class="tool-card-title">Calculadora de Valor Esperado (EV)</div>
-    <div class="tool-card-desc">¿Hay valor en esta apuesta? Calculá EV% y EV en unidades al instante.</div>
-  </a>
-  <a href="/herramientas/conversor-cuotas" class="tool-card">
-    <div class="tool-card-icon">🔄</div>
-    <div class="tool-card-title">Conversor de cuotas</div>
-    <div class="tool-card-desc">Decimal ↔ fraccionaria ↔ americana ↔ probabilidad implícita. Live, los 4 a la vez.</div>
-  </a>
-</div>
-
-<article class="article" style="margin-top:40px">
-  <h2>¿Para qué sirven?</h2>
-  <p>Las 3 calculadoras resuelven los problemas matemáticos básicos del apostador disciplinado:</p>
-  <ul>
-    <li><strong>Conversor de cuotas</strong> — para cuando una casa o un análisis usa formato distinto al que estás acostumbrado.</li>
-    <li><strong>Calculadora EV</strong> — para confirmar que una apuesta tiene valor esperado positivo antes de jugarla.</li>
-    <li><strong>Calculadora Kelly</strong> — una vez confirmado EV+, definir cuánto apostar exactamente.</li>
-  </ul>
-  <p>Las tres se complementan. El flujo natural: <strong>convertir → confirmar EV → calcular stake</strong>.</p>
-  <div class="info-box">
-    <p>🤖 Si querés que la matemática se haga sola, la <a href="https://gambeta.ai/#pronosticos">IA de gambeta.ai</a> publica picks con cuota, probabilidad del modelo y stake ya calculados. Las calculadoras son para cuando querés ajustar a tu propia estimación.</p>
+  <div class="hero-eyebrow"><span class="hero-dot"></span> Herramientas</div>
+  <h1>Calculadoras gratis para <span class="accent">apostar con criterio</span></h1>
+  <p class="lead">Las 3 calculadoras que todo apostador serio necesita más el Bankroll Manager: dimensionar el stake, detectar valor en una cuota y comparar formatos. Todo gratis, sin registro.</p>
+  <div class="hero-meta">
+    <span class="pill">🆓 100% gratis</span>
+    <span class="pill">🚫 Sin registro</span>
+    <span class="pill">📱 Mobile + Desktop</span>
   </div>
-</article>
+</header>
 
-<div class="cta-box">
-  <h3>🧠 Probá la IA de gambeta.ai</h3>
-  <p>Pronósticos gratuitos con probabilidad del modelo, cuota y stake sugerido — todo calculado.</p>
-  <a class="btn-cta" href="https://gambeta.ai/#pronosticos">Ver pronósticos →</a>
+<section class="tools-section">
+  <div class="tools-grid">
+
+    <a href="/herramientas/kelly" class="tool-card" data-featured="1">
+      <div class="tool-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 14l4-4 4 4 6-6"/><circle cx="7" cy="14" r="1.5"/><circle cx="11" cy="10" r="1.5"/><circle cx="15" cy="14" r="1.5"/><circle cx="21" cy="8" r="1.5"/></svg>
+      </div>
+      <h3>Calculadora Kelly</h3>
+      <div class="tool-tag-row">
+        <span class="tool-tag">stake óptimo</span>
+        <span class="tool-tag">bankroll</span>
+      </div>
+      <p>Calculá cuánto apostar para maximizar el crecimiento de tu bankroll a largo plazo, sin sobreapostar ni quedarte corto. El criterio matemático que usan los profesionales.</p>
+      <span class="tool-cta">Usar Kelly <span class="tool-cta-arrow">→</span></span>
+    </a>
+
+    <a href="/herramientas/valor-esperado" class="tool-card" data-featured="1">
+      <div class="tool-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M12 2v20M5 7h12a3 3 0 010 6H9a3 3 0 000 6h11"/></svg>
+      </div>
+      <h3>Valor Esperado (EV+)</h3>
+      <div class="tool-tag-row">
+        <span class="tool-tag">value</span>
+        <span class="tool-tag">profitabilidad</span>
+      </div>
+      <p>Descubrí si una cuota tiene valor matemático antes de apostar. La diferencia entre apostar por intuición y apostar con ventaja real a largo plazo.</p>
+      <span class="tool-cta">Calcular EV+ <span class="tool-cta-arrow">→</span></span>
+    </a>
+
+    <a href="/herramientas/conversor-cuotas" class="tool-card">
+      <div class="tool-icon-wrap">
+        <svg viewBox="0 0 24 24"><path d="M7 12h10M17 7l5 5-5 5M17 12H7M7 7l-5 5 5 5"/></svg>
+      </div>
+      <h3>Conversor de cuotas</h3>
+      <div class="tool-tag-row">
+        <span class="tool-tag">decimal</span>
+        <span class="tool-tag">fraccional</span>
+        <span class="tool-tag">americana</span>
+      </div>
+      <p>Cambiá entre los 4 formatos de cuota más usados: decimal, fraccional, americana e implícita. Útil para comparar cuotas entre casas internacionales.</p>
+      <span class="tool-cta">Convertir cuota <span class="tool-cta-arrow">→</span></span>
+    </a>
+
+    <a href="/#bankroll" class="tool-card">
+      <div class="tool-icon-wrap">
+        <svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="12" rx="2"/><path d="M7 12h.01M10 12h7M3 11h18"/></svg>
+      </div>
+      <h3>Bankroll Manager</h3>
+      <div class="tool-tag-row">
+        <span class="tool-tag">tracking</span>
+        <span class="tool-tag">P/L histórico</span>
+      </div>
+      <p>Llevá el control de cada apuesta que hagas: stake, cuota, resultado y rentabilidad acumulada. Solo necesitás una cuenta gratuita para guardar tu historial.</p>
+      <span class="tool-cta">Abrir Bankroll <span class="tool-cta-arrow">→</span></span>
+    </a>
+
+  </div>
+</section>
+
+<div class="section-divider">
+  <span class="section-divider-line"></span>
+  <span class="section-divider-label">Por qué importa</span>
+  <span class="section-divider-line"></span>
 </div>
 
-</main>
-<footer class="footer"><p>© 2026 <a href="https://gambeta.ai">gambeta.ai</a> · Inteligencia Artificial para Apostar · 18+</p></footer>
-</body></html>
+<section class="why-section">
+  <div class="why-grid">
+    <div class="why-card">
+      <span class="num">01</span>
+      <h4>Stake óptimo, no random</h4>
+      <p>La mayoría apuesta por intuición. Kelly te dice exactamente cuánto poner según la ventaja real, sin emoción.</p>
+    </div>
+    <div class="why-card">
+      <span class="num">02</span>
+      <h4>Detectar value</h4>
+      <p>El EV+ es la diferencia entre el apostador que pierde a la larga y el que gana. Casi nadie lo calcula. Acá lo tenés en 3 inputs.</p>
+    </div>
+    <div class="why-card">
+      <span class="num">03</span>
+      <h4>Comparar casas</h4>
+      <p>Cuotas en formato decimal en Latam, fraccional en UK, americano en USA. El conversor unifica todo para que veas dónde pagan mejor.</p>
+    </div>
+    <div class="why-card">
+      <span class="num">04</span>
+      <h4>Disciplina con datos</h4>
+      <p>El Bankroll Manager te muestra tu rendimiento real: ROI, racha, picks resueltos. Sin engañarte a vos mismo.</p>
+    </div>
+  </div>
+</section>
+
+<section class="cta-final">
+  <h2>¿Listo para apostar con cabeza?</h2>
+  <p>Empezá por la Calculadora Kelly. Es la que más impacto tiene si nunca usaste matemática para apostar.</p>
+  <a href="/herramientas/kelly" class="btn-primary">Probar Kelly ahora →</a>
+  <a href="/como-funciona" class="btn-ghost" style="margin-left:8px">Ver cómo funciona la IA</a>
+</section>
+
+<footer>
+  © 2026 Gambeta AI · <a href="/">Inicio</a> · <a href="/como-funciona">Cómo funciona</a> · <a href="/blog/">Blog</a>
+</footer>
+
+</body>
+</html>
