@@ -596,7 +596,7 @@ function authorChip(name) {
   return `<span class="clickable-author" data-profile="${safe(name)}">${safe(name)}</span>${rankBadge(name)}${followBtn(name)}`;
 }
 
-// Event delegation para clicks en follow buttons y author chips
+// Event delegation para clicks en follow buttons, author chips y hilos
 document.addEventListener('click', e => {
   const f = e.target.closest('.follow-btn[data-follow]');
   if (f) {
@@ -608,7 +608,21 @@ document.addEventListener('click', e => {
   if (a) {
     e.preventDefault(); e.stopPropagation();
     openProfile(a.dataset.profile);
+    return;
   }
+  // Click en una card de hilo (div.thread con data-thread-id) → abrir panel
+  const hilo = e.target.closest('.thread[data-thread-id]');
+  if (hilo && !e.target.closest('a, button')) {
+    e.preventDefault();
+    const tid = hilo.dataset.threadId;
+    if (tid) openTopicPanel(tid);
+  }
+});
+// Keyboard: Enter o Space en hilo abre panel (accesibilidad)
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter' && e.key !== ' ') return;
+  const hilo = e.target.closest('.thread[data-thread-id]');
+  if (hilo) { e.preventDefault(); openTopicPanel(hilo.dataset.threadId); }
 });
 
 // ── PERFIL MODAL ──
@@ -857,12 +871,35 @@ const _topicAccents = {
 
 async function openTopicPanel(tid) {
   _currentTopicId = tid;
-  const meta = TOPIC_META[tid];
   const panel = document.getElementById('topicPanel');
-  document.getElementById('tpEmoji').textContent = meta.emoji;
-  document.getElementById('tpTitle').textContent = meta.title;
-  document.getElementById('tpDesc').textContent = meta.desc;
-  panel.style.setProperty('--accent', _topicAccents[tid] || 'var(--verde)');
+  const meta = TOPIC_META[tid];
+  let emoji, title, desc, accent;
+  if (meta) {
+    emoji = meta.emoji;
+    title = meta.title;
+    desc = meta.desc;
+    accent = _topicAccents[tid] || 'var(--verde)';
+  } else {
+    // Hilo de partido — buscar en allThreads para armar header
+    const thread = allThreads.find(t => t.id === tid);
+    if (thread) {
+      emoji = '⚽';
+      title = `${thread.home} vs ${thread.away}`;
+      const league = thread.pick_data?.league || thread.league || '';
+      const rec = thread.pick_data?.rec || '';
+      desc = [league, rec ? `IA Gambeta: ${rec}` : ''].filter(Boolean).join(' · ') || 'Comentá este partido';
+      accent = 'var(--verde)';
+    } else {
+      emoji = '💬';
+      title = 'Hilo';
+      desc = '';
+      accent = 'var(--verde)';
+    }
+  }
+  document.getElementById('tpEmoji').textContent = emoji;
+  document.getElementById('tpTitle').textContent = title;
+  document.getElementById('tpDesc').textContent = desc;
+  panel.style.setProperty('--accent', accent);
   panel.classList.add('is-open');
   panel.scrollIntoView({ behavior:'smooth', block:'start' });
   // Restaurar alias si ya posteó antes
@@ -1136,7 +1173,7 @@ function renderThreads() {
     const rec = t.pick_data?.rec || '';
     const lastTs = lastPost ? lastPost.created_at : t.created_at;
     const league = t.pick_data?.league || t.league || '';
-    return `<a class="thread ${isHot ? 'is-hot' : ''}" href="/#predcard-${t.id || ''}" data-thread-id="${t.id}">
+    return `<div class="thread ${isHot ? 'is-hot' : ''}" data-thread-id="${t.id}" role="button" tabindex="0" aria-label="Abrir hilo ${safe(t.home)} vs ${safe(t.away)}">
       <div class="thread-head">
         <div>
           ${league ? `<div class="thread-league">${safe(league)}</div>` : ''}
@@ -1153,7 +1190,7 @@ function renderThreads() {
         <div class="thread-author-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(lastAuthor)}</div>
         <span>${authorChip(lastAuthor)}</span>
       </div>
-    </a>`;
+    </div>`;
   }).join('');
 }
 
