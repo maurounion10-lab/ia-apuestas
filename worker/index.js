@@ -2645,6 +2645,193 @@ async function _sendUptimeAlert(env, result) {
 }
 
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// DASHBOARD HTML — vista unificada de los 3 monitores (Schema + Uptime + Billing)
+// GET /admin/dashboard?token=... → HTML mobile-friendly, auto-refresh 60s.
+// ═══════════════════════════════════════════════════════════════════════════
+function _renderDashboardHTML() {
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0f">
+<title>Gambeta Monitors</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  :root { --bg:#0a0a0f; --card:#111118; --border:rgba(255,255,255,0.08); --text:#f0ece0; --mute:rgba(255,255,255,0.55); --green:#0a8a3a; --yellow:#d9a800; --red:#c81030; }
+  body { background:var(--bg); color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif; line-height:1.5; min-height:100vh; padding:16px; }
+  header { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:14px; border-bottom:1px solid var(--border); }
+  h1 { font-size:1.25rem; font-weight:800; letter-spacing:-0.3px; }
+  .updated { font-size:.75rem; color:var(--mute); font-family:"SF Mono",Menlo,monospace; }
+  .grid { display:grid; gap:14px; max-width:780px; margin:0 auto; }
+  .card { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px; }
+  .card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; }
+  .card-title { font-size:.7rem; font-weight:800; letter-spacing:2px; text-transform:uppercase; color:var(--mute); }
+  .card-status { display:flex; align-items:center; gap:6px; font-size:.78rem; font-weight:700; padding:4px 10px; border-radius:999px; }
+  .status-green { background:rgba(10,138,58,0.15); color:var(--green); border:1px solid rgba(10,138,58,0.4); }
+  .status-yellow { background:rgba(217,168,0,0.15); color:var(--yellow); border:1px solid rgba(217,168,0,0.4); }
+  .status-red { background:rgba(200,16,48,0.15); color:var(--red); border:1px solid rgba(200,16,48,0.4); }
+  .dot { width:8px; height:8px; border-radius:50%; }
+  .dot-green { background:var(--green); box-shadow:0 0 8px rgba(10,138,58,0.6); }
+  .dot-yellow { background:var(--yellow); box-shadow:0 0 8px rgba(217,168,0,0.6); }
+  .dot-red { background:var(--red); box-shadow:0 0 8px rgba(200,16,48,0.6); animation:pulse 1.6s infinite; }
+  @keyframes pulse { 0%,100% { opacity:1 } 50% { opacity:0.5 } }
+  .metric-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:12px; margin-bottom:14px; }
+  .metric { background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); border-radius:8px; padding:10px; }
+  .metric-label { font-size:.65rem; color:var(--mute); text-transform:uppercase; letter-spacing:1.2px; margin-bottom:4px; }
+  .metric-value { font-size:1.4rem; font-weight:800; font-family:"SF Mono",Menlo,monospace; }
+  .row { display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.04); font-size:.85rem; }
+  .row:last-child { border-bottom:0; }
+  .row-name { font-weight:600; }
+  .row-detail { color:var(--mute); font-size:.78rem; font-family:"SF Mono",Menlo,monospace; }
+  .row-value { font-weight:700; }
+  .row-value.up { color:var(--green); }
+  .row-value.down { color:var(--red); }
+  .row-value.warn { color:var(--yellow); }
+  footer { text-align:center; margin-top:24px; padding-top:14px; font-size:.7rem; color:var(--mute); }
+  .err { padding:14px; background:rgba(200,16,48,0.1); border:1px solid rgba(200,16,48,0.3); border-radius:8px; color:var(--red); font-size:.85rem; }
+  .empty { padding:14px; color:var(--mute); font-size:.85rem; text-align:center; font-style:italic; }
+</style>
+</head>
+<body>
+<div class="grid">
+  <header>
+    <h1>🛡️ Gambeta Monitors</h1>
+    <span class="updated" id="updated">cargando...</span>
+  </header>
+
+  <div class="card" id="card-uptime">
+    <div class="card-head"><span class="card-title">Uptime</span><span class="card-status" id="uptime-status">—</span></div>
+    <div id="uptime-body">cargando...</div>
+  </div>
+
+  <div class="card" id="card-schema">
+    <div class="card-head"><span class="card-title">Schema Monitor</span><span class="card-status" id="schema-status">—</span></div>
+    <div id="schema-body">cargando...</div>
+  </div>
+
+  <div class="card" id="card-billing">
+    <div class="card-head"><span class="card-title">Billing</span><span class="card-status" id="billing-status">—</span></div>
+    <div id="billing-body">cargando...</div>
+  </div>
+
+  <footer>Auto-refresh cada 60s · Datos directos de los endpoints /status</footer>
+</div>
+
+<script>
+const BASE = 'https://apuestas-api.mauro-union10.workers.dev';
+const fmt = (ms) => ms < 1000 ? ms + 'ms' : (ms/1000).toFixed(1) + 's';
+const setStatus = (id, color, txt) => {
+  const el = document.getElementById(id);
+  el.className = 'card-status status-' + color;
+  el.innerHTML = '<span class="dot dot-' + color + '"></span>' + txt;
+};
+
+async function loadUptime() {
+  try {
+    const r = await fetch(BASE + '/admin/uptime/status', {cache:'no-store'});
+    const d = await r.json();
+    const state = d.current_state || {};
+    const downCount = Object.values(state).filter(s => s.status === 'DOWN').length;
+    const targetUrls = (d.targets || []).map(t => t.url);
+    const cleanState = Object.fromEntries(Object.entries(state).filter(([url]) => targetUrls.includes(url)));
+    const totalTargets = d.targets_count;
+    const upCount = totalTargets - downCount;
+
+    if (downCount === 0) setStatus('uptime-status', 'green', upCount + '/' + totalTargets + ' UP');
+    else setStatus('uptime-status', 'red', downCount + ' CAÍDO');
+
+    const rows = (d.targets || []).map(t => {
+      const s = state[t.url];
+      if (!s) return '<div class="row"><span class="row-name">' + t.name + '</span><span class="row-value warn">SIN DATO</span></div>';
+      const color = s.status === 'UP' ? 'up' : 'down';
+      return '<div class="row"><div><div class="row-name">' + t.name + '</div><div class="row-detail">' + s.code + ' · ' + fmt(s.ms) + '</div></div><span class="row-value ' + color + '">' + s.status + '</span></div>';
+    }).join('');
+    document.getElementById('uptime-body').innerHTML = rows || '<div class="empty">Sin targets</div>';
+  } catch(e) {
+    setStatus('uptime-status', 'red', 'ERROR');
+    document.getElementById('uptime-body').innerHTML = '<div class="err">' + e.message + '</div>';
+  }
+}
+
+async function loadSchema() {
+  try {
+    const r = await fetch(BASE + '/admin/schema-monitor/status', {cache:'no-store'});
+    const d = await r.json();
+    if (d.ok === false) {
+      setStatus('schema-status', 'yellow', 'SIN DATA');
+      document.getElementById('schema-body').innerHTML = '<div class="empty">Esperando primera corrida del cron</div>';
+      return;
+    }
+    const sev = d.findings_by_severity || {critical:0, medium:0, low:0};
+    if (d.alert) setStatus('schema-status', 'red', sev.critical + ' críticos');
+    else if (sev.medium > 0) setStatus('schema-status', 'yellow', sev.medium + ' medium');
+    else setStatus('schema-status', 'green', '0 bugs');
+
+    const tsDate = new Date(d.ts);
+    const ago = Math.floor((Date.now() - tsDate.getTime()) / 60000);
+    document.getElementById('schema-body').innerHTML =
+      '<div class="metric-grid"><div class="metric"><div class="metric-label">Páginas</div><div class="metric-value">' + d.samples_audited + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Críticos</div><div class="metric-value" style="color:' + (sev.critical > 0 ? 'var(--red)' : 'var(--green)') + '">' + sev.critical + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Medium</div><div class="metric-value" style="color:' + (sev.medium > 0 ? 'var(--yellow)' : 'var(--green)') + '">' + sev.medium + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Total</div><div class="metric-value">' + d.findings_count + '</div></div></div>' +
+      '<div class="row-detail">Último audit: hace ' + (ago < 60 ? ago + 'm' : Math.floor(ago/60) + 'h ' + (ago%60) + 'm') + ' · Próximo: lunes 03:00 ART</div>';
+  } catch(e) {
+    setStatus('schema-status', 'red', 'ERROR');
+    document.getElementById('schema-body').innerHTML = '<div class="err">' + e.message + '</div>';
+  }
+}
+
+async function loadBilling() {
+  try {
+    const r = await fetch(BASE + '/admin/billing/list', {cache:'no-store'});
+    const d = await r.json();
+    const subs = d.subscriptions || [];
+    const latest = d.last_run;
+    const upcoming = latest?.upcoming_in_7d || [];
+    const monthlyTotal = subs.reduce((s,x) => s + (x.amount || 0), 0);
+
+    if (upcoming.length === 0) setStatus('billing-status', 'green', 'OK');
+    else if (upcoming.some(u => u.days_until <= 2)) setStatus('billing-status', 'red', upcoming.length + ' próximos');
+    else setStatus('billing-status', 'yellow', upcoming.length + ' próximos');
+
+    const upcomingTotal = upcoming.reduce((s,x) => s + x.amount, 0);
+    let body = '<div class="metric-grid"><div class="metric"><div class="metric-label">Suscripciones</div><div class="metric-value">' + subs.length + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Total mensual</div><div class="metric-value">$' + monthlyTotal + '</div></div>' +
+      '<div class="metric"><div class="metric-label">Próximos 7d</div><div class="metric-value" style="color:' + (upcoming.length > 0 ? 'var(--yellow)' : 'var(--green)') + '">' + upcoming.length + '</div></div>' +
+      '<div class="metric"><div class="metric-label">A pagar 7d</div><div class="metric-value">$' + upcomingTotal + '</div></div></div>';
+
+    if (upcoming.length > 0) {
+      body += upcoming.map(u => {
+        const color = u.days_until <= 2 ? 'down' : u.days_until <= 4 ? 'warn' : 'up';
+        return '<div class="row"><div><div class="row-name">' + u.name + '</div><div class="row-detail">' + u.next_charge + '</div></div><span class="row-value ' + color + '">$' + u.amount + ' · ' + u.days_until + 'd</span></div>';
+      }).join('');
+    } else {
+      body += '<div class="empty">Sin cobros en próximos 7 días</div>';
+    }
+    document.getElementById('billing-body').innerHTML = body;
+  } catch(e) {
+    setStatus('billing-status', 'red', 'ERROR');
+    document.getElementById('billing-body').innerHTML = '<div class="err">' + e.message + '</div>';
+  }
+}
+
+async function refresh() {
+  await Promise.all([loadUptime(), loadSchema(), loadBilling()]);
+  const now = new Date();
+  document.getElementById('updated').textContent = 'Actualizado: ' + now.toLocaleTimeString('es-AR', {timeZone:'America/Argentina/Buenos_Aires', hour:'2-digit', minute:'2-digit', second:'2-digit'});
+}
+
+refresh();
+setInterval(refresh, 60000);
+</script>
+</body>
+</html>`;
+}
+
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
@@ -3136,7 +3323,20 @@ export default {
       }
     }
 
-    // ── 🆕 (30-jun-2026 #605) /admin/uptime/* — uptime monitor ──
+    // ── 🆕 (30-jun-2026 #606) /admin/dashboard — vista unificada HTML ──
+    if (path === '/admin/dashboard' && request.method === 'GET') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response('Unauthorized', { status: 401, headers: { 'Content-Type': 'text/plain' } });
+      }
+      return new Response(_renderDashboardHTML(), {
+        status: 200,
+        headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' }
+      });
+    }
+
+        // ── 🆕 (30-jun-2026 #605) /admin/uptime/* — uptime monitor ──
     if (path === '/admin/uptime/status' && request.method === 'GET') {
       try {
         const targets = await env.CACHE_KV.get('uptime:targets', { type: 'json' }) || [];
