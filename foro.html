@@ -177,6 +177,60 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .bet-cta{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#FFD700,#FFAA00);color:#000;font-weight:900;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:.78rem;transition:all .15s}
 .bet-cta:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,215,0,0.3)}
 
+/* ── Rangos de Tipster (badge al lado del nombre) ── */
+.rank-badge{display:inline-flex;align-items:center;gap:3px;font-size:.6rem;font-weight:900;padding:2px 7px;border-radius:6px;text-transform:uppercase;letter-spacing:0.8px;border:1px solid;font-family:'Geist Mono','SF Mono',monospace;vertical-align:middle;margin-left:6px;line-height:1}
+.rank-badge.aspirante{background:rgba(176,141,87,0.1);color:#cd9b5e;border-color:rgba(205,155,94,0.4)}
+.rank-badge.oro{background:linear-gradient(135deg,rgba(255,215,0,0.18),rgba(255,170,0,0.08));color:#FFD700;border-color:rgba(255,215,0,0.5)}
+.rank-badge.diamante{background:linear-gradient(135deg,rgba(91,192,222,0.18),rgba(91,192,222,0.05));color:#5BC0DE;border-color:rgba(91,192,222,0.5);box-shadow:0 0 8px rgba(91,192,222,0.2)}
+.rank-badge.maestro{background:linear-gradient(135deg,rgba(220,30,46,0.2),rgba(255,215,0,0.1));color:#fff;border-color:#FFD700;box-shadow:0 0 12px rgba(255,215,0,0.4);animation:rankShine 3s infinite}
+@keyframes rankShine{0%,100%{box-shadow:0 0 12px rgba(255,215,0,0.4)}50%{box-shadow:0 0 18px rgba(255,215,0,0.7)}}
+
+/* ── Predicciones de Fútbol (ranking podio) ── */
+.predicciones-section{background:linear-gradient(135deg,rgba(255,215,0,0.04),rgba(0,200,83,0.02));border:1px solid rgba(255,215,0,0.2);border-radius:18px;padding:24px;margin-bottom:32px;position:relative;overflow:hidden}
+.predicciones-section::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#FFD700,transparent)}
+.pf-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.pf-title{font-size:1.05rem;font-weight:900;color:#fff;letter-spacing:-0.3px;display:flex;align-items:center;gap:8px}
+.pf-title .pf-trophy{font-size:1.3rem;filter:drop-shadow(0 0 8px rgba(255,215,0,0.5))}
+.pf-period{font-size:.7rem;color:var(--mute);text-transform:uppercase;letter-spacing:1.4px;font-family:'Geist Mono','SF Mono',monospace}
+.pf-podium{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:8px;margin-bottom:14px;align-items:end}
+.pf-pod-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 12px;text-align:center;transition:all .25s;position:relative;overflow:hidden}
+.pf-pod-card.pf-1{order:2;border-color:rgba(255,215,0,0.45);background:linear-gradient(180deg,rgba(255,215,0,0.08),var(--card));padding-top:18px;padding-bottom:18px;transform:translateY(-4px)}
+.pf-pod-card.pf-2{order:1;border-color:rgba(192,192,192,0.4);background:linear-gradient(180deg,rgba(192,192,192,0.06),var(--card))}
+.pf-pod-card.pf-3{order:3;border-color:rgba(205,127,50,0.4);background:linear-gradient(180deg,rgba(205,127,50,0.06),var(--card))}
+.pf-pod-medal{font-size:1.6rem;line-height:1;margin-bottom:6px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))}
+.pf-pod-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--verde),#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.92rem;margin:0 auto 8px}
+.pf-pod-name{font-size:.82rem;font-weight:800;color:#fff;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pf-pod-stats{font-size:.7rem;color:var(--mute);font-family:'Geist Mono','SF Mono',monospace;font-variant-numeric:tabular-nums;line-height:1.5}
+.pf-pod-stats b{color:#fff}
+.pf-pod-roi{display:inline-block;font-weight:800;padding:2px 7px;border-radius:5px;margin-top:4px;font-size:.7rem}
+.pf-pod-roi.pos{background:rgba(0,200,83,0.15);color:var(--verde)}
+.pf-pod-roi.neg{background:rgba(255,51,102,0.15);color:var(--rosa)}
+.pf-rest{display:grid;gap:6px;margin-top:6px}
+.pf-row{display:grid;grid-template-columns:24px 28px 1fr auto auto auto;gap:10px;align-items:center;padding:8px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;font-size:.78rem;transition:background .15s}
+.pf-row:hover{background:rgba(255,255,255,0.04)}
+.pf-pos{font-family:'Geist Mono','SF Mono',monospace;font-weight:800;color:var(--mute2);text-align:right}
+.pf-avatar{width:28px;height:28px;background:linear-gradient(135deg,var(--verde),#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.74rem}
+.pf-name{font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;flex-wrap:wrap}
+.pf-stat{font-size:.7rem;color:var(--mute);font-family:'Geist Mono','SF Mono',monospace;font-variant-numeric:tabular-nums}
+.pf-stat b{color:#fff;font-weight:800}
+.pf-roi{font-weight:800;padding:2px 8px;border-radius:5px;font-size:.7rem;font-family:'Geist Mono','SF Mono',monospace}
+.pf-roi.pos{background:rgba(0,200,83,0.15);color:var(--verde)}
+.pf-roi.neg{background:rgba(255,51,102,0.15);color:var(--rosa)}
+.pf-empty{text-align:center;padding:24px;color:var(--mute);font-size:.85rem}
+
+@media(max-width:600px){
+  .predicciones-section{padding:18px 14px}
+  .pf-podium{grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .pf-pod-card{padding:10px 8px}
+  .pf-pod-card.pf-1{padding-top:14px;padding-bottom:14px;transform:translateY(-2px)}
+  .pf-pod-medal{font-size:1.3rem}
+  .pf-pod-avatar{width:30px;height:30px;font-size:.8rem}
+  .pf-pod-name{font-size:.74rem}
+  .pf-pod-stats{font-size:.64rem}
+  .pf-row{grid-template-columns:20px 24px 1fr auto auto;gap:6px;padding:6px 10px;font-size:.7rem}
+  .pf-row .pf-hide-mobile{display:none}
+}
+
 @media(max-width:600px){
   .topic-panel{padding:18px 14px}
   .tp-form input[type="text"]{width:100%;flex:1 1 100%}
@@ -228,6 +282,17 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
   <div class="topics-grid" id="topicsGrid">
     <div class="loading">Cargando…</div>
   </div>
+
+  <!-- ── Predicciones de Fútbol — ranking mensual ── -->
+  <section class="predicciones-section" id="predicciones">
+    <div class="pf-head">
+      <div class="pf-title"><span class="pf-trophy">🏆</span> Predicciones de Fútbol</div>
+      <div class="pf-period" id="pfPeriod">…</div>
+    </div>
+    <div id="pfPodium" class="pf-podium" style="display:none"></div>
+    <div id="pfRest" class="pf-rest"></div>
+    <div id="pfEmpty" class="pf-empty" style="display:none">Todavía nadie publicó apuestas resueltas este mes. ¡Sé el primero! 🎯</div>
+  </section>
 
   <div class="topic-panel" id="topicPanel">
     <div class="tp-head">
@@ -389,13 +454,139 @@ function safe(s) { return String(s||'').replace(/[<>]/g, c => ({'<':'&lt;','>':'
 
 let allThreads = [];
 let allPosts = [];
+let allBetPosts = [];
+let userStatsMap = {};
 let currentCat = 'all';
+
+// ── Rangos ──
+function getRank(stats) {
+  if (!stats || stats.total === 0) return null;
+  const { total, wins, losses, winRate, roi } = stats;
+  if (total >= 100 && winRate >= 0.60 && roi > 0) return { key:'maestro', label:'Maestro', emoji:'👑' };
+  if (total >= 50 && winRate >= 0.55 && roi > 0) return { key:'diamante', label:'Diamante', emoji:'💎' };
+  if (total >= 10 && winRate >= 0.50) return { key:'oro', label:'Oro', emoji:'🥇' };
+  return { key:'aspirante', label:'Aspirante', emoji:'🥉' };
+}
+
+function rankBadge(name) {
+  const stats = userStatsMap[name];
+  const rank = getRank(stats);
+  if (!rank) return '';
+  return `<span class="rank-badge ${rank.key}">${rank.emoji} ${rank.label}</span>`;
+}
+
+// Calcula stats por user_name a partir de todos los posts con bet_data
+function computeUserStats(posts) {
+  const map = {};
+  for (const p of posts) {
+    const bd = p.bet_data;
+    if (!bd || !bd.is_bet) continue;
+    const name = (p.user_name || '').trim();
+    if (!name || isAiUser(name)) continue;
+    if (!map[name]) map[name] = { name, total:0, wins:0, losses:0, pending:0, stakeTotal:0, profitTotal:0 };
+    const u = map[name];
+    u.total++;
+    const stake = parseFloat(bd.stake) || 100;
+    const odds = parseFloat(bd.odds) || 1.5;
+    if (bd.result === 'win') {
+      u.wins++;
+      u.profitTotal += stake * (odds - 1);
+      u.stakeTotal += stake;
+    } else if (bd.result === 'loss') {
+      u.losses++;
+      u.profitTotal -= stake;
+      u.stakeTotal += stake;
+    } else {
+      u.pending++;
+    }
+  }
+  // Derivadas
+  for (const name in map) {
+    const u = map[name];
+    const resolved = u.wins + u.losses;
+    u.winRate = resolved > 0 ? u.wins / resolved : 0;
+    u.roi = u.stakeTotal > 0 ? (u.profitTotal / u.stakeTotal) * 100 : 0;
+  }
+  return map;
+}
+
+function renderPredicciones() {
+  // Filtrar posts del mes actual y solo resueltos (win/loss)
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const monthPosts = allBetPosts.filter(p => {
+    const ts = new Date(p.created_at).getTime();
+    return ts >= monthStart && p.bet_data && (p.bet_data.result === 'win' || p.bet_data.result === 'loss');
+  });
+  const monthStatsMap = computeUserStats(monthPosts);
+  // Ranking: por ROI desc, desempate por # picks resueltos desc
+  const ranked = Object.values(monthStatsMap)
+    .filter(u => (u.wins + u.losses) >= 1)
+    .sort((a, b) => (b.roi - a.roi) || ((b.wins + b.losses) - (a.wins + a.losses)));
+
+  const periodLabel = now.toLocaleDateString('es-AR', { month:'long', year:'numeric' }).toUpperCase();
+  document.getElementById('pfPeriod').textContent = '📅 ' + periodLabel;
+
+  const podiumEl = document.getElementById('pfPodium');
+  const restEl = document.getElementById('pfRest');
+  const emptyEl = document.getElementById('pfEmpty');
+
+  if (!ranked.length) {
+    podiumEl.style.display = 'none';
+    restEl.innerHTML = '';
+    emptyEl.style.display = 'block';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  // Top 3 → podio
+  const top3 = ranked.slice(0, 3);
+  if (top3.length >= 1) {
+    podiumEl.style.display = 'grid';
+    podiumEl.innerHTML = [1, 0, 2].map(i => {
+      const u = top3[i];
+      if (!u) return `<div class="pf-pod-card pf-${i+1}" style="opacity:.3"><div class="pf-pod-medal">${['🥇','🥈','🥉'][i]}</div><div class="pf-pod-name">—</div></div>`;
+      const rank = getRank(userStatsMap[u.name]); // rango global, no del mes
+      const medal = ['🥇','🥈','🥉'][i];
+      const roiClass = u.roi >= 0 ? 'pos' : 'neg';
+      const roiSign = u.roi >= 0 ? '+' : '';
+      return `<div class="pf-pod-card pf-${i+1}">
+        <div class="pf-pod-medal">${medal}</div>
+        <div class="pf-pod-avatar">${avatarLetter(u.name)}</div>
+        <div class="pf-pod-name">${safe(u.name)}${rank ? ' '+rank.emoji : ''}</div>
+        <div class="pf-pod-stats"><b>${u.wins}</b>W · <b>${u.losses}</b>L · <b>${Math.round(u.winRate*100)}%</b></div>
+        <span class="pf-pod-roi ${roiClass}">${roiSign}${u.roi.toFixed(1)}% ROI</span>
+      </div>`;
+    }).join('');
+  }
+
+  // 4-10 → lista
+  const rest = ranked.slice(3, 10);
+  if (rest.length) {
+    restEl.innerHTML = rest.map((u, idx) => {
+      const pos = idx + 4;
+      const rank = getRank(userStatsMap[u.name]);
+      const roiClass = u.roi >= 0 ? 'pos' : 'neg';
+      const roiSign = u.roi >= 0 ? '+' : '';
+      return `<div class="pf-row">
+        <span class="pf-pos">#${pos}</span>
+        <div class="pf-avatar">${avatarLetter(u.name)}</div>
+        <div class="pf-name">${safe(u.name)}${rank ? '<span class="rank-badge '+rank.key+'">'+rank.emoji+' '+rank.label+'</span>' : ''}</div>
+        <span class="pf-stat pf-hide-mobile"><b>${u.wins + u.losses}</b> picks</span>
+        <span class="pf-stat"><b>${Math.round(u.winRate*100)}%</b> aciertos</span>
+        <span class="pf-roi ${roiClass}">${roiSign}${u.roi.toFixed(1)}%</span>
+      </div>`;
+    }).join('');
+  } else {
+    restEl.innerHTML = '';
+  }
+}
 
 async function loadAll() {
   try {
     const [threadsR, postsR] = await Promise.all([
       fetch(SB_URL + '/rest/v1/forum_threads?select=id,home,away,league,match_date,pick_data,created_at&order=created_at.desc&limit=200', { headers: H }),
-      fetch(SB_URL + '/rest/v1/forum_posts?select=id,thread_id,user_name,content,created_at,is_deleted&is_deleted=eq.false&order=created_at.desc&limit=200', { headers: H })
+      fetch(SB_URL + '/rest/v1/forum_posts?select=id,thread_id,user_name,content,bet_data,created_at,is_deleted&is_deleted=eq.false&order=created_at.desc&limit=500', { headers: H })
     ]);
     allThreads = await threadsR.json();
     allPosts = await postsR.json();
@@ -411,9 +602,14 @@ async function loadAll() {
     document.getElementById('statPosts').textContent = totalPosts;
     document.getElementById('statHoy').textContent = todayCount;
 
+    // Cache: posts con bet_data para stats globales
+    allBetPosts = allPosts.filter(p => p.bet_data && p.bet_data.is_bet);
+    userStatsMap = computeUserStats(allBetPosts);
+
     renderTopics();
     renderTabsCounts();
     renderThreads();
+    renderPredicciones();
   } catch (e) {
     document.getElementById('topicsGrid').innerHTML = '<div class="empty">Error cargando el foro. Intentá refrescar.</div>';
     document.getElementById('threadList').innerHTML = '';
@@ -505,7 +701,7 @@ async function loadTopicPosts(tid) {
         return `<div class="tp-post is-bet">
           <div class="tp-post-head">
             <div class="tp-post-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(name)}</div>
-            <span class="tp-post-name">${safe(name)}</span>
+            <span class="tp-post-name">${safe(name)}${rankBadge(name)}</span>
             <span class="tp-post-time">${timeAgo(p.created_at)}</span>
           </div>
           <div class="bet-banner">
@@ -528,7 +724,7 @@ async function loadTopicPosts(tid) {
       return `<div class="tp-post">
         <div class="tp-post-head">
           <div class="tp-post-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(name)}</div>
-          <span class="tp-post-name">${safe(name)}</span>
+          <span class="tp-post-name">${safe(name)}${rankBadge(name)}</span>
           <span class="tp-post-time">${timeAgo(p.created_at)}</span>
         </div>
         <div class="tp-post-content">${safe(p.content)}</div>
@@ -738,7 +934,7 @@ function renderThreads() {
       <div class="thread-preview">${preview}</div>
       <div class="thread-author">
         <div class="thread-author-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(lastAuthor)}</div>
-        <span>${safe(lastAuthor)}</span>
+        <span>${safe(lastAuthor)}${rankBadge(lastAuthor)}</span>
       </div>
     </a>`;
   }).join('');
