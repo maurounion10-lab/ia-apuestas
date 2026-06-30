@@ -7351,82 +7351,6 @@ window.toggleHeroBubble = function(n) {
     </div>
   </section>
 
-<!-- 🆕 (#585) Separador zona PRODUCTO → HERRAMIENTAS -->
-<div class="gb-zone-divider" aria-hidden="true">
-  <span class="gb-zone-line"></span>
-  <span class="gb-zone-label">🧮 Herramientas de la IA</span>
-  <span class="gb-zone-line"></span>
-</div>
-
-<section id="calculator">
-    <div class="section-title">
-      <div class="icon">🧮</div>
-      Calculadora de Apuestas
-    </div>
-    <div class="calc-container">
-      <div class="calc-form card">
-        <div class="form-group">
-          <label>Tipo de Apuesta</label>
-          <select id="betType" onchange="updateCalc()">
-            <option value="simple">Apuesta Simple</option>
-            <option value="doble">Doble Oportunidad</option>
-            <option value="sistema">Sistema</option>
-            <option value="combinada">Combinada</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Monto a Apostar ($)</label>
-          <input type="number" id="betAmount" value="100" min="1" oninput="updateCalc()" placeholder="Ej: 100">
-        </div>
-        <div class="form-group">
-          <label>Cuota / Odds</label>
-          <input type="number" id="betOdds" value="1.85" min="1.01" step="0.01" oninput="updateCalc()" placeholder="Ej: 1.85">
-        </div>
-        <div class="form-group">
-          <label>Probabilidad Real Estimada (%)</label>
-          <input type="number" id="betProb" value="55" min="1" max="99" oninput="updateCalc()" placeholder="Ej: 55">
-        </div>
-        <div class="form-group">
-          <label>Bankroll Total ($)</label>
-          <input type="number" id="betBankroll" value="1000" min="1" oninput="updateCalc()" placeholder="Ej: 1000">
-        </div>
-        <button class="btn-primary" onclick="updateCalc()">⚡ Calcular</button>
-      </div>
-
-      <div class="calc-result">
-        <h3>📊 Resultados del Análisis</h3>
-        <div class="result-rows">
-          <div class="result-row">
-            <span class="label">Ganancia Potencial</span>
-            <span class="value" id="r-ganancia">$85.00</span>
-          </div>
-          <div class="result-row highlight-row">
-            <span class="label">Retorno Total</span>
-            <span class="value" id="r-retorno">$185.00</span>
-          </div>
-          <div class="result-row">
-            <span class="label">ROI</span>
-            <span class="value" id="r-roi">85%</span>
-          </div>
-          <div class="result-row">
-            <span class="label">Valor Esperado (EV)</span>
-            <span class="value" id="r-ev" style="color: var(--verde)">+$1.75</span>
-          </div>
-        </div>
-        <div class="ev-meter">
-          <span style="font-size:0.78rem;color:var(--texto-sec)">Valor de la apuesta</span>
-          <div class="ev-bar-bg">
-            <div class="ev-bar-fill" id="evBar" style="width:62%"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:#555;margin-top:3px">
-            <span>Sin valor</span>
-            <span>Valor óptimo</span>
-          </div>
-        </div>
-        <div id="calc-tip" style="background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.2);border-radius:10px;padding:10px 12px;font-size:0.82rem;color:var(--texto-sec);line-height:1.5;"></div>
-      </div>
-    </div>
-  </section>
 
 
 <!-- 🆕 (29-jun-2026 #582) FOOTER RICH SEO — estilo Flashscore/Forebet -->
@@ -8483,6 +8407,77 @@ window.toggleHeroBubble = function(n) {
     </div>
   </div>
 </section>
+
+<!-- 🆕 (#588) Calculadora al fondo del home -->
+<section id="calculator">
+    <div class="section-title">
+      <div class="icon">🧮</div>
+      Calculadora de Apuestas
+    </div>
+    <div class="calc-container">
+      <div class="calc-form card">
+        <div class="form-group">
+          <label>Tipo de Apuesta</label>
+          <select id="betType" onchange="updateCalc()">
+            <option value="simple">Apuesta Simple</option>
+            <option value="doble">Doble Oportunidad</option>
+            <option value="sistema">Sistema</option>
+            <option value="combinada">Combinada</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Monto a Apostar ($)</label>
+          <input type="number" id="betAmount" value="100" min="1" oninput="updateCalc()" placeholder="Ej: 100">
+        </div>
+        <div class="form-group">
+          <label>Cuota / Odds</label>
+          <input type="number" id="betOdds" value="1.85" min="1.01" step="0.01" oninput="updateCalc()" placeholder="Ej: 1.85">
+        </div>
+        <div class="form-group">
+          <label>Probabilidad Real Estimada (%)</label>
+          <input type="number" id="betProb" value="55" min="1" max="99" oninput="updateCalc()" placeholder="Ej: 55">
+        </div>
+        <div class="form-group">
+          <label>Bankroll Total ($)</label>
+          <input type="number" id="betBankroll" value="1000" min="1" oninput="updateCalc()" placeholder="Ej: 1000">
+        </div>
+        <button class="btn-primary" onclick="updateCalc()">⚡ Calcular</button>
+      </div>
+
+      <div class="calc-result">
+        <h3>📊 Resultados del Análisis</h3>
+        <div class="result-rows">
+          <div class="result-row">
+            <span class="label">Ganancia Potencial</span>
+            <span class="value" id="r-ganancia">$85.00</span>
+          </div>
+          <div class="result-row highlight-row">
+            <span class="label">Retorno Total</span>
+            <span class="value" id="r-retorno">$185.00</span>
+          </div>
+          <div class="result-row">
+            <span class="label">ROI</span>
+            <span class="value" id="r-roi">85%</span>
+          </div>
+          <div class="result-row">
+            <span class="label">Valor Esperado (EV)</span>
+            <span class="value" id="r-ev" style="color: var(--verde)">+$1.75</span>
+          </div>
+        </div>
+        <div class="ev-meter">
+          <span style="font-size:0.78rem;color:var(--texto-sec)">Valor de la apuesta</span>
+          <div class="ev-bar-bg">
+            <div class="ev-bar-fill" id="evBar" style="width:62%"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;font-size:0.68rem;color:#555;margin-top:3px">
+            <span>Sin valor</span>
+            <span>Valor óptimo</span>
+          </div>
+        </div>
+        <div id="calc-tip" style="background:rgba(0,200,83,0.07);border:1px solid rgba(0,200,83,0.2);border-radius:10px;padding:10px 12px;font-size:0.82rem;color:var(--texto-sec);line-height:1.5;"></div>
+      </div>
+    </div>
+  </section>
 
 <!-- FOOTER -->
 <footer>
@@ -14976,6 +14971,7 @@ setTimeout(_fpBadgeInit, 1200);
 </html>
 
 <!-- redeploy 2026-05-20T21:42Z: re-sync tras rollback de tarea escudos -->
+
 
 
 
