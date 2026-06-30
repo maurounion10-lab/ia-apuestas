@@ -1902,7 +1902,88 @@ window.toggleHeroBubble = function(n) {
   </div>
 </section>
 
-<section id="gbRichFooter" aria-label="Mapa del sitio Gambeta IA">
+
+
+  <!-- ═══════════════════════════════════════════════
+       FORO — Widget 1: Intro a la comunidad
+  ═══════════════════════════════════════════════ -->
+  <section id="gbForoIntro" style="background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.06);padding:48px 20px 36px">
+    <div style="max-width:920px;margin:0 auto;text-align:center">
+      <div style="display:inline-block;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.25);color:#00c853;font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:999px;margin-bottom:14px">&#128172; Comunidad</div>
+      <h2 style="font-size:clamp(1.4rem,3.5vw,2rem);font-weight:900;color:#fff;letter-spacing:-0.5px;margin-bottom:12px;line-height:1.2">El <span style="background:linear-gradient(135deg,#00c853,#00e860);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text">Foro</span> donde se charla cada pick</h2>
+      <p style="color:rgba(255,255,255,0.6);max-width:580px;margin:0 auto 26px;font-size:.95rem;line-height:1.55">Comenta los pronosticos de la IA, debatí lesiones de ultimo momento, compartí donde esta el valor. Sumate a la comunidad de apostadores con datos.</p>
+      <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-bottom:8px">
+        <a href="/foro" style="display:inline-flex;align-items:center;gap:8px;background:#00c853;color:#000;font-weight:800;padding:11px 22px;border-radius:9999px;font-size:.85rem;transition:all .15s;text-decoration:none">
+          Entrar al foro
+          <svg viewBox="0 0 24 24" width="14" height="14"><path d="M5 12h14M13 5l7 7-7 7" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#predictions" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);color:#fff;font-weight:700;padding:11px 22px;border-radius:9999px;font-size:.85rem;border:1px solid rgba(255,255,255,0.12);text-decoration:none;transition:all .15s">Comentar un pick</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════
+       FORO — Widget 2: Comentarios recientes
+  ═══════════════════════════════════════════════ -->
+  <section id="gbForoRecent" style="background:#0f0f0f;border-top:1px solid rgba(255,255,255,0.04);padding:36px 20px 48px">
+    <div style="max-width:920px;margin:0 auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px;flex-wrap:wrap">
+        <h3 style="font-size:.95rem;font-weight:800;color:#fff;letter-spacing:-0.2px;display:flex;align-items:center;gap:8px;margin:0">
+          <span style="display:inline-block;width:8px;height:8px;background:#00c853;border-radius:50%;box-shadow:0 0 8px rgba(0,200,83,0.6);animation:gbForoPulse 1.8s infinite"></span>
+          Conversacion en vivo
+        </h3>
+        <a href="/foro" style="color:rgba(255,255,255,0.5);font-size:.78rem;text-decoration:none;font-weight:600">Ver todo &rarr;</a>
+      </div>
+      <div id="gbForoRecentList" style="display:grid;gap:8px"></div>
+    </div>
+  </section>
+
+  <style>
+    @keyframes gbForoPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(.95)}}
+    .gb-recent-item{display:flex;gap:12px;padding:12px 14px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;transition:all .15s;text-decoration:none;color:inherit}
+    .gb-recent-item:hover{border-color:rgba(0,200,83,0.25);background:rgba(255,255,255,0.04)}
+    .gb-recent-avatar{width:32px;height:32px;background:linear-gradient(135deg,#00c853,#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.78rem;flex-shrink:0}
+    .gb-recent-body{flex:1;min-width:0}
+    .gb-recent-head{display:flex;gap:8px;align-items:baseline;margin-bottom:3px;font-size:.78rem;flex-wrap:wrap}
+    .gb-recent-name{font-weight:800;color:#fff}
+    .gb-recent-match{color:rgba(0,200,83,0.85);font-weight:600;font-size:.72rem}
+    .gb-recent-time{color:rgba(255,255,255,0.35);margin-left:auto;font-size:.7rem;font-family:'Geist Mono','SF Mono',ui-monospace,monospace}
+    .gb-recent-text{color:rgba(255,255,255,0.7);font-size:.83rem;line-height:1.45;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  </style>
+
+  <script>
+  (function(){
+    var SB_URL='https://ixfrtjvhnpapyuphqfxp.supabase.co';
+    var SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZnJ0anZobnBhcHl1cGhxZnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MDExOTMsImV4cCI6MjA4OTE3NzE5M30.Lc5cOfvXCrrMlm9Yup5GG6RgCxOB_GSNJnKLTb1-bZQ';
+    var H={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+    function ago(iso){var d=new Date(iso),m=Math.round((Date.now()-d)/60000);if(m<1)return'ahora';if(m<60)return m+'m';if(m<1440)return Math.round(m/60)+'h';return Math.round(m/1440)+'d';}
+    function av(n){return(n||'A')[0].toUpperCase();}
+    function safe(s){return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').slice(0,140);}
+    async function load(){
+      try{
+        var r=await fetch(SB_URL+'/rest/v1/forum_posts?select=id,thread_id,user_name,content,created_at,is_deleted,forum_threads(home,away)&is_deleted=eq.false&order=created_at.desc&limit=6',{headers:H});
+        if(!r.ok){document.getElementById('gbForoRecent').style.display='none';return;}
+        var posts=await r.json();
+        if(!posts.length){document.getElementById('gbForoRecent').style.display='none';return;}
+        var list=document.getElementById('gbForoRecentList');
+        list.innerHTML=posts.map(function(p){
+          var t=p.forum_threads||{};
+          var match=(t.home&&t.away)?(safe(t.home)+' vs '+safe(t.away)):'';
+          return '<a class="gb-recent-item" href="/foro">'+
+            '<div class="gb-recent-avatar">'+av(p.user_name)+'</div>'+
+            '<div class="gb-recent-body">'+
+            '<div class="gb-recent-head"><span class="gb-recent-name">'+safe(p.user_name||'Anonimo')+'</span>'+
+            (match?'<span class="gb-recent-match">'+match+'</span>':'')+
+            '<span class="gb-recent-time">'+ago(p.created_at)+'</span></div>'+
+            '<div class="gb-recent-text">'+safe(p.content)+'</div></div></a>';
+        }).join('');
+      }catch(e){document.getElementById('gbForoRecent').style.display='none';}
+    }
+    if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load);else load();
+  })();
+  </script>
+
+  <section id="gbRichFooter" aria-label="Mapa del sitio Gambeta IA">
   <div class="gb-rf-inner">
     <div class="gb-rf-grid">
 

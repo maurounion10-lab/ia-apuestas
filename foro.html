@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0f">
+<title>Foro Gambeta · Comunidad de apostadores con IA</title>
+<meta name="description" content="Sumate al foro de Gambeta. Comentá los picks IA, compartí tus apuestas, debatí lesiones y dónde está el valor. Comunidad de apostadores con datos.">
+<link rel="canonical" href="https://gambeta.ai/foro">
+<meta property="og:title" content="Foro Gambeta · Comunidad de apostadores con IA">
+<meta property="og:description" content="Sumate al foro de Gambeta. Comentá los picks, debatí lesiones, encontrá valor.">
+<meta property="og:image" content="https://gambeta.ai/og-image.png">
+<meta property="og:url" content="https://gambeta.ai/foro">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@Gambeta_ai">
+<link rel="icon" href="/favicon.ico">
+<link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('/fonts/inter-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('/fonts/inter-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
+@font-face{font-family:'Geist Mono';font-style:normal;font-weight:100 900;font-display:swap;src:url('/fonts/geist-mono-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--verde:#00c853;--fondo:#0a0a0f;--card:#111118;--border:rgba(255,255,255,0.08);--texto:#f0ece0;--mute:rgba(255,255,255,0.55);--gold:#FFD700;--rosa:#FF3366}
+html,body{background:var(--fondo);color:var(--texto);font-family:'Inter','Segoe UI',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;padding-top:66px}
+a{color:inherit;text-decoration:none}
+nav.nav{position:fixed;top:0;left:0;right:0;height:66px;background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);display:flex;align-items:center;padding:0 20px;z-index:10000}
+.nav-logo-wrap{display:flex;align-items:center;gap:11px}
+.nav-icon-box{width:42px;height:42px;background:linear-gradient(135deg,#0d2a0d,#112011);border:1px solid rgba(0,200,83,0.35);border-radius:11px;display:flex;align-items:center;justify-content:center}
+.nav-logo-text{font-size:1.08rem;font-weight:900;color:#fff}
+.nav-logo-text span{color:#00c853}
+.nav-back{margin-left:auto;color:rgba(255,255,255,0.7);font-size:.82rem;padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);transition:all .15s}
+.nav-back:hover{color:#fff;border-color:rgba(255,255,255,0.25)}
+.hero{padding:48px 20px 32px;text-align:center;background:linear-gradient(180deg,#0d1a0d,#0a0a0f);border-bottom:1px solid var(--border)}
+.hero h1{font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:900;letter-spacing:-0.5px;margin-bottom:10px}
+.hero h1 span{background:linear-gradient(135deg,var(--verde),#00e860);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--mute);max-width:560px;margin:0 auto 22px;font-size:.95rem}
+.stats{display:flex;gap:20px;justify-content:center;margin-top:18px;flex-wrap:wrap}
+.stat{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:14px 22px;min-width:130px}
+.stat-val{font-family:'Geist Mono','SF Mono',ui-monospace,monospace;font-size:1.6rem;font-weight:800;color:var(--verde);font-variant-numeric:tabular-nums}
+.stat-lbl{font-size:.7rem;color:var(--mute);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
+main{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+.section-title{font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--mute);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title::before{content:'';width:4px;height:14px;background:var(--verde);border-radius:2px}
+.thread-list{display:grid;gap:10px}
+.thread{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:all .15s;cursor:pointer;display:block}
+.thread:hover{border-color:rgba(0,200,83,0.3);transform:translateY(-1px)}
+.thread-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
+.thread-match{font-size:1.02rem;font-weight:800;color:#fff;line-height:1.3}
+.thread-meta{display:flex;gap:14px;font-size:.72rem;color:var(--mute);flex-shrink:0;font-family:'Geist Mono','SF Mono',monospace;font-variant-numeric:tabular-nums}
+.thread-meta b{color:#fff;font-weight:700}
+.thread-rec{display:inline-block;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.25);color:var(--verde);font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:6px;margin-top:6px;letter-spacing:0.3px}
+.thread-preview{color:rgba(255,255,255,0.7);font-size:.85rem;margin-top:10px;line-height:1.5;max-height:42px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.thread-author{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:.72rem;color:var(--mute)}
+.thread-author-avatar{width:22px;height:22px;background:linear-gradient(135deg,var(--verde),#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.7rem}
+.empty{text-align:center;padding:48px 20px;color:var(--mute);font-size:.9rem}
+.loading{display:flex;gap:8px;justify-content:center;padding:40px;color:var(--mute);font-size:.85rem}
+.cta-box{background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(0,200,83,0.02));border:1px solid rgba(0,200,83,0.25);border-radius:14px;padding:24px;text-align:center;margin-top:28px}
+.cta-box h3{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px}
+.cta-box p{font-size:.85rem;color:var(--mute);margin-bottom:14px}
+.cta-box a{display:inline-block;background:var(--verde);color:#000;font-weight:800;padding:10px 22px;border-radius:8px;font-size:.85rem;transition:all .15s}
+.cta-box a:hover{background:#00e860;transform:translateY(-1px)}
+@media(max-width:600px){
+  .hero{padding:32px 16px 24px}
+  .stats{gap:10px}
+  .stat{min-width:90px;padding:12px 14px}
+  .stat-val{font-size:1.3rem}
+  main{padding:24px 16px 60px}
+  .thread{padding:14px 16px}
+  .thread-head{flex-direction:column;gap:6px}
+  .thread-meta{font-size:.68rem}
+}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a class="nav-logo-wrap" href="/">
+    <div class="nav-icon-box" style="font-size:1.4rem">⚡</div>
+    <div class="nav-logo-text">gambeta<span>.ai</span></div>
+  </a>
+  <a class="nav-back" href="/">← Volver al sitio</a>
+</nav>
+
+<header class="hero">
+  <h1>💬 Foro <span>Gambeta</span></h1>
+  <p>Comentá los picks IA, compartí tus apuestas, debatí lesiones y dónde está el valor. Una comunidad de apostadores con datos.</p>
+  <div class="stats">
+    <div class="stat"><div class="stat-val" id="statThreads">–</div><div class="stat-lbl">Hilos</div></div>
+    <div class="stat"><div class="stat-val" id="statPosts">–</div><div class="stat-lbl">Mensajes</div></div>
+    <div class="stat"><div class="stat-val" id="statHoy">–</div><div class="stat-lbl">Hoy</div></div>
+  </div>
+</header>
+
+<main>
+  <div class="section-title">🔥 Hilos recientes</div>
+  <div class="thread-list" id="threadList">
+    <div class="loading">Cargando hilos…</div>
+  </div>
+  <div class="cta-box">
+    <h3>¿Querés sumar tu opinión?</h3>
+    <p>Para comentar y dar like, entrá a cualquier pick del home y abrí la ficha. Cada partido tiene su hilo.</p>
+    <a href="/#predictions">Ver picks de hoy →</a>
+  </div>
+</main>
+
+<script>
+const SB_URL = 'https://ixfrtjvhnpapyuphqfxp.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZnJ0anZobnBhcHl1cGhxZnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MDExOTMsImV4cCI6MjA4OTE3NzE5M30.Lc5cOfvXCrrMlm9Yup5GG6RgCxOB_GSNJnKLTb1-bZQ';
+const HEADERS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
+
+function timeAgo(iso) {
+  const d = new Date(iso);
+  const ago = Math.round((Date.now() - d.getTime()) / 60000);
+  if (ago < 1) return 'ahora';
+  if (ago < 60) return ago + 'm';
+  if (ago < 1440) return Math.round(ago/60) + 'h';
+  return Math.round(ago/1440) + 'd';
+}
+
+function avatarLetter(name) {
+  return (name || 'A')[0].toUpperCase();
+}
+
+function shortDate(iso) {
+  if (!iso) return '';
+  return new Date(iso).toLocaleDateString('es-AR',{day:'2-digit',month:'short'});
+}
+
+async function loadForum() {
+  try {
+    // Threads recientes con su última actividad
+    const [threadsR, postsR] = await Promise.all([
+      fetch(SB_URL + '/rest/v1/forum_threads?select=id,home,away,league,match_date,pick_data,created_at&order=created_at.desc&limit=15', { headers: HEADERS }),
+      fetch(SB_URL + '/rest/v1/forum_posts?select=id,thread_id,user_name,content,created_at,is_deleted&is_deleted=eq.false&order=created_at.desc&limit=50', { headers: HEADERS })
+    ]);
+    const threads = await threadsR.json();
+    const posts = await postsR.json();
+
+    // Stats globales
+    const allThreadsCountR = await fetch(SB_URL + '/rest/v1/forum_threads?select=id', { headers: { ...HEADERS, 'Prefer': 'count=exact', 'Range': '0-0' } });
+    const allThreadsCount = parseInt((allThreadsCountR.headers.get('content-range') || '0/0').split('/')[1]) || threads.length;
+
+    const allPostsCountR = await fetch(SB_URL + '/rest/v1/forum_posts?select=id&is_deleted=eq.false', { headers: { ...HEADERS, 'Prefer': 'count=exact', 'Range': '0-0' } });
+    const allPostsCount = parseInt((allPostsCountR.headers.get('content-range') || '0/0').split('/')[1]) || posts.length;
+
+    // Posts de hoy
+    const todayStart = new Date(); todayStart.setHours(0,0,0,0);
+    const todayCount = posts.filter(p => new Date(p.created_at) >= todayStart).length;
+
+    document.getElementById('statThreads').textContent = allThreadsCount;
+    document.getElementById('statPosts').textContent = allPostsCount;
+    document.getElementById('statHoy').textContent = todayCount;
+
+    // Build thread list con posts agrupados
+    const postsByThread = {};
+    posts.forEach(p => {
+      if (!postsByThread[p.thread_id]) postsByThread[p.thread_id] = [];
+      postsByThread[p.thread_id].push(p);
+    });
+
+    const list = document.getElementById('threadList');
+    if (!threads.length) {
+      list.innerHTML = '<div class="empty">No hay hilos todavía. Andá a un pick del home y comentá para arrancar la comunidad. 💬</div>';
+      return;
+    }
+
+    list.innerHTML = threads.map(t => {
+      const tposts = postsByThread[t.id] || [];
+      const lastPost = tposts[0];
+      const lastAuthor = lastPost ? lastPost.user_name : (t.pick_data?.user_name || 'IA');
+      const preview = lastPost ? lastPost.content.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '').slice(0, 140) : 'Sin comentarios aún';
+      const rec = t.pick_data?.rec || '';
+      const lastTs = lastPost ? lastPost.created_at : t.created_at;
+      // Link a la ficha (el handler en home abre el modal)
+      const anchor = '#predcard-' + (t.id || (t.home + '-' + t.away).toLowerCase().replace(/[^a-z0-9]/g, '-'));
+      return `
+        <a class="thread" href="/${anchor}" data-thread-id="${t.id}">
+          <div class="thread-head">
+            <div>
+              <div class="thread-match">${t.home} vs ${t.away}</div>
+              ${rec ? `<span class="thread-rec">${rec}</span>` : ''}
+            </div>
+            <div class="thread-meta">
+              <span><b>${tposts.length}</b> 💬</span>
+              <span>${timeAgo(lastTs)}</span>
+            </div>
+          </div>
+          <div class="thread-preview">${preview}</div>
+          <div class="thread-author">
+            <div class="thread-author-avatar">${avatarLetter(lastAuthor)}</div>
+            <span>${lastAuthor}</span>
+          </div>
+        </a>`;
+    }).join('');
+  } catch (e) {
+    document.getElementById('threadList').innerHTML = '<div class="empty">No pudimos cargar los hilos. Probá refrescar.</div>';
+    console.error('[foro]', e);
+  }
+}
+
+loadForum();
+</script>
+</body>
+</html>
