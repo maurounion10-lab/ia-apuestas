@@ -138,6 +138,45 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .tp-post-content{color:rgba(255,255,255,0.78);font-size:.86rem;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
 .tp-empty{text-align:center;padding:32px 20px;color:var(--mute);font-size:.85rem;background:rgba(0,0,0,0.2);border-radius:12px;border:1px dashed var(--border)}
 
+/* Tabs Comentario / Apuesta */
+.tp-tabs{display:flex;gap:6px;margin-bottom:12px}
+.tp-tab{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);color:var(--mute);font-weight:700;font-size:.78rem;padding:8px 12px;border-radius:9px;cursor:pointer;font-family:inherit;transition:all .15s}
+.tp-tab:hover{background:rgba(255,255,255,0.06);color:#fff}
+.tp-tab.active{background:linear-gradient(135deg,var(--accent,var(--verde)),var(--verde-d));color:#000;border-color:transparent}
+
+/* Form Apuesta */
+.tp-bet-row{display:flex;gap:8px;margin-bottom:8px;align-items:center}
+.tp-bet-row > span{color:var(--mute2);font-weight:700;font-size:.85rem;padding:0 4px}
+.tp-form select,.tp-form input[type="number"]{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.85rem;color:#fff;font-family:inherit;transition:border-color .15s}
+.tp-form select:focus,.tp-form input[type="number"]:focus{outline:none;border-color:var(--accent,var(--verde))}
+.tp-form select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+.tp-form select option{background:#0f0f12;color:#fff}
+.tp-bet-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px}
+.tp-bet-grid label{display:block;font-size:.65rem;color:var(--mute);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px;font-weight:700}
+.tp-bet-help{font-size:.7rem;color:var(--mute2);margin-top:-2px;margin-bottom:8px}
+
+/* Card de POST con bet_data */
+.tp-post.is-bet{background:linear-gradient(135deg,rgba(255,215,0,0.05),rgba(255,215,0,0.01));border-color:rgba(255,215,0,0.25)}
+.tp-post.is-bet:hover{border-color:rgba(255,215,0,0.5)}
+.bet-banner{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.bet-badge{display:inline-flex;align-items:center;gap:4px;background:linear-gradient(135deg,#FFD700,#FFAA00);color:#000;font-size:.66rem;font-weight:900;padding:3px 8px;border-radius:6px;letter-spacing:1px;text-transform:uppercase}
+.bet-house{font-size:.7rem;color:var(--mute);font-weight:700}
+.bet-house.is-sponsor{color:#FFD700}
+.bet-match{font-size:.95rem;font-weight:800;color:#fff;line-height:1.3;margin-bottom:2px}
+.bet-league{font-size:.66rem;color:var(--mute);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:8px}
+.bet-pick{display:inline-block;background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-size:.78rem;font-weight:800;padding:4px 12px;border-radius:8px;margin-bottom:10px}
+.bet-meta{display:flex;gap:12px;font-size:.75rem;color:var(--mute);margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.bet-meta b{color:#fff;font-weight:800;font-family:'Geist Mono','SF Mono',monospace;font-variant-numeric:tabular-nums}
+.bet-odds{background:rgba(255,255,255,0.04);padding:4px 10px;border-radius:6px;border:1px solid var(--border)}
+.bet-odds b{color:#FFD700;font-size:.95rem}
+.bet-status{padding:3px 8px;border-radius:6px;font-size:.7rem;font-weight:800;text-transform:uppercase;letter-spacing:0.8px}
+.bet-status.pending{background:rgba(255,255,255,0.06);color:var(--mute);border:1px solid var(--border)}
+.bet-status.win{background:rgba(0,200,83,0.15);color:var(--verde);border:1px solid rgba(0,200,83,0.4)}
+.bet-status.loss{background:rgba(255,51,102,0.15);color:var(--rosa);border:1px solid rgba(255,51,102,0.4)}
+.bet-justif{color:rgba(255,255,255,0.7);font-size:.85rem;line-height:1.5;margin-bottom:12px;white-space:pre-wrap;word-wrap:break-word}
+.bet-cta{display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,#FFD700,#FFAA00);color:#000;font-weight:900;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:.78rem;transition:all .15s}
+.bet-cta:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(255,215,0,0.3)}
+
 @media(max-width:600px){
   .topic-panel{padding:18px 14px}
   .tp-form input[type="text"]{width:100%;flex:1 1 100%}
@@ -198,16 +237,86 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
     </div>
     <div class="tp-desc" id="tpDesc">…</div>
     <form class="tp-form" id="tpForm" autocomplete="off">
+      <div class="tp-tabs">
+        <button type="button" class="tp-tab active" data-mode="comment">💬 Comentario</button>
+        <button type="button" class="tp-tab" data-mode="bet">🎯 Publicar Apuesta</button>
+      </div>
+
       <div class="tp-form-row">
         <input type="text" id="tpName" placeholder="Tu nombre o alias" maxlength="40" required>
       </div>
-      <div class="tp-form-row">
-        <textarea id="tpText" placeholder="Compartí tu aporte… (mín. 10 caracteres, máx. 500)" maxlength="500" required></textarea>
+
+      <!-- Modo comentario -->
+      <div id="tpCommentFields">
+        <div class="tp-form-row">
+          <textarea id="tpText" placeholder="Compartí tu aporte… (mín. 10 caracteres, máx. 500)" maxlength="500"></textarea>
+        </div>
+        <div class="tp-form-actions">
+          <span><span id="tpCharCount">0</span>/500</span>
+          <button type="submit" id="tpSubmit">Publicar</button>
+        </div>
       </div>
-      <div class="tp-form-actions">
-        <span><span id="tpCharCount">0</span>/500</span>
-        <button type="submit" id="tpSubmit">Publicar</button>
+
+      <!-- Modo apuesta -->
+      <div id="tpBetFields" style="display:none">
+        <div class="tp-bet-row">
+          <input type="text" id="tpBetHome" placeholder="Equipo local" maxlength="50">
+          <span>vs</span>
+          <input type="text" id="tpBetAway" placeholder="Equipo visitante" maxlength="50">
+        </div>
+        <div class="tp-form-row">
+          <input type="text" id="tpBetLeague" placeholder="Liga (ej: La Liga, Premier, Mundial 2026)" maxlength="60">
+        </div>
+        <div class="tp-form-row">
+          <select id="tpBetPick">
+            <option value="">— Elegí tu pick —</option>
+            <option value="Gana Local">Gana Local</option>
+            <option value="Empate">Empate</option>
+            <option value="Gana Visitante">Gana Visitante</option>
+            <option value="Doble 1X">Doble 1X (Local o Empate)</option>
+            <option value="Doble 12">Doble 12 (Sin Empate)</option>
+            <option value="Doble X2">Doble X2 (Empate o Visitante)</option>
+            <option value="Más de 1.5 goles">Más de 1.5 goles</option>
+            <option value="Más de 2.5 goles">Más de 2.5 goles</option>
+            <option value="Más de 3.5 goles">Más de 3.5 goles</option>
+            <option value="Menos de 2.5 goles">Menos de 2.5 goles</option>
+            <option value="Menos de 3.5 goles">Menos de 3.5 goles</option>
+            <option value="Ambos marcan SÍ">Ambos marcan SÍ</option>
+            <option value="Ambos marcan NO">Ambos marcan NO</option>
+            <option value="__custom__">Otro pick personalizado…</option>
+          </select>
+        </div>
+        <div class="tp-form-row" id="tpBetCustomRow" style="display:none">
+          <input type="text" id="tpBetCustom" placeholder="Describí tu pick (ej: '1er gol Mbappé', 'Saque inicial', etc)" maxlength="80">
+        </div>
+        <div class="tp-bet-grid">
+          <div>
+            <label>Cuota</label>
+            <input type="number" id="tpBetOdds" step="0.01" min="1.01" max="100" placeholder="1.85">
+          </div>
+          <div>
+            <label>Stake ($)</label>
+            <input type="number" id="tpBetStake" step="100" min="0" placeholder="opcional">
+          </div>
+          <div>
+            <label>Casa</label>
+            <select id="tpBetHouse">
+              <option value="DBbet">⭐ DBbet (sponsor)</option>
+              <option value="Melbet">Melbet</option>
+              <option value="Otra">Otra</option>
+            </select>
+          </div>
+        </div>
+        <div class="tp-form-row">
+          <textarea id="tpBetComment" placeholder="Justificación (opcional, máx. 300 chars)…" maxlength="300"></textarea>
+        </div>
+        <div class="tp-bet-help">⏳ La apuesta queda pendiente. Se resuelve automáticamente cuando termine el partido con nuestros scores.</div>
+        <div class="tp-form-actions">
+          <span></span>
+          <button type="submit" id="tpSubmitBet">🎯 Publicar Apuesta</button>
+        </div>
       </div>
+
       <div class="tp-msg" id="tpMsg"></div>
     </form>
     <div class="tp-posts" id="tpPosts">
@@ -386,6 +495,36 @@ async function loadTopicPosts(tid) {
     list.innerHTML = posts.map(p => {
       const name = p.user_name || 'Anónimo';
       const isAi = isAiUser(name);
+      const bd = p.bet_data;
+      // ── Post con apuesta ──
+      if (bd && bd.is_bet) {
+        const dbbetUrl = 'https://db-bet-3540.pro/?tag=5777587_l';
+        const isDBbet = (bd.house || '').toLowerCase() === 'dbbet';
+        const statusClass = bd.result === 'win' ? 'win' : bd.result === 'loss' ? 'loss' : 'pending';
+        const statusTxt = bd.result === 'win' ? '✅ GANADA' : bd.result === 'loss' ? '❌ PERDIDA' : '⏳ PENDIENTE';
+        return `<div class="tp-post is-bet">
+          <div class="tp-post-head">
+            <div class="tp-post-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(name)}</div>
+            <span class="tp-post-name">${safe(name)}</span>
+            <span class="tp-post-time">${timeAgo(p.created_at)}</span>
+          </div>
+          <div class="bet-banner">
+            <span class="bet-badge">🎯 Apuesta</span>
+            <span class="bet-house ${isDBbet ? 'is-sponsor' : ''}">${isDBbet ? '⭐ DBbet' : safe(bd.house || 'Casa')}</span>
+          </div>
+          <div class="bet-match">${safe(bd.home)} vs ${safe(bd.away)}</div>
+          ${bd.league ? `<div class="bet-league">${safe(bd.league)}</div>` : ''}
+          <div class="bet-pick">${safe(bd.pick)}</div>
+          <div class="bet-meta">
+            <span class="bet-odds">Cuota: <b>${Number(bd.odds).toFixed(2)}</b></span>
+            ${bd.stake ? `<span>Stake: <b>$${Number(bd.stake).toLocaleString('es-AR')}</b></span>` : ''}
+            <span class="bet-status ${statusClass}">${statusTxt}</span>
+          </div>
+          ${bd.justification ? `<div class="bet-justif">${safe(bd.justification)}</div>` : ''}
+          ${isDBbet ? `<a class="bet-cta" href="${dbbetUrl}" target="_blank" rel="noopener" onclick="try{window.dataLayer&&window.dataLayer.push({event:'bet_cta_dbbet'})}catch(e){}">🔗 Apostar en DBbet</a>` : ''}
+        </div>`;
+      }
+      // ── Post comentario normal ──
       return `<div class="tp-post">
         <div class="tp-post-head">
           <div class="tp-post-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(name)}</div>
@@ -418,40 +557,114 @@ document.getElementById('tpText').addEventListener('input', e => {
   document.getElementById('tpCharCount').textContent = e.target.value.length;
 });
 
+// Tabs comentario/apuesta
+let _formMode = 'comment';
+document.querySelectorAll('.tp-tab').forEach(t => {
+  t.addEventListener('click', () => {
+    _formMode = t.dataset.mode;
+    document.querySelectorAll('.tp-tab').forEach(b => b.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tpCommentFields').style.display = _formMode === 'comment' ? '' : 'none';
+    document.getElementById('tpBetFields').style.display = _formMode === 'bet' ? '' : 'none';
+    document.getElementById('tpMsg').className = 'tp-msg';
+    document.getElementById('tpMsg').textContent = '';
+  });
+});
+
+// Toggle pick personalizado
+document.getElementById('tpBetPick').addEventListener('change', e => {
+  document.getElementById('tpBetCustomRow').style.display = e.target.value === '__custom__' ? '' : 'none';
+});
+
+// Submit form (modo comentario o apuesta)
 document.getElementById('tpForm').addEventListener('submit', async e => {
   e.preventDefault();
   if (!_currentTopicId) return;
   const name = document.getElementById('tpName').value.trim();
-  const text = document.getElementById('tpText').value.trim();
   const msg = document.getElementById('tpMsg');
-  const btn = document.getElementById('tpSubmit');
-  msg.className = 'tp-msg';
-  msg.textContent = '';
+  msg.className = 'tp-msg'; msg.textContent = '';
 
   if (name.length < 2) { msg.className='tp-msg err'; msg.textContent='El nombre debe tener al menos 2 caracteres.'; return; }
-  if (text.length < 10) { msg.className='tp-msg err'; msg.textContent='El texto debe tener al menos 10 caracteres.'; return; }
-  if (text.length > 500) { msg.className='tp-msg err'; msg.textContent='Máximo 500 caracteres.'; return; }
   if (!rateLimitOk()) { msg.className='tp-msg err'; msg.textContent='Frená un poco — máx 3 posts cada 5 minutos.'; return; }
+
+  // ── Modo COMENTARIO ──
+  if (_formMode === 'comment') {
+    const text = document.getElementById('tpText').value.trim();
+    const btn = document.getElementById('tpSubmit');
+    if (text.length < 10) { msg.className='tp-msg err'; msg.textContent='El texto debe tener al menos 10 caracteres.'; return; }
+    if (text.length > 500) { msg.className='tp-msg err'; msg.textContent='Máximo 500 caracteres.'; return; }
+    btn.disabled = true; btn.textContent='Publicando…';
+    try {
+      const r = await fetch(SB_URL + '/rest/v1/forum_posts', {
+        method:'POST',
+        headers: { ...H, 'Content-Type':'application/json', 'Prefer':'return=minimal' },
+        body: JSON.stringify({ thread_id:_currentTopicId, user_name:name, user_email:'foro@gambeta.ai', content:text, is_ai_post:false, is_deleted:false })
+      });
+      if (!r.ok) throw new Error('http_'+r.status);
+      localStorage.setItem('gb_forum_alias', name);
+      msg.className='tp-msg ok'; msg.textContent='¡Publicado! 🎉';
+      document.getElementById('tpText').value=''; document.getElementById('tpCharCount').textContent='0';
+      await loadTopicPosts(_currentTopicId);
+      loadAll();
+    } catch(err) {
+      msg.className='tp-msg err'; msg.textContent='No se pudo publicar. Probá de nuevo.';
+    } finally { btn.disabled=false; btn.textContent='Publicar'; }
+    return;
+  }
+
+  // ── Modo APUESTA ──
+  const btn = document.getElementById('tpSubmitBet');
+  const home = document.getElementById('tpBetHome').value.trim();
+  const away = document.getElementById('tpBetAway').value.trim();
+  const league = document.getElementById('tpBetLeague').value.trim();
+  let pick = document.getElementById('tpBetPick').value;
+  const custom = document.getElementById('tpBetCustom').value.trim();
+  const odds = parseFloat(document.getElementById('tpBetOdds').value);
+  const stake = parseFloat(document.getElementById('tpBetStake').value) || null;
+  const house = document.getElementById('tpBetHouse').value;
+  const justif = document.getElementById('tpBetComment').value.trim();
+
+  if (!home || !away) { msg.className='tp-msg err'; msg.textContent='Indicá los 2 equipos (local y visitante).'; return; }
+  if (!pick) { msg.className='tp-msg err'; msg.textContent='Elegí un pick.'; return; }
+  if (pick === '__custom__') {
+    if (custom.length < 3) { msg.className='tp-msg err'; msg.textContent='Describí tu pick personalizado.'; return; }
+    pick = custom;
+  }
+  if (!odds || odds < 1.01) { msg.className='tp-msg err'; msg.textContent='Cuota mínima 1.01.'; return; }
+
+  const betData = {
+    is_bet: true,
+    home, away, league: league || null,
+    pick, odds, stake,
+    house,
+    justification: justif || null,
+    result: 'pending',
+    posted_at: new Date().toISOString()
+  };
+  // Composé un content legible (para feed/listado)
+  const content = `🎯 Apuesta: ${home} vs ${away}${league ? ' ('+league+')' : ''}\nPick: ${pick} @ ${odds.toFixed(2)}${stake ? ' · $'+stake : ''}${justif ? '\n'+justif : ''}`;
 
   btn.disabled = true; btn.textContent='Publicando…';
   try {
     const r = await fetch(SB_URL + '/rest/v1/forum_posts', {
       method:'POST',
       headers: { ...H, 'Content-Type':'application/json', 'Prefer':'return=minimal' },
-      body: JSON.stringify({ thread_id:_currentTopicId, user_name:name, user_email:'foro@gambeta.ai', content:text, is_ai_post:false, is_deleted:false })
+      body: JSON.stringify({ thread_id:_currentTopicId, user_name:name, user_email:'foro@gambeta.ai', content, bet_data:betData, is_ai_post:false, is_deleted:false })
     });
     if (!r.ok) throw new Error('http_'+r.status);
     localStorage.setItem('gb_forum_alias', name);
-    msg.className='tp-msg ok'; msg.textContent='¡Publicado! 🎉';
-    document.getElementById('tpText').value=''; document.getElementById('tpCharCount').textContent='0';
+    msg.className='tp-msg ok'; msg.textContent='¡Apuesta publicada! 🎯';
+    // Limpiar form bet
+    ['tpBetHome','tpBetAway','tpBetLeague','tpBetOdds','tpBetStake','tpBetComment','tpBetCustom'].forEach(id => {
+      const el = document.getElementById(id); if (el) el.value = '';
+    });
+    document.getElementById('tpBetPick').value = '';
+    document.getElementById('tpBetCustomRow').style.display = 'none';
     await loadTopicPosts(_currentTopicId);
-    // Refrescar también la stats del hero
     loadAll();
   } catch(err) {
     msg.className='tp-msg err'; msg.textContent='No se pudo publicar. Probá de nuevo.';
-  } finally {
-    btn.disabled=false; btn.textContent='Publicar';
-  }
+  } finally { btn.disabled=false; btn.textContent='🎯 Publicar Apuesta'; }
 });
 
 function renderTabsCounts() {
