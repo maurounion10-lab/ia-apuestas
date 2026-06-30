@@ -2066,6 +2066,144 @@
     .gb-zone-label { font-size: 0.62rem; letter-spacing: 1px; padding: 3px 8px; }
   }
 
+
+  /* 🆕 (#587) FAQ Acordeón premium con animación grid moderna */
+  .gb-faq-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .gb-faq-item {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 14px;
+    overflow: hidden;
+    transition:
+      border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      background 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+      box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .gb-faq-item:hover {
+    border-color: rgba(0,200,83,0.25);
+    background: rgba(255,255,255,0.045);
+  }
+  .gb-faq-item[open] {
+    border-color: rgba(0,200,83,0.35);
+    background: rgba(0,200,83,0.025);
+    box-shadow: 0 4px 24px rgba(0,200,83,0.08);
+  }
+  .gb-faq-item summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 22px;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+    transition: padding 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .gb-faq-item summary::-webkit-details-marker,
+  .gb-faq-item summary::marker { display: none; }
+  .gb-faq-q {
+    font-family: 'Inter',system-ui,sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #fff;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+    flex: 1;
+  }
+  .gb-faq-icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0,200,83,0.12);
+    border: 1px solid rgba(0,200,83,0.25);
+    position: relative;
+    transition:
+      transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+      background 0.3s ease,
+      border-color 0.3s ease;
+  }
+  .gb-faq-icon::before,
+  .gb-faq-icon::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    background: #00e676;
+    border-radius: 1px;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .gb-faq-icon::before {
+    width: 11px;
+    height: 1.5px;
+    transform: translate(-50%, -50%);
+  }
+  .gb-faq-icon::after {
+    width: 1.5px;
+    height: 11px;
+    transform: translate(-50%, -50%);
+  }
+  .gb-faq-item[open] .gb-faq-icon {
+    transform: rotate(180deg);
+    background: rgba(0,200,83,0.22);
+    border-color: rgba(0,200,83,0.5);
+  }
+  .gb-faq-item[open] .gb-faq-icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+  }
+  .gb-faq-item:hover .gb-faq-icon {
+    background: rgba(0,200,83,0.18);
+    border-color: rgba(0,200,83,0.4);
+  }
+
+  /* Animación grid-template-rows 0fr → 1fr (técnica moderna 2024+) */
+  .gb-faq-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .gb-faq-item[open] .gb-faq-content {
+    grid-template-rows: 1fr;
+  }
+  .gb-faq-content-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+  .gb-faq-content-inner p {
+    padding: 0 22px 20px;
+    font-size: 0.92rem;
+    color: rgba(255,255,255,0.72);
+    line-height: 1.7;
+    margin: 0;
+    opacity: 0;
+    transform: translateY(-4px);
+    transition:
+      opacity 0.35s cubic-bezier(0.4, 0, 0.2, 1) 0.1s,
+      transform 0.35s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+  }
+  .gb-faq-item[open] .gb-faq-content-inner p {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Reduced motion respeta accesibilidad */
+  @media (prefers-reduced-motion: reduce) {
+    .gb-faq-item, .gb-faq-icon, .gb-faq-icon::before, .gb-faq-icon::after,
+    .gb-faq-content, .gb-faq-content-inner p {
+      transition: none !important;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .gb-faq-item summary { padding: 16px 18px; gap: 12px; }
+    .gb-faq-q { font-size: 0.94rem; }
+    .gb-faq-content-inner p { padding: 0 18px 18px; font-size: 0.88rem; }
+  }
+
   /* ─── Gambeta 1.1 (#578) — Sistema de diseño premium ─── */
   /* Tipografía: Inter para UI + Geist Mono para números */
   h1, h2, h3, h4, h5, h6 {
@@ -7756,41 +7894,59 @@ window.toggleHeroBubble = function(n) {
 </section>
 
 <!-- SECCIÓN: FAQ -->
-<section id="gbFaq" style="background:#0a0a0a;border-top:1px solid rgba(0,200,83,0.15);padding:56px 20px 52px">
-  <div style="max-width:760px;margin:0 auto">
-    <div style="text-align:center;margin-bottom:32px">
+<section id="gbFaq" style="background:#0a0a0a;border-top:1px solid rgba(0,200,83,0.15);padding:64px 20px 60px">
+  <div style="max-width:780px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:36px">
       <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.28);border-radius:30px;padding:5px 18px;font-size:0.72rem;font-weight:700;color:var(--verde);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:18px">
         ❓ Preguntas frecuentes
       </div>
-      <h2 style="font-size:clamp(1.6rem,5vw,2.2rem);font-weight:900;color:#fff;margin:0;letter-spacing:-0.5px">
-        PREGUNTAS FRECUENTES
+      <h2 style="font-size:clamp(1.6rem,5vw,2.2rem);font-weight:900;color:#fff;margin:0;letter-spacing:-0.5px;font-family:'Inter',system-ui,sans-serif">
+        Lo que más nos preguntan
       </h2>
     </div>
-    <div style="display:flex;flex-direction:column;gap:14px">
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(0,200,83,0.15);border-radius:14px;padding:20px 22px">
-        <h3 style="font-size:1rem;font-weight:800;color:#fff;margin:0 0 8px">¿Qué es gambeta.ai?</h3>
-        <p style="font-size:0.9rem;color:rgba(255,255,255,0.55);line-height:1.65;margin:0">gambeta.ai es una inteligencia artificial que genera pronósticos de fútbol de forma automática. Analiza estadísticas, cuotas y contexto de cada partido para identificar picks con valor en más de 38 ligas, entre ellas Champions League, Premier League, Libertadores y la Liga Argentina.</p>
-      </div>
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(0,200,83,0.15);border-radius:14px;padding:20px 22px">
-        <h3 style="font-size:1rem;font-weight:800;color:#fff;margin:0 0 8px">¿gambeta.ai es gratis?</h3>
-        <p style="font-size:0.9rem;color:rgba(255,255,255,0.55);line-height:1.65;margin:0">Sí. Todos los pronósticos de la IA son gratuitos y no requieren registro para verlos. El proyecto se sostiene gracias a su sponsor, lo que permite mantener el acceso abierto para todos los usuarios.</p>
-      </div>
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(0,200,83,0.15);border-radius:14px;padding:20px 22px">
-        <h3 style="font-size:1rem;font-weight:800;color:#fff;margin:0 0 8px">¿Cómo genera los pronósticos la IA?</h3>
-        <p style="font-size:0.9rem;color:rgba(255,255,255,0.55);line-height:1.65;margin:0">La IA procesa estadísticas históricas y en tiempo real, cuotas del mercado, forma de los equipos y contexto de cada partido. Con esos datos calcula la probabilidad real de cada resultado y la compara con la cuota ofrecida para detectar dónde hay valor.</p>
-      </div>
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(0,200,83,0.15);border-radius:14px;padding:20px 22px">
-        <h3 style="font-size:1rem;font-weight:800;color:#fff;margin:0 0 8px">¿Qué ligas y competencias cubre gambeta.ai?</h3>
-        <p style="font-size:0.9rem;color:rgba(255,255,255,0.55);line-height:1.65;margin:0">gambeta.ai cubre más de 38 ligas y competencias, incluyendo Champions League, Premier League, La Liga, Serie A, Copa Libertadores y la Liga Profesional Argentina, además de torneos de otros continentes.</p>
-      </div>
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(0,200,83,0.15);border-radius:14px;padding:20px 22px">
-        <h3 style="font-size:1rem;font-weight:800;color:#fff;margin:0 0 8px">¿Necesito crear una cuenta para usar gambeta.ai?</h3>
-        <p style="font-size:0.9rem;color:rgba(255,255,255,0.55);line-height:1.65;margin:0">No es obligatorio. Podés ver los pronósticos del día sin registrarte. Crear una cuenta gratuita habilita funciones extra como el seguimiento de resultados, el Bankroll Manager y el canje de premios.</p>
-      </div>
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(0,200,83,0.15);border-radius:14px;padding:20px 22px">
-        <h3 style="font-size:1rem;font-weight:800;color:#fff;margin:0 0 8px">¿Los pronósticos de gambeta.ai garantizan ganancias?</h3>
-        <p style="font-size:0.9rem;color:rgba(255,255,255,0.55);line-height:1.65;margin:0">No. Ningún pronóstico puede garantizar ganancias: las apuestas deportivas siempre implican riesgo. gambeta.ai es una herramienta de análisis que busca picks con valor a largo plazo. Apostá siempre con responsabilidad y solo dinero que puedas permitirte perder.</p>
-      </div>
+    <div class="gb-faq-list">
+      <details class="gb-faq-item" open>
+        <summary>
+          <span class="gb-faq-q">¿Qué es gambeta.ai?</span>
+          <span class="gb-faq-icon" aria-hidden="true"></span>
+        </summary>
+        <div class="gb-faq-content"><div class="gb-faq-content-inner"><p>gambeta.ai es una inteligencia artificial que genera pronósticos de fútbol de forma automática. Analiza estadísticas, cuotas y contexto de cada partido para identificar picks con valor en más de 38 ligas, entre ellas Champions League, Premier League, Libertadores y la Liga Argentina.</p></div></div>
+      </details>
+      <details class="gb-faq-item">
+        <summary>
+          <span class="gb-faq-q">¿gambeta.ai es gratis?</span>
+          <span class="gb-faq-icon" aria-hidden="true"></span>
+        </summary>
+        <div class="gb-faq-content"><div class="gb-faq-content-inner"><p>Sí. Todos los pronósticos de la IA son gratuitos y no requieren registro para verlos. El proyecto se sostiene gracias a su sponsor, lo que permite mantener el acceso abierto para todos los usuarios.</p></div></div>
+      </details>
+      <details class="gb-faq-item">
+        <summary>
+          <span class="gb-faq-q">¿Cómo genera los pronósticos la IA?</span>
+          <span class="gb-faq-icon" aria-hidden="true"></span>
+        </summary>
+        <div class="gb-faq-content"><div class="gb-faq-content-inner"><p>La IA procesa estadísticas históricas y en tiempo real, cuotas del mercado, forma de los equipos y contexto de cada partido. Con esos datos calcula la probabilidad real de cada resultado y la compara con la cuota ofrecida para detectar dónde hay valor.</p></div></div>
+      </details>
+      <details class="gb-faq-item">
+        <summary>
+          <span class="gb-faq-q">¿Qué ligas y competencias cubre gambeta.ai?</span>
+          <span class="gb-faq-icon" aria-hidden="true"></span>
+        </summary>
+        <div class="gb-faq-content"><div class="gb-faq-content-inner"><p>gambeta.ai cubre más de 38 ligas y competencias, incluyendo Champions League, Premier League, La Liga, Serie A, Copa Libertadores y la Liga Profesional Argentina, además de torneos de otros continentes.</p></div></div>
+      </details>
+      <details class="gb-faq-item">
+        <summary>
+          <span class="gb-faq-q">¿Necesito crear una cuenta para usar gambeta.ai?</span>
+          <span class="gb-faq-icon" aria-hidden="true"></span>
+        </summary>
+        <div class="gb-faq-content"><div class="gb-faq-content-inner"><p>No es obligatorio. Podés ver los pronósticos del día sin registrarte. Crear una cuenta gratuita habilita funciones extra como el seguimiento de resultados, el Bankroll Manager y el canje de premios.</p></div></div>
+      </details>
+      <details class="gb-faq-item">
+        <summary>
+          <span class="gb-faq-q">¿Los pronósticos de gambeta.ai garantizan ganancias?</span>
+          <span class="gb-faq-icon" aria-hidden="true"></span>
+        </summary>
+        <div class="gb-faq-content"><div class="gb-faq-content-inner"><p>No. Ningún pronóstico puede garantizar ganancias: las apuestas deportivas siempre implican riesgo. gambeta.ai es una herramienta de análisis que busca picks con valor a largo plazo. Apostá siempre con responsabilidad y solo dinero que puedas permitirte perder.</p></div></div>
+      </details>
     </div>
   </div>
 </section>
@@ -14820,6 +14976,7 @@ setTimeout(_fpBadgeInit, 1200);
 </html>
 
 <!-- redeploy 2026-05-20T21:42Z: re-sync tras rollback de tarea escudos -->
+
 
 
 
