@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a0a0f">
 <title>Foro Gambeta · Comunidad de apostadores con IA</title>
-<meta name="description" content="Sumate al foro de Gambeta. Comentá los picks IA, compartí tus apuestas, debatí lesiones y dónde está el valor. Comunidad de apostadores con datos.">
+<meta name="description" content="Sumate al foro de Gambeta. Comentá los picks IA, debatí lesiones, compartí fichajes, encontrá valor. Comunidad de apostadores con datos.">
 <link rel="canonical" href="https://gambeta.ai/foro">
 <meta property="og:title" content="Foro Gambeta · Comunidad de apostadores con IA">
-<meta property="og:description" content="Sumate al foro de Gambeta. Comentá los picks, debatí lesiones, encontrá valor.">
+<meta property="og:description" content="Sub-foros por competencia, lesiones, valor, combinadas. Comunidad activa con datos.">
 <meta property="og:image" content="https://gambeta.ai/og-image.png">
 <meta property="og:url" content="https://gambeta.ai/foro">
 <meta name="twitter:card" content="summary_large_image">
@@ -20,9 +20,11 @@
 @font-face{font-family:'Inter';font-style:normal;font-weight:100 900;font-display:swap;src:url('/fonts/inter-latin-ext.woff2') format('woff2');unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+0304,U+0308,U+0329,U+1D00-1DBF,U+1E00-1E9F,U+1EF2-1EFF,U+2020,U+20A0-20AB,U+20AD-20C0,U+2113,U+2C60-2C7F,U+A720-A7FF}
 @font-face{font-family:'Geist Mono';font-style:normal;font-weight:100 900;font-display:swap;src:url('/fonts/geist-mono-latin.woff2') format('woff2');unicode-range:U+0000-00FF,U+0131}
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--verde:#00c853;--fondo:#0a0a0f;--card:#111118;--border:rgba(255,255,255,0.08);--texto:#f0ece0;--mute:rgba(255,255,255,0.55);--gold:#FFD700;--rosa:#FF3366}
+:root{--verde:#00c853;--verde-d:#009e3f;--fondo:#0a0a0f;--card:#111118;--card-hi:#14141c;--border:rgba(255,255,255,0.08);--border-hi:rgba(255,255,255,0.14);--texto:#f0ece0;--mute:rgba(255,255,255,0.55);--mute2:rgba(255,255,255,0.35);--gold:#FFD700;--rosa:#FF3366;--cl:#0066ff;--pl:#38003c;--la:#ff4500;--lpf:#75AADB;--bra:#009C3B;--wc:#FFD700}
 html,body{background:var(--fondo);color:var(--texto);font-family:'Inter','Segoe UI',system-ui,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;padding-top:66px}
 a{color:inherit;text-decoration:none}
+
+/* Nav */
 nav.nav{position:fixed;top:0;left:0;right:0;height:66px;background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);display:flex;align-items:center;padding:0 20px;z-index:10000}
 .nav-logo-wrap{display:flex;align-items:center;gap:11px}
 .nav-icon-box{width:42px;height:42px;background:linear-gradient(135deg,#0d2a0d,#112011);border:1px solid rgba(0,200,83,0.35);border-radius:11px;display:flex;align-items:center;justify-content:center}
@@ -30,44 +32,95 @@ nav.nav{position:fixed;top:0;left:0;right:0;height:66px;background:#060d06;borde
 .nav-logo-text span{color:#00c853}
 .nav-back{margin-left:auto;color:rgba(255,255,255,0.7);font-size:.82rem;padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);transition:all .15s}
 .nav-back:hover{color:#fff;border-color:rgba(255,255,255,0.25)}
-.hero{padding:48px 20px 32px;text-align:center;background:linear-gradient(180deg,#0d1a0d,#0a0a0f);border-bottom:1px solid var(--border)}
-.hero h1{font-size:clamp(1.5rem,3.5vw,2.2rem);font-weight:900;letter-spacing:-0.5px;margin-bottom:10px}
-.hero h1 span{background:linear-gradient(135deg,var(--verde),#00e860);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero p{color:var(--mute);max-width:560px;margin:0 auto 22px;font-size:.95rem}
-.stats{display:flex;gap:20px;justify-content:center;margin-top:18px;flex-wrap:wrap}
-.stat{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:14px;padding:14px 22px;min-width:130px}
-.stat-val{font-family:'Geist Mono','SF Mono',ui-monospace,monospace;font-size:1.6rem;font-weight:800;color:var(--verde);font-variant-numeric:tabular-nums}
-.stat-lbl{font-size:.7rem;color:var(--mute);letter-spacing:1.5px;text-transform:uppercase;margin-top:4px}
-main{max-width:880px;margin:0 auto;padding:32px 20px 80px}
+
+/* Hero compacto */
+.hero{padding:36px 20px 22px;text-align:center;background:radial-gradient(ellipse at center top,rgba(0,200,83,0.12),transparent 60%),#0a0a0f;border-bottom:1px solid var(--border)}
+.hero-eyebrow{display:inline-block;background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.3);color:var(--verde);font-size:.66rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:999px;margin-bottom:12px}
+.hero h1{font-size:clamp(1.4rem,3.5vw,2rem);font-weight:900;letter-spacing:-0.5px;margin-bottom:8px}
+.hero h1 span{background:linear-gradient(135deg,#00c853,#00e860);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--mute);max-width:520px;margin:0 auto;font-size:.92rem}
+.stats{display:flex;gap:14px;justify-content:center;margin-top:20px;flex-wrap:wrap}
+.stat{background:rgba(255,255,255,0.03);border:1px solid var(--border);border-radius:12px;padding:10px 16px;min-width:90px}
+.stat-val{font-family:'Geist Mono','SF Mono',ui-monospace,monospace;font-size:1.3rem;font-weight:800;color:var(--verde);font-variant-numeric:tabular-nums;line-height:1}
+.stat-lbl{font-size:.62rem;color:var(--mute);letter-spacing:1.4px;text-transform:uppercase;margin-top:5px}
+
+main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
+
+/* Section titles */
 .section-title{font-size:.7rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--mute);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .section-title::before{content:'';width:4px;height:14px;background:var(--verde);border-radius:2px}
+
+/* ── SUB-FOROS STICKY (5 topics premium) ── */
+.topics-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-bottom:36px}
+.topic-card{position:relative;background:linear-gradient(135deg,var(--card),var(--card-hi));border:1px solid var(--border);border-radius:16px;padding:18px 16px;transition:all .25s cubic-bezier(.34,1.56,.64,1);overflow:hidden;cursor:pointer;text-decoration:none;color:inherit;display:block}
+.topic-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent,#00c853),transparent);opacity:0;transition:opacity .2s}
+.topic-card:hover{transform:translateY(-3px);border-color:var(--accent,rgba(0,200,83,0.4));box-shadow:0 14px 32px rgba(0,0,0,0.5)}
+.topic-card:hover::before{opacity:1}
+.topic-emoji{font-size:1.7rem;display:block;margin-bottom:8px;line-height:1}
+.topic-title{font-size:.9rem;font-weight:800;color:#fff;letter-spacing:-0.2px;margin-bottom:3px}
+.topic-desc{font-size:.72rem;color:var(--mute);line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.topic-meta{display:flex;justify-content:space-between;align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);font-size:.66rem;color:var(--mute2);font-family:'Geist Mono','SF Mono',monospace;font-variant-numeric:tabular-nums}
+.topic-meta b{color:#fff;font-weight:700}
+.topic-card.topic-fichajes{--accent:#9b59b6}
+.topic-card.topic-noticias{--accent:#3498db}
+.topic-card.topic-lesiones{--accent:#e74c3c}
+.topic-card.topic-valor{--accent:var(--gold)}
+.topic-card.topic-combinadas{--accent:var(--verde)}
+
+/* ── TABS COMPETENCIAS (sticky en scroll) ── */
+.tabs-wrap{position:sticky;top:66px;background:rgba(10,10,15,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);margin:0 -20px 24px;padding:14px 20px;z-index:90}
+.tabs{display:flex;gap:6px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;background:rgba(255,255,255,0.03);border:1px solid var(--border);color:var(--mute);font-size:.78rem;font-weight:700;padding:8px 14px;border-radius:999px;cursor:pointer;transition:all .15s;display:inline-flex;align-items:center;gap:6px;font-family:inherit;white-space:nowrap}
+.tab:hover{background:rgba(255,255,255,0.06);color:#fff;border-color:var(--border-hi)}
+.tab.active{background:linear-gradient(135deg,var(--verde),var(--verde-d));color:#000;border-color:transparent;font-weight:800}
+.tab-count{background:rgba(0,0,0,0.18);padding:1px 6px;border-radius:8px;font-size:.66rem;font-family:'Geist Mono','SF Mono',monospace}
+.tab.active .tab-count{background:rgba(0,0,0,0.3);color:#000}
+
+/* ── HILOS DE PARTIDOS ── */
 .thread-list{display:grid;gap:10px}
-.thread{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;transition:all .15s;cursor:pointer;display:block}
-.thread:hover{border-color:rgba(0,200,83,0.3);transform:translateY(-1px)}
+.thread{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px;transition:all .18s;cursor:pointer;display:block;color:inherit}
+.thread:hover{border-color:rgba(0,200,83,0.3);background:var(--card-hi);transform:translateY(-1px)}
 .thread-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:8px}
-.thread-match{font-size:1.02rem;font-weight:800;color:#fff;line-height:1.3}
-.thread-meta{display:flex;gap:14px;font-size:.72rem;color:var(--mute);flex-shrink:0;font-family:'Geist Mono','SF Mono',monospace;font-variant-numeric:tabular-nums}
+.thread-match{font-size:1rem;font-weight:800;color:#fff;line-height:1.3}
+.thread-league{display:inline-block;font-size:.62rem;color:var(--mute);text-transform:uppercase;letter-spacing:1.2px;margin-bottom:4px}
+.thread-meta{display:flex;gap:12px;font-size:.7rem;color:var(--mute);flex-shrink:0;font-family:'Geist Mono','SF Mono',monospace;font-variant-numeric:tabular-nums;align-items:center}
 .thread-meta b{color:#fff;font-weight:700}
-.thread-rec{display:inline-block;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.25);color:var(--verde);font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:6px;margin-top:6px;letter-spacing:0.3px}
-.thread-preview{color:rgba(255,255,255,0.7);font-size:.85rem;margin-top:10px;line-height:1.5;max-height:42px;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.thread-rec{display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.25);color:var(--verde);font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:6px;margin-top:6px}
+.thread-preview{color:rgba(255,255,255,0.7);font-size:.82rem;margin-top:10px;line-height:1.5;max-height:42px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .thread-author{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:.72rem;color:var(--mute)}
-.thread-author-avatar{width:22px;height:22px;background:linear-gradient(135deg,var(--verde),#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.7rem}
-.empty{text-align:center;padding:48px 20px;color:var(--mute);font-size:.9rem}
+.thread-author-avatar{width:24px;height:24px;background:linear-gradient(135deg,var(--verde),#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.7rem}
+.thread-author-avatar.is-ai{background:linear-gradient(135deg,#9b59b6,#3498db);color:#fff}
+.thread.is-hot{position:relative;border-color:rgba(255,193,7,0.3)}
+.thread.is-hot::before{content:'🔥';position:absolute;top:14px;right:14px;font-size:.9rem;animation:flicker 1.4s infinite}
+@keyframes flicker{0%,100%{opacity:1}50%{opacity:.6}}
+
+.empty{text-align:center;padding:48px 20px;color:var(--mute);font-size:.9rem;background:var(--card);border:1px dashed var(--border);border-radius:14px}
 .loading{display:flex;gap:8px;justify-content:center;padding:40px;color:var(--mute);font-size:.85rem}
-.cta-box{background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(0,200,83,0.02));border:1px solid rgba(0,200,83,0.25);border-radius:14px;padding:24px;text-align:center;margin-top:28px}
-.cta-box h3{font-size:1.1rem;font-weight:800;color:#fff;margin-bottom:8px}
-.cta-box p{font-size:.85rem;color:var(--mute);margin-bottom:14px}
-.cta-box a{display:inline-block;background:var(--verde);color:#000;font-weight:800;padding:10px 22px;border-radius:8px;font-size:.85rem;transition:all .15s}
+
+.cta-box{background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(0,200,83,0.02));border:1px solid rgba(0,200,83,0.25);border-radius:14px;padding:22px;text-align:center;margin-top:28px}
+.cta-box h3{font-size:1rem;font-weight:800;color:#fff;margin-bottom:8px}
+.cta-box p{font-size:.82rem;color:var(--mute);margin-bottom:14px}
+.cta-box a{display:inline-block;background:var(--verde);color:#000;font-weight:800;padding:10px 22px;border-radius:8px;font-size:.82rem;transition:all .15s}
 .cta-box a:hover{background:#00e860;transform:translateY(-1px)}
+
 @media(max-width:600px){
-  .hero{padding:32px 16px 24px}
-  .stats{gap:10px}
-  .stat{min-width:90px;padding:12px 14px}
-  .stat-val{font-size:1.3rem}
-  main{padding:24px 16px 60px}
-  .thread{padding:14px 16px}
+  .hero{padding:28px 16px 18px}
+  .stats{gap:8px}
+  .stat{min-width:78px;padding:8px 12px}
+  .stat-val{font-size:1.1rem}
+  main{padding:22px 16px 50px}
+  .topics-grid{grid-template-columns:repeat(2,1fr);gap:8px}
+  .topic-card{padding:14px 12px}
+  .topic-emoji{font-size:1.4rem}
+  .topic-title{font-size:.82rem}
+  .topic-desc{display:none}
+  .topic-meta{font-size:.62rem;margin-top:8px;padding-top:6px}
+  .tabs-wrap{margin:0 -16px 18px;padding:10px 16px}
+  .tab{padding:7px 12px;font-size:.74rem}
+  .thread{padding:14px 14px}
   .thread-head{flex-direction:column;gap:6px}
-  .thread-meta{font-size:.68rem}
+  .thread-meta{font-size:.66rem}
 }
 </style>
 </head>
@@ -81,8 +134,9 @@ main{max-width:880px;margin:0 auto;padding:32px 20px 80px}
 </nav>
 
 <header class="hero">
-  <h1>💬 Foro <span>Gambeta</span></h1>
-  <p>Comentá los picks IA, compartí tus apuestas, debatí lesiones y dónde está el valor. Una comunidad de apostadores con datos.</p>
+  <div class="hero-eyebrow">💬 Comunidad</div>
+  <h1>Foro <span>Gambeta</span></h1>
+  <p>Sub-foros por competencia y temática. Compartí valor, debatí picks, ayudate con la comunidad.</p>
   <div class="stats">
     <div class="stat"><div class="stat-val" id="statThreads">–</div><div class="stat-lbl">Hilos</div></div>
     <div class="stat"><div class="stat-val" id="statPosts">–</div><div class="stat-lbl">Mensajes</div></div>
@@ -91,13 +145,34 @@ main{max-width:880px;margin:0 auto;padding:32px 20px 80px}
 </header>
 
 <main>
+  <!-- SUB-FOROS STICKY -->
+  <div class="section-title">📌 Sub-foros destacados</div>
+  <div class="topics-grid" id="topicsGrid">
+    <div class="loading">Cargando…</div>
+  </div>
+
+  <!-- TABS COMPETENCIAS -->
+  <div class="tabs-wrap">
+    <div class="tabs" id="tabsRow">
+      <button class="tab active" data-cat="all">🔥 Todos <span class="tab-count" id="cnt_all">0</span></button>
+      <button class="tab" data-cat="cl">⚽ Champions <span class="tab-count" id="cnt_cl">0</span></button>
+      <button class="tab" data-cat="pl">🏴󠁧󠁢󠁥󠁮󠁧󠁿 Premier <span class="tab-count" id="cnt_pl">0</span></button>
+      <button class="tab" data-cat="la">🇪🇸 La Liga <span class="tab-count" id="cnt_la">0</span></button>
+      <button class="tab" data-cat="lpf">🇦🇷 Liga Argentina <span class="tab-count" id="cnt_lpf">0</span></button>
+      <button class="tab" data-cat="bra">🇧🇷 Brasileirão <span class="tab-count" id="cnt_bra">0</span></button>
+      <button class="tab" data-cat="wc">🏆 Mundial 2026 <span class="tab-count" id="cnt_wc">0</span></button>
+      <button class="tab" data-cat="other">🌎 Otras <span class="tab-count" id="cnt_other">0</span></button>
+    </div>
+  </div>
+
   <div class="section-title">🔥 Hilos recientes</div>
   <div class="thread-list" id="threadList">
     <div class="loading">Cargando hilos…</div>
   </div>
+
   <div class="cta-box">
     <h3>¿Querés sumar tu opinión?</h3>
-    <p>Para comentar y dar like, entrá a cualquier pick del home y abrí la ficha. Cada partido tiene su hilo.</p>
+    <p>Cada partido tiene su hilo en el home. Hacé tap en el botón 💬 de la ficha para comentar.</p>
     <a href="/#predictions">Ver picks de hoy →</a>
   </div>
 </main>
@@ -105,7 +180,27 @@ main{max-width:880px;margin:0 auto;padding:32px 20px 80px}
 <script>
 const SB_URL = 'https://ixfrtjvhnpapyuphqfxp.supabase.co';
 const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZnJ0anZobnBhcHl1cGhxZnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MDExOTMsImV4cCI6MjA4OTE3NzE5M30.Lc5cOfvXCrrMlm9Yup5GG6RgCxOB_GSNJnKLTb1-bZQ';
-const HEADERS = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
+const H = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
+
+const TOPIC_META = {
+  topic_fichajes: { emoji:'💼', title:'Fichajes y rumores', desc:'Movimientos de mercado, jugadores en la rampa, hilos por club.' },
+  topic_noticias: { emoji:'📰', title:'Noticias del fútbol', desc:'Lo que pasa hoy en el mundo del fútbol. Datos que mueven cuotas.' },
+  topic_lesiones: { emoji:'🏥', title:'Lesiones y bajas', desc:'Reportá lesiones — el dato más valioso para encontrar valor.' },
+  topic_valor:    { emoji:'💎', title:'Datos de valor', desc:'Sharp moves, líneas blandas. Compartí tu edge.' },
+  topic_combinadas:{ emoji:'🎯', title:'Combinadas del día', desc:'Armá la tuya, pedí opinión, copiá la del que sabe.' },
+};
+const TOPIC_ORDER = ['topic_fichajes','topic_noticias','topic_lesiones','topic_valor','topic_combinadas'];
+
+function categorize(league) {
+  const s = String(league || '').toLowerCase();
+  if (/champions|uefa.*cl|champ.*league/.test(s)) return 'cl';
+  if (/premier|englan|inglate|epl|english.*league|^pl /.test(s)) return 'pl';
+  if (/la ?liga|spani|espan|spain|^laliga/.test(s)) return 'la';
+  if (/lpf|liga profesional|argentin|primera (nacional|argentina)/.test(s)) return 'lpf';
+  if (/brasil|brazil|brasileir|serie ?a.*brasil/.test(s)) return 'bra';
+  if (/mundial|world cup|fifa.*world|wc2026|copa del mundo/.test(s)) return 'wc';
+  return 'other';
+}
 
 function timeAgo(iso) {
   const d = new Date(iso);
@@ -115,89 +210,150 @@ function timeAgo(iso) {
   if (ago < 1440) return Math.round(ago/60) + 'h';
   return Math.round(ago/1440) + 'd';
 }
+function avatarLetter(name) { return (name || 'A')[0].toUpperCase(); }
+function isAiUser(name) { return /^gambeta ia|^bot|^ia$/i.test(String(name||'').trim()); }
+function safe(s) { return String(s||'').replace(/[<>]/g, c => ({'<':'&lt;','>':'&gt;'}[c])); }
 
-function avatarLetter(name) {
-  return (name || 'A')[0].toUpperCase();
-}
+let allThreads = [];
+let allPosts = [];
+let currentCat = 'all';
 
-function shortDate(iso) {
-  if (!iso) return '';
-  return new Date(iso).toLocaleDateString('es-AR',{day:'2-digit',month:'short'});
-}
-
-async function loadForum() {
+async function loadAll() {
   try {
-    // Threads recientes con su última actividad
     const [threadsR, postsR] = await Promise.all([
-      fetch(SB_URL + '/rest/v1/forum_threads?select=id,home,away,league,match_date,pick_data,created_at&order=created_at.desc&limit=15', { headers: HEADERS }),
-      fetch(SB_URL + '/rest/v1/forum_posts?select=id,thread_id,user_name,content,created_at,is_deleted&is_deleted=eq.false&order=created_at.desc&limit=50', { headers: HEADERS })
+      fetch(SB_URL + '/rest/v1/forum_threads?select=id,home,away,league,match_date,pick_data,created_at&order=created_at.desc&limit=200', { headers: H }),
+      fetch(SB_URL + '/rest/v1/forum_posts?select=id,thread_id,user_name,content,created_at,is_deleted&is_deleted=eq.false&order=created_at.desc&limit=200', { headers: H })
     ]);
-    const threads = await threadsR.json();
-    const posts = await postsR.json();
+    allThreads = await threadsR.json();
+    allPosts = await postsR.json();
 
-    // Stats globales
-    const allThreadsCountR = await fetch(SB_URL + '/rest/v1/forum_threads?select=id', { headers: { ...HEADERS, 'Prefer': 'count=exact', 'Range': '0-0' } });
-    const allThreadsCount = parseInt((allThreadsCountR.headers.get('content-range') || '0/0').split('/')[1]) || threads.length;
-
-    const allPostsCountR = await fetch(SB_URL + '/rest/v1/forum_posts?select=id&is_deleted=eq.false', { headers: { ...HEADERS, 'Prefer': 'count=exact', 'Range': '0-0' } });
-    const allPostsCount = parseInt((allPostsCountR.headers.get('content-range') || '0/0').split('/')[1]) || posts.length;
-
-    // Posts de hoy
+    // Counts globales
+    const countThreadsR = await fetch(SB_URL + '/rest/v1/forum_threads?select=id', { headers: { ...H, 'Prefer': 'count=exact', 'Range': '0-0' } });
+    const countPostsR = await fetch(SB_URL + '/rest/v1/forum_posts?select=id&is_deleted=eq.false', { headers: { ...H, 'Prefer': 'count=exact', 'Range': '0-0' } });
+    const totalThreads = parseInt((countThreadsR.headers.get('content-range') || '0/0').split('/')[1]) || allThreads.length;
+    const totalPosts = parseInt((countPostsR.headers.get('content-range') || '0/0').split('/')[1]) || allPosts.length;
     const todayStart = new Date(); todayStart.setHours(0,0,0,0);
-    const todayCount = posts.filter(p => new Date(p.created_at) >= todayStart).length;
-
-    document.getElementById('statThreads').textContent = allThreadsCount;
-    document.getElementById('statPosts').textContent = allPostsCount;
+    const todayCount = allPosts.filter(p => new Date(p.created_at) >= todayStart).length;
+    document.getElementById('statThreads').textContent = totalThreads;
+    document.getElementById('statPosts').textContent = totalPosts;
     document.getElementById('statHoy').textContent = todayCount;
 
-    // Build thread list con posts agrupados
-    const postsByThread = {};
-    posts.forEach(p => {
-      if (!postsByThread[p.thread_id]) postsByThread[p.thread_id] = [];
-      postsByThread[p.thread_id].push(p);
-    });
-
-    const list = document.getElementById('threadList');
-    if (!threads.length) {
-      list.innerHTML = '<div class="empty">No hay hilos todavía. Andá a un pick del home y comentá para arrancar la comunidad. 💬</div>';
-      return;
-    }
-
-    list.innerHTML = threads.map(t => {
-      const tposts = postsByThread[t.id] || [];
-      const lastPost = tposts[0];
-      const lastAuthor = lastPost ? lastPost.user_name : (t.pick_data?.user_name || 'IA');
-      const preview = lastPost ? lastPost.content.replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, '').slice(0, 140) : 'Sin comentarios aún';
-      const rec = t.pick_data?.rec || '';
-      const lastTs = lastPost ? lastPost.created_at : t.created_at;
-      // Link a la ficha (el handler en home abre el modal)
-      const anchor = '#predcard-' + (t.id || (t.home + '-' + t.away).toLowerCase().replace(/[^a-z0-9]/g, '-'));
-      return `
-        <a class="thread" href="/${anchor}" data-thread-id="${t.id}">
-          <div class="thread-head">
-            <div>
-              <div class="thread-match">${t.home} vs ${t.away}</div>
-              ${rec ? `<span class="thread-rec">${rec}</span>` : ''}
-            </div>
-            <div class="thread-meta">
-              <span><b>${tposts.length}</b> 💬</span>
-              <span>${timeAgo(lastTs)}</span>
-            </div>
-          </div>
-          <div class="thread-preview">${preview}</div>
-          <div class="thread-author">
-            <div class="thread-author-avatar">${avatarLetter(lastAuthor)}</div>
-            <span>${lastAuthor}</span>
-          </div>
-        </a>`;
-    }).join('');
+    renderTopics();
+    renderTabsCounts();
+    renderThreads();
   } catch (e) {
-    document.getElementById('threadList').innerHTML = '<div class="empty">No pudimos cargar los hilos. Probá refrescar.</div>';
+    document.getElementById('topicsGrid').innerHTML = '<div class="empty">Error cargando el foro. Intentá refrescar.</div>';
+    document.getElementById('threadList').innerHTML = '';
     console.error('[foro]', e);
   }
 }
 
-loadForum();
+function renderTopics() {
+  const grid = document.getElementById('topicsGrid');
+  const postsByThread = {};
+  allPosts.forEach(p => {
+    if (!postsByThread[p.thread_id]) postsByThread[p.thread_id] = [];
+    postsByThread[p.thread_id].push(p);
+  });
+  grid.innerHTML = TOPIC_ORDER.map(tid => {
+    const meta = TOPIC_META[tid];
+    const posts = postsByThread[tid] || [];
+    const last = posts[0];
+    const cssId = tid.replace('_', '-');
+    return `<a class="topic-card ${tid}" href="#topic-${tid}" data-topic="${tid}">
+      <span class="topic-emoji">${meta.emoji}</span>
+      <div class="topic-title">${meta.title}</div>
+      <div class="topic-desc">${meta.desc}</div>
+      <div class="topic-meta"><span><b>${posts.length}</b> mensajes</span><span>${last ? timeAgo(last.created_at) : 'nuevo'}</span></div>
+    </a>`;
+  }).join('');
+  // Click → expandir/scroll a un detalle del topic — por ahora redirige al home para que comenten desde un pick
+  grid.querySelectorAll('.topic-card').forEach(c => {
+    c.addEventListener('click', e => {
+      e.preventDefault();
+      window.location.href = '/#predictions';
+    });
+  });
+}
+
+function renderTabsCounts() {
+  const counts = { all: 0, cl: 0, pl: 0, la: 0, lpf: 0, bra: 0, wc: 0, other: 0 };
+  for (const t of allThreads) {
+    if (t.id && t.id.startsWith('topic_')) continue;
+    counts.all++;
+    counts[categorize(t.pick_data?.league || t.league)] = (counts[categorize(t.pick_data?.league || t.league)] || 0) + 1;
+  }
+  Object.keys(counts).forEach(k => {
+    const el = document.getElementById('cnt_' + k);
+    if (el) el.textContent = counts[k];
+  });
+
+  document.querySelectorAll('.tab').forEach(btn => {
+    btn.onclick = () => {
+      document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentCat = btn.dataset.cat;
+      renderThreads();
+    };
+  });
+}
+
+function renderThreads() {
+  const list = document.getElementById('threadList');
+  const postsByThread = {};
+  allPosts.forEach(p => {
+    if (!postsByThread[p.thread_id]) postsByThread[p.thread_id] = [];
+    postsByThread[p.thread_id].push(p);
+  });
+
+  // Filtrar: nada de topics, y por categoría
+  const filtered = allThreads.filter(t => {
+    if (t.id && t.id.startsWith('topic_')) return false;
+    if (currentCat === 'all') return true;
+    return categorize(t.pick_data?.league || t.league) === currentCat;
+  });
+
+  if (!filtered.length) {
+    list.innerHTML = '<div class="empty">No hay hilos en esta categoría todavía. Andá a un pick del home y arrancá la conversación. 💬</div>';
+    return;
+  }
+
+  // Detectar hot threads (>= 3 mensajes en últimas 24h)
+  const dayAgo = Date.now() - 86400000;
+  list.innerHTML = filtered.slice(0, 30).map(t => {
+    const tposts = postsByThread[t.id] || [];
+    const recentCount = tposts.filter(p => new Date(p.created_at).getTime() > dayAgo).length;
+    const isHot = recentCount >= 3;
+    const lastPost = tposts[0];
+    const lastAuthor = lastPost ? lastPost.user_name : 'IA';
+    const isAi = isAiUser(lastAuthor);
+    const previewRaw = lastPost ? lastPost.content : 'Sin comentarios aún';
+    const preview = safe(previewRaw.slice(0, 140));
+    const rec = t.pick_data?.rec || '';
+    const lastTs = lastPost ? lastPost.created_at : t.created_at;
+    const league = t.pick_data?.league || t.league || '';
+    return `<a class="thread ${isHot ? 'is-hot' : ''}" href="/#predcard-${t.id || ''}" data-thread-id="${t.id}">
+      <div class="thread-head">
+        <div>
+          ${league ? `<div class="thread-league">${safe(league)}</div>` : ''}
+          <div class="thread-match">${safe(t.home)} <span style="color:var(--mute2);font-weight:600">vs</span> ${safe(t.away)}</div>
+          ${rec ? `<span class="thread-rec">🤖 ${safe(rec)}</span>` : ''}
+        </div>
+        <div class="thread-meta">
+          <span><b>${tposts.length}</b> 💬</span>
+          <span>${timeAgo(lastTs)}</span>
+        </div>
+      </div>
+      <div class="thread-preview">${preview}</div>
+      <div class="thread-author">
+        <div class="thread-author-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(lastAuthor)}</div>
+        <span>${safe(lastAuthor)}</span>
+      </div>
+    </a>`;
+  }).join('');
+}
+
+loadAll();
 </script>
 </body>
 </html>
