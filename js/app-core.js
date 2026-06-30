@@ -3931,7 +3931,7 @@ function _updateHeroProStats() {
         // Fallback ampliado para WC con timestamps raros: si pending + age 0-160min, considerar live
         if (p && (!p.result || p.result === 'pending') && p.commenceTs) {
           var age = Date.now() - p.commenceTs;
-          if (age >= -15 * 60 * 1000 && age <= 160 * 60 * 1000) {
+          if (age >= -15 * 60 * 1000 && age <= 120 * 60 * 1000) {
             liveCount++;
           }
         }
@@ -4059,7 +4059,7 @@ function _isPickLive(p) {
     if (p.commenceTs) {
       var now = Date.now();
       var elapsed = now - p.commenceTs;
-      if (elapsed >= 0 && elapsed <= 105 * 60 * 1000) {
+      if (elapsed >= 0 && elapsed <= 120 * 60 * 1000) {
         var mins = Math.min(Math.floor(elapsed / 60000), 95);
         return {
           live: true,
@@ -4070,7 +4070,7 @@ function _isPickLive(p) {
         };
       }
       // Self-heal: si pasó la ventana pero sigue pending, trigger resolver
-      if (elapsed > 105 * 60 * 1000 && typeof window._maybeSelfHealResolve === 'function') {
+      if (elapsed > 120 * 60 * 1000 && typeof window._maybeSelfHealResolve === 'function') {
         try { window._maybeSelfHealResolve(p); } catch(_){}
       }
     }
@@ -12827,6 +12827,7 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
 
