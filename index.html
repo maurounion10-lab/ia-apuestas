@@ -6,7 +6,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://api.accesoia.app">
 <!-- 🆕 #578 Gambeta 1.1 — Tipografía premium Inter + Geist Mono -->
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Geist+Mono:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@600;700;800;900&family=Geist+Mono:wght@500;600&display=swap">
 <link rel="dns-prefetch" href="https://www.clarity.ms">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Pronósticos de Fútbol con IA Gratis · 38 Ligas + Mundial 2026</title>
@@ -6194,6 +6194,9 @@ html { -webkit-tap-highlight-color: rgba(0,200,83,0.15); }
   /* Reduce animaciones costosas en mobile (mejora INP) */
   .pred-card, .estrella-card { transition: none !important; }
 }
+
+/* #608 — CLS fix: flags dinámicas tienen tamaño fijo via CSS */
+.flag-icon, img[src*="flagcdn.com"] { aspect-ratio: 3/2; min-height: 16px; }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script type="application/ld+json">
@@ -7389,7 +7392,7 @@ window.toggleHeroBubble = function(n) {
     <!-- Bono destacado del día -->
     <a id="bonosCalStage" class="bonos-cal-stage" href="#" target="_blank" rel="noopener nofollow" onclick="trackEvent('bono_click',{src:'calendar-stage'})">
       <div class="bonos-cal-stage-left">
-        <div class="bonos-cal-logo-wrap"><img id="bonosCalLogo" src="" alt=""></div>
+        <div class="bonos-cal-logo-wrap"><img id="bonosCalLogo" src="" alt="" loading="lazy" decoding="async" width="80" height="30"></div>
         <div>
           <div class="bonos-cal-name-row">
             <span id="bonosCalName" class="bonos-cal-name">…</span>
