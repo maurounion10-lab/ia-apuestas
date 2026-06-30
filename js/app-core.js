@@ -5488,12 +5488,10 @@ function renderPreds() {
         _liveT.style.opacity='0.45';
         _liveT.style.animation='none';
         _liveT.style.cursor='default';
-        if(window._predTimeFilter==='live'){
-          window._predTimeFilter='all';
-          document.querySelectorAll('#predTimeTabs button').forEach(b=>b.classList.remove('active'));
-          const _at=document.querySelector('#predTimeTabs button.sport-tab');
-          if(_at)_at.classList.add('active');
-        }
+        // 🆕 #594 NO resetear el filtro live automáticamente cuando _liveC=0.
+        // Antes se reseteaba a 'all' y mostraba los últimos TERMINADOS confundiendo al usuario.
+        // Ahora respetamos la elección del usuario: si clickeó EN JUEGO y no hay live,
+        // mostrará empty state.
       }
     }
   }catch(_){}
@@ -12853,6 +12851,7 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
 
