@@ -296,23 +296,85 @@
   .compare-table .no { color: #ff8a80; }
   .compare-wrap { overflow-x: auto; }
 
-  /* FAQ */
+  /* FAQ acordeón premium con animación grid moderna */
   .faq-list { display: flex; flex-direction: column; gap: 10px; margin-top: 22px; }
   .faq-item {
-    background: rgba(255,255,255,0.025);
+    background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 12px;
-    padding: 0 20px;
+    border-radius: 14px;
+    overflow: hidden;
+    transition:
+      border-color 0.3s cubic-bezier(0.4,0,0.2,1),
+      background 0.3s cubic-bezier(0.4,0,0.2,1),
+      box-shadow 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+  .faq-item:hover { border-color: rgba(0,200,83,0.25); background: rgba(255,255,255,0.045); }
+  .faq-item[open] {
+    border-color: rgba(0,200,83,0.35);
+    background: rgba(0,200,83,0.025);
+    box-shadow: 0 4px 24px rgba(0,200,83,0.08);
   }
   .faq-item summary {
-    padding: 16px 0; cursor: pointer; font-weight: 600; color: #fff;
-    font-size: 0.95rem; list-style: none;
-    display: flex; justify-content: space-between; align-items: center;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 18px 22px; cursor: pointer;
+    list-style: none; user-select: none;
+    font-weight: 600; color: #fff; font-size: 0.97rem;
+    letter-spacing: -0.01em; line-height: 1.35;
   }
-  .faq-item summary::-webkit-details-marker { display: none; }
-  .faq-item summary::after { content: '+'; color: #00e676; font-size: 1.4rem; font-weight: 300; transition: transform 0.18s; }
-  .faq-item[open] summary::after { transform: rotate(45deg); }
-  .faq-item p { padding: 0 0 16px; font-size: 0.9rem; color: rgba(255,255,255,0.72); line-height: 1.65; }
+  .faq-item summary::-webkit-details-marker, .faq-item summary::marker { display: none; }
+  .faq-item summary::after {
+    content: '';
+    flex-shrink: 0;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: rgba(0,200,83,0.12);
+    border: 1px solid rgba(0,200,83,0.25);
+    background-image:
+      linear-gradient(#00e676,#00e676),
+      linear-gradient(#00e676,#00e676);
+    background-size: 11px 1.5px, 1.5px 11px;
+    background-position: center, center;
+    background-repeat: no-repeat;
+    transition:
+      transform 0.4s cubic-bezier(0.34,1.56,0.64,1),
+      background-color 0.3s ease,
+      border-color 0.3s ease,
+      background-size 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  }
+  .faq-item:hover summary::after {
+    background-color: rgba(0,200,83,0.18);
+    border-color: rgba(0,200,83,0.4);
+  }
+  .faq-item[open] summary::after {
+    transform: rotate(180deg);
+    background-color: rgba(0,200,83,0.22);
+    border-color: rgba(0,200,83,0.5);
+    background-size: 11px 1.5px, 0 0;
+  }
+
+  /* Animación grid-template-rows 0fr → 1fr — el truco moderno */
+  .faq-item > div.faq-anim {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+  .faq-item[open] > div.faq-anim { grid-template-rows: 1fr; }
+  .faq-anim-inner { overflow: hidden; min-height: 0; }
+  .faq-item p {
+    padding: 0 22px 20px;
+    font-size: 0.92rem; color: rgba(255,255,255,0.72); line-height: 1.7;
+    margin: 0;
+    opacity: 0; transform: translateY(-4px);
+    transition:
+      opacity 0.35s cubic-bezier(0.4,0,0.2,1) 0.1s,
+      transform 0.35s cubic-bezier(0.4,0,0.2,1) 0.1s;
+  }
+  .faq-item[open] p { opacity: 1; transform: translateY(0); }
+  @media (prefers-reduced-motion: reduce) {
+    .faq-item, .faq-item summary::after, .faq-item > div.faq-anim, .faq-item p {
+      transition: none !important;
+    }
+  }
 
   /* CTA final */
   .cta-final {
@@ -503,13 +565,13 @@
   <h2 class="section-h2">Lo que más nos preguntan</h2>
 
   <div class="faq-list">
-    <details class="faq-item"><summary>¿Realmente acierta una IA de fútbol?</summary><p>El fútbol tiene un componente aleatorio importante, ninguna IA llega al 100%. El objetivo del modelo no es predecir resultados perfectos sino encontrar picks con value: que la cuota pague más de lo que el modelo cree probable. Eso, repetido en el tiempo, genera rentabilidad positiva aunque no se acierte siempre.</p></details>
-    <details class="faq-item"><summary>¿Cómo verifico el historial?</summary><p>El historial completo y público está en <a href="/#historial">gambeta.ai/#historial</a>. Cada pick muestra el pronóstico original, la cuota, el resultado real (marcador), si fue ganado/perdido/void y la rentabilidad acumulada. Es auditable por cualquiera en cualquier momento.</p></details>
-    <details class="faq-item"><summary>¿Tengo que registrarme?</summary><p>No. Para ver picks, historial y herramientas no hace falta crear cuenta. El registro solo se necesita para guardar tu bankroll personal o recibir alertas push del navegador.</p></details>
-    <details class="faq-item"><summary>¿Por qué a veces no hay picks de un partido?</summary><p>Porque el modelo no encontró value matemático sobre la cuota. Si la probabilidad implícita de la cuota es mayor o igual a la del modelo, simplemente no publica el pick. Es la regla más importante para mantener la rentabilidad.</p></details>
-    <details class="faq-item"><summary>¿Qué pasa si un partido se suspende?</summary><p>El pick se marca como <strong>void</strong> y la cuota se considera devuelta (stake = 0 ganancia / 0 pérdida). El sistema lo resuelve automáticamente cuando detecta el cambio de estado del partido.</p></details>
-    <details class="faq-item"><summary>¿Cuáles son los recursos de la IA?</summary><p>Cuotas multicasa actualizadas cada 6 horas, forma reciente y head-to-head, estadísticas oficiales de cada liga, contexto deportivo (descenso, copa, calendario internacional) y, para el Mundial 2026, ranking FIFA + valor de plantilla + factor local.</p></details>
-    <details class="faq-item"><summary>¿Recomiendan apostar dinero real?</summary><p>Gambeta es una herramienta de análisis, no asesoramiento financiero. Recomendamos siempre apostar con responsabilidad, dentro de un bankroll definido, usar nuestra <a href="/herramientas/kelly">calculadora Kelly</a> para dimensionar el stake y nunca apostar más de lo que estés dispuesto a perder.</p></details>
+    <details class="faq-item"><summary>¿Realmente acierta una IA de fútbol?</summary><div class="faq-anim"><div class="faq-anim-inner">El fútbol tiene un componente aleatorio importante, ninguna IA llega al 100%. El objetivo del modelo no es predecir resultados perfectos sino encontrar picks con value: que la cuota pague más de lo que el modelo cree probable. Eso, repetido en el tiempo, genera rentabilidad positiva aunque no se acierte siempre.</div></div></details>
+    <details class="faq-item"><summary>¿Cómo verifico el historial?</summary><div class="faq-anim"><div class="faq-anim-inner">El historial completo y público está en <a href="/#historial">gambeta.ai/#historial</a>. Cada pick muestra el pronóstico original, la cuota, el resultado real (marcador), si fue ganado/perdido/void y la rentabilidad acumulada. Es auditable por cualquiera en cualquier momento.</div></div></details>
+    <details class="faq-item"><summary>¿Tengo que registrarme?</summary><div class="faq-anim"><div class="faq-anim-inner">No. Para ver picks, historial y herramientas no hace falta crear cuenta. El registro solo se necesita para guardar tu bankroll personal o recibir alertas push del navegador.</div></div></details>
+    <details class="faq-item"><summary>¿Por qué a veces no hay picks de un partido?</summary><div class="faq-anim"><div class="faq-anim-inner">Porque el modelo no encontró value matemático sobre la cuota. Si la probabilidad implícita de la cuota es mayor o igual a la del modelo, simplemente no publica el pick. Es la regla más importante para mantener la rentabilidad.</div></div></details>
+    <details class="faq-item"><summary>¿Qué pasa si un partido se suspende?</summary><div class="faq-anim"><div class="faq-anim-inner">El pick se marca como <strong>void</strong> y la cuota se considera devuelta (stake = 0 ganancia / 0 pérdida). El sistema lo resuelve automáticamente cuando detecta el cambio de estado del partido.</div></div></details>
+    <details class="faq-item"><summary>¿Cuáles son los recursos de la IA?</summary><div class="faq-anim"><div class="faq-anim-inner">Cuotas multicasa actualizadas cada 6 horas, forma reciente y head-to-head, estadísticas oficiales de cada liga, contexto deportivo (descenso, copa, calendario internacional) y, para el Mundial 2026, ranking FIFA + valor de plantilla + factor local.</div></div></details>
+    <details class="faq-item"><summary>¿Recomiendan apostar dinero real?</summary><div class="faq-anim"><div class="faq-anim-inner">Gambeta es una herramienta de análisis, no asesoramiento financiero. Recomendamos siempre apostar con responsabilidad, dentro de un bankroll definido, usar nuestra <a href="/herramientas/kelly">calculadora Kelly</a> para dimensionar el stake y nunca apostar más de lo que estés dispuesto a perder.</div></div></details>
   </div>
 </section>
 
@@ -531,3 +593,4 @@
 
 </body>
 </html>
+
