@@ -3931,7 +3931,7 @@ function _updateHeroProStats() {
         // Fallback ampliado para WC con timestamps raros: si pending + age 0-160min, considerar live
         if (p && (!p.result || p.result === 'pending') && p.commenceTs) {
           var age = Date.now() - p.commenceTs;
-          if (age >= -15 * 60 * 1000 && age <= 120 * 60 * 1000) {
+          if (age >= -15 * 60 * 1000 && age <= 130 * 60 * 1000) {
             liveCount++;
           }
         }
@@ -4059,7 +4059,11 @@ function _isPickLive(p) {
     if (p.commenceTs) {
       var now = Date.now();
       var elapsed = now - p.commenceTs;
-      if (elapsed >= 0 && elapsed <= 120 * 60 * 1000) {
+      // 🆕 #592 Fallback temporal con 2 capas (cubre descuentos + entretiempo + prórroga):
+      //   0-130 min: cap normal (90' + 10' desc1 + 15' entretiempo + 15' desc2 = 130min)
+      //   130-180 min: aún live si no hay marcador final guardado (cubre prórroga + penales)
+      //   > 180 min: definitivamente terminado, trigger self-heal
+      if (elapsed >= 0 && elapsed <= 130 * 60 * 1000) {
         var mins = Math.min(Math.floor(elapsed / 60000), 95);
         return {
           live: true,
@@ -4069,8 +4073,30 @@ function _isPickLive(p) {
           source: 'fallback'
         };
       }
-      // Self-heal: si pasó la ventana pero sigue pending, trigger resolver
-      if (elapsed > 120 * 60 * 1000 && typeof window._maybeSelfHealResolve === 'function') {
+      // Zona "posible prórroga": 130-180 min. Solo si no se detectó cierre.
+      if (elapsed > 130 * 60 * 1000 && elapsed <= 180 * 60 * 1000) {
+        // Para esta ventana, ser un poco más estrictos: no asumir live por defecto
+        // si lleva más de 150 min y no tenemos scoresData. Damos margen porque
+        // partidos de eliminación directa SÍ pueden durar más.
+        if (elapsed <= 150 * 60 * 1000) {
+          // Hasta 150 min: aún consideramos live por descuento + prórroga corta
+          return {
+            live: true,
+            scoreH: null,
+            scoreA: null,
+            minute: '90+',
+            source: 'fallback-extended'
+          };
+        }
+        // 150-180 min: zona ambigua. Trigger self-heal para forzar resolución
+        if (typeof window._maybeSelfHealResolve === 'function') {
+          try { window._maybeSelfHealResolve(p); } catch(_){}
+        }
+        // No considerar live por defecto
+        return null;
+      }
+      // > 180 min: definitivamente terminado, trigger self-heal
+      if (elapsed > 180 * 60 * 1000 && typeof window._maybeSelfHealResolve === 'function') {
         try { window._maybeSelfHealResolve(p); } catch(_){}
       }
     }
@@ -12827,6 +12853,7 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
 
