@@ -2119,11 +2119,182 @@ async function runWcAutoGenerate(env) {
   return stats;
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════════
+// SCHEMA MONITOR — auditoría anti-regresión schema.org JSON-LD
+// Corre semanalmente vía cron (lunes 06:00 UTC = 03:00 ART)
+// 3 controles independientes (grep + HTTP + semántico) sobre muestra del sitio.
+// Resultado guardado en KV. Endpoints /admin/schema-monitor/status (GET) y /run (POST).
+// ═══════════════════════════════════════════════════════════════════════════
+async function runSchemaMonitor(env) {
+  const SAMPLES = [
+    'https://gambeta.ai/',
+    'https://gambeta.ai/como-funciona',
+    'https://gambeta.ai/herramientas',
+    'https://gambeta.ai/mundial-2026',
+    'https://gambeta.ai/blog/ia-para-apostar',
+    'https://gambeta.ai/blog/que-es-scores24',
+    'https://gambeta.ai/blog/1x2-mercado-simple',
+    'https://gambeta.ai/blog/adamchoi-mas-ia-futbol',
+    'https://gambeta.ai/blog/pronostico-argentina-jordania-27-06',
+    'https://gambeta.ai/previa/final-sf-w1-vs-sf-w2-mundial-2026',
+    'https://gambeta.ai/previa/semifinal-qf1-vs-qf2-mundial-2026',
+    'https://gambeta.ai/bonos',
+  ];
+
+  // Patrones inventados/mockup/genéricos — NO deben aparecer nunca
+  const BAD_PATTERNS = [
+    { name: 'logo.png 404',        pattern: 'gambeta.ai/logo.png',    severity: 'critical' },
+    { name: 'twitter @ inventado', pattern: '@gambetaia',             severity: 'critical' },
+    { name: 'twitter.com inventado', pattern: 'twitter.com/gambetaia', severity: 'critical' },
+    { name: 'telegram canal inventado', pattern: '+gambeta_canal',     severity: 'critical' },
+    { name: 'lorem residual',      pattern: 'lorem ipsum',            severity: 'critical' },
+    { name: 'placeholder test',    pattern: 'test@example.com',       severity: 'medium' },
+    { name: 'XXXXXX placeholder',  pattern: 'XXXXXX',                 severity: 'medium' },
+    { name: 'replace-me',          pattern: 'replace-me',             severity: 'medium' },
+  ];
+
+  // URLs que el sitio referencia en JSON-LD y deben responder 200
+  const REQUIRED_URLS = [
+    'https://gambeta.ai/favicon-512.png',
+    'https://x.com/Gambeta_ai',
+    'https://t.me/GrupoLatam',
+    'https://www.youtube.com/@apuestaslatam',
+    'https://www.fifa.com',
+  ];
+
+  // sameAs whitelist (Organization schema)
+  const ALLOWED_SAMEAS = ['x.com/Gambeta_ai', 't.me/GrupoLatam', 'youtube.com/@apuestaslatam', 'www.fifa.com'];
+
+  const findings = [];
+  const ua = 'Mozilla/5.0 (GambetaSchemaMonitor/1.0)';
+  const sampleHtmls = {};
+
+  // ── Control #1: grep patterns en HTML live ──
+  for (const url of SAMPLES) {
+    try {
+      const r = await fetch(url, { headers: { 'User-Agent': ua }, redirect: 'follow' });
+      if (!r.ok) {
+        findings.push({ control: 1, severity: 'medium', url, issue: `http_${r.status}` });
+        continue;
+      }
+      const html = await r.text();
+      sampleHtmls[url] = html;
+      for (const bp of BAD_PATTERNS) {
+        if (html.includes(bp.pattern)) {
+          findings.push({ control: 1, severity: bp.severity, url, issue: `bad_pattern: ${bp.name}` });
+        }
+      }
+    } catch (e) {
+      findings.push({ control: 1, severity: 'medium', url, issue: `fetch_error: ${e.message}` });
+    }
+  }
+
+  // ── Control #2: HEAD a URLs requeridas ──
+  for (const url of REQUIRED_URLS) {
+    try {
+      const r = await fetch(url, { method: 'HEAD', headers: { 'User-Agent': ua }, redirect: 'follow' });
+      if (r.status >= 400) {
+        findings.push({ control: 2, severity: 'critical', url, issue: `required_url_returns_${r.status}` });
+      }
+    } catch (e) {
+      findings.push({ control: 2, severity: 'medium', url, issue: `head_error: ${e.message}` });
+    }
+  }
+
+  // ── Control #3: parsear JSON-LD y validar schema.org compliance ──
+  for (const url of SAMPLES) {
+    const html = sampleHtmls[url];
+    if (!html) continue;
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+    for (const m of blocks) {
+      let d;
+      try { d = JSON.parse(m[1].trim()); }
+      catch (e) {
+        findings.push({ control: 3, severity: 'critical', url, issue: 'json_parse_error' });
+        continue;
+      }
+      function walk(obj) {
+        if (!obj || typeof obj !== 'object') return;
+        if (Array.isArray(obj)) { obj.forEach(walk); return; }
+        if (obj['@graph']) obj['@graph'].forEach(walk);
+        const t = obj['@type'];
+        if (t === 'SportsEvent') {
+          if (!obj.description) findings.push({ control: 3, severity: 'medium', url, issue: 'SportsEvent_no_description' });
+          if (!obj.organizer) findings.push({ control: 3, severity: 'medium', url, issue: 'SportsEvent_no_organizer' });
+          else if (typeof obj.organizer === 'object' && !obj.organizer.url) findings.push({ control: 3, severity: 'medium', url, issue: 'SportsEvent_organizer_no_url' });
+        }
+        if (t === 'Article') {
+          if (!obj.image) findings.push({ control: 3, severity: 'critical', url, issue: 'Article_no_image' });
+          if (!obj.author) findings.push({ control: 3, severity: 'critical', url, issue: 'Article_no_author' });
+          if (!obj.datePublished) findings.push({ control: 3, severity: 'critical', url, issue: 'Article_no_datePublished' });
+          const pub = obj.publisher;
+          if (!pub || typeof pub !== 'object') findings.push({ control: 3, severity: 'critical', url, issue: 'Article_no_publisher' });
+          else if (!pub.logo || typeof pub.logo !== 'object' || !pub.logo.url) findings.push({ control: 3, severity: 'critical', url, issue: 'Article_no_publisher_logo' });
+          else if (!pub.logo.url.includes('favicon-512')) findings.push({ control: 3, severity: 'medium', url, issue: 'Article_publisher_logo_wrong_url' });
+        }
+        if (t === 'Organization' && Array.isArray(obj.sameAs)) {
+          for (const s of obj.sameAs) {
+            if (!ALLOWED_SAMEAS.some(a => s.includes(a))) {
+              findings.push({ control: 3, severity: 'critical', url, issue: `Organization_sameAs_off_whitelist: ${s.slice(0,80)}` });
+            }
+          }
+        }
+        for (const k in obj) {
+          if (typeof obj[k] === 'object' && k !== '@graph') walk(obj[k]);
+        }
+      }
+      walk(d);
+    }
+  }
+
+  // ── Comparar contra baseline ──
+  let prev = null;
+  try { prev = await env.CACHE_KV.get('schema_monitor:baseline', { type: 'json' }); } catch(e) {}
+  const prevKeys = new Set((prev?.findings || []).map(f => `${f.severity}|${f.issue}|${f.url}`));
+  const newBugs = findings.filter(f => !prevKeys.has(`${f.severity}|${f.issue}|${f.url}`));
+
+  const bySev = {
+    critical: findings.filter(f => f.severity === 'critical').length,
+    medium:   findings.filter(f => f.severity === 'medium').length,
+    low:      findings.filter(f => f.severity === 'low').length,
+  };
+  const result = {
+    ts: new Date().toISOString(),
+    samples_audited: SAMPLES.length,
+    findings_count: findings.length,
+    findings_by_severity: bySev,
+    findings,
+    new_vs_baseline: newBugs,
+    new_count: newBugs.length,
+    alert: newBugs.filter(b => b.severity === 'critical').length > 0,
+  };
+
+  await env.CACHE_KV.put('schema_monitor:latest', JSON.stringify(result), { expirationTtl: 86400 * 60 });
+  // Solo actualizar baseline si NO hay críticos nuevos (baseline = último estado limpio)
+  if (!result.alert) {
+    await env.CACHE_KV.put('schema_monitor:baseline', JSON.stringify(result), { expirationTtl: 86400 * 90 });
+  }
+  if (result.alert) console.log('[SCHEMA_MONITOR_ALERT]', JSON.stringify({ count: newBugs.length, sample: newBugs.slice(0,5) }));
+  return result;
+}
+
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
     const cronExpr = controller.cron;
-    if (cronExpr === '0 */6 * * *') {
+    if (cronExpr === '0 6 * * 1') {
+      // ── Lunes 06:00 UTC (03:00 ART): Schema Monitor anti-regresión ──
+      const stats = await runSchemaMonitor(env);
+      console.log('[cron-schema-monitor]', JSON.stringify({
+        ts: stats.ts,
+        critical: stats.findings_by_severity.critical,
+        medium: stats.findings_by_severity.medium,
+        new_bugs: stats.new_count,
+        alert: stats.alert,
+      }));
+    } else if (cronExpr === '0 */6 * * *') {
       // Every 6h: update odds for pending picks
       const stats = await runOddsUpdater(env);
       console.log('[cron-odds]', JSON.stringify(stats));
@@ -2513,6 +2684,47 @@ export default {
         return new Response(JSON.stringify({ ok: true, msgId, before, after: updated.length, removed: before - updated.length }), { headers: CORS });
       } catch (e) {
         return new Response(JSON.stringify({ error: e.message, stack: e.stack?.slice(0, 500) }), { status: 500, headers: CORS });
+      }
+    }
+
+    // ── 🆕 (30-jun-2026 #602) /admin/schema-monitor — auditoría anti-regresión schema.org ──
+    if (path === '/admin/schema-monitor/status' && request.method === 'GET') {
+      try {
+        const latest = await env.CACHE_KV.get('schema_monitor:latest', { type: 'json' });
+        if (!latest) {
+          return new Response(JSON.stringify({ ok: false, error: 'no_data_yet', hint: 'POST /admin/schema-monitor/run?token=... para correr la primera vez' }, null, 2), {
+            status: 200, headers: { ...CORS, 'Content-Type': 'application/json' }
+          });
+        }
+        return new Response(JSON.stringify(latest, null, 2), {
+          status: 200, headers: { ...CORS, 'Content-Type': 'application/json' }
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
+    if (path === '/admin/schema-monitor/run' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) {
+        return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      }
+      try {
+        const result = await runSchemaMonitor(env);
+        return new Response(JSON.stringify({
+          ok: true,
+          ts: result.ts,
+          findings_count: result.findings_count,
+          by_severity: result.findings_by_severity,
+          new_vs_baseline: result.new_count,
+          alert: result.alert,
+          findings: result.findings,
+        }, null, 2), {
+          status: 200, headers: { ...CORS, 'Content-Type': 'application/json' }
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
       }
     }
 
