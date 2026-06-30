@@ -7808,411 +7808,110 @@ window.toggleHeroBubble = function(n) {
   </section>
 
 <!-- SECCIÓN: CANALES Y COMUNIDAD -->
-  <section id="bot-alerta">
-    <div class="section-title">
-      <div class="icon">🤖</div>
-      Bot de Alerta
+  <section id="gbNotificaciones" style="padding:48px 20px 56px;border-top:1px solid rgba(0,200,83,0.12)">
+  <!-- IDs legacy para que navTo('bot-alerta') y navTo('telegram') sigan funcionando -->
+  <span id="bot-alerta" style="position:absolute;visibility:hidden"></span>
+  <span id="telegram" style="position:absolute;visibility:hidden"></span>
+
+  <div style="max-width:920px;margin:0 auto">
+    <div style="text-align:center;margin-bottom:28px">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.28);border-radius:30px;padding:5px 18px;font-size:0.72rem;font-weight:700;color:var(--verde);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px">
+        🔔 No te pierdas un pick
+      </div>
+      <h2 style="font-size:clamp(1.5rem,4.5vw,2rem);font-weight:800;color:#fff;margin:0 0 8px;letter-spacing:-0.5px;font-family:'Inter',system-ui,sans-serif">Notificaciones de la IA</h2>
+      <p style="font-size:0.95rem;color:rgba(255,255,255,0.6);max-width:560px;margin:0 auto;line-height:1.6">Elegí cómo querés recibir los picks: notificación del navegador, canal de Telegram o bot con alertas en tiempo real.</p>
     </div>
 
-    <!-- Hero banner -->
-    <div style="position:relative;border-radius:20px;overflow:hidden;margin-bottom:24px;border:1px solid rgba(0,180,255,0.3);box-shadow:0 0 40px rgba(0,150,255,0.2)">
-      <!-- Imagen del banner -->
-      <img loading="lazy" decoding="async" src="https://lh3.googleusercontent.com/d/1eLAdCSjLRycxnNAXemI6UZfP97Qz9ynK"
-           alt="Bot de Alerta"
-           style="width:100%;display:block;max-height:340px;object-fit:cover;object-position:center"
-           onerror="this.style.display='none';document.getElementById('botHeroFallback').style.display='flex'"
-      />
-      <!-- Fallback si la imagen no carga -->
-      <div id="botHeroFallback" style="display:none;background:linear-gradient(135deg,#0a0a1a,#0d1b3e,#0a1628);padding:40px 28px;flex-direction:column;align-items:center;text-align:center;gap:10px">
-        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,180,255,0.15);border:1px solid rgba(0,180,255,0.4);border-radius:20px;padding:4px 14px;font-size:0.72rem;font-weight:700;color:#00b4ff;letter-spacing:1px;text-transform:uppercase">
-          <span style="width:6px;height:6px;border-radius:50%;background:#00b4ff;animation:live-ping 1.4s ease-out infinite;display:inline-block"></span>
-          ALERTAS EN TIEMPO REAL
+    <!-- Tabs -->
+    <div id="gbNotifTabs" style="display:flex;gap:6px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:14px;padding:6px;margin:0 auto 24px;max-width:520px">
+      <button class="gb-notif-tab active" data-tab="push" onclick="gbNotifSwitch('push',this)" style="flex:1;padding:10px 12px;background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.35);border-radius:10px;color:#9fcf26;font-family:inherit;font-size:0.78rem;font-weight:700;cursor:pointer;letter-spacing:0.3px;transition:all .18s ease">🔔 <span style="display:inline">Web Push</span></button>
+      <button class="gb-notif-tab" data-tab="telegram" onclick="gbNotifSwitch('telegram',this)" style="flex:1;padding:10px 12px;background:transparent;border:1px solid transparent;border-radius:10px;color:rgba(255,255,255,0.55);font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all .18s ease">📣 <span>Telegram</span></button>
+      <button class="gb-notif-tab" data-tab="bot" onclick="gbNotifSwitch('bot',this)" style="flex:1;padding:10px 12px;background:transparent;border:1px solid transparent;border-radius:10px;color:rgba(255,255,255,0.55);font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;transition:all .18s ease">🤖 <span>Bot Alerta</span></button>
+    </div>
+
+    <!-- Tab content: PUSH (web notifs) -->
+    <div id="gbNotifPane-push" class="gb-notif-pane" style="display:block">
+      <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(0,200,83,0.22);border-radius:18px;padding:32px 28px;text-align:center">
+        <div style="display:inline-flex;align-items:center;justify-content:center;width:60px;height:60px;background:rgba(0,200,83,0.12);border:1px solid rgba(0,200,83,0.3);border-radius:50%;margin:0 auto 18px">
+          <span style="font-size:1.6rem">🔔</span>
         </div>
-        <div style="font-size:clamp(2rem,6vw,3.2rem);font-weight:900;line-height:1;letter-spacing:-1px">
-          <span style="background:linear-gradient(90deg,#fff,#a0d8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent">BOT</span>
-          <span style="color:rgba(255,255,255,0.4);font-weight:300"> DE </span>
-          <span style="background:linear-gradient(90deg,#f0a500,#ffcd00);-webkit-background-clip:text;-webkit-text-fill-color:transparent">ALERTA</span>
-        </div>
-      </div>
-      <!-- Overlay badge sobre la imagen -->
-      <div style="position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);border:1px solid rgba(0,180,255,0.5);border-radius:20px;padding:5px 14px;font-size:0.72rem;font-weight:700;color:#00b4ff;letter-spacing:1px;text-transform:uppercase">
-        <span style="width:6px;height:6px;border-radius:50%;background:#00b4ff;animation:live-ping 1.4s ease-out infinite;display:inline-block"></span>
-        ALERTAS EN TIEMPO REAL
-      </div>
-      <div style="position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,#00b4ff,#f0a500,#00b4ff,transparent)"></div>
-      <div style="position:relative;z-index:1;padding:18px 24px 22px;background:linear-gradient(to top,rgba(0,0,0,0.85) 0%,transparent 100%)">
-        <div style="font-size:1rem;color:rgba(255,255,255,0.75);line-height:1.6">
-          Nuestro bot analiza partidos en vivo y detecta el momento exacto para apostar al próximo córner — con segundos de ventaja.
-        </div>
+        <h3 style="font-size:1.15rem;color:#fff;margin:0 0 10px;font-weight:700;letter-spacing:-0.3px">Notificaciones del navegador</h3>
+        <p style="font-size:0.9rem;color:rgba(255,255,255,0.65);max-width:460px;margin:0 auto 22px;line-height:1.6">Recibí una alerta cuando la IA publica un pick de máxima confianza o cuando un partido tuyo está por arrancar.</p>
+        <button onclick="if(typeof requestPushPermission==='function'){requestPushPermission()}else{Notification.requestPermission()}" style="background:linear-gradient(180deg,#00c853,#00a045);color:#000;border:none;border-radius:999px;padding:12px 26px;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:inherit;box-shadow:0 4px 16px rgba(0,200,83,0.25);transition:transform .15s">Activar notificaciones →</button>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:14px">Funciona en Chrome, Firefox, Edge y Safari · No te llega spam</div>
       </div>
     </div>
 
-    <!-- Cómo funciona -->
-    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-bottom:24px">
-      <div style="background:var(--gris-card);border:1px solid var(--borde);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px">
-        <span style="font-size:1.8rem">⏱️</span>
-        <div style="font-weight:700;font-size:0.9rem;color:#fff">Partidos en etapa final</div>
-        <div style="font-size:0.78rem;color:var(--texto-sec);line-height:1.5">El bot monitorea partidos cerca del final del tiempo reglamentario donde la estadística de córners es más predecible.</div>
-      </div>
-      <div style="background:var(--gris-card);border:1px solid var(--borde);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px">
-        <span style="font-size:1.8rem">📐</span>
-        <div style="font-weight:700;font-size:0.9rem;color:#fff">Apuesta a +1 córner</div>
-        <div style="font-size:0.78rem;color:var(--texto-sec);line-height:1.5">Identifica situaciones donde la probabilidad de al menos un córner más es alta, con cuotas favorables en el mercado en vivo.</div>
-      </div>
-      <div style="background:var(--gris-card);border:1px solid var(--borde);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px">
-        <span style="font-size:1.8rem">📲</span>
-        <div style="font-weight:700;font-size:0.9rem;color:#fff">Alerta instantánea</div>
-        <div style="font-size:0.78rem;color:var(--texto-sec);line-height:1.5">Recibís la notificación directo en Telegram con el partido, la cuota recomendada y el tiempo restante para actuar.</div>
-      </div>
-      <div style="background:var(--gris-card);border:1px solid var(--borde);border-radius:14px;padding:18px;display:flex;flex-direction:column;gap:8px">
-        <span style="font-size:1.8rem">📅</span>
-        <div style="font-weight:700;font-size:0.9rem;color:#fff">Alertas diarias</div>
-        <div style="font-size:0.78rem;color:var(--texto-sec);line-height:1.5">Funciona todos los días, durante toda la jornada futbolística. Sin días de descanso, sin excusas.</div>
-      </div>
-    </div>
-
-    <!-- Pricing -->
-    <div style="max-width:420px;margin:0 auto">
-      <div style="background:linear-gradient(135deg,rgba(0,200,83,0.08),rgba(0,180,255,0.05));border:1px solid rgba(0,200,83,0.35);border-radius:20px;padding:28px;text-align:center;position:relative;overflow:hidden">
-        <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,rgba(0,200,83,0.15),transparent 70%);pointer-events:none"></div>
-        <!-- Listón de oferta -->
-        <div style="position:absolute;top:18px;right:-28px;background:linear-gradient(135deg,#ff4444,#cc0000);color:#fff;font-size:0.65rem;font-weight:900;letter-spacing:1px;text-transform:uppercase;padding:5px 36px;transform:rotate(45deg);box-shadow:0 2px 8px rgba(255,0,0,0.5);pointer-events:none;z-index:3">🔥 OFERTA</div>
-        <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--verde);margin-bottom:8px">Acceso al canal privado</div>
-        <div style="margin-bottom:4px;display:flex;align-items:baseline;justify-content:center;gap:6px">
-          <span style="font-size:3rem;font-weight:900;color:#fff">$10</span>
-          <span style="font-size:1.2rem;color:var(--texto-sec);font-weight:600">USD</span>
-        </div>
-        <div style="display:inline-block;background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.4);border-radius:50px;padding:3px 14px;font-size:0.72rem;font-weight:800;color:var(--verde);letter-spacing:0.8px;text-transform:uppercase;margin-bottom:12px">🔒 Pago único · Acceso vitalicio</div>
-        <div style="font-size:0.78rem;color:var(--texto-sec);margin-bottom:20px">Canal privado con chat · Alertas diarias · Soporte directo</div>
-        <a href="https://t.me/clubdewinners/2654" target="_blank" rel="noopener"
-           style="display:flex;align-items:center;justify-content:center;gap:8px;background:var(--verde);color:#000;font-size:1rem;font-weight:800;padding:14px 28px;border-radius:30px;text-decoration:none;box-shadow:0 4px 20px rgba(0,200,83,0.35);transition:opacity .2s"
-           onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-          🤖 Quiero acceder al Bot
+    <!-- Tab content: TELEGRAM -->
+    <div id="gbNotifPane-telegram" class="gb-notif-pane" style="display:none">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+        <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" style="display:block;background:rgba(0,140,200,0.06);border:1px solid rgba(0,180,255,0.25);border-radius:14px;padding:20px 22px;color:#fff;text-decoration:none;transition:all .2s">
+          <div style="font-size:0.66rem;color:#64b5f6;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:6px">📣 Grupo principal</div>
+          <div style="font-size:1.05rem;color:#fff;font-weight:700;margin-bottom:8px">Apuestas Latam</div>
+          <div style="font-size:0.84rem;color:rgba(255,255,255,0.6);line-height:1.5">Comunidad oficial. Picks del día, análisis y la mejor info en vivo.</div>
+          <div style="font-size:0.78rem;color:#64b5f6;font-weight:600;margin-top:12px">Unirme →</div>
         </a>
-        <div style="font-size:0.7rem;color:var(--texto-sec);margin-top:10px">Contactá al admin por Telegram para coordinar el acceso</div>
-      </div>
-    </div>
-  </section>
-  <section id="telegram">
-    <div class="section-title">
-      <div class="icon">🎁</div>
-      Canal de Promociones de Apuestas
-    </div>
-    <!-- ★ CANAL PRINCIPAL — destacado ★ -->
-    <div style="max-width:1100px;margin:0 auto 20px">
-      <div style="position:relative;background:linear-gradient(135deg,rgba(34,158,217,0.18) 0%,rgba(26,90,160,0.22) 50%,rgba(34,158,217,0.12) 100%);border:2px solid rgba(34,158,217,0.6);border-radius:24px;padding:32px 36px;display:flex;flex-wrap:wrap;align-items:center;gap:28px;box-shadow:0 0 40px rgba(34,158,217,0.18),0 8px 32px rgba(0,0,0,0.4);overflow:hidden">
-        <!-- Glow de fondo -->
-        <div style="position:absolute;top:-60px;left:-60px;width:260px;height:260px;background:radial-gradient(circle,rgba(34,158,217,0.15) 0%,transparent 70%);pointer-events:none"></div>
-        <div style="position:absolute;bottom:-60px;right:-60px;width:220px;height:220px;background:radial-gradient(circle,rgba(34,158,217,0.10) 0%,transparent 70%);pointer-events:none"></div>
-
-        <!-- Badge CANAL PRINCIPAL -->
-        <div style="position:absolute;top:16px;right:16px;background:linear-gradient(135deg,#229ED9,#1A6FAF);color:#fff;font-size:0.68rem;font-weight:900;padding:4px 12px;border-radius:20px;letter-spacing:1px;text-transform:uppercase;box-shadow:0 2px 10px rgba(34,158,217,0.5)">⭐ CANAL PRINCIPAL</div>
-
-        <!-- Avatar -->
-        <div style="flex-shrink:0;position:relative">
-          <img loading="lazy" decoding="async" src="https://pbs.twimg.com/media/HDBbXBxaMAAYpse?format=png&name=small" alt="Apuestas LATAM" style="width:90px;height:90px;border-radius:50%;border:3px solid rgba(34,158,217,0.7);box-shadow:0 0 24px rgba(34,158,217,0.5);object-fit:cover" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"><div style="display:none;width:90px;height:90px;border-radius:50%;border:3px solid rgba(34,158,217,0.7);box-shadow:0 0 24px rgba(34,158,217,0.5);background:linear-gradient(135deg,#229ED9,#1A6FAF);align-items:center;justify-content:center;font-size:2.8rem">✈️</div>
-          <!-- Badge seguidores -->
-          <div style="position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#229ED9,#0e5fa0);color:#fff;font-size:0.65rem;font-weight:900;padding:3px 10px;border-radius:20px;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,0.4)">👥 15K</div>
-        </div>
-
-        <!-- Texto -->
-        <div style="flex:1;min-width:200px">
-          <div style="font-size:1.6rem;font-weight:900;color:#fff;margin-bottom:4px;line-height:1.2">Apuestas LATAM <span style="font-size:1.1rem">🎩</span></div>
-          <div style="font-size:0.9rem;color:#229ED9;font-weight:700;margin-bottom:10px">+15.000 miembros activos</div>
-          <div style="font-size:0.88rem;color:var(--texto-sec);line-height:1.6;max-width:520px">
-            El canal más grande de apuestas deportivas en LATAM. Pronósticos diarios de fútbol, análisis IA, alertas en tiempo real y picks verificados. <strong style="color:#fff">Gratis, siempre.</strong>
-          </div>
-          <!-- Mini features -->
-          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px">
-            <span style="background:rgba(34,158,217,0.15);border:1px solid rgba(34,158,217,0.35);color:#a8d8f0;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:20px">📊 Picks diarios</span>
-            <span style="background:rgba(34,158,217,0.15);border:1px solid rgba(34,158,217,0.35);color:#a8d8f0;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:20px">🤖 Análisis IA</span>
-            <span style="background:rgba(34,158,217,0.15);border:1px solid rgba(34,158,217,0.35);color:#a8d8f0;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:20px">🔔 Alertas en vivo</span>
-            <span style="background:rgba(34,158,217,0.15);border:1px solid rgba(34,158,217,0.35);color:#a8d8f0;font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:20px">💯 100% Gratis</span>
-          </div>
-        </div>
-
-        <!-- CTA -->
-        <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:10px">
-          <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener"
-             onclick="trackEvent('promo_click',{promo:'canal_principal_latam',type:'telegram'})"
-             style="display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#229ED9,#1A6FAF);color:#fff;font-size:1.05rem;font-weight:800;padding:15px 32px;border-radius:40px;text-decoration:none;box-shadow:0 4px 24px rgba(34,158,217,0.5);transition:all .2s;white-space:nowrap"
-             onmouseover="this.style.transform='scale(1.04)';this.style.boxShadow='0 6px 30px rgba(34,158,217,0.7)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 4px 24px rgba(34,158,217,0.5)'">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
-            Unirme al canal
-          </a>
-          <div style="font-size:0.72rem;color:rgba(34,158,217,0.8);font-weight:600">✓ Más de 15.000 ya están adentro</div>
-        </div>
-      </div>
-    </div>
-
-    <div style="max-width:1100px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;align-items:stretch">
-
-      <!-- Canal 1: Club de Ganadores -->
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <div style="flex:1;background:linear-gradient(135deg,rgba(34,158,217,0.12),rgba(26,122,181,0.06));border:1px solid rgba(34,158,217,0.35);border-radius:20px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
-          <img loading="lazy" decoding="async" src="https://unavatar.io/telegram/clubdewinners"
-               alt="Club de Ganadores"
-               style="width:72px;height:72px;border-radius:50%;object-fit:cover;box-shadow:0 4px 20px rgba(34,158,217,0.4)"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
-          /><div style="display:none;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#229ED9,#1A7AB5);align-items:center;justify-content:center;font-size:2rem;box-shadow:0 4px 20px rgba(34,158,217,0.4)">✈️</div>
-          <div style="flex:1">
-            <div style="font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:4px">Club de Ganadores</div>
-            <div style="font-size:0.85rem;color:#229ED9;margin-bottom:8px">@clubdewinners</div>
-            <div style="font-size:0.82rem;color:var(--texto-sec);line-height:1.5;max-width:340px">
-              Aquí tendrás las mejores promociones en casas de apuestas, sumado a nuestros Pronósticos VIP.<br><br>Estos son nuestros mejores pronósticos.
-            </div>
-          </div>
-          <a href="https://t.me/clubdewinners" target="_blank" rel="noopener"
-             onclick="trackEvent('promo_click',{promo:'clubdewinners',type:'telegram'})"
-             style="display:inline-flex;align-items:center;gap:8px;background:#229ED9;color:#fff;font-size:0.95rem;font-weight:700;padding:12px 28px;border-radius:30px;text-decoration:none;box-shadow:0 4px 16px rgba(34,158,217,0.4);transition:opacity .2s"
-             onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
-            Abrir en Telegram
-          </a>
-        </div>
-        <!-- Perks canal 1 -->
-        <div style="background:var(--gris-card);border:1px solid var(--borde);border-radius:16px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">🎯</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">Picks diarios</div><div style="font-size:0.75rem;color:var(--texto-sec)">Pronósticos con análisis IA</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">📊</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">Estadísticas</div><div style="font-size:0.75rem;color:var(--texto-sec)">Historial de aciertos verificado</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">⚡</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">Alertas en vivo</div><div style="font-size:0.75rem;color:var(--texto-sec)">Notificaciones antes del partido</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">🆓</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">100% gratis</div><div style="font-size:0.75rem;color:var(--texto-sec)">Sin suscripción ni pagos</div></div>
-          </div>
-        </div>
-      </div><!-- /canal-1-wrapper -->
-
-      <!-- Canal 2: Destraba Bonos -->
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <div style="flex:1;background:linear-gradient(135deg,rgba(0,200,83,0.10),rgba(0,150,60,0.05));border:1px solid rgba(0,200,83,0.30);border-radius:20px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
-          <img loading="lazy" decoding="async" src="https://lh3.googleusercontent.com/d/1lDRsd2ArvmAFjxzVlkT9NPthqabPn4i5"
-               alt="Destraba Bonos"
-               style="width:72px;height:72px;border-radius:50%;object-fit:cover;box-shadow:0 4px 20px rgba(0,200,83,0.4)"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
-          /><div style="display:none;width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#00c853,#007c32);align-items:center;justify-content:center;font-size:2rem;box-shadow:0 4px 20px rgba(0,200,83,0.4)">🎁</div>
-          <div style="flex:1">
-            <div style="font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:4px">Destraba Bonos</div>
-            <div style="font-size:0.85rem;color:var(--verde);margin-bottom:8px">@canaldestrababonos</div>
-            <div style="font-size:0.82rem;color:var(--texto-sec);line-height:1.5;max-width:340px">
-              Todos los días publicamos apuestas para destrabar los bonos de bienvenida y los bonos semanales de las casas de apuestas.
-            </div>
-          </div>
-          <a href="https://t.me/canaldestrababonos" target="_blank" rel="noopener"
-             onclick="trackEvent('promo_click',{promo:'canaldestrababonos',type:'telegram'})"
-             style="display:inline-flex;align-items:center;gap:8px;background:var(--verde);color:#000;font-size:0.95rem;font-weight:700;padding:12px 28px;border-radius:30px;text-decoration:none;box-shadow:0 4px 16px rgba(0,200,83,0.4);transition:opacity .2s"
-             onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="black"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 13.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/></svg>
-            Abrir en Telegram
-          </a>
-        </div>
-        <!-- Perks canal 2 -->
-        <div style="background:var(--gris-card);border:1px solid var(--borde);border-radius:16px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">🎁</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">Bonos de bienvenida</div><div style="font-size:0.75rem;color:var(--texto-sec)">Apuestas diarias para desbloquearlos</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">📅</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">Bonos semanales</div><div style="font-size:0.75rem;color:var(--texto-sec)">Picks para liberar cada semana</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">💰</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">Depósito duplicado</div><div style="font-size:0.75rem;color:var(--texto-sec)">Alertas cuando la casa te duplica el saldo</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">🆓</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">100% gratis</div><div style="font-size:0.75rem;color:var(--texto-sec)">Sin suscripción ni pagos</div></div>
-          </div>
-        </div>
-      </div><!-- /canal-2-wrapper -->
-
-      <!-- Canal 3: YouTube -->
-      <div style="display:flex;flex-direction:column;gap:16px">
-        <div style="flex:1;background:linear-gradient(135deg,rgba(255,0,0,0.12),rgba(180,0,0,0.05));border:1px solid rgba(255,0,0,0.30);border-radius:20px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
-          <div style="width:80px;height:80px;border-radius:50%;box-shadow:0 4px 20px rgba(255,0,0,0.4);flex-shrink:0;background:#ff0000;display:flex;align-items:center;justify-content:center"><svg width="42" height="30" viewBox="0 0 44 31" fill="white"><path d="M43.06 4.85A5.53 5.53 0 0 0 39.17.96C35.74 0 22 0 22 0S8.26 0 4.83.96A5.53 5.53 0 0 0 .94 4.85C0 8.28 0 15.5 0 15.5s0 7.22.94 10.65a5.53 5.53 0 0 0 3.89 3.89C8.26 31 22 31 22 31s13.74 0 17.17-.96a5.53 5.53 0 0 0 3.89-3.89C44 22.72 44 15.5 44 15.5s0-7.22-.94-10.65zM17.5 22.07V8.93L29 15.5 17.5 22.07z"/></svg></div>
-          <div style="flex:1">
-            <div style="font-size:1.3rem;font-weight:800;color:#fff;margin-bottom:4px">Apuestas LATAM</div>
-            <div style="font-size:0.85rem;color:#ff4444;margin-bottom:8px">@apuestaslatam</div>
-            <div style="font-size:0.82rem;color:var(--texto-sec);line-height:1.5;max-width:340px">
-              Análisis de partidos, picks explicados y estrategias de apuestas deportivas en video. Contenido nuevo cada semana.
-            </div>
-          </div>
-          <a href="https://www.youtube.com/@apuestaslatam" target="_blank" rel="noopener"
-             onclick="trackEvent('promo_click',{promo:'youtube_apuestaslatam',type:'youtube'})"
-             style="display:inline-flex;align-items:center;gap:8px;background:#ff0000;color:#fff;font-size:0.95rem;font-weight:700;padding:12px 28px;border-radius:30px;text-decoration:none;box-shadow:0 4px 16px rgba(255,0,0,0.4);transition:opacity .2s"
-             onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
-            Suscribirse en YouTube
-          </a>
-        </div>
-        <!-- Perks canal YouTube -->
-        <div style="background:var(--gris-card);border:1px solid var(--borde);border-radius:16px;padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">🎬</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">Análisis en video</div><div style="font-size:0.75rem;color:var(--texto-sec)">Picks explicados partido a partido</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">📈</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">Estrategias</div><div style="font-size:0.75rem;color:var(--texto-sec)">Gestión de banca y value bets</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">⚽</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">Resúmenes semanales</div><div style="font-size:0.75rem;color:var(--texto-sec)">Resultados y aciertos del período</div></div>
-          </div>
-          <div style="display:flex;align-items:flex-start;gap:10px">
-            <span style="font-size:1.3rem">🆓</span>
-            <div><div style="font-size:0.85rem;font-weight:700;color:#fff">100% gratis</div><div style="font-size:0.75rem;color:var(--texto-sec)">Sin suscripción de pago</div></div>
-          </div>
-        </div>
-      </div><!-- /canal-3-youtube -->
-
-    </div><!-- /outer-grid -->
-
-    <!-- ── TODOS LOS CANALES GRATIS ── -->
-    <div style="max-width:1100px;margin:28px auto 0">
-      <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--verde);margin-bottom:12px">📲 Todos los canales gratuitos</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
-
-        <!-- Canal Principal -->
-        <a href="https://t.me/GrupoLatam" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
-          <span style="font-size:1.4rem;flex-shrink:0">🌐</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">Principal LATAM</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">Pronósticos generales</div></div>
+        <a href="https://t.me/clubdewinners" target="_blank" rel="noopener" style="display:block;background:rgba(0,200,83,0.06);border:1px solid rgba(0,200,83,0.25);border-radius:14px;padding:20px 22px;color:#fff;text-decoration:none;transition:all .2s">
+          <div style="font-size:0.66rem;color:#9fcf26;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:6px">🏆 Club VIP</div>
+          <div style="font-size:1.05rem;color:#fff;font-weight:700;margin-bottom:8px">Club de Winners</div>
+          <div style="font-size:0.84rem;color:rgba(255,255,255,0.6);line-height:1.5">Canal premium con picks de alta confianza y análisis VIP.</div>
+          <div style="font-size:0.78rem;color:#9fcf26;font-weight:600;margin-top:12px">Unirme →</div>
         </a>
-
-        <!-- Tenis -->
-        <a href="https://t.me/TenisLATAM" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
-          <span style="font-size:1.4rem;flex-shrink:0">🎾</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">Apuestas Tenis</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">@TenisLATAM</div></div>
+        <a href="https://t.me/canaldestrababonos" target="_blank" rel="noopener" style="display:block;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.25);border-radius:14px;padding:20px 22px;color:#fff;text-decoration:none;transition:all .2s">
+          <div style="font-size:0.66rem;color:#ffd600;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:6px">🎁 Bonos</div>
+          <div style="font-size:1.05rem;color:#fff;font-weight:700;margin-bottom:8px">Canal Destraba Bonos</div>
+          <div style="font-size:0.84rem;color:rgba(255,255,255,0.6);line-height:1.5">Tips para destrabar bonos de casas + promos exclusivas.</div>
+          <div style="font-size:0.78rem;color:#ffd600;font-weight:600;margin-top:12px">Unirme →</div>
         </a>
-
-        <!-- Fútbol -->
-        <a href="https://t.me/elseleccionado" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
-          <span style="font-size:1.4rem;flex-shrink:0">⚽</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">Apuestas Fútbol</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">@elseleccionado</div></div>
-        </a>
-
-        <!-- Rugby -->
-        <a href="https://t.me/apuestasrugby" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
-          <span style="font-size:1.4rem;flex-shrink:0">🏉</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">Apuestas Rugby</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">@apuestasrugby</div></div>
-        </a>
-
-        <!-- PackBall -->
-        <a href="https://t.me/PackballGRATIS" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
-          <span style="font-size:1.4rem;flex-shrink:0">📦</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">PackBall Premium</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">Gratis · @PackballGRATIS</div></div>
-        </a>
-
-        <!-- Gastón LATAM -->
-        <a href="https://t.me/gastonlatam" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
-          <span style="font-size:1.4rem;flex-shrink:0">👤</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">Gastón LATAM</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">@gastonlatam</div></div>
-        </a>
-
-        <!-- Tomi LATAM -->
-        <a href="https://t.me/Tomiilatam" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
-          <span style="font-size:1.4rem;flex-shrink:0">👤</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">Tomi LATAM</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">VIP Gratis · @Tomiilatam</div></div>
-        </a>
-
-        <!-- Chat Rugby -->
-        <a href="https://t.me/+clg2aAmJFn5lYzRh" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
-          <span style="font-size:1.4rem;flex-shrink:0">💬</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">Chat Rugby</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">Comunidad activa</div></div>
-        </a>
-
-        <!-- Soporte -->
-        <a href="https://t.me/Atencionvipproarg" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(34,158,217,0.08);border:1px solid rgba(34,158,217,0.25);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(34,158,217,0.16)'" onmouseout="this.style.background='rgba(34,158,217,0.08)'">
-          <span style="font-size:1.4rem;flex-shrink:0">🛟</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#fff;line-height:1.2">Soporte</div><div style="font-size:0.65rem;color:rgba(165,214,167,0.6)">Dudas y accesos</div></div>
-        </a>
-
-      </div>
-    </div>
-
-    <!-- ── REDES SOCIALES ── -->
-    <div style="max-width:1100px;margin:20px auto 0">
-      <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:var(--texto-sec);margin-bottom:12px">🌐 Redes sociales</div>
-      <div style="display:flex;flex-wrap:wrap;gap:10px">
-        <a href="https://x.com/Grupo_LATAM" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">𝕏 Fútbol &amp; Sorteos LATAM</a>
-        <a href="https://x.com/TenisLATAM_" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:10px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">𝕏 Tenis LATAM</a>
-        <a href="https://www.instagram.com/pronosticos.latam" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(200,55,150,0.08);border:1px solid rgba(200,55,150,0.25);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(200,55,150,0.18)'" onmouseout="this.style.background='rgba(200,55,150,0.08)'">📸 Instagram</a>
-        <a href="https://www.tiktok.com/@rugbylatam" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.05)'">🎵 TikTok Rugby</a>
-        <a href="https://www.youtube.com/@apuestaslatam" target="_blank" rel="noopener" onclick="trackEvent('promo_click',{promo:'youtube_apuestaslatam',type:'youtube'})" style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,0,0,0.08);border:1px solid rgba(255,0,0,0.30);border-radius:30px;padding:8px 16px;text-decoration:none;color:#e0e0e0;font-size:0.78rem;font-weight:600;transition:background .2s" onmouseover="this.style.background='rgba(255,0,0,0.18)'" onmouseout="this.style.background='rgba(255,0,0,0.08)'">▶️ YouTube Apuestas LATAM</a>
-      </div>
-    </div>
-
-    <!-- ── VIP PAGOS ── -->
-    <div style="max-width:1100px;margin:24px auto 0">
-      <div style="font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.2px;color:#ffd600;margin-bottom:12px">👑 Servicios VIP (pagos)</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
-
-        <a href="https://t.me/atencionvipproarg" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,214,0,0.12)'" onmouseout="this.style.background='rgba(255,214,0,0.06)'">
-          <span style="font-size:1.4rem;flex-shrink:0">👑</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#ffd600;line-height:1.2">VIP Mauro</div><div style="font-size:0.65rem;color:rgba(255,214,0,0.55)">Temporada completa</div></div>
-        </a>
-
-        <a href="https://t.me/rusolatam" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,214,0,0.12)'" onmouseout="this.style.background='rgba(255,214,0,0.06)'">
-          <span style="font-size:1.4rem;flex-shrink:0">⚽</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#ffd600;line-height:1.2">VIP Fútbol + Lives</div><div style="font-size:0.65rem;color:rgba(255,214,0,0.55)">Ruso LATAM</div></div>
-        </a>
-
-        <a href="https://t.me/BenjaLatam" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,214,0,0.12)'" onmouseout="this.style.background='rgba(255,214,0,0.06)'">
-          <span style="font-size:1.4rem;flex-shrink:0">🇺🇸</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#ffd600;line-height:1.2">VIP USA</div><div style="font-size:0.65rem;color:rgba(255,214,0,0.55)">Benja LATAM</div></div>
-        </a>
-
-        <a href="https://t.me/atencionvipproarg" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,214,0,0.12)'" onmouseout="this.style.background='rgba(255,214,0,0.06)'">
-          <span style="font-size:1.4rem;flex-shrink:0">📈</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#ffd600;line-height:1.2">Progresión 1k→50k</div><div style="font-size:0.65rem;color:rgba(255,214,0,0.55)">Canal de progressión</div></div>
-        </a>
-
-        <a href="https://t.me/atencionvipproarg" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,214,0,0.12)'" onmouseout="this.style.background='rgba(255,214,0,0.06)'">
-          <span style="font-size:1.4rem;flex-shrink:0">🚀</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#ffd600;line-height:1.2">Progresión 5k→250k</div><div style="font-size:0.65rem;color:rgba(255,214,0,0.55)">Canal de progressión</div></div>
-        </a>
-
-        <a href="https://t.me/Atencionvipproarg" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;background:rgba(255,214,0,0.06);border:1px solid rgba(255,214,0,0.2);border-radius:12px;padding:10px 14px;text-decoration:none;transition:background .2s" onmouseover="this.style.background='rgba(255,214,0,0.12)'" onmouseout="this.style.background='rgba(255,214,0,0.06)'">
-          <span style="font-size:1.4rem;flex-shrink:0">🤖</span>
-          <div><div style="font-size:0.78rem;font-weight:700;color:#ffd600;line-height:1.2">Bot Alerta</div><div style="font-size:0.65rem;color:rgba(255,214,0,0.55)">Equipos ganadores</div></div>
-        </a>
-
-      </div>
-    </div>
-
-    <!-- Cross-navigation -->
-    <div class="gb-cross-nav">
-      <div class="gb-cross-nav-label">Explorá también</div>
-      <div class="gb-cross-nav-btns">
-        <a class="gb-cross-nav-item" onclick="navTo('predictions')">
-          <span class="gb-cni-icon">🔮</span>
-          <span class="gb-cni-label">Pronósticos</span>
-          <span class="gb-cni-desc">Picks de hoy</span>
-        </a>
-        <a class="gb-cross-nav-item" onclick="navTo('historial')">
-          <span class="gb-cni-icon">📋</span>
-          <span class="gb-cni-label">Resultados</span>
-          <span class="gb-cni-desc">Picks finalizados</span>
-        </a>
-        <a class="gb-cross-nav-item" href="/blog/">
-          <span class="gb-cni-icon">📰</span>
-          <span class="gb-cni-label">Blog</span>
-          <span class="gb-cni-desc">Guías y estrategias</span>
+        <a href="https://www.youtube.com/@apuestaslatam" target="_blank" rel="noopener" style="display:block;background:rgba(229,57,53,0.06);border:1px solid rgba(229,57,53,0.25);border-radius:14px;padding:20px 22px;color:#fff;text-decoration:none;transition:all .2s">
+          <div style="font-size:0.66rem;color:#ff8a80;letter-spacing:1.2px;text-transform:uppercase;font-weight:700;margin-bottom:6px">▶️ YouTube</div>
+          <div style="font-size:1.05rem;color:#fff;font-weight:700;margin-bottom:8px">Apuestas Latam YT</div>
+          <div style="font-size:0.84rem;color:rgba(255,255,255,0.6);line-height:1.5">Análisis en video, hilos profundos y guía del Mundial 2026.</div>
+          <div style="font-size:0.78rem;color:#ff8a80;font-weight:600;margin-top:12px">Suscribirme →</div>
         </a>
       </div>
     </div>
 
-  </section>
+    <!-- Tab content: BOT ALERTA -->
+    <div id="gbNotifPane-bot" class="gb-notif-pane" style="display:none">
+      <div style="background:linear-gradient(135deg,rgba(0,150,255,0.04) 0%,rgba(0,180,255,0.02) 100%);border:1px solid rgba(0,180,255,0.3);border-radius:18px;padding:28px 26px;text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,180,255,0.12);border:1px solid rgba(0,180,255,0.35);border-radius:20px;padding:4px 12px;font-size:0.66rem;font-weight:700;color:#64b5f6;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px">
+          <span style="width:6px;height:6px;border-radius:50%;background:#64b5f6;animation:gb-pulse 1.4s ease-in-out infinite;display:inline-block"></span>
+          Alertas en tiempo real
+        </div>
+        <h3 style="font-size:1.2rem;color:#fff;margin:0 0 10px;font-weight:700;letter-spacing:-0.3px">Bot Alerta de Apuestas</h3>
+        <p style="font-size:0.92rem;color:rgba(255,255,255,0.65);max-width:480px;margin:0 auto 22px;line-height:1.6">Avisos instantáneos cuando la IA detecta un pick con valor. Llega antes a las cuotas antes de que la casa las ajuste.</p>
+        <a href="https://t.me/clubdewinners/2654" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:8px;background:linear-gradient(180deg,#00b4ff,#0088c8);color:#fff;border-radius:999px;padding:12px 26px;font-size:0.88rem;font-weight:700;text-decoration:none;box-shadow:0 4px 16px rgba(0,180,255,0.25);transition:transform .15s">Activar el bot →</a>
+        <div style="font-size:0.72rem;color:rgba(255,255,255,0.4);margin-top:14px">Setup en 2 minutos · Funciona desde Telegram</div>
+      </div>
+    </div>
+  </div>
 
+  <script>
+    (function(){
+      window.gbNotifSwitch = function(tab, btn) {
+        document.querySelectorAll('.gb-notif-tab').forEach(b => {
+          b.classList.remove('active');
+          b.style.background = 'transparent';
+          b.style.borderColor = 'transparent';
+          b.style.color = 'rgba(255,255,255,0.55)';
+          b.style.fontWeight = '600';
+        });
+        if (btn) {
+          btn.classList.add('active');
+          btn.style.background = 'rgba(0,200,83,0.12)';
+          btn.style.borderColor = 'rgba(0,200,83,0.35)';
+          btn.style.color = '#9fcf26';
+          btn.style.fontWeight = '700';
+        }
+        document.querySelectorAll('.gb-notif-pane').forEach(p => p.style.display = 'none');
+        const pane = document.getElementById('gbNotifPane-' + tab);
+        if (pane) pane.style.display = 'block';
+      };
+    })();
+  </script>
+</section>
+  
 <!-- SECCIÓN: CALCULADORA -->
   
 <!-- SEO: HUB DE ENLACES INTERNOS MUNDIAL 2026 -->
@@ -14966,6 +14665,7 @@ setTimeout(_fpBadgeInit, 1200);
 </html>
 
 <!-- redeploy 2026-05-20T21:42Z: re-sync tras rollback de tarea escudos -->
+
 
 
 
