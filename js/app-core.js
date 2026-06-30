@@ -5538,7 +5538,18 @@ function renderPreds() {
         } catch(_e) {}
       }
       realPreds = _finished;
-    } else if (tf === 'live') {      realPreds = realPreds.filter(p => !!_isPickLive(p));
+    } else if (tf === 'live') {      
+      realPreds = realPreds.filter(p => !!_isPickLive(p));
+      // 🆕 #594 Si no hay picks live, forzar empty state limpio y SALIR del render
+      // (antes dejaba las cards anteriores visibles porque flujo posterior no actualizaba)
+      if (!realPreds.length) {
+        window._aiPreds = [];
+        const _gridEl = document.getElementById('predGrid');
+        if (_gridEl) {
+          _gridEl.innerHTML = '<div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 20px;gap:14px;text-align:center"><div style="font-size:2.4rem;opacity:0.7">⚫</div><div style="font-size:1.05rem;font-weight:700;color:#fff">No hay partidos en vivo ahora</div><div style="font-size:0.85rem;color:rgba(255,255,255,0.6);max-width:340px;line-height:1.5">El filtro EN JUEGO se activa cuando hay un partido en curso. Mientras tanto, mirá los próximos picks o el historial.</div><button onclick="filterPredTime(\'all\', document.querySelector(\'#predTimeTabs button.sport-tab\'))" style="background:var(--verde);color:#000;border:none;border-radius:30px;padding:9px 22px;font-size:0.84rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px">Ver todos los picks</button></div>';
+        }
+        return;
+      }
     }
     if (!realPreds.length) realPreds = null;
   }
@@ -12851,6 +12862,7 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
 
