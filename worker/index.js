@@ -2896,13 +2896,14 @@ async function _searchScoreTheSportsDB(home, away) {
   ];
   for (const q of queries) {
     try {
-      const url = `https://www.thesportsdb.com/api/v1/json/${key}/searchevents.php?e=${encodeURIComponent(q)}&s=Soccer`;
+      const url = `https://www.thesportsdb.com/api/v1/json/${key}/searchevents.php?e=${encodeURIComponent(q)}`;
       const r = await fetch(url, { headers: { 'User-Agent': 'Gambeta-Worker/1.0' } });
       if (!r.ok) continue;
       const data = await r.json().catch(() => ({}));
       const events = data.event || [];
       // Buscar match más reciente con scores finalizados
       for (const ev of events) {
+        if (ev.strSport && ev.strSport !== 'Soccer') continue;
         const evH = ev.strHomeTeam || '', evA = ev.strAwayTeam || '';
         const directMatch  = norm(evH) === nH && norm(evA) === nA;
         const swappedMatch = norm(evH) === nA && norm(evA) === nH;
@@ -2952,10 +2953,8 @@ async function runForumBetResolver(env) {
       if (!home || !away || !pick) { stats.errors.push(`post ${post.id} missing fields`); continue; }
 
       // Custom picks: no se resuelven auto
-      if (pick === '__custom__' || !FORUM_PICK_RULES.resolve(0, 0, pick) === null && !pick.match(/gana|empate|doble|m[áa]s de|menos de|ambos marcan/i)) {
-        stats.custom_skipped++;
-        continue;
-      }
+      // Custom: solo skip si es marker __custom__
+      if (pick === '__custom__') { stats.custom_skipped++; continue; }
 
       const score = await _searchScoreTheSportsDB(home, away);
       if (!score) { stats.no_score++; continue; }
