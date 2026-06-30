@@ -5539,7 +5539,19 @@ function renderPreds() {
       }
       realPreds = _finished;
     } else if (tf === 'live') {      
-      realPreds = realPreds.filter(p => !!_isPickLive(p));
+      // 🆕 #596 Picks live se buscan en realPreds + historial completo (porque
+      // picks WC pending pueden no estar en _aiPreds si buildPredsFromOdds los saltea)
+      const _liveFromPreds = realPreds.filter(p => !!_isPickLive(p));
+      let _liveAll = _liveFromPreds.slice();
+      try {
+        const _hist = (typeof loadHistorial === 'function') ? loadHistorial() : [];
+        const _existingIds = new Set(_liveAll.map(p => p?.id).filter(Boolean));
+        const _liveFromHist = (_hist || [])
+          .filter(h => h && h.id && !_existingIds.has(h.id) && _isPickLive(h))
+          .map(h => ({ ...h, _started: true, _histResult: h.result || 'pending' }));
+        _liveAll = [..._liveAll, ..._liveFromHist];
+      } catch(_e) {}
+      realPreds = _liveAll;
       // 🆕 #594 Si no hay picks live, forzar empty state limpio y SALIR del render
       // (antes dejaba las cards anteriores visibles porque flujo posterior no actualizaba)
       if (!realPreds.length) {
@@ -12862,6 +12874,7 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
 
