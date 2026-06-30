@@ -4010,18 +4010,30 @@ function _updateHeroProStats() {
 function _isPickLive(p) {
   try {
     if (!p) return null;
+    // 1) Excluir picks resueltos
     if (p._histResult === 'win' || p._histResult === 'loss' || p._histResult === 'void') return null;
     if (p.result === 'win' || p.result === 'loss' || p.result === 'void') return null;
+    // 🆕 #590 Excluir explícitamente picks con marcador final guardado
+    if (p.finalScore && /^\d+-\d+$/.test(p.finalScore)) return null;
+    if (p._histScore && /^\d+-\d+$/.test(p._histScore)) return null;
 
-    // 1) scoresData autoritativo
+    // 2) scoresData autoritativo — PRIMERO chequear si el partido YA TERMINÓ
     if (typeof scoresData !== 'undefined' && Array.isArray(scoresData) && typeof teamsMatch === 'function') {
+      // 🆕 #590 Si scoresData dice flag='final' → terminado, NO es live
+      const lfinal = scoresData.find(function(s){
+        return s && s.flag === 'final' &&
+          (teamsMatch(s.home, p.home) || teamsMatch(s.homeRaw||s.home, p.home)) &&
+          (teamsMatch(s.away, p.away) || teamsMatch(s.awayRaw||s.away, p.away));
+      });
+      if (lfinal) return null;
+
+      // Si scoresData dice flag='live' → está en vivo confirmado
       const le = scoresData.find(function(s){
         return s && s.flag === 'live' &&
           (teamsMatch(s.home, p.home) || teamsMatch(s.homeRaw||s.home, p.home)) &&
           (teamsMatch(s.away, p.away) || teamsMatch(s.awayRaw||s.away, p.away));
       });
       if (le) {
-        // minuto del partido (preferir time del API; si no, derivar de commenceTs)
         var minute = '';
         if (le.time && typeof le.time === 'string') {
           minute = le.time.replace(/[^0-9]/g, '');
@@ -4041,11 +4053,13 @@ function _isPickLive(p) {
       }
     }
 
-    // 2) Fallback temporal: kickoff <= now AND kickoff > now - 2.5h
+    // 3) Fallback temporal MÁS ESTRICTO: solo si elapsed entre 0 y 105 min (#590)
+    //    Antes eran 2.5h (150 min) — eso traía picks ya terminados.
+    //    Un partido dura 90' + ~10' descuento + 5' margen = 105 min cap.
     if (p.commenceTs) {
       var now = Date.now();
       var elapsed = now - p.commenceTs;
-      if (elapsed >= 0 && elapsed <= 2.5 * 3600 * 1000) {
+      if (elapsed >= 0 && elapsed <= 105 * 60 * 1000) {
         var mins = Math.min(Math.floor(elapsed / 60000), 95);
         return {
           live: true,
@@ -4055,8 +4069,8 @@ function _isPickLive(p) {
           source: 'fallback'
         };
       }
-      // 🆕 #573 Self-heal: si pasó la ventana viva pero sigue pending, trigger resolver
-      if (elapsed > 2.5 * 3600 * 1000 && typeof window._maybeSelfHealResolve === 'function') {
+      // Self-heal: si pasó la ventana pero sigue pending, trigger resolver
+      if (elapsed > 105 * 60 * 1000 && typeof window._maybeSelfHealResolve === 'function') {
         try { window._maybeSelfHealResolve(p); } catch(_){}
       }
     }
@@ -12813,6 +12827,7 @@ function _purgeNbaPicks() {
     if (cleanPicks.length !== picks.length) localStorage.setItem(AC_PICK, JSON.stringify(cleanPicks));
   } catch(e) {}
 }
+
 
 
 
