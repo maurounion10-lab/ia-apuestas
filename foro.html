@@ -104,7 +104,46 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .cta-box a{display:inline-block;background:var(--verde);color:#000;font-weight:800;padding:10px 22px;border-radius:8px;font-size:.82rem;transition:all .15s}
 .cta-box a:hover{background:#00e860;transform:translateY(-1px)}
 
+/* ── Panel sub-foro expandible ── */
+.topic-panel{display:none;background:linear-gradient(180deg,var(--card),var(--card-hi));border:1px solid var(--border-hi);border-radius:18px;padding:24px;margin-bottom:32px;animation:tpFade .35s ease}
+.topic-panel.is-open{display:block}
+@keyframes tpFade{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.tp-head{display:flex;align-items:center;gap:14px;margin-bottom:6px}
+.tp-emoji{font-size:2rem;line-height:1}
+.tp-title{font-size:1.2rem;font-weight:900;color:#fff;letter-spacing:-0.3px}
+.tp-close{margin-left:auto;background:rgba(255,255,255,0.05);border:1px solid var(--border);color:var(--mute);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;font-family:inherit;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.tp-close:hover{background:rgba(255,255,255,0.1);color:#fff}
+.tp-desc{font-size:.85rem;color:var(--mute);margin-bottom:18px;line-height:1.5}
+.tp-form{background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:22px}
+.tp-form-row{display:flex;gap:8px;margin-bottom:8px}
+.tp-form input[type="text"],.tp-form textarea{flex:1;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-size:.85rem;color:#fff;font-family:inherit;transition:border-color .15s}
+.tp-form input[type="text"]:focus,.tp-form textarea:focus{outline:none;border-color:var(--accent,var(--verde))}
+.tp-form input[type="text"]{width:160px;flex:0 0 160px}
+.tp-form textarea{width:100%;min-height:60px;resize:vertical;line-height:1.45}
+.tp-form-actions{display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:.7rem;color:var(--mute2)}
+.tp-form-actions button{background:var(--accent,var(--verde));color:#000;font-weight:800;border:0;padding:9px 22px;border-radius:8px;font-size:.82rem;cursor:pointer;font-family:inherit;transition:all .15s}
+.tp-form-actions button:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 16px rgba(0,200,83,0.25)}
+.tp-form-actions button:disabled{opacity:.5;cursor:not-allowed}
+.tp-msg{margin-top:8px;font-size:.75rem;padding:8px 12px;border-radius:8px;display:none}
+.tp-msg.ok{display:block;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.3);color:var(--verde)}
+.tp-msg.err{display:block;background:rgba(255,51,102,0.08);border:1px solid rgba(255,51,102,0.3);color:var(--rosa)}
+.tp-posts{display:grid;gap:10px}
+.tp-post{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px;padding:14px 16px;transition:border-color .15s}
+.tp-post:hover{border-color:var(--border-hi)}
+.tp-post-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.8rem}
+.tp-post-avatar{width:28px;height:28px;background:linear-gradient(135deg,var(--accent,var(--verde)),#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.78rem}
+.tp-post-avatar.is-ai{background:linear-gradient(135deg,#9b59b6,#3498db);color:#fff}
+.tp-post-name{font-weight:800;color:#fff}
+.tp-post-time{margin-left:auto;font-size:.7rem;color:var(--mute2);font-family:'Geist Mono','SF Mono',monospace}
+.tp-post-content{color:rgba(255,255,255,0.78);font-size:.86rem;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
+.tp-empty{text-align:center;padding:32px 20px;color:var(--mute);font-size:.85rem;background:rgba(0,0,0,0.2);border-radius:12px;border:1px dashed var(--border)}
+
 @media(max-width:600px){
+  .topic-panel{padding:18px 14px}
+  .tp-form input[type="text"]{width:100%;flex:1 1 100%}
+  .tp-form-row{flex-direction:column}
+  .tp-emoji{font-size:1.6rem}
+  .tp-title{font-size:1.05rem}
   .hero{padding:28px 16px 18px}
   .stats{gap:8px}
   .stat{min-width:78px;padding:8px 12px}
@@ -149,6 +188,31 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
   <div class="section-title">📌 Sub-foros destacados</div>
   <div class="topics-grid" id="topicsGrid">
     <div class="loading">Cargando…</div>
+  </div>
+
+  <div class="topic-panel" id="topicPanel">
+    <div class="tp-head">
+      <span class="tp-emoji" id="tpEmoji">💬</span>
+      <div class="tp-title" id="tpTitle">…</div>
+      <button class="tp-close" id="tpClose" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="tp-desc" id="tpDesc">…</div>
+    <form class="tp-form" id="tpForm" autocomplete="off">
+      <div class="tp-form-row">
+        <input type="text" id="tpName" placeholder="Tu nombre o alias" maxlength="40" required>
+      </div>
+      <div class="tp-form-row">
+        <textarea id="tpText" placeholder="Compartí tu aporte… (mín. 10 caracteres, máx. 500)" maxlength="500" required></textarea>
+      </div>
+      <div class="tp-form-actions">
+        <span><span id="tpCharCount">0</span>/500</span>
+        <button type="submit" id="tpSubmit">Publicar</button>
+      </div>
+      <div class="tp-msg" id="tpMsg"></div>
+    </form>
+    <div class="tp-posts" id="tpPosts">
+      <div class="tp-empty">Sin posts todavía. ¡Sé el primero! 💬</div>
+    </div>
   </div>
 
   <!-- TABS COMPETENCIAS -->
@@ -267,14 +331,128 @@ function renderTopics() {
       <div class="topic-meta"><span><b>${posts.length}</b> mensajes</span><span>${last ? timeAgo(last.created_at) : 'nuevo'}</span></div>
     </a>`;
   }).join('');
-  // Click → expandir/scroll a un detalle del topic — por ahora redirige al home para que comenten desde un pick
+  // Click → abrir panel inline con form + posts del topic
   grid.querySelectorAll('.topic-card').forEach(c => {
     c.addEventListener('click', e => {
       e.preventDefault();
-      window.location.href = '/#predictions';
+      const tid = c.dataset.topic;
+      openTopicPanel(tid);
     });
   });
 }
+
+// ── PANEL SUB-FORO (posteo directo) ──
+let _currentTopicId = null;
+const _topicAccents = {
+  topic_fichajes:'#9b59b6', topic_noticias:'#3498db', topic_lesiones:'#e74c3c',
+  topic_valor:'#FFD700', topic_combinadas:'#00c853'
+};
+
+async function openTopicPanel(tid) {
+  _currentTopicId = tid;
+  const meta = TOPIC_META[tid];
+  const panel = document.getElementById('topicPanel');
+  document.getElementById('tpEmoji').textContent = meta.emoji;
+  document.getElementById('tpTitle').textContent = meta.title;
+  document.getElementById('tpDesc').textContent = meta.desc;
+  panel.style.setProperty('--accent', _topicAccents[tid] || 'var(--verde)');
+  panel.classList.add('is-open');
+  panel.scrollIntoView({ behavior:'smooth', block:'start' });
+  // Restaurar alias si ya posteó antes
+  const savedName = localStorage.getItem('gb_forum_alias') || '';
+  document.getElementById('tpName').value = savedName;
+  document.getElementById('tpText').value = '';
+  document.getElementById('tpCharCount').textContent = '0';
+  document.getElementById('tpMsg').className = 'tp-msg';
+  document.getElementById('tpMsg').textContent = '';
+  await loadTopicPosts(tid);
+}
+
+function closeTopicPanel() {
+  document.getElementById('topicPanel').classList.remove('is-open');
+  _currentTopicId = null;
+}
+
+async function loadTopicPosts(tid) {
+  const list = document.getElementById('tpPosts');
+  list.innerHTML = '<div class="tp-empty">Cargando…</div>';
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/forum_posts?thread_id=eq.' + encodeURIComponent(tid) + '&is_deleted=eq.false&select=*&order=created_at.desc&limit=50', { headers: H });
+    const posts = await r.json();
+    if (!posts || !posts.length) {
+      list.innerHTML = '<div class="tp-empty">Sin posts todavía. ¡Sé el primero! 💬</div>';
+      return;
+    }
+    list.innerHTML = posts.map(p => {
+      const name = p.user_name || 'Anónimo';
+      const isAi = isAiUser(name);
+      return `<div class="tp-post">
+        <div class="tp-post-head">
+          <div class="tp-post-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(name)}</div>
+          <span class="tp-post-name">${safe(name)}</span>
+          <span class="tp-post-time">${timeAgo(p.created_at)}</span>
+        </div>
+        <div class="tp-post-content">${safe(p.content)}</div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div class="tp-empty">Error cargando posts. Intentá refrescar.</div>';
+  }
+}
+
+function rateLimitOk() {
+  const KEY = 'gb_forum_posts_history';
+  let hist = [];
+  try { hist = JSON.parse(localStorage.getItem(KEY) || '[]'); } catch {}
+  const fiveMinAgo = Date.now() - 5*60*1000;
+  hist = hist.filter(ts => ts > fiveMinAgo);
+  if (hist.length >= 3) return false;
+  hist.push(Date.now());
+  localStorage.setItem(KEY, JSON.stringify(hist));
+  return true;
+}
+
+document.getElementById('tpClose').addEventListener('click', closeTopicPanel);
+
+document.getElementById('tpText').addEventListener('input', e => {
+  document.getElementById('tpCharCount').textContent = e.target.value.length;
+});
+
+document.getElementById('tpForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  if (!_currentTopicId) return;
+  const name = document.getElementById('tpName').value.trim();
+  const text = document.getElementById('tpText').value.trim();
+  const msg = document.getElementById('tpMsg');
+  const btn = document.getElementById('tpSubmit');
+  msg.className = 'tp-msg';
+  msg.textContent = '';
+
+  if (name.length < 2) { msg.className='tp-msg err'; msg.textContent='El nombre debe tener al menos 2 caracteres.'; return; }
+  if (text.length < 10) { msg.className='tp-msg err'; msg.textContent='El texto debe tener al menos 10 caracteres.'; return; }
+  if (text.length > 500) { msg.className='tp-msg err'; msg.textContent='Máximo 500 caracteres.'; return; }
+  if (!rateLimitOk()) { msg.className='tp-msg err'; msg.textContent='Frená un poco — máx 3 posts cada 5 minutos.'; return; }
+
+  btn.disabled = true; btn.textContent='Publicando…';
+  try {
+    const r = await fetch(SB_URL + '/rest/v1/forum_posts', {
+      method:'POST',
+      headers: { ...H, 'Content-Type':'application/json', 'Prefer':'return=minimal' },
+      body: JSON.stringify({ thread_id:_currentTopicId, user_name:name, user_email:'foro@gambeta.ai', content:text, is_ai_post:false, is_deleted:false })
+    });
+    if (!r.ok) throw new Error('http_'+r.status);
+    localStorage.setItem('gb_forum_alias', name);
+    msg.className='tp-msg ok'; msg.textContent='¡Publicado! 🎉';
+    document.getElementById('tpText').value=''; document.getElementById('tpCharCount').textContent='0';
+    await loadTopicPosts(_currentTopicId);
+    // Refrescar también la stats del hero
+    loadAll();
+  } catch(err) {
+    msg.className='tp-msg err'; msg.textContent='No se pudo publicar. Probá de nuevo.';
+  } finally {
+    btn.disabled=false; btn.textContent='Publicar';
+  }
+});
 
 function renderTabsCounts() {
   const counts = { all: 0, cl: 0, pl: 0, la: 0, lpf: 0, bra: 0, wc: 0, other: 0 };
