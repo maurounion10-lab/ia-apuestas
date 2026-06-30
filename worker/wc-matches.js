@@ -737,7 +737,7 @@ export const WC_MATCHES = [
     stake: 110, odds: 1.45,
     _hO: 1.85, _dO: 3.40, _aO: 4.50, _bestOdds: 1.45,
     _bookKey: 'dbbet', _bookLabel: 'DBbet',
-    result: 'pending',
+    result: 'win', finalScore: '1-1', scoreH: 1, scoreA: 1, pl: 49.50,
     league: '🏆 Mundial 2026',
     date: '2026-06-30T01:00:00.000Z',
     commenceTs: ART_ts(2026, 5, 29, 22, 0),

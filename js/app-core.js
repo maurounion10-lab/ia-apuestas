@@ -3879,16 +3879,22 @@ function _updateHeroProStats() {
     var DAY = 24 * 3600 * 1000;
 
     // KPI 1: picks hoy (commenceTs entre 00:00 y 23:59 de hoy ART)
+    // #622: bug previo sólo miraba preds; si había 1 pendiente en preds + 1
+    // resuelto en hist contaba 1 (debería ser 2). Ahora une ambos con dedup.
     var todayStart = new Date(); todayStart.setHours(0,0,0,0);
     var todayEnd   = new Date(); todayEnd.setHours(23,59,59,999);
-    var picksHoyCount = preds.filter(function(p){
-      return p && p.commenceTs && p.commenceTs >= todayStart.getTime() && p.commenceTs <= todayEnd.getTime();
-    }).length;
-    // Si no hay realPreds yet pero sí hist con picks de hoy, contarlos también
-    if (picksHoyCount === 0) {
-      picksHoyCount = hist.filter(function(h){
-        return h && h.commenceTs && h.commenceTs >= todayStart.getTime() && h.commenceTs <= todayEnd.getTime();
-      }).length;
+    var todayStartMs = todayStart.getTime(), todayEndMs = todayEnd.getTime();
+    var hoySeen = new Set();
+    var picksHoyCount = 0;
+    var todayAll = preds.concat(hist || []);
+    for (var hi = 0; hi < todayAll.length; hi++) {
+      var hp = todayAll[hi];
+      if (!hp || !hp.commenceTs) continue;
+      if (hp.commenceTs < todayStartMs || hp.commenceTs > todayEndMs) continue;
+      var hk = (hp.id || '') + '|' + (hp.home || '') + '|' + (hp.away || '');
+      if (hoySeen.has(hk)) continue;
+      hoySeen.add(hk);
+      picksHoyCount++;
     }
     var elHoy = document.getElementById('gbStatHoy');
     if (elHoy) elHoy.textContent = picksHoyCount > 0 ? picksHoyCount : '–';
