@@ -4166,6 +4166,36 @@ export default {
 
     // ── 🆕 (1-jul-2026 #636) /admin/force-resolve — resolver manualmente un pick sin score external ──
     // Sirve para picks de futures (stage, groupwin, qualify, champion, topscorer) que no tienen commenceTs.
+    // 🆕 (1-jul-2026) Proxy temporal para explorar la doc de la API DBbet
+    // ?token=gambeta_wc_2026_trigger&path=/sitemap.xml
+    if (path === '/admin/dbbet-probe') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({ ok:false, error:'unauthorized' }), { status:401, headers:CORS });
+      const targetPath = url.searchParams.get('path') || '/';
+      const targetUrl = 'https://docs-marketing-sport.com' + targetPath;
+      const auth = 'Basic ' + btoa('marketingsport:9ihnsG4jkKSZjDTh');
+      try {
+        const r = await fetch(targetUrl, {
+          headers: {
+            'Authorization': auth,
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml,application/json;q=0.9,*/*;q=0.8',
+          },
+          redirect: 'follow',
+        });
+        const text = await r.text();
+        const ctype = r.headers.get('content-type') || '';
+        // Devolver como texto crudo para que se lea directo
+        return new Response(text, {
+          status: r.status,
+          headers: { ...CORS, 'content-type': ctype || 'text/plain; charset=utf-8', 'x-target': targetUrl }
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok:false, error: String(e) }), { status:500, headers:CORS });
+      }
+    }
+
     // Body: { id, result: 'win'|'loss'|'void', pl?: number, finalScore?: string }
     if (path === '/admin/force-resolve' && request.method === 'POST') {
       const token = url.searchParams.get('token');
