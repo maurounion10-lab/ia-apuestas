@@ -4013,10 +4013,32 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
   async function loadMatches() {
     var sel = document.getElementById('gbmPartido');
     try {
-      var r = await fetch('https://apuestas-api.mauro-union10.workers.dev/preds?limit=80', { cache:'no-store' });
+      var r = await fetch('https://apuestas-api.mauro-union10.workers.dev/odds', { cache:'no-store' });
       if (!r.ok) throw new Error('feed');
-      var data = await r.json();
-      var picks = (data.picks || data || []).filter(function(p) { return p.home && p.away && !p.result; });
+      var raw = await r.json();
+      var events = (raw.data || raw || []);
+      // Transformar shape /odds → shape que espera el modal
+      var picks = events.filter(function(e) { return e.home_team && e.away_team; }).map(function(e) {
+        // Best odds: promedio h2h de los bookmakers
+        var h2h_odds = null;
+        try {
+          var books = (e.bookmakers || []).slice(0, 5);
+          var homeOdds = books.map(function(b) {
+            var m = (b.markets || []).find(function(x){return x.key==='h2h';});
+            var o = m ? m.outcomes.find(function(x){return x.name===e.home_team;}) : null;
+            return o ? o.price : null;
+          }).filter(Boolean);
+          if (homeOdds.length) h2h_odds = homeOdds.reduce(function(a,b){return a+b;},0) / homeOdds.length;
+        } catch(err) {}
+        return {
+          home: e.home_team,
+          away: e.away_team,
+          league: e.sport_title || 'Fútbol',
+          date: e.commence_time,
+          odds: h2h_odds ? h2h_odds.toFixed(2) : null,
+          rec: 'Gana Local'
+        };
+      });
       var seen = {};
       _matches = picks.filter(function(p) {
         var k = (p.home + '|' + p.away).toLowerCase();
