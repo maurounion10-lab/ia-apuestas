@@ -3830,10 +3830,294 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
 }
 #gbBetBbl:hover::before { opacity: 1; }
 </style>
-<button id="gbBetBbl" type="button" onclick="window.location.href='/foro?open=bet';" title="Publicar apuesta" aria-label="Publicar apuesta">
+<button id="gbBetBbl" type="button" onclick="openGbBetModal();" title="Publicar apuesta" aria-label="Publicar apuesta">
   <span class="gbb-emoji">🎯</span>
 </button>
 <!-- fin tríada bubbles v2 -->
+
+
+<!-- 🆕 (1-jul-2026) Modal universal Publicar Apuesta — desde cualquier página, sin redirect -->
+<style>
+#gbBetModal{position:fixed;inset:0;z-index:99997;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:80px 16px 20px;overflow-y:auto}
+#gbBetModal.is-open{display:flex}
+.gbm-box{width:100%;max-width:520px;background:#0d1a0d;border:1px solid rgba(0,200,83,0.3);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.7);animation:gbmSlide .28s cubic-bezier(.34,1.3,.64,1)}
+@keyframes gbmSlide{from{opacity:0;transform:translateY(-20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.gbm-head{background:linear-gradient(135deg,#e01237,#c8102e);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gbm-title{font-weight:800;color:#fff;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.gbm-close{background:rgba(0,0,0,0.25);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s}
+.gbm-close:hover{background:rgba(0,0,0,0.5);transform:rotate(90deg)}
+.gbm-body{padding:18px;display:flex;flex-direction:column;gap:14px}
+.gbm-lbl{display:block;font-size:.7rem;font-weight:700;color:#00c853;letter-spacing:.08em;margin-bottom:.4rem;text-transform:uppercase}
+.gbm-input,.gbm-select,.gbm-textarea{width:100%;background:#162616;color:#fff;border:1.5px solid rgba(0,200,83,0.25);border-radius:10px;padding:.7rem .85rem;font-size:.92rem;font-family:inherit;outline:none;transition:border-color .15s;box-sizing:border-box}
+.gbm-input:focus,.gbm-select:focus,.gbm-textarea:focus{border-color:rgba(0,200,83,0.6)}
+.gbm-select{cursor:pointer;appearance:none;-webkit-appearance:none;padding-right:2.2rem;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300c853'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;background-size:1.4rem}
+.gbm-select option{background:#0d1a0d;color:#fff;padding:.5rem}
+.gbm-textarea{resize:vertical;min-height:100px;font-family:inherit;line-height:1.5}
+.gbm-readonly{background:rgba(0,200,83,0.05)!important;color:rgba(255,255,255,0.85)!important;font-weight:600;cursor:not-allowed}
+.gbm-hint{font-size:.7rem;color:rgba(255,255,255,0.5);margin-top:.35rem;line-height:1.4}
+.gbm-count{font-weight:700;color:rgba(255,140,0,0.85)}
+.gbm-count.ok{color:rgba(0,200,83,0.95)}
+.gbm-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gbm-submit{background:linear-gradient(135deg,#00c853,#007a22);border:none;color:#fff;padding:.85rem 1.2rem;border-radius:12px;font-weight:800;font-size:1rem;font-family:inherit;cursor:pointer;letter-spacing:.02em;transition:transform .15s,box-shadow .15s,opacity .15s;box-shadow:0 4px 12px rgba(0,200,83,0.3);display:flex;align-items:center;justify-content:center;gap:8px}
+.gbm-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,200,83,0.5)}
+.gbm-submit:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.gbm-msg{font-size:.82rem;text-align:center;padding:.5rem;border-radius:8px;display:none}
+.gbm-msg.ok{display:block;background:rgba(0,200,83,0.15);color:#a5d6a7;border:1px solid rgba(0,200,83,0.4)}
+.gbm-msg.err{display:block;background:rgba(255,80,80,0.15);color:#ff8a8a;border:1px solid rgba(255,80,80,0.4)}
+@media (max-width:480px){#gbBetModal{padding:60px 8px 20px}.gbm-body{padding:14px;gap:11px}.gbm-row2{grid-template-columns:1fr}}
+</style>
+
+<div id="gbBetModal" role="dialog" aria-modal="true" aria-labelledby="gbmTitle">
+  <div class="gbm-box">
+    <div class="gbm-head">
+      <div class="gbm-title" id="gbmTitle">🎯 Publicar Apuesta al Foro</div>
+      <button class="gbm-close" onclick="closeGbBetModal()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="gbm-body">
+      <div>
+        <label class="gbm-lbl" for="gbmAlias">Tu alias en el foro</label>
+        <input type="text" class="gbm-input" id="gbmAlias" placeholder="Ej: MauroPicks" maxlength="30">
+      </div>
+      <div>
+        <label class="gbm-lbl" for="gbmPartido">⚽ Elegí el partido</label>
+        <select class="gbm-select" id="gbmPartido">
+          <option value="">Cargando partidos disponibles…</option>
+        </select>
+        <div class="gbm-hint">Datos del partido (equipos, liga, cuota) se toman automáticamente del feed</div>
+      </div>
+      <div class="gbm-row2">
+        <div>
+          <label class="gbm-lbl">Equipos</label>
+          <input type="text" class="gbm-input gbm-readonly" id="gbmMatchDisplay" readonly placeholder="—">
+        </div>
+        <div>
+          <label class="gbm-lbl">Liga</label>
+          <input type="text" class="gbm-input gbm-readonly" id="gbmLeagueDisplay" readonly placeholder="—">
+        </div>
+      </div>
+      <div>
+        <label class="gbm-lbl" for="gbmMercado">📊 Mercado</label>
+        <select class="gbm-select" id="gbmMercado">
+          <option value="">Ganador Local</option>
+          <option>Empate</option>
+          <option>Ganador Visitante</option>
+          <option>Doble 1X (No pierde local)</option>
+          <option>Doble X2 (No pierde visitante)</option>
+          <option>Doble 12 (Sin empate)</option>
+          <option>Más de 1.5 goles</option>
+          <option>Más de 2.5 goles</option>
+          <option>Más de 3.5 goles</option>
+          <option>Menos de 2.5 goles</option>
+          <option>Ambos Marcan</option>
+          <option>Local Sin Recibir</option>
+        </select>
+      </div>
+      <div class="gbm-row2">
+        <div>
+          <label class="gbm-lbl">Cuota</label>
+          <input type="number" class="gbm-input gbm-readonly" id="gbmOdds" readonly placeholder="Auto" step="0.01">
+        </div>
+        <div>
+          <label class="gbm-lbl">Casa</label>
+          <input type="text" class="gbm-input gbm-readonly" id="gbmHouse" readonly value="⭐ DBbet (sponsor)">
+        </div>
+      </div>
+      <div>
+        <label class="gbm-lbl" for="gbmJustif">💭 Justificá en 20+ palabras (obligatorio)</label>
+        <textarea class="gbm-textarea" id="gbmJustif" placeholder="Explicá por qué esta apuesta tiene valor: datos, estadísticas, contexto, motivación de los equipos…"></textarea>
+        <div class="gbm-hint"><span class="gbm-count" id="gbmWordCount">0/20 palabras</span> · La apuesta queda pendiente y se resuelve auto cuando termine el partido</div>
+      </div>
+      <div class="gbm-msg" id="gbmMsg"></div>
+      <button class="gbm-submit" id="gbmSubmit" onclick="submitGbBet()" disabled>🎯 Publicar Apuesta</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var GBM_SB = 'https://ixfrtjvhnpapyuphqfxp.supabase.co';
+  var GBM_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZnJ0anZobnBhcHl1cGhxZnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MDExOTMsImV4cCI6MjA4OTE3NzE5M30.Lc5cOfvXCrrMlm9Yup5GG6RgCxOB_GSNJnKLTb1-bZQ';
+  var _matches = [];
+  var _loaded = false;
+
+  window.openGbBetModal = function() {
+    var m = document.getElementById('gbBetModal');
+    if (!m) return;
+    m.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    // Restaurar alias guardado
+    var saved = localStorage.getItem('gb_forum_alias') || '';
+    document.getElementById('gbmAlias').value = saved;
+    if (!_loaded) { _loaded = true; loadMatches(); }
+  };
+  window.closeGbBetModal = function() {
+    var m = document.getElementById('gbBetModal');
+    if (m) m.classList.remove('is-open');
+    document.body.style.overflow = '';
+  };
+
+  async function loadMatches() {
+    var sel = document.getElementById('gbmPartido');
+    try {
+      var r = await fetch('https://apuestas-api.mauro-union10.workers.dev/preds?limit=80', { cache:'no-store' });
+      if (!r.ok) throw new Error('feed');
+      var data = await r.json();
+      var picks = (data.picks || data || []).filter(function(p) { return p.home && p.away && !p.result; });
+      var seen = {};
+      _matches = picks.filter(function(p) {
+        var k = (p.home + '|' + p.away).toLowerCase();
+        if (seen[k]) return false;
+        seen[k] = 1;
+        return true;
+      });
+      if (!_matches.length) {
+        sel.innerHTML = '<option value="">Sin partidos disponibles ahora</option>';
+        return;
+      }
+      var opts = ['<option value="">Elegí partido…</option>'];
+      _matches.forEach(function(p, i) {
+        var d = p.date ? new Date(p.date) : null;
+        var dStr = d ? d.toLocaleDateString('es-AR', {day:'2-digit',month:'short'}) + ' ' + d.toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'}) : '';
+        var lg = (p.league || '').replace(/^[^\w]+/, '').slice(0, 22);
+        opts.push('<option value="' + i + '">' + p.home + ' vs ' + p.away + (dStr ? ' · ' + dStr : '') + (lg ? ' · ' + lg : '') + '</option>');
+      });
+      sel.innerHTML = opts.join('');
+    } catch(e) {
+      sel.innerHTML = '<option value="">Error cargando partidos</option>';
+      console.warn('[gbm]', e);
+    }
+  }
+
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'gbmPartido') {
+      var idx = parseInt(e.target.value, 10);
+      var p = _matches[idx];
+      if (!p) {
+        document.getElementById('gbmMatchDisplay').value = '';
+        document.getElementById('gbmLeagueDisplay').value = '';
+        document.getElementById('gbmOdds').value = '';
+        return;
+      }
+      document.getElementById('gbmMatchDisplay').value = p.home + ' vs ' + p.away;
+      document.getElementById('gbmLeagueDisplay').value = (p.league || '').replace(/^[^\w]+/, '');
+      document.getElementById('gbmOdds').value = p.odds ? parseFloat(p.odds).toFixed(2) : '';
+      // Sugerir mercado según IA
+      if (p.rec) {
+        var m = document.getElementById('gbmMercado');
+        var recLC = String(p.rec).toLowerCase();
+        for (var i = 0; i < m.options.length; i++) {
+          if (m.options[i].value.toLowerCase().indexOf(recLC.slice(0,10)) >= 0 ||
+              recLC.indexOf(m.options[i].value.toLowerCase().slice(0,10)) >= 0) {
+            m.selectedIndex = i; break;
+          }
+        }
+      }
+    }
+  });
+
+  document.addEventListener('input', function(e) {
+    if (e.target && e.target.id === 'gbmJustif') updateWordCount();
+  });
+
+  function updateWordCount() {
+    var ta = document.getElementById('gbmJustif');
+    var el = document.getElementById('gbmWordCount');
+    var words = ta.value.trim().split(/\s+/).filter(function(w){return w.length>0;}).length;
+    el.textContent = words + '/20 palabras';
+    el.classList.toggle('ok', words >= 20);
+    var btn = document.getElementById('gbmSubmit');
+    var partido = document.getElementById('gbmPartido').value;
+    var alias = document.getElementById('gbmAlias').value.trim();
+    btn.disabled = words < 20 || !partido || alias.length < 2;
+  }
+  document.addEventListener('input', function(e) {
+    if (e.target && (e.target.id === 'gbmAlias' || e.target.id === 'gbmPartido')) updateWordCount();
+  });
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'gbmPartido') setTimeout(updateWordCount, 50);
+  });
+
+  window.submitGbBet = async function() {
+    var btn = document.getElementById('gbmSubmit');
+    var msg = document.getElementById('gbmMsg');
+    msg.className = 'gbm-msg';
+    msg.textContent = '';
+    var idx = parseInt(document.getElementById('gbmPartido').value, 10);
+    var p = _matches[idx];
+    if (!p) { msg.className='gbm-msg err'; msg.textContent='Elegí un partido'; return; }
+    var alias = document.getElementById('gbmAlias').value.trim();
+    var mercado = document.getElementById('gbmMercado').value || 'Ganador Local';
+    var odds = parseFloat(document.getElementById('gbmOdds').value) || 0;
+    var justif = document.getElementById('gbmJustif').value.trim();
+    if (justif.split(/\s+/).filter(function(w){return w.length>0;}).length < 20) {
+      msg.className='gbm-msg err'; msg.textContent='Mínimo 20 palabras en la justificación'; return;
+    }
+    if (odds < 1.30) { msg.className='gbm-msg err'; msg.textContent='Cuota mínima 1.30'; return; }
+
+    var betData = {
+      is_bet: true,
+      home: p.home, away: p.away,
+      league: (p.league || '').replace(/^[^\w]+/, '') || null,
+      pick: mercado, odds: odds, stake: 100,
+      house: 'DBbet',
+      justification: justif,
+      result: 'pending',
+      posted_at: new Date().toISOString()
+    };
+    var content = '🎯 Apuesta: ' + p.home + ' vs ' + p.away + '\nPick: ' + mercado + ' @ ' + odds.toFixed(2) + '\n' + justif;
+
+    btn.disabled = true; btn.textContent = 'Publicando…';
+    try {
+      var r = await fetch(GBM_SB + '/rest/v1/forum_posts', {
+        method: 'POST',
+        headers: {
+          'apikey': GBM_KEY,
+          'Authorization': 'Bearer ' + GBM_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          thread_id: 'topic_combinadas',
+          user_name: alias,
+          user_email: 'foro@gambeta.ai',
+          content: content,
+          bet_data: betData,
+          is_ai_post: false,
+          is_deleted: false
+        })
+      });
+      if (!r.ok) throw new Error('http_' + r.status);
+      localStorage.setItem('gb_forum_alias', alias);
+      msg.className='gbm-msg ok';
+      msg.textContent = '¡Apuesta publicada! 🎯 Podés verla en el foro Combinadas del día';
+      // Reset form
+      document.getElementById('gbmPartido').value = '';
+      document.getElementById('gbmMatchDisplay').value = '';
+      document.getElementById('gbmLeagueDisplay').value = '';
+      document.getElementById('gbmOdds').value = '';
+      document.getElementById('gbmJustif').value = '';
+      updateWordCount();
+      setTimeout(closeGbBetModal, 2200);
+    } catch(e) {
+      msg.className='gbm-msg err';
+      msg.textContent = 'Error publicando · intentá de nuevo';
+      console.warn('[gbm submit]', e);
+    } finally {
+      btn.textContent = '🎯 Publicar Apuesta';
+      updateWordCount();
+    }
+  };
+
+  // Cerrar con ESC + click en overlay
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeGbBetModal();
+  });
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'gbBetModal') closeGbBetModal();
+  });
+})();
+</script>
+<!-- fin modal Publicar Apuesta -->
 
 </body>
 </html>
