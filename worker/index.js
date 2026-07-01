@@ -4075,6 +4075,63 @@ export default {
       return new Response(JSON.stringify(stats), { headers: CORS });
     }
 
+
+    // ── 🆕 (1-jul-2026 #636) /admin/force-resolve — resolver manualmente un pick sin score external ──
+    // Sirve para picks de futures (stage, groupwin, qualify, champion, topscorer) que no tienen commenceTs.
+    // Body: { id, result: 'win'|'loss'|'void', pl?: number, finalScore?: string }
+    if (path === '/admin/force-resolve' && request.method === 'POST') {
+      const token = url.searchParams.get('token');
+      const expected = env.ADMIN_TRIGGER_TOKEN || env.TRIGGER_TOKEN || 'gambeta_wc_2026_trigger';
+      if (token !== expected) return new Response(JSON.stringify({ ok: false, error: 'unauthorized' }), { status: 401, headers: CORS });
+      try {
+        const body = await request.json().catch(() => ({}));
+        const { id, result, finalScore } = body;
+        let { pl } = body;
+        if (!id || !['win','loss','void'].includes(result)) {
+          return new Response(JSON.stringify({ ok: false, error: 'id y result (win/loss/void) requeridos' }), { status: 400, headers: CORS });
+        }
+        const skey = env.SUPABASE_SERVICE_ROLE_KEY;
+        if (!skey) return new Response(JSON.stringify({ ok: false, error: 'no_service_key' }), { status: 500, headers: CORS });
+        // Leer el historial del admin
+        const hist = await fetchAdminHistorial(env);
+        const idx = hist.findIndex(p => p.id === id);
+        if (idx < 0) return new Response(JSON.stringify({ ok: false, error: 'pick not found', id }), { status: 404, headers: CORS });
+        const pick = hist[idx];
+        // Calcular pl si no viene
+        if (typeof pl !== 'number') {
+          const stake = parseFloat(pick.stake) || 50;
+          const odds = parseFloat(pick.odds) || 1.5;
+          if (result === 'win') pl = +(stake * (odds - 1)).toFixed(2);
+          else if (result === 'loss') pl = -stake;
+          else pl = 0;
+        }
+        hist[idx] = { ...pick, result, pl, finalScore: finalScore || pick.finalScore || null, _resolvedAt: new Date().toISOString(), _resolvedManual: true };
+        await saveAdminHistorial(env, hist);
+        // También pushear al global_historial_v1 (que es el que el cliente lee)
+        try {
+          const r = await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.global_historial_v1&select=data`, { headers: { apikey: skey, Authorization: `Bearer ${skey}` } });
+          const rows = await r.json();
+          if (rows && rows[0]) {
+            const data = rows[0].data;
+            const arr = Array.isArray(data) ? data : (data?.picks || []);
+            const gi = arr.findIndex(p => p.id === id);
+            if (gi >= 0) {
+              arr[gi] = hist[idx];
+              const newData = Array.isArray(data) ? arr : { ...data, picks: arr };
+              await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.global_historial_v1`, {
+                method: 'PATCH',
+                headers: { apikey: skey, Authorization: `Bearer ${skey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+                body: JSON.stringify({ data: newData }),
+              });
+            }
+          }
+        } catch(_) {}
+        return new Response(JSON.stringify({ ok: true, resolved: hist[idx] }), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+      } catch (e) {
+        return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
     // ── 🆕 (29-jun-2026 #573) /admin/resolve-pick?id=X ────────────────────────
     // Resuelve UN pick específico sin esperar al cron. Usa fetchApfScore +
     // fetchTsdbEvent + ESPN. Sin gate de tiempo (90min) — el caller decide.
