@@ -3874,10 +3874,26 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       <button class="gbm-close" onclick="closeGbBetModal()" aria-label="Cerrar">✕</button>
     </div>
     <div class="gbm-body">
-      <div>
-        <label class="gbm-lbl" for="gbmAlias">Tu alias en el foro</label>
-        <input type="text" class="gbm-input" id="gbmAlias" placeholder="Ej: MauroPicks" maxlength="30">
+      <div id="gbmAuthGate" style="display:none;text-align:center;padding:24px 8px">
+        <div style="font-size:3rem;margin-bottom:.6rem">🔒</div>
+        <div style="font-weight:800;color:#fff;font-size:1.15rem;margin-bottom:.5rem">Registrate para publicar picks</div>
+        <div style="color:rgba(255,255,255,0.75);font-size:.9rem;line-height:1.5;margin-bottom:1.2rem">Solo tipsters registrados pueden publicar apuestas al foro. Es gratis y toma 30 segundos.<br>Con tu cuenta también accedés al ranking mensual y podés ser <b style="color:#FFD700">Campeón del Mes 👑</b></div>
+        <button class="gbm-submit" onclick="gbmGoToAuth()" style="width:100%;margin-bottom:.5rem">Crear cuenta gratis →</button>
+        <button style="background:transparent;border:none;color:rgba(255,255,255,0.6);cursor:pointer;font-size:.8rem;padding:.4rem;font-family:inherit" onclick="gbmGoToAuth(true)">Ya tengo cuenta · Iniciar sesión</button>
       </div>
+      <div id="gbmAuthedBody">
+      <div id="gbmUserInfoRow" style="display:none">
+        <label class="gbm-lbl">Publicando como</label>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.3);border-radius:10px;padding:.65rem .85rem">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#00c853,#007a22);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:.95rem" id="gbmUserAvatar">?</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;color:#fff;font-size:.9rem" id="gbmUserAlias">—</div>
+            <div style="font-size:.7rem;color:rgba(255,255,255,0.55)" id="gbmUserEmail">—</div>
+          </div>
+          <span style="font-size:.68rem;color:#00c853;font-weight:700;letter-spacing:.05em">✓ VERIFICADO</span>
+        </div>
+      </div>
+      <input type="hidden" id="gbmAlias" value="">
       <div>
         <label class="gbm-lbl" for="gbmPartido">⚽ Elegí el partido</label>
         <select class="gbm-select" id="gbmPartido">
@@ -3929,6 +3945,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       </div>
       <div class="gbm-msg" id="gbmMsg"></div>
       <button class="gbm-submit" id="gbmSubmit" onclick="submitGbBet()" disabled>🎯 Publicar Apuesta</button>
+      </div>
     </div>
   </div>
 </div>
@@ -3945,10 +3962,38 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     if (!m) return;
     m.classList.add('is-open');
     document.body.style.overflow = 'hidden';
-    // Restaurar alias guardado
-    var saved = localStorage.getItem('gb_forum_alias') || '';
-    document.getElementById('gbmAlias').value = saved;
+    var user = (typeof authUser !== 'undefined' && authUser && authUser.email) ? authUser : null;
+    var gate = document.getElementById('gbmAuthGate');
+    var body = document.getElementById('gbmAuthedBody');
+    var userRow = document.getElementById('gbmUserInfoRow');
+    if (!user) {
+      if (gate) gate.style.display = 'block';
+      if (body) body.style.display = 'none';
+      return;
+    }
+    if (gate) gate.style.display = 'none';
+    if (body) body.style.display = '';
+    var email = user.email;
+    var alias = (user.alias || user.name || email.split('@')[0] || 'user').slice(0, 24);
+    document.getElementById('gbmAlias').value = alias;
+    if (userRow) userRow.style.display = '';
+    document.getElementById('gbmUserAlias').textContent = alias;
+    document.getElementById('gbmUserEmail').textContent = email;
+    document.getElementById('gbmUserAvatar').textContent = alias.charAt(0).toUpperCase();
     if (!_loaded) { _loaded = true; loadMatches(); }
+    updateWordCount();
+  };
+
+  window.gbmGoToAuth = function(isLogin) {
+    closeGbBetModal();
+    setTimeout(function() {
+      if (typeof openAuth === 'function') {
+        openAuth();
+        if (isLogin && typeof goToEmailLogin === 'function') setTimeout(goToEmailLogin, 300);
+      } else {
+        window.location.href = '/?_auth=open';
+      }
+    }, 250);
   };
   window.closeGbBetModal = function() {
     var m = document.getElementById('gbBetModal');
@@ -4022,16 +4067,18 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
   function updateWordCount() {
     var ta = document.getElementById('gbmJustif');
     var el = document.getElementById('gbmWordCount');
+    if (!ta || !el) return;
     var words = ta.value.trim().split(/\s+/).filter(function(w){return w.length>0;}).length;
     el.textContent = words + '/20 palabras';
     el.classList.toggle('ok', words >= 20);
     var btn = document.getElementById('gbmSubmit');
-    var partido = document.getElementById('gbmPartido').value;
-    var alias = document.getElementById('gbmAlias').value.trim();
+    var partidoEl = document.getElementById('gbmPartido');
+    var partido = partidoEl ? partidoEl.value : '';
+    var alias = (document.getElementById('gbmAlias').value || '').trim();
     btn.disabled = words < 20 || !partido || alias.length < 2;
   }
   document.addEventListener('input', function(e) {
-    if (e.target && (e.target.id === 'gbmAlias' || e.target.id === 'gbmPartido')) updateWordCount();
+    if (e.target && e.target.id === 'gbmPartido') updateWordCount();
   });
   document.addEventListener('change', function(e) {
     if (e.target && e.target.id === 'gbmPartido') setTimeout(updateWordCount, 50);
@@ -4042,6 +4089,8 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     var msg = document.getElementById('gbmMsg');
     msg.className = 'gbm-msg';
     msg.textContent = '';
+    var user = (typeof authUser !== 'undefined' && authUser && authUser.email) ? authUser : null;
+    if (!user) { msg.className='gbm-msg err'; msg.textContent='Iniciá sesión para publicar'; return; }
     var idx = parseInt(document.getElementById('gbmPartido').value, 10);
     var p = _matches[idx];
     if (!p) { msg.className='gbm-msg err'; msg.textContent='Elegí un partido'; return; }
@@ -4079,7 +4128,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
         body: JSON.stringify({
           thread_id: 'topic_combinadas',
           user_name: alias,
-          user_email: 'foro@gambeta.ai',
+          user_email: user.email,
           content: content,
           bet_data: betData,
           is_ai_post: false,
