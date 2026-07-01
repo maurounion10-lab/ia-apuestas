@@ -90,8 +90,12 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .thread-rec{display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.25);color:var(--verde);font-size:.7rem;font-weight:700;padding:3px 10px;border-radius:6px;margin-top:6px}
 .thread-preview{color:rgba(255,255,255,0.7);font-size:.82rem;margin-top:10px;line-height:1.5;max-height:42px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .thread-author{display:flex;align-items:center;gap:8px;margin-top:12px;font-size:.72rem;color:var(--mute)}
-.thread-author-avatar{width:24px;height:24px;background:linear-gradient(135deg,var(--verde),#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.7rem}
-.thread-author-avatar.is-ai{background:linear-gradient(135deg,#9b59b6,#3498db);color:#fff}
+.thread-author-avatar{display:inline-flex;align-items:center;justify-content:center}
+/* 🆕 #635 — sistema de avatares generativos */
+.gb-avatar{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#000;font-weight:900;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.35);overflow:hidden;position:relative;font-family:'Inter',system-ui,sans-serif;vertical-align:middle;line-height:1}
+.gb-avatar__letter{color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.4);line-height:1;letter-spacing:-0.5px;font-weight:800}
+.gb-avatar--ai{background:linear-gradient(135deg,#FFD700 0%,#ff9800 50%,#c66e00 100%);color:#000;box-shadow:0 0 0 2px rgba(255,215,0,0.4),0 2px 8px rgba(0,0,0,0.4)}
+.gb-avatar__ai-inner{font-weight:900;letter-spacing:-0.5px;color:#000}
 .thread.is-hot{position:relative;border-color:rgba(255,193,7,0.3)}
 .thread.is-hot::before{content:'🔥';position:absolute;top:14px;right:14px;font-size:.9rem;animation:flicker 1.4s infinite}
 @keyframes flicker{0%,100%{opacity:1}50%{opacity:.6}}
@@ -132,8 +136,8 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .tp-post{background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:12px;padding:14px 16px;transition:border-color .15s}
 .tp-post:hover{border-color:var(--border-hi)}
 .tp-post-head{display:flex;align-items:center;gap:10px;margin-bottom:8px;font-size:.8rem}
-.tp-post-avatar{width:28px;height:28px;background:linear-gradient(135deg,var(--accent,var(--verde)),#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.78rem}
-.tp-post-avatar.is-ai{background:linear-gradient(135deg,#9b59b6,#3498db);color:#fff}
+.tp-post-avatar{display:inline-flex;align-items:center;justify-content:center}
+
 .tp-post-name{font-weight:800;color:#fff}
 .tp-post-time{margin-left:auto;font-size:.7rem;color:var(--mute2);font-family:'Geist Mono','SF Mono',monospace}
 .tp-post-content{color:rgba(255,255,255,0.78);font-size:.86rem;line-height:1.55;white-space:pre-wrap;word-wrap:break-word}
@@ -199,7 +203,7 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .pf-pod-card.pf-2{order:1;border-color:rgba(192,192,192,0.4);background:linear-gradient(180deg,rgba(192,192,192,0.06),var(--card))}
 .pf-pod-card.pf-3{order:3;border-color:rgba(205,127,50,0.4);background:linear-gradient(180deg,rgba(205,127,50,0.06),var(--card))}
 .pf-pod-medal{font-size:1.6rem;line-height:1;margin-bottom:6px;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.4))}
-.pf-pod-avatar{width:36px;height:36px;background:linear-gradient(135deg,var(--verde),#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.92rem;margin:0 auto 8px}
+.pf-pod-avatar{display:flex;justify-content:center;margin:0 auto 8px}
 .pf-pod-name{font-size:.82rem;font-weight:800;color:#fff;margin-bottom:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .pf-pod-stats{font-size:.7rem;color:var(--mute);font-family:'Geist Mono','SF Mono',monospace;font-variant-numeric:tabular-nums;line-height:1.5}
 .pf-pod-stats b{color:#fff}
@@ -210,7 +214,7 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .pf-row{display:grid;grid-template-columns:24px 28px 1fr auto auto auto;gap:10px;align-items:center;padding:8px 12px;background:rgba(255,255,255,0.02);border:1px solid var(--border);border-radius:10px;font-size:.78rem;transition:background .15s}
 .pf-row:hover{background:rgba(255,255,255,0.04)}
 .pf-pos{font-family:'Geist Mono','SF Mono',monospace;font-weight:800;color:var(--mute2);text-align:right}
-.pf-avatar{width:28px;height:28px;background:linear-gradient(135deg,var(--verde),#00a846);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#000;font-weight:900;font-size:.74rem}
+.pf-avatar{display:inline-flex}
 .pf-name{font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:flex;align-items:center;flex-wrap:wrap}
 .pf-stat{font-size:.7rem;color:var(--mute);font-family:'Geist Mono','SF Mono',monospace;font-variant-numeric:tabular-nums}
 .pf-stat b{color:#fff;font-weight:800}
@@ -225,7 +229,7 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
   .pf-pod-card{padding:10px 8px}
   .pf-pod-card.pf-1{padding-top:14px;padding-bottom:14px;transform:translateY(-2px)}
   .pf-pod-medal{font-size:1.3rem}
-  .pf-pod-avatar{width:30px;height:30px;font-size:.8rem}
+  .pf-pod-avatar>.gb-avatar{width:30px!important;height:30px!important}
   .pf-pod-name{font-size:.74rem}
   .pf-pod-stats{font-size:.64rem}
   .pf-row{grid-template-columns:20px 24px 1fr auto auto;gap:6px;padding:6px 10px;font-size:.7rem}
@@ -318,6 +322,37 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
   .profile-stat-lbl{font-size:.55rem;letter-spacing:1px}
   .profile-body{padding:14px 16px 18px}
 }
+
+/* 🆕 #635 — Toolbar sticky del foro con busqueda */
+.foro-toolbar{position:sticky;top:56px;z-index:100;background:rgba(6,13,6,0.95);backdrop-filter:blur(12px);border:1px solid var(--border);border-radius:14px;padding:10px 12px;margin-bottom:16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap;box-shadow:0 4px 18px rgba(0,0,0,0.4)}
+.foro-toolbar__title{display:flex;align-items:center;gap:8px;font-weight:800;font-size:.9rem;color:#fff;letter-spacing:-0.2px;flex-shrink:0}
+.foro-toolbar__icon{font-size:1.1rem}
+.foro-toolbar__count{font-family:'Geist Mono','SF Mono',monospace;font-size:.7rem;color:var(--verde);background:rgba(0,200,83,0.1);border:1px solid rgba(0,200,83,0.25);padding:2px 8px;border-radius:99px;font-variant-numeric:tabular-nums;font-weight:700}
+.foro-toolbar__search{flex:1;min-width:200px;position:relative;display:flex;align-items:center;background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:10px;padding:0 12px;transition:all .18s}
+.foro-toolbar__search:focus-within{border-color:var(--verde);background:rgba(0,200,83,0.06);box-shadow:0 0 0 3px rgba(0,200,83,0.12)}
+.foro-toolbar__search svg{color:var(--mute);flex-shrink:0}
+.foro-toolbar__search input{flex:1;background:transparent;border:0;outline:0;color:#fff;padding:9px 10px;font-family:inherit;font-size:.88rem;min-width:0}
+.foro-toolbar__search input::placeholder{color:var(--mute)}
+#foroSearchClear{background:transparent;border:0;color:var(--mute);font-size:1.3rem;cursor:pointer;font-family:inherit;padding:0 4px;line-height:1;display:none;transition:color .15s}
+#foroSearchClear:hover{color:#fff}
+.foro-toolbar__search.has-value #foroSearchClear{display:block}
+@media (max-width:600px){
+  .foro-toolbar{padding:8px 10px;gap:8px;top:52px}
+  .foro-toolbar__title{font-size:.82rem}
+  .foro-toolbar__count{font-size:.65rem;padding:1px 6px}
+  .foro-toolbar__search{min-width:140px}
+  .foro-toolbar__search input{padding:8px 8px;font-size:.82rem}
+}
+
+/* Boton scroll-to-top */
+.foro-scroll-top{position:fixed;bottom:80px;right:20px;width:44px;height:44px;background:linear-gradient(135deg,var(--verde),#009e3f);color:#000;border:0;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,200,83,0.4),0 2px 6px rgba(0,0,0,0.5);z-index:98;transition:all .22s cubic-bezier(.34,1.56,.64,1);font-family:inherit}
+.foro-scroll-top:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,200,83,0.55)}
+.foro-scroll-top.is-visible{display:flex;animation:foroScrollTopIn .3s ease}
+@keyframes foroScrollTopIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@media (max-width:600px){
+  .foro-scroll-top{bottom:90px;right:14px;width:40px;height:40px}
+}
+
 </style>
 </head>
 <body>
@@ -341,6 +376,20 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 </header>
 
 <main>
+  <!-- 🆕 (30-jun-2026 #635) TOOLBAR STICKY con busqueda -->
+  <div class="foro-toolbar" id="foroToolbar">
+    <div class="foro-toolbar__title">
+      <span class="foro-toolbar__icon">💬</span>
+      <span>Foro</span>
+      <span class="foro-toolbar__count" id="foroTotalCount">0</span>
+    </div>
+    <div class="foro-toolbar__search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" id="foroSearch" placeholder="Buscar hilos, autores…" aria-label="Buscar" autocomplete="off">
+      <button type="button" id="foroSearchClear" aria-label="Limpiar" title="Limpiar">×</button>
+    </div>
+  </div>
+
   <!-- SUB-FOROS STICKY -->
   <div class="section-title">📌 Sub-foros destacados</div>
   <div class="topics-grid" id="topicsGrid">
@@ -503,6 +552,9 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
       </div>
     </div>
   </div>
+<button type="button" id="foroScrollTop" class="foro-scroll-top" aria-label="Volver arriba" title="Volver arriba">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+  </button>
 </main>
 
 <script>
@@ -539,6 +591,40 @@ function timeAgo(iso) {
   return Math.round(ago/1440) + 'd';
 }
 function avatarLetter(name) { return (name || 'A')[0].toUpperCase(); }
+
+// ── 🆕 (30-jun-2026 #635) AVATARES generativos con hash color + rank ring ──
+const _AVATAR_PALETTE = [
+  ['#00c853','#00a846'], ['#3498db','#2874a6'], ['#9b59b6','#7d3c98'],
+  ['#e67e22','#b9691e'], ['#e74c3c','#a93226'], ['#f39c12','#b9770e'],
+  ['#1abc9c','#148f77'], ['#16a085','#0e6655'], ['#d35400','#a04000'],
+  ['#c0392b','#922b21'], ['#8e44ad','#6c3483'], ['#27ae60','#1e8449'],
+  ['#2980b9','#1f618d'], ['#f1c40f','#b7950b'], ['#ff5252','#c62828'],
+  ['#7c4dff','#4527a0'], ['#26c6da','#0097a7'], ['#66bb6a','#388e3c']
+];
+function _hashCode(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h<<5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+const _RANK_RING = {
+  aspirante: '#cd7f32', oro: '#FFD700', diamante: '#00e5ff', maestro: '#e040fb'
+};
+function avatarSvg(name, size = 32) {
+  const n = String(name || 'A').trim();
+  if (isAiUser(n)) {
+    return `<span class="gb-avatar gb-avatar--ai" style="width:${size}px;height:${size}px" title="IA de Gambeta"><span class="gb-avatar__ai-inner" style="font-size:${Math.round(size*0.34)}px">IA</span></span>`;
+  }
+  const hash = _hashCode(n.toLowerCase());
+  const pal = _AVATAR_PALETTE[hash % _AVATAR_PALETTE.length];
+  const c1 = pal[0], c2 = pal[1];
+  const letter = n[0]?.toUpperCase() || 'A';
+  const stats = (typeof userStatsMap !== 'undefined') ? userStatsMap[n] : null;
+  const rank = stats ? (getRank(stats)?.key) : null;
+  const ringColor = rank ? _RANK_RING[rank] : null;
+  const ringStyle = ringColor ? `box-shadow:0 0 0 2px ${ringColor},0 2px 6px rgba(0,0,0,0.4)` : '';
+  const fontSize = Math.round(size * 0.44);
+  return `<span class="gb-avatar" style="width:${size}px;height:${size}px;background:linear-gradient(135deg,${c1},${c2});${ringStyle}" title="${n}"><span class="gb-avatar__letter" style="font-size:${fontSize}px">${letter}</span></span>`;
+}
 function isAiUser(name) { return /^gambeta ia|^bot|^ia$/i.test(String(name||'').trim()); }
 function safe(s) { return String(s||'').replace(/[<>]/g, c => ({'<':'&lt;','>':'&gt;'}[c])); }
 
@@ -630,7 +716,7 @@ function openProfile(name) {
   if (!name) return;
   const overlay = document.getElementById('profileOverlay');
   const stats = userStatsMap[name] || { total:0, wins:0, losses:0, pending:0, winRate:0, roi:0 };
-  document.getElementById('profileAvatar').textContent = avatarLetter(name);
+  document.getElementById('profileAvatar').innerHTML = avatarSvg(name, 72);
   document.getElementById('profileName').innerHTML = safe(name) + rankBadge(name);
   // Fecha del primer post
   const userPosts = allPosts.filter(p => (p.user_name||'').trim() === name);
@@ -768,7 +854,7 @@ function renderPredicciones() {
       const roiSign = u.roi >= 0 ? '+' : '';
       return `<div class="pf-pod-card pf-${i+1}">
         <div class="pf-pod-medal">${medal}</div>
-        <div class="pf-pod-avatar">${avatarLetter(u.name)}</div>
+        <div class="pf-pod-avatar">${avatarSvg(u.name, 36)}</div>
         <div class="pf-pod-name">${safe(u.name)}${rank ? ' '+rank.emoji : ''}</div>
         <div class="pf-pod-stats"><b>${u.wins}</b>W · <b>${u.losses}</b>L · <b>${Math.round(u.winRate*100)}%</b></div>
         <span class="pf-pod-roi ${roiClass}">${roiSign}${u.roi.toFixed(1)}% ROI</span>
@@ -786,7 +872,7 @@ function renderPredicciones() {
       const roiSign = u.roi >= 0 ? '+' : '';
       return `<div class="pf-row">
         <span class="pf-pos">#${pos}</span>
-        <div class="pf-avatar">${avatarLetter(u.name)}</div>
+        <div class="pf-avatar">${avatarSvg(u.name, 28)}</div>
         <div class="pf-name">${safe(u.name)}${rank ? '<span class="rank-badge '+rank.key+'">'+rank.emoji+' '+rank.label+'</span>' : ''}</div>
         <span class="pf-stat pf-hide-mobile"><b>${u.wins + u.losses}</b> picks</span>
         <span class="pf-stat"><b>${Math.round(u.winRate*100)}%</b> aciertos</span>
@@ -942,7 +1028,7 @@ async function loadTopicPosts(tid) {
         const statusTxt = bd.result === 'win' ? '✅ GANADA' : bd.result === 'loss' ? '❌ PERDIDA' : '⏳ PENDIENTE';
         return `<div class="tp-post is-bet">
           <div class="tp-post-head">
-            <div class="tp-post-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(name)}</div>
+            <div class="tp-post-avatar ${isAi ? 'is-ai' : ''}">${avatarSvg(name, 28)}</div>
             <span class="tp-post-name">${authorChip(name)}</span>
             <span class="tp-post-time">${timeAgo(p.created_at)}</span>
           </div>
@@ -965,7 +1051,7 @@ async function loadTopicPosts(tid) {
       // ── Post comentario normal ──
       return `<div class="tp-post">
         <div class="tp-post-head">
-          <div class="tp-post-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(name)}</div>
+          <div class="tp-post-avatar ${isAi ? 'is-ai' : ''}">${avatarSvg(name, 28)}</div>
           <span class="tp-post-name">${authorChip(name)}</span>
           <span class="tp-post-time">${timeAgo(p.created_at)}</span>
         </div>
@@ -1044,6 +1130,48 @@ document.getElementById('tpForm').addEventListener('submit', async e => {
       document.getElementById('tpText').value=''; document.getElementById('tpCharCount').textContent='0';
       await loadTopicPosts(_currentTopicId);
       loadAll();
+
+// ── 🆕 #635 — Wireup toolbar busqueda + scroll-to-top ──
+(function _wireupToolbar(){
+  const searchInput = document.getElementById('foroSearch');
+  const searchClear = document.getElementById('foroSearchClear');
+  const searchWrap = document.querySelector('.foro-toolbar__search');
+  const scrollBtn = document.getElementById('foroScrollTop');
+  if (searchInput) {
+    let debounceT;
+    searchInput.addEventListener('input', e => {
+      clearTimeout(debounceT);
+      const v = e.target.value.trim();
+      searchWrap.classList.toggle('has-value', v.length > 0);
+      debounceT = setTimeout(() => {
+        _foroSearchQuery = v;
+        renderThreads();
+      }, 150);
+    });
+  }
+  if (searchClear) {
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchWrap.classList.remove('has-value');
+      _foroSearchQuery = '';
+      renderThreads();
+      searchInput.focus();
+    });
+  }
+  if (scrollBtn) {
+    window.addEventListener('scroll', () => {
+      scrollBtn.classList.toggle('is-visible', window.scrollY > 400);
+    }, { passive: true });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+})();
+// Hook: refrescar counter cuando cambian los threads
+const _origRenderTabsCounts = typeof renderTabsCounts === 'function' ? renderTabsCounts : null;
+if (_origRenderTabsCounts) {
+  renderTabsCounts = function() { _origRenderTabsCounts.apply(this, arguments); _updateToolbarCount(); };
+}
     } catch(err) {
       msg.className='tp-msg err'; msg.textContent='No se pudo publicar. Probá de nuevo.';
     } finally { btn.disabled=false; btn.textContent='Publicar'; }
@@ -1100,6 +1228,48 @@ document.getElementById('tpForm').addEventListener('submit', async e => {
     document.getElementById('tpBetCustomRow').style.display = 'none';
     await loadTopicPosts(_currentTopicId);
     loadAll();
+
+// ── 🆕 #635 — Wireup toolbar busqueda + scroll-to-top ──
+(function _wireupToolbar(){
+  const searchInput = document.getElementById('foroSearch');
+  const searchClear = document.getElementById('foroSearchClear');
+  const searchWrap = document.querySelector('.foro-toolbar__search');
+  const scrollBtn = document.getElementById('foroScrollTop');
+  if (searchInput) {
+    let debounceT;
+    searchInput.addEventListener('input', e => {
+      clearTimeout(debounceT);
+      const v = e.target.value.trim();
+      searchWrap.classList.toggle('has-value', v.length > 0);
+      debounceT = setTimeout(() => {
+        _foroSearchQuery = v;
+        renderThreads();
+      }, 150);
+    });
+  }
+  if (searchClear) {
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchWrap.classList.remove('has-value');
+      _foroSearchQuery = '';
+      renderThreads();
+      searchInput.focus();
+    });
+  }
+  if (scrollBtn) {
+    window.addEventListener('scroll', () => {
+      scrollBtn.classList.toggle('is-visible', window.scrollY > 400);
+    }, { passive: true });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+})();
+// Hook: refrescar counter cuando cambian los threads
+const _origRenderTabsCounts = typeof renderTabsCounts === 'function' ? renderTabsCounts : null;
+if (_origRenderTabsCounts) {
+  renderTabsCounts = function() { _origRenderTabsCounts.apply(this, arguments); _updateToolbarCount(); };
+}
   } catch(err) {
     msg.className='tp-msg err'; msg.textContent='No se pudo publicar. Probá de nuevo.';
   } finally { btn.disabled=false; btn.textContent='🎯 Publicar Apuesta'; }
@@ -1132,6 +1302,31 @@ function renderTabsCounts() {
   });
 }
 
+// ── 🆕 #635 — busqueda global del foro ──
+let _foroSearchQuery = '';
+function _foroMatchesSearch(t, posts) {
+  if (!_foroSearchQuery) return true;
+  const q = _foroSearchQuery.toLowerCase();
+  // Match por: home, away, liga, cualquier autor, cualquier contenido de post
+  if (String(t.home||'').toLowerCase().includes(q)) return true;
+  if (String(t.away||'').toLowerCase().includes(q)) return true;
+  if (String(t.pick_data?.league || t.league || '').toLowerCase().includes(q)) return true;
+  if (String(t.pick_data?.pick || t.pick || '').toLowerCase().includes(q)) return true;
+  const threadPosts = (posts || []).filter(p => p.thread_id === t.id);
+  return threadPosts.some(p =>
+    String(p.user_name||'').toLowerCase().includes(q) ||
+    String(p.content||'').toLowerCase().includes(q)
+  );
+}
+
+// Total counter en el toolbar
+function _updateToolbarCount() {
+  const el = document.getElementById('foroTotalCount');
+  if (!el) return;
+  const total = (allThreads || []).filter(t => !(t.id && t.id.startsWith('topic_'))).length;
+  el.textContent = total;
+}
+
 function renderThreads() {
   const list = document.getElementById('threadList');
   const postsByThread = {};
@@ -1144,6 +1339,7 @@ function renderThreads() {
   const followingList = getFollowing();
   const filtered = allThreads.filter(t => {
     if (t.id && t.id.startsWith('topic_')) return false;
+    if (!_foroMatchesSearch(t, allPosts)) return false;
     if (currentCat === 'all') return true;
     if (currentCat === 'following') {
       // Mostrar hilos donde el último mensaje viene de un tipster seguido
@@ -1187,7 +1383,7 @@ function renderThreads() {
       </div>
       <div class="thread-preview">${preview}</div>
       <div class="thread-author">
-        <div class="thread-author-avatar ${isAi ? 'is-ai' : ''}">${avatarLetter(lastAuthor)}</div>
+        <div class="thread-author-avatar ${isAi ? 'is-ai' : ''}">${avatarSvg(lastAuthor, 24)}</div>
         <span>${authorChip(lastAuthor)}</span>
       </div>
     </div>`;
@@ -1195,6 +1391,48 @@ function renderThreads() {
 }
 
 loadAll();
+
+// ── 🆕 #635 — Wireup toolbar busqueda + scroll-to-top ──
+(function _wireupToolbar(){
+  const searchInput = document.getElementById('foroSearch');
+  const searchClear = document.getElementById('foroSearchClear');
+  const searchWrap = document.querySelector('.foro-toolbar__search');
+  const scrollBtn = document.getElementById('foroScrollTop');
+  if (searchInput) {
+    let debounceT;
+    searchInput.addEventListener('input', e => {
+      clearTimeout(debounceT);
+      const v = e.target.value.trim();
+      searchWrap.classList.toggle('has-value', v.length > 0);
+      debounceT = setTimeout(() => {
+        _foroSearchQuery = v;
+        renderThreads();
+      }, 150);
+    });
+  }
+  if (searchClear) {
+    searchClear.addEventListener('click', () => {
+      searchInput.value = '';
+      searchWrap.classList.remove('has-value');
+      _foroSearchQuery = '';
+      renderThreads();
+      searchInput.focus();
+    });
+  }
+  if (scrollBtn) {
+    window.addEventListener('scroll', () => {
+      scrollBtn.classList.toggle('is-visible', window.scrollY > 400);
+    }, { passive: true });
+    scrollBtn.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+})();
+// Hook: refrescar counter cuando cambian los threads
+const _origRenderTabsCounts = typeof renderTabsCounts === 'function' ? renderTabsCounts : null;
+if (_origRenderTabsCounts) {
+  renderTabsCounts = function() { _origRenderTabsCounts.apply(this, arguments); _updateToolbarCount(); };
+}
 
 
 // ── 🆕 (30-jun-2026 #630) FAVICON DINÁMICO + DOCUMENT TITLE con badge ──
