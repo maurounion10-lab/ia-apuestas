@@ -405,6 +405,10 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
   .tp-share-btn{width:30px;height:30px;right:50px;top:12px}
 }
 
+
+/* 🆕 Inputs bloqueados en form bet (hilo de partido) */
+.tp-bet-row input.is-locked, .tp-form-row input.is-locked{background:rgba(0,200,83,0.06)!important;border-color:rgba(0,200,83,0.25)!important;color:#fff!important;cursor:not-allowed;font-weight:600}
+.tp-bet-row input.is-locked:focus,.tp-form-row input.is-locked:focus{outline:none;box-shadow:0 0 0 2px rgba(0,200,83,0.1)}
 </style>
 </head>
 <body>
@@ -1069,6 +1073,32 @@ async function openTopicPanel(tid) {
   document.getElementById('tpCharCount').textContent = '0';
   document.getElementById('tpMsg').className = 'tp-msg';
   document.getElementById('tpMsg').textContent = '';
+  // 🆕 (1-jul-2026) Pre-fill home/away en el form bet si estamos en un hilo de partido
+  const _hInput = document.getElementById('tpBetHome');
+  const _aInput = document.getElementById('tpBetAway');
+  const _lInput = document.getElementById('tpBetLeague');
+  if (_hInput && _aInput) {
+    if (!meta) {
+      // Hilo de partido: pre-llenar y bloquear edición
+      const thread = allThreads.find(t => t.id === tid);
+      if (thread) {
+        _hInput.value = thread.home || '';
+        _aInput.value = thread.away || '';
+        _hInput.readOnly = true; _aInput.readOnly = true;
+        _hInput.classList.add('is-locked'); _aInput.classList.add('is-locked');
+        if (_lInput) {
+          const lg = thread.pick_data?.league || thread.league || '';
+          if (lg) { _lInput.value = lg; _lInput.readOnly = true; _lInput.classList.add('is-locked'); }
+        }
+      }
+    } else {
+      // Sub-foro temático: permitir escribir libremente
+      _hInput.value = ''; _aInput.value = '';
+      _hInput.readOnly = false; _aInput.readOnly = false;
+      _hInput.classList.remove('is-locked'); _aInput.classList.remove('is-locked');
+      if (_lInput) { _lInput.value = ''; _lInput.readOnly = false; _lInput.classList.remove('is-locked'); }
+    }
+  }
   await loadTopicPosts(tid);
 }
 
