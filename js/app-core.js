@@ -6997,10 +6997,10 @@ function _dbbetCouponCode(p) {
 // ── buildDBbetCouponURL: SIEMPRE afiliado + deep link al partido ──
 function buildDBbetCouponURL(p) {
   // 🩹 2026-06-28: El redirector refpa96317.com borra el query "&url=" durante el
-  // redirect a db-bet-3540.pro/en, así que el deeplink al partido NUNCA llega.
+  // redirect a db-bet-1639.pro/en, así que el deeplink al partido NUNCA llega.
   // Resultado: el usuario aterrizaba en la home de DBbet en inglés en vez de
   // en el partido del Mundial → fricción enorme y caída de conversión.
-  // Hasta validar el tracking de la URL directa (db-bet-3540.pro/es/line/...?tag=...)
+  // Hasta validar el tracking de la URL directa (db-bet-1639.pro/es/line/...?tag=...)
   // siempre devolvemos el afiliado base — al menos preserva el tag con seguridad.
   return DBBET_AFFILIATE_BASE;
 }
@@ -9422,7 +9422,7 @@ function filterHistMercado(mercado, btn) {
 // Links de afiliado por casa de apuestas
 const BOOK_AFFILIATE = {
   megapari:  'https://proarg.megapari-003572.in/',
-  melbet:    'https://refpa3665.com/L?tag=d_5377076m_2170c_&site=5377076&ad=2170&r=registration',
+  melbet:    'https://refpa3665.com/L?tag=d_5777587m_11213c_&site=5777587&ad=2170&r=registration',
   betwinner: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM',
   dbbet_aff:  'https://refpa96317.com/L?tag=d_5777587m_11213c_&site=5777587&ad=11213&utm_source=home_dbbet&utm_medium=site',
   dbbet:  'https://refpa96317.com/L?tag=d_5777587m_11213c_&site=5777587&ad=11213&utm_source=home_dbbet&utm_medium=site&r=email',
