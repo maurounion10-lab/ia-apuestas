@@ -3737,32 +3737,103 @@ window.toggleHeroBubble = function(n) {
 })();
 </script>
 
-<!-- 🆕 (1-jul-2026) Tríada de bubbles laterales centrados verticalmente + 3er bubble "Publicar apuesta" -->
+<!-- 🆕 (1-jul-2026 v2) Tríada bubbles: FIX específicos con translateY(-50%) para centrar matemáticamente -->
 <style>
-/* Contenedor lateral: reposiciona TODOS los bubbles al lado derecho, centrados verticalmente */
-#aiChatBtn { top: calc(50% + 68px) !important; bottom: auto !important; z-index: 9998; }
-.forum-bbl { top: 50% !important; transform: translateY(-50%) !important; bottom: auto !important; z-index: 9998; }
-#gbBetBbl { position: fixed !important; top: calc(50% - 68px) !important; right: 20px !important; width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg,#e01237,#c8102e); border: 1.5px solid rgba(255,215,0,0.55); cursor: pointer; z-index: 9998; box-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 0 12px rgba(224,18,55,0.35); display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.15s, box-shadow 0.15s; }
-#gbBetBbl:hover { transform: translateY(-2px); box-shadow: 0 4px 18px rgba(0,0,0,0.65), 0 0 18px rgba(224,18,55,0.55); }
-#gbBetBbl:active { transform: translateY(0); }
-#gbBetBbl .gbb-emoji { font-size: 26px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); }
-/* Ajuste de popup del chat AI para que no tape el bubble superior */
-#aiChatBox { top: auto !important; bottom: calc(50% - 100px) !important; }
-/* Ajuste responsive: mobile mantiene el layout vertical center right */
-@media (max-width: 480px) {
-  #aiChatBtn { right: 12px !important; top: calc(50% + 60px) !important; width: 46px; height: 46px; }
-  .forum-bbl { right: 12px !important; top: 50% !important; }
-  #gbBetBbl { right: 12px !important; top: calc(50% - 60px) !important; width: 46px !important; height: 46px !important; }
-  #gbBetBbl .gbb-emoji { font-size: 22px; }
+/* Force máxima especificidad: los 3 bubbles al lado derecho, centrados vertical exacto */
+html body #gbBetBbl,
+html body .forum-bbl,
+html body #aiChatBtn {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: auto !important;
+  left: auto !important;
+  z-index: 9998 !important;
+  transform: translateY(-50%) !important;
+  width: 54px !important;
+  height: 54px !important;
+  transition: box-shadow 0.18s, filter 0.15s !important;
 }
-/* Tooltip label a la izquierda del bubble en hover */
-#gbBetBbl::before { content: "Publicar apuesta"; position: absolute; right: 64px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.85); color: #fff; font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 8px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s; }
+html body #gbBetBbl  { top: calc(50% - 68px) !important; }
+html body .forum-bbl { top: 50% !important; }
+html body #aiChatBtn { top: calc(50% + 68px) !important; }
+
+/* Hover: en vez de translateY(-2px) que rompe el centrado, uso filter para dar feedback visual */
+html body #gbBetBbl:hover,
+html body .forum-bbl:hover,
+html body #aiChatBtn:hover {
+  filter: brightness(1.15) drop-shadow(0 0 12px rgba(0,200,83,0.4)) !important;
+}
+html body #gbBetBbl:hover { filter: brightness(1.15) drop-shadow(0 0 14px rgba(224,18,55,0.55)) !important; }
+
+/* Estilos propios del bubble Publicar apuesta */
+#gbBetBbl {
+  border-radius: 50%;
+  background: linear-gradient(135deg,#e01237,#c8102e);
+  border: 1.5px solid rgba(255,215,0,0.55);
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 0 12px rgba(224,18,55,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+#gbBetBbl .gbb-emoji { font-size: 26px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); }
+
+/* Popup chat AI: aparece a la IZQUIERDA del bubble center-right (no interfiere con los 3 bubbles) */
+html body #aiChatBox {
+  top: 50% !important;
+  bottom: auto !important;
+  right: 90px !important;
+  transform: translateY(calc(-50% + 68px)) !important;
+  transform-origin: right center !important;
+}
+html body #aiChatBox.open { transform: translateY(calc(-50% + 68px)) scale(1) !important; }
+html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 68px)) scale(0.05) !important; }
+
+/* Mobile: mismo layout pero bubbles más chicos y popup fullwidth abajo */
+@media (max-width: 480px) {
+  html body #gbBetBbl, html body .forum-bbl, html body #aiChatBtn {
+    width: 46px !important;
+    height: 46px !important;
+    right: 12px !important;
+  }
+  html body #gbBetBbl  { top: calc(50% - 60px) !important; }
+  html body #aiChatBtn { top: calc(50% + 60px) !important; }
+  #gbBetBbl .gbb-emoji { font-size: 22px; }
+  html body #aiChatBox {
+    top: auto !important;
+    bottom: 12px !important;
+    right: 68px !important;
+    width: calc(100vw - 92px) !important;
+    transform: none !important;
+  }
+  html body #aiChatBox.open { transform: scale(1) !important; }
+  html body #aiChatBox:not(.open) { transform: scale(0.05) !important; }
+}
+
+/* Tooltip a la izquierda del bubble en hover */
+#gbBetBbl::before {
+  content: "Publicar apuesta";
+  position: absolute;
+  right: 64px; top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
 #gbBetBbl:hover::before { opacity: 1; }
 </style>
 <button id="gbBetBbl" type="button" onclick="window.location.href='/foro?open=bet';" title="Publicar apuesta" aria-label="Publicar apuesta">
   <span class="gbb-emoji">🎯</span>
 </button>
-<!-- fin tríada bubbles -->
+<!-- fin tríada bubbles v2 -->
 
 </body>
 </html>
