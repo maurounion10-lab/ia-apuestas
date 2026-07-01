@@ -3736,6 +3736,34 @@ window.toggleHeroBubble = function(n) {
   }, 90 * 1000); // cada 90s
 })();
 </script>
+
+<!-- 🆕 (1-jul-2026) Tríada de bubbles laterales centrados verticalmente + 3er bubble "Publicar apuesta" -->
+<style>
+/* Contenedor lateral: reposiciona TODOS los bubbles al lado derecho, centrados verticalmente */
+#aiChatBtn { top: calc(50% + 68px) !important; bottom: auto !important; z-index: 9998; }
+.forum-bbl { top: 50% !important; transform: translateY(-50%) !important; bottom: auto !important; z-index: 9998; }
+#gbBetBbl { position: fixed !important; top: calc(50% - 68px) !important; right: 20px !important; width: 54px; height: 54px; border-radius: 50%; background: linear-gradient(135deg,#e01237,#c8102e); border: 1.5px solid rgba(255,215,0,0.55); cursor: pointer; z-index: 9998; box-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 0 12px rgba(224,18,55,0.35); display: flex; align-items: center; justify-content: center; padding: 0; transition: transform 0.15s, box-shadow 0.15s; }
+#gbBetBbl:hover { transform: translateY(-2px); box-shadow: 0 4px 18px rgba(0,0,0,0.65), 0 0 18px rgba(224,18,55,0.55); }
+#gbBetBbl:active { transform: translateY(0); }
+#gbBetBbl .gbb-emoji { font-size: 26px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); }
+/* Ajuste de popup del chat AI para que no tape el bubble superior */
+#aiChatBox { top: auto !important; bottom: calc(50% - 100px) !important; }
+/* Ajuste responsive: mobile mantiene el layout vertical center right */
+@media (max-width: 480px) {
+  #aiChatBtn { right: 12px !important; top: calc(50% + 60px) !important; width: 46px; height: 46px; }
+  .forum-bbl { right: 12px !important; top: 50% !important; }
+  #gbBetBbl { right: 12px !important; top: calc(50% - 60px) !important; width: 46px !important; height: 46px !important; }
+  #gbBetBbl .gbb-emoji { font-size: 22px; }
+}
+/* Tooltip label a la izquierda del bubble en hover */
+#gbBetBbl::before { content: "Publicar apuesta"; position: absolute; right: 64px; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.85); color: #fff; font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: 8px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity 0.15s; }
+#gbBetBbl:hover::before { opacity: 1; }
+</style>
+<button id="gbBetBbl" type="button" onclick="window.location.href='/foro?open=bet';" title="Publicar apuesta" aria-label="Publicar apuesta">
+  <span class="gbb-emoji">🎯</span>
+</button>
+<!-- fin tríada bubbles -->
+
 </body>
 </html>
 
