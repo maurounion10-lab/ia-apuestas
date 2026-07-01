@@ -515,15 +515,23 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
         </div>
       </div>
 
-      <!-- Modo apuesta -->
+      <!-- Modo apuesta v2 (1-jul-2026): user solo elige partido + mercado + justifica -->
       <div id="tpBetFields" style="display:none">
-        <div class="tp-bet-row">
-          <input type="text" id="tpBetHome" placeholder="Equipo local" maxlength="50">
-          <span>vs</span>
-          <input type="text" id="tpBetAway" placeholder="Equipo visitante" maxlength="50">
+        <div class="tp-form-row" id="tpBetPartidoRow">
+          <label class="tp-form-label" for="tpBetPartido">⚽ ELEGÍ EL PARTIDO</label>
+          <select id="tpBetPartido" class="tp-select-partido">
+            <option value="">Cargando partidos disponibles…</option>
+          </select>
+          <div class="tp-hint">Los datos del partido (equipos, liga, cuota) se toman automáticamente del feed de DBbet · vos solo elegís mercado y explicás tu razonamiento</div>
         </div>
-        <div class="tp-form-row">
-          <input type="text" id="tpBetLeague" placeholder="Liga (ej: La Liga, Premier, Mundial 2026)" maxlength="60">
+        <!-- Inputs originales: OCULTOS pero se llenan por JS al elegir partido -->
+        <div class="tp-bet-row" style="display:none">
+          <input type="text" id="tpBetHome" readonly>
+          <span>vs</span>
+          <input type="text" id="tpBetAway" readonly>
+        </div>
+        <div class="tp-form-row" style="display:none">
+          <input type="text" id="tpBetLeague" readonly>
         </div>
         <div class="tp-form-row">
           <select id="tpBetPick">
@@ -1916,5 +1924,116 @@ setInterval(() => {
 window.addEventListener('load', _markForumVisited);
 
 </script>
+
+<style>
+/* 🆕 (1-jul-2026) Publicar apuesta v2: dropdown partido + hint */
+.tp-form-label{display:block;font-size:.72rem;font-weight:700;color:var(--verde);letter-spacing:.06em;margin-bottom:.4rem;text-transform:uppercase}
+.tp-select-partido{width:100%;background:#0d1a0d;color:#fff;border:1.5px solid rgba(0,200,83,0.3);border-radius:10px;padding:.7rem .85rem;font-size:.95rem;font-family:inherit;font-weight:500;cursor:pointer;outline:none;transition:border-color .15s}
+.tp-select-partido:focus{border-color:rgba(0,200,83,0.6)}
+.tp-select-partido option{background:#0d1a0d;color:#fff;padding:.4rem}
+.tp-hint{font-size:.72rem;color:rgba(255,255,255,0.55);margin-top:.35rem;line-height:1.35}
+#tpBetWordCount{color:rgba(255,140,0,0.85);font-weight:600}
+#tpBetWordCount.ok{color:rgba(0,200,83,0.9)}
+</style>
+<script>
+// 🆕 Publicar apuesta v2 — carga partidos desde el feed y auto-completa datos
+(async function initBetFormV2() {
+  async function loadPartidos() {
+    const sel = document.getElementById('tpBetPartido');
+    if (!sel) return;
+    try {
+      // Intentar traer picks pendientes de gambeta.ai (fichas del sitio)
+      const r = await fetch('https://apuestas-api.mauro-union10.workers.dev/preds?limit=60', { cache:'no-store' });
+      if (!r.ok) throw new Error('feed no disponible');
+      const data = await r.json();
+      const picks = (data.picks || data || []).filter(p => p.home && p.away && !p.result);
+      if (!picks.length) { sel.innerHTML = '<option value="">Sin partidos disponibles ahora</option>'; return; }
+      // Deduplicar por home-away
+      const seen = new Set();
+      const uniq = [];
+      picks.forEach(p => {
+        const k = (p.home + '|' + p.away).toLowerCase();
+        if (seen.has(k)) return;
+        seen.add(k); uniq.push(p);
+      });
+      // Guardar catálogo global
+      window._betCatalog = uniq;
+      sel.innerHTML = '<option value="">Elegí partido…</option>' + uniq.map((p, i) => {
+        const d = p.date ? new Date(p.date) : null;
+        const dStr = d ? d.toLocaleDateString('es-AR', { day:'2-digit', month:'short' }) + ' ' + d.toLocaleTimeString('es-AR', { hour:'2-digit', minute:'2-digit' }) : '';
+        const lg = (p.league || '').replace(/^[^\w]+/, '').slice(0, 24);
+        return `<option value="${i}">${p.home} vs ${p.away}${dStr ? ' · '+dStr : ''}${lg ? ' · '+lg : ''}</option>`;
+      }).join('');
+    } catch(e) {
+      console.warn('[bet-form v2] feed error', e);
+      sel.innerHTML = '<option value="">Error cargando partidos · intentá recargar</option>';
+    }
+  }
+
+  // Al elegir partido, auto-completar home/away/liga/cuota
+  document.addEventListener('change', (e) => {
+    if (e.target && e.target.id === 'tpBetPartido') {
+      const idx = parseInt(e.target.value, 10);
+      const p = (window._betCatalog || [])[idx];
+      if (!p) return;
+      const h = document.getElementById('tpBetHome'); if (h) h.value = p.home || '';
+      const a = document.getElementById('tpBetAway'); if (a) a.value = p.away || '';
+      const l = document.getElementById('tpBetLeague'); if (l) l.value = (p.league || '').replace(/^[^\w]+/, '');
+      const o = document.getElementById('tpBetOdds'); if (o && p.odds) o.value = parseFloat(p.odds).toFixed(2);
+      // Auto-seleccionar mercado si el pick tiene rec (recomendación IA)
+      const m = document.getElementById('tpBetMarket');
+      if (m && p.rec) {
+        // Buscar opción que contenga la rec
+        const recLC = String(p.rec).toLowerCase();
+        for (const opt of m.options) {
+          if (opt.value.toLowerCase().includes(recLC.slice(0, 10)) || recLC.includes(opt.value.toLowerCase().slice(0, 10))) {
+            m.value = opt.value; break;
+          }
+        }
+      }
+    }
+    // Contador de palabras en justificación
+    if (e.target && e.target.id === 'tpBetComment') {
+      updateWordCount();
+    }
+  });
+  document.addEventListener('input', (e) => {
+    if (e.target && e.target.id === 'tpBetComment') updateWordCount();
+  });
+  function updateWordCount() {
+    const ta = document.getElementById('tpBetComment');
+    const el = document.getElementById('tpBetWordCount');
+    if (!ta || !el) return;
+    const words = ta.value.trim().split(/\s+/).filter(w => w.length > 0).length;
+    el.textContent = words + '/20 palabras mínimas';
+    el.classList.toggle('ok', words >= 20);
+    // Deshabilitar botón submit si no hay 20 palabras
+    const btn = document.getElementById('tpSubmitBet');
+    if (btn) btn.disabled = words < 20;
+  }
+
+  // Auto-abrir modal si viene ?open=bet en la URL (desde bubble global)
+  function checkAutoOpen() {
+    if (new URLSearchParams(window.location.search).get('open') === 'bet') {
+      // Buscar tab de bet en modal de topic panel
+      const betTab = document.querySelector('.tp-tab[data-mode="bet"]');
+      if (betTab) betTab.click();
+      // Scroll al form si no se abre modal
+      setTimeout(() => {
+        const el = document.getElementById('tpBetPartido');
+        if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+      }, 400);
+    }
+  }
+
+  // Init cuando el foro cargue
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => { loadPartidos(); checkAutoOpen(); });
+  } else {
+    loadPartidos(); checkAutoOpen();
+  }
+})();
+</script>
+
 </body>
 </html>
