@@ -175,7 +175,7 @@ function getDailyPromoCta() {
   const promos = {
     0: { texto: '🎁 Mañana <strong>Melbet duplica tu depósito</strong> — aprovechalo antes de las 23:59.',  casa: 'Melbet',      link: 'https://refpa3665.com/L?tag=d_5208568m_11213c_&site=5208568&ad=2170&r=registration' },
     1: { texto: '🎁 Hoy <strong>Melbet duplica tu depósito</strong> — el bono se activa solo los lunes.',   casa: 'Melbet',      link: 'https://refpa3665.com/L?tag=d_5208568m_11213c_&site=5208568&ad=2170&r=registration' },
-    2: { texto: '🎁 Hoy <strong>DBbet duplica tu primer depósito</strong> — bonos de bienvenida activos.', casa: 'DBbet',  link: 'https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213&utm_source=home_dbbet&utm_medium=site', link2: 'https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213&utm_source=home_dbbet&utm_medium=site&r=email', casa2: 'DBbet' },
+    2: { texto: '🎁 Hoy <strong>DBbet duplica tu primer depósito</strong> — bonos de bienvenida activos.', casa: 'DBbet',  link: 'https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213', link2: 'https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213', casa2: 'DBbet' },
     3: { texto: '🎁 Mañana <strong>BetWinner duplica tu depósito</strong> — preparate hoy para el bono del jueves.', casa: 'BetWinner', link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
     4: { texto: '🎁 Hoy <strong>BetWinner duplica tu depósito</strong> — el bono del jueves está activo ahora.', casa: 'BetWinner',   link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
     5: { texto: '🎁 Mañana <strong>Megapari duplica tu depósito</strong> — depositá hoy para tenerlo listo.',  casa: 'Megapari',   link: 'https://proarg.megapari-003572.in/' },
@@ -368,7 +368,7 @@ function _showPromoDirecta() {
 
   // DBbet hero banner
   const dbbetHero =
-    `<a href="https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213&utm_source=home_dbbet&utm_medium=site" target="_blank" rel="noopener" onclick="trackEvent('promo_click',{promo:'dbbet',type:'ai_promo'})" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg,#1a0507,#1a0408);border:1px solid rgba(220,30,46,0.5);border-radius:12px;text-decoration:none;margin-bottom:10px;position:relative;overflow:hidden">` +
+    `<a href="https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213" target="_blank" rel="noopener" onclick="trackEvent('promo_click',{promo:'dbbet',type:'ai_promo'})" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:linear-gradient(135deg,#1a0507,#1a0408);border:1px solid rgba(220,30,46,0.5);border-radius:12px;text-decoration:none;margin-bottom:10px;position:relative;overflow:hidden">` +
     `<div style="position:absolute;inset:0;background:linear-gradient(135deg,rgba(220,30,46,0.08),transparent);pointer-events:none"></div>` +
     `<img loading="lazy" decoding="async" src="/img/casas/dbbet.svg" style="height:32px;object-fit:contain;flex-shrink:0;filter:brightness(1.1)" onerror="this.outerHTML='<span style=\\'font-weight:900;font-size:1.1rem;color:#FFD700\\'>DB<span style=\\'color:#fff\\'>bet</span></span>'">` +
     `<div style="flex:1;min-width:0">` +
@@ -382,7 +382,7 @@ function _showPromoDirecta() {
     { nombre: 'Melbet',      logo: 'https://www.google.com/s2/favicons?domain=melbet.com&sz=64',       link: 'https://refpa3665.com/L?tag=d_5208568m_11213c_&site=5208568&ad=2170&r=registration', color: '#ffa000' },
     { nombre: 'BetWinner',   logo: 'https://www.google.com/s2/favicons?domain=betwinner.com&sz=64',    link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM',                 color: '#2196f3' },
     { nombre: 'Megapari',    logo: 'https://www.google.com/s2/favicons?domain=megapari.com&sz=64',     link: 'https://proarg.megapari-003572.in/',                                                color: '#9c27b0' },
-    { nombre: 'DBbetbet', logo: 'https://www.google.com/s2/favicons?domain=dbbetbet.com&sz=64',  link: 'https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213&utm_source=home_dbbet&utm_medium=site&r=email',   color: '#00acc1' },
+    { nombre: 'DBbetbet', logo: 'https://www.google.com/s2/favicons?domain=dbbetbet.com&sz=64',  link: 'https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213',   color: '#00acc1' },
   ];
 
   const otrosCasasHtml = otrosCasas.map(c =>
@@ -556,7 +556,7 @@ async function aiSend() {
           <div style="font-size:0.7rem;font-weight:900;color:#FFD700;letter-spacing:0.5px;line-height:1.2">💎 MAIN SPONSOR</div>
           <div style="font-size:0.65rem;color:rgba(255,255,255,0.65);line-height:1.3">Apostá estas cuotas en DBbet y bancá el proyecto</div>
         </div>
-        <a href="https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213&utm_source=home_dbbet&utm_medium=site" target="_blank" rel="noopener"
+        <a href="https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213" target="_blank" rel="noopener"
            onclick="trackEvent('promo_click',{promo:'dbbet',type:'ai_odds_ad'})"
            style="background:linear-gradient(135deg,#C9A227,#F0CC5A 45%,#B8860B);color:#fff;font-size:0.63rem;font-weight:800;padding:5px 10px;border-radius:7px;text-decoration:none;white-space:nowrap;letter-spacing:0.3px;flex-shrink:0">
           APOSTAR →
