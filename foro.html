@@ -409,6 +409,28 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 /* 🆕 Inputs bloqueados en form bet (hilo de partido) */
 .tp-bet-row input.is-locked, .tp-form-row input.is-locked{background:rgba(0,200,83,0.06)!important;border-color:rgba(0,200,83,0.25)!important;color:#fff!important;cursor:not-allowed;font-weight:600}
 .tp-bet-row input.is-locked:focus,.tp-form-row input.is-locked:focus{outline:none;box-shadow:0 0 0 2px rgba(0,200,83,0.1)}
+
+/* 🆕 Ranking mensual v2: countdown + profit + Hall of Fame */
+.pf-countdown{display:inline-block;margin-left:.5rem;padding:.2rem .55rem;background:rgba(255,215,0,.14);color:#FFD700;border:1px solid rgba(255,215,0,.35);border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.02em;animation:pfCountBlink 2s ease-in-out infinite}
+@keyframes pfCountBlink{0%,100%{opacity:1}50%{opacity:.75}}
+.pf-pod-roi-mini{display:block;margin-top:.15rem;font-size:.7rem;opacity:.75;font-weight:600}
+.pf-pod-roi-mini.pos{color:rgba(0,200,83,.85)}.pf-pod-roi-mini.neg{color:rgba(255,90,90,.85)}
+/* Hall of Fame */
+.hof-widget{background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(0,0,0,0));border:1px solid rgba(255,215,0,.18);border-radius:18px;padding:1rem 1.15rem;margin-top:1.2rem}
+.hof-title{display:flex;align-items:center;gap:.5rem;color:#FFD700;font-weight:700;font-size:.9rem;margin-bottom:.65rem}
+.hof-title::before{content:"🏆";font-size:1.05rem}
+.hof-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.55rem}
+.hof-item{display:flex;align-items:center;gap:.5rem;background:rgba(255,215,0,.05);border:1px solid rgba(255,215,0,.14);padding:.5rem .65rem;border-radius:12px}
+.hof-crown{font-size:1.15rem;filter:drop-shadow(0 0 6px rgba(255,215,0,.5))}
+.hof-info{display:flex;flex-direction:column;line-height:1.15}
+.hof-name{font-size:.78rem;font-weight:700;color:#fff;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hof-period{font-size:.65rem;color:rgba(255,215,0,.75);letter-spacing:.02em}
+.hof-empty{opacity:.5;font-size:.75rem;text-align:center;padding:.4rem}
+/* Badge campeón permanente en perfil */
+.champ-badge{display:inline-flex;align-items:center;gap:.25rem;background:linear-gradient(135deg,rgba(255,215,0,.25),rgba(255,140,0,.15));border:1px solid rgba(255,215,0,.5);padding:.15rem .5rem;border-radius:999px;font-size:.68rem;font-weight:700;color:#FFD700;margin-left:.35rem;box-shadow:0 0 8px rgba(255,215,0,.2)}
+.champ-badge::before{content:"👑"}
+.champ-badges-row{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.35rem}
+
 </style>
 </head>
 <body>
@@ -457,9 +479,11 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
     <div class="pf-head">
       <div class="pf-title"><span class="pf-trophy">🏆</span> Predicciones de Fútbol</div>
       <div class="pf-period" id="pfPeriod">…</div>
+          <span id="pfCountdown" class="pf-countdown">⏳ ...</span>
     </div>
     <div id="pfPodium" class="pf-podium" style="display:none"></div>
     <div id="pfRest" class="pf-rest"></div>
+        <div class="hof-widget"><div class="hof-title">Campeones Anteriores</div><div class="hof-list" id="hofList"><div class="hof-empty">Sin campeones aún — sé el primero este mes</div></div></div>
     <div id="pfEmpty" class="pf-empty" style="display:none">Todavía nadie publicó apuestas resueltas este mes. ¡Sé el primero! 🎯</div>
   </section>
 
@@ -774,7 +798,7 @@ function openProfile(name) {
   const overlay = document.getElementById('profileOverlay');
   const stats = userStatsMap[name] || { total:0, wins:0, losses:0, pending:0, winRate:0, roi:0 };
   document.getElementById('profileAvatar').innerHTML = avatarSvg(name, 72);
-  document.getElementById('profileName').innerHTML = safe(name) + rankBadge(name);
+  document.getElementById('profileName').innerHTML = safe(name) + rankBadge(name) + champBadgesHTML(name);
   // Fecha del primer post
   const userPosts = allPosts.filter(p => (p.user_name||'').trim() === name);
   const firstTs = userPosts.length ? userPosts[userPosts.length-1].created_at : null;
@@ -872,22 +896,120 @@ function computeUserStats(posts) {
   return map;
 }
 
+
+// 🆕 (1-jul-2026) Hall of Fame — campeones mensuales
+const HOF_STORAGE_KEY = 'gb_forum_hof_v1';
+const CHAMP_BADGES_KEY = 'gb_forum_champ_badges_v1'; // { userName: ['2026-06', '2026-05'] }
+
+function _loadHof() {
+  try { return JSON.parse(localStorage.getItem(HOF_STORAGE_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function _saveHof(list) { try { localStorage.setItem(HOF_STORAGE_KEY, JSON.stringify(list)); } catch(e){} }
+
+function _loadChampBadges() {
+  try { return JSON.parse(localStorage.getItem(CHAMP_BADGES_KEY) || '{}'); }
+  catch(e) { return {}; }
+}
+function _saveChampBadges(map) { try { localStorage.setItem(CHAMP_BADGES_KEY, JSON.stringify(map)); } catch(e){} }
+
+// Snapshot automático: si es día 1-3 del mes y el mes anterior no está en HOF, congelarlo
+function _autoSnapshotLastMonth() {
+  try {
+    const now = new Date();
+    if (now.getDate() > 3) return; // solo días 1-3 del mes
+    const lastMonth = new Date(now.getFullYear(), now.getMonth()-1, 15);
+    const key = lastMonth.getFullYear() + '-' + String(lastMonth.getMonth()+1).padStart(2,'0');
+    const hof = _loadHof();
+    if (hof.some(h => h.period === key)) return; // ya congelado
+    // Calcular ranking del mes pasado
+    const lmStart = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1).getTime();
+    const lmEnd = new Date(lastMonth.getFullYear(), lastMonth.getMonth()+1, 1).getTime();
+    const lmPosts = allBetPosts.filter(p => {
+      const ts = new Date(p.created_at).getTime();
+      return ts >= lmStart && ts < lmEnd && p.bet_data && (p.bet_data.result === 'win' || p.bet_data.result === 'loss');
+    });
+    const lmStats = computeUserStats(lmPosts);
+    const lmRanked = Object.values(lmStats)
+      .filter(u => (u.wins + u.losses) >= 3)
+      .sort((a, b) => (b.profitTotal - a.profitTotal) || (b.winRate - a.winRate));
+    if (!lmRanked.length) return;
+    const champ = lmRanked[0];
+    const periodLabel = lastMonth.toLocaleDateString('es-AR', { month:'long', year:'numeric' }).toUpperCase();
+    hof.unshift({ period: key, periodLabel, champion: champ.name, profit: Math.round(champ.profitTotal), wins: champ.wins, losses: champ.losses });
+    _saveHof(hof.slice(0, 24)); // conservar últimos 24 meses
+    // Otorgar badge permanente al campeón
+    const badges = _loadChampBadges();
+    if (!badges[champ.name]) badges[champ.name] = [];
+    if (!badges[champ.name].includes(key)) badges[champ.name].push(key);
+    _saveChampBadges(badges);
+  } catch(e) { console.warn('[hof snapshot]', e); }
+}
+
+function renderHallOfFame() {
+  const el = document.getElementById('hofList');
+  if (!el) return;
+  const hof = _loadHof();
+  if (!hof.length) {
+    el.innerHTML = '<div class="hof-empty">Sin campeones aún — sé el primero este mes</div>';
+    return;
+  }
+  el.innerHTML = hof.slice(0, 12).map(h => `
+    <div class="hof-item" title="${safe(h.periodLabel)} — Profit: $${(h.profit||0).toLocaleString('es-AR')}">
+      <span class="hof-crown">👑</span>
+      <div class="hof-info">
+        <span class="hof-name">${safe(h.champion)}</span>
+        <span class="hof-period">${safe(h.periodLabel.split(' ')[0].slice(0,3))} ${h.period.split('-')[0].slice(2)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Badge campeón en el nombre del user (llamar desde render de perfil)
+function champBadgesHTML(userName) {
+  if (!userName) return '';
+  const badges = _loadChampBadges();
+  const list = badges[userName] || [];
+  if (!list.length) return '';
+  return '<div class="champ-badges-row">' + list.slice(0, 6).map(k => {
+    const [y, m] = k.split('-');
+    const monthShort = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][parseInt(m,10)-1] || m;
+    return `<span class="champ-badge" title="Campeón ${monthShort} ${y}">${monthShort.charAt(0).toUpperCase()+monthShort.slice(1)} ${y.slice(2)}</span>`;
+  }).join('') + '</div>';
+}
+
 function renderPredicciones() {
-  // Filtrar posts del mes actual y solo resueltos (win/loss)
+  // 🆕 (1-jul-2026) Ranking mensual v2: métrica PROFIT $, mínimo 3 apuestas, countdown fin de mes
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  const monthEnd = new Date(now.getFullYear(), now.getMonth()+1, 1).getTime();
   const monthPosts = allBetPosts.filter(p => {
     const ts = new Date(p.created_at).getTime();
     return ts >= monthStart && p.bet_data && (p.bet_data.result === 'win' || p.bet_data.result === 'loss');
   });
   const monthStatsMap = computeUserStats(monthPosts);
-  // Ranking: por ROI desc, desempate por # picks resueltos desc
+  // Ranking: por PROFIT $ desc, mínimo 3 apuestas, desempate por winrate desc
   const ranked = Object.values(monthStatsMap)
-    .filter(u => (u.wins + u.losses) >= 1)
-    .sort((a, b) => (b.roi - a.roi) || ((b.wins + b.losses) - (a.wins + a.losses)));
+    .filter(u => (u.wins + u.losses) >= 3)
+    .sort((a, b) => (b.profitTotal - a.profitTotal) || (b.winRate - a.winRate));
 
   const periodLabel = now.toLocaleDateString('es-AR', { month:'long', year:'numeric' }).toUpperCase();
-  document.getElementById('pfPeriod').textContent = '📅 ' + periodLabel;
+  const periodEl = document.getElementById('pfPeriod');
+  if (periodEl) periodEl.textContent = '📅 ' + periodLabel;
+
+  // Countdown a fin de mes
+  const cdEl = document.getElementById('pfCountdown');
+  if (cdEl) {
+    const daysLeft = Math.ceil((monthEnd - now.getTime()) / 86400000);
+    const hoursLeft = Math.floor((monthEnd - now.getTime()) / 3600000);
+    if (daysLeft > 1) cdEl.textContent = '⏳ Cierra en ' + daysLeft + ' días';
+    else if (daysLeft === 1) cdEl.textContent = '🔥 Último día · cierra en ' + hoursLeft + 'h';
+    else cdEl.textContent = '⚡ Cierra hoy';
+  }
+
+  // Guardar snapshot para uso externo (Hall of Fame, widget home, etc)
+  window._monthlyRanking = ranked;
+  window._monthlyPeriod = { start: monthStart, end: monthEnd, label: periodLabel };
 
   const podiumEl = document.getElementById('pfPodium');
   const restEl = document.getElementById('pfRest');
@@ -910,6 +1032,9 @@ function renderPredicciones() {
       if (!u) return `<div class="pf-pod-card pf-${i+1}" style="opacity:.3"><div class="pf-pod-medal">${['🥇','🥈','🥉'][i]}</div><div class="pf-pod-name">—</div></div>`;
       const rank = getRank(userStatsMap[u.name]); // rango global, no del mes
       const medal = ['🥇','🥈','🥉'][i];
+      const profitClass = u.profitTotal >= 0 ? 'pos' : 'neg';
+      const profitSign = u.profitTotal >= 0 ? '+' : '';
+      const profitFmt = profitSign + '$' + Math.round(Math.abs(u.profitTotal)).toLocaleString('es-AR');
       const roiClass = u.roi >= 0 ? 'pos' : 'neg';
       const roiSign = u.roi >= 0 ? '+' : '';
       return `<div class="pf-pod-card pf-${i+1}">
@@ -917,7 +1042,8 @@ function renderPredicciones() {
         <div class="pf-pod-avatar">${avatarSvg(u.name, 36)}</div>
         <div class="pf-pod-name">${safe(u.name)}${rank ? ' '+rank.emoji : ''}</div>
         <div class="pf-pod-stats"><b>${u.wins}</b>W · <b>${u.losses}</b>L · <b>${Math.round(u.winRate*100)}%</b></div>
-        <span class="pf-pod-roi ${roiClass}">${roiSign}${u.roi.toFixed(1)}% ROI</span>
+        <span class="pf-pod-roi ${profitClass}" title="Profit acumulado del mes">${profitFmt}</span>
+        <span class="pf-pod-roi-mini ${roiClass}">${roiSign}${u.roi.toFixed(1)}% ROI</span>
       </div>`;
     }).join('');
   }
@@ -930,13 +1056,16 @@ function renderPredicciones() {
       const rank = getRank(userStatsMap[u.name]);
       const roiClass = u.roi >= 0 ? 'pos' : 'neg';
       const roiSign = u.roi >= 0 ? '+' : '';
+      const profitClass = u.profitTotal >= 0 ? 'pos' : 'neg';
+      const profitSign = u.profitTotal >= 0 ? '+' : '';
+      const profitFmt = profitSign + '$' + Math.round(Math.abs(u.profitTotal)).toLocaleString('es-AR');
       return `<div class="pf-row">
         <span class="pf-pos">#${pos}</span>
         <div class="pf-avatar">${avatarSvg(u.name, 28)}</div>
         <div class="pf-name">${safe(u.name)}${rank ? '<span class="rank-badge '+rank.key+'">'+rank.emoji+' '+rank.label+'</span>' : ''}</div>
         <span class="pf-stat pf-hide-mobile"><b>${u.wins + u.losses}</b> picks</span>
         <span class="pf-stat"><b>${Math.round(u.winRate*100)}%</b> aciertos</span>
-        <span class="pf-roi ${roiClass}">${roiSign}${u.roi.toFixed(1)}%</span>
+        <span class="pf-roi ${profitClass}" title="Profit del mes">${profitFmt}</span>
       </div>`;
     }).join('');
   } else {
@@ -985,7 +1114,7 @@ async function loadAll() {
     renderTopics();
     renderTabsCounts();
     renderThreads();
-    renderPredicciones();
+    _autoSnapshotLastMonth(); renderPredicciones(); renderHallOfFame();
   } catch (e) {
     document.getElementById('topicsGrid').innerHTML = '<div class="empty">Error cargando el foro. Intentá refrescar.</div>';
     document.getElementById('threadList').innerHTML = '';
