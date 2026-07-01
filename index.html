@@ -3917,18 +3917,10 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
         <select class="gbm-select" id="gbmPartido">
           <option value="">Cargando partidos disponibles…</option>
         </select>
-        <div class="gbm-hint">Datos del partido (equipos, liga, cuota) se toman automáticamente del feed</div>
+        
       </div>
-      <div class="gbm-row2">
-        <div>
-          <label class="gbm-lbl">Equipos</label>
-          <input type="text" class="gbm-input gbm-readonly" id="gbmMatchDisplay" readonly placeholder="—">
-        </div>
-        <div>
-          <label class="gbm-lbl">Liga</label>
-          <input type="text" class="gbm-input gbm-readonly" id="gbmLeagueDisplay" readonly placeholder="—">
-        </div>
-      </div>
+      <input type="hidden" id="gbmMatchDisplay" value="">
+      <input type="hidden" id="gbmLeagueDisplay" value="">
       <div>
         <label class="gbm-lbl" for="gbmMercado">📊 Mercado</label>
         <select class="gbm-select" id="gbmMercado">
