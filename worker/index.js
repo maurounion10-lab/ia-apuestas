@@ -1895,7 +1895,6 @@ async function runScheduledResolver(env) {
         delete p._justResolved;
       }
       stats.log.push(`resueltos: ${stats.resolved} · guardados admin=${savedAdmin} global_v1=${savedGlobal}`);
-    } picks resueltos`);
     }
   } catch (e) {
     stats.errors++;
