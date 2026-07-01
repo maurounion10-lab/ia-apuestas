@@ -173,8 +173,8 @@ function aiAddMsg(role, text, withTime = true) {
 function getDailyPromoCta() {
   const day = new Date().getDay(); // 0=Dom…6=Sáb
   const promos = {
-    0: { texto: '🎁 Mañana <strong>Melbet duplica tu depósito</strong> — aprovechalo antes de las 23:59.',  casa: 'Melbet',      link: 'https://refpa3665.com/L?tag=d_5377076m_2170c_&site=5377076&ad=2170&r=registration' },
-    1: { texto: '🎁 Hoy <strong>Melbet duplica tu depósito</strong> — el bono se activa solo los lunes.',   casa: 'Melbet',      link: 'https://refpa3665.com/L?tag=d_5377076m_2170c_&site=5377076&ad=2170&r=registration' },
+    0: { texto: '🎁 Mañana <strong>Melbet duplica tu depósito</strong> — aprovechalo antes de las 23:59.',  casa: 'Melbet',      link: 'https://refpa3665.com/L?tag=d_5777587m_11213c_&site=5377076&ad=2170&r=registration' },
+    1: { texto: '🎁 Hoy <strong>Melbet duplica tu depósito</strong> — el bono se activa solo los lunes.',   casa: 'Melbet',      link: 'https://refpa3665.com/L?tag=d_5777587m_11213c_&site=5377076&ad=2170&r=registration' },
     2: { texto: '🎁 Hoy <strong>DBbet duplica tu primer depósito</strong> — bonos de bienvenida activos.', casa: 'DBbet',  link: 'https://refpa96317.com/L?tag=d_5777587m_11213c_&site=5777587&ad=11213&utm_source=home_dbbet&utm_medium=site', link2: 'https://refpa96317.com/L?tag=d_5777587m_11213c_&site=5777587&ad=11213&utm_source=home_dbbet&utm_medium=site&r=email', casa2: 'DBbet' },
     3: { texto: '🎁 Mañana <strong>BetWinner duplica tu depósito</strong> — preparate hoy para el bono del jueves.', casa: 'BetWinner', link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
     4: { texto: '🎁 Hoy <strong>BetWinner duplica tu depósito</strong> — el bono del jueves está activo ahora.', casa: 'BetWinner',   link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
@@ -379,7 +379,7 @@ function _showPromoDirecta() {
     `</a>`;
 
   const otrosCasas = [
-    { nombre: 'Melbet',      logo: 'https://www.google.com/s2/favicons?domain=melbet.com&sz=64',       link: 'https://refpa3665.com/L?tag=d_5377076m_2170c_&site=5377076&ad=2170&r=registration', color: '#ffa000' },
+    { nombre: 'Melbet',      logo: 'https://www.google.com/s2/favicons?domain=melbet.com&sz=64',       link: 'https://refpa3665.com/L?tag=d_5777587m_11213c_&site=5377076&ad=2170&r=registration', color: '#ffa000' },
     { nombre: 'BetWinner',   logo: 'https://www.google.com/s2/favicons?domain=betwinner.com&sz=64',    link: 'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM',                 color: '#2196f3' },
     { nombre: 'Megapari',    logo: 'https://www.google.com/s2/favicons?domain=megapari.com&sz=64',     link: 'https://proarg.megapari-003572.in/',                                                color: '#9c27b0' },
     { nombre: 'DBbetbet', logo: 'https://www.google.com/s2/favicons?domain=dbbetbet.com&sz=64',  link: 'https://refpa96317.com/L?tag=d_5777587m_11213c_&site=5777587&ad=11213&utm_source=home_dbbet&utm_medium=site&r=email',   color: '#00acc1' },
