@@ -1807,6 +1807,23 @@
 
   /* Responsive — mobile stack */
   @media (max-width: 600px) {
+    /* Hero mobile: centrar todo el contenido del hero-text */
+    .hero { padding: 32px 18px 28px; }
+    .hero-text {
+      text-align: center !important;
+      max-width: 100%;
+    }
+    .hero h1 {
+      font-size: clamp(1.6rem, 6.5vw, 2.1rem);
+      line-height: 1.15;
+    }
+    .hero p {
+      font-size: 0.95rem;
+      max-width: 92%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    /* Profile row & elementos internos */
     .gb-profile-row {
       gap: 8px;
       justify-content: center;
@@ -1821,13 +1838,27 @@
       font-size: 0.62rem;
     }
     .gb-online-text { letter-spacing: 0.2px; white-space: nowrap; }
+    /* Stats de 4 numeros: mejor spacing en mobile angosto */
     .gb-profile-stats {
       padding: 10px 2px;
       margin: 18px 0 14px;
+      gap: 0;
     }
-    .gb-pstat-num { font-size: 1.15rem; }
-    .gb-pstat-lbl { font-size: 0.55rem; letter-spacing: 0.5px; }
-    .gb-pill { padding: 9px 14px; font-size: 0.78rem; }
+    .gb-pstat { padding: 2px 4px; }
+    .gb-pstat-num { font-size: 1.15rem; letter-spacing: -0.4px; }
+    .gb-pstat-lbl { font-size: 0.52rem; letter-spacing: 0.4px; }
+    /* Botones del hero: centrados + full-width friendly */
+    .gb-pill {
+      padding: 10px 16px;
+      font-size: 0.78rem;
+      justify-content: center;
+    }
+    .hero-buttons, .gb-hero-btns, .hero-cta {
+      justify-content: center !important;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
   }
 
   /* Ajuste extra ultra-mobile (<380px): stack profile row en columna centrada */
