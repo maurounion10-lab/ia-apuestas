@@ -4092,22 +4092,29 @@ export default {
         }
         const skey = env.SUPABASE_SERVICE_ROLE_KEY;
         if (!skey) return new Response(JSON.stringify({ ok: false, error: 'no_service_key' }), { status: 500, headers: CORS });
-        // Leer el historial del admin
-        const hist = await fetchAdminHistorial(env);
-        const idx = hist.findIndex(p => p.id === id);
-        if (idx < 0) return new Response(JSON.stringify({ ok: false, error: 'pick not found', id }), { status: 404, headers: CORS });
-        const pick = hist[idx];
-        // Calcular pl si no viene
-        if (typeof pl !== 'number') {
-          const stake = parseFloat(pick.stake) || 50;
-          const odds = parseFloat(pick.odds) || 1.5;
-          if (result === 'win') pl = +(stake * (odds - 1)).toFixed(2);
-          else if (result === 'loss') pl = -stake;
-          else pl = 0;
-        }
-        hist[idx] = { ...pick, result, pl, finalScore: finalScore || pick.finalScore || null, _resolvedAt: new Date().toISOString(), _resolvedManual: true };
-        await saveAdminHistorial(env, hist);
-        // También pushear al global_historial_v1 (que es el que el cliente lee)
+        // Leer AMBAS fuentes: acoin_users.historial_full Y global_historial_v1
+        // (picks auto-generados WC viven solo en el segundo)
+        let updatedIn = [];
+        // 1) Admin (acoin_users)
+        try {
+          const hist = await fetchAdminHistorial(env);
+          const idx = hist.findIndex(p => p.id === id);
+          if (idx >= 0) {
+            const pick = hist[idx];
+            if (typeof pl !== 'number') {
+              const stake = parseFloat(pick.stake) || 50;
+              const odds = parseFloat(pick.odds) || 1.5;
+              if (result === 'win') pl = +(stake * (odds - 1)).toFixed(2);
+              else if (result === 'loss') pl = -stake;
+              else pl = 0;
+            }
+            hist[idx] = { ...pick, result, pl, finalScore: finalScore || pick.finalScore || null, _resolvedAt: new Date().toISOString(), _resolvedManual: true };
+            await saveAdminHistorial(env, hist);
+            updatedIn.push('admin');
+          }
+        } catch(_) {}
+        // 2) global_historial_v1 (cache pública que el cliente lee)
+        let resolvedPick = null;
         try {
           const r = await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.global_historial_v1&select=data`, { headers: { apikey: skey, Authorization: `Bearer ${skey}` } });
           const rows = await r.json();
@@ -4116,17 +4123,28 @@ export default {
             const arr = Array.isArray(data) ? data : (data?.picks || []);
             const gi = arr.findIndex(p => p.id === id);
             if (gi >= 0) {
-              arr[gi] = hist[idx];
+              const pick = arr[gi];
+              if (typeof pl !== 'number') {
+                const stake = parseFloat(pick.stake) || 50;
+                const odds = parseFloat(pick.odds) || 1.5;
+                if (result === 'win') pl = +(stake * (odds - 1)).toFixed(2);
+                else if (result === 'loss') pl = -stake;
+                else pl = 0;
+              }
+              arr[gi] = { ...pick, result, pl, finalScore: finalScore || pick.finalScore || null, _resolvedAt: new Date().toISOString(), _resolvedManual: true };
+              resolvedPick = arr[gi];
               const newData = Array.isArray(data) ? arr : { ...data, picks: arr };
-              await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.global_historial_v1`, {
+              const patchRes = await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.global_historial_v1`, {
                 method: 'PATCH',
                 headers: { apikey: skey, Authorization: `Bearer ${skey}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
                 body: JSON.stringify({ data: newData }),
               });
+              if (patchRes.ok) updatedIn.push('global_v1');
             }
           }
         } catch(_) {}
-        return new Response(JSON.stringify({ ok: true, resolved: hist[idx] }), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
+        if (updatedIn.length === 0) return new Response(JSON.stringify({ ok: false, error: 'pick not found in admin nor global_v1', id }), { status: 404, headers: CORS });
+        return new Response(JSON.stringify({ ok: true, updated_in: updatedIn, resolved: resolvedPick }), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
       } catch (e) {
         return new Response(JSON.stringify({ ok: false, error: e.message }), { status: 500, headers: CORS });
       }
