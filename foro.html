@@ -1206,170 +1206,7 @@ document.getElementById('tpForm').addEventListener('submit', async e => {
 
 
 
-// ══════════════════════════════════════════════════════════════════════
-// 🆕 #640 — FORO FASE 3 PREMIUM
-// ══════════════════════════════════════════════════════════════════════
 
-// ── 1) REACCIONES ── (Discord-style, 6 emojis)
-const _REACTIONS = ['🔥','❤️','👍','💯','🎯','💰'];
-let _reactionsCache = {}; // post_id → { emoji: count, ... }
-
-async function loadReactions() {
-  try {
-    const r = await fetch(`${SB_URL}/rest/v1/forum_reactions?select=post_id,emoji`, { headers: H });
-    if (!r.ok) return;
-    const rows = await r.json();
-    const map = {};
-    for (const row of rows) {
-      const pid = row.post_id;
-      if (!map[pid]) map[pid] = {};
-      map[pid][row.emoji] = (map[pid][row.emoji] || 0) + 1;
-    }
-    _reactionsCache = map;
-  } catch(e) {}
-}
-
-function myReactions(postId) {
-  try { return JSON.parse(localStorage.getItem('gb_reactions_' + postId) || '[]'); } catch { return []; }
-}
-function _setMyReactions(postId, arr) {
-  localStorage.setItem('gb_reactions_' + postId, JSON.stringify(arr));
-}
-
-async function toggleReaction(postId, emoji) {
-  const my = myReactions(postId);
-  const isAdding = !my.includes(emoji);
-  const newMy = isAdding ? [...my, emoji] : my.filter(e => e !== emoji);
-  _setMyReactions(postId, newMy);
-  // Update cache + persist
-  if (!_reactionsCache[postId]) _reactionsCache[postId] = {};
-  _reactionsCache[postId][emoji] = (_reactionsCache[postId][emoji] || 0) + (isAdding ? 1 : -1);
-  if (_reactionsCache[postId][emoji] <= 0) delete _reactionsCache[postId][emoji];
-  // Optimistic UI
-  document.querySelectorAll(`[data-post-id="${postId}"] .gb-reactions-row`).forEach(row => {
-    row.outerHTML = renderReactionsRow(postId);
-  });
-  // Persist
-  try {
-    if (isAdding) {
-      await fetch(`${SB_URL}/rest/v1/forum_reactions`, {
-        method: 'POST',
-        headers: { ...H, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ post_id: postId, emoji, alias: localStorage.getItem('gb_forum_alias') || 'anon' })
-      });
-    } else {
-      const alias = localStorage.getItem('gb_forum_alias') || 'anon';
-      await fetch(`${SB_URL}/rest/v1/forum_reactions?post_id=eq.${postId}&emoji=eq.${encodeURIComponent(emoji)}&alias=eq.${encodeURIComponent(alias)}`, {
-        method: 'DELETE', headers: H
-      });
-    }
-  } catch(e) {}
-}
-
-function renderReactionsRow(postId) {
-  const counts = _reactionsCache[postId] || {};
-  const my = myReactions(postId);
-  const nonZero = _REACTIONS.filter(e => counts[e] > 0);
-  const zero = _REACTIONS.filter(e => !counts[e]);
-  const show = [...nonZero, ...zero.slice(0, Math.max(0, 3 - nonZero.length))];
-  return `<div class="gb-reactions-row" data-post-id="${postId}">${
-    show.map(e => {
-      const c = counts[e] || 0;
-      const active = my.includes(e);
-      return `<button class="gb-reaction ${active ? 'is-active' : ''} ${c === 0 ? 'is-zero' : ''}" data-react="${postId}|${e}"><span class="gb-reaction__emoji">${e}</span><span class="gb-reaction__count">${c || ''}</span></button>`;
-    }).join('')
-  }</div>`;
-}
-
-// ── 2) ACHIEVEMENTS ──
-function getAchievements(name) {
-  const stats = userStatsMap[name];
-  if (!stats || stats.total === 0) return [];
-  const achs = [];
-  // Primera Apuesta
-  if (stats.total >= 1) achs.push({ icon:'🎯', label:'1er Pick', key:'firstpick' });
-  // Racha 3+ (calculada por streak)
-  const streak = _computeStreakForUser(name);
-  if (streak.count >= 3 && streak.type === 'W') achs.push({ icon:'🔥', label:`Racha ${streak.count}`, key:'fire' });
-  // Consistente: 10+ picks con ROI > 0
-  if (stats.total >= 10 && stats.roi > 0) achs.push({ icon:'💎', label:'Consistente', key:'gem' });
-  // Blitz: 5+ posts en un día (skip, ya que necesita fechas por día — se puede sumar después)
-  // Top 10 mes (calculado si aparece en el podio del mes actual)
-  if (window._monthTop10 && window._monthTop10.includes(name)) {
-    achs.push({ icon:'👑', label:'Top 10 mes', key:'crown' });
-  }
-  return achs;
-}
-
-function achievementsBadges(name) {
-  const achs = getAchievements(name);
-  if (!achs.length) return '';
-  return achs.map(a => `<span class="gb-ach gb-ach--${a.key}" title="${a.label}"><span class="gb-ach__icon">${a.icon}</span>${a.label}</span>`).join('');
-}
-
-// ── 3) STREAK ── analiza últimas apuestas resueltas de un usuario
-function _computeStreakForUser(name) {
-  if (!allBetPosts) return { count: 0, type: null };
-  const userBets = allBetPosts
-    .filter(p => (p.user_name||'').trim() === name && p.bet_data && ['win','loss'].includes(p.bet_data.result))
-    .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-  if (!userBets.length) return { count: 0, type: null };
-  const firstResult = userBets[0].bet_data.result;
-  let streak = 0;
-  for (const bp of userBets) {
-    if (bp.bet_data.result === firstResult) streak++;
-    else break;
-  }
-  return { count: streak, type: firstResult === 'win' ? 'W' : 'L' };
-}
-
-function streakHTML(name) {
-  const s = _computeStreakForUser(name);
-  if (s.count < 2) return '';
-  const isWin = s.type === 'W';
-  return `<div class="gb-streak ${isWin ? '' : 'gb-streak--cold'}">
-    <span class="gb-streak__icon">${isWin ? '🔥' : '❄️'}</span>
-    <span>Racha de <span class="gb-streak__num">${s.count}</span> ${isWin ? 'aciertos' : 'fallos'}</span>
-  </div>`;
-}
-
-// ── 4) TRENDING badge visual ──
-function trendingBadgeHTML(recentCount) {
-  if (recentCount < 3) return '';
-  return `<span class="gb-trending-badge"><span class="gb-trending-badge__spark">⚡</span>Trending</span>`;
-}
-
-// ── 5) DEEPLINK a hilos ── (URL hash)
-function updateHiloHash(threadId) {
-  const newHash = '#hilo=' + encodeURIComponent(threadId);
-  if (location.hash !== newHash) history.pushState(null, '', newHash);
-}
-function clearHiloHash() {
-  if (location.hash.startsWith('#hilo=')) history.pushState(null, '', location.pathname + location.search);
-}
-function copyHiloUrl(btn) {
-  navigator.clipboard.writeText(location.href).then(() => {
-    btn.classList.add('copied');
-    btn.textContent = '✓';
-    setTimeout(() => {
-      btn.classList.remove('copied');
-      btn.textContent = '🔗';
-    }, 1500);
-  });
-}
-
-// Event delegation extra
-document.addEventListener('click', e => {
-  const r = e.target.closest('[data-react]');
-  if (r) {
-    e.preventDefault(); e.stopPropagation();
-    const [pid, emoji] = r.dataset.react.split('|');
-    toggleReaction(pid, emoji);
-    return;
-  }
-});
-
-loadReactions().then(loadAll);
 
 // ── 🆕 #635 — Wireup toolbar busqueda + scroll-to-top ──
 (function _wireupToolbar(){
@@ -1590,6 +1427,171 @@ function _updateToolbarCount() {
   const total = (allThreads || []).filter(t => !(t.id && t.id.startsWith('topic_'))).length;
   el.textContent = total;
 }
+
+// ══════════════════════════════════════════════════════════════════════
+// 🆕 #640 — FORO FASE 3 PREMIUM
+// ══════════════════════════════════════════════════════════════════════
+
+// ── 1) REACCIONES ── (Discord-style, 6 emojis)
+const _REACTIONS = ['🔥','❤️','👍','💯','🎯','💰'];
+let _reactionsCache = {}; // post_id → { emoji: count, ... }
+
+async function loadReactions() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/forum_reactions?select=post_id,emoji`, { headers: H });
+    if (!r.ok) return;
+    const rows = await r.json();
+    const map = {};
+    for (const row of rows) {
+      const pid = row.post_id;
+      if (!map[pid]) map[pid] = {};
+      map[pid][row.emoji] = (map[pid][row.emoji] || 0) + 1;
+    }
+    _reactionsCache = map;
+  } catch(e) {}
+}
+
+function myReactions(postId) {
+  try { return JSON.parse(localStorage.getItem('gb_reactions_' + postId) || '[]'); } catch { return []; }
+}
+function _setMyReactions(postId, arr) {
+  localStorage.setItem('gb_reactions_' + postId, JSON.stringify(arr));
+}
+
+async function toggleReaction(postId, emoji) {
+  const my = myReactions(postId);
+  const isAdding = !my.includes(emoji);
+  const newMy = isAdding ? [...my, emoji] : my.filter(e => e !== emoji);
+  _setMyReactions(postId, newMy);
+  // Update cache + persist
+  if (!_reactionsCache[postId]) _reactionsCache[postId] = {};
+  _reactionsCache[postId][emoji] = (_reactionsCache[postId][emoji] || 0) + (isAdding ? 1 : -1);
+  if (_reactionsCache[postId][emoji] <= 0) delete _reactionsCache[postId][emoji];
+  // Optimistic UI
+  document.querySelectorAll(`[data-post-id="${postId}"] .gb-reactions-row`).forEach(row => {
+    row.outerHTML = renderReactionsRow(postId);
+  });
+  // Persist
+  try {
+    if (isAdding) {
+      await fetch(`${SB_URL}/rest/v1/forum_reactions`, {
+        method: 'POST',
+        headers: { ...H, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ post_id: postId, emoji, alias: localStorage.getItem('gb_forum_alias') || 'anon' })
+      });
+    } else {
+      const alias = localStorage.getItem('gb_forum_alias') || 'anon';
+      await fetch(`${SB_URL}/rest/v1/forum_reactions?post_id=eq.${postId}&emoji=eq.${encodeURIComponent(emoji)}&alias=eq.${encodeURIComponent(alias)}`, {
+        method: 'DELETE', headers: H
+      });
+    }
+  } catch(e) {}
+}
+
+function renderReactionsRow(postId) {
+  const counts = _reactionsCache[postId] || {};
+  const my = myReactions(postId);
+  const nonZero = _REACTIONS.filter(e => counts[e] > 0);
+  const zero = _REACTIONS.filter(e => !counts[e]);
+  const show = [...nonZero, ...zero.slice(0, Math.max(0, 3 - nonZero.length))];
+  return `<div class="gb-reactions-row" data-post-id="${postId}">${
+    show.map(e => {
+      const c = counts[e] || 0;
+      const active = my.includes(e);
+      return `<button class="gb-reaction ${active ? 'is-active' : ''} ${c === 0 ? 'is-zero' : ''}" data-react="${postId}|${e}"><span class="gb-reaction__emoji">${e}</span><span class="gb-reaction__count">${c || ''}</span></button>`;
+    }).join('')
+  }</div>`;
+}
+
+// ── 2) ACHIEVEMENTS ──
+function getAchievements(name) {
+  const stats = userStatsMap[name];
+  if (!stats || stats.total === 0) return [];
+  const achs = [];
+  // Primera Apuesta
+  if (stats.total >= 1) achs.push({ icon:'🎯', label:'1er Pick', key:'firstpick' });
+  // Racha 3+ (calculada por streak)
+  const streak = _computeStreakForUser(name);
+  if (streak.count >= 3 && streak.type === 'W') achs.push({ icon:'🔥', label:`Racha ${streak.count}`, key:'fire' });
+  // Consistente: 10+ picks con ROI > 0
+  if (stats.total >= 10 && stats.roi > 0) achs.push({ icon:'💎', label:'Consistente', key:'gem' });
+  // Blitz: 5+ posts en un día (skip, ya que necesita fechas por día — se puede sumar después)
+  // Top 10 mes (calculado si aparece en el podio del mes actual)
+  if (window._monthTop10 && window._monthTop10.includes(name)) {
+    achs.push({ icon:'👑', label:'Top 10 mes', key:'crown' });
+  }
+  return achs;
+}
+
+function achievementsBadges(name) {
+  const achs = getAchievements(name);
+  if (!achs.length) return '';
+  return achs.map(a => `<span class="gb-ach gb-ach--${a.key}" title="${a.label}"><span class="gb-ach__icon">${a.icon}</span>${a.label}</span>`).join('');
+}
+
+// ── 3) STREAK ── analiza últimas apuestas resueltas de un usuario
+function _computeStreakForUser(name) {
+  if (!allBetPosts) return { count: 0, type: null };
+  const userBets = allBetPosts
+    .filter(p => (p.user_name||'').trim() === name && p.bet_data && ['win','loss'].includes(p.bet_data.result))
+    .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
+  if (!userBets.length) return { count: 0, type: null };
+  const firstResult = userBets[0].bet_data.result;
+  let streak = 0;
+  for (const bp of userBets) {
+    if (bp.bet_data.result === firstResult) streak++;
+    else break;
+  }
+  return { count: streak, type: firstResult === 'win' ? 'W' : 'L' };
+}
+
+function streakHTML(name) {
+  const s = _computeStreakForUser(name);
+  if (s.count < 2) return '';
+  const isWin = s.type === 'W';
+  return `<div class="gb-streak ${isWin ? '' : 'gb-streak--cold'}">
+    <span class="gb-streak__icon">${isWin ? '🔥' : '❄️'}</span>
+    <span>Racha de <span class="gb-streak__num">${s.count}</span> ${isWin ? 'aciertos' : 'fallos'}</span>
+  </div>`;
+}
+
+// ── 4) TRENDING badge visual ──
+function trendingBadgeHTML(recentCount) {
+  if (recentCount < 3) return '';
+  return `<span class="gb-trending-badge"><span class="gb-trending-badge__spark">⚡</span>Trending</span>`;
+}
+
+// ── 5) DEEPLINK a hilos ── (URL hash)
+function updateHiloHash(threadId) {
+  const newHash = '#hilo=' + encodeURIComponent(threadId);
+  if (location.hash !== newHash) history.pushState(null, '', newHash);
+}
+function clearHiloHash() {
+  if (location.hash.startsWith('#hilo=')) history.pushState(null, '', location.pathname + location.search);
+}
+function copyHiloUrl(btn) {
+  navigator.clipboard.writeText(location.href).then(() => {
+    btn.classList.add('copied');
+    btn.textContent = '✓';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.textContent = '🔗';
+    }, 1500);
+  });
+}
+
+// Event delegation extra
+document.addEventListener('click', e => {
+  const r = e.target.closest('[data-react]');
+  if (r) {
+    e.preventDefault(); e.stopPropagation();
+    const [pid, emoji] = r.dataset.react.split('|');
+    toggleReaction(pid, emoji);
+    return;
+  }
+});
+
+loadReactions().then(loadAll);
 
 function renderThreads() {
   const list = document.getElementById('threadList');
