@@ -466,7 +466,8 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .foro-layout #topicsGrid,
 .foro-layout .section-title.gb-topics-title,
 .foro-layout .topics-title,
-.foro-layout [data-hide-with-sidebar] {display:none !important}
+.foro-layout [data-hide-with-sidebar] {position:absolute !important;left:-9999px !important;width:1px !important;height:1px !important;overflow:hidden !important;pointer-events:none !important}
+.foro-layout [data-hide-with-sidebar] * {pointer-events:auto !important}
 /* Toolbar sticky: sacar contador redundante (ya está en el sidebar) */
 .foro-layout .foro-toolbar__count {display:none}
 /* Reducir gap entre elementos del feed */
