@@ -2587,7 +2587,7 @@ function nationalTeamBadge(name, size=48) {
   // onerror del logo principal: fallback a bandera con object-fit:cover llenando el círculo
   const fallbackBig = flagUrl.replace(/'/g, "\\'");
   return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.5);background:#fff">`
-       + `<img src="${mainLogoUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:contain;display:block;transform:scale(1.08);transform-origin:center center" onerror="this.onerror=null;this.src='${fallbackBig}';this.style.objectFit='cover';this.style.transform='none'">`
+       + `<img src="${mainLogoUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:contain;display:block;transform:scale(1.45);transform-origin:center center" onerror="this.onerror=null;this.src='${fallbackBig}';this.style.objectFit='cover';this.style.transform='none'">`
        + `</span>`;
 }
 
