@@ -2776,6 +2776,8 @@
     position: relative;
     z-index: 2;
   }
+  .db-arrow svg { display: block; stroke: #fff; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)) }
+  .db-arrow svg polyline { stroke-width: 3.5 }
   .pred-dbbet-1click:hover .db-arrow { transform: translateX(5px); }
 
   /* Responsive mobile */
