@@ -6302,7 +6302,7 @@ function renderPreds() {
         <button class="pred-action-btn btn-icon btn-forum" onclick="openPickForum('${p.home.replace(/'/g,"\\'")}','${p.away.replace(/'/g,"\\'")}',{home:'${p.home.replace(/'/g,"\\'")}',away:'${p.away.replace(/'/g,"\\'")}',league:'${(p.league||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',bvrText:'${(_bvrText||'').replace(/'/g,"\\'")}'})" title="Ver comentarios" aria-label="Comentar">
           <span aria-hidden="true">💬</span>
         </button>
-        <button class="pred-action-btn btn-icon btn-publish" onclick="openGbBetModalWithPick({home:'${p.home.replace(/'/g,"\\'")}',away:'${p.away.replace(/'/g,"\\'")}',league:'${(p.league||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',odds:${(_odds ? _odds : (p._oddsRec||p.odds||1.85))},commenceTs:${p.commenceTs||'null'}})" title="Publicar tu apuesta con este pick pre-cargado" aria-label="Publicar apuesta">
+        <button class="pred-action-btn btn-icon btn-publish" onclick="openGbBetModalWithPick({home:'${p.home.replace(/'/g,"\\'")}',away:'${p.away.replace(/'/g,"\\'")}',league:'${(p.league||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',odds:${(p._bestOdds||p._oddsRec||p.odds||1.85)},commenceTs:${p.commenceTs||'null'}})" title="Publicar tu apuesta con este pick pre-cargado" aria-label="Publicar apuesta">
           <span aria-hidden="true">🎯</span>
         </button>
         <button class="pred-action-btn btn-like${_isPickLiked(idx) ? ' liked' : ''}" id="plbtn-${idx}" onclick="togglePickLike(${idx}, ${source.length})" title="Me gusta este pick" aria-label="Me gusta">
