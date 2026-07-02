@@ -26,13 +26,42 @@ html,body{background:var(--fondo);color:var(--texto);font-family:'Inter','Segoe 
 a{color:inherit;text-decoration:none}
 
 /* Nav */
-nav.nav{position:fixed;top:0;left:0;right:0;height:66px;background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);display:flex;align-items:center;padding:0 20px;z-index:10000}
-.nav-logo-wrap{display:flex;align-items:center;gap:11px}
-.nav-icon-box{width:42px;height:42px;background:linear-gradient(135deg,#0d2a0d,#112011);border:1px solid rgba(0,200,83,0.35);border-radius:11px;display:flex;align-items:center;justify-content:center}
-.nav-logo-text{font-size:1.08rem;font-weight:900;color:#fff}
-.nav-logo-text span{color:#00c853}
-.nav-back{margin-left:auto;color:rgba(255,255,255,0.7);font-size:.82rem;padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.1);transition:all .15s}
-.nav-back:hover{color:#fff;border-color:rgba(255,255,255,0.25)}
+/* Nav estilo home (main.css). Overrides forales para consistencia visual */
+nav.nav{position:fixed;top:44px;left:0;right:0;height:66px;background:#060d06;border-bottom:1px solid rgba(0,200,83,0.2);display:flex;align-items:center;padding:0 20px;z-index:10000;gap:16px}
+.nav-links{display:flex;align-items:center;gap:4px;margin-left:auto;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{color:rgba(255,255,255,0.82);font-size:.86rem;font-weight:600;padding:8px 12px;border-radius:8px;text-decoration:none;transition:all .15s;white-space:nowrap;display:inline-flex;align-items:center;gap:5px;cursor:pointer;font-family:inherit}
+.nav-links a:hover{color:#fff;background:rgba(0,200,83,0.1)}
+.nav-links a.nav-active{color:#00e564;background:rgba(0,200,83,0.15);border:1px solid rgba(0,200,83,0.35)}
+.nav-links .nav-wc{color:#ffd600;font-weight:700;position:relative}
+.nav-links .nav-wc-pulse{width:6px;height:6px;background:#ffd600;border-radius:50%;animation:navWcPulse 1.5s ease-in-out infinite}
+@keyframes navWcPulse{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:1;transform:scale(1.4)}}
+.nav-auth-btn{background:linear-gradient(135deg,#00c853,#007a22);color:#fff;border:none;padding:9px 16px;border-radius:9px;font-weight:800;font-size:.82rem;cursor:pointer;transition:all .15s;display:flex;flex-direction:column;line-height:1.15;font-family:inherit;flex-shrink:0}
+.nav-auth-btn:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,200,83,0.4)}
+.nav-auth-entrar{font-size:.72rem;font-weight:600;opacity:.85}
+.nav-auth-register{font-size:.85rem}
+.logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo-icon-wrap{width:38px;height:38px;background:linear-gradient(135deg,#0d2a0d,#112011);border:1px solid rgba(0,200,83,0.35);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-line1{font-size:1.05rem;font-weight:900;color:#00c853;letter-spacing:-0.01em}
+.nav-user-wrap{position:relative;flex-shrink:0}
+.nav-user-btn{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);cursor:pointer;padding:6px 12px 6px 6px;border-radius:22px;display:flex;align-items:center;gap:7px;transition:all .15s;font-family:inherit}
+.nav-user-btn:hover{background:rgba(0,200,83,0.1);border-color:rgba(0,200,83,0.4)}
+.nav-user-avatar{width:28px;height:28px;background:linear-gradient(135deg,#00c853,#007a22);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:900;color:#fff;font-size:.82rem}
+.nav-user-name{color:#fff;font-size:.85rem;font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-user-chevron{color:rgba(255,255,255,0.5);font-size:.75rem}
+.lang-picker{position:relative;flex-shrink:0}
+#langBtn{width:32px;height:32px;border-radius:50%;background-size:cover;background-position:center;border:1.5px solid rgba(255,255,255,0.15);cursor:pointer;transition:all .15s}
+#langBtn:hover{border-color:rgba(0,200,83,0.5);transform:scale(1.08)}
+.lang-dropdown{position:absolute;top:calc(100% + 8px);right:0;background:#0d1a0d;border:1px solid rgba(0,200,83,0.25);border-radius:10px;padding:6px;display:none;flex-direction:column;gap:3px;min-width:145px;box-shadow:0 8px 24px rgba(0,0,0,0.5);z-index:1000}
+.lang-picker.is-open .lang-dropdown{display:flex}
+.lang-dropdown button{background:transparent;border:none;color:#fff;padding:8px 12px;border-radius:6px;font-size:.85rem;cursor:pointer;text-align:left;font-family:inherit;transition:background .12s}
+.lang-dropdown button:hover{background:rgba(0,200,83,0.15)}
+.user-dropdown{position:absolute;top:calc(100% + 8px);right:0;min-width:260px;background:#0d1a0d;border:1px solid rgba(0,200,83,0.25);border-radius:12px;padding:10px;display:none;flex-direction:column;gap:2px;box-shadow:0 12px 32px rgba(0,0,0,0.6);z-index:1000}
+.nav-user-wrap.is-open .user-dropdown{display:flex}
+.user-dd-header{padding:12px 14px 14px;border-bottom:1px solid rgba(0,200,83,0.15);margin-bottom:6px}
+@media(max-width:900px){.nav-links a{padding:7px 9px;font-size:.8rem}.nav-links a .nav-text{display:none}.nav-links .nav-wc .nav-text-wc{display:inline}}
+@media(max-width:600px){.nav-links{gap:2px}.nav-links a{padding:6px 8px;font-size:1rem}.nav-auth-btn{padding:7px 12px;font-size:.78rem}.nav-user-name{display:none}.logo-line1{font-size:.95rem}}
+@media(max-width:480px){.logo-icon-wrap{width:34px;height:34px}}
 
 /* Hero compacto */
 .hero{padding:36px 20px 22px;text-align:center;background:radial-gradient(ellipse at center top,rgba(0,200,83,0.12),transparent 60%),#0a0a0f;border-bottom:1px solid var(--border)}
@@ -508,12 +537,105 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 </style>
 </head>
 <body>
-<nav class="nav">
-  <a class="nav-logo-wrap" href="/">
-    <div class="nav-icon-box" style="font-size:1.4rem">⚡</div>
-    <div class="nav-logo-text">gambeta<span>.ai</span></div>
-  </a>
-  <a class="nav-back" href="/">← Volver al sitio</a>
+<nav>
+  <div class="logo">
+    <div class="logo-icon-wrap">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="26" height="26">
+        <defs>
+          <linearGradient id="bolt-g" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffd600"/>
+            <stop offset="100%" stop-color="#ff9100"/>
+          </linearGradient>
+          <filter id="bolt-glow"><feGaussianBlur stdDeviation="1.8" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+        </defs>
+        <!-- Bolt -->
+        <path d="M23,4 L13,22 L20,22 L17,36 L27,18 L20,18 Z" fill="url(#bolt-g)" filter="url(#bolt-glow)"/>
+        <!-- Small dot accent -->
+        <circle cx="30" cy="8" r="2.5" fill="#00c853" opacity="0.9"/>
+        <circle cx="10" cy="30" r="1.8" fill="#00c853" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="logo-text-wrap" style="display:flex;flex-direction:column;line-height:1">
+      <span class="logo-line1">gam<span style="color:#fff;letter-spacing:0.5px">beta</span><span style="color:var(--verde)">.ai</span></span>
+    </div>
+  </div>
+  <!-- Nav visitante (sin login) -->
+  <div class="nav-links" id="navLinksGuest">
+    <a onclick="navTo('predictions')">🔮 <span class="nav-text">Picks</span></a>
+    <a href="/mundial-2026" class="nav-wc"><span class="nav-text-wc">🏆 Mundial 2026</span><span class="nav-wc-pulse"></span></a>
+    <a onclick="navTo('historial')">📋 <span class="nav-text">Resultados</span></a>
+    <a href="/herramientas">🧮 <span class="nav-text">Herramientas</span></a>
+    <a href="/foro" class="nav-active">💬 <span class="nav-text">Foro</span><sup style="font-size:0.55rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</sup></a>
+    <a href="/blog/">📰 <span class="nav-text">Blog</span></a>
+    <a href="/bonos">💰 <span class="nav-text">Bonos</span></a>
+  </div>
+
+  <!-- Nav usuario registrado -->
+  <div class="nav-links" id="navLinksUser" style="display:none">
+    <a onclick="navTo('predictions')">🔮 <span class="nav-text">Picks</span></a>
+    <a href="/mundial-2026" class="nav-wc"><span class="nav-text-wc">🏆 Mundial 2026</span><span class="nav-wc-pulse"></span></a>
+    <a onclick="navTo('historial')">📋 <span class="nav-text">Resultados</span></a>
+    <a href="/herramientas">🧮 <span class="nav-text">Herramientas</span></a>
+    <a href="/foro" class="nav-active">💬 <span class="nav-text">Foro</span><sup style="font-size:0.55rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</sup></a>
+    <a href="/blog/">📰 <span class="nav-text">Blog</span></a>
+    <a href="/bonos">💰 <span class="nav-text">Bonos</span></a>
+  </div>
+
+  <!-- ( widget removido) -->
+
+  <!-- Auth button (logged out) -->
+  <button class="nav-auth-btn" id="navAuthBtn" onclick="openAuth()">
+    <span class="nav-auth-entrar" data-i18n="auth.enter">Entrar</span>
+    <span class="nav-auth-register">✦ <span data-i18n="auth.register">Registro Gratis</span></span>
+  </button>
+
+  <!-- Inbox bell (logged in) -->
+  <button id="inboxBellBtn" onclick="openInbox()" style="display:none;position:relative;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);cursor:pointer;width:36px;height:36px;border-radius:50%;align-items:center;justify-content:center;transition:all .15s;flex-shrink:0" onmouseover="this.style.background='rgba(0,200,83,0.15)';this.style.borderColor='rgba(0,200,83,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.borderColor='rgba(255,255,255,0.1)'">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+    <span id="inboxBadge" style="display:none;position:absolute;top:-5px;right:-5px;min-width:18px;height:18px;background:#ef5350;border-radius:9px;font-size:0.62rem;font-weight:900;color:#fff;line-height:1;align-items:center;justify-content:center;padding:0 4px;pointer-events:none;border:2px solid #0a0f0a;box-shadow:0 2px 6px rgba(239,83,80,0.6);animation:badgePulse 2s ease-in-out infinite"></span>
+  </button>
+
+  <!-- User menu (logged in) -->
+  <div class="nav-user-wrap" id="navUserWrap">
+    <button class="nav-user-btn" onclick="toggleUserMenu()">
+      <div class="nav-user-avatar" id="navUserAvatar">?</div>
+      <span class="nav-user-name" id="navUserName">Usuario</span>
+      <span class="nav-user-chevron">▾</span>
+    </button>
+    <div class="user-dropdown" id="userDropdown">
+      <div class="user-dd-header">
+        <div style="display:flex;align-items:center;gap:9px;margin-bottom:4px">
+          <div id="ddAvatarBadge" style="display:none;width:30px;height:30px;flex-shrink:0"></div>
+          <div>
+            <div class="user-dd-name" id="ddName">—</div>
+            <div class="user-dd-email" id="ddEmail">—</div>
+          </div>
+        </div>
+      </div>
+      <button class="user-dd-item" onclick="navTo('predictions');closeUserMenu()">🔮 Picks IA</button>
+      <button class="user-dd-item" onclick="navTo('historial');closeUserMenu()">📋 Resultados</button>
+      <a class="user-dd-item" href="/foro" style="text-decoration:none;display:block">💬 Foro <span style="font-size:0.55rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</span></a>
+      <button class="user-dd-item" onclick="navTo('bankroll');closeUserMenu()">💰 Bankroll</button>
+      <div class="user-dd-sep"></div>
+      <button class="user-dd-item danger" onclick="logoutUser()">↩ Cerrar sesión</button>
+    </div>
+  </div>
+
+  <!-- $A-Coin widget -->
+  <!-- Hamburger (mobile only) -->
+  <button class="hamburger" id="hamburgerBtn" onclick="toggleMobileNav()" aria-label="Menú">
+    <span></span><span></span><span></span>
+  </button>
+
+  <!-- Language picker — always last -->
+  <div class="lang-picker" id="langPicker">
+    <button id="langBtn" onclick="toggleLangMenu(event)" aria-label="Idioma" style="background-image:url('https://flagcdn.com/w40/es.png')"></button>
+    <div class="lang-dropdown" id="langDropdown">
+      <button onclick="setLang('es')" id="langOpt_es">🇪🇸 Español</button>
+      <button onclick="setLang('en')" id="langOpt_en">🇺🇸 English</button>
+      <button onclick="setLang('pt')" id="langOpt_pt">🇧🇷 Português</button>
+    </div>
+  </div>
 </nav>
 
 <header class="hero">
