@@ -6183,15 +6183,26 @@ html { -webkit-tap-highlight-color: rgba(0,200,83,0.15); }
 /* #608 — CLS fix: flags dinámicas tienen tamaño fijo via CSS */
 .flag-icon, img[src*="flagcdn.com"] { aspect-ratio: 3/2; min-height: 16px; }
 
-/* 🆕 (2-jul-2026) FIX MOBILE: boton APOSTAR (Anton mas chico en pantallas chicas) */
+/* 🆕 (2-jul-2026 v2) SINCRONÍA MOBILE: boton DBbet compacto y balanceado */
+/* <=520px — mobile normal: gap tight, separador oculto, todo pegado al logo */
 @media (max-width: 520px) {
-  .pred-dbbet-1click .db-msg-single { font-size: 0.9rem !important; letter-spacing: 0.04em !important; }
-  .pred-dbbet-1click .db-odds { font-size: 0.85rem !important }
+  .pred-dbbet-1click { gap: 7px !important; padding: 9px 11px !important }
+  .pred-dbbet-1click .db-sep { display: none !important }
+  .pred-dbbet-1click .db-msg { flex: 1 1 auto !important; justify-content: flex-start !important; gap: 4px }
+  .pred-dbbet-1click .db-msg-single { font-size: 0.92rem !important; letter-spacing: 0.03em !important; line-height: 1 }
+  .pred-dbbet-1click .db-odds { font-size: 0.85rem !important; padding: 4px 8px !important }
+  .pred-dbbet-1click .db-odds-gem { margin-right: 3px !important }
+  .pred-dbbet-1click .db-arrow { font-size: 0.95rem !important }
+  .pred-dbbet-1click .db-arrow svg { width: 10px; height: 10px }
 }
+/* <=380px — mobile chico (iPhone SE): todo aún más compacto */
 @media (max-width: 380px) {
-  .pred-dbbet-1click .db-msg-single { font-size: 0.82rem !important; letter-spacing: 0.03em !important; }
-  .pred-dbbet-1click .db-odds { font-size: 0.8rem !important; padding: 3px 7px !important }
-  .pred-dbbet-1click .db-odds-gem { font-size: 0.85em !important; margin-right: 3px !important }
+  .pred-dbbet-1click { gap: 5px !important; padding: 8px 9px !important }
+  .pred-dbbet-1click .db-logo-svg { height: 16px !important }
+  .pred-dbbet-1click .db-msg-single { font-size: 0.82rem !important; letter-spacing: 0.02em !important }
+  .pred-dbbet-1click .db-odds { font-size: 0.78rem !important; padding: 3px 6px !important }
+  .pred-dbbet-1click .db-odds-gem { font-size: 0.8em !important; margin-right: 2px !important }
+  .pred-dbbet-1click .db-arrow svg { width: 9px; height: 9px }
 }
 /* SVG del sello ACERTADO: reemplaza el emoji, mismo tamaño visual, animacion suave */
 .pred-result-stamp-icon svg {
