@@ -4379,53 +4379,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
 <!-- fin modal Publicar Apuesta -->
 
 
-<script>
-// 🚑 (2-jul-2026) Progressive Enhancement DESACTIVADO — investigar si rompe render
-// Original preservado abajo para reactivar cuando esté validado
-/*
-// mientras el user consume el hero + fichas (los primeros 20% visibles).
-// Esto evita el "flash" cuando el user scrollea abajo.
-(function(){
-  var idle = window.requestIdleCallback || function(cb){ return setTimeout(cb, 200); };
-  idle(function(){
-    // Pre-forzar render de las 3 primeras secciones lazy (justo debajo del fold)
-    var sections = document.querySelectorAll('.gb-lazy-render');
-    var count = Math.min(3, sections.length);
-    for (var i = 0; i < count; i++) {
-      sections[i].style.contentVisibility = 'visible';
-    }
-    // Restaurar lazy en las que quedaron fuera de vista después de 3s (para no gastar RAM)
-    setTimeout(function(){
-      for (var i = 0; i < count; i++) {
-        var s = sections[i];
-        var rect = s.getBoundingClientRect();
-        if (rect.top > window.innerHeight * 2 || rect.bottom < -window.innerHeight) {
-          s.style.contentVisibility = '';
-        }
-      }
-    }, 3000);
-  });
-  // IntersectionObserver: cuando el user se acerca a una sección lazy, pre-renderamos las 2 siguientes
-  if ('IntersectionObserver' in window) {
-    var io = new IntersectionObserver(function(entries){
-      entries.forEach(function(e){
-        if (e.isIntersecting) {
-          var s = e.target;
-          var next = s.nextElementSibling;
-          if (next && next.classList && next.classList.contains('gb-lazy-render')) {
-            next.style.contentVisibility = 'visible';
-            var nn = next.nextElementSibling;
-            if (nn && nn.classList && nn.classList.contains('gb-lazy-render')) {
-              nn.style.contentVisibility = 'visible';
-            }
-          }
-        }
-      });
-    }, { rootMargin: '400px 0px' });
-    document.querySelectorAll('.gb-lazy-render').forEach(function(s){ io.observe(s); });
-  }
-})();
-</script>
+<!-- (2-jul-2026) Progressive enhancement removido temporalmente — reactivar cuando esté validado -->
 
 </body>
 </html>
