@@ -766,8 +766,13 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
         </div>
         <div class="tp-bet-grid">
           <div>
-            <label>Cuota</label>
-            <input type="number" id="tpBetOdds" step="0.01" min="1.01" max="100" placeholder="1.85">
+            <label>Cuota DBbet</label>
+            <div class="tp-dbbet-chip" id="tpBetOddsChip">
+              <svg class="tp-db-logo" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="900" fill="#dc1e2e">DB</text></svg>
+              <span class="tp-db-cuota" id="tpBetOddsDisplay">—</span>
+              <span class="tp-db-badge">AUTO</span>
+              <input type="hidden" id="tpBetOdds" value="1.85">
+            </div>
           </div>
           <div>
             <label>Stake ($)</label>
@@ -775,11 +780,12 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
           </div>
           <div>
             <label>Casa</label>
-            <select id="tpBetHouse">
-              <option value="DBbet">⭐ DBbet (sponsor)</option>
-              <option value="Melbet">Melbet</option>
-              <option value="Otra">Otra</option>
-            </select>
+            <div class="tp-dbbet-chip tp-dbbet-house">
+              <svg class="tp-db-logo" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="900" fill="#dc1e2e">DB</text></svg>
+              <span class="tp-db-cuota">DBbet</span>
+              <span class="tp-db-badge">SPONSOR</span>
+              <input type="hidden" id="tpBetHouse" value="DBbet">
+            </div>
           </div>
         </div>
         <div class="tp-form-row">
@@ -2200,6 +2206,13 @@ window.addEventListener('load', _markForumVisited);
 .tp-hint{font-size:.72rem;color:rgba(255,255,255,0.55);margin-top:.35rem;line-height:1.35}
 #tpBetWordCount{color:rgba(255,140,0,0.85);font-weight:600}
 #tpBetWordCount.ok{color:rgba(0,200,83,0.9)}
+/* DBbet chip para cuota + casa (fijo, no editable, estilo ficha 1-click) */
+.tp-dbbet-chip{display:inline-flex;align-items:center;gap:9px;width:100%;padding:11px 14px;background:linear-gradient(135deg,rgba(255,215,0,0.06) 0%,transparent 40%),linear-gradient(135deg,#dc1e2e 0%,#b8121f 50%,#8a0a16 100%);border:1.5px solid #FFD700;border-radius:11px;color:#fff;font-weight:800;font-family:inherit;position:relative;overflow:hidden;box-shadow:0 4px 12px rgba(220,30,46,0.3),0 0 0 1px rgba(255,215,0,0.2) inset;box-sizing:border-box;cursor:not-allowed}
+.tp-dbbet-chip .tp-db-logo{flex-shrink:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4))}
+.tp-dbbet-chip .tp-db-cuota{font-size:1.05rem;font-weight:900;letter-spacing:-0.01em;flex:1;font-variant-numeric:tabular-nums}
+.tp-dbbet-chip .tp-db-badge{font-size:0.6rem;font-weight:800;background:rgba(255,215,0,0.9);color:#5a0810;padding:2px 6px;border-radius:4px;letter-spacing:0.06em}
+.tp-dbbet-chip::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(105deg,transparent 30%,rgba(255,215,0,0.25) 50%,rgba(255,255,255,0.35) 52%,rgba(255,215,0,0.25) 55%,transparent 65%);transform:skewX(-22deg);pointer-events:none;animation:tpDbbetShine 4s ease-in-out infinite}
+@keyframes tpDbbetShine{0%,100%{left:-100%}50%,55%{left:200%}}
 </style>
 <script>
 // 🆕 Publicar apuesta v2 — carga partidos desde el feed y auto-completa datos
@@ -2245,7 +2258,13 @@ window.addEventListener('load', _markForumVisited);
       const h = document.getElementById('tpBetHome'); if (h) h.value = p.home || '';
       const a = document.getElementById('tpBetAway'); if (a) a.value = p.away || '';
       const l = document.getElementById('tpBetLeague'); if (l) l.value = (p.league || '').replace(/^[^\w]+/, '');
-      const o = document.getElementById('tpBetOdds'); if (o && p.odds) o.value = parseFloat(p.odds).toFixed(2);
+      const o = document.getElementById('tpBetOdds');
+      const odDisp = document.getElementById('tpBetOddsDisplay');
+      if (p.odds) {
+        var _od = parseFloat(p.odds).toFixed(2);
+        if (o) o.value = _od;
+        if (odDisp) odDisp.textContent = _od;
+      } else if (odDisp) { odDisp.textContent = '1.85'; if (o) o.value = '1.85'; }
       // Auto-seleccionar mercado si el pick tiene rec (recomendación IA)
       const m = document.getElementById('tpBetMarket');
       if (m && p.rec) {
