@@ -3453,6 +3453,28 @@
   .pred-action-btn.btn-like.liked  { background: rgba(255,80,80,0.1); border-color: rgba(255,80,80,0.45); color: #ff5252; }
   .pred-action-btn.btn-twitter { border-color: rgba(29,161,242,0.2); color: rgba(29,161,242,0.85); }
   .pred-action-btn.btn-twitter:hover { background: rgba(29,161,242,0.08); border-color: rgba(29,161,242,0.4); color: #1da1f2; }
+  /* Publicar tu apuesta (dardo) — CTA principal, un poco más marcado */
+  .pred-action-btn.btn-publish {
+    border-color: rgba(255,214,0,0.35);
+    color: #ffd600;
+    background: rgba(255,214,0,0.06);
+  }
+  .pred-action-btn.btn-publish:hover {
+    background: rgba(255,214,0,0.14);
+    border-color: rgba(255,214,0,0.6);
+    color: #ffea00;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255,214,0,0.18);
+  }
+  /* Botones que son solo icono: cuadrados compactos, no crecen tanto */
+  .pred-action-btn.btn-icon {
+    flex: 0 0 auto;
+    min-width: 36px;
+    padding: 7px 8px;
+    font-size: 0.9rem;
+  }
+  .pred-action-btn.btn-icon > span { line-height: 1; font-size: 0.95rem; }
+  /* .btn-like sigue con contador visible, ocupa flex normal */
   .pred-action-arrow { font-size: 0.55rem; margin-left: 2px; transition: transform .2s; }
   .pred-action-arrow.open { transform: rotate(180deg); }
   /* mantener .share-pick-btn como alias por si se usa en otro lado */
