@@ -4186,7 +4186,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
           'Prefer': 'return=minimal'
         },
         body: JSON.stringify({
-          thread_id: 'topic_combinadas',
+          thread_id: 'topic_picks',
           user_name: alias,
           user_email: user.email,
           content: content,
@@ -4198,7 +4198,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       if (!r.ok) throw new Error('http_' + r.status);
       localStorage.setItem('gb_forum_alias', alias);
       msg.className='gbm-msg ok';
-      msg.textContent = '¡Apuesta publicada! 🎯 Podés verla en el foro Combinadas del día';
+      msg.textContent = '¡Apuesta publicada! 🎯 Podés verla en el foro Picks del día';
       // Reset form
       document.getElementById('gbmPartido').value = '';
       document.getElementById('gbmMatchDisplay').value = '';
@@ -4217,7 +4217,105 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     }
   };
 
-  // Cerrar con ESC + click en overlay
+  // 🆕 (2-jul-2026) openGbBetModalWithPick: abre el modal con el pick de Gambeta pre-cargado
+  window.openGbBetModalWithPick = async function(pick) {
+    if (!pick || !pick.home || !pick.away) return openGbBetModal();
+    // Pending pick — se resuelve después de que loadMatches() termine
+    window._gbmPendingPrefill = pick;
+    openGbBetModal();
+    // Si matches ya están cargados, aplicar de una
+    if (_loaded && _matches && _matches.length) {
+      _applyPrefill();
+    }
+  };
+
+  function _applyPrefill() {
+    var pick = window._gbmPendingPrefill;
+    if (!pick) return;
+    window._gbmPendingPrefill = null;
+    var sel = document.getElementById('gbmPartido');
+    if (!sel) return;
+    // Buscar match matcheante en _matches
+    var norm = function(x){ return (x||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,''); };
+    var pickH = norm(pick.home), pickA = norm(pick.away);
+    var foundIdx = -1;
+    for (var i=0; i<_matches.length; i++) {
+      var m = _matches[i];
+      var mH = norm(m.home), mA = norm(m.away);
+      if ((mH === pickH || mH.indexOf(pickH)>=0 || pickH.indexOf(mH)>=0) &&
+          (mA === pickA || mA.indexOf(pickA)>=0 || pickA.indexOf(mA)>=0)) {
+        foundIdx = i; break;
+      }
+    }
+    if (foundIdx < 0) {
+      // Partido no está en el feed — inyectarlo al top
+      _matches.unshift({
+        home: pick.home, away: pick.away, league: pick.league || '',
+        homeOdd: pick.odds || 0, drawOdd: 0, awayOdd: 0,
+        commenceTs: pick.commenceTs || null
+      });
+      // Rebuild dropdown
+      var opts = '<option value="">Elegí un partido…</option>';
+      _matches.forEach(function(m, i){
+        var lbl = m.home + ' vs ' + m.away + (m.league ? ' · ' + m.league : '');
+        opts += '<option value="'+i+'">'+lbl+'</option>';
+      });
+      sel.innerHTML = opts;
+      foundIdx = 0;
+    }
+    sel.value = String(foundIdx);
+    sel.dispatchEvent(new Event('change'));
+
+    // Auto-seleccionar mercado según rec
+    setTimeout(function(){
+      var mercadoSel = document.getElementById('gbmMercado');
+      if (mercadoSel && pick.rec) {
+        var recMap = {
+          'gana local':'Ganador Local','local':'Ganador Local','1':'Ganador Local',
+          'gana visitante':'Ganador Visitante','visitante':'Ganador Visitante','2':'Ganador Visitante',
+          'empate':'Empate','x':'Empate',
+          'doble 1x':'Doble 1X (No pierde local)','no pierde local':'Doble 1X (No pierde local)',
+          'doble x2':'Doble X2 (No pierde visitante)','no pierde visitante':'Doble X2 (No pierde visitante)',
+          'doble 12':'Doble 12 (Sin empate)','sin empate':'Doble 12 (Sin empate)',
+          'más de 1.5':'Más de 1.5 goles','mas de 1.5':'Más de 1.5 goles',
+          'más de 2.5':'Más de 2.5 goles','mas de 2.5':'Más de 2.5 goles',
+          'más de 3.5':'Más de 3.5 goles','mas de 3.5':'Más de 3.5 goles',
+          'menos de 2.5':'Menos de 2.5 goles',
+          'ambos marcan':'Ambos Marcan','btts':'Ambos Marcan',
+          'local sin recibir':'Local Sin Recibir','a 0':'Local Sin Recibir'
+        };
+        var recLower = String(pick.rec).toLowerCase().trim();
+        var target = null;
+        for (var k in recMap) { if (recLower.indexOf(k) >= 0) { target = recMap[k]; break; } }
+        if (target) {
+          // Buscar option con ese texto
+          var opts = mercadoSel.options;
+          for (var i=0; i<opts.length; i++) {
+            if (opts[i].textContent.trim() === target || opts[i].value === target) {
+              mercadoSel.selectedIndex = i; break;
+            }
+          }
+        }
+      }
+      // Auto-fill odds
+      var oddsInp = document.getElementById('gbmOdds');
+      if (oddsInp && pick.odds && pick.odds >= 1.30) oddsInp.value = Number(pick.odds).toFixed(2);
+      // Sugerir justificación mínima
+      var just = document.getElementById('gbmJustif');
+      if (just && !just.value) {
+        just.placeholder = 'IA de Gambeta sugiere: ' + (pick.rec || '') + '. Agregá tu propia lectura (min. 20 palabras) — datos, estadísticas, motivación, contexto…';
+      }
+      if (typeof updateWordCount === 'function') updateWordCount();
+    }, 150);
+  }
+  // Hook a loadMatches finalización — parcheamos loadMatches para llamar _applyPrefill al final
+  var _origLoadMatches = window.loadMatches;
+  window.loadMatches = async function() {
+    if (_origLoadMatches) await _origLoadMatches();
+    if (window._gbmPendingPrefill) _applyPrefill();
+  };
+
+    // Cerrar con ESC + click en overlay
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeGbBetModal();
   });
