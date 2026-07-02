@@ -6254,10 +6254,10 @@ function renderPreds() {
           </svg>
           <span class="db-sep"></span>
           <span class="db-msg">
-            <span class="db-msg-single">${isMaxConf ? '💎 MEJOR CUOTA' : '🎯 HACER AQUÍ'}</span>
+            <span class="db-msg-single">${isMaxConf ? '💎 MEJOR CUOTA' : 'Apostar'}</span>
           </span>
           ${_odds ? `<span class="db-odds">${_odds}</span>` : ''}
-          <span class="db-arrow">→</span>
+          <span class="db-arrow"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 6 15 12 9 18"/></svg></span>
         </a>`;
       })() : ''}
       <!-- (Bloque de apuesta con  removido) -->
