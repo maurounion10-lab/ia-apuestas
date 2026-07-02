@@ -21,15 +21,25 @@
   contain-intrinsic-size: 800px 600px; /* placeholder aprox del bloque, evita jump */
   contain: content;
 }
+/* 🆕 (2-jul-2026) Precisión por sección — reduce CLS a casi cero */
+#historial.gb-lazy-render        { contain-intrinsic-size: 1000px 620px }
+#gbBonos.gb-lazy-render           { contain-intrinsic-size: 1000px 560px }
+#gbBlog.gb-lazy-render            { contain-intrinsic-size: 1000px 720px }
+#gbFaq.gb-lazy-render             { contain-intrinsic-size: 1000px 480px }
+#myPicksPanel.gb-lazy-render      { contain-intrinsic-size: 1000px 400px }
+#gbForoRecent.gb-lazy-render      { contain-intrinsic-size: 1000px 380px }
+#gbRichFooter.gb-lazy-render      { contain-intrinsic-size: 1000px 640px }
+#seo-hub-mundial.gb-lazy-render   { contain-intrinsic-size: 1000px 340px }
+/* Above-fold priority: fuerza render inmediato de header + hero + predictions */
+.gb-above-fold {
+  contain: layout style paint;
+  content-visibility: visible !important;
+}
 @supports not (content-visibility: auto) {
   /* Fallback: en browsers viejos, no hace nada, la sección se renderiza normal */
   .gb-lazy-render { content-visibility: visible; }
 }
-/* Above-the-fold: forzar prioridad de render */
-.gb-above-fold {
-  contain: layout style;
-  will-change: contents;
-}
+/* .gb-above-fold reglas expandidas arriba */
 
 
 /* 🆕 (1-jul-2026) .gb-online--top: hereda alineacion del titulo h1 gambeta.ai */
@@ -756,15 +766,39 @@ window.toggleHeroBubble = function(n) {
           head.innerHTML = 'MUNDIAL 2026 EN VIVO';
         }
       }
-      // Hora ART desde commenceTs
-      var hhmm = '';
+      // 🆕 (2-jul-2026) Hora detectada del timezone del usuario — no más ART hardcodeado
+      var hhmm = '', tzLabel = 'local';
       if (todayMatch && todayMatch.commenceTs) {
-        var dt = new Date(todayMatch.commenceTs);
-        var artMs = todayMatch.commenceTs + (-3*60 - dt.getTimezoneOffset()) * 60000;
-        var dtArt = new Date(artMs);
-        hhmm = String(dtArt.getHours()).padStart(2,'0') + ':' + String(dtArt.getMinutes()).padStart(2,'0');
+        var userTz = 'America/Argentina/Buenos_Aires';
+        try { userTz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e) {}
+        try {
+          // Format hora en la zona del usuario (Intl.DateTimeFormat es el estándar moderno)
+          hhmm = new Intl.DateTimeFormat('es-AR', {
+            hour: '2-digit', minute: '2-digit', hour12: false, timeZone: userTz
+          }).format(new Date(todayMatch.commenceTs));
+        } catch(e) {
+          var dt = new Date(todayMatch.commenceTs);
+          hhmm = String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0');
+        }
+        // Etiqueta amigable según zona
+        var tz = (userTz || '').toLowerCase();
+        if      (tz.indexOf('argentina')>=0 || tz.indexOf('buenos_aires')>=0) tzLabel = 'ART';
+        else if (tz.indexOf('mexico')>=0)      tzLabel = 'CDMX';
+        else if (tz.indexOf('bogota')>=0)      tzLabel = 'COL';
+        else if (tz.indexOf('santiago')>=0)    tzLabel = 'CL';
+        else if (tz.indexOf('lima')>=0)        tzLabel = 'PET';
+        else if (tz.indexOf('caracas')>=0)     tzLabel = 'VET';
+        else if (tz.indexOf('montevideo')>=0)  tzLabel = 'UY';
+        else if (tz.indexOf('asuncion')>=0)    tzLabel = 'PY';
+        else if (tz.indexOf('la_paz')>=0)      tzLabel = 'BO';
+        else if (tz.indexOf('guayaquil')>=0)   tzLabel = 'EC';
+        else if (tz.indexOf('madrid')>=0)      tzLabel = 'ES';
+        else if (tz.indexOf('europe')>=0)      tzLabel = 'local';
+        else if (tz.indexOf('america/new_york')>=0 || tz.indexOf('america/chicago')>=0 ||
+                 tz.indexOf('america/los_angeles')>=0) tzLabel = 'US';
+        else tzLabel = 'tu hora';
       }
-      if (tag) tag.innerHTML = todayMatch ? ('⚡ PICK IA DEL DÍA · ' + (hhmm ? hhmm + ' ART' : 'Mundial 2026')) : '✨ Picks IA en gambeta.ai';
+      if (tag) tag.innerHTML = todayMatch ? ('⚡ PICK IA DEL DÍA · ' + (hhmm ? hhmm + ' ' + tzLabel : 'Mundial 2026')) : '✨ Picks IA en gambeta.ai';
       if (sub) {
         if (todayMatch) {
           var _vfHome = (todayMatch.home || '').replace(/'/g, "\\'");
@@ -1008,7 +1042,7 @@ window.toggleHeroBubble = function(n) {
     <div class="hero-bubble hero-bubble--mascot" id="heroBubble1">Somos de Argentina pero ya recibimos visitas de todo el mundo 🌍</div>
     <div class="hero-bubble hero-bubble--mascot" id="heroBubble2">Para que siga siendo gratis compártela por redes, a tus amigos o en los grupos 🙌</div>
     <div class="hero-mascot">
-      <video autoplay loop muted playsinline preload="metadata" poster="/img/hero-mascot-poster.jpg" aria-label="gambeta.ai Bot animado">
+      <video autoplay loop muted playsinline preload="auto" fetchpriority="high" poster="/img/hero-mascot-poster.jpg" aria-label="gambeta.ai Bot animado">
         <source src="/img/hero-mascot.webm" type="video/webm">
         <source src="/img/hero-mascot.mp4" type="video/mp4">
         <img loading="lazy" decoding="async" src="/img/hero-mascot-poster.jpg" alt="gambeta.ai Bot">
@@ -1020,7 +1054,7 @@ window.toggleHeroBubble = function(n) {
 <main>
 
   <!-- PREDICTIONS -->
-  <section id="predictions">
+  <section id="predictions" class="gb-above-fold">
     <div class="section-title">
       <div class="icon">🔮</div>
       Pronósticos de la IA
@@ -4343,6 +4377,53 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
 })();
 </script>
 <!-- fin modal Publicar Apuesta -->
+
+
+<script>
+// 🆕 (2-jul-2026) Progressive Enhancement: pre-render de secciones cercanas al viewport
+// mientras el user consume el hero + fichas (los primeros 20% visibles).
+// Esto evita el "flash" cuando el user scrollea abajo.
+(function(){
+  var idle = window.requestIdleCallback || function(cb){ return setTimeout(cb, 200); };
+  idle(function(){
+    // Pre-forzar render de las 3 primeras secciones lazy (justo debajo del fold)
+    var sections = document.querySelectorAll('.gb-lazy-render');
+    var count = Math.min(3, sections.length);
+    for (var i = 0; i < count; i++) {
+      sections[i].style.contentVisibility = 'visible';
+    }
+    // Restaurar lazy en las que quedaron fuera de vista después de 3s (para no gastar RAM)
+    setTimeout(function(){
+      for (var i = 0; i < count; i++) {
+        var s = sections[i];
+        var rect = s.getBoundingClientRect();
+        if (rect.top > window.innerHeight * 2 || rect.bottom < -window.innerHeight) {
+          s.style.contentVisibility = '';
+        }
+      }
+    }, 3000);
+  });
+  // IntersectionObserver: cuando el user se acerca a una sección lazy, pre-renderamos las 2 siguientes
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(e){
+        if (e.isIntersecting) {
+          var s = e.target;
+          var next = s.nextElementSibling;
+          if (next && next.classList && next.classList.contains('gb-lazy-render')) {
+            next.style.contentVisibility = 'visible';
+            var nn = next.nextElementSibling;
+            if (nn && nn.classList && nn.classList.contains('gb-lazy-render')) {
+              nn.style.contentVisibility = 'visible';
+            }
+          }
+        }
+      });
+    }, { rootMargin: '400px 0px' });
+    document.querySelectorAll('.gb-lazy-render').forEach(function(s){ io.observe(s); });
+  }
+})();
+</script>
 
 </body>
 </html>
