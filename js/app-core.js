@@ -6278,10 +6278,10 @@ function renderPreds() {
         </div>
       </div>` : ''}
 
-      <!-- ── Fila de acciones: Compartir · Análisis · Comentar · Likes ── -->
+      <!-- ── Fila de acciones: Share · Analysis/Tweet · Comment · Publish · Like ── -->
       <div class="pred-action-row">
-        <button class="pred-action-btn btn-share" onclick="sharePick('${p.home}','${p.away}','${p.rec}',${_bvr},'${p.league}')" title="Compartir este pick">
-          📤 <span>Compartir</span>
+        <button class="pred-action-btn btn-icon btn-share" onclick="sharePick('${p.home}','${p.away}','${p.rec}',${_bvr},'${p.league}')" title="Compartir este pick" aria-label="Compartir">
+          <span aria-hidden="true">📤</span>
         </button>
         ${p.insight
           ? `<button class="pred-action-btn btn-analysis" style="display:none" onclick="togglePredExpand(${idx})" id="pred-analysis-btn-${idx}" title="Ver análisis de la IA">
@@ -6290,15 +6290,18 @@ function renderPreds() {
             </button>`
           : (() => {
               const _tweetTxt = encodeURIComponent('Sobre esta Apuesta de @Gambeta_ai: ' + p.home + ' vs ' + p.away + ' → ' + (p.rec||'') + (p.league && p.league.length < 20 ? ' | ' + p.league : '') + ' 🤖⚽\nhttps://gambeta.ai');
-              return `<a class="pred-action-btn btn-twitter" href="https://twitter.com/intent/tweet?text=${_tweetTxt}" target="_blank" rel="noopener" title="Twitear esta apuesta">
-              🗣️ <span>Twitear</span>
+              return `<a class="pred-action-btn btn-icon btn-twitter" href="https://twitter.com/intent/tweet?text=${_tweetTxt}" target="_blank" rel="noopener" title="Twitear esta apuesta" aria-label="Twitear">
+              <span aria-hidden="true">🗣️</span>
             </a>`;
             })()
         }
-        <button class="pred-action-btn btn-forum" onclick="openPickForum('${p.home.replace(/'/g,"\\'")}','${p.away.replace(/'/g,"\\'")}',{home:'${p.home.replace(/'/g,"\\'")}',away:'${p.away.replace(/'/g,"\\'")}',league:'${(p.league||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',bvrText:'${(_bvrText||'').replace(/'/g,"\\'")}'})" title="Ver comentarios">
-          💬 <span>Comentar</span>
+        <button class="pred-action-btn btn-icon btn-forum" onclick="openPickForum('${p.home.replace(/'/g,"\\'")}','${p.away.replace(/'/g,"\\'")}',{home:'${p.home.replace(/'/g,"\\'")}',away:'${p.away.replace(/'/g,"\\'")}',league:'${(p.league||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',bvrText:'${(_bvrText||'').replace(/'/g,"\\'")}'})" title="Ver comentarios" aria-label="Comentar">
+          <span aria-hidden="true">💬</span>
         </button>
-        <button class="pred-action-btn btn-like${_isPickLiked(idx) ? ' liked' : ''}" id="plbtn-${idx}" onclick="togglePickLike(${idx}, ${source.length})" title="Me gusta este pick">
+        <button class="pred-action-btn btn-icon btn-publish" onclick="openGbBetModalWithPick({home:'${p.home.replace(/'/g,"\\'")}',away:'${p.away.replace(/'/g,"\\'")}',league:'${(p.league||'').replace(/'/g,"\\'")}',rec:'${(p.rec||'').replace(/'/g,"\\'")}',odds:${(_odds ? _odds : (p._oddsRec||p.odds||1.85))},commenceTs:${p.commenceTs||'null'}})" title="Publicar tu apuesta con este pick pre-cargado" aria-label="Publicar apuesta">
+          <span aria-hidden="true">🎯</span>
+        </button>
+        <button class="pred-action-btn btn-like${_isPickLiked(idx) ? ' liked' : ''}" id="plbtn-${idx}" onclick="togglePickLike(${idx}, ${source.length})" title="Me gusta este pick" aria-label="Me gusta">
           👍 <span id="plikes-${idx}">${_getFakeLikes(idx, source.length) + (_isPickLiked(idx) ? 1 : 0)}</span>
         </button>
       </div>
