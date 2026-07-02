@@ -2573,16 +2573,21 @@ function nationalTeamBadge(name, size=48) {
   const subSize = Math.max(14, Math.round(size * 0.38));
   // Si no hay logo federacion (ej. seleccion que no esta en el dict), usar bandera como principal
   if (!mainLogoUrl) {
-    return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:visible;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.5);background:#fff">`
-         + `<img loading="lazy" decoding="async" src="${flagUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;border-radius:50%;display:block">`
-         + `<img loading="lazy" decoding="async" src="${WC2026_CONFEDS[info.conf]}" alt="${info.conf}" width="${subSize}" height="${subSize}" style="position:absolute;top:-3px;left:-3px;width:${subSize}px;height:${subSize}px;border-radius:50%;background:#fff;padding:2px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.4)" onerror="this.style.display='none'">`
+    // Bandera llenando el círculo con cover (inner-clipping); mini-badge confed queda fuera del clip
+    return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;flex-shrink:0">`
+         + `<span style="display:block;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.5)">`
+         + `<img loading="lazy" decoding="async" src="${flagUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;display:block">`
+         + `</span>`
+         + `<img loading="lazy" decoding="async" src="${WC2026_CONFEDS[info.conf]}" alt="${info.conf}" width="${subSize}" height="${subSize}" style="position:absolute;top:-3px;left:-3px;width:${subSize}px;height:${subSize}px;border-radius:50%;background:#fff;padding:2px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.4);z-index:2" onerror="this.style.display='none'">`
          + `</span>`;
   }
   // Caso normal: SOLO escudo de federacion (sin sub-bandera) — Mauro lo pidio limpio
-  // onerror del logo principal: fallback a bandera con tamaño grande
+  // 🆕 (2-jul-2026) Escudo lleno la circunferencia: sacamos padding + bg del img (span ya provee circulo blanco)
+  //   + scale(1.05) para que el escudo tenga presencia visual dentro del círculo (compensa padding interno del PNG)
+  // onerror del logo principal: fallback a bandera con object-fit:cover llenando el círculo
   const fallbackBig = flagUrl.replace(/'/g, "\\'");
-  return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:visible;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.5);background:#fff">`
-       + `<img src="${mainLogoUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:contain;border-radius:50%;display:block;background:#fff;padding:3px;box-sizing:border-box" onerror="this.onerror=null;this.src='${fallbackBig}';this.style.objectFit='cover';this.style.padding='0'">`
+  return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.5);background:#fff">`
+       + `<img src="${mainLogoUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:contain;display:block;transform:scale(1.08);transform-origin:center center" onerror="this.onerror=null;this.src='${fallbackBig}';this.style.objectFit='cover';this.style.transform='none'">`
        + `</span>`;
 }
 
