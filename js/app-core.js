@@ -6267,11 +6267,11 @@ function renderPreds() {
         <span class="pred-result-stamp-icon">${isHighConfWin ? '🏆' : isFinishedWin ? '✅' : isFinishedLoss ? '❌' : '⏳'}</span>
         <div class="pred-result-stamp-body">
           <span class="pred-result-stamp-text">${
-            isHighConfWin ? 'Alta Confianza Acertado' :
-            isFinishedWin ? 'Pronóstico Acertado' :
-            isFinishedLoss ? 'Pronóstico Fallado' : 'Resultado Pendiente'
+            isHighConfWin ? '¡ACERTADO! Máxima Confianza' :
+            isFinishedWin ? '¡ACERTADO!' :
+            isFinishedLoss ? 'FALLADO' : 'Resultado Pendiente'
           }</span>
-          ${finalScore ? `<span class="pred-result-stamp-sub">Resultado final: ${_translateMatchState(finalScore)}</span>` : ''}
+          ${finalScore ? `<span class="pred-result-stamp-sub">Resultado: ${_translateMatchState(finalScore)}</span>` : ''}
         </div>
       </div>` : ''}
 
