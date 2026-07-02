@@ -2039,5 +2039,842 @@ window.addEventListener('load', _markForumVisited);
 })();
 </script>
 
+
+
+<!-- 🆕 (1-jul-2026) Popups sincronizados con el home: bubbles + modal apuesta + chat AI -->
+<!-- 🆕 (1-jul-2026 v2) Tríada bubbles: FIX específicos con translateY(-50%) para centrar matemáticamente -->
+<style>
+/* Force máxima especificidad: los 3 bubbles al lado derecho, centrados vertical exacto */
+html body #gbBetBbl,
+html body .forum-bbl,
+html body #aiChatBtn {
+  position: fixed !important;
+  right: 20px !important;
+  bottom: auto !important;
+  left: auto !important;
+  z-index: 9998 !important;
+  transform: translateY(-50%) !important;
+  width: 43px !important;
+  height: 43px !important;
+  transition: box-shadow 0.18s, filter 0.15s !important;
+}
+html body #gbBetBbl  { top: calc(50% - 55px) !important; }
+html body .forum-bbl { top: 50% !important; }
+html body #aiChatBtn { top: calc(50% + 55px) !important; }
+
+/* Hover: en vez de translateY(-2px) que rompe el centrado, uso filter para dar feedback visual */
+html body #gbBetBbl:hover,
+html body .forum-bbl:hover,
+html body #aiChatBtn:hover {
+  filter: brightness(1.15) drop-shadow(0 0 12px rgba(0,200,83,0.4)) !important;
+}
+html body #gbBetBbl:hover { filter: brightness(1.15) drop-shadow(0 0 14px rgba(224,18,55,0.55)) !important; }
+
+/* Estilos propios del bubble Publicar apuesta */
+#gbBetBbl {
+  border-radius: 50%;
+  background: linear-gradient(135deg,#e01237,#c8102e);
+  border: 1.5px solid rgba(255,215,0,0.55);
+  cursor: pointer;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5), 0 0 12px rgba(224,18,55,0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+#gbBetBbl .gbb-emoji { font-size: 21px; line-height: 1; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4)); }
+
+/* Popup chat AI: aparece a la IZQUIERDA del bubble center-right (no interfiere con los 3 bubbles) */
+html body #aiChatBox {
+  top: 50% !important;
+  bottom: auto !important;
+  right: 90px !important;
+  transform: translateY(calc(-50% + 55px)) !important;
+  transform-origin: right center !important;
+}
+html body #aiChatBox.open { transform: translateY(calc(-50% + 55px)) scale(1) !important; }
+html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale(0.05) !important; }
+
+/* Mobile: mismo layout pero bubbles más chicos y popup fullwidth abajo */
+@media (max-width: 480px) {
+  html body #gbBetBbl, html body .forum-bbl, html body #aiChatBtn {
+    width: 37px !important;
+    height: 37px !important;
+    right: 12px !important;
+  }
+  html body #gbBetBbl  { top: calc(50% - 48px) !important; }
+  html body #aiChatBtn { top: calc(50% + 48px) !important; }
+  #gbBetBbl .gbb-emoji { font-size: 18px; }
+  html body #aiChatBox {
+    top: auto !important;
+    bottom: 12px !important;
+    right: 68px !important;
+    width: calc(100vw - 92px) !important;
+    transform: none !important;
+  }
+  html body #aiChatBox.open { transform: scale(1) !important; }
+  html body #aiChatBox:not(.open) { transform: scale(0.05) !important; }
+}
+
+/* Tooltip a la izquierda del bubble en hover */
+#gbBetBbl::before {
+  content: "Publicar apuesta";
+  position: absolute;
+  right: 52px; top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+}
+#gbBetBbl:hover::before { opacity: 1; }
+</style>
+<button id="gbBetBbl" type="button" onclick="openGbBetModal();" title="Publicar apuesta" aria-label="Publicar apuesta">
+  <span class="gbb-emoji">🎯</span>
+</button>
+<!-- fin tríada bubbles v2 -->
+<!-- 🆕 (1-jul-2026) Modal universal Publicar Apuesta — desde cualquier página, sin redirect -->
+<style>
+#gbBetModal{position:fixed;inset:0;z-index:99997;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:80px 16px 20px;overflow-y:auto}
+#gbBetModal.is-open{display:flex}
+.gbm-box{width:100%;max-width:520px;background:#0d1a0d;border:1px solid rgba(0,200,83,0.3);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.7);animation:gbmSlide .28s cubic-bezier(.34,1.3,.64,1)}
+@keyframes gbmSlide{from{opacity:0;transform:translateY(-20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.gbm-head{background:linear-gradient(135deg,#e01237,#c8102e);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.gbm-title{font-weight:800;color:#fff;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.gbm-close{background:rgba(0,0,0,0.25);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s}
+.gbm-close:hover{background:rgba(0,0,0,0.5);transform:rotate(90deg)}
+.gbm-body{padding:20px;display:flex;flex-direction:column;gap:18px}
+.gbm-body>div{margin:0;padding:0}
+.gbm-lbl{display:block;margin:0 0 8px 2px;font-size:.72rem;font-weight:700;color:#00c853;letter-spacing:.08em;text-transform:uppercase;line-height:1.2}
+.gbm-input,.gbm-select,.gbm-textarea{width:100%;background:#162616;color:#fff;border:1.5px solid rgba(0,200,83,0.25);border-radius:10px;padding:.7rem .85rem;font-size:.92rem;font-family:inherit;outline:none;transition:border-color .15s;box-sizing:border-box}
+.gbm-input:focus,.gbm-select:focus,.gbm-textarea:focus{border-color:rgba(0,200,83,0.6)}
+.gbm-select{cursor:pointer;appearance:none;-webkit-appearance:none;padding-right:2.2rem;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300c853'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;background-size:1.4rem}
+.gbm-select option{background:#0d1a0d;color:#fff;padding:.5rem}
+.gbm-textarea{resize:vertical;min-height:100px;font-family:inherit;line-height:1.5}
+.gbm-readonly{background:rgba(0,200,83,0.05)!important;color:rgba(255,255,255,0.85)!important;font-weight:600;cursor:not-allowed}
+.gbm-hint{font-size:.7rem;color:rgba(255,255,255,0.5);margin-top:.35rem;line-height:1.4}
+.gbm-count{font-weight:700;color:rgba(255,140,0,0.85)}
+.gbm-count.ok{color:rgba(0,200,83,0.95)}
+.gbm-row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.gbm-submit{background:linear-gradient(135deg,#00c853,#007a22);border:none;color:#fff;padding:.85rem 1.2rem;border-radius:12px;font-weight:800;font-size:1rem;font-family:inherit;cursor:pointer;letter-spacing:.02em;transition:transform .15s,box-shadow .15s,opacity .15s;box-shadow:0 4px 12px rgba(0,200,83,0.3);display:flex;align-items:center;justify-content:center;gap:8px}
+.gbm-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,200,83,0.5)}
+.gbm-submit:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
+.gbm-msg{font-size:.82rem;text-align:center;padding:.5rem;border-radius:8px;display:none}
+.gbm-msg.ok{display:block;background:rgba(0,200,83,0.15);color:#a5d6a7;border:1px solid rgba(0,200,83,0.4)}
+.gbm-msg.err{display:block;background:rgba(255,80,80,0.15);color:#ff8a8a;border:1px solid rgba(255,80,80,0.4)}
+@media (max-width:480px){#gbBetModal{padding:60px 8px 20px}.gbm-body{padding:14px;gap:11px}.gbm-row2{grid-template-columns:1fr}}
+</style>
+
+<div id="gbBetModal" role="dialog" aria-modal="true" aria-labelledby="gbmTitle">
+  <div class="gbm-box">
+    <div class="gbm-head">
+      <div class="gbm-title" id="gbmTitle">🎯 Publicar Apuesta al Foro</div>
+      <button class="gbm-close" onclick="closeGbBetModal()" aria-label="Cerrar">✕</button>
+    </div>
+    <div class="gbm-body">
+      <div id="gbmAuthGate" style="display:none;text-align:center;padding:24px 8px">
+        <div style="font-size:3rem;margin-bottom:.6rem">🔒</div>
+        <div style="font-weight:800;color:#fff;font-size:1.15rem;margin-bottom:.5rem">Registrate para publicar picks</div>
+        <div style="color:rgba(255,255,255,0.75);font-size:.9rem;line-height:1.5;margin-bottom:1.2rem">Solo tipsters registrados pueden publicar apuestas al foro. Es gratis y toma 30 segundos.<br>Con tu cuenta también accedés al ranking mensual y podés ser <b style="color:#FFD700">Campeón del Mes 👑</b></div>
+        <button class="gbm-submit" onclick="gbmGoToAuth()" style="width:100%;margin-bottom:.5rem">Crear cuenta gratis →</button>
+        <button style="background:transparent;border:none;color:rgba(255,255,255,0.6);cursor:pointer;font-size:.8rem;padding:.4rem;font-family:inherit" onclick="gbmGoToAuth(true)">Ya tengo cuenta · Iniciar sesión</button>
+      </div>
+      <div id="gbmAuthedBody">
+      <div id="gbmUserInfoRow" style="display:none">
+        <label class="gbm-lbl">Publicando como</label>
+        <div style="display:flex;align-items:center;gap:10px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.3);border-radius:10px;padding:.65rem .85rem">
+          <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#00c853,#007a22);display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:.95rem" id="gbmUserAvatar">?</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-weight:700;color:#fff;font-size:.9rem" id="gbmUserAlias">—</div>
+            <div style="font-size:.7rem;color:rgba(255,255,255,0.55)" id="gbmUserEmail">—</div>
+          </div>
+          <span style="font-size:.68rem;color:#00c853;font-weight:700;letter-spacing:.05em">✓ VERIFICADO</span>
+        </div>
+      </div>
+      <input type="hidden" id="gbmAlias" value="">
+      <div>
+        <label class="gbm-lbl" for="gbmPartido">⚽ Elegí el partido</label>
+        <select class="gbm-select" id="gbmPartido">
+          <option value="">Cargando partidos disponibles…</option>
+        </select>
+        
+      </div>
+      <input type="hidden" id="gbmMatchDisplay" value="">
+      <input type="hidden" id="gbmLeagueDisplay" value="">
+      <div>
+        <label class="gbm-lbl" for="gbmMercado">📊 Mercado</label>
+        <select class="gbm-select" id="gbmMercado">
+          <option value="">Ganador Local</option>
+          <option>Empate</option>
+          <option>Ganador Visitante</option>
+          <option>Doble 1X (No pierde local)</option>
+          <option>Doble X2 (No pierde visitante)</option>
+          <option>Doble 12 (Sin empate)</option>
+          <option>Más de 1.5 goles</option>
+          <option>Más de 2.5 goles</option>
+          <option>Más de 3.5 goles</option>
+          <option>Menos de 2.5 goles</option>
+          <option>Ambos Marcan</option>
+          <option>Local Sin Recibir</option>
+        </select>
+      </div>
+      <div class="gbm-row2">
+        <div>
+          <label class="gbm-lbl">Cuota</label>
+          <input type="number" class="gbm-input gbm-readonly" id="gbmOdds" readonly placeholder="Auto" step="0.01">
+        </div>
+        <div>
+          <label class="gbm-lbl">Casa</label>
+          <input type="text" class="gbm-input gbm-readonly" id="gbmHouse" readonly value="⭐ DBbet (sponsor)">
+        </div>
+      </div>
+      <div>
+        <label class="gbm-lbl" for="gbmJustif">💭 Justificá en 20+ palabras (obligatorio)</label>
+        <textarea class="gbm-textarea" id="gbmJustif" placeholder="Explicá por qué esta apuesta tiene valor: datos, estadísticas, contexto, motivación de los equipos…"></textarea>
+        <div class="gbm-hint"><span class="gbm-count" id="gbmWordCount">0/20 palabras</span> · La apuesta queda pendiente y se resuelve auto cuando termine el partido</div>
+      </div>
+      <div class="gbm-msg" id="gbmMsg"></div>
+      <button class="gbm-submit" id="gbmSubmit" onclick="submitGbBet()" disabled>🎯 Publicar Apuesta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var GBM_SB = 'https://ixfrtjvhnpapyuphqfxp.supabase.co';
+  var GBM_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml4ZnJ0anZobnBhcHl1cGhxZnhwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzM2MDExOTMsImV4cCI6MjA4OTE3NzE5M30.Lc5cOfvXCrrMlm9Yup5GG6RgCxOB_GSNJnKLTb1-bZQ';
+  var _matches = [];
+  var _loaded = false;
+
+  window.openGbBetModal = function() {
+    var m = document.getElementById('gbBetModal');
+    if (!m) return;
+    m.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    var user = (typeof authUser !== 'undefined' && authUser && authUser.email) ? authUser : null;
+    var gate = document.getElementById('gbmAuthGate');
+    var body = document.getElementById('gbmAuthedBody');
+    var userRow = document.getElementById('gbmUserInfoRow');
+    if (!user) {
+      if (gate) gate.style.display = 'block';
+      if (body) body.style.display = 'none';
+      return;
+    }
+    if (gate) gate.style.display = 'none';
+    if (body) body.style.display = '';
+    var email = user.email;
+    var alias = (user.alias || user.name || email.split('@')[0] || 'user').slice(0, 24);
+    document.getElementById('gbmAlias').value = alias;
+    if (userRow) userRow.style.display = '';
+    document.getElementById('gbmUserAlias').textContent = alias;
+    document.getElementById('gbmUserEmail').textContent = email;
+    document.getElementById('gbmUserAvatar').textContent = alias.charAt(0).toUpperCase();
+    if (!_loaded) { _loaded = true; loadMatches(); }
+    updateWordCount();
+  };
+
+  window.gbmGoToAuth = function(isLogin) {
+    closeGbBetModal();
+    setTimeout(function() {
+      if (typeof openAuth === 'function') {
+        openAuth();
+        if (isLogin && typeof goToEmailLogin === 'function') setTimeout(goToEmailLogin, 300);
+      } else {
+        window.location.href = '/?_auth=open';
+      }
+    }, 250);
+  };
+  window.closeGbBetModal = function() {
+    var m = document.getElementById('gbBetModal');
+    if (m) m.classList.remove('is-open');
+    document.body.style.overflow = '';
+  };
+
+  async function loadMatches() {
+    var sel = document.getElementById('gbmPartido');
+    try {
+      var r = await fetch('https://apuestas-api.mauro-union10.workers.dev/odds', { cache:'no-store' });
+      if (!r.ok) throw new Error('feed');
+      var raw = await r.json();
+      var events = (raw.data || raw || []);
+      // Transformar shape /odds → shape que espera el modal
+      var picks = events.filter(function(e) { return e.home_team && e.away_team; }).map(function(e) {
+        // Best odds: promedio h2h de los bookmakers
+        var h2h_odds = null;
+        try {
+          var books = (e.bookmakers || []).slice(0, 5);
+          var homeOdds = books.map(function(b) {
+            var m = (b.markets || []).find(function(x){return x.key==='h2h';});
+            var o = m ? m.outcomes.find(function(x){return x.name===e.home_team;}) : null;
+            return o ? o.price : null;
+          }).filter(Boolean);
+          if (homeOdds.length) h2h_odds = homeOdds.reduce(function(a,b){return a+b;},0) / homeOdds.length;
+        } catch(err) {}
+        return {
+          home: e.home_team,
+          away: e.away_team,
+          league: e.sport_title || 'Fútbol',
+          date: e.commence_time,
+          odds: h2h_odds ? h2h_odds.toFixed(2) : null,
+          rec: 'Gana Local'
+        };
+      });
+      var seen = {};
+      _matches = picks.filter(function(p) {
+        var k = (p.home + '|' + p.away).toLowerCase();
+        if (seen[k]) return false;
+        seen[k] = 1;
+        return true;
+      });
+      if (!_matches.length) {
+        sel.innerHTML = '<option value="">Sin partidos disponibles ahora</option>';
+        return;
+      }
+      var opts = ['<option value="">Elegí partido…</option>'];
+      _matches.forEach(function(p, i) {
+        var d = p.date ? new Date(p.date) : null;
+        var dStr = d ? d.toLocaleDateString('es-AR', {day:'2-digit',month:'short'}) + ' ' + d.toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'}) : '';
+        var lg = (p.league || '').replace(/^[^\w]+/, '').slice(0, 22);
+        opts.push('<option value="' + i + '">' + p.home + ' vs ' + p.away + (dStr ? ' · ' + dStr : '') + (lg ? ' · ' + lg : '') + '</option>');
+      });
+      sel.innerHTML = opts.join('');
+    } catch(e) {
+      sel.innerHTML = '<option value="">Error cargando partidos</option>';
+      console.warn('[gbm]', e);
+    }
+  }
+
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'gbmPartido') {
+      var idx = parseInt(e.target.value, 10);
+      var p = _matches[idx];
+      if (!p) {
+        document.getElementById('gbmMatchDisplay').value = '';
+        document.getElementById('gbmLeagueDisplay').value = '';
+        document.getElementById('gbmOdds').value = '';
+        return;
+      }
+      document.getElementById('gbmMatchDisplay').value = p.home + ' vs ' + p.away;
+      document.getElementById('gbmLeagueDisplay').value = (p.league || '').replace(/^[^\w]+/, '');
+      document.getElementById('gbmOdds').value = p.odds ? parseFloat(p.odds).toFixed(2) : '';
+      // Sugerir mercado según IA
+      if (p.rec) {
+        var m = document.getElementById('gbmMercado');
+        var recLC = String(p.rec).toLowerCase();
+        for (var i = 0; i < m.options.length; i++) {
+          if (m.options[i].value.toLowerCase().indexOf(recLC.slice(0,10)) >= 0 ||
+              recLC.indexOf(m.options[i].value.toLowerCase().slice(0,10)) >= 0) {
+            m.selectedIndex = i; break;
+          }
+        }
+      }
+    }
+  });
+
+  document.addEventListener('input', function(e) {
+    if (e.target && e.target.id === 'gbmJustif') updateWordCount();
+  });
+
+  function updateWordCount() {
+    var ta = document.getElementById('gbmJustif');
+    var el = document.getElementById('gbmWordCount');
+    if (!ta || !el) return;
+    var words = ta.value.trim().split(/\s+/).filter(function(w){return w.length>0;}).length;
+    el.textContent = words + '/20 palabras';
+    el.classList.toggle('ok', words >= 20);
+    var btn = document.getElementById('gbmSubmit');
+    var partidoEl = document.getElementById('gbmPartido');
+    var partido = partidoEl ? partidoEl.value : '';
+    var alias = (document.getElementById('gbmAlias').value || '').trim();
+    btn.disabled = words < 20 || !partido || alias.length < 2;
+  }
+  document.addEventListener('input', function(e) {
+    if (e.target && e.target.id === 'gbmPartido') updateWordCount();
+  });
+  document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'gbmPartido') setTimeout(updateWordCount, 50);
+  });
+
+  window.submitGbBet = async function() {
+    var btn = document.getElementById('gbmSubmit');
+    var msg = document.getElementById('gbmMsg');
+    msg.className = 'gbm-msg';
+    msg.textContent = '';
+    var user = (typeof authUser !== 'undefined' && authUser && authUser.email) ? authUser : null;
+    if (!user) { msg.className='gbm-msg err'; msg.textContent='Iniciá sesión para publicar'; return; }
+    var idx = parseInt(document.getElementById('gbmPartido').value, 10);
+    var p = _matches[idx];
+    if (!p) { msg.className='gbm-msg err'; msg.textContent='Elegí un partido'; return; }
+    var alias = document.getElementById('gbmAlias').value.trim();
+    var mercado = document.getElementById('gbmMercado').value || 'Ganador Local';
+    var odds = parseFloat(document.getElementById('gbmOdds').value) || 0;
+    var justif = document.getElementById('gbmJustif').value.trim();
+    if (justif.split(/\s+/).filter(function(w){return w.length>0;}).length < 20) {
+      msg.className='gbm-msg err'; msg.textContent='Mínimo 20 palabras en la justificación'; return;
+    }
+    if (odds < 1.30) { msg.className='gbm-msg err'; msg.textContent='Cuota mínima 1.30'; return; }
+
+    var betData = {
+      is_bet: true,
+      home: p.home, away: p.away,
+      league: (p.league || '').replace(/^[^\w]+/, '') || null,
+      pick: mercado, odds: odds, stake: 100,
+      house: 'DBbet',
+      justification: justif,
+      result: 'pending',
+      posted_at: new Date().toISOString()
+    };
+    var content = '🎯 Apuesta: ' + p.home + ' vs ' + p.away + '\nPick: ' + mercado + ' @ ' + odds.toFixed(2) + '\n' + justif;
+
+    btn.disabled = true; btn.textContent = 'Publicando…';
+    try {
+      var r = await fetch(GBM_SB + '/rest/v1/forum_posts', {
+        method: 'POST',
+        headers: {
+          'apikey': GBM_KEY,
+          'Authorization': 'Bearer ' + GBM_KEY,
+          'Content-Type': 'application/json',
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify({
+          thread_id: 'topic_combinadas',
+          user_name: alias,
+          user_email: user.email,
+          content: content,
+          bet_data: betData,
+          is_ai_post: false,
+          is_deleted: false
+        })
+      });
+      if (!r.ok) throw new Error('http_' + r.status);
+      localStorage.setItem('gb_forum_alias', alias);
+      msg.className='gbm-msg ok';
+      msg.textContent = '¡Apuesta publicada! 🎯 Podés verla en el foro Combinadas del día';
+      // Reset form
+      document.getElementById('gbmPartido').value = '';
+      document.getElementById('gbmMatchDisplay').value = '';
+      document.getElementById('gbmLeagueDisplay').value = '';
+      document.getElementById('gbmOdds').value = '';
+      document.getElementById('gbmJustif').value = '';
+      updateWordCount();
+      setTimeout(closeGbBetModal, 2200);
+    } catch(e) {
+      msg.className='gbm-msg err';
+      msg.textContent = 'Error publicando · intentá de nuevo';
+      console.warn('[gbm submit]', e);
+    } finally {
+      btn.textContent = '🎯 Publicar Apuesta';
+      updateWordCount();
+    }
+  };
+
+  // Cerrar con ESC + click en overlay
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeGbBetModal();
+  });
+  document.addEventListener('click', function(e) {
+    if (e.target && e.target.id === 'gbBetModal') closeGbBetModal();
+  });
+})();
+</script>
+<!-- fin modal Publicar Apuesta -->
+<style>
+/* ── Botón flotante ── */
+#aiChatBtn {
+  position: fixed;
+  bottom: 80px;   /* 🆕 (23-jun) encima del banner VIP sticky de abajo */
+  right: 20px;
+  width: 54px;   /* mismo tamaño que .forum-bbl */
+  height: 54px;
+  padding: 0;
+  border-radius: 50%;
+  background: #0d1a0d;
+  border: 1.5px solid rgba(0,200,83,0.40);
+  cursor: pointer;
+  z-index: 9000;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: box-shadow 0.18s, transform 0.15s;
+  overflow: visible;
+}
+#aiChatBtn:hover {
+  box-shadow: 0 4px 18px rgba(0,0,0,0.65), 0 0 0 1px rgba(0,200,83,0.3);
+  transform: translateY(-2px);
+}
+#aiChatBtn:active { transform: translateY(0); }
+#aiChatBtn .chat-btn-avatar {
+  width: 42px; height: 42px;  /* avatar un poco más grande dentro del botón */
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center top;
+  flex-shrink: 0;
+}
+#aiChatBtn .chat-btn-label { display: none; }
+#aiChatBtn .chat-btn-dot  { display: none; }
+#aiChatBadge {
+  position: absolute;
+  top: -4px; right: -4px;
+  min-width: 18px; height: 18px;
+  padding: 0 5px;
+  background: #e53935;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9px;
+  border: 2px solid #0a1a0a;
+  box-shadow: 0 0 6px rgba(229,57,53,0.9);
+  z-index: 2;
+  animation: badge-pulse 2s ease-in-out infinite;
+}
+@keyframes badge-pulse {
+  0%,100% { box-shadow: 0 0 6px rgba(229,57,53,0.9); }
+  50%      { box-shadow: 0 0 12px rgba(229,57,53,1), 0 0 4px rgba(229,57,53,0.6); }
+}
+@keyframes aiBlink { 0%,100%{opacity:1} 50%{opacity:0.4} }
+
+/* ── Popup chat ── */
+#aiChatBox {
+  position: fixed;
+  bottom: 84px;  /* 20px + 54px botón + 10px gap */
+  right: 20px;
+  width: 340px;
+  max-height: 540px;
+  background: #0d1a0d;
+  border: 1px solid rgba(0,200,83,0.25);
+  border-radius: 18px;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,200,83,0.1);
+  z-index: 9001;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Estado inicial: colapsado hacia el globo (abajo a la derecha) */
+  transform: scale(0.05) translate(60px, 80px);
+  transform-origin: bottom right;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.3s cubic-bezier(.34,1.3,.64,1), opacity 0.25s ease;
+}
+#aiChatBox.open {
+  transform: scale(1) translate(0, 0);
+  opacity: 1;
+  pointer-events: all;
+}
+/* Animación de cierre: se encoge de vuelta hacia el globo */
+#aiChatBox.minimizing {
+  transform: scale(0.05) translate(60px, 80px);
+  transform-origin: bottom right;
+  opacity: 0;
+  pointer-events: none;
+  transition: transform 0.25s cubic-bezier(.4,0,.8,1), opacity 0.2s ease;
+}
+#aiChatBox.open.active {
+  width: min(680px, calc(100vw - 48px));
+  /* Altura: 75vh pero nunca más de (pantalla - navbar - botón flotante) */
+  max-height: min(75vh, calc(100vh - 160px));
+  right: max(24px, calc(50vw - 340px)); /* centra en pantallas anchas */
+  transition: transform 0.22s cubic-bezier(.4,0,.2,1), opacity 0.22s,
+              width 0.35s cubic-bezier(.4,0,.2,1),
+              max-height 0.4s cubic-bezier(.4,0,.2,1),
+              right 0.35s cubic-bezier(.4,0,.2,1);
+}
+/* Notebook / tablet (481–1100px) */
+@media (min-width: 481px) and (max-width: 1100px) {
+  #aiChatBox.open.active {
+    width: min(480px, calc(100vw - 48px));
+    max-height: min(70vh, calc(100vh - 160px));
+    right: 24px;
+  }
+}
+@media (max-width: 480px) {
+  #aiChatBox.open.active {
+    width: calc(100vw - 16px);
+    max-height: min(75vh, calc(100vh - 140px));
+    right: 8px;
+    bottom: 82px;
+  }
+}
+
+/* Header */
+.ai-header {
+  background: linear-gradient(135deg, #00c853, #007a22);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ai-header-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.4rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.ai-header-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.ai-header-info { flex: 1; }
+.ai-header-name { font-weight: 700; font-size: 0.92rem; color: #fff; }
+.ai-header-status { font-size: 0.72rem; color: rgba(255,255,255,0.85); display: flex; align-items: center; gap: 4px; }
+.ai-header-status::before { content:''; width:7px; height:7px; background:#fff; border-radius:50%; display:inline-block; }
+.ai-close-btn {
+  background: rgba(0,0,0,0.2);
+  border: none; border-radius: 50%;
+  width: 28px; height: 28px;
+  color: #fff;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+.ai-close-btn:hover { background: rgba(0,0,0,0.4); transform: scale(1.1); }
+.ai-close-btn svg { width: 14px; height: 14px; }
+
+/* Mensajes */
+#aiMessages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  scroll-behavior: smooth;
+}
+#aiMessages::-webkit-scrollbar { width: 4px; }
+#aiMessages::-webkit-scrollbar-track { background: transparent; }
+#aiMessages::-webkit-scrollbar-thumb { background: rgba(0,200,83,0.3); border-radius: 2px; }
+
+.ai-msg {
+  max-width: 88%;
+  padding: 9px 13px;
+  border-radius: 14px;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  word-break: break-word;
+}
+.ai-msg.bot {
+  background: #162616;
+  border: 1px solid rgba(0,200,83,0.15);
+  color: #d4edda;
+  align-self: flex-start;
+  border-radius: 4px 14px 14px 14px;
+}
+.ai-msg.user {
+  background: linear-gradient(135deg, #00c853, #007a22);
+  color: #fff;
+  align-self: flex-end;
+  border-radius: 14px 14px 4px 14px;
+}
+.ai-msg-time {
+  font-size: 0.65rem;
+  color: rgba(165,214,167,0.45);
+  margin-top: 3px;
+  text-align: right;
+}
+.ai-typing {
+  display: flex; gap: 4px; align-items: center;
+  padding: 10px 14px;
+  background: #162616;
+  border: 1px solid rgba(0,200,83,0.15);
+  border-radius: 4px 14px 14px 14px;
+  width: fit-content;
+}
+.ai-typing span {
+  width: 7px; height: 7px;
+  background: #00c853;
+  border-radius: 50%;
+  animation: aiDot 1.2s infinite;
+}
+.ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes aiDot { 0%,60%,100%{transform:translateY(0)} 30%{transform:translateY(-6px)} }
+@keyframes aiBounce {
+  0%,100% { transform: translateY(0) scaleX(1) scaleY(1); animation-timing-function: cubic-bezier(.33,0,.66,0); }
+  45%     { transform: translateY(-14px) scaleX(0.95) scaleY(1.05); animation-timing-function: cubic-bezier(.33,1,.66,1); }
+  90%     { transform: translateY(0) scaleX(1.1) scaleY(0.9); animation-timing-function: cubic-bezier(.33,1,.66,1); }
+}
+
+/* Quick chips */
+#aiQuickChips {
+  padding: 6px 12px 4px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.ai-chip {
+  background: rgba(0,200,83,0.1);
+  border: 1px solid rgba(0,200,83,0.3);
+  color: #a5d6a7;
+  border-radius: 20px;
+  padding: 5px 11px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.ai-chip:hover { background: rgba(0,200,83,0.22); color: #fff; }
+
+/* Input */
+.ai-input-row {
+  padding: 10px 12px;
+  display: flex;
+  gap: 8px;
+  border-top: 1px solid rgba(0,200,83,0.12);
+  background: #0d1a0d;
+}
+#aiInput {
+  flex: 1;
+  background: #162616;
+  border: 1px solid rgba(0,200,83,0.25);
+  border-radius: 22px;
+  padding: 9px 14px;
+  color: #d4edda;
+  font-size: 0.82rem;
+  font-family: inherit;
+  outline: none;
+  resize: none;
+  max-height: 80px;
+  transition: border-color 0.15s;
+}
+#aiInput::placeholder { color: rgba(165,214,167,0.4); }
+#aiInput:focus { border-color: rgba(0,200,83,0.5); }
+#aiSendBtn {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00c853, #00952e);
+  border: none;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  align-self: flex-end;
+  transition: transform 0.15s, opacity 0.15s;
+}
+#aiSendBtn:hover { transform: scale(1.08); }
+#aiSendBtn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+#aiImgBtn {
+  width: auto; height: auto;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  color: rgba(165,214,167,0.85);
+  font-size: 1.25rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  align-self: flex-end;
+  padding: 4px;
+  transition: transform 0.15s, opacity 0.15s;
+}
+#aiImgBtn:hover { opacity: 0.75; transform: scale(1.1); }
+#aiImgPreview {
+  padding: 6px 12px 0;
+  display: none;
+}
+#aiImgPreview img {
+  max-height: 90px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,200,83,0.3);
+  display: block;
+}
+#aiImgRemove {
+  background: rgba(255,80,80,0.15);
+  border: none;
+  color: #ff6b6b;
+  font-size: 0.7rem;
+  cursor: pointer;
+  margin-top: 3px;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-family: inherit;
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  #aiChatBox { width: calc(100vw - 24px); right: 12px; bottom: 72px; }
+  #aiChatBtn { right: 16px; bottom: 72px; width: 38px; height: 38px; }
+}
+</style>
+
+<!-- Botón flotante -->
+<button id="aiChatBtn" onclick="aiToggleChat()">
+  <img loading="lazy" decoding="async" class="chat-btn-avatar" src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA">
+  <span class="chat-btn-label">Chat IA</span>
+  <span class="chat-btn-dot"></span>
+  <span id="aiChatBadge">1</span>
+</button>
+
+<!-- Chat popup -->
+<div id="aiChatBox">
+  <!-- Header -->
+  <div class="ai-header">
+    <div class="ai-header-avatar">
+      <img loading="lazy" decoding="async" src="https://drive.google.com/thumbnail?id=1B3uVSJCrCDvJF-XUqvNoWyOZSY7XjI3C&sz=w400" alt="IA" style="width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:center top">
+    </div>
+    <div class="ai-header-info">
+      <div class="ai-header-name">gambeta.ai <span style="font-size:0.58rem;font-weight:700;letter-spacing:0.8px;background:rgba(255,214,0,0.15);color:#ffd600;border:1px solid rgba(255,214,0,0.35);border-radius:4px;padding:1px 5px;vertical-align:middle;position:relative;top:-1px">BETA</span></div>
+      <div class="ai-header-status">En línea · Análisis de pronósticos</div>
+    </div>
+    <button class="ai-close-btn" onclick="aiToggleChat()" title="Minimizar">
+      <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="2" y="6.5" width="10" height="2" rx="1" fill="white"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Mensajes -->
+  <div id="aiMessages"></div>
+
+  <!-- Quick chips -->
+  <div id="aiQuickChips">
+    <button class="ai-chip" onclick="aiSendChip('mejor-apuesta')">⚽ Mejor apuesta hoy</button>
+    <button class="ai-chip" onclick="aiSendChip('equipos-racha')">🔥 Equipos en Racha</button>
+    <button class="ai-chip" onclick="aiSendChip('gestion-banca')">💰 Gestión de Banca</button>
+    <button class="ai-chip" onclick="aiSendChip('promo-hoy')">🎁 Promo para hoy</button>
+  </div>
+
+  <!-- Preview imagen seleccionada -->
+  <div id="aiImgPreview">
+    <img loading="lazy" decoding="async" id="aiImgThumb" src="" alt="preview">
+    <button id="aiImgRemove" onclick="aiClearImage()">✕ Quitar imagen</button>
+  </div>
+
+  <!-- Input -->
+  <div class="ai-input-row">
+    <input type="file" id="aiImgFile" accept="image/*" style="display:none" onchange="aiHandleImage(this)">
+    <button id="aiImgBtn" onclick="document.getElementById('aiImgFile').click()" title="Adjuntar imagen">🖼️</button>
+    <textarea id="aiInput" placeholder="Preguntá a la IA..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();aiSend()}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px';_resetInactivityTimer()"></textarea>
+    <button id="aiSendBtn" onclick="aiSend()">➤</button>
+  </div>
+</div>
+
+<script src="/js/ai-chat-bundle.js?v=1782933698" defer></script>
+<style>
+/* En el foro: ocultar el bubble .forum-bbl (redundante) y re-alinear los 2 restantes */
+html body .forum-bbl{display:none!important}
+html body #gbBetBbl{top:calc(50% - 24px)!important;transform:translateY(-50%)!important}
+html body #aiChatBtn{top:calc(50% + 24px)!important;transform:translateY(-50%)!important}
+@media (max-width:480px){
+  html body #gbBetBbl{top:calc(50% - 22px)!important}
+  html body #aiChatBtn{top:calc(50% + 22px)!important}
+}
+</style>
+
 </body>
 </html>
