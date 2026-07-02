@@ -1636,9 +1636,11 @@
     gap: 16px;
     margin: 0 0 8px;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
   }
+  /* Chip 'En línea' pegado al borde izquierdo — alineado con h1 gambeta.ai */
+  .gb-online.gb-online--top { align-self: flex-start; margin-left: 0; }
   .gb-handle {
     display: inline-flex;
     align-items: center;
