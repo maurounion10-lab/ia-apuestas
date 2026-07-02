@@ -445,6 +445,65 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .pf-pod-roi-mini.pos{color:rgba(0,200,83,.85)}.pf-pod-roi-mini.neg{color:rgba(255,90,90,.85)}
 /* Hall of Fame */
 .hof-widget{background:linear-gradient(135deg,rgba(255,215,0,.06),rgba(0,0,0,0));border:1px solid rgba(255,215,0,.18);border-radius:18px;padding:1rem 1.15rem;margin-top:1.2rem}
+/* ── LIGA UNIVERSAL DE TIPSTERS ── */
+.liga-universal-section{background:linear-gradient(180deg,#0a0f0a 0%,#0d1a0d 100%);border:1px solid rgba(0,200,83,0.18);border-radius:20px;padding:1.6rem 1.4rem;margin:2rem 0;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.lu-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px;margin-bottom:1.1rem}
+.lu-title{font-size:1.32rem;font-weight:900;color:#fff;display:flex;align-items:center;gap:10px;letter-spacing:-0.01em}
+.lu-icon{filter:drop-shadow(0 2px 6px rgba(255,215,0,0.5))}
+.lu-sub{font-size:.78rem;color:rgba(255,255,255,0.55);font-weight:600;letter-spacing:0.02em}
+.lu-legend{display:flex;flex-wrap:wrap;gap:14px;padding:.7rem .9rem;background:rgba(0,0,0,0.3);border-radius:12px;border:1px solid rgba(255,255,255,0.06);margin-bottom:1rem;font-size:.72rem;color:rgba(255,255,255,0.75)}
+.lu-legend-item{display:inline-flex;align-items:center;gap:6px}
+.lu-legend-dot{width:9px;height:9px;border-radius:50%;box-shadow:0 0 6px currentColor}
+.lu-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.lu-table{width:100%;min-width:520px;display:flex;flex-direction:column;gap:6px}
+.lu-header-row{display:grid;grid-template-columns:44px 1fr 68px 78px 78px 96px 60px;gap:10px;padding:.55rem .8rem;background:rgba(0,200,83,0.08);border-radius:9px;font-size:.68rem;color:rgba(0,229,100,0.9);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.lu-row{display:grid;grid-template-columns:44px 1fr 68px 78px 78px 96px 60px;gap:10px;align-items:center;padding:.7rem .8rem;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);border-radius:11px;transition:all .18s;position:relative;overflow:hidden}
+.lu-row:hover{background:rgba(0,200,83,0.05);border-color:rgba(0,200,83,0.2);transform:translateX(2px)}
+.lu-row.is-top1{background:linear-gradient(90deg,rgba(255,215,0,0.12) 0%,rgba(255,215,0,0.03) 60%);border-color:rgba(255,215,0,0.4);box-shadow:0 4px 14px rgba(255,215,0,0.15)}
+.lu-row.is-top2{background:linear-gradient(90deg,rgba(192,192,192,0.10) 0%,rgba(192,192,192,0.02) 60%);border-color:rgba(192,192,192,0.28)}
+.lu-row.is-top3{background:linear-gradient(90deg,rgba(205,127,50,0.10) 0%,rgba(205,127,50,0.02) 60%);border-color:rgba(205,127,50,0.28)}
+.lu-row.is-fire{background:linear-gradient(90deg,rgba(255,107,0,0.10) 0%,rgba(0,0,0,0) 65%);border-color:rgba(255,107,0,0.28);animation:luFireGlow 3s ease-in-out infinite}
+@keyframes luFireGlow{0%,100%{box-shadow:0 2px 12px rgba(255,107,0,0.15)}50%{box-shadow:0 4px 20px rgba(255,107,0,0.32)}}
+.lu-pos{font-family:'Geist Mono','SF Mono',ui-monospace,monospace;font-weight:900;font-size:.92rem;color:rgba(255,255,255,0.65);text-align:center;font-variant-numeric:tabular-nums}
+.lu-row.is-top1 .lu-pos{color:#ffd700}
+.lu-row.is-top2 .lu-pos{color:#e0e0e0}
+.lu-row.is-top3 .lu-pos{color:#cd7f32}
+.lu-tipster{display:flex;align-items:center;gap:9px;min-width:0}
+.lu-avatar{width:32px;height:32px;flex-shrink:0;border-radius:50%;overflow:hidden;background:rgba(0,200,83,0.15);border:1.5px solid rgba(0,200,83,0.35);display:flex;align-items:center;justify-content:center}
+.lu-avatar svg{width:100%;height:100%;display:block}
+.lu-name-col{display:flex;flex-direction:column;min-width:0;gap:2px}
+.lu-name{color:#fff;font-weight:700;font-size:.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer;transition:color .12s}
+.lu-name:hover{color:#00e564}
+.lu-name-meta{font-size:.66rem;color:rgba(255,255,255,0.5);font-weight:600;display:flex;align-items:center;gap:5px}
+.lu-fire{display:inline-flex;align-items:center;gap:2px;font-size:.7rem;font-weight:900;padding:2px 6px;border-radius:999px;background:linear-gradient(135deg,#ff6b00,#ff3300);color:#fff;box-shadow:0 2px 6px rgba(255,107,0,0.5);letter-spacing:.02em}
+.lu-fire.tier-2{background:linear-gradient(135deg,#ff8a3d,#ff4500);box-shadow:0 2px 8px rgba(255,138,61,0.6)}
+.lu-fire.tier-3{background:linear-gradient(135deg,#ffd700 0%,#ff8a3d 50%,#ff4500 100%);box-shadow:0 2px 10px rgba(255,215,0,0.7);animation:luFirePulse 1.5s ease-in-out infinite}
+@keyframes luFirePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.lu-picks,.lu-wins,.lu-rate,.lu-streak-col{font-family:'Geist Mono','SF Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-weight:700;font-size:.85rem;text-align:center;color:rgba(255,255,255,0.85)}
+.lu-rate.hot{color:#00e564}
+.lu-rate.cold{color:#ef5350}
+.lu-profit{font-family:'Geist Mono','SF Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-weight:900;font-size:.9rem;text-align:right;padding-right:.3rem}
+.lu-profit.pos{color:#00e564}
+.lu-profit.neg{color:#ef5350}
+.lu-streak-col{color:rgba(255,255,255,0.4);font-size:.72rem}
+.lu-streak-col.pos{color:#00e564}
+.lu-streak-col.neg{color:#ef5350}
+.lu-empty{text-align:center;padding:2.4rem 1rem;color:rgba(255,255,255,0.5);font-size:.9rem;line-height:1.6}
+.lu-loading{text-align:center;padding:1.6rem;color:rgba(255,255,255,0.4);font-size:.82rem}
+.lu-footer{margin-top:1.2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.lu-updated{font-size:.7rem;color:rgba(255,255,255,0.4);font-family:'Geist Mono','SF Mono',monospace}
+.lu-cta-btn{background:linear-gradient(135deg,#00c853,#007a22);border:none;color:#fff;padding:.7rem 1.15rem;border-radius:10px;font-weight:800;font-size:.85rem;cursor:pointer;font-family:inherit;transition:all .18s;box-shadow:0 4px 12px rgba(0,200,83,0.35)}
+.lu-cta-btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,200,83,0.5)}
+@media(max-width:640px){
+  .lu-header-row,.lu-row{grid-template-columns:36px 1fr 62px 80px 60px;gap:6px;padding:.6rem;font-size:.78rem}
+  .lu-header-row .lu-h-picks,.lu-row .lu-picks{display:none}
+  .lu-header-row .lu-h-rate,.lu-row .lu-rate{display:none}
+  .lu-avatar{width:28px;height:28px}
+  .lu-name{font-size:.82rem}
+  .liga-universal-section{padding:1.2rem 1rem;margin:1.5rem 0}
+  .lu-title{font-size:1.1rem}
+  .lu-legend{font-size:.68rem;gap:8px;padding:.55rem}
+}
 .hof-title{display:flex;align-items:center;gap:.5rem;color:#FFD700;font-weight:700;font-size:.9rem;margin-bottom:.65rem}
 .hof-title::before{content:"🏆";font-size:1.05rem}
 .hof-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.55rem}
@@ -694,6 +753,28 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
     <div id="pfRest" class="pf-rest"></div>
         <div class="hof-widget"><div class="hof-title">Campeones Anteriores</div><div class="hof-list" id="hofList"><div class="hof-empty">Sin campeones aún — sé el primero este mes</div></div></div>
     <div id="pfEmpty" class="pf-empty" style="display:none">Todavía nadie publicó apuestas resueltas este mes. ¡Sé el primero! 🎯</div>
+  </section>
+
+  <!-- ── LIGA UNIVERSAL DE TIPSTERS — ranking all-time ── -->
+  <section class="liga-universal-section" id="ligaUniversal">
+    <div class="lu-head">
+      <div class="lu-title"><span class="lu-icon">🏆</span> Liga Universal de Tipsters</div>
+      <div class="lu-sub">Ranking all-time · Ordenado por profit · Actualizado en vivo</div>
+    </div>
+    <div class="lu-legend">
+      <span class="lu-legend-item"><span class="lu-legend-dot" style="background:linear-gradient(135deg,#ff6b00,#ff3300)"></span>🔥 Racha 2+ <b style="color:#ff8a3d">EN LLAMAS</b></span>
+      <span class="lu-legend-item"><span class="lu-legend-dot" style="background:linear-gradient(135deg,#ff8a3d,#ff4500)"></span>🔥🔥 Racha 4+ <b style="color:#ff6b1a">IMPARABLE</b></span>
+      <span class="lu-legend-item"><span class="lu-legend-dot" style="background:linear-gradient(135deg,#ffd700,#ff6b00)"></span>🔥🔥🔥 Racha 7+ <b style="color:#ffa500">DEIDAD</b></span>
+    </div>
+    <div class="lu-table-wrap">
+      <div class="lu-table" id="luTable">
+        <div class="lu-loading">Cargando liga…</div>
+      </div>
+    </div>
+    <div class="lu-footer">
+      <span class="lu-updated" id="luUpdated">—</span>
+      <button class="lu-cta-btn" type="button" onclick="openGbBetModal()">🎯 Publicar tu apuesta y competir</button>
+    </div>
   </section>
 
   <div class="topic-panel" id="topicPanel">
@@ -1320,6 +1401,116 @@ function renderPredicciones() {
   }
 }
 
+// 🆕 (2-jul-2026 #682) LIGA UNIVERSAL: ranking all-time + streaks 🔥
+function computeStreak(userPosts) {
+  // Retorna { current: N, sign: 'pos'|'neg'|'', longestWin: N }
+  // Ordenar posts resueltos por fecha DESC (más reciente primero)
+  const resolved = userPosts
+    .filter(p => p.bet_data && (p.bet_data.result === 'win' || p.bet_data.result === 'loss'))
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  if (!resolved.length) return { current:0, sign:'', longestWin:0 };
+  // Racha ACTUAL: contar desde el más reciente hacia atrás mientras sea del mismo tipo
+  const firstResult = resolved[0].bet_data.result;
+  let current = 0;
+  for (const p of resolved) {
+    if (p.bet_data.result === firstResult) current++;
+    else break;
+  }
+  // Longest win streak (histórica) — para stats
+  let longestWin = 0, tmp = 0;
+  for (let i = resolved.length - 1; i >= 0; i--) {
+    if (resolved[i].bet_data.result === 'win') { tmp++; if (tmp > longestWin) longestWin = tmp; }
+    else tmp = 0;
+  }
+  return { current, sign: firstResult === 'win' ? 'pos' : 'neg', longestWin };
+}
+
+function fireBadgeHTML(streakCount) {
+  if (streakCount < 2) return '';
+  let tier = 1, emoji = '🔥', label = 'EN LLAMAS';
+  if (streakCount >= 7)      { tier = 3; emoji = '🔥🔥🔥'; label = 'DEIDAD'; }
+  else if (streakCount >= 4) { tier = 2; emoji = '🔥🔥';   label = 'IMPARABLE'; }
+  return `<span class="lu-fire tier-${tier}" title="${label} · ${streakCount} aciertos seguidos">${emoji} <span>${streakCount}</span></span>`;
+}
+
+function renderLigaUniversal() {
+  const el = document.getElementById('luTable');
+  if (!el) return;
+  // Postear TODOS los bets (all-time), incluir pending pero solo resueltos cuentan para métricas
+  const stats = computeUserStats(allBetPosts);
+  const users = Object.values(stats).filter(u => (u.wins + u.losses) >= 2);
+  if (!users.length) {
+    el.innerHTML = `<div class="lu-empty">
+      🎯 Todavía no hay suficientes tipsters con apuestas resueltas.<br>
+      <b style="color:#00e564">Publicá tu primera apuesta y arrancá tu racha.</b>
+    </div>`;
+    return;
+  }
+  // Agrupar posts por user para computar streak
+  const postsByUser = {};
+  for (const p of allBetPosts) {
+    const n = (p.user_name||'').trim();
+    if (!n || isAiUser(n)) continue;
+    if (!postsByUser[n]) postsByUser[n] = [];
+    postsByUser[n].push(p);
+  }
+  // Añadir streak a cada usuario
+  for (const u of users) {
+    u.streak = computeStreak(postsByUser[u.name] || []);
+  }
+  // Ordenar: 1) profit desc, 2) winrate desc, 3) picks desc
+  users.sort((a, b) => (b.profitTotal - a.profitTotal) || (b.winRate - a.winRate) || ((b.wins+b.losses) - (a.wins+a.losses)));
+
+  const header = `<div class="lu-header-row">
+    <span>#</span>
+    <span>Tipster</span>
+    <span class="lu-h-picks">Picks</span>
+    <span class="lu-h-rate">%Acierto</span>
+    <span>Aciertos</span>
+    <span style="text-align:right">Profit</span>
+    <span>Racha</span>
+  </div>`;
+
+  const rows = users.slice(0, 50).map((u, i) => {
+    const pos = i + 1;
+    let cls = '';
+    if (pos === 1) cls = 'is-top1';
+    else if (pos === 2) cls = 'is-top2';
+    else if (pos === 3) cls = 'is-top3';
+    if (u.streak.sign === 'pos' && u.streak.current >= 2) cls += ' is-fire';
+    const profitAbs = Math.round(Math.abs(u.profitTotal)).toLocaleString('es-AR');
+    const profitCls = u.profitTotal >= 0 ? 'pos' : 'neg';
+    const profitSign = u.profitTotal >= 0 ? '+' : '−';
+    const rateInt = Math.round(u.winRate * 100);
+    const rateCls = rateInt >= 55 ? 'hot' : rateInt <= 40 ? 'cold' : '';
+    const rank = getRank(u);
+    const fire = u.streak.sign === 'pos' ? fireBadgeHTML(u.streak.current) : '';
+    const streakDisplay = u.streak.current > 0 
+      ? `<span class="lu-streak-col ${u.streak.sign}">${u.streak.sign === 'pos' ? '↑' : '↓'}${u.streak.current}</span>`
+      : `<span class="lu-streak-col">—</span>`;
+    return `<div class="lu-row ${cls}" data-user="${safe(u.name)}">
+      <span class="lu-pos">${pos}</span>
+      <div class="lu-tipster">
+        <div class="lu-avatar">${avatarSvg(u.name, 32)}</div>
+        <div class="lu-name-col">
+          <span class="lu-name" onclick="openProfile('${safe(u.name).replace(/'/g,"\\'")}')" title="Ver perfil">${safe(u.name)}${rank ? ' '+rank.emoji : ''}</span>
+          <span class="lu-name-meta">${fire ? fire : (rank ? rank.label : '')}</span>
+        </div>
+      </div>
+      <span class="lu-picks">${u.wins + u.losses}</span>
+      <span class="lu-rate ${rateCls}">${rateInt}%</span>
+      <span class="lu-wins">${u.wins}<span style="color:rgba(255,255,255,0.3);font-weight:400"> / ${u.losses}</span></span>
+      <span class="lu-profit ${profitCls}">${profitSign}$${profitAbs}</span>
+      ${streakDisplay}
+    </div>`;
+  }).join('');
+
+  el.innerHTML = header + rows;
+
+  const upd = document.getElementById('luUpdated');
+  if (upd) upd.textContent = '🔄 Actualizado ' + new Date().toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'}) + ' · ' + users.length + ' tipsters';
+}
+
 async function loadAll() {
   try {
     const [threadsR, postsR] = await Promise.all([
@@ -1363,7 +1554,7 @@ async function loadAll() {
     renderTopics();
     renderTabsCounts();
     renderThreads();
-    _autoSnapshotLastMonth(); renderPredicciones(); renderHallOfFame();
+    _autoSnapshotLastMonth(); renderPredicciones(); renderHallOfFame(); renderLigaUniversal();
   } catch (e) {
     document.getElementById('topicsGrid').innerHTML = '<div class="empty">Error cargando el foro. Intentá refrescar.</div>';
     document.getElementById('threadList').innerHTML = '';
