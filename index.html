@@ -1027,10 +1027,16 @@ window.toggleHeroBubble = function(n) {
     </div>
     <!-- Filtros pronósticos IA: pills destacados + dropdown agrupado (28-jun-2026 simplificación) -->
     <div style="display:flex;gap:6px;margin:0 0 8px;flex-wrap:wrap;align-items:center" id="predSportTabs">
-      <button class="sport-tab active" data-league="all"          data-home="1" style="padding:6px 14px;font-size:0.78rem;white-space:nowrap" onclick="filterPredSport('all',this)">⭐ Principales</button>
-      <button class="sport-tab"        data-league="todos"        data-home="1" style="padding:6px 14px;font-size:0.78rem;white-space:nowrap" onclick="if(document.body.dataset.gbpage==='picks'){filterPredSport('todos',this)}else{gbSetPage('picks');setTimeout(()=>{const b=document.querySelector('#predSportTabs [data-league=todos]');if(b)filterPredSport('todos',b);},80)}">📋 Todos</button>
-      <button class="sport-tab"        data-league="mundial"      data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap;background:linear-gradient(135deg,rgba(255,215,0,0.18),rgba(200,16,46,0.18));border:1px solid rgba(255,215,0,0.45);color:#FFD700;font-weight:800" onclick="filterPredSport('mundial',this)">🏆 Mundial 2026</button>
-      <button class="sport-tab"        data-league="wcfutures"    data-home="1" style="padding:6px 11px;font-size:0.75rem;white-space:nowrap;background:linear-gradient(135deg,rgba(200,16,46,0.18),rgba(255,215,0,0.18));border:1px solid rgba(255,215,0,0.45);color:#FFD700;font-weight:800" onclick="filterPredSport('wcfutures',this)">🎯 WC Largo Plazo</button>
+      <!-- Dropdown categorías: Principales / Todos / Mundial / WC Largo Plazo (2-jul-2026) -->
+      <label for="predCategoryDropdown" style="font-size:0.7rem;color:rgba(255,255,255,0.45);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin:0 4px 0 0">Categoría</label>
+      <select id="predCategoryDropdown" class="filter-dropdown sport-tab active" data-league="all" data-home="1"
+        onchange="filterPredCategory(this)"
+        style="padding:6px 32px 6px 14px;font-size:0.78rem;background:#181818 url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 12 8%22 fill=%22%23ccc%22><path d=%22M1 1l5 5 5-5%22 stroke=%22%23ccc%22 stroke-width=%221.5%22 fill=%22none%22/></svg>') no-repeat right 10px center;background-size:10px;border:1px solid rgba(0,200,83,0.55);color:#00e676;border-radius:20px;cursor:pointer;font-family:inherit;font-weight:700;-webkit-appearance:none;-moz-appearance:none;appearance:none;outline:none;transition:border-color .15s,color .15s;min-width:180px">
+        <option value="all"       selected>⭐ Principales</option>
+        <option value="todos"     >📋 Todos los picks</option>
+        <option value="mundial"   >🏆 Mundial 2026</option>
+        <option value="wcfutures" >🎯 WC Largo Plazo</option>
+      </select>
 
       <!-- Dropdown agrupado por categoría (reemplaza 48 botones individuales) -->
       <select id="leagueDropdown" class="filter-dropdown"
