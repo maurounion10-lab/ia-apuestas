@@ -2978,5 +2978,108 @@ html body #aiChatBtn{top:calc(50% + 24px)!important;transform:translateY(-50%)!i
 }
 </style>
 
+
+<script>
+// 🆕 (1-jul-2026 #654) FASE A — Navegación Reddit/XenForo híbrido — inyectado como bloque separado
+(function(){
+  let _feedSort = 'hot';
+  window._feedSort = _feedSort;
+  const _LEAGUE_LABELS = {
+    all: { emoji:'📋', name:'Todos los hilos' },
+    cl:  { emoji:'⭐', name:'Champions League' },
+    pl:  { emoji:'🏴󠁧󠁢󠁥󠁮󠁧󠁿', name:'Premier League' },
+    la:  { emoji:'🇪🇸', name:'La Liga' },
+    lpf: { emoji:'🇦🇷', name:'Liga Argentina' },
+    bra: { emoji:'🇧🇷', name:'Brasileirão' },
+    wc:  { emoji:'🏆', name:'Mundial 2026' },
+    other:{ emoji:'🌎', name:'Otras competencias' },
+    following:{ emoji:'★', name:'Siguiendo tipsters' }
+  };
+  window._LEAGUE_LABELS = _LEAGUE_LABELS;
+
+  window.renderForoSidebar = function() {
+    const subList = document.getElementById('foroSubList');
+    const leagueList = document.getElementById('foroLeagueList');
+    if (!subList || !leagueList) return;
+    if (typeof TOPIC_META === 'undefined' || typeof allThreads === 'undefined') return;
+    const postsByTopic = {};
+    (allThreads || []).forEach(t => {
+      if (t.id && t.id.startsWith('topic_')) postsByTopic[t.id] = (allPosts||[]).filter(p => p.thread_id === t.id).length;
+    });
+    subList.innerHTML = Object.keys(TOPIC_META).map(tid => {
+      const meta = TOPIC_META[tid];
+      const count = postsByTopic[tid] || 0;
+      return '<button class="foro-sub-link" data-nav-topic="' + tid + '"><span class="foro-sub-emoji">' + meta.emoji + '</span><span class="foro-sub-name">' + meta.title + '</span><span class="foro-sub-count">' + count + '</span></button>';
+    }).join('');
+    const catCounts = {};
+    (allThreads || []).forEach(t => {
+      if (t.id && t.id.startsWith('topic_')) return;
+      const cat = (typeof categorize === 'function') ? categorize(t.pick_data?.league || t.league) : 'other';
+      catCounts[cat] = (catCounts[cat] || 0) + 1;
+    });
+    catCounts.all = (allThreads || []).filter(t => !(t.id && t.id.startsWith('topic_'))).length;
+    const leagueKeys = ['all','wc','cl','pl','la','lpf','bra','other','following'];
+    leagueList.innerHTML = leagueKeys.map(cat => {
+      const l = _LEAGUE_LABELS[cat];
+      if (!l) return '';
+      const active = ((typeof currentCat !== 'undefined' ? currentCat : 'all') === cat) ? ' is-active' : '';
+      const count = catCounts[cat] || 0;
+      return '<button class="foro-sub-link' + active + '" data-nav-cat="' + cat + '"><span class="foro-sub-emoji">' + l.emoji + '</span><span class="foro-sub-name">' + l.name + '</span><span class="foro-sub-count">' + count + '</span></button>';
+    }).join('');
+  };
+
+  window.renderForoCrumb = function() {
+    const crumb = document.getElementById('foroCrumb');
+    if (!crumb) return;
+    const cat = (typeof currentCat !== 'undefined' ? currentCat : 'all');
+    const l = _LEAGUE_LABELS[cat] || _LEAGUE_LABELS.all;
+    crumb.innerHTML = '<button data-nav-cat="all">Foro</button> <span class="foro-crumb__sep">›</span> <span class="foro-crumb__current">' + l.emoji + ' ' + l.name + '</span>';
+  };
+
+  document.addEventListener('click', (e) => {
+    const subBtn = e.target.closest('[data-nav-topic]');
+    if (subBtn) {
+      e.preventDefault();
+      const tid = subBtn.dataset.navTopic;
+      if (typeof openTopicPanel === 'function') openTopicPanel(tid);
+      return;
+    }
+    const catBtn = e.target.closest('[data-nav-cat]');
+    if (catBtn) {
+      e.preventDefault();
+      if (typeof currentCat !== 'undefined') window.currentCat = catBtn.dataset.navCat;
+      renderForoSidebar();
+      renderForoCrumb();
+      if (typeof renderThreads === 'function') renderThreads();
+      const list = document.getElementById('threadList');
+      if (list) list.scrollIntoView({behavior:'smooth', block:'start'});
+      const sb = document.getElementById('foroSidebar');
+      if (sb) sb.classList.remove('is-open');
+      return;
+    }
+    const sortBtn = e.target.closest('.foro-sort-tab');
+    if (sortBtn) {
+      _feedSort = sortBtn.dataset.sort;
+      window._feedSort = _feedSort;
+      document.querySelectorAll('.foro-sort-tab').forEach(b => b.classList.toggle('is-active', b === sortBtn));
+      if (typeof renderThreads === 'function') renderThreads();
+      return;
+    }
+  });
+
+  // Re-render sidebar cuando se recargan hilos
+  const _origLoadAll = typeof loadAll === 'function' ? loadAll : null;
+  if (_origLoadAll) {
+    window.loadAll = async function() {
+      const r = await _origLoadAll.apply(this, arguments);
+      try { renderForoSidebar(); renderForoCrumb(); } catch(e) { console.warn('[sidebar]', e); }
+      return r;
+    };
+  }
+  // Init si allThreads ya está cargado
+  setTimeout(() => { try { renderForoSidebar(); renderForoCrumb(); } catch(e){} }, 800);
+})();
+</script>
+
 </body>
 </html>
