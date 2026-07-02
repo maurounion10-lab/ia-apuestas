@@ -72,6 +72,51 @@ function _sendInactivityPromo() {
   wrap.scrollTop = wrap.scrollHeight;
 }
 
+// ─────────────────────────────────────────────────────────────
+// BADGE 48h — desaparece al abrir el chat, vuelve 48h después
+// ─────────────────────────────────────────────────────────────
+const AI_BADGE_KEY = 'gb_ai_badge_opened_at';
+const AI_BADGE_COOLDOWN_MS = 48 * 60 * 60 * 1000; // 48 horas
+
+function aiHideBadge() {
+  const b = document.getElementById('aiChatBadge');
+  if (b) b.style.display = 'none';
+  try { localStorage.setItem(AI_BADGE_KEY, String(Date.now())); } catch(_) {}
+}
+
+function aiShowBadge() {
+  const b = document.getElementById('aiChatBadge');
+  if (b) b.style.display = '';
+}
+
+function aiCheckBadgeVisibility() {
+  const b = document.getElementById('aiChatBadge');
+  if (!b) return;
+  let lastOpened = 0;
+  try { lastOpened = parseInt(localStorage.getItem(AI_BADGE_KEY) || '0', 10); } catch(_) {}
+  if (!lastOpened) { aiShowBadge(); return; }
+  const elapsed = Date.now() - lastOpened;
+  if (elapsed >= AI_BADGE_COOLDOWN_MS) {
+    // Pasaron 48h desde la última apertura → mostrar de nuevo
+    try { localStorage.removeItem(AI_BADGE_KEY); } catch(_) {}
+    aiShowBadge();
+  } else {
+    // Todavía dentro de la ventana de 48h → mantener oculto
+    b.style.display = 'none';
+  }
+}
+
+// Ejecutar en cuanto el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', aiCheckBadgeVisibility);
+} else {
+  aiCheckBadgeVisibility();
+}
+// Además revisar al volver a la pestaña (visibilitychange) por si pasaron las 48h en segundo plano
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) aiCheckBadgeVisibility();
+});
+
 function aiToggleChat() {
   const box = document.getElementById('aiChatBox');
   if (aiOpen) {
@@ -88,7 +133,8 @@ function aiToggleChat() {
     // Forzar reflow para que la transición de apertura funcione limpia
     void box.offsetWidth;
     box.classList.add('open');
-    // puntito rojo siempre visible — no se oculta al abrir
+    // Ocultar notificación + guardar timestamp (vuelve 48h después)
+    aiHideBadge();
     if (!aiGreeted) aiGreet();
     setTimeout(() => document.getElementById('aiInput').focus(), 300);
   }
