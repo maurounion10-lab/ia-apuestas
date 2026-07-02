@@ -4206,6 +4206,13 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     var idx = parseInt(document.getElementById('gbmPartido').value, 10);
     var p = _matches[idx];
     if (!p) { msg.className='gbm-msg err'; msg.textContent='Elegí un partido'; return; }
+    // 🚫 Anti-trampa (2-jul-2026): último gate — no permitir publicar si el partido ya arrancó/terminó
+    var _kickMs2 = (p.commenceTs && p.commenceTs > 1e10) ? p.commenceTs : (p.commenceTs ? p.commenceTs*1000 : 0);
+    if (_kickMs2 && Date.now() >= _kickMs2 - 60*1000) {
+      msg.className='gbm-msg err';
+      msg.textContent='❌ El partido ya arrancó. Solo se pueden publicar apuestas ANTES del inicio.';
+      return;
+    }
     var alias = document.getElementById('gbmAlias').value.trim();
     var mercado = document.getElementById('gbmMercado').value || 'Ganador Local';
     var odds = parseFloat(document.getElementById('gbmOdds').value) || 0;
@@ -4272,6 +4279,17 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
   // 🆕 (2-jul-2026) openGbBetModalWithPick: abre el modal con el pick de Gambeta pre-cargado
   window.openGbBetModalWithPick = async function(pick) {
     if (!pick || !pick.home || !pick.away) return openGbBetModal();
+    // 🚫 Anti-trampa (2-jul-2026): rechazar picks resueltos o con partido ya iniciado
+    var _kickMs = (pick.commenceTs && pick.commenceTs > 1e10) ? pick.commenceTs : (pick.commenceTs ? pick.commenceTs*1000 : 0);
+    if (_kickMs && Date.now() >= _kickMs - 60*1000) {
+      alert('⚠️ No podés publicar este pick — el partido ya arrancó.\n\nPara publicar una apuesta hay que hacerlo ANTES del inicio del partido. Si el resultado ya se sabe, sería trampa.');
+      return;
+    }
+    if (pick.result === 'win' || pick.result === 'loss' || pick.result === 'void' ||
+        (pick.finalScore && /^\d+-\d+$/.test(pick.finalScore))) {
+      alert('⚠️ Este pronóstico ya está resuelto. No se puede publicar como apuesta.');
+      return;
+    }
     // Pending pick — se resuelve después de que loadMatches() termine
     window._gbmPendingPrefill = pick;
     openGbBetModal();
