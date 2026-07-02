@@ -30,9 +30,8 @@
 #gbForoRecent.gb-lazy-render      { contain-intrinsic-size: 1000px 380px }
 #gbRichFooter.gb-lazy-render      { contain-intrinsic-size: 1000px 640px }
 #seo-hub-mundial.gb-lazy-render   { contain-intrinsic-size: 1000px 340px }
-/* Above-fold priority: fuerza render inmediato de header + hero + predictions */
+/* Above-fold priority: fuerza render inmediato de header + hero + predictions (sin contain agresivo) */
 .gb-above-fold {
-  contain: layout style paint;
   content-visibility: visible !important;
 }
 @supports not (content-visibility: auto) {
@@ -305,6 +304,7 @@ main{max-width:1280px;margin:0 auto;padding:32px 20px}
       }
     } catch(e){}
   })();
+*/
 </script>
 <style id="gb-hide-coins">/* Sistema  /  discontinuado — UI ocultada (no romper JS) */
 #acoinPanel,#acoinToast,#acoinNavBal,.acoin-widget,.acoin-panel,.acoin-toast,.acoin-pick-section,.acoin-pick-btns,.acoin-pick-btn,.acico,#panelPremios,#ranking,#gFeedWrap,.gfeed-list,[id^="acoin"],[class^="acoin"]{display:none!important}</style>
@@ -1054,7 +1054,7 @@ window.toggleHeroBubble = function(n) {
 <main>
 
   <!-- PREDICTIONS -->
-  <section id="predictions" class="gb-above-fold">
+  <section id="predictions">
     <div class="section-title">
       <div class="icon">🔮</div>
       Pronósticos de la IA
@@ -4380,7 +4380,9 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
 
 
 <script>
-// 🆕 (2-jul-2026) Progressive Enhancement: pre-render de secciones cercanas al viewport
+// 🚑 (2-jul-2026) Progressive Enhancement DESACTIVADO — investigar si rompe render
+// Original preservado abajo para reactivar cuando esté validado
+/*
 // mientras el user consume el hero + fichas (los primeros 20% visibles).
 // Esto evita el "flash" cuando el user scrollea abajo.
 (function(){
