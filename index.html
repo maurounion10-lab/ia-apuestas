@@ -3911,15 +3911,15 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
 
 <!-- 🆕 (1-jul-2026) Modal universal Publicar Apuesta — desde cualquier página, sin redirect -->
 <style>
-#gbBetModal{position:fixed;inset:0;z-index:99997;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);display:none;align-items:flex-start;justify-content:center;padding:80px 16px 20px;overflow-y:auto}
+#gbBetModal{position:fixed;inset:0;z-index:99997;background:rgba(0,0,0,0.85);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px 16px;overflow-y:auto}
 #gbBetModal.is-open{display:flex}
-.gbm-box{width:100%;max-width:520px;background:#0d1a0d;border:1px solid rgba(0,200,83,0.3);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.7);animation:gbmSlide .28s cubic-bezier(.34,1.3,.64,1)}
+.gbm-box{width:100%;max-width:520px;background:#0d1a0d;border:1px solid rgba(0,200,83,0.3);border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.7);animation:gbmSlide .28s cubic-bezier(.34,1.3,.64,1);display:flex;flex-direction:column;max-height:calc(100vh - 100px)}
 @keyframes gbmSlide{from{opacity:0;transform:translateY(-20px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-.gbm-head{background:linear-gradient(135deg,#e01237,#c8102e);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.gbm-title{font-weight:800;color:#fff;font-size:1.05rem;display:flex;align-items:center;gap:8px}
+.gbm-head{background:linear-gradient(135deg,#0d1a0d,#0a1a0a);border-bottom:2px solid rgba(0,200,83,0.35);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-shrink:0}
+.gbm-title{font-weight:900;color:#fff;font-size:1.08rem;display:flex;align-items:center;gap:8px;letter-spacing:.01em}
 .gbm-close{background:rgba(0,0,0,0.25);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s}
 .gbm-close:hover{background:rgba(0,0,0,0.5);transform:rotate(90deg)}
-.gbm-body{padding:28px 26px 30px;display:flex;flex-direction:column;gap:26px}
+.gbm-body{padding:24px 24px 26px;display:flex;flex-direction:column;gap:22px;overflow-y:auto;flex:1;min-height:0}
 .gbm-body>div{margin:0;padding:0}
 .gbm-lbl{display:block;margin:0 0 12px 2px;font-size:.76rem;font-weight:700;color:#00c853;letter-spacing:.08em;text-transform:uppercase;line-height:1.2}
 .gbm-input,.gbm-select,.gbm-textarea{width:100%;background:#162616;color:#fff;border:1.5px solid rgba(0,200,83,0.25);border-radius:10px;padding:1.05rem 1.15rem;font-size:.98rem;font-family:inherit;outline:none;transition:border-color .15s;box-sizing:border-box}
@@ -3937,15 +3937,19 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
 .gbm-submit:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
 .gbm-msg{font-size:.85rem;text-align:center;padding:.75rem 1rem;border-radius:10px;display:none;margin:4px 0}
 /* DBbet chip fija (cuota + casa) — estilo compartido con ficha 1-click del home */
-.gbm-dbbet-chip{display:inline-flex;align-items:center;gap:10px;width:100%;padding:1.05rem 1.15rem;background:linear-gradient(135deg,rgba(255,215,0,0.06) 0%,transparent 40%),linear-gradient(135deg,#dc1e2e 0%,#b8121f 50%,#8a0a16 100%);border:1.5px solid #FFD700;border-radius:11px;color:#fff;font-weight:800;font-family:inherit;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(220,30,46,0.35),0 0 0 1px rgba(255,215,0,0.22) inset;box-sizing:border-box;cursor:not-allowed}
+.gbm-dbbet-chip{display:inline-flex;align-items:center;gap:10px;width:100%;padding:.95rem 1.05rem;background:linear-gradient(135deg,rgba(0,200,83,0.05) 0%,transparent 60%),#162616;border:1.5px solid rgba(0,200,83,0.35);border-radius:11px;color:#fff;font-weight:800;font-family:inherit;position:relative;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.25),0 0 0 1px rgba(0,200,83,0.08) inset;box-sizing:border-box;cursor:not-allowed}
+.gbm-dbbet-chip.gbm-dbbet-house{background:linear-gradient(135deg,rgba(255,215,0,0.06) 0%,transparent 40%),linear-gradient(135deg,#c8102e 0%,#a10d24 60%,#7d0819 100%);border:1.5px solid rgba(255,215,0,0.55);box-shadow:0 3px 10px rgba(200,16,46,0.25),0 0 0 1px rgba(255,215,0,0.18) inset}
 .gbm-dbbet-chip .gbm-db-logo{flex-shrink:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4))}
-.gbm-dbbet-chip .gbm-db-cuota{font-size:1.1rem;font-weight:900;letter-spacing:-0.01em;flex:1;font-variant-numeric:tabular-nums}
-.gbm-dbbet-chip .gbm-db-badge{font-size:.62rem;font-weight:800;background:rgba(255,215,0,0.9);color:#5a0810;padding:2px 7px;border-radius:5px;letter-spacing:0.06em}
-.gbm-dbbet-chip::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(105deg,transparent 30%,rgba(255,215,0,0.25) 50%,rgba(255,255,255,0.35) 52%,rgba(255,215,0,0.25) 55%,transparent 65%);transform:skewX(-22deg);pointer-events:none;animation:gbmDbbetShine 4s ease-in-out infinite}
+.gbm-dbbet-chip .gbm-db-cuota{font-size:1.15rem;font-weight:900;letter-spacing:-0.01em;flex:1;font-variant-numeric:tabular-nums;color:#00e564}
+.gbm-dbbet-chip.gbm-dbbet-house .gbm-db-cuota{color:#fff}
+.gbm-dbbet-chip .gbm-db-badge{font-size:.62rem;font-weight:800;background:rgba(0,200,83,0.9);color:#0a1a0a;padding:2px 7px;border-radius:5px;letter-spacing:0.06em}
+.gbm-dbbet-chip.gbm-dbbet-house .gbm-db-badge{background:rgba(255,215,0,0.9);color:#5a0810}
+.gbm-dbbet-chip::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(105deg,transparent 30%,rgba(0,200,83,0.18) 50%,rgba(255,255,255,0.15) 52%,rgba(0,200,83,0.18) 55%,transparent 65%);transform:skewX(-22deg);pointer-events:none;animation:gbmDbbetShine 4s ease-in-out infinite}
+.gbm-dbbet-chip.gbm-dbbet-house::before{background:linear-gradient(105deg,transparent 30%,rgba(255,215,0,0.25) 50%,rgba(255,255,255,0.35) 52%,rgba(255,215,0,0.25) 55%,transparent 65%)}
 @keyframes gbmDbbetShine{0%,100%{left:-100%}50%,55%{left:200%}}
 .gbm-msg.ok{display:block;background:rgba(0,200,83,0.15);color:#a5d6a7;border:1px solid rgba(0,200,83,0.4)}
 .gbm-msg.err{display:block;background:rgba(255,80,80,0.15);color:#ff8a8a;border:1px solid rgba(255,80,80,0.4)}
-@media (max-width:480px){#gbBetModal{padding:60px 10px 20px}.gbm-body{padding:22px 20px 24px;gap:22px}.gbm-row2{grid-template-columns:1fr;gap:22px}.gbm-submit{padding:1rem 1.2rem;font-size:1rem}}
+@media (max-width:480px){#gbBetModal{padding:12px 10px}.gbm-box{max-height:calc(100vh - 24px)}.gbm-body{padding:18px 16px 20px;gap:18px}.gbm-row2{grid-template-columns:1fr;gap:18px}.gbm-submit{padding:1rem 1.2rem;font-size:1rem}}
 </style>
 
 <div id="gbBetModal" role="dialog" aria-modal="true" aria-labelledby="gbmTitle">
@@ -4006,7 +4010,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
           <label class="gbm-lbl">Cuota DBbet</label>
           <div class="gbm-dbbet-chip" id="gbmOddsChip">
             <svg class="gbm-db-logo" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="900" fill="#dc1e2e">DB</text></svg>
-            <span class="gbm-db-cuota" id="gbmOddsDisplay">—</span>
+            <span class="gbm-db-cuota" id="gbmOddsDisplay">1.85</span>
             <span class="gbm-db-badge">AUTO</span>
             <input type="hidden" id="gbmOdds" value="1.85">
           </div>
