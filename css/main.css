@@ -6182,3 +6182,28 @@ html { -webkit-tap-highlight-color: rgba(0,200,83,0.15); }
 
 /* #608 — CLS fix: flags dinámicas tienen tamaño fijo via CSS */
 .flag-icon, img[src*="flagcdn.com"] { aspect-ratio: 3/2; min-height: 16px; }
+
+/* 🆕 (2-jul-2026) FIX MOBILE: boton APOSTAR (Anton mas chico en pantallas chicas) */
+@media (max-width: 520px) {
+  .pred-dbbet-1click .db-msg-single { font-size: 0.9rem !important; letter-spacing: 0.04em !important; }
+  .pred-dbbet-1click .db-odds { font-size: 0.85rem !important }
+}
+@media (max-width: 380px) {
+  .pred-dbbet-1click .db-msg-single { font-size: 0.82rem !important; letter-spacing: 0.03em !important; }
+  .pred-dbbet-1click .db-odds { font-size: 0.8rem !important; padding: 3px 7px !important }
+  .pred-dbbet-1click .db-odds-gem { font-size: 0.85em !important; margin-right: 3px !important }
+}
+/* SVG del sello ACERTADO: reemplaza el emoji, mismo tamaño visual, animacion suave */
+.pred-result-stamp-icon svg {
+  display: block;
+  width: 44px; height: 44px;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+  animation: stampBadgePop 2.2s ease-in-out infinite;
+}
+@keyframes stampBadgePop {
+  0%,100% { transform: scale(1) rotate(-3deg) }
+  50%     { transform: scale(1.08) rotate(4deg) }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pred-result-stamp-icon svg { animation: none }
+}
