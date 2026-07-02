@@ -431,6 +431,34 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .champ-badge::before{content:"👑"}
 .champ-badges-row{display:flex;flex-wrap:wrap;gap:.25rem;margin-top:.35rem}
 
+
+/* 🆕 (1-jul-2026 #654) FASE A — Rediseño navegación estilo Reddit/XenForo híbrido */
+.foro-layout{display:grid;grid-template-columns:260px 1fr;gap:24px;margin-top:12px;align-items:start}
+.foro-sidebar{position:sticky;top:120px;background:rgba(6,13,6,0.92);border:1px solid var(--border);border-radius:16px;padding:14px 12px;max-height:calc(100vh - 140px);overflow-y:auto;backdrop-filter:blur(10px)}
+.foro-sidebar__title{font-size:.68rem;font-weight:800;color:var(--verde);letter-spacing:.1em;text-transform:uppercase;padding:0 6px 8px;border-bottom:1px solid rgba(0,200,83,.15);margin-bottom:8px}
+.foro-sub-link{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;color:#d4edda;text-decoration:none;font-size:.85rem;transition:background .15s,color .15s;cursor:pointer;font-family:inherit;background:none;border:none;width:100%;text-align:left;line-height:1.3}
+.foro-sub-link:hover{background:rgba(0,200,83,.08);color:#fff}
+.foro-sub-link.is-active{background:rgba(0,200,83,.14);color:#fff;box-shadow:inset 3px 0 0 var(--verde)}
+.foro-sub-emoji{font-size:1.05rem;flex-shrink:0}
+.foro-sub-name{flex:1;font-weight:600}
+.foro-sub-count{font-size:.7rem;color:rgba(165,214,167,.6);font-family:'Geist Mono','SF Mono',monospace;font-variant-numeric:tabular-nums;background:rgba(0,200,83,.06);padding:2px 6px;border-radius:6px}
+.foro-sub-divider{height:1px;background:rgba(0,200,83,.1);margin:10px 4px}
+/* Breadcrumb */
+.foro-crumb{display:flex;align-items:center;gap:8px;font-size:.82rem;color:rgba(255,255,255,.65);padding:8px 4px 14px;flex-wrap:wrap}
+.foro-crumb a,.foro-crumb button{color:var(--verde);text-decoration:none;cursor:pointer;background:none;border:none;padding:0;font:inherit;font-weight:600}
+.foro-crumb a:hover,.foro-crumb button:hover{text-decoration:underline}
+.foro-crumb__sep{opacity:.5}
+.foro-crumb__current{color:#fff;font-weight:700}
+/* Tabs Hot/Nuevo/Top */
+.foro-sort-tabs{display:flex;gap:4px;padding:4px;background:rgba(0,0,0,.3);border:1px solid rgba(0,200,83,.15);border-radius:12px;margin-bottom:12px;width:fit-content}
+.foro-sort-tab{padding:6px 14px;font-size:.8rem;font-weight:700;color:rgba(255,255,255,.5);background:none;border:none;border-radius:8px;cursor:pointer;transition:background .15s,color .15s;letter-spacing:.02em;font-family:inherit}
+.foro-sort-tab:hover{color:#fff}
+.foro-sort-tab.is-active{background:var(--verde);color:#0a1a0a}
+/* Mobile: collapse sidebar */
+@media(max-width:960px){.foro-layout{grid-template-columns:1fr;gap:0}.foro-sidebar{position:relative;top:0;max-height:none;margin-bottom:16px}}
+@media(max-width:600px){.foro-sidebar{display:none}.foro-sidebar.is-open{display:block;position:fixed;inset:60px 12px 12px;z-index:200;overflow-y:auto}.foro-mobile-menu{display:flex}}
+.foro-mobile-menu{display:none;align-items:center;gap:8px;padding:8px 12px;background:rgba(0,200,83,.1);border:1px solid rgba(0,200,83,.3);border-radius:10px;color:var(--verde);font-weight:700;font-size:.85rem;cursor:pointer;margin-bottom:10px}
+
 </style>
 </head>
 <body>
@@ -454,7 +482,20 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 </header>
 
 <main>
-  <!-- 🆕 (30-jun-2026 #635) TOOLBAR STICKY con busqueda -->
+  
+<!-- 🆕 (1-jul-2026 #654) Layout con sidebar sub-foros -->
+<button class="foro-mobile-menu" onclick="document.getElementById('foroSidebar').classList.toggle('is-open')">☰ Sub-foros</button>
+<div class="foro-layout">
+  <aside class="foro-sidebar" id="foroSidebar">
+    <div class="foro-sidebar__title">Sub-foros temáticos</div>
+    <div id="foroSubList"></div>
+    <div class="foro-sub-divider"></div>
+    <div class="foro-sidebar__title">Por competencia</div>
+    <div id="foroLeagueList"></div>
+  </aside>
+  <div class="foro-main">
+    <div class="foro-crumb" id="foroCrumb"></div>
+<!-- 🆕 (30-jun-2026 #635) TOOLBAR STICKY con busqueda -->
   <div class="foro-toolbar" id="foroToolbar">
     <div class="foro-toolbar__title">
       <span class="foro-toolbar__icon">💬</span>
@@ -606,12 +647,22 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
     </div>
   </div>
 
-  <div class="section-title">🔥 Hilos recientes</div>
+  <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:10px">
+    <div class="section-title" id="foroFeedTitle" style="margin:0">🔥 Hilos recientes</div>
+    <div class="foro-sort-tabs" role="tablist">
+      <button class="foro-sort-tab is-active" data-sort="hot" role="tab">🔥 Hot</button>
+      <button class="foro-sort-tab" data-sort="new" role="tab">🆕 Nuevo</button>
+      <button class="foro-sort-tab" data-sort="top" role="tab">⭐ Top</button>
+    </div>
+  </div>
   <div class="thread-list" id="threadList">
     <div class="loading">Cargando hilos…</div>
   </div>
 
-  <div class="cta-box">
+    </div><!-- /foro-main -->
+</div><!-- /foro-layout -->
+
+<div class="cta-box">
     <h3>¿Querés sumar tu opinión?</h3>
     <p>Cada partido tiene su hilo en el home. Hacé tap en el botón 💬 de la ficha para comentar.</p>
     <a href="/#predictions">Ver picks de hoy →</a>
@@ -1794,7 +1845,34 @@ function renderThreads() {
 
   // Detectar hot threads (>= 3 mensajes en últimas 24h)
   const dayAgo = Date.now() - 86400000;
-  list.innerHTML = filtered.slice(0, 30).map(t => {
+  // 🆕 Aplicar sort según _feedSort
+  const sortedFiltered = (function(){
+    if (_feedSort === 'new') {
+      return [...filtered].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
+    }
+    if (_feedSort === 'top') {
+      // ordenar por # posts (más comentados)
+      return [...filtered].sort((a,b) => {
+        const ca = (postsByThread[a.id]||[]).length;
+        const cb = (postsByThread[b.id]||[]).length;
+        return cb - ca;
+      });
+    }
+    // hot (default): mezcla actividad reciente + score
+    const now = Date.now();
+    return [...filtered].sort((a,b) => {
+      const pa = (postsByThread[a.id]||[]);
+      const pb = (postsByThread[b.id]||[]);
+      const lastA = pa[0] ? new Date(pa[0].created_at).getTime() : new Date(a.created_at||0).getTime();
+      const lastB = pb[0] ? new Date(pb[0].created_at).getTime() : new Date(b.created_at||0).getTime();
+      const ageA = (now - lastA) / 3600000; // horas
+      const ageB = (now - lastB) / 3600000;
+      const scoreA = pa.length / Math.pow(ageA+2, 0.8);
+      const scoreB = pb.length / Math.pow(ageB+2, 0.8);
+      return scoreB - scoreA;
+    });
+  })();
+  list.innerHTML = sortedFiltered.slice(0, 30).map(t => {
     const tposts = postsByThread[t.id] || [];
     const recentCount = tposts.filter(p => new Date(p.created_at).getTime() > dayAgo).length;
     const isHot = recentCount >= 3;
