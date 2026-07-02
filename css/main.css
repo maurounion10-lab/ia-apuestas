@@ -6245,3 +6245,142 @@ html { -webkit-tap-highlight-color: rgba(0,200,83,0.15); }
 @media (max-width: 380px) {
   :root { --gb-top-banners: 110px; --gb-bottom-banner: 54px }
 }
+
+/* 🆕 (2-jul-2026) CHEQUEO GENERAL MOBILE — mejor adaptación de textos, touch targets, wrapping */
+
+/* ── PREVENCIÓN DE OVERFLOW HORIZONTAL — GLOBAL ────────────────────── */
+html, body { overflow-x: hidden }
+* { max-width: 100% }
+img, video, iframe, svg { max-width: 100%; height: auto }
+
+/* ── WRAPPING INTELIGENTE DE TEXTOS LARGOS ─────────────────────────── */
+@media (max-width: 720px) {
+  h1, h2, h3, h4, .hero h1, .section-title {
+    overflow-wrap: break-word;
+    word-break: break-word;
+    hyphens: auto;
+    -webkit-hyphens: auto;
+  }
+  p, li, span, a, button {
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+  /* Palabras muy largas / URLs / emails */
+  a, code, .pred-card, .breadcrumb, .pred-rec-title { overflow-wrap: anywhere }
+}
+
+/* ── FLEX CHILDREN QUE NO SE ENCOJEN CORRECTAMENTE ─────────────────── */
+@media (max-width: 720px) {
+  .pred-card > *, .card > *, .flex-row > * { min-width: 0 }
+  .pred-card .team-name { flex: 1 1 auto; min-width: 0; overflow-wrap: break-word }
+}
+
+/* ── TOUCH TARGETS: min 44px alto en mobile (Apple/Google guidelines) ─ */
+@media (max-width: 720px) {
+  button, a[href], input[type=button], input[type=submit], [role=button], .btn, .tab {
+    min-height: 40px;
+    padding-block: max(8px, 0.5em);
+  }
+  /* Excluir botones dentro de nav/toolbar donde el diseño ya está compacto */
+  nav button, .nav button, .foro-toolbar button, .tab-count { min-height: auto }
+}
+
+/* ── INPUTS: font-size >= 16px para evitar zoom automático iOS ───────── */
+@media (max-width: 720px) {
+  input, textarea, select { font-size: 16px !important }
+}
+
+/* ── SPACING LATERAL CONSISTENTE ─────────────────────────────────────── */
+@media (max-width: 720px) {
+  .container, main, section { padding-left: 14px; padding-right: 14px }
+  section.hero, header.hero { padding-left: 16px; padding-right: 16px }
+}
+@media (max-width: 380px) {
+  .container, main, section { padding-left: 10px; padding-right: 10px }
+}
+
+/* ── HERO TITLE — clamp para escalar bien y no reventar en mobile ──── */
+@media (max-width: 720px) {
+  header.hero h1, .hero h1 {
+    font-size: clamp(1.5rem, 6vw, 2.4rem);
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+  header.hero p, .hero p {
+    font-size: clamp(0.9rem, 3.5vw, 1.05rem);
+    line-height: 1.5;
+  }
+}
+
+/* ── TABS Y CHIPS: scroll horizontal en vez de wrap desprolijo ───────── */
+@media (max-width: 720px) {
+  .tabs-row, .chips-row, .filter-row, [class*="tabs-scroll"] {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .tabs-row::-webkit-scrollbar, .chips-row::-webkit-scrollbar { display: none }
+  .tabs-row > *, .chips-row > * { flex-shrink: 0 }
+}
+
+/* ── TABLAS: scroll horizontal wrapper ───────────────────────────────── */
+@media (max-width: 720px) {
+  table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch }
+}
+
+/* ── CARDS DE PICKS: mejor uso del espacio ───────────────────────────── */
+@media (max-width: 720px) {
+  .pred-card, .pick-card { padding: 14px 12px !important }
+  .pred-card .pred-header { flex-wrap: wrap; gap: 6px }
+  .pred-card .team-block { flex: 1 1 45%; min-width: 0 }
+  .pred-card img { max-height: 40px; width: auto }
+}
+
+/* ── LEGIBILIDAD: line-height más generoso ───────────────────────────── */
+@media (max-width: 720px) {
+  body, p, li, .pred-insight, .pred-rec-desc {
+    line-height: 1.55;
+  }
+}
+
+/* ── BOTONES CTA GRANDES en mobile — más grandes, no chiquitos ────── */
+@media (max-width: 720px) {
+  .cta-btn, .btn-primary, [class*="pred-cta"] {
+    padding: 12px 16px;
+    font-size: 0.95rem;
+    min-height: 44px;
+    width: 100%;
+  }
+}
+
+/* ── MODAL/POPUP GENÉRICO — safe area + no tapar banners ────────────── */
+@media (max-width: 720px) {
+  [role="dialog"], .modal, .popup, .overlay {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+  [role="dialog"] > *, .modal > *, .popup > * {
+    max-width: 100%;
+  }
+}
+
+/* ── COUNTERS / STATS: no romperse en pantallas chicas ─────────────── */
+@media (max-width: 380px) {
+  .stat-val { font-size: 1.35rem !important }
+  .stat-lbl { font-size: 0.6rem !important }
+  .stats { gap: 10px !important }
+}
+
+/* ── FORO SIDEBAR-OFF MOBILE: badges/counters compactos ─────────────── */
+@media (max-width: 600px) {
+  .foro-sub-count { font-size: 0.62rem !important; padding: 1px 5px !important }
+  .foro-sub-name { font-size: 0.8rem !important }
+}
+
+/* ── NAV CTA "Registro Gratis" — permitir wrap en pantallas chicas ─── */
+@media (max-width: 500px) {
+  .nav-cta-btn { font-size: 0.72rem !important; padding: 6px 10px !important }
+}
