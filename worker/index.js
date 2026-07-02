@@ -4271,6 +4271,42 @@ export default {
     // Resuelve UN pick específico sin esperar al cron. Usa fetchApfScore +
     // fetchTsdbEvent + ESPN. Sin gate de tiempo (90min) — el caller decide.
     // Usado por el cliente self-healing (Gambeta 1.1 madurez).
+    if (path === '/admin/wc-futures-resolve') {
+      const token = url.searchParams.get('token');
+      if (token !== 'gambeta_wc_2026_trigger') return new Response('unauthorized', { status: 401, headers: CORS });
+      const targetId = url.searchParams.get('id');
+      const targetResult = url.searchParams.get('result');
+      const targetPl = parseFloat(url.searchParams.get('pl') || '0');
+      if (!targetId || !targetResult) return new Response(JSON.stringify({error:'id+result required'}), {status:400, headers:CORS});
+      try {
+        const key = env.SUPABASE_SERVICE_ROLE_KEY;
+        if (!key) return new Response(JSON.stringify({error:'no service_role'}), {status:500, headers:CORS});
+        const r = await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.global_historial_v1&select=data`, { headers:{apikey:key, Authorization:`Bearer ${key}`}});
+        const rows = await r.json();
+        const picks = rows?.[0]?.data;
+        if (!Array.isArray(picks)) return new Response(JSON.stringify({error:'no picks'}), {status:404, headers:CORS});
+        let modified = false;
+        for (const p of picks) {
+          if (p && p.id === targetId) {
+            p.result = targetResult;
+            p.pl = targetPl;
+            p._manuallyResolved = true;
+            p._resolvedAt = new Date().toISOString();
+            modified = true;
+            break;
+          }
+        }
+        if (!modified) return new Response(JSON.stringify({error:'pick id not found', id:targetId}), {status:404, headers:CORS});
+        const pr = await fetch(`${SUPABASE_URL}/rest/v1/shared_cache?key=eq.global_historial_v1`, {
+          method:'PATCH', headers:{apikey:key, Authorization:`Bearer ${key}`, 'Content-Type':'application/json'},
+          body: JSON.stringify({ data: picks, fetched_at: new Date().toISOString() })
+        });
+        return new Response(JSON.stringify({ok: pr.ok, id:targetId, result:targetResult, pl:targetPl, status:pr.status}), {headers:CORS});
+      } catch(e) {
+        return new Response(JSON.stringify({error:e.message}), {status:500, headers:CORS});
+      }
+    }
+
     if (path === '/admin/resolve-pick') {
       const pickId = url.searchParams.get('id');
       if (!pickId) return new Response(JSON.stringify({ error: 'id required' }), { status: 400, headers: CORS });
