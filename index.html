@@ -3967,12 +3967,36 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
   var _matches = [];
   var _loaded = false;
 
+  // 🆕 (1-jul-2026) _gbmGetUser: lee sesión desde localStorage Supabase (funciona en cualquier página, sin depender de app-core.js)
+  function _gbmGetUser() {
+    // 1) Primer intento: variable global authUser (si app-core.js está cargado, ej. en el home)
+    if (typeof authUser !== 'undefined' && authUser && authUser.email) return authUser;
+    // 2) Segundo intento: leer token Supabase directamente de localStorage
+    try {
+      // Supabase v2 usa la key: sb-{project-ref}-auth-token
+      var keys = Object.keys(localStorage);
+      var authKey = keys.find(function(k) { return /^sb-.*-auth-token$/.test(k); });
+      if (!authKey) return null;
+      var raw = localStorage.getItem(authKey);
+      if (!raw) return null;
+      var data = JSON.parse(raw);
+      var sess = (data && data.currentSession) || data;
+      if (!sess || !sess.user || !sess.user.email) return null;
+      var u = sess.user;
+      return {
+        email: u.email,
+        name: u.user_metadata && (u.user_metadata.name || u.user_metadata.full_name || u.user_metadata.alias) || u.email.split('@')[0],
+        alias: u.user_metadata && u.user_metadata.alias
+      };
+    } catch(e) { return null; }
+  }
+
   window.openGbBetModal = function() {
     var m = document.getElementById('gbBetModal');
     if (!m) return;
     m.classList.add('is-open');
     document.body.style.overflow = 'hidden';
-    var user = (typeof authUser !== 'undefined' && authUser && authUser.email) ? authUser : null;
+    var user = _gbmGetUser();
     var gate = document.getElementById('gbmAuthGate');
     var body = document.getElementById('gbmAuthedBody');
     var userRow = document.getElementById('gbmUserInfoRow');
@@ -4121,7 +4145,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     var msg = document.getElementById('gbmMsg');
     msg.className = 'gbm-msg';
     msg.textContent = '';
-    var user = (typeof authUser !== 'undefined' && authUser && authUser.email) ? authUser : null;
+    var user = _gbmGetUser();
     if (!user) { msg.className='gbm-msg err'; msg.textContent='Iniciá sesión para publicar'; return; }
     var idx = parseInt(document.getElementById('gbmPartido').value, 10);
     var p = _matches[idx];
