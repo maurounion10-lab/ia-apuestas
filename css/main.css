@@ -625,10 +625,11 @@
     flex-shrink: 0;
   }
   .gfeed-avatar.initials {
-    border-radius: 50%;
-    background: rgba(255,214,0,0.12);
-    border: 1.5px solid rgba(255,214,0,0.3);
+    border-radius: 0;
+    background: transparent;
+    border: none;
   }
+  .gfeed-avatar img { width: 100%; height: 100%; object-fit: contain; background: transparent; }
   .gfeed-nick { font-size: 0.78rem; font-weight: 700; color: #ffd600; display:inline-flex; align-items:center; gap:3px; flex-wrap:nowrap; max-width:200px; }
   .gfeed-nick-text { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:120px; flex-shrink:1; }
   .gfeed-time { font-size: 0.65rem; color: var(--texto-sec); white-space:nowrap; }
@@ -2714,6 +2715,19 @@
     font-size: 0.85rem;
     padding: 0 8px;
   }
+  /* Escudos de fichas en mobile — más compactos, proporcionados a la card */
+  @media (max-width: 600px) {
+    .pred-match { margin-bottom: 12px; gap: 6px; }
+    .pred-team { gap: 3px; }
+    .pred-emoji { font-size: 1.6rem; }
+    .pred-emoji img { width: 52px !important; height: 52px !important; }
+    .pred-tname { font-size: 0.78rem; line-height: 1.15; }
+    .pred-vs { font-size: 0.72rem; padding: 0 4px; letter-spacing: 0.05em; }
+  }
+  @media (max-width: 380px) {
+    .pred-emoji img { width: 44px !important; height: 44px !important; }
+    .pred-tname { font-size: 0.72rem; }
+  }
 
   
   /* ── PRED CARD — Botón DBbet 1-click bet (PREMIUM) ── */
@@ -4361,8 +4375,8 @@
   .rk-pod-2 .rk-pod-avatar { width: 46px; height: 46px; }
   .rk-pod-3 .rk-pod-avatar { width: 38px; height: 38px; }
   .rk-pod-avatar-text {
-    border-radius: 50%; margin: 0 auto 8px;
-    background: rgba(0,200,83,0.15); border: 2px solid rgba(0,200,83,0.25);
+    border-radius: 0; margin: 0 auto 8px;
+    background: transparent; border: none;
     display: flex; align-items: center; justify-content: center;
     font-weight: 800; color: var(--verde);
   }
@@ -4397,7 +4411,7 @@
   .rk-row.rk-row-me { border-color: rgba(0,200,83,0.4); background: rgba(0,200,83,0.07); }
   .rk-row-num { width: 24px; text-align: center; font-size: 0.8rem; font-weight: 800; color: rgba(255,255,255,0.4); flex-shrink: 0; }
   .rk-row-avatar { width: 30px; height: 30px; border-radius: 0; object-fit: contain; background: transparent; padding: 2px; flex-shrink: 0; }
-  .rk-row-avatar-text { width: 30px; height: 30px; border-radius: 50%; background: rgba(0,200,83,0.15); display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: var(--verde); flex-shrink: 0; }
+  .rk-row-avatar-text { width: 30px; height: 30px; border-radius: 0; background: transparent; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: 800; color: var(--verde); flex-shrink: 0; }
   .rk-row-nick { flex: 1; font-size: 0.84rem; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .rk-row-bal  { font-size: 0.78rem; font-weight: 700; color: #ffd600; flex-shrink: 0; }
   .rk-row-prize { font-size: 0.65rem; font-weight: 700; color: var(--verde); background: rgba(0,200,83,0.12); border: 1px solid rgba(0,200,83,0.25); border-radius: 10px; padding: 2px 7px; flex-shrink: 0; }
@@ -4426,8 +4440,8 @@
   }
   .rkup-avatar { width: 44px; height: 44px; object-fit: contain; border-radius: 0; flex-shrink: 0; }
   .rkup-avatar-text {
-    width: 44px; height: 44px; border-radius: 50%; flex-shrink: 0;
-    background: rgba(0,200,83,0.15); border: 2px solid rgba(0,200,83,0.25);
+    width: 44px; height: 44px; border-radius: 0; flex-shrink: 0;
+    background: transparent; border: none;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.1rem; font-weight: 800; color: var(--verde);
   }
@@ -4919,13 +4933,14 @@
   }
   .drawer-user-avatar {
     width: 36px; height: 36px;
-    border-radius: 50%;
-    background: rgba(0,200,83,0.12);
-    border: 1px solid rgba(0,200,83,0.3);
+    border-radius: 0;
+    background: transparent;
+    border: none;
     display: flex; align-items: center; justify-content: center;
     font-size: 0.78rem; font-weight: 800; color: var(--verde);
     flex-shrink: 0; overflow: hidden;
   }
+  .drawer-user-avatar img { width: 100%; height: 100%; object-fit: contain; background: transparent; }
   .drawer-user-info { flex: 1; min-width: 0; }
   .drawer-user-name { font-size: 0.88rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .drawer-user-email { font-size: 0.7rem; color: var(--texto-sec); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
