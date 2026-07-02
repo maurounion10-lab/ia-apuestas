@@ -1274,6 +1274,95 @@
     background-size: 200% 100%;
     animation: golden-sweep 2.8s linear infinite;
   }
+  /* ─── Franja superior de ficha resuelta (WIN / LOSS) — Gambeta 1.1 ─── */
+  .pred-result-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 14px;
+    margin: -14px -14px 12px -14px;
+    border-radius: 12px 12px 0 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    position: relative;
+    overflow: hidden;
+  }
+  .pred-result-strip::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+  }
+  .pred-result-strip__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px; height: 18px;
+    border-radius: 999px;
+    flex-shrink: 0;
+  }
+  .pred-result-strip__icon svg { display: block; width: 12px; height: 12px; }
+  .pred-result-strip__label {
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    font-size: 0.72rem;
+  }
+  .pred-result-strip__sep {
+    width: 3px; height: 3px;
+    border-radius: 999px;
+    opacity: 0.5;
+    flex-shrink: 0;
+  }
+  .pred-result-strip__score {
+    font-family: 'Geist Mono', 'SF Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    font-size: 0.75rem;
+    letter-spacing: 0.01em;
+    opacity: 0.85;
+  }
+  .pred-result-strip__spacer { flex: 1; }
+  .pred-result-strip__status {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    opacity: 0.55;
+    text-transform: uppercase;
+  }
+  /* WIN */
+  .pred-result-strip--win {
+    background: linear-gradient(90deg, rgba(0,200,83,0.16) 0%, rgba(0,200,83,0.08) 100%);
+    border-bottom: 1px solid rgba(0,200,83,0.28);
+    color: #00e676;
+  }
+  .pred-result-strip--win::before { background: #00c853; }
+  .pred-result-strip--win .pred-result-strip__icon {
+    background: rgba(0,200,83,0.22);
+    color: #00e676;
+  }
+  .pred-result-strip--win .pred-result-strip__sep { background: #00e676; }
+  /* LOSS */
+  .pred-result-strip--loss {
+    background: linear-gradient(90deg, rgba(229,57,53,0.14) 0%, rgba(229,57,53,0.06) 100%);
+    border-bottom: 1px solid rgba(229,57,53,0.24);
+    color: #ef5350;
+  }
+  .pred-result-strip--loss::before { background: #e53935; }
+  .pred-result-strip--loss .pred-result-strip__icon {
+    background: rgba(229,57,53,0.22);
+    color: #ef5350;
+  }
+  .pred-result-strip--loss .pred-result-strip__sep { background: #ef5350; }
+  @media (max-width: 480px) {
+    .pred-result-strip { padding: 8px 12px; gap: 8px; font-size: 0.72rem; }
+    .pred-result-strip__label { font-size: 0.68rem; }
+    .pred-result-strip__score { font-size: 0.7rem; }
+    .pred-result-strip__status { display: none; }
+  }
+
   .pred-card-win {
     border-color: rgba(0,200,83,0.45) !important;
     background: linear-gradient(180deg, rgba(0,200,83,0.07) 0%, var(--gris-card) 60%) !important;
