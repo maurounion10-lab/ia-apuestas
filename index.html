@@ -3919,14 +3919,14 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
 .gbm-title{font-weight:800;color:#fff;font-size:1.05rem;display:flex;align-items:center;gap:8px}
 .gbm-close{background:rgba(0,0,0,0.25);border:none;color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s}
 .gbm-close:hover{background:rgba(0,0,0,0.5);transform:rotate(90deg)}
-.gbm-body{padding:20px;display:flex;flex-direction:column;gap:18px}
+.gbm-body{padding:24px;display:flex;flex-direction:column;gap:22px}
 .gbm-body>div{margin:0;padding:0}
-.gbm-lbl{display:block;margin:0 0 8px 2px;font-size:.72rem;font-weight:700;color:#00c853;letter-spacing:.08em;text-transform:uppercase;line-height:1.2}
-.gbm-input,.gbm-select,.gbm-textarea{width:100%;background:#162616;color:#fff;border:1.5px solid rgba(0,200,83,0.25);border-radius:10px;padding:.7rem .85rem;font-size:.92rem;font-family:inherit;outline:none;transition:border-color .15s;box-sizing:border-box}
+.gbm-lbl{display:block;margin:0 0 10px 2px;font-size:.74rem;font-weight:700;color:#00c853;letter-spacing:.08em;text-transform:uppercase;line-height:1.2}
+.gbm-input,.gbm-select,.gbm-textarea{width:100%;background:#162616;color:#fff;border:1.5px solid rgba(0,200,83,0.25);border-radius:10px;padding:.95rem 1.05rem;font-size:.95rem;font-family:inherit;outline:none;transition:border-color .15s;box-sizing:border-box}
 .gbm-input:focus,.gbm-select:focus,.gbm-textarea:focus{border-color:rgba(0,200,83,0.6)}
 .gbm-select{cursor:pointer;appearance:none;-webkit-appearance:none;padding-right:2.2rem;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2300c853'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .55rem center;background-size:1.4rem}
 .gbm-select option{background:#0d1a0d;color:#fff;padding:.5rem}
-.gbm-textarea{resize:vertical;min-height:100px;font-family:inherit;line-height:1.5}
+.gbm-textarea{resize:vertical;min-height:120px;font-family:inherit;line-height:1.6;padding:1rem 1.05rem}
 .gbm-readonly{background:rgba(0,200,83,0.05)!important;color:rgba(255,255,255,0.85)!important;font-weight:600;cursor:not-allowed}
 .gbm-hint{font-size:.7rem;color:rgba(255,255,255,0.5);margin-top:.35rem;line-height:1.4}
 .gbm-count{font-weight:700;color:rgba(255,140,0,0.85)}
@@ -3938,7 +3938,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
 .gbm-msg{font-size:.82rem;text-align:center;padding:.5rem;border-radius:8px;display:none}
 .gbm-msg.ok{display:block;background:rgba(0,200,83,0.15);color:#a5d6a7;border:1px solid rgba(0,200,83,0.4)}
 .gbm-msg.err{display:block;background:rgba(255,80,80,0.15);color:#ff8a8a;border:1px solid rgba(255,80,80,0.4)}
-@media (max-width:480px){#gbBetModal{padding:60px 8px 20px}.gbm-body{padding:14px;gap:11px}.gbm-row2{grid-template-columns:1fr}}
+@media (max-width:480px){#gbBetModal{padding:60px 10px 20px}.gbm-body{padding:18px;gap:18px}.gbm-row2{grid-template-columns:1fr;gap:18px}}
 </style>
 
 <div id="gbBetModal" role="dialog" aria-modal="true" aria-labelledby="gbmTitle">
@@ -4275,9 +4275,22 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     // Pending pick — se resuelve después de que loadMatches() termine
     window._gbmPendingPrefill = pick;
     openGbBetModal();
-    // Si matches ya están cargados, aplicar de una
-    if (_loaded && _matches && _matches.length) {
+    // 🆕 (2-jul-2026 fix) Poll cada 120ms hasta que _matches esté cargado
+    // (el parche a window.loadMatches no funcionaba porque loadMatches es local a este IIFE)
+    if (_matches && _matches.length > 0) {
       _applyPrefill();
+    } else {
+      var _tries = 0;
+      var _pollId = setInterval(function() {
+        _tries++;
+        if (_matches && _matches.length > 0) {
+          clearInterval(_pollId);
+          _applyPrefill();
+        } else if (_tries > 100) { // ~12 segundos max
+          clearInterval(_pollId);
+          console.warn('[GbBetModal] prefill timeout — _matches nunca cargó');
+        }
+      }, 120);
     }
   };
 
@@ -4360,13 +4373,6 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       if (typeof updateWordCount === 'function') updateWordCount();
     }, 150);
   }
-  // Hook a loadMatches finalización — parcheamos loadMatches para llamar _applyPrefill al final
-  var _origLoadMatches = window.loadMatches;
-  window.loadMatches = async function() {
-    if (_origLoadMatches) await _origLoadMatches();
-    if (window._gbmPendingPrefill) _applyPrefill();
-  };
-
     // Cerrar con ESC + click en overlay
   document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') closeGbBetModal();
