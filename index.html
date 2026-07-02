@@ -1100,12 +1100,24 @@ window.toggleHeroBubble = function(n) {
 
       <button class="sport-tab-more" id="predVerMasHome" onclick="window.location.hash='picks'" style="padding:6px 12px;font-size:0.75rem;white-space:nowrap;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.45);border-radius:20px;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='rgba(0,200,83,0.5)';this.style.color='rgba(0,200,83,0.8)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.45)'">Ver más →</button>
     </div>
-    <!-- Sub-filtros de tiempo -->
-    <div style="display:flex;gap:6px;margin:0 0 12px;flex-wrap:wrap" id="predTimeTabs">
-      <button class="sport-tab active" style="font-size:0.72rem;padding:5px 12px" onclick="filterPredTime('all',this)">Todos</button>
-      <button class="sport-tab" style="font-size:0.72rem;padding:5px 12px" onclick="filterPredTime('today',this)">📅 HOY</button>
-      <button class="sport-tab" style="font-size:0.72rem;padding:5px 12px" onclick="filterPredTime('upcoming',this)">⏳ PRÓXIMOS</button>
-      <button class="sport-tab" id="predLiveTab" style="font-size:0.72rem;padding:5px 12px;display:none;background:linear-gradient(135deg,#dc1e2e,#ff335c);color:#fff;border-color:#dc1e2e;font-weight:900;animation:gambeta-live-blink 1.5s ease-in-out infinite" onclick="filterPredTime('live',this)">🔴 EN JUEGO</button><button class="sport-tab" style="font-size:0.72rem;padding:5px 12px" onclick="filterPredTime('finished',this)">✅ TERMINADOS</button>
+    <!-- Sub-filtro de tiempo: dropdown compacto (2-jul-2026) — integrado con filtros de arriba -->
+    <div id="predTimeTabs" style="display:flex;gap:8px;margin:0 0 12px;flex-wrap:wrap;align-items:center">
+      <label for="predTimeDropdown" style="font-size:0.7rem;color:rgba(255,255,255,0.45);font-weight:700;letter-spacing:0.06em;text-transform:uppercase;margin:0 2px 0 0">Cuándo</label>
+      <div style="position:relative;display:inline-flex;align-items:center">
+        <select id="predTimeDropdown" class="filter-dropdown"
+          onchange="filterPredTime(this.value, null)"
+          style="padding:6px 30px 6px 14px;font-size:0.78rem;background:#181818 url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 12 8%22 fill=%22%23ccc%22><path d=%22M1 1l5 5 5-5%22 stroke=%22%23ccc%22 stroke-width=%221.5%22 fill=%22none%22/></svg>') no-repeat right 10px center;background-size:10px;border:1px solid rgba(0,200,83,0.35);color:#e0e0e0;border-radius:20px;cursor:pointer;font-family:inherit;font-weight:700;-webkit-appearance:none;-moz-appearance:none;appearance:none;outline:none;transition:border-color .15s,color .15s;min-width:170px">
+          <option value="all" selected>📋 Todos los picks</option>
+          <option value="today">📅 HOY</option>
+          <option value="upcoming">⏳ PRÓXIMOS</option>
+          <option value="live">⚫ EN JUEGO</option>
+          <option value="finished">✅ TERMINADOS</option>
+        </select>
+        <!-- Badge live: rojo pulsante cuando hay partidos en curso -->
+        <span id="predLiveBadge" style="display:none;position:absolute;top:-6px;right:-6px;background:linear-gradient(135deg,#dc1e2e,#ff335c);color:#fff;font-size:0.6rem;font-weight:900;padding:2px 6px;border-radius:999px;border:2px solid #0a0a0a;letter-spacing:0.04em;animation:gambeta-live-blink 1.5s ease-in-out infinite;pointer-events:none">🔴 <span id="predLiveBadgeCount">0</span></span>
+      </div>
+      <button id="predTimeReset" onclick="filterPredTime('all', null); document.getElementById('predTimeDropdown').value='all';" style="display:none;padding:5px 11px;font-size:0.68rem;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.55);border-radius:16px;cursor:pointer;font-family:inherit;transition:all .15s" onmouseover="this.style.borderColor='rgba(0,200,83,0.5)';this.style.color='rgba(0,200,83,0.8)'" onmouseout="this.style.borderColor='rgba(255,255,255,0.15)';this.style.color='rgba(255,255,255,0.55)'">✕ Limpiar</button>
+      <!-- Live label discreto: aparece cuando el filtro está activo en 'live' -->
     </div>
     <div id="predsStatusBar" style="display:none !important"></div>
     <!-- Pick Estrella del Finde (visible viernes–domingo) -->
