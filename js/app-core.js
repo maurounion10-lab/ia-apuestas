@@ -6171,7 +6171,7 @@ function renderPreds() {
         <div style="display:flex;align-items:center;gap:6px">
           ${resultBadgeHtml}
           <div style="display:flex;align-items:center;gap:6px">
-            <span class="confidence-badge ${p.conf==='high'?'conf-high':'conf-med'}">${p.confLabel || p.bvrText || (p.conf==='high'?'Alta':p.conf==='med'?'Media-Alta':'Media')}</span>
+            <span class="confidence-badge ${p.conf==='high'?'conf-high':'conf-med'}">${(p.bvr === 6 || p.confLabel === 'Máxima' || p.bvrText === 'Máxima') ? '🔥 CONFIANZA MÁXIMA · 6/6' : (p.confLabel || p.bvrText || (p.conf==='high'?'Alta':p.conf==='med'?'Media-Alta':'Media'))}</span>
           </div>
         </div>
       </div>
