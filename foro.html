@@ -3064,10 +3064,17 @@ html body #aiChatBtn{top:calc(50% + 24px)!important;transform:translateY(-50%)!i
     const catBtn = e.target.closest('[data-nav-cat]');
     if (catBtn) {
       e.preventDefault();
-      if (typeof currentCat !== 'undefined') window.currentCat = catBtn.dataset.navCat;
+      const cat = catBtn.dataset.navCat;
+      // Forward al tab viejo (offscreen pero clickable) que tiene el handler original enlazado a `let currentCat`
+      const oldTab = document.querySelector('.tab[data-cat="' + cat + '"]');
+      if (oldTab) {
+        oldTab.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+      } else if (typeof currentCat !== 'undefined') {
+        window.currentCat = cat;
+        if (typeof renderThreads === 'function') renderThreads();
+      }
       renderForoSidebar();
       renderForoCrumb();
-      if (typeof renderThreads === 'function') renderThreads();
       const list = document.getElementById('threadList');
       /* scroll suave sacado — causaba salto brusco cuando el usuario clickeaba desde el sidebar */
       const sb = document.getElementById('foroSidebar');
