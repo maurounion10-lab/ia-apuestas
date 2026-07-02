@@ -6267,7 +6267,7 @@ function renderPreds() {
         <span class="pred-result-stamp-icon">${isHighConfWin ? `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-label="Acertado Maxima" width="32" height="32"><circle cx="16" cy="16" r="14" fill="#2a1e00" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/><path d="M10 16.2 L14.2 20.5 L22.2 12" fill="none" stroke="#ffd600" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` : isFinishedWin ? `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-label="Acertado" width="32" height="32"><circle cx="16" cy="16" r="14" fill="#0e2a15" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/><path d="M10 16.2 L14.2 20.5 L22.2 12" fill="none" stroke="#00e85a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` : isFinishedLoss ? '❌' : '⏳'}</span>
         <div class="pred-result-stamp-body">
           <span class="pred-result-stamp-text">${
-            isHighConfWin ? '¡ACERTADO! Máxima Confianza' :
+            isHighConfWin ? '¡ACERTADO!' :
             isFinishedWin ? '¡ACERTADO!' :
             isFinishedLoss ? 'FALLADO' : 'Resultado Pendiente'
           }</span>
