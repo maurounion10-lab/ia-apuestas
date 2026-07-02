@@ -5571,15 +5571,11 @@ function renderPreds() {
         _liveAll = [..._liveAll, ..._liveFromHist];
       } catch(_e) {}
       realPreds = _liveAll;
-      // 🆕 #594 Si no hay picks live, forzar empty state limpio y SALIR del render
-      // (antes dejaba las cards anteriores visibles porque flujo posterior no actualizaba)
+      // 🆕 (2-jul-2026 #686) Si no hay live, NO mostrar empty state — dejar que el pad de min-10 rellene con aciertos del historial
+      // El usuario nunca ve grid vacío, siempre 10 fichas mínimo (posiblemente TODAS del historial si el filtro está en cero)
       if (!realPreds.length) {
-        window._aiPreds = [];
-        const _gridEl = document.getElementById('predGrid');
-        if (_gridEl) {
-          _gridEl.innerHTML = '<div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 20px;gap:14px;text-align:center"><div style="font-size:2.4rem;opacity:0.7">⚫</div><div style="font-size:1.05rem;font-weight:700;color:#fff">No hay partidos en vivo ahora</div><div style="font-size:0.85rem;color:rgba(255,255,255,0.6);max-width:340px;line-height:1.5">El filtro EN JUEGO se activa cuando hay un partido en curso. Mientras tanto, mirá los próximos picks o el historial.</div><button onclick="filterPredTime(\'all\', null)" style="background:var(--verde);color:#000;border:none;border-radius:30px;padding:9px 22px;font-size:0.84rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px">Ver todos los picks</button></div>';
-        }
-        return;
+        // Retornar realPreds vacío para que el pad de min-10 lo llene con historial
+        // No hacer return: dejar que la lógica siga y el pad complete
       }
     }
     if (!realPreds.length) realPreds = null;
@@ -5859,9 +5855,40 @@ function renderPreds() {
     realPreds = [..._upcoming.slice(0, _homeUpLimit), ..._homeShowcase];
   }
 
+  // 🆕 (2-jul-2026 #686) GARANTIZAR MIN 10 FICHAS — rellenar con aciertos del historial (max 2 fallos)
+  // Requisito Mauro: "Asegura que haya 10 fichas al menos subidas... No obligues picks pero completa con aciertos (y maximo 2 fallos)"
+  try {
+    const MIN_FICHAS = 10;
+    if (realPreds && realPreds.length < MIN_FICHAS) {
+      const _needed = MIN_FICHAS - realPreds.length;
+      const _existingIds = new Set(realPreds.map(p => p && p.id).filter(Boolean));
+      const _hist = (typeof loadHistorial === 'function') ? loadHistorial() : [];
+      // Ordenar historial por fecha DESC (más reciente primero)
+      const _sortedHist = _hist
+        .filter(h => h && h.id && !_existingIds.has(h.id) && (h.result === 'win' || h.result === 'loss'))
+        .sort((a, b) => (b.commenceTs || new Date(b.date||0).getTime() || 0) - (a.commenceTs || new Date(a.date||0).getTime() || 0));
+      const _wins   = _sortedHist.filter(h => h.result === 'win');
+      const _losses = _sortedHist.filter(h => h.result === 'loss');
+      // Estrategia: hasta 2 fallos + resto con aciertos
+      const _maxLosses = Math.min(2, _losses.length, Math.max(0, _needed));
+      const _neededWins = Math.max(0, _needed - _maxLosses);
+      const _fillLosses = _losses.slice(0, _maxLosses);
+      const _fillWins   = _wins.slice(0, _neededWins);
+      const _pad = [..._fillWins, ..._fillLosses].map(h => ({
+        ...h,
+        _started: true,
+        _histResult: h.result,
+        _padded: true // marca visual: ficha de relleno del historial
+      }));
+      // Intercalar: primero los picks reales (que Mauro sube), después el pad
+      realPreds = [...realPreds, ..._pad];
+      try { console.log('[MIN_FICHAS] pad', _pad.length, '(wins='+_fillWins.length+' losses='+_fillLosses.length+') → total='+realPreds.length); } catch(_){}
+    }
+  } catch(e) { console.warn('[MIN_FICHAS] pad error', e); }
+
   // WC Largo Plazo: subir el cap para que los 10 picks futures (Mbappé, España campeón,
   // Argentina semis, Marruecos cuartos, Noruega octavos, etc.) se muestren todos.
-  const HOME_PICKS_LIMIT = window._predSportFilter === 'wcfutures' ? 20 : 9;
+  const HOME_PICKS_LIMIT = window._predSportFilter === 'wcfutures' ? 20 : 10;
   let source = _isPicksSubPage ? realPreds : realPreds.slice(0, HOME_PICKS_LIMIT);
 
   // ── Banner de estado ──
