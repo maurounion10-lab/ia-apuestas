@@ -6136,10 +6136,7 @@ function renderPreds() {
         <div class="max-sparkles">
           <span>✦</span><span>✦</span><span>★</span><span>✦</span><span>★</span><span>✦</span>
         </div>
-        ${isPickFinde
-          ? `<div class="pred-finde-badge">⭐ PICK DEL FINDE</div>`
-          : `<div class="pred-max-badge">🔥 CONFIANZA MÁXIMA · 6/6</div>`
-        }` : ''}
+        ${isPickFinde ? `<div class="pred-finde-badge">⭐ PICK DEL FINDE</div>` : ''}` : ''}
       <div class="pred-header">
         <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${(() => {
           const _lgRaw = (p._sportKey ? (sportKeyToLeague(p._sportKey, p.home, p.away) || p.league) : p.league) || '';
