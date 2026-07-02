@@ -4070,17 +4070,24 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
   window.openGbBetModal = function() {
     var m = document.getElementById('gbBetModal');
     if (!m) return;
+    var user = _gbmGetUser();
+    // 🆕 (2-jul-2026 #688) Sin login → SALTAR el gate intermedio, ir directo al auth modal completo
+    // (antes: mostraba una pantalla "Registrate para publicar picks" con boton hacia auth. Ahora 1 click menos.)
+    if (!user) {
+      // Guardar intención para volver al modal después del login
+      try { sessionStorage.setItem('gb_pending_action', 'openGbBetModal'); } catch(_){}
+      if (typeof openAuth === 'function') {
+        openAuth();
+      } else {
+        window.location.href = '/?_auth=open&_return=bet';
+      }
+      return;
+    }
     m.classList.add('is-open');
     document.body.style.overflow = 'hidden';
-    var user = _gbmGetUser();
     var gate = document.getElementById('gbmAuthGate');
     var body = document.getElementById('gbmAuthedBody');
     var userRow = document.getElementById('gbmUserInfoRow');
-    if (!user) {
-      if (gate) gate.style.display = 'block';
-      if (body) body.style.display = 'none';
-      return;
-    }
     if (gate) gate.style.display = 'none';
     if (body) body.style.display = '';
     var email = user.email;
@@ -4093,6 +4100,35 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     if (!_loaded) { _loaded = true; loadMatches(); }
     updateWordCount();
   };
+
+  // 🆕 (2-jul-2026 #688) Auto-reabrir modal después de login si venía de "Publicar Apuesta"
+  (function _autoReopenBetModalPostLogin() {
+    function _tryReopen() {
+      try {
+        var pending = sessionStorage.getItem('gb_pending_action');
+        if (pending !== 'openGbBetModal') return false;
+        var user = _gbmGetUser();
+        if (!user) return false;
+        sessionStorage.removeItem('gb_pending_action');
+        setTimeout(function() {
+          if (typeof window.openGbBetModal === 'function') window.openGbBetModal();
+        }, 300);
+        return true;
+      } catch(_) { return false; }
+    }
+    // Intentar al cargar
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function(){ setTimeout(_tryReopen, 800); });
+    } else {
+      setTimeout(_tryReopen, 800);
+    }
+    // Poll cada 500ms por 15s por si el login toma un momento en propagarse
+    var tries = 0;
+    var pid = setInterval(function() {
+      tries++;
+      if (_tryReopen() || tries > 30) clearInterval(pid);
+    }, 500);
+  })();
 
   window.gbmGoToAuth = function(isLogin) {
     closeGbBetModal();
