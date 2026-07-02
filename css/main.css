@@ -2719,16 +2719,25 @@
     padding: 0 8px;
   }
   /* Escudos de fichas en mobile — más compactos, proporcionados a la card */
+  /* 🔧 (2-jul-2026 fix) Escalar TODO el wrapper de escudos WC (span + img) uniformemente
+     para preservar el escudo redondo blanco de selecciones. Antes el img se forzaba a 52px
+     pero el <span> wrapper con background circular quedaba en 64px → escudo se veía mal. */
   @media (max-width: 600px) {
     .pred-match { margin-bottom: 12px; gap: 6px; }
     .pred-team { gap: 3px; }
     .pred-emoji { font-size: 1.6rem; }
-    .pred-emoji img { width: 52px !important; height: 52px !important; }
+    /* Escalar wrapper de badges nacionales (span) + club logos (img directo) */
+    .pred-emoji > span, .pred-emoji > img {
+      transform: scale(0.82);
+      transform-origin: center center;
+    }
     .pred-tname { font-size: 0.78rem; line-height: 1.15; }
     .pred-vs { font-size: 0.72rem; padding: 0 4px; letter-spacing: 0.05em; }
   }
   @media (max-width: 380px) {
-    .pred-emoji img { width: 44px !important; height: 44px !important; }
+    .pred-emoji > span, .pred-emoji > img {
+      transform: scale(0.68);
+    }
     .pred-tname { font-size: 0.72rem; }
   }
 
