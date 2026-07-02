@@ -2733,10 +2733,12 @@
     z-index: 2;
   }
   .pred-dbbet-1click .db-msg-single {
-    font-size: 0.88rem;
-    font-weight: 900;
+    font-family: 'Anton', 'Inter', 'Impact', sans-serif;
+    font-size: 1.05rem;
+    font-weight: 400;
     color: #fff;
-    letter-spacing: 0.1px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
     text-shadow: 0 1px 3px rgba(0,0,0,0.5);
     max-width: 100%;
     /* Antes: nowrap + ellipsis cortaba "Apost... Mej...". Ahora wrap a 2 líneas. */
