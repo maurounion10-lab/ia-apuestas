@@ -1864,10 +1864,10 @@ function renderThreads() {
   const dayAgo = Date.now() - 86400000;
   // 🆕 Aplicar sort según _feedSort
   const sortedFiltered = (function(){
-    if (_feedSort === 'new') {
+    if (window._feedSort === 'new') {
       return [...filtered].sort((a,b) => new Date(b.created_at||0) - new Date(a.created_at||0));
     }
-    if (_feedSort === 'top') {
+    if (window._feedSort === 'top') {
       // ordenar por # posts (más comentados)
       return [...filtered].sort((a,b) => {
         const ca = (postsByThread[a.id]||[]).length;
@@ -2999,8 +2999,7 @@ html body #aiChatBtn{top:calc(50% + 24px)!important;transform:translateY(-50%)!i
 <script>
 // 🆕 (1-jul-2026 #654) FASE A — Navegación Reddit/XenForo híbrido — inyectado como bloque separado
 (function(){
-  let _feedSort = 'hot';
-  window._feedSort = _feedSort;
+  window._feedSort = window._feedSort || 'hot';
   const _LEAGUE_LABELS = {
     all: { emoji:'📋', name:'Todos los hilos' },
     cl:  { emoji:'⭐', name:'Champions League' },
@@ -3076,8 +3075,7 @@ html body #aiChatBtn{top:calc(50% + 24px)!important;transform:translateY(-50%)!i
     }
     const sortBtn = e.target.closest('.foro-sort-tab');
     if (sortBtn) {
-      _feedSort = sortBtn.dataset.sort;
-      window._feedSort = _feedSort;
+      window._feedSort = sortBtn.dataset.sort;
       document.querySelectorAll('.foro-sort-tab').forEach(b => b.classList.toggle('is-active', b === sortBtn));
       if (typeof renderThreads === 'function') renderThreads();
       return;
