@@ -1837,6 +1837,9 @@
     border-radius: 50%;
     box-shadow: 0 0 10px rgba(239,83,80,0.75);
     animation: gb-live-pulse-anim 1.2s ease-in-out infinite;
+    margin-right: 7px;
+    vertical-align: middle;
+    display: inline-block;
   }
   @keyframes gb-live-pulse-anim {
     0%, 100% { opacity: 1; transform: scale(1); }
