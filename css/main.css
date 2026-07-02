@@ -6184,3 +6184,64 @@ html { -webkit-tap-highlight-color: rgba(0,200,83,0.15); }
   width: 34px; height: 34px;
   filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
 }
+
+/* 🆕 (2-jul-2026) FIX MOBILE: popups respetan nav + sponsor-bar + banner sticky inferior + safe area iOS */
+@media (max-width: 720px) {
+  /* Variables de dimensiones de banners */
+  :root {
+    --gb-top-banners: 116px;   /* nav 66 + dbbet-sponsor-bar 50 */
+    --gb-bottom-banner: 60px;  /* banner sticky inferior */
+    --gb-safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* 1) Foro popup — arranca DEBAJO de los banners + termina ANTES del banner inferior */
+  #forum-panel {
+    top: var(--gb-top-banners) !important;
+    height: calc(100dvh - var(--gb-top-banners) - var(--gb-bottom-banner) - var(--gb-safe-bottom)) !important;
+    max-height: calc(100dvh - var(--gb-top-banners) - var(--gb-bottom-banner) - var(--gb-safe-bottom)) !important;
+    padding-bottom: calc(20px + var(--gb-safe-bottom)) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  #forum-backdrop { top: var(--gb-top-banners) !important; bottom: var(--gb-bottom-banner) !important }
+
+  /* 2) Modal publicar apuesta */
+  #gbBetModal {
+    padding-top: calc(var(--gb-top-banners) + 12px) !important;
+    padding-bottom: calc(var(--gb-bottom-banner) + var(--gb-safe-bottom) + 20px) !important;
+  }
+  #gbBetModal > * { max-height: calc(100dvh - var(--gb-top-banners) - var(--gb-bottom-banner) - 40px) }
+
+  /* 3) Chat IA */
+  #aiChatBox, #aiChatPanel, .ai-chat-panel {
+    top: var(--gb-top-banners) !important;
+    max-height: calc(100dvh - var(--gb-top-banners) - var(--gb-bottom-banner) - var(--gb-safe-bottom) - 20px) !important;
+    padding-bottom: calc(12px + var(--gb-safe-bottom)) !important;
+  }
+
+  /* 4) Modales genéricos (broadcast, analysis, inbox, adm) */
+  #broadcastModal, #inboxModal, #admUserPicksModal, #analysisModal, #rkUserPopup, .modal-overlay {
+    padding-top: calc(var(--gb-top-banners) + 12px) !important;
+    padding-bottom: calc(var(--gb-bottom-banner) + var(--gb-safe-bottom) + 20px) !important;
+  }
+  #broadcastModal .bcast-inner, #inboxModal > div, #admUserPicksModal > div {
+    max-height: calc(100dvh - var(--gb-top-banners) - var(--gb-bottom-banner) - 60px) !important;
+    overflow-y: auto !important;
+  }
+
+  /* 5) Popup DBbet promo — que NO tape banners superior/inferior */
+  #dbbPromo {
+    max-height: calc(100dvh - var(--gb-top-banners) - var(--gb-bottom-banner) - 20px) !important;
+    overflow-y: auto;
+  }
+
+  /* 6) Bubbles sticky - reposicionar si están tapadas por banner inferior */
+  #forumBubble, #aiChatBtn, #gbBetBbl, .forum-bbl {
+    bottom: calc(var(--gb-bottom-banner) + var(--gb-safe-bottom) + 12px) !important;
+  }
+}
+
+/* Pantallas muy chicas: banner inferior más chico */
+@media (max-width: 380px) {
+  :root { --gb-top-banners: 110px; --gb-bottom-banner: 54px }
+}
