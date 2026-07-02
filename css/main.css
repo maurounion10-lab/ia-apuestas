@@ -1233,48 +1233,22 @@
   }
   /* Alta confianza acertado — fondo dorado sólido */
   .stamp-highconf {
-    border: 1px solid rgba(255,255,255,0.2);
-    background: linear-gradient(135deg, #FFE566 0%, #ffd600 35%, #f4b400 75%, #d99000 100%);
-    box-shadow: 0 6px 26px rgba(255,214,0,0.55), 0 0 65px rgba(255,229,102,0.3), inset 0 1px 0 rgba(255,255,255,0.4), inset 0 -1px 0 rgba(0,0,0,0.15);
-    overflow: hidden;
-    animation: stampBounceIn .55s cubic-bezier(0.34,1.56,0.64,1) both;
+    border: 1px solid rgba(255,214,0,0.4);
+    background: #ffd600;
+    box-shadow: 0 4px 16px rgba(255,214,0,0.35);
   }
-  .stamp-highconf::before {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.55) 50%, transparent 70%);
-    transform: translateX(-100%);
-    animation: stampShine 3s ease-in-out 0.4s infinite;
-    pointer-events: none; border-radius: inherit;
-  }
-  .stamp-highconf .pred-result-stamp-text { color: #1a1200; text-shadow: 0 1px 0 rgba(255,255,255,0.45); font-size: 1.02rem; letter-spacing: 0.8px; }
-  .stamp-highconf .pred-result-stamp-sub  { color: rgba(26,18,0,0.75); font-weight: 700 }
-  .stamp-highconf .pred-result-stamp-icon { font-size: 2.5rem; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.3)); animation: stampIconPop 1.4s ease-in-out infinite }
+  .stamp-highconf .pred-result-stamp-text { color: #1a1200; font-size: 0.95rem; letter-spacing: 0.4px }
+  .stamp-highconf .pred-result-stamp-sub  { color: rgba(26,18,0,0.7); font-weight: 700 }
+  .stamp-highconf .pred-result-stamp-icon { }
   /* Acertado — fondo verde sólido */
   .stamp-win {
-    border: 1px solid rgba(255,255,255,0.15);
-    background: linear-gradient(135deg, #00e85a 0%, #00c853 45%, #00a846 100%);
-    box-shadow: 0 6px 24px rgba(0,200,83,0.55), 0 0 60px rgba(0,232,90,0.25), inset 0 1px 0 rgba(255,255,255,0.35), inset 0 -1px 0 rgba(0,0,0,0.12);
-    overflow: hidden;
-    animation: stampBounceIn .55s cubic-bezier(0.34,1.56,0.64,1) both;
+    border: 1px solid rgba(0,200,83,0.35);
+    background: #00c853;
+    box-shadow: 0 4px 16px rgba(0,200,83,0.35);
   }
-  .stamp-win::before {
-    content: ""; position: absolute; inset: 0;
-    background: linear-gradient(115deg, transparent 30%, rgba(255,255,255,0.45) 50%, transparent 70%);
-    transform: translateX(-100%);
-    animation: stampShine 3.2s ease-in-out 0.6s infinite;
-    pointer-events: none; border-radius: inherit;
-  }
-  .stamp-win .pred-result-stamp-text { color: #002910; text-shadow: 0 1px 0 rgba(255,255,255,0.35); font-size: 1rem; letter-spacing: 0.8px; }
-  .stamp-win .pred-result-stamp-sub  { color: rgba(0,41,16,0.72); font-weight: 700 }
-  .stamp-win .pred-result-stamp-icon { font-size: 2.4rem; filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25)); animation: stampIconPop 1.4s ease-in-out infinite }
-  @keyframes stampBounceIn { 0%{opacity:0; transform:scale(.55) translateY(8px)} 60%{opacity:1; transform:scale(1.06) translateY(0)} 100%{opacity:1; transform:scale(1)} }
-  @keyframes stampShine { 0%{transform:translateX(-100%)} 60%,100%{transform:translateX(100%)} }
-  @keyframes stampIconPop { 0%,100%{transform:scale(1) rotate(-2deg)} 50%{transform:scale(1.1) rotate(3deg)} }
-  @media (prefers-reduced-motion: reduce) {
-    .stamp-win, .stamp-highconf { animation: none }
-    .stamp-win::before, .stamp-highconf::before { display: none }
-    .stamp-win .pred-result-stamp-icon, .stamp-highconf .pred-result-stamp-icon { animation: none }
-  }
+  .stamp-win .pred-result-stamp-text { color: #002910; font-size: 0.95rem; letter-spacing: 0.4px }
+  .stamp-win .pred-result-stamp-sub  { color: rgba(0,41,16,0.7); font-weight: 700 }
+  .stamp-win .pred-result-stamp-icon { }
   /* Fallado — fondo rojo sólido */
   .stamp-loss {
     border: none;
@@ -6207,14 +6181,6 @@ html { -webkit-tap-highlight-color: rgba(0,200,83,0.15); }
 /* SVG del sello ACERTADO: reemplaza el emoji, mismo tamaño visual, animacion suave */
 .pred-result-stamp-icon svg {
   display: block;
-  width: 44px; height: 44px;
-  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
-  animation: stampBadgePop 2.2s ease-in-out infinite;
-}
-@keyframes stampBadgePop {
-  0%,100% { transform: scale(1) rotate(-3deg) }
-  50%     { transform: scale(1.08) rotate(4deg) }
-}
-@media (prefers-reduced-motion: reduce) {
-  .pred-result-stamp-icon svg { animation: none }
+  width: 34px; height: 34px;
+  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
 }
