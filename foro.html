@@ -8,7 +8,7 @@
 <meta name="description" content="Sumate al foro de Gambeta. Comentá los picks IA, debatí lesiones, compartí fichajes, encontrá valor. Comunidad de apostadores con datos.">
 <link rel="canonical" href="https://gambeta.ai/foro">
 <meta property="og:title" content="Foro Gambeta · Comunidad de apostadores con IA">
-<meta property="og:description" content="Sub-foros por competencia, lesiones, valor, combinadas. Comunidad activa con datos.">
+<meta property="og:description" content="Sub-foros por competencia, lesiones, valor. Comunidad activa con datos.">
 <meta property="og:image" content="https://gambeta.ai/og-image.png">
 <meta property="og:url" content="https://gambeta.ai/foro">
 <meta name="twitter:card" content="summary_large_image">
@@ -66,7 +66,6 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 .topic-card.topic-noticias{--accent:#3498db}
 .topic-card.topic-lesiones{--accent:#e74c3c}
 .topic-card.topic-valor{--accent:var(--gold)}
-.topic-card.topic-combinadas{--accent:var(--verde)}
 
 /* ── TABS COMPETENCIAS (sticky en scroll) ── */
 .tabs-wrap{position:sticky;top:66px;background:rgba(10,10,15,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);margin:0 -20px 24px;padding:14px 20px;z-index:90}
@@ -755,9 +754,9 @@ const TOPIC_META = {
   topic_noticias: { emoji:'📰', title:'Noticias del fútbol', desc:'Lo que pasa hoy en el mundo del fútbol. Datos que mueven cuotas.' },
   topic_lesiones: { emoji:'🏥', title:'Lesiones y bajas', desc:'Reportá lesiones — el dato más valioso para encontrar valor.' },
   topic_valor:    { emoji:'💎', title:'Datos de valor', desc:'Sharp moves, líneas blandas. Compartí tu edge.' },
-  topic_combinadas:{ emoji:'🎯', title:'Combinadas del día', desc:'Armá la tuya, pedí opinión, copiá la del que sabe.' },
+  topic_picks:    { emoji:'🎯', title:'Picks del día', desc:'Publicá tu apuesta individual. Sin combinadas — un pick, una lectura.' },
 };
-const TOPIC_ORDER = ['topic_fichajes','topic_noticias','topic_lesiones','topic_valor','topic_combinadas'];
+const TOPIC_ORDER = ['topic_fichajes','topic_noticias','topic_lesiones','topic_valor','topic_picks'];
 
 function categorize(league) {
   const s = String(league || '').toLowerCase();
@@ -1265,7 +1264,7 @@ function renderTopics() {
 let _currentTopicId = null;
 const _topicAccents = {
   topic_fichajes:'#9b59b6', topic_noticias:'#3498db', topic_lesiones:'#e74c3c',
-  topic_valor:'#FFD700', topic_combinadas:'#00c853'
+  topic_valor:'#FFD700', topic_picks:'#00c853'
 };
 
 async function openTopicPanel(tid) {
@@ -2593,7 +2592,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
           'Prefer': 'return=minimal'
         },
         body: JSON.stringify({
-          thread_id: 'topic_combinadas',
+          thread_id: 'topic_picks',
           user_name: alias,
           user_email: user.email,
           content: content,
@@ -2605,7 +2604,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       if (!r.ok) throw new Error('http_' + r.status);
       localStorage.setItem('gb_forum_alias', alias);
       msg.className='gbm-msg ok';
-      msg.textContent = '¡Apuesta publicada! 🎯 Podés verla en el foro Combinadas del día';
+      msg.textContent = '¡Apuesta publicada! 🎯 Podés verla en el foro Picks del día';
       // Reset form
       document.getElementById('gbmPartido').value = '';
       document.getElementById('gbmMatchDisplay').value = '';
