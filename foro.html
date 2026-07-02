@@ -461,12 +461,12 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 }
 
 /* Boton scroll-to-top */
-.foro-scroll-top{position:fixed;bottom:80px;right:20px;width:44px;height:44px;background:linear-gradient(135deg,var(--verde),#009e3f);color:#000;border:0;border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 20px rgba(0,200,83,0.4),0 2px 6px rgba(0,0,0,0.5);z-index:98;transition:all .22s cubic-bezier(.34,1.56,.64,1);font-family:inherit}
-.foro-scroll-top:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(0,200,83,0.55)}
+.foro-scroll-top{position:fixed;top:calc(50% + 110px);right:20px;bottom:auto;left:auto;width:43px;height:43px;background:linear-gradient(135deg,var(--verde),#009e3f);color:#000;border:1.5px solid rgba(255,255,255,0.15);border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 14px rgba(0,200,83,0.4),0 2px 6px rgba(0,0,0,0.5);z-index:9998;transition:filter .15s,box-shadow .18s;font-family:inherit;transform:translateY(-50%)}
+.foro-scroll-top:hover{filter:brightness(1.15) drop-shadow(0 0 12px rgba(0,200,83,0.55));transform:translateY(-50%) scale(1.05)}
 .foro-scroll-top.is-visible{display:flex;animation:foroScrollTopIn .3s ease}
 @keyframes foroScrollTopIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 @media (max-width:600px){
-  .foro-scroll-top{bottom:90px;right:14px;width:40px;height:40px}
+  .foro-scroll-top{top:calc(50% + 96px);right:12px;width:37px;height:37px}
 }
 
 
@@ -1928,7 +1928,7 @@ document.getElementById('tpForm').addEventListener('submit', async e => {
   }
   if (scrollBtn) {
     window.addEventListener('scroll', () => {
-      scrollBtn.classList.toggle('is-visible', window.scrollY > 400);
+      scrollBtn.classList.toggle('is-visible', window.scrollY > (window.innerHeight * 2));
     }, { passive: true });
     scrollBtn.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
