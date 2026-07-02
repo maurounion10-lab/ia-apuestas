@@ -459,6 +459,23 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 @media(max-width:600px){.foro-sidebar{display:none}.foro-sidebar.is-open{display:block;position:fixed;inset:60px 12px 12px;z-index:200;overflow-y:auto}.foro-mobile-menu{display:flex}}
 .foro-mobile-menu{display:none;align-items:center;gap:8px;padding:8px 12px;background:rgba(0,200,83,.1);border:1px solid rgba(0,200,83,.3);border-radius:10px;color:var(--verde);font-weight:700;font-size:.85rem;cursor:pointer;margin-bottom:10px}
 
+
+/* 🆕 (1-jul-2026 #654 v2) FASE A refinamiento — ocultar duplicados + fix scroll loco */
+/* Los tabs viejos por liga y las cards de sub-foros destacados quedan reemplazados por el sidebar */
+.foro-layout .foro-cat-tabs,
+.foro-layout #topicsGrid,
+.foro-layout .section-title.gb-topics-title,
+.foro-layout .topics-title,
+.foro-layout [data-hide-with-sidebar] {display:none !important}
+/* Toolbar sticky: sacar contador redundante (ya está en el sidebar) */
+.foro-layout .foro-toolbar__count {display:none}
+/* Reducir gap entre elementos del feed */
+.foro-main > * + * {margin-top:8px}
+.foro-main .foro-toolbar {margin-bottom:8px}
+.foro-main .cta-box {margin-top:16px}
+/* Feed title más compacto */
+#foroFeedTitle {font-size:1rem !important;margin:0 !important}
+
 </style>
 </head>
 <body>
@@ -510,7 +527,7 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
   </div>
 
   <!-- SUB-FOROS STICKY -->
-  <div class="section-title">📌 Sub-foros destacados</div>
+  <div class="section-title" data-hide-with-sidebar="true">📌 Sub-foros destacados</div>
   <div class="topics-grid" id="topicsGrid">
     <div class="loading">Cargando…</div>
   </div>
@@ -634,7 +651,7 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 
   <!-- TABS COMPETENCIAS -->
   <div class="tabs-wrap">
-    <div class="tabs" id="tabsRow">
+    <div data-hide-with-sidebar="true"  class="tabs" id="tabsRow">
       <button class="tab active" data-cat="all">🔥 Todos <span class="tab-count" id="cnt_all">0</span></button>
       <button class="tab" data-cat="following">⭐ Siguiendo <span class="tab-count" id="cnt_following">0</span></button>
       <button class="tab" data-cat="cl">⚽ Champions <span class="tab-count" id="cnt_cl">0</span></button>
@@ -3052,7 +3069,7 @@ html body #aiChatBtn{top:calc(50% + 24px)!important;transform:translateY(-50%)!i
       renderForoCrumb();
       if (typeof renderThreads === 'function') renderThreads();
       const list = document.getElementById('threadList');
-      if (list) list.scrollIntoView({behavior:'smooth', block:'start'});
+      /* scroll suave sacado — causaba salto brusco cuando el usuario clickeaba desde el sidebar */
       const sb = document.getElementById('foroSidebar');
       if (sb) sb.classList.remove('is-open');
       return;
