@@ -6121,17 +6121,20 @@ function renderPreds() {
           : ''
     }">
       ${_stageBadgeHtml}
-      ${(!isGameLive && isStarted && finalScore && (histResult === 'win' || histResult === 'loss')) ? `
-        <div style="
-          display:flex;align-items:center;justify-content:center;gap:8px;
-          padding:6px 14px;
-          background:${histResult === 'win' ? 'rgba(0,200,83,0.12)' : 'rgba(229,57,53,0.12)'};
-          border-bottom:1px solid ${histResult === 'win' ? 'rgba(0,200,83,0.25)' : 'rgba(229,57,53,0.25)'};
-          border-radius:10px 10px 0 0;
-          margin:-14px -14px 10px -14px;
-        ">
-          <span style="font-size:1rem;font-weight:900;color:${histResult === 'win' ? '#00e676' : '#ef5350'};letter-spacing:1.5px;font-family:'Arial Black',Arial,sans-serif;">${_translateMatchState(finalScore)} ${histResult === 'win' ? '✅ Acertado!' : '❌ Fallado'}</span>
-        </div>` : ''}
+      ${(!isGameLive && isStarted && finalScore && (histResult === 'win' || histResult === 'loss')) ? (() => {
+        const _isWin = histResult === 'win';
+        const _icon = _isWin
+          ? '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12.5 L10 17 L19 7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          : '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6 L18 18 M18 6 L6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+        return `<div class="pred-result-strip ${_isWin ? 'pred-result-strip--win' : 'pred-result-strip--loss'}">
+          <span class="pred-result-strip__icon">${_icon}</span>
+          <span class="pred-result-strip__label">${_isWin ? 'Acertado' : 'Fallado'}</span>
+          <span class="pred-result-strip__sep"></span>
+          <span class="pred-result-strip__score">${_translateMatchState(finalScore)}</span>
+          <span class="pred-result-strip__spacer"></span>
+          <span class="pred-result-strip__status">Final</span>
+        </div>`;
+      })() : ''}
       ${isMaxConf ? `
         <div class="max-sparkles">
           <span>✦</span><span>✦</span><span>★</span><span>✦</span><span>★</span><span>✦</span>
