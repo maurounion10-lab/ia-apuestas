@@ -2562,32 +2562,68 @@ function wcEventBadge(name, size=48) {
   return `<span title="${(name||'').replace(/"/g,'&quot;')}" style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${bg};color:#fff;font-size:${fsz}px;line-height:1;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.4);border:2px solid rgba(255,215,0,0.5)">${emoji}</span>`;
 }
 
-// Badge para selección nacional: bandera grande + escudo confederación esquina superior izq
+// Selecciones campeonas del Mundo (para las estrellitas encima del escudo)
+const WC_CHAMPIONS = {
+  'Brasil': 5, 'Alemania': 4, 'Italia': 4, 'Argentina': 3, 'Uruguay': 2, 'Francia': 2,
+  'Inglaterra': 1, 'España': 1
+};
+
+// 🆕 (2-jul-2026 #690) Badge premium para selecciones nacionales:
+// - Anillo dorado exterior (frame de sponsor Mundial)
+// - Bandera / escudo federación en el centro
+// - Estrellas de campeón mundial arriba (⭐ por título)
+// - Badge de confederación esquina superior derecha (redondo, pulido)
+// - Banner ISO sutil abajo
+// - Sombras + glow para look de "moneda" premium
 function nationalTeamBadge(name, size=48) {
   const info = WC2026_NATIONS[name];
   if (!info) return null;
   const flagUrl = `https://flagcdn.com/w160/${info.iso}.png`;
-  // 🆕 (25-jun-2026) Invertido: escudo de FEDERACION es la imagen PRINCIPAL (AFA, CBF, DFB...)
-  // La bandera queda como sub-escudito chico en la esquina (referencia visual del pais).
   const mainLogoUrl = WC2026_NATION_LOGOS[name];
-  const subSize = Math.max(14, Math.round(size * 0.38));
-  // Si no hay logo federacion (ej. seleccion que no esta en el dict), usar bandera como principal
-  if (!mainLogoUrl) {
-    // Bandera llenando el círculo con cover (inner-clipping); mini-badge confed queda fuera del clip
-    return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;flex-shrink:0">`
-         + `<span style="display:block;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,0.5)">`
-         + `<img loading="lazy" decoding="async" src="${flagUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;display:block">`
-         + `</span>`
-         + `<img loading="lazy" decoding="async" src="${WC2026_CONFEDS[info.conf]}" alt="${info.conf}" width="${subSize}" height="${subSize}" style="position:absolute;top:-3px;left:-3px;width:${subSize}px;height:${subSize}px;border-radius:50%;background:#fff;padding:2px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.4);z-index:2" onerror="this.style.display='none'">`
-         + `</span>`;
-  }
-  // Caso normal: SOLO escudo de federacion (sin sub-bandera) — Mauro lo pidio limpio
-  // 🆕 (2-jul-2026) Escudo lleno la circunferencia: sacamos padding + bg del img (span ya provee circulo blanco)
-  //   + scale(1.05) para que el escudo tenga presencia visual dentro del círculo (compensa padding interno del PNG)
-  // onerror del logo principal: fallback a bandera con object-fit:cover llenando el círculo
+  const confedUrl = WC2026_CONFEDS[info.conf];
+  const stars = WC_CHAMPIONS[name] || 0;
+  const iso3 = (info.iso || '').toUpperCase().replace('-', '').slice(0, 3);
+  const subSize = Math.max(12, Math.round(size * 0.34));
+  const starSize = Math.max(8, Math.round(size * 0.18));
+  const ringPad = Math.max(2, Math.round(size * 0.045));
+  const innerSize = size - (ringPad * 2);
   const fallbackBig = flagUrl.replace(/'/g, "\\'");
-  return `<span title="${name} (${info.conf})" style="position:relative;display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 2px 8px rgba(0,0,0,0.5);background:#fff">`
-       + `<img src="${mainLogoUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:contain;display:block;transform:scale(1.45);transform-origin:center center" onerror="this.onerror=null;this.src='${fallbackBig}';this.style.objectFit='cover';this.style.transform='none'">`
+  
+  // Contenido central: escudo federación con fallback a bandera cover
+  const centerImg = mainLogoUrl
+    ? `<img loading="lazy" decoding="async" src="${mainLogoUrl}" alt="${name}" style="width:${innerSize}px;height:${innerSize}px;object-fit:contain;display:block;transform:scale(1.4);transform-origin:center center" onerror="this.onerror=null;this.src='${fallbackBig}';this.style.objectFit='cover';this.style.transform='none'">`
+    : `<img loading="lazy" decoding="async" src="${flagUrl}" alt="${name}" style="width:${innerSize}px;height:${innerSize}px;object-fit:cover;display:block">`;
+
+  // Estrellitas de campeón mundial (solo si tamaño ≥ 40 y campeón)
+  const starsRow = (stars > 0 && size >= 40)
+    ? `<span style="position:absolute;top:-4px;left:50%;transform:translateX(-50%);display:flex;gap:1px;z-index:3;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,0.6)">` +
+      Array.from({length: Math.min(stars, 5)}).map(() => 
+        `<span style="font-size:${starSize}px;color:#FFD700;line-height:1;filter:drop-shadow(0 0 3px rgba(255,215,0,0.6))">★</span>`
+      ).join('') +
+      `</span>`
+    : '';
+
+  // Badge confederación (solo si tamaño ≥ 36)
+  const confedBadge = (confedUrl && size >= 36)
+    ? `<img loading="lazy" decoding="async" src="${confedUrl}" alt="${info.conf}" style="position:absolute;top:${Math.round(size*0.02)}px;right:${Math.round(size*0.02)}px;width:${subSize}px;height:${subSize}px;border-radius:50%;background:#fff;padding:1.5px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.55),0 0 0 1.5px rgba(255,215,0,0.6);z-index:2" onerror="this.style.display='none'">`
+    : '';
+
+  // ISO country code al fondo (chip discreto) — solo si tamaño ≥ 44
+  const isoChip = (size >= 44 && iso3.length >= 2)
+    ? `<span style="position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#000,#1a1a1a);color:#FFD700;font-size:${Math.max(7, Math.round(size*0.15))}px;font-weight:900;padding:1px 5px;border-radius:6px;border:1px solid rgba(255,215,0,0.5);letter-spacing:0.06em;line-height:1.2;box-shadow:0 2px 4px rgba(0,0,0,0.5);z-index:2;font-family:'Geist Mono','SF Mono',monospace">${iso3}</span>`
+    : '';
+
+  return `<span title="${name} (${info.conf})${stars ? ' — ' + stars + '× Campeón del Mundo' : ''}" style="position:relative;display:inline-block;width:${size}px;height:${size}px;flex-shrink:0;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.45))">`
+       // Anillo dorado exterior + fondo dark
+       + `<span style="display:block;width:${size}px;height:${size}px;border-radius:50%;background:linear-gradient(135deg,#FFD700 0%,#B8860B 45%,#8B6914 100%);padding:${ringPad}px;box-sizing:border-box;box-shadow:0 0 0 1px rgba(0,0,0,0.4),inset 0 1px 2px rgba(255,255,255,0.4),inset 0 -1px 2px rgba(0,0,0,0.35),0 3px 10px rgba(255,215,0,0.15)">`
+       // Círculo interior blanco (contenido)
+       +   `<span style="display:block;width:${innerSize}px;height:${innerSize}px;border-radius:50%;overflow:hidden;background:#fff;position:relative;box-shadow:inset 0 0 4px rgba(0,0,0,0.3)">`
+       +     centerImg
+       +   `</span>`
+       + `</span>`
+       + starsRow
+       + confedBadge
+       + isoChip
        + `</span>`;
 }
 
@@ -5043,13 +5079,9 @@ function renderPreds() {
   // Array vacío también cuenta como sin datos
   if (realPreds && realPreds.length === 0) realPreds = null;
 
-  // 🏆 WC_ONLY_MODE GLOBAL — DESACTIVADO (2-jul-2026 #689)
-  // Antes bloqueaba picks no-Mundial en realPreds → fichas como España-Austria +2.5 desaparecían al arrancar
-  // porque el modelo las marca live/started y este filtro las borraba.
-  // El filtro de `source` (linea ~5984) ya tiene su propio WC_ONLY_MODE toggle que Mauro puso en false.
-  // Este filtro GLOBAL estaba HARDCODEADO en true → causa raíz de las desapariciones.
-  const _WC_ONLY_GLOBAL = false; // ← si en algún momento hay que volver a solo Mundial, poner true
-  if (_WC_ONLY_GLOBAL && realPreds && Array.isArray(realPreds)) {
+  // 🏆 WC_ONLY_MODE GLOBAL — aplicado a realPreds (afecta TODO: source, Pick Estrella del Finde, ticker, banner, chat IA, etc)
+  // Hasta 20-jul-2026 (día después de la final) solo se muestran picks del Mundial 2026.
+  if (realPreds && Array.isArray(realPreds)) {
     const _WC_END_TS = new Date('2026-07-20T00:00:00-03:00').getTime();
     const _beforeWC = realPreds.length;
     realPreds = realPreds.filter(p => {
@@ -5060,7 +5092,7 @@ function renderPreds() {
       return true;
     });
     if (_beforeWC !== realPreds.length) {
-      console.log('[WC_ONLY_MODE realPreds] Bloqueados', _beforeWC - realPreds.length, 'picks no-Mundial / post-Mundial');
+      console.log('[WC_ONLY_MODE realPreds] Bloqueados', _beforeWC - realPreds.length, 'picks no-Mundial / post-Mundial (incluye Pick Estrella del Finde)');
     }
     if (realPreds.length === 0) realPreds = null;
   }
