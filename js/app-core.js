@@ -5485,28 +5485,27 @@ function renderPreds() {
     if (realPreds && realPreds.length === 0) realPreds = null;
   }
 
-  // ── Sub-filtro de tiempo (HOY / PRÓXIMOS / EN JUEGO / TERMINADOS) ──
-  // 🆕 (28-jun-2026) Tab EN JUEGO SIEMPRE visible. Cuando hay live: rojo+animación+contador. Cuando no: gris+atenuado.
+  // ── Sub-filtro de tiempo (Todos / HOY / PRÓXIMOS / EN JUEGO / TERMINADOS) ──
+  // 🆕 (2-jul-2026) Dropdown compacto. Badge live rojo pulsa arriba a la derecha cuando hay partidos en curso.
   try{
     const _liveC=(realPreds||[]).filter(p=>!!_isPickLive(p)).length;
-    const _liveT=document.getElementById('predLiveTab');
-    if(_liveT){
-      _liveT.style.display='inline-block';
-      if(_liveC>0){
-        _liveT.innerHTML='🔴 EN JUEGO ('+_liveC+')';
-        _liveT.style.opacity='1';
-        _liveT.style.animation='gambeta-live-blink 1.5s ease-in-out infinite';
-        _liveT.style.cursor='pointer';
-        _liveT.disabled=false;
+    // Actualizar badge live junto al dropdown
+    const _liveBadge = document.getElementById('predLiveBadge');
+    const _liveBadgeCount = document.getElementById('predLiveBadgeCount');
+    if (_liveBadge && _liveBadgeCount) {
+      if (_liveC > 0) {
+        _liveBadgeCount.textContent = _liveC;
+        _liveBadge.style.display = 'inline-flex';
       } else {
-        _liveT.innerHTML='⚫ EN JUEGO';
-        _liveT.style.opacity='0.45';
-        _liveT.style.animation='none';
-        _liveT.style.cursor='default';
-        // 🆕 #594 NO resetear el filtro live automáticamente cuando _liveC=0.
-        // Antes se reseteaba a 'all' y mostraba los últimos TERMINADOS confundiendo al usuario.
-        // Ahora respetamos la elección del usuario: si clickeó EN JUEGO y no hay live,
-        // mostrará empty state.
+        _liveBadge.style.display = 'none';
+      }
+    }
+    // Actualizar el label del option EN JUEGO con el contador
+    const _dd = document.getElementById('predTimeDropdown');
+    if (_dd) {
+      const _liveOpt = _dd.querySelector('option[value="live"]');
+      if (_liveOpt) {
+        _liveOpt.textContent = _liveC > 0 ? ('🔴 EN JUEGO (' + _liveC + ')') : '⚫ EN JUEGO';
       }
     }
   }catch(_){}
@@ -5573,7 +5572,7 @@ function renderPreds() {
         window._aiPreds = [];
         const _gridEl = document.getElementById('predGrid');
         if (_gridEl) {
-          _gridEl.innerHTML = '<div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 20px;gap:14px;text-align:center"><div style="font-size:2.4rem;opacity:0.7">⚫</div><div style="font-size:1.05rem;font-weight:700;color:#fff">No hay partidos en vivo ahora</div><div style="font-size:0.85rem;color:rgba(255,255,255,0.6);max-width:340px;line-height:1.5">El filtro EN JUEGO se activa cuando hay un partido en curso. Mientras tanto, mirá los próximos picks o el historial.</div><button onclick="filterPredTime(\'all\', document.querySelector(\'#predTimeTabs button.sport-tab\'))" style="background:var(--verde);color:#000;border:none;border-radius:30px;padding:9px 22px;font-size:0.84rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px">Ver todos los picks</button></div>';
+          _gridEl.innerHTML = '<div style="grid-column:1/-1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:64px 20px;gap:14px;text-align:center"><div style="font-size:2.4rem;opacity:0.7">⚫</div><div style="font-size:1.05rem;font-weight:700;color:#fff">No hay partidos en vivo ahora</div><div style="font-size:0.85rem;color:rgba(255,255,255,0.6);max-width:340px;line-height:1.5">El filtro EN JUEGO se activa cuando hay un partido en curso. Mientras tanto, mirá los próximos picks o el historial.</div><button onclick="filterPredTime(\'all\', null)" style="background:var(--verde);color:#000;border:none;border-radius:30px;padding:9px 22px;font-size:0.84rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:6px">Ver todos los picks</button></div>';
         }
         return;
       }
@@ -9325,7 +9324,28 @@ function filterPredSport(sport, btn) {
 }
 window._predTimeFilter = 'all';
 function filterPredTime(time, btn) {
-  window._predTimeFilter = time;
+  window._predTimeFilter = time || 'all';
+  // Sincronizar dropdown si el cambio vino de código (btn=null) o botón
+  try{
+    var _dd = document.getElementById('predTimeDropdown');
+    if (_dd && _dd.value !== window._predTimeFilter) _dd.value = window._predTimeFilter;
+    var _rst = document.getElementById('predTimeReset');
+    if (_rst) _rst.style.display = (window._predTimeFilter === 'all') ? 'none' : 'inline-flex';
+    // Highlight dropdown cuando hay filtro activo
+    if (_dd) {
+      if (window._predTimeFilter === 'all') {
+        _dd.style.borderColor = 'rgba(0,200,83,0.35)';
+        _dd.style.color = '#e0e0e0';
+      } else if (window._predTimeFilter === 'live') {
+        _dd.style.borderColor = 'rgba(220,30,46,0.55)';
+        _dd.style.color = '#ff6673';
+      } else {
+        _dd.style.borderColor = 'rgba(0,200,83,0.55)';
+        _dd.style.color = '#00e676';
+      }
+    }
+  }catch(_){}
+  // Legacy support: si venía de un botón viejo aún se marca active
   document.querySelectorAll('#predTimeTabs .sport-tab').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
   renderPreds();
@@ -11267,9 +11287,10 @@ function gbSetPage(page) {
   // En picks: resetear filtro de tiempo a "Todos" para mostrar todos los picks
   if (page === 'picks') {
     window._predTimeFilter = 'all';
-    document.querySelectorAll('#predTimeTabs .sport-tab').forEach(b => b.classList.remove('active'));
-    const todosBtn = document.querySelector('#predTimeTabs .sport-tab');
-    if (todosBtn) todosBtn.classList.add('active');
+    var _dd = document.getElementById('predTimeDropdown');
+    if (_dd) _dd.value = 'all';
+    var _rst = document.getElementById('predTimeReset');
+    if (_rst) _rst.style.display = 'none';
     renderPreds?.();
   }
   // En historial: resetear todos los filtros y re-renderizar para mostrar el historial completo
