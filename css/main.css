@@ -1279,9 +1279,9 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 9px 14px;
-    margin: -14px -14px 12px -14px;
-    border-radius: 12px 12px 0 0;
+    padding: 10px 20px;
+    margin: -20px -20px 14px -20px;
+    border-radius: 15px 15px 0 0;
     font-family: inherit;
     font-size: 0.78rem;
     font-weight: 700;
@@ -1357,7 +1357,7 @@
   }
   .pred-result-strip--loss .pred-result-strip__sep { background: #ef5350; }
   @media (max-width: 480px) {
-    .pred-result-strip { padding: 8px 12px; gap: 8px; font-size: 0.72rem; }
+    .pred-result-strip { padding: 9px 16px; gap: 8px; font-size: 0.72rem; margin: -20px -20px 12px -20px; }
     .pred-result-strip__label { font-size: 0.68rem; }
     .pred-result-strip__score { font-size: 0.7rem; }
     .pred-result-strip__status { display: none; }
