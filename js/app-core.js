@@ -9320,8 +9320,56 @@ function filterPredSport(sport, btn) {
   window._predSportFilter = sport;
   document.querySelectorAll('#predSportTabs .sport-tab').forEach(b => b.classList.remove('active'));
   if (btn) btn.classList.add('active');
+  // Sync category dropdown: si el sport pertenece al dropdown de categorías, ajustar visual
+  try {
+    var _cd = document.getElementById('predCategoryDropdown');
+    if (_cd) {
+      var catValues = ['all','todos','mundial','wcfutures'];
+      if (catValues.indexOf(sport) >= 0) {
+        _cd.value = sport;
+        _applyPredCategoryStyle(_cd, sport);
+      } else {
+        // Filtro es una liga específica del otro dropdown — resetear category a Principales visual pero mantener valor semántico
+        _cd.value = 'all';
+        _applyPredCategoryStyle(_cd, 'all', true /* isFallback */);
+      }
+    }
+  } catch(_) {}
   renderPreds();
 }
+
+// 🆕 (2-jul-2026) Dropdown de categorías: Principales / Todos / Mundial / WC Largo Plazo
+function filterPredCategory(sel) {
+  if (!sel) return;
+  var val = sel.value || 'all';
+  // Para 'todos' respetamos el jump a la página completa de picks si estamos en el home
+  if (val === 'todos' && document.body.dataset.gbpage !== 'picks') {
+    gbSetPage('picks');
+    setTimeout(function() {
+      filterPredSport('todos', null);
+    }, 80);
+    _applyPredCategoryStyle(sel, val);
+    return;
+  }
+  filterPredSport(val, null);
+  _applyPredCategoryStyle(sel, val);
+}
+
+function _applyPredCategoryStyle(sel, val, isFallback) {
+  if (!sel) return;
+  // Colores según categoría — verde para core, oro para Mundial
+  if (val === 'mundial' || val === 'wcfutures') {
+    sel.style.borderColor = 'rgba(255,215,0,0.6)';
+    sel.style.color = '#FFD700';
+    sel.style.background = "linear-gradient(135deg,rgba(255,215,0,0.10),rgba(200,16,46,0.10)), #181818";
+  } else {
+    sel.style.borderColor = isFallback ? 'rgba(255,255,255,0.25)' : 'rgba(0,200,83,0.55)';
+    sel.style.color = isFallback ? 'rgba(255,255,255,0.6)' : '#00e676';
+    sel.style.background = "#181818 url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 12 8%22 fill=%22%23ccc%22><path d=%22M1 1l5 5 5-5%22 stroke=%22%23ccc%22 stroke-width=%221.5%22 fill=%22none%22/></svg>') no-repeat right 10px center";
+    sel.style.backgroundSize = '10px';
+  }
+}
+window.filterPredCategory = filterPredCategory;
 window._predTimeFilter = 'all';
 function filterPredTime(time, btn) {
   window._predTimeFilter = time || 'all';
