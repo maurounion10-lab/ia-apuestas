@@ -3936,6 +3936,13 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
 .gbm-submit:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,200,83,0.5)}
 .gbm-submit:disabled{opacity:.45;cursor:not-allowed;transform:none;box-shadow:none}
 .gbm-msg{font-size:.85rem;text-align:center;padding:.75rem 1rem;border-radius:10px;display:none;margin:4px 0}
+/* DBbet chip fija (cuota + casa) — estilo compartido con ficha 1-click del home */
+.gbm-dbbet-chip{display:inline-flex;align-items:center;gap:10px;width:100%;padding:1.05rem 1.15rem;background:linear-gradient(135deg,rgba(255,215,0,0.06) 0%,transparent 40%),linear-gradient(135deg,#dc1e2e 0%,#b8121f 50%,#8a0a16 100%);border:1.5px solid #FFD700;border-radius:11px;color:#fff;font-weight:800;font-family:inherit;position:relative;overflow:hidden;box-shadow:0 4px 14px rgba(220,30,46,0.35),0 0 0 1px rgba(255,215,0,0.22) inset;box-sizing:border-box;cursor:not-allowed}
+.gbm-dbbet-chip .gbm-db-logo{flex-shrink:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.4))}
+.gbm-dbbet-chip .gbm-db-cuota{font-size:1.1rem;font-weight:900;letter-spacing:-0.01em;flex:1;font-variant-numeric:tabular-nums}
+.gbm-dbbet-chip .gbm-db-badge{font-size:.62rem;font-weight:800;background:rgba(255,215,0,0.9);color:#5a0810;padding:2px 7px;border-radius:5px;letter-spacing:0.06em}
+.gbm-dbbet-chip::before{content:'';position:absolute;top:0;left:-100%;width:50%;height:100%;background:linear-gradient(105deg,transparent 30%,rgba(255,215,0,0.25) 50%,rgba(255,255,255,0.35) 52%,rgba(255,215,0,0.25) 55%,transparent 65%);transform:skewX(-22deg);pointer-events:none;animation:gbmDbbetShine 4s ease-in-out infinite}
+@keyframes gbmDbbetShine{0%,100%{left:-100%}50%,55%{left:200%}}
 .gbm-msg.ok{display:block;background:rgba(0,200,83,0.15);color:#a5d6a7;border:1px solid rgba(0,200,83,0.4)}
 .gbm-msg.err{display:block;background:rgba(255,80,80,0.15);color:#ff8a8a;border:1px solid rgba(255,80,80,0.4)}
 @media (max-width:480px){#gbBetModal{padding:60px 10px 20px}.gbm-body{padding:22px 20px 24px;gap:22px}.gbm-row2{grid-template-columns:1fr;gap:22px}.gbm-submit{padding:1rem 1.2rem;font-size:1rem}}
@@ -3996,12 +4003,22 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       </div>
       <div class="gbm-row2">
         <div>
-          <label class="gbm-lbl">Cuota</label>
-          <input type="number" class="gbm-input gbm-readonly" id="gbmOdds" readonly placeholder="Auto" step="0.01">
+          <label class="gbm-lbl">Cuota DBbet</label>
+          <div class="gbm-dbbet-chip" id="gbmOddsChip">
+            <svg class="gbm-db-logo" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="900" fill="#dc1e2e">DB</text></svg>
+            <span class="gbm-db-cuota" id="gbmOddsDisplay">—</span>
+            <span class="gbm-db-badge">AUTO</span>
+            <input type="hidden" id="gbmOdds" value="1.85">
+          </div>
         </div>
         <div>
           <label class="gbm-lbl">Casa</label>
-          <input type="text" class="gbm-input gbm-readonly" id="gbmHouse" readonly value="⭐ DBbet (sponsor)">
+          <div class="gbm-dbbet-chip gbm-dbbet-house">
+            <svg class="gbm-db-logo" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="900" fill="#dc1e2e">DB</text></svg>
+            <span class="gbm-db-cuota">DBbet</span>
+            <span class="gbm-db-badge">SPONSOR</span>
+            <input type="hidden" id="gbmHouse" value="DBbet">
+          </div>
         </div>
       </div>
       <div>
@@ -4152,12 +4169,16 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       if (!p) {
         document.getElementById('gbmMatchDisplay').value = '';
         document.getElementById('gbmLeagueDisplay').value = '';
-        document.getElementById('gbmOdds').value = '';
+        document.getElementById('gbmOdds').value = '1.85';
+        var _od = document.getElementById('gbmOddsDisplay'); if (_od) _od.textContent = '—';
         return;
       }
       document.getElementById('gbmMatchDisplay').value = p.home + ' vs ' + p.away;
-      document.getElementById('gbmLeagueDisplay').value = (p.league || '').replace(/^[^\w]+/, '');
-      document.getElementById('gbmOdds').value = p.odds ? parseFloat(p.odds).toFixed(2) : '';
+      document.getElementById('gbmLeagueDisplay').value = (p.league || '').replace(/^[\W]+/, '');
+      var _oddsVal = p.odds ? parseFloat(p.odds).toFixed(2) : '1.85';
+      document.getElementById('gbmOdds').value = _oddsVal;
+      var _oddsDisp = document.getElementById('gbmOddsDisplay');
+      if (_oddsDisp) _oddsDisp.textContent = _oddsVal;
       // Sugerir mercado según IA
       if (p.rec) {
         var m = document.getElementById('gbmMercado');
@@ -4262,7 +4283,8 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       document.getElementById('gbmPartido').value = '';
       document.getElementById('gbmMatchDisplay').value = '';
       document.getElementById('gbmLeagueDisplay').value = '';
-      document.getElementById('gbmOdds').value = '';
+      document.getElementById('gbmOdds').value = '1.85';
+        var _od = document.getElementById('gbmOddsDisplay'); if (_od) _od.textContent = '—';
       document.getElementById('gbmJustif').value = '';
       updateWordCount();
       setTimeout(closeGbBetModal, 2200);
@@ -4380,9 +4402,14 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
           }
         }
       }
-      // Auto-fill odds
+      // Auto-fill odds + display
       var oddsInp = document.getElementById('gbmOdds');
-      if (oddsInp && pick.odds && pick.odds >= 1.30) oddsInp.value = Number(pick.odds).toFixed(2);
+      var oddsDsp = document.getElementById('gbmOddsDisplay');
+      if (pick.odds && pick.odds >= 1.30) {
+        var _v = Number(pick.odds).toFixed(2);
+        if (oddsInp) oddsInp.value = _v;
+        if (oddsDsp) oddsDsp.textContent = _v;
+      } else if (oddsDsp) { oddsDsp.textContent = '1.85'; if (oddsInp) oddsInp.value = '1.85'; }
       // Sugerir justificación mínima
       var just = document.getElementById('gbmJustif');
       if (just && !just.value) {
