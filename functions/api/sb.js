@@ -67,11 +67,26 @@ export async function onRequest(context) {
         if (Array.isArray(d)) fromUsers = d;
       }
 
-      // Usar la fuente con más picks
-      const best = fromCache.length >= fromUsers.length ? fromCache : fromUsers;
+      // FUSION: unir ambas fuentes por id, preservando picks resueltos.
+      // Bug histórico: los picks WC futures (largo plazo) viven en fromCache y
+      // NO estaban en fromUsers, entonces si users tenía mas total, se perdian
+      // los futures. Ahora se preservan todos los ids únicos + gana el que tenga
+      // result != 'pending' (resuelto sobre pending).
+      const merged = new Map();
+      const rankResult = (p) => (p && p.result && p.result !== 'pending') ? 1 : 0;
+      const addPick = (p) => {
+        if (!p || !p.id) return;
+        const existing = merged.get(p.id);
+        if (!existing || rankResult(p) > rankResult(existing)) {
+          merged.set(p.id, p);
+        }
+      };
+      fromCache.forEach(addPick);
+      fromUsers.forEach(addPick);
+      const merged_all = Array.from(merged.values());
 
       return new Response(
-        JSON.stringify(best.length > 0 ? [{ historial_full: best }] : []),
+        JSON.stringify(merged_all.length > 0 ? [{ historial_full: merged_all }] : []),
         { headers: CACHE_HEADERS }
       );
 
