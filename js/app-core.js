@@ -2351,14 +2351,19 @@ const WC2026_RESULTS_BY_ID = {
   'wc2026_h5_uru_esp_26jun': { homeScore: 0, awayScore: 1 },
 };
 function resolveWcLocal(pick) {
-  // 🛡️ DEFENSA: si el partido aún no se jugó (commenceTs futuro - 4h), NUNCA puede estar resuelto
+  // 🛡️ DEFENSA #706 (5-jul-2026): solo forzar a pending si NO hay marcador cargado.
+  // La versión anterior pisaba TODOS los picks marcados como win/loss antes de que
+  // commenceTs+4h pasara, incluso si tenían finalScore real (bug Brasil-Noruega 1-2).
   if (pick && pick._sportKey === 'soccer_fifa_world_cup' && pick.commenceTs) {
     const nowSafe = Date.now();
-    const ended = pick.commenceTs + (4 * 60 * 60 * 1000); // 4h después del kick-off
+    const ended = pick.commenceTs + (4 * 60 * 60 * 1000);
     if (nowSafe < ended && pick.result && pick.result !== 'pending' && pick.result !== 'void') {
-      // FORZAR a pending — alguien lo marcó como win/loss antes de tiempo (BUG)
-      console.warn('[WC] Pick marcado como', pick.result, 'pero no se jugó. Forzando a pending:', pick.home, 'vs', pick.away);
-      pick = { ...pick, result: 'pending', pl: 0, marcador: '', homeScore: undefined, awayScore: undefined };
+      const hasScore = (pick.finalScore && /\d+\s*-\s*\d+/.test(pick.finalScore))
+                    || (typeof pick.homeScore === 'number' && typeof pick.awayScore === 'number');
+      if (!hasScore) {
+        console.warn('[WC] Pick marcado como', pick.result, 'pero sin marcador. Forzando a pending:', pick.home, 'vs', pick.away);
+        pick = { ...pick, result: 'pending', pl: 0, marcador: '', homeScore: undefined, awayScore: undefined };
+      }
     }
   }
   if (!pick || pick.result !== 'pending') return pick;
