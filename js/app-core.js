@@ -2568,62 +2568,16 @@ const WC_CHAMPIONS = {
   'Inglaterra': 1, 'España': 1
 };
 
-// 🆕 (2-jul-2026 #690) Badge premium para selecciones nacionales:
-// - Anillo dorado exterior (frame de sponsor Mundial)
-// - Bandera / escudo federación en el centro
-// - Estrellas de campeón mundial arriba (⭐ por título)
-// - Badge de confederación esquina superior derecha (redondo, pulido)
-// - Banner ISO sutil abajo
-// - Sombras + glow para look de "moneda" premium
+// (5-jul-2026 #703) Badge selecciones nacionales — SOLO BANDERA
+// Pedido de Mauro: revertir el rediseño premium del 2-jul (adf7e8a26f) que agregó
+// anillo dorado + estrellas + confederación esquina + ISO chip. Quedó demasiado cargado.
+// Solución: bandera del país llenando el círculo, punto.
 function nationalTeamBadge(name, size=48) {
   const info = WC2026_NATIONS[name];
   if (!info) return null;
   const flagUrl = `https://flagcdn.com/w160/${info.iso}.png`;
-  const mainLogoUrl = WC2026_NATION_LOGOS[name];
-  const confedUrl = WC2026_CONFEDS[info.conf];
-  const stars = WC_CHAMPIONS[name] || 0;
-  const iso3 = (info.iso || '').toUpperCase().replace('-', '').slice(0, 3);
-  const subSize = Math.max(12, Math.round(size * 0.34));
-  const starSize = Math.max(8, Math.round(size * 0.18));
-  const ringPad = Math.max(2, Math.round(size * 0.045));
-  const innerSize = size - (ringPad * 2);
-  const fallbackBig = flagUrl.replace(/'/g, "\\'");
-  
-  // Contenido central: escudo federación con fallback a bandera cover
-  const centerImg = mainLogoUrl
-    ? `<img loading="lazy" decoding="async" src="${mainLogoUrl}" alt="${name}" style="width:${innerSize}px;height:${innerSize}px;object-fit:contain;display:block;transform:scale(1.4);transform-origin:center center" onerror="this.onerror=null;this.src='${fallbackBig}';this.style.objectFit='cover';this.style.transform='none'">`
-    : `<img loading="lazy" decoding="async" src="${flagUrl}" alt="${name}" style="width:${innerSize}px;height:${innerSize}px;object-fit:cover;display:block">`;
-
-  // Estrellitas de campeón mundial (solo si tamaño ≥ 40 y campeón)
-  const starsRow = (stars > 0 && size >= 40)
-    ? `<span style="position:absolute;top:-4px;left:50%;transform:translateX(-50%);display:flex;gap:1px;z-index:3;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,0.6)">` +
-      Array.from({length: Math.min(stars, 5)}).map(() => 
-        `<span style="font-size:${starSize}px;color:#FFD700;line-height:1;filter:drop-shadow(0 0 3px rgba(255,215,0,0.6))">★</span>`
-      ).join('') +
-      `</span>`
-    : '';
-
-  // Badge confederación (solo si tamaño ≥ 36)
-  const confedBadge = (confedUrl && size >= 36)
-    ? `<img loading="lazy" decoding="async" src="${confedUrl}" alt="${info.conf}" style="position:absolute;top:${Math.round(size*0.02)}px;right:${Math.round(size*0.02)}px;width:${subSize}px;height:${subSize}px;border-radius:50%;background:#fff;padding:1.5px;box-sizing:border-box;box-shadow:0 1px 4px rgba(0,0,0,0.55),0 0 0 1.5px rgba(255,215,0,0.6);z-index:2" onerror="this.style.display='none'">`
-    : '';
-
-  // ISO country code al fondo (chip discreto) — solo si tamaño ≥ 44
-  const isoChip = (size >= 44 && iso3.length >= 2)
-    ? `<span style="position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,#000,#1a1a1a);color:#FFD700;font-size:${Math.max(7, Math.round(size*0.15))}px;font-weight:900;padding:1px 5px;border-radius:6px;border:1px solid rgba(255,215,0,0.5);letter-spacing:0.06em;line-height:1.2;box-shadow:0 2px 4px rgba(0,0,0,0.5);z-index:2;font-family:'Geist Mono','SF Mono',monospace">${iso3}</span>`
-    : '';
-
-  return `<span title="${name} (${info.conf})${stars ? ' — ' + stars + '× Campeón del Mundo' : ''}" style="position:relative;display:inline-block;width:${size}px;height:${size}px;flex-shrink:0;filter:drop-shadow(0 3px 8px rgba(0,0,0,0.45))">`
-       // Anillo dorado exterior + fondo dark
-       + `<span style="display:block;width:${size}px;height:${size}px;border-radius:50%;background:linear-gradient(135deg,#FFD700 0%,#B8860B 45%,#8B6914 100%);padding:${ringPad}px;box-sizing:border-box;box-shadow:0 0 0 1px rgba(0,0,0,0.4),inset 0 1px 2px rgba(255,255,255,0.4),inset 0 -1px 2px rgba(0,0,0,0.35),0 3px 10px rgba(255,215,0,0.15)">`
-       // Círculo interior blanco (contenido)
-       +   `<span style="display:block;width:${innerSize}px;height:${innerSize}px;border-radius:50%;overflow:hidden;background:#fff;position:relative;box-shadow:inset 0 0 4px rgba(0,0,0,0.3)">`
-       +     centerImg
-       +   `</span>`
-       + `</span>`
-       + starsRow
-       + confedBadge
-       + isoChip
+  return `<span title="${name}" style="display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.4);background:#fff">`
+       + `<img loading="lazy" decoding="async" src="${flagUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;display:block">`
        + `</span>`;
 }
 
@@ -6241,7 +6195,7 @@ function renderPreds() {
         <div style="display:flex;align-items:center;gap:6px">
           ${resultBadgeHtml}
           <div style="display:flex;align-items:center;gap:6px">
-            <span class="confidence-badge ${p.conf==='high'?'conf-high':'conf-med'}">${(p.bvr === 6 || p.confLabel === 'Máxima' || p.bvrText === 'Máxima') ? '🔥 CONFIANZA MÁXIMA · 6/6' : (p.confLabel || p.bvrText || (p.conf==='high'?'Alta':p.conf==='med'?'Media-Alta':'Media'))}</span>
+            <span class="confidence-badge ${p.conf==='high'?'conf-high':'conf-med'}">${(p.bvr === 6 || p.confLabel === 'Máxima' || p.bvrText === 'Máxima') ? '🔥 6/6' : (p.confLabel || p.bvrText || (p.conf==='high'?'Alta':p.conf==='med'?'Media-Alta':'Media'))}</span>
           </div>
         </div>
       </div>
