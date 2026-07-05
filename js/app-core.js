@@ -5079,9 +5079,12 @@ function renderPreds() {
   // Array vacío también cuenta como sin datos
   if (realPreds && realPreds.length === 0) realPreds = null;
 
-  // 🏆 WC_ONLY_MODE GLOBAL — aplicado a realPreds (afecta TODO: source, Pick Estrella del Finde, ticker, banner, chat IA, etc)
-  // Hasta 20-jul-2026 (día después de la final) solo se muestran picks del Mundial 2026.
-  if (realPreds && Array.isArray(realPreds)) {
+  // 🏆 WC_ONLY_MODE GLOBAL — DESACTIVADO (2-jul-2026 #689 + 5-jul-2026 re-fix)
+  // Antes bloqueaba picks no-Mundial en realPreds → fichas como España-Austria, Brasil-Noruega +2.5
+  // desaparecían al arrancar porque el modelo las marca live/started y este filtro las borraba.
+  // El filtro de `source` (linea ~6020) ya tiene su propio WC_ONLY_MODE toggle que Mauro puso en false.
+  const _WC_ONLY_GLOBAL = false; // ← si en algún momento hay que volver a solo Mundial, poner true
+  if (_WC_ONLY_GLOBAL && realPreds && Array.isArray(realPreds)) {
     const _WC_END_TS = new Date('2026-07-20T00:00:00-03:00').getTime();
     const _beforeWC = realPreds.length;
     realPreds = realPreds.filter(p => {
@@ -5092,7 +5095,7 @@ function renderPreds() {
       return true;
     });
     if (_beforeWC !== realPreds.length) {
-      console.log('[WC_ONLY_MODE realPreds] Bloqueados', _beforeWC - realPreds.length, 'picks no-Mundial / post-Mundial (incluye Pick Estrella del Finde)');
+      console.log('[WC_ONLY_MODE realPreds] Bloqueados', _beforeWC - realPreds.length, 'picks no-Mundial / post-Mundial');
     }
     if (realPreds.length === 0) realPreds = null;
   }
