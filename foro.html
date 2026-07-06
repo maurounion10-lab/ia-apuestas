@@ -655,24 +655,24 @@ main{max-width:1000px;margin:0 auto;padding:28px 20px 60px}
 
 /* 🆕 (2-jul-2026 #654 v6) Desktop: sidebar sube hasta la altura del hero, elimina espacio vacío arriba-izquierda */
 @media(min-width:1100px){
-  /* Sidebar: fixed a la izquierda desde debajo del nav */
+  /* 🆕 (5-jul-2026 #712) Sidebar sticky (no fixed) para respetar navbar del sitio */
   .foro-sidebar {
-    position: fixed !important;
-    top: 78px !important;
-    left: 20px !important;
+    position: sticky !important;
+    top: 90px !important;
     width: 260px !important;
-    max-height: calc(100vh - 90px) !important;
+    max-height: calc(100vh - 110px) !important;
     overflow-y: auto !important;
     z-index: 30;
+    align-self: start;
   }
   /* Hero + main: arranca justo despues del sidebar (300px = 20 left + 260 width + 20 gap) */
-  header.hero { padding: 20px 20px 18px !important; margin-left: 300px !important; margin-right: 20px !important; max-width: none !important }
+  header.hero { padding: 20px 20px 18px !important }
   header.hero h1 { font-size: 2.1rem !important; margin: 4px 0 !important }
   header.hero .stats { margin-top: 12px !important; gap: 20px !important }
   header.hero .stat-val { font-size: 1.6rem !important }
-  main { margin-left: 300px !important; margin-right: 20px !important; max-width: none !important; padding-left: 0 !important; padding-right: 0 !important }
+  main { padding-left: 0 !important; padding-right: 0 !important }
   /* Layout ya no es grid en desktop (sidebar es fixed) */
-  .foro-layout { display: block !important }
+  .foro-layout { display: grid !important; grid-template-columns: 260px 1fr; gap: 24px; max-width: 1400px; margin: 0 auto; padding: 0 20px }
   .foro-main { max-width: none !important }
 }
 /* Compactar hero también en 960-1099 para reducir espacio blanco */
