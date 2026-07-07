@@ -2581,7 +2581,7 @@ function nationalTeamBadge(name, size=48) {
   const info = WC2026_NATIONS[name];
   if (!info) return null;
   const flagUrl = `https://flagcdn.com/w160/${info.iso}.png`;
-  return `<span title="${name}" style="display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;box-shadow:0 2px 6px rgba(0,0,0,0.4);background:#fff">`
+  return `<span title="${name}" style="display:inline-block;width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;flex-shrink:0;background:transparent">`
        + `<img loading="lazy" decoding="async" src="${flagUrl}" alt="${name}" width="${size}" height="${size}" style="width:${size}px;height:${size}px;object-fit:cover;display:block">`
        + `</span>`;
 }
