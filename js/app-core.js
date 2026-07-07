@@ -6153,8 +6153,8 @@ function renderPreds() {
       ${(!isGameLive && isStarted && finalScore && (histResult === 'win' || histResult === 'loss')) ? (() => {
         const _isWin = histResult === 'win';
         const _icon = _isWin
-          ? '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12.5 L10 17 L19 7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
-          : '<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6 L18 18 M18 6 L6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
+          ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 12.5 L10 17 L19 7.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          : '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6 L18 18 M18 6 L6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>';
         return `<div class="pred-result-strip ${_isWin ? 'pred-result-strip--win' : 'pred-result-strip--loss'}">
           <span class="pred-result-strip__icon">${_icon}</span>
           <span class="pred-result-strip__label">${_isWin ? 'Acertado' : 'Fallado'}</span>
