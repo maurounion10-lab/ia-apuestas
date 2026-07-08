@@ -1214,57 +1214,69 @@
     background: linear-gradient(180deg, rgba(255,214,0,0.13) 0%, var(--gris-card) 55%) !important;
     animation: golden-pulse 2.5s ease-in-out infinite, confetti-pop 0.6s ease-out;
   }
-  /* ── Sellos de resultado en las fichas ── */
+  /* ── Sello de resultado en las fichas (pulido 8-jul-2026) ── */
   .pred-result-stamp {
-    display: flex; align-items: center; justify-content: center; gap: 12px;
-    width: 100%; border-radius: 14px;
-    padding: 20px 16px; margin: 16px 0 8px;
-    position: relative; background: transparent;
+    display: flex; align-items: center; gap: 11px;
+    width: 100%; box-sizing: border-box; border-radius: 14px;
+    padding: 12px 14px; margin: 16px 0 8px;
+    position: relative;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.22);
   }
-  .pred-result-stamp-icon { font-size: 2rem; line-height: 1; flex-shrink: 0; }
-  .pred-result-stamp-body { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; }
+  .pred-result-stamp-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  }
+  .pred-result-stamp-body { display: flex; flex-direction: column; gap: 1px; flex: 1; min-width: 0; }
   .pred-result-stamp-text {
-    font-size: 0.9rem; font-weight: 800;
-    letter-spacing: 0.5px; text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    font-size: 0.95rem; font-weight: 900;
+    letter-spacing: 0.3px; text-transform: uppercase; line-height: 1.1;
     font-family: 'Segoe UI', system-ui, sans-serif;
   }
-  .pred-result-stamp-sub {
-    font-size: 0.72rem; font-weight: 600; letter-spacing: 0;
-    opacity: 0.7; font-family: 'Segoe UI', system-ui, sans-serif;
+  .stamp-max-tag {
+    font-size: 0.5rem; font-weight: 800; letter-spacing: 0.1em; text-transform: none;
+    padding: 2px 6px; border-radius: 5px;
+    background: rgba(26,18,0,0.85); color: #ffd600; flex-shrink: 0;
   }
-  /* Alta confianza acertado — fondo dorado sólido */
-  .stamp-highconf {
-    border: 1px solid rgba(255,214,0,0.4);
-    background: #ffd600;
-    box-shadow: 0 4px 16px rgba(255,214,0,0.35);
+  .pred-result-stamp-sub { font-size: 0.68rem; font-weight: 700; font-family: 'Segoe UI', system-ui, sans-serif; }
+  .pred-result-stamp-score {
+    display: flex; flex-direction: column; align-items: center; gap: 1px;
+    border-radius: 9px; padding: 5px 11px; flex-shrink: 0;
   }
-  .stamp-highconf .pred-result-stamp-text { color: #1a1200; font-size: 0.95rem; letter-spacing: 0.4px }
-  .stamp-highconf .pred-result-stamp-sub  { color: rgba(26,18,0,0.7); font-weight: 700 }
-  .stamp-highconf .pred-result-stamp-icon { }
-  /* Acertado — fondo verde sólido */
-  .stamp-win {
-    border: 1px solid rgba(0,200,83,0.35);
-    background: #00c853;
-    box-shadow: 0 4px 16px rgba(0,200,83,0.35);
-  }
-  .stamp-win .pred-result-stamp-text { color: #002910; font-size: 0.95rem; letter-spacing: 0.4px }
-  .stamp-win .pred-result-stamp-sub  { color: rgba(0,41,16,0.7); font-weight: 700 }
-  .stamp-win .pred-result-stamp-icon { }
-  /* Fallado — fondo rojo sólido */
-  .stamp-loss {
-    border: none;
-    background: #e53935;
-    box-shadow: 0 4px 18px rgba(229,57,53,0.45);
-  }
+  .stamp-score-num { font-size: 0.95rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+  .stamp-score-lbl { font-size: 0.44rem; font-weight: 800; letter-spacing: 0.14em; }
+  /* Ganado máxima — dorado sólido */
+  .stamp-highconf { background: linear-gradient(135deg,#ffe680,#ffcf1a); box-shadow: 0 6px 22px rgba(255,214,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4); }
+  .stamp-highconf .pred-result-stamp-icon { background: rgba(60,44,0,0.2); color: #3a2c00; }
+  .stamp-highconf .pred-result-stamp-text { color: #1a1200; }
+  .stamp-highconf .pred-result-stamp-sub  { color: rgba(26,18,0,0.62); }
+  .stamp-highconf .pred-result-stamp-score { background: rgba(26,18,0,0.14); }
+  .stamp-highconf .stamp-score-num { color: #1a1200; }
+  .stamp-highconf .stamp-score-lbl { color: rgba(26,18,0,0.55); }
+  /* Ganado — verde sólido */
+  .stamp-win { background: linear-gradient(135deg,#00d95a,#00b84a); box-shadow: 0 6px 20px rgba(0,200,83,0.4), inset 0 1px 0 rgba(255,255,255,0.25); }
+  .stamp-win .pred-result-stamp-icon { background: rgba(0,52,22,0.28); color: #eafff1; }
+  .stamp-win .pred-result-stamp-text { color: #00280f; }
+  .stamp-win .pred-result-stamp-sub  { color: rgba(0,40,15,0.65); }
+  .stamp-win .pred-result-stamp-score { background: rgba(0,40,15,0.22); }
+  .stamp-win .stamp-score-num { color: #00280f; }
+  .stamp-win .stamp-score-lbl { color: rgba(0,40,15,0.6); }
+  /* Fallado — rojo sólido */
+  .stamp-loss { background: linear-gradient(135deg,#e53935,#c62828); box-shadow: 0 6px 18px rgba(229,57,53,0.4), inset 0 1px 0 rgba(255,255,255,0.18); }
+  .stamp-loss .pred-result-stamp-icon { background: rgba(60,0,0,0.25); color: #fff; }
   .stamp-loss .pred-result-stamp-text { color: #fff; text-shadow: none; }
   .stamp-loss .pred-result-stamp-sub  { color: rgba(255,255,255,0.75); }
-  /* Pendiente — fondo gris */
-  .stamp-pending {
-    border: 1px solid rgba(180,180,180,0.25);
-    background: rgba(180,180,180,0.12);
-  }
-  .stamp-pending .pred-result-stamp-text { color: rgba(200,200,200,0.85); }
+  .stamp-loss .pred-result-stamp-score { background: rgba(0,0,0,0.18); }
+  .stamp-loss .stamp-score-num { color: #fff; }
+  .stamp-loss .stamp-score-lbl { color: rgba(255,255,255,0.7); }
+  /* Pendiente — gris translúcido */
+  .stamp-pending { background: rgba(180,180,180,0.1); border: 1px solid rgba(180,180,180,0.22); box-shadow: none; }
+  .stamp-pending .pred-result-stamp-icon { background: rgba(255,255,255,0.06); color: rgba(220,220,220,0.8); }
+  .stamp-pending .pred-result-stamp-text { color: rgba(210,210,210,0.9); }
   .stamp-pending .pred-result-stamp-sub  { color: rgba(180,180,180,0.6); }
+  .stamp-pending .pred-result-stamp-score { background: rgba(255,255,255,0.05); }
+  .stamp-pending .stamp-score-num { color: rgba(220,220,220,0.85); }
+  .stamp-pending .stamp-score-lbl { color: rgba(180,180,180,0.55); }
   /* Legacy — ocultar */
   .high-conf-stamp { display: none; }
   .high-conf-stamp-text {}
@@ -1685,13 +1697,13 @@
   }
   /* Score final en tarjeta terminada */
   .pred-final-score {
-    font-size: 1.3rem; font-weight: 900; letter-spacing: 3px;
-    padding: 3px 14px; border-radius: 8px; line-height: 1;
+    font-size: 1.15rem; font-weight: 900; letter-spacing: 0; line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
-  .pred-final-score.score-win      { color: #00e676; background: rgba(0,200,83,0.12);   border: 1px solid rgba(0,200,83,0.35); }
-  .pred-final-score.score-gold-win { color: #ffd600; background: rgba(255,214,0,0.15); border: 1px solid rgba(255,214,0,0.55); box-shadow: 0 0 12px rgba(255,214,0,0.3); }
-  .pred-final-score.score-loss     { color: #ff5252; background: rgba(255,61,61,0.12);  border: 1px solid rgba(255,61,61,0.35); }
-  .pred-final-score.score-void     { color: #888;    background: rgba(255,255,255,0.05); border: 1px solid #333; }
+  .pred-final-score.score-win      { color: #00e676; }
+  .pred-final-score.score-gold-win { color: #ffd600; text-shadow: 0 0 10px rgba(255,214,0,0.45); }
+  .pred-final-score.score-loss     { color: #ff5252; }
+  .pred-final-score.score-void     { color: #9fb0a4; }
   /* Corona dorada grande para acierto de confianza alta */
   .golden-crown-badge {
     position: absolute; top: -2px; right: 14px;
@@ -2529,20 +2541,39 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 14px;
+    gap: 8px;
+    margin-bottom: 13px;
   }
+  .pred-meta { display: flex; align-items: center; gap: 6px; min-width: 0; overflow: hidden; }
+  .pred-conf-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+  .pred-league-chip {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 0.6rem; font-weight: 700; white-space: nowrap;
+    color: #f6cf6b; background: rgba(255,214,0,0.1);
+    border: 1px solid rgba(255,214,0,0.3); border-radius: 999px;
+    padding: 3px 8px; max-width: 100%; overflow: hidden; text-overflow: ellipsis;
+  }
+  .pred-league-chip.is-max { color: #04160c; background: linear-gradient(135deg,#ffe066,#ffc400); border-color: transparent; font-weight: 800; }
+  .pred-time {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 0.66rem; font-weight: 600; color: #8fb99a; white-space: nowrap; flex-shrink: 0;
+  }
+  .pred-time.is-live { color: #ff5252; font-weight: 800; }
+  .pred-time-pip { width: 6px; height: 6px; border-radius: 50%; background: #ff3d3d; box-shadow: 0 0 6px rgba(255,61,61,0.85); }
 
   /* ── BET VALUE RATING ── */
   .bvr-wrap {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
     margin-bottom: 12px;
     padding: 7px 11px;
-    background: rgba(0,0,0,0.25);
+    background: rgba(0,0,0,0.28);
     border-radius: 10px;
     border: 1px solid rgba(255,255,255,0.06);
   }
+  .bvr-wrap--high { border-color: rgba(0,200,83,0.16); }
+  .bvr-wrap--max  { border-color: rgba(255,214,0,0.25); background: rgba(0,0,0,0.32); }
   .bvr-label {
     font-size: 0.63rem;
     font-weight: 700;
@@ -2559,22 +2590,21 @@
     flex: 1;
   }
   .bvr-gem {
-    font-size: 1.05rem;
+    font-size: 0.85rem;
     line-height: 1;
     display: inline-block;
-    opacity: 0.14;
-    filter: grayscale(1);
-    transition: opacity 0.2s, filter 0.2s, text-shadow 0.2s;
+    color: rgba(255,255,255,0.16);
+    transition: color 0.2s, text-shadow 0.2s;
     user-select: none;
   }
-  /* BVR 1-2 = Baja (rojo) | 3-4 = Media (naranja) | 5 = Alta (verde) | 6 = Máxima (dorado) */
-  .bvr-gem.active-1, .bvr-gem.active-2 { opacity:1; filter:sepia(1) saturate(4) hue-rotate(300deg) brightness(1.1); }
-  .bvr-gem.active-3, .bvr-gem.active-4 { opacity:1; filter:sepia(1) saturate(3) hue-rotate(330deg); }
-  .bvr-gem.active-5 { opacity:1; filter:sepia(1) saturate(3) hue-rotate(60deg) brightness(1.1); }
-  .bvr-gem.active-6 { opacity:1; filter:sepia(1) saturate(5) brightness(1.25); text-shadow:0 0 12px rgba(255,214,0,0.95), 0 0 5px rgba(255,180,0,0.7); }
+  /* Estrellas nítidas, color directo (sin filtros sepia/hue): 1-2 Baja rojo | 3-4 Media naranja | 5 Alta verde | 6 Máxima dorado */
+  .bvr-gem.active-1, .bvr-gem.active-2 { color:#ff5252; text-shadow:0 0 6px rgba(255,82,82,0.5); }
+  .bvr-gem.active-3, .bvr-gem.active-4 { color:#ff9100; text-shadow:0 0 6px rgba(255,145,0,0.45); }
+  .bvr-gem.active-5 { color:#00e676; text-shadow:0 0 8px rgba(0,200,83,0.55); }
+  .bvr-gem.active-6 { color:#ffd600; text-shadow:0 0 10px rgba(255,214,0,0.9), 0 0 4px rgba(255,180,0,0.6); }
   /* ── Override por IA: última estrella roja (stake bajó) o verde (stake subió) ── */
-  .bvr-gem.ia-down { opacity:1 !important; filter:sepia(1) saturate(7) hue-rotate(310deg) brightness(1.15) !important; text-shadow:0 0 10px rgba(226,75,75,0.9) !important; }
-  .bvr-gem.ia-up   { opacity:1 !important; filter:sepia(1) saturate(7) hue-rotate(70deg)  brightness(1.1)  !important; text-shadow:0 0 10px rgba(0,200,83,0.85) !important; }
+  .bvr-gem.ia-down { color:#e24b4a !important; text-shadow:0 0 10px rgba(226,75,75,0.9) !important; }
+  .bvr-gem.ia-up   { color:#00e676 !important; text-shadow:0 0 10px rgba(0,200,83,0.85) !important; }
 
   /* ── Cinta IA: aviso compacto de la IA sobre el pick (estilo alerta minimalista) ── */
   @keyframes iaStripIn {
@@ -2676,47 +2706,68 @@
   .bvr-text.r6 { color: #ffd600; text-shadow: 0 0 8px rgba(255,214,0,0.5); }
 
   .confidence-badge {
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 4px 10px;
-    border-radius: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.68rem;
+    font-weight: 800;
+    padding: 3px 9px;
+    border-radius: 999px;
     white-space: nowrap;
     letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  /* Máxima 6/6 — pill dorado sólido con fuego */
+  .conf-max {
+    color: #04160c;
+    background: linear-gradient(135deg, #ffe066, #ffc400);
+    box-shadow: 0 1px 6px rgba(255,200,0,0.35);
   }
   .conf-high {
     background: linear-gradient(135deg, rgba(255,214,0,0.22), rgba(255,180,0,0.12));
     color: #ffd600;
-    border: 1px solid rgba(255,214,0,0.6);
-    box-shadow: 0 0 8px rgba(255,214,0,0.25), inset 0 1px 0 rgba(255,255,255,0.1);
-    text-shadow: 0 0 8px rgba(255,214,0,0.5);
+    border: 1px solid rgba(255,214,0,0.55);
+    box-shadow: 0 0 8px rgba(255,214,0,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+    text-shadow: 0 0 8px rgba(255,214,0,0.4);
     letter-spacing: 0.3px;
   }
-  .conf-med { background: rgba(255,145,0,0.2); color: var(--naranja); border: 1px solid rgba(255,145,0,0.4); }
+  .conf-med { background: rgba(255,145,0,0.16); color: #ffb060; border: 1px solid rgba(255,145,0,0.4); }
 
   .pred-match {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 14px;
+    gap: 10px;
+    margin-bottom: 12px;
   }
   .pred-team {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
     flex: 1;
+    min-width: 0;
   }
-  .pred-emoji { font-size: 2rem; }
+  .pred-emoji {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 50px; height: 50px; border-radius: 50%;
+    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
+    overflow: hidden; flex-shrink: 0;
+  }
+  .pred-emoji > img, .pred-emoji > span { transform: scale(0.6); transform-origin: center center; }
   .pred-tname {
-    font-size: 0.85rem;
-    font-weight: 600;
+    font-size: 0.78rem;
+    font-weight: 700;
     text-align: center;
+    color: #e8f5e9;
   }
   .pred-vs {
-    font-weight: 700;
-    color: #555;
-    font-size: 0.85rem;
-    padding: 0 8px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 800;
+    color: #7d8f80;
+    font-size: 0.62rem; letter-spacing: 0.08em;
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px; padding: 3px 8px;
   }
   /* Escudos de fichas en mobile — más compactos, proporcionados a la card */
   /* 🔧 (2-jul-2026 fix) Escalar TODO el wrapper de escudos WC (span + img) uniformemente
@@ -2724,21 +2775,22 @@
      pero el <span> wrapper con background circular quedaba en 64px → escudo se veía mal. */
   @media (max-width: 600px) {
     .pred-match { margin-bottom: 12px; gap: 6px; }
-    .pred-team { gap: 3px; }
-    .pred-emoji { font-size: 1.6rem; }
-    /* Escalar wrapper de badges nacionales (span) + club logos (img directo) */
+    .pred-team { gap: 4px; }
+    .pred-emoji { width: 44px; height: 44px; }
+    /* Escalar wrapper de badges nacionales (span) + club logos (img directo) dentro del marco */
     .pred-emoji > span, .pred-emoji > img {
-      transform: scale(0.82);
+      transform: scale(0.52);
       transform-origin: center center;
     }
-    .pred-tname { font-size: 0.78rem; line-height: 1.15; }
-    .pred-vs { font-size: 0.72rem; padding: 0 4px; letter-spacing: 0.05em; }
+    .pred-tname { font-size: 0.74rem; line-height: 1.15; }
+    .pred-vs { font-size: 0.58rem; padding: 2px 6px; letter-spacing: 0.05em; }
   }
   @media (max-width: 380px) {
+    .pred-emoji { width: 40px; height: 40px; }
     .pred-emoji > span, .pred-emoji > img {
-      transform: scale(0.68);
+      transform: scale(0.46);
     }
-    .pred-tname { font-size: 0.72rem; }
+    .pred-tname { font-size: 0.7rem; }
   }
 
   
@@ -2984,58 +3036,87 @@
     .pred-saber-mas { font-size: 0.7rem; margin-top: 4px }
   }
   .pred-recommendation {
-    background: linear-gradient(135deg, rgba(255,215,0,0.10) 0%, rgba(255,170,0,0.06) 100%);
-    border: 1px solid rgba(255,215,0,0.32);
-    border-radius: 10px;
-    padding: 11px 14px;
+    background: linear-gradient(135deg, rgba(255,215,0,0.10) 0%, rgba(255,170,0,0.05) 100%);
+    border: 1px solid rgba(255,215,0,0.3);
+    border-radius: 12px;
+    padding: 11px 12px;
     margin-bottom: 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
-    box-shadow: 0 0 0 1px rgba(255,215,0,0.05) inset;
+    gap: 10px;
   }
   .pred-rec-left {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 6px;
     min-width: 0;
     flex: 1 1 auto;
   }
   .pred-rec-label {
-    font-size: 0.65rem;
-    color: rgba(255,215,0,0.75);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.56rem;
+    color: #f6cf6b;
     text-transform: uppercase;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.09em;
     font-weight: 700;
   }
   .pred-rec-value {
-    font-size: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: fit-content;
+    max-width: 100%;
+    font-size: 0.88rem;
     font-weight: 800;
-    color: #fff;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    /* Permitir wrap si el texto es muy largo (picks Mundial con frases extendidas).
-       Antes era white-space: nowrap → se solapaba con la cuota. */
-    line-height: 1.25;
+    color: #eafff1;
+    background: rgba(0,200,83,0.14);
+    border: 1px solid rgba(0,200,83,0.4);
+    border-radius: 8px;
+    padding: 5px 11px;
+    line-height: 1.2;
     word-break: break-word;
     overflow-wrap: anywhere;
   }
-  .pred-rec-right {
-    flex: 0 0 auto;
-  }
+  .pred-rec-ico { display: inline-flex; flex-shrink: 0; }
+  .rec-ico-pick, .rec-ico-win { color: #2ee66f; }
+  .rec-ico-loss { color: #ff6b6b; }
   .pred-rec-right {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 1px;
+    flex: 0 0 auto;
     flex-shrink: 0;
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 11px;
+    padding: 6px 13px;
+  }
+  .pred-rec-odds-label {
+    font-size: 0.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #7d8f80;
   }
   .pred-rec-odds {
-    font-size: 2rem;
+    font-size: 1.4rem;
     font-weight: 900;
     color: #fff;
     line-height: 1;
     letter-spacing: -0.5px;
   }
+  /* Variantes por resultado: el chip del pick y la cápsula se tiñen igual que el contenedor */
+  .pred-card-win .pred-rec-value,
+  .pred-golden-win .pred-rec-value { background: rgba(0,200,83,0.12); border-color: rgba(0,200,83,0.4); }
+  .pred-card-loss .pred-rec-value { background: rgba(255,61,61,0.1); border-color: rgba(255,61,61,0.35); }
+  .pred-card-loss .pred-rec-value .pred-rec-ico { color: #ff6b6b; }
+  .pred-card-win .pred-rec-right,
+  .pred-golden-win .pred-rec-right { border-color: rgba(0,200,83,0.2); }
+  .pred-card-loss .pred-rec-right { border-color: rgba(255,61,61,0.2); }
   .pred-rec-book {
     display: flex;
     flex-direction: column;
@@ -6318,11 +6399,10 @@ html { -webkit-tap-highlight-color: rgba(0,200,83,0.15); }
   .pred-dbbet-1click .db-odds-gem { font-size: 0.8em !important; margin-right: 2px !important }
   .pred-dbbet-1click .db-arrow svg { width: 9px; height: 9px }
 }
-/* SVG del sello ACERTADO: reemplaza el emoji, mismo tamaño visual, animacion suave */
+/* SVG del check/x dentro del badge circular del sello (badge = 34px, ícono ~17px) */
 .pred-result-stamp-icon svg {
   display: block;
-  width: 34px; height: 34px;
-  filter: drop-shadow(0 2px 3px rgba(0,0,0,0.25));
+  width: 17px; height: 17px;
 }
 
 /* 🆕 (2-jul-2026) FIX MOBILE: popups respetan nav + sponsor-bar + banner sticky inferior + safe area iOS */

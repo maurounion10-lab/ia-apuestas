@@ -6041,6 +6041,19 @@ function renderPreds() {
     return source.findIndex(p => (p.bvr || 0) >= 6 && !p._started);
   })();
 
+  // 🎨 (8-jul-2026) Íconos SVG inline para la ficha pulida (reemplazan emojis; sin dependencia externa).
+  //    Usan currentColor y 1em → el color/tamaño lo controla el contenedor.
+  const _IC = {
+    trophy: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.14em"><path d="M7 4h10v5a5 5 0 0 1-10 0V4Z"/><path d="M7 5H4v2a3 3 0 0 0 3 3M17 5h3v2a3 3 0 0 1-3 3M9 20h6M12 14v6"/></svg>',
+    clock: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.13em"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>',
+    calendar: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.13em"><rect x="3" y="4.5" width="18" height="16.5" rx="2"/><path d="M3 9.5h18M8 2.5v4M16 2.5v4M9 15l2 2 4-4"/></svg>',
+    fire: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="currentColor" style="vertical-align:-0.14em"><path d="M12 2c1.2 3-1 4.8-2.6 6.4C8 10 7 11.6 7 13.7a5 5 0 0 0 10 0c0-2-1-3.6-2.1-5.1-.4 1-1.4 1.6-2 1.1.6-2.2.4-5.4-.9-7.7Z"/></svg>',
+    robot: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.15em"><rect x="4" y="8" width="16" height="12" rx="3"/><path d="M12 4v4M8.5 13.5h.01M15.5 13.5h.01M2.5 13v3M21.5 13v3"/></svg>',
+    target: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2.1" style="vertical-align:-0.15em"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg>',
+    checkCircle: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.16em"><circle cx="12" cy="12" r="9.5" stroke-width="2"/><path d="M8 12.5l2.5 2.5L16 9" stroke-width="2.4"/></svg>',
+    xCircle: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-linecap="round" style="vertical-align:-0.16em"><circle cx="12" cy="12" r="9.5" stroke-width="2"/><path d="M9 9l6 6M15 9l-6 6" stroke-width="2.4"/></svg>'
+  };
+
   document.getElementById('predGrid').innerHTML = source.map((p, idx) => {
     // BVR: usar valor guardado en p, o derivar de p.conf para datos estáticos
     const _bvr     = p.bvr     || (p.conf==='high' ? 5 : 3);
@@ -6049,9 +6062,11 @@ function renderPreds() {
     const _bvrStarsHtml = Array.from({length:6}, (_,i) =>
       `<span class="bvr-gem ${i < _bvr ? 'active-'+_bvr : ''}">★</span>`
     ).join('');
-    const bvrHtml = `<div class="bvr-wrap">
+    const _bvrRightLabel = _bvrText || (_bvr >= 6 ? 'Máxima' : _bvr >= 5 ? 'Alta' : _bvr >= 3 ? 'Media' : 'Baja');
+    const bvrHtml = `<div class="bvr-wrap${_bvr >= 6 ? ' bvr-wrap--max' : _bvr >= 5 ? ' bvr-wrap--high' : ''}">
       <span class="bvr-label">Confianza IA</span>
       <div class="bvr-gems">${_bvrStarsHtml}</div>
+      <span class="bvr-text r${_bvr}">${_bvrRightLabel}</span>
     </div>`;
 
     const oddsHtml = affCtaHtml;
@@ -6170,12 +6185,10 @@ function renderPreds() {
         </div>
         ${isPickFinde ? `<div class="pred-finde-badge">⭐ PICK DEL FINDE</div>` : ''}` : ''}
       <div class="pred-header">
-        <span style="font-size:0.78rem;color:var(--texto-sec);display:flex;align-items:center;gap:4px">${(() => {
+        ${(() => {
           const _lgRaw = (p._sportKey ? (sportKeyToLeague(p._sportKey, p.home, p.away) || p.league) : p.league) || '';
           let lg = (_lgRaw && _lgRaw !== 'Fútbol' && _lgRaw !== 'Tenis' && _lgRaw !== 'Liga') ? leagueShort(_lgRaw) : '';
-          // Calcular tiempo siempre desde commenceTs (evita strings "Hoy/Mañ." stale del caché)
-          // _dateIcon: ‼️ si es HOY, 🗓️ si es Mañ./futuro — reemplaza la pelota ⚽ del fallback de liga
-          let _dateIcon = '';
+          // Tiempo siempre dinámico desde commenceTs (evita strings "Hoy/Mañ." stale del caché)
           const _fmtTs = (ts) => {
             if (!ts) return '';
             const _md = new Date(ts);
@@ -6183,25 +6196,25 @@ function renderPreds() {
             const _cd = new Date(_md); _cd.setHours(0,0,0,0);
             const _diff = Math.round((_cd - _td) / 86400000);
             const _ts = _md.toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit',hour12:false});
-            if (_diff === 0)      _dateIcon = '‼️';
-            else if (_diff >= 1)  _dateIcon = '🗓️';
-            return (_diff === -1 ? 'Ayer' : _diff === 0 ? 'Hoy' : _diff === 1 ? 'Mañ.' : _md.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'})) + ' · ' + _ts;
+            const _lbl = _diff === -1 ? 'Ayer' : _diff === 0 ? 'Hoy' : _diff === 1 ? 'Mañ.' : _md.toLocaleDateString('es-AR',{day:'2-digit',month:'2-digit'});
+            return _diff < 0 ? _lbl : (_lbl + ' ' + _ts);   // partidos pasados: solo la fecha; futuros: fecha + hora
           };
-          const t  = isGameLive ? '🔴 EN VIVO'
-                   : p.commenceTs ? _fmtTs(p.commenceTs)   // siempre dinámico si hay timestamp
-                   : p.time || '';                           // fallback para picks muy viejos sin ts
-          // Reemplazar fallback ⚽ por icono de fecha si aplica; si no, prependear el icono a la liga real
-          if (_dateIcon && !isGameLive) {
-            if (lg === '⚽' || lg === '') lg = _dateIcon;
-            else lg = _dateIcon + ' ' + lg;
-          }
-          return [lg, t].filter(Boolean).join(' · ');
-        })()}</span>
-        <div style="display:flex;align-items:center;gap:6px">
+          const _tRaw = isGameLive ? 'EN VIVO'
+                   : p.commenceTs ? _fmtTs(p.commenceTs)
+                   : (p.time || '');
+          const _timeIco = isGameLive ? '<span class="pred-time-pip"></span>' : (isStarted ? _IC.calendar : _IC.clock);
+          const _chip = lg ? `<span class="pred-league-chip${isMaxConf ? ' is-max' : ''}">${_IC.trophy} ${lg}</span>` : '';
+          const _time = _tRaw ? `<span class="pred-time${isGameLive ? ' is-live' : ''}">${_timeIco} ${_tRaw}</span>` : '';
+          return `<div class="pred-meta">${_chip}${_time}</div>`;
+        })()}
+        <div class="pred-conf-wrap">
           ${resultBadgeHtml}
-          <div style="display:flex;align-items:center;gap:6px">
-            <span class="confidence-badge ${p.conf==='high'?'conf-high':'conf-med'}">${(p.bvr === 6 || p.confLabel === 'Máxima' || p.bvrText === 'Máxima') ? '🔥 6/6' : (p.confLabel || p.bvrText || (p.conf==='high'?'Alta':p.conf==='med'?'Media-Alta':'Media'))}</span>
-          </div>
+          ${(() => {
+            const _is6 = (p.bvr === 6 || p.confLabel === 'Máxima' || p.bvrText === 'Máxima');
+            const _txt = _is6 ? '6/6' : (p.confLabel || p.bvrText || (p.conf==='high' ? 'Alta' : p.conf==='med' ? 'Media-Alta' : 'Media'));
+            const _cls = _is6 ? 'conf-max' : (p.conf==='high' ? 'conf-high' : 'conf-med');
+            return `<span class="confidence-badge ${_cls}">${_is6 ? _IC.fire + ' ' : ''}${_txt}</span>`;
+          })()}
         </div>
       </div>
       ${bvrHtml}
@@ -6239,13 +6252,15 @@ function renderPreds() {
       ${formRow}
       <div class="pred-recommendation">
         <div class="pred-rec-left">
-          <div class="pred-rec-label">🤖 Recomendación IA</div>
-          <div class="pred-rec-value">${isFinishedLoss ? '❌' : isFinishedWin ? '✅' : '🎯'} ${_recLabel(p.rec, p.home, p.away)}</div>
+          <div class="pred-rec-label">${_IC.robot} Recomendación de la IA</div>
+          <div class="pred-rec-value">${
+            isFinishedWin  ? `<span class="pred-rec-ico rec-ico-win">${_IC.checkCircle}</span>`
+          : isFinishedLoss ? `<span class="pred-rec-ico rec-ico-loss">${_IC.xCircle}</span>`
+          :                  `<span class="pred-rec-ico rec-ico-pick">${_IC.target}</span>`
+          } ${_recLabel(p.rec, p.home, p.away)}</div>
           ${(()=>{ const _u = buildPickBlogUrl(p); return _u ? `<a href="${_u}" class="pred-saber-mas" title="Leer análisis completo del pick"><span class="sm-ico">📖</span> Análisis completo <span class="sm-arrow">→</span></a>` : ''; })()}
         </div>
-        <div class="pred-rec-right">
-          ${(()=>{ const _s=_recSideOf(p); const _roRaw = _s==='home' ? (p._hO ? parseFloat(p._hO) : null) : _s==='away' ? (p._aO ? parseFloat(p._aO) : null) : _s==='draw' ? (p._dO ? parseFloat(p._dO) : null) : (p._bestOdds ? parseFloat(p._bestOdds) : null); if (!_roRaw) return ''; const _roShown = isMaxConf ? (_roRaw * 0.95).toFixed(2) : _roRaw.toFixed(2); return `<div class="pred-rec-odds">${_roShown}</div>`; })()}
-        </div>
+        ${(()=>{ const _s=_recSideOf(p); const _roRaw = _s==='home' ? (p._hO ? parseFloat(p._hO) : null) : _s==='away' ? (p._aO ? parseFloat(p._aO) : null) : _s==='draw' ? (p._dO ? parseFloat(p._dO) : null) : (p._bestOdds ? parseFloat(p._bestOdds) : null); if (!_roRaw) return ''; const _roShown = isMaxConf ? (_roRaw * 0.95).toFixed(2) : _roRaw.toFixed(2); return `<div class="pred-rec-right"><span class="pred-rec-odds-label">Cuota</span><div class="pred-rec-odds">${_roShown}</div></div>`; })()}
       </div>
       ${(p.probH > 0 || p.probA > 0) ? `
       <div class="pred-bars">
@@ -6294,18 +6309,26 @@ function renderPreds() {
       })() : ''}
       <!-- (Bloque de apuesta con  removido) -->
       <!-- Sello de resultado (solo partidos terminados) -->
-      ${isStarted ? `
-      <div class="pred-result-stamp ${isHighConfWin ? 'stamp-highconf' : isFinishedWin ? 'stamp-win' : isFinishedLoss ? 'stamp-loss' : 'stamp-pending'}">
-        <span class="pred-result-stamp-icon">${isHighConfWin ? `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-label="Acertado Maxima" width="32" height="32"><circle cx="16" cy="16" r="14" fill="#2a1e00" stroke="rgba(255,255,255,0.4)" stroke-width="1.2"/><path d="M10 16.2 L14.2 20.5 L22.2 12" fill="none" stroke="#ffd600" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` : isFinishedWin ? `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-label="Acertado" width="32" height="32"><circle cx="16" cy="16" r="14" fill="#0e2a15" stroke="rgba(255,255,255,0.35)" stroke-width="1.2"/><path d="M10 16.2 L14.2 20.5 L22.2 12" fill="none" stroke="#00e85a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>` : isFinishedLoss ? '❌' : '⏳'}</span>
+      ${isStarted ? (() => {
+        const _win = isFinishedWin || isHighConfWin;
+        const _cls = isHighConfWin ? 'stamp-highconf' : isFinishedWin ? 'stamp-win' : isFinishedLoss ? 'stamp-loss' : 'stamp-pending';
+        const _ico = _win
+          ? '<svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M5 12.5 L10 17 L19 7.5" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          : isFinishedLoss
+          ? '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M6 6 L18 18 M18 6 L6 18" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"/></svg>'
+          : '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>';
+        const _title = _win ? '¡Acertado!' : isFinishedLoss ? 'Fallado' : 'Pendiente';
+        const _sub = isHighConfWin ? 'Máxima confianza · ganado' : isFinishedWin ? 'La IA ganó este pick' : isFinishedLoss ? 'Este pick no entró' : 'Esperando resultado';
+        const _scoreFmt = finalScore ? (/^\d+\s*-\s*\d+$/.test(finalScore) ? finalScore.replace(/\s*-\s*/, ' – ') : _translateMatchState(finalScore)) : '';
+        return `<div class="pred-result-stamp ${_cls}">
+        <span class="pred-result-stamp-icon">${_ico}</span>
         <div class="pred-result-stamp-body">
-          <span class="pred-result-stamp-text">${
-            isHighConfWin ? '¡ACERTADO!' :
-            isFinishedWin ? '¡ACERTADO!' :
-            isFinishedLoss ? 'FALLADO' : 'Resultado Pendiente'
-          }</span>
-          ${finalScore ? `<span class="pred-result-stamp-sub">Resultado: ${_translateMatchState(finalScore)}</span>` : ''}
+          <span class="pred-result-stamp-text">${_title}${isHighConfWin ? ' <span class="stamp-max-tag">★ MÁXIMA</span>' : ''}</span>
+          <span class="pred-result-stamp-sub">${_sub}</span>
         </div>
-      </div>` : ''}
+        ${_scoreFmt ? `<div class="pred-result-stamp-score"><span class="stamp-score-num">${_scoreFmt}</span><span class="stamp-score-lbl">FINAL</span></div>` : ''}
+      </div>`;
+      })() : ''}
 
       <!-- ── Fila de acciones: Share · Analysis/Tweet · Comment · Publish · Like ── -->
       <div class="pred-action-row">
