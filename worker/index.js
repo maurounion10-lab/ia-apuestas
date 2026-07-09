@@ -3189,6 +3189,53 @@ export default {
       return new Response(null, { status: 204, headers: CORS });
     }
 
+    // ── 🆕 (9-jul-2026) /api/sb?type=historial — mirror del Pages Function /api/sb
+    // Fallback anti-adblock para accesoia.app (api.accesoia.app apunta a este worker,
+    // los adblockers bloquean gambeta.ai pero no el dominio propio). Usado por live.js.
+    if (path === '/api/sb' && request.method === 'GET') {
+      const sbType = url.searchParams.get('type');
+      if (sbType !== 'historial') {
+        return new Response(JSON.stringify({ error: `unknown type: ${sbType}` }), { status: 400, headers: CORS });
+      }
+      try {
+        const key = env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_ANON_KEY;
+        const sbFetch = (p) => fetch(`${SUPABASE_URL}/rest/v1/${p}`, {
+          headers: { apikey: key, Authorization: `Bearer ${key}`, Accept: 'application/json' },
+        });
+        const [r1, r2] = await Promise.allSettled([
+          sbFetch(`shared_cache?key=eq.global_historial_v1&select=data&limit=1`),
+          sbFetch(`acoin_users?email=eq.${encodeURIComponent(ADMIN_EMAIL)}&select=historial_full&limit=1`),
+        ]);
+        let fromCache = [], fromUsers = [];
+        if (r1.status === 'fulfilled' && r1.value.ok) {
+          const rows = await r1.value.json();
+          const d = rows?.[0]?.data;
+          if (Array.isArray(d)) fromCache = d;
+        }
+        if (r2.status === 'fulfilled' && r2.value.ok) {
+          const rows = await r2.value.json();
+          const d = rows?.[0]?.historial_full;
+          if (Array.isArray(d)) fromUsers = d;
+        }
+        const merged = new Map();
+        const rankResult = (p) => (p && p.result && p.result !== 'pending') ? 1 : 0;
+        const addPick = (p) => {
+          if (!p || !p.id) return;
+          const existing = merged.get(p.id);
+          if (!existing || rankResult(p) > rankResult(existing)) merged.set(p.id, p);
+        };
+        fromCache.forEach(addPick);
+        fromUsers.forEach(addPick);
+        const merged_all = Array.from(merged.values());
+        return new Response(
+          JSON.stringify(merged_all.length > 0 ? [{ historial_full: merged_all }] : []),
+          { headers: { ...CORS, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=30, s-maxage=60' } }
+        );
+      } catch (e) {
+        return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: CORS });
+      }
+    }
+
     // ── 🆕 /api/lead-signup — captura de leads desde landings Mundial ──
     if (path === '/api/lead-signup' && request.method === 'POST') {
       try {
