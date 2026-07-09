@@ -1,32 +1,32 @@
 {
- "generatedAt": "2026-07-09T21:46:19.106Z",
+ "generatedAt": "2026-07-09T23:21:16.126Z",
  "propertyId": "544952014",
  "window": "28d",
  "today": {
   "date": "20260709",
-  "users": 1202,
-  "sessions": 1218,
-  "pageviews": 1324,
-  "avgDur": 14,
+  "users": 2133,
+  "sessions": 2162,
+  "pageviews": 2325,
+  "avgDur": 12,
   "engagement": 0.2,
   "dUsers": null,
   "dSessions": null,
   "dPageviews": null
  },
  "totals": {
-  "sessions": 1218,
-  "users": 1202,
-  "pageviews": 1324,
+  "sessions": 2162,
+  "users": 2133,
+  "pageviews": 2325,
   "avgEngagement": 0.2,
-  "pagesPerSession": 1.09
+  "pagesPerSession": 1.08
  },
  "daily": [
   {
    "date": "20260709",
-   "users": 1202,
-   "sessions": 1218,
-   "pageviews": 1324,
-   "avgDur": 14,
+   "users": 2133,
+   "sessions": 2162,
+   "pageviews": 2325,
+   "avgDur": 12,
    "engagement": 0.2
   }
  ],
@@ -93,23 +93,23 @@
   },
   {
    "hour": 15,
-   "sessions": 553
+   "sessions": 555
   },
   {
    "hour": 16,
-   "sessions": 397
+   "sessions": 410
   },
   {
    "hour": 17,
-   "sessions": 259
+   "sessions": 348
   },
   {
    "hour": 18,
-   "sessions": 8
+   "sessions": 453
   },
   {
    "hour": 19,
-   "sessions": 0
+   "sessions": 392
   },
   {
    "hour": 20,
@@ -130,43 +130,57 @@
  ],
  "sources": [
   {
+   "source": "fb",
+   "medium": "paid",
+   "sessions": 749,
+   "users": 740,
+   "engagement": 0.5
+  },
+  {
    "source": "(data not available)",
    "medium": "(data not available)",
-   "sessions": 404,
-   "users": 404,
+   "sessions": 591,
+   "users": 591,
+   "engagement": 0
+  },
+  {
+   "source": "ig",
+   "medium": "paid",
+   "sessions": 469,
+   "users": 467,
    "engagement": 0
   },
   {
    "source": "(not set)",
    "medium": "(not set)",
-   "sessions": 351,
-   "users": 330,
-   "engagement": 0.3
-  },
-  {
-   "source": "fb",
-   "medium": "paid",
-   "sessions": 340,
-   "users": 336,
-   "engagement": 0.6
-  },
-  {
-   "source": "ig",
-   "medium": "paid",
-   "sessions": 166,
-   "users": 166,
-   "engagement": 0
+   "sessions": 416,
+   "users": 384,
+   "engagement": 0.2
   },
   {
    "source": "(direct)",
    "medium": "(none)",
-   "sessions": 23,
-   "users": 22,
+   "sessions": 36,
+   "users": 35,
    "engagement": 0
   },
   {
    "source": "google",
    "medium": "organic",
+   "sessions": 7,
+   "users": 7,
+   "engagement": 0
+  },
+  {
+   "source": "tiktok.com",
+   "medium": "referral",
+   "sessions": 6,
+   "users": 6,
+   "engagement": 0
+  },
+  {
+   "source": "t.co",
+   "medium": "referral",
    "sessions": 4,
    "users": 4,
    "engagement": 0
@@ -174,8 +188,8 @@
   {
    "source": "bing",
    "medium": "organic",
-   "sessions": 1,
-   "users": 1,
+   "sessions": 2,
+   "users": 2,
    "engagement": 0
   },
   {
@@ -186,15 +200,15 @@
    "engagement": 0
   },
   {
-   "source": "pe.search.yahoo.com",
+   "source": "lm.facebook.com",
    "medium": "referral",
    "sessions": 1,
    "users": 1,
    "engagement": 0
   },
   {
-   "source": "perplexity.ai",
-   "medium": "ai-assistant",
+   "source": "ntp.msn.com",
+   "medium": "referral",
    "sessions": 1,
    "users": 1,
    "engagement": 0
@@ -204,16 +218,23 @@
   {
    "host": "accesoia.app",
    "path": "/predicciones-ia",
-   "views": 1232,
-   "users": 1163,
-   "avgDur": 6
+   "views": 2189,
+   "users": 2066,
+   "avgDur": 5
   },
   {
    "host": "gambeta.ai",
    "path": "/",
-   "views": 62,
-   "users": 39,
+   "views": 94,
+   "users": 64,
    "avgDur": 193
+  },
+  {
+   "host": "accesoia.app",
+   "path": "/",
+   "views": 8,
+   "users": 8,
+   "avgDur": 30
   },
   {
    "host": "accesoia.app",
@@ -223,18 +244,11 @@
    "avgDur": 63
   },
   {
-   "host": "accesoia.app",
-   "path": "/",
-   "views": 6,
-   "users": 6,
-   "avgDur": 0
-  },
-  {
    "host": "gambeta.ai",
    "path": "/mundial-2026",
-   "views": 4,
-   "users": 4,
-   "avgDur": 41
+   "views": 6,
+   "users": 6,
+   "avgDur": 28
   },
   {
    "host": "accesoia.app",
@@ -247,8 +261,15 @@
    "host": "gambeta.ai",
    "path": "/blog/ia-para-apostar",
    "views": 3,
-   "users": 3,
-   "avgDur": 0
+   "users": 4,
+   "avgDur": 12
+  },
+  {
+   "host": "accesoia.app",
+   "path": "/estadisticas-ia",
+   "views": 2,
+   "users": 2,
+   "avgDur": 454
   },
   {
    "host": "accesoia.app",
@@ -258,11 +279,25 @@
    "avgDur": 75
   },
   {
-   "host": "accesoia.app",
-   "path": "/estadisticas-ia",
+   "host": "gambeta.ai",
+   "path": "/blog/linemate-mas-ia-futbol",
+   "views": 2,
+   "users": 1,
+   "avgDur": 448
+  },
+  {
+   "host": "gambeta.ai",
+   "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+   "views": 2,
+   "users": 3,
+   "avgDur": 0
+  },
+  {
+   "host": "gambeta.ai",
+   "path": "/blog/apuestas-deportivas-errores",
    "views": 1,
    "users": 1,
-   "avgDur": 886
+   "avgDur": 0
   },
   {
    "host": "gambeta.ai",
@@ -284,53 +319,32 @@
    "views": 1,
    "users": 1,
    "avgDur": 960
-  },
-  {
-   "host": "gambeta.ai",
-   "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
-   "views": 1,
-   "users": 1,
-   "avgDur": 0
-  },
-  {
-   "host": "gambeta.ai",
-   "path": "/blog/predictz-espanol",
-   "views": 0,
-   "users": 1,
-   "avgDur": 0
-  },
-  {
-   "host": "gambeta.ai",
-   "path": "/blog/quien-gana-mundial-2026",
-   "views": 0,
-   "users": 1,
-   "avgDur": 0
   }
  ],
  "landing": [
   {
    "path": "",
-   "sessions": 90,
+   "sessions": 135,
    "bounce": 100
   },
   {
    "path": "/",
-   "sessions": 29,
+   "sessions": 53,
    "bounce": 100
   },
   {
    "path": "/?ref=blog-promo-picks",
-   "sessions": 3,
+   "sessions": 4,
    "bounce": 100
   },
   {
    "path": "/mundial-2026",
-   "sessions": 3,
+   "sessions": 4,
    "bounce": 100
   },
   {
    "path": "/predicciones-ia",
-   "sessions": 3,
+   "sessions": 4,
    "bounce": 100
   },
   {
@@ -360,55 +374,80 @@
   }
  ],
  "events": {
-  "page_view": 1324,
-  "session_start": 1215,
-  "first_visit": 1209,
-  "user_engagement": 82,
-  "spoiler_click_open_gate": 73,
-  "gate_show": 37,
-  "scroll": 30,
-  "gate_manual_open": 12,
-  "inline_cta_open_gate": 8,
+  "page_view": 2325,
+  "session_start": 2158,
+  "first_visit": 2147,
+  "spoiler_click_open_gate": 129,
+  "user_engagement": 128,
+  "gate_show": 63,
+  "scroll": 39,
+  "gate_manual_open": 16,
+  "inline_cta_open_gate": 11,
   "lead_capture": 8,
+  "click": 7,
   "form_start": 6,
-  "sticky_open_gate": 5,
+  "sticky_open_gate": 6,
   "eleccion_jugada": 4,
-  "click": 3,
-  "goto_gambeta": 2,
-  "telegram_click": 1
+  "telegram_click": 3,
+  "goto_gambeta": 2
  },
  "devices": [
   {
    "device": "mobile",
-   "sessions": 1205,
+   "sessions": 2137,
    "engagement": 0.2
   },
   {
    "device": "desktop",
-   "sessions": 13,
+   "sessions": 21,
+   "engagement": 0
+  },
+  {
+   "device": "tablet",
+   "sessions": 3,
    "engagement": 0
   }
  ],
  "countries": [
   {
    "country": "Argentina",
-   "sessions": 1171,
-   "users": 1156
+   "sessions": 2086,
+   "users": 2058
   },
   {
    "country": "Mexico",
-   "sessions": 10,
-   "users": 10
-  },
-  {
-   "country": "Spain",
-   "sessions": 6,
-   "users": 6
+   "sessions": 13,
+   "users": 13
   },
   {
    "country": "Brazil",
+   "sessions": 9,
+   "users": 9
+  },
+  {
+   "country": "Spain",
+   "sessions": 9,
+   "users": 9
+  },
+  {
+   "country": "Chile",
    "sessions": 5,
    "users": 5
+  },
+  {
+   "country": "Colombia",
+   "sessions": 5,
+   "users": 5
+  },
+  {
+   "country": "France",
+   "sessions": 4,
+   "users": 4
+  },
+  {
+   "country": "United States",
+   "sessions": 4,
+   "users": 4
   },
   {
    "country": "",
@@ -416,95 +455,75 @@
    "users": 3
   },
   {
-   "country": "Chile",
+   "country": "Bolivia",
    "sessions": 3,
    "users": 3
-  },
-  {
-   "country": "United States",
-   "sessions": 3,
-   "users": 3
-  },
-  {
-   "country": "Colombia",
-   "sessions": 2,
-   "users": 2
-  },
-  {
-   "country": "France",
-   "sessions": 2,
-   "users": 2
-  },
-  {
-   "country": "Albania",
-   "sessions": 1,
-   "users": 1
   }
  ],
  "cities": [
   {
    "city": "Buenos Aires",
-   "sessions": 150
+   "sessions": 259
   },
   {
    "city": "",
-   "sessions": 109
+   "sessions": 187
   },
   {
    "city": "Cordoba",
-   "sessions": 43
-  },
-  {
-   "city": "Rosario",
-   "sessions": 27
+   "sessions": 81
   },
   {
    "city": "Mar del Plata",
-   "sessions": 24
+   "sessions": 51
+  },
+  {
+   "city": "Rosario",
+   "sessions": 50
   },
   {
    "city": "Salta",
-   "sessions": 23
+   "sessions": 40
   },
   {
-   "city": "Bahia Blanca",
-   "sessions": 17
+   "city": "Santa Fe",
+   "sessions": 29
   },
   {
    "city": "San Miguel de Tucuman",
-   "sessions": 17
+   "sessions": 27
   }
  ],
  "newVsReturning": [
   {
    "type": "new",
-   "sessions": 1188
+   "sessions": 2120
   },
   {
    "type": "",
-   "sessions": 111
+   "sessions": 175
   }
  ],
  "funnel": {
-  "sessions": 1218,
-  "gateShows": 37,
-  "gateOpens": 98,
+  "sessions": 2162,
+  "gateShows": 63,
+  "gateOpens": 162,
   "formStarts": 6,
   "leads": 8,
-  "tgClicks": 1,
+  "tgClicks": 3,
   "gotoGambeta": 2,
   "eleccion": 4,
-  "gateOpenRate": 8,
-  "leadConvRate": 0.66,
-  "gateToLeadRate": 8.2,
+  "gateOpenRate": 7.5,
+  "leadConvRate": 0.37,
+  "gateToLeadRate": 4.9,
   "leadToGambetaRate": 25,
   "formToLeadRate": 133.3
  },
  "clarity": {
   "accesoia": {
-   "totalSessions": 1295,
-   "uniqueUsers": 1286,
-   "botSessions": 1,
+   "totalSessions": 2476,
+   "uniqueUsers": 2462,
+   "botSessions": 2,
    "pagesPerSession": 1.08,
    "rageClicks": {
     "sessions": 0,
@@ -512,162 +531,162 @@
    },
    "deadClicks": {
     "sessions": 5,
-    "pct": 0.23
+    "pct": 0.12
    },
    "errorClicks": {
     "sessions": 0,
     "pct": 0
    },
    "quickback": {
-    "sessions": 0,
-    "pct": 0
+    "sessions": 1,
+    "pct": 0.04
    },
    "excessiveScroll": {
     "sessions": 0,
     "pct": 0
    },
    "scriptErrors": {
-    "sessions": 63,
-    "pct": 3.78
+    "sessions": 121,
+    "pct": 3.84
    },
-   "scrollDepth": 17.1,
+   "scrollDepth": 16.3,
    "engagementTime": {
-    "total": 22,
-    "active": 8
+    "total": 21,
+    "active": 7
    },
    "popularPages": [
     {
      "url": "https://accesoia.app/predicciones-ia",
-     "visits": 1294
+     "visits": 2476
+    },
+    {
+     "url": "https://accesoia.app/",
+     "visits": 4
     },
     {
      "url": "https://accesoia.app/eleccion",
      "visits": 4
     },
     {
-     "url": "https://accesoia.app/",
-     "visits": 3
+     "url": "https://accesoia.app/calendario-ia",
+     "visits": 2
     },
     {
-     "url": "https://accesoia.app/calendario-ia",
+     "url": "https://accesoia.app/estadisticas-ia",
      "visits": 2
     },
     {
      "url": "https://accesoia.app/pick-del-dia",
      "visits": 2
-    },
-    {
-     "url": "https://accesoia.app/estadisticas-ia",
-     "visits": 1
     }
    ],
    "devices": [
     {
      "name": "Mobile",
-     "sessions": 1295
+     "sessions": 2476
     }
    ],
    "browsers": [
     {
      "name": "FacebookApp",
-     "sessions": 883
+     "sessions": 1578
     },
     {
      "name": "InstagramApp",
-     "sessions": 407
+     "sessions": 888
     },
     {
      "name": "ChromeMobile",
-     "sessions": 4
+     "sessions": 6
     },
     {
      "name": "MobileSafari",
-     "sessions": 1
+     "sessions": 4
     }
    ],
    "os": [
     {
      "name": "Android",
-     "sessions": 1023
+     "sessions": 1838
     },
     {
      "name": "IOS",
-     "sessions": 272
+     "sessions": 638
     }
    ],
    "countries": [
     {
      "name": "Argentina",
-     "sessions": 1279
-    },
-    {
-     "name": "Brazil",
-     "sessions": 3
+     "sessions": 2436
     },
     {
      "name": "Spain",
-     "sessions": 3
+     "sessions": 8
     },
     {
-     "name": "United States",
-     "sessions": 2
+     "name": "Brazil",
+     "sessions": 5
     },
     {
      "name": "Uruguay",
-     "sessions": 1
+     "sessions": 4
     },
     {
-     "name": "Albania",
-     "sessions": 1
+     "name": "United States",
+     "sessions": 3
     },
     {
-     "name": "Peru",
-     "sessions": 1
+     "name": "Mexico",
+     "sessions": 2
     },
     {
-     "name": "United Kingdom",
-     "sessions": 1
+     "name": "France",
+     "sessions": 2
+    },
+    {
+     "name": "Aruba",
+     "sessions": 2
     }
    ]
   },
   "gambeta": {
-   "totalSessions": 1187,
-   "uniqueUsers": 912,
+   "totalSessions": 1121,
+   "uniqueUsers": 859,
    "botSessions": 31,
-   "pagesPerSession": 1.31,
+   "pagesPerSession": 1.3,
    "rageClicks": {
     "sessions": 0,
     "pct": 0
    },
    "deadClicks": {
     "sessions": 15,
-    "pct": 0.67
+    "pct": 0.71
    },
    "errorClicks": {
     "sessions": 0,
     "pct": 0
    },
    "quickback": {
-    "sessions": 46,
-    "pct": 3.2
+    "sessions": 41,
+    "pct": 2.95
    },
    "excessiveScroll": {
     "sessions": 0,
     "pct": 0
    },
    "scriptErrors": {
-    "sessions": 4,
-    "pct": 0.34
+    "sessions": 2,
+    "pct": 0.18
    },
-   "scrollDepth": 20.3,
+   "scrollDepth": 19.9,
    "engagementTime": {
-    "total": 222,
-    "active": 51
+    "total": 225,
+    "active": 50
    },
    "popularPages": [
     {
      "url": "https://gambeta.ai/",
-     "visits": 1208
+     "visits": 1139
     },
     {
      "url": "https://gambeta.ai/blog/dbbet-bono-100-freebet-argentina-mundial-2026",
@@ -679,15 +698,15 @@
     },
     {
      "url": "https://gambeta.ai/bonos",
-     "visits": 6
+     "visits": 5
+    },
+    {
+     "url": "https://gambeta.ai/mundial-2026",
+     "visits": 4
     },
     {
      "url": "https://Electron",
      "visits": 3
-    },
-    {
-     "url": "https://gambeta.ai/mundial-2026",
-     "visits": 1
     },
     {
      "url": "https://gambeta.ai/herramientas/",
@@ -701,71 +720,71 @@
    "devices": [
     {
      "name": "Mobile",
-     "sessions": 928
+     "sessions": 869
     },
     {
      "name": "PC",
-     "sessions": 251
+     "sessions": 243
     },
     {
      "name": "Tablet",
-     "sessions": 8
+     "sessions": 9
     }
    ],
    "browsers": [
     {
      "name": "ChromeMobile",
-     "sessions": 558
+     "sessions": 532
     },
     {
      "name": "MobileSafari",
-     "sessions": 223
+     "sessions": 217
     },
     {
      "name": "Chrome",
-     "sessions": 185
+     "sessions": 180
     },
     {
      "name": "Other",
-     "sessions": 62
+     "sessions": 47
     },
     {
      "name": "InstagramApp",
-     "sessions": 49
-    },
-    {
-     "name": "GoogleApp",
-     "sessions": 26
-    },
-    {
-     "name": "Edge",
-     "sessions": 26
+     "sessions": 45
     },
     {
      "name": "Opera",
      "sessions": 26
+    },
+    {
+     "name": "Edge",
+     "sessions": 25
+    },
+    {
+     "name": "GoogleApp",
+     "sessions": 18
     }
    ],
    "os": [
     {
      "name": "Android",
-     "sessions": 470
+     "sessions": 446
     },
     {
      "name": "IOS",
-     "sessions": 466
+     "sessions": 432
     },
     {
      "name": "Windows",
-     "sessions": 192
+     "sessions": 186
     },
     {
      "name": "MacOSX",
-     "sessions": 38
+     "sessions": 37
     },
     {
      "name": "Linux",
-     "sessions": 15
+     "sessions": 14
     },
     {
      "name": "ChromeOS",
@@ -775,27 +794,27 @@
    "countries": [
     {
      "name": "Argentina",
-     "sessions": 555
+     "sessions": 510
     },
     {
      "name": "Spain",
-     "sessions": 138
+     "sessions": 130
     },
     {
      "name": "Mexico",
-     "sessions": 126
+     "sessions": 123
     },
     {
      "name": "Colombia",
-     "sessions": 69
+     "sessions": 67
     },
     {
      "name": "Peru",
-     "sessions": 60
+     "sessions": 59
     },
     {
      "name": "Ecuador",
-     "sessions": 54
+     "sessions": 53
     },
     {
      "name": "Chile",
@@ -803,7 +822,7 @@
     },
     {
      "name": "United States",
-     "sessions": 32
+     "sessions": 30
     }
    ]
   },
@@ -817,8 +836,8 @@
   "pendientes": 4
  },
  "ia": {
-  "error": "invalid_request_error",
-  "text": "El análisis IA no corrió: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.. (Suele ser falta de saldo — cargá crédito en console.anthropic.com y el próximo refresh lo genera.)",
-  "at": "2026-07-09T21:46:19.105Z"
+  "text": "# 📊 Diagnóstico Accesoia.app\n\n**🟢 Qué funciona:**\nEl form convierte de diez: cuando alguien lo arranca, casi siempre deja el mail (formToLeadRate 133%). El problema no es el producto, es que casi nadie llega a verlo.\n\n**🔴 Cuello de botella:**\nDe 2162 sesiones, solo el 16.3% scrollea y apenas 162 abren el gate (7.5%). Estás perdiendo 9 de cada 10 usuarios ANTES de mostrarles la oferta. El gate depende del scroll y el scroll no pasa.\n\n**🎯 Acciones (por impacto):**\n\n1. **Sacá el gate del scroll-trigger.** Ponelo por tiempo (3-5seg) o exit-intent en mobile (99% del tráfico es mobile). Ahí vas a mover el 7.5% de gate-open a algo mucho más alto sin tocar nada más.\n\n2. **Arreglá el tracking.** 591 sesiones \"data not available\" y engagement=0 en IG paid son señal de UTMs rotos o problema de consent/GTM. Sin esto no sabés qué campaña realmente convierte.\n\n3. **Pausá o rehacé creative de IG paid** (0% engagement vs 0.5% de FB). Estás quemando presupuesto en tráfico que ni interactúa.\n\n**Extra:** con 5 leads reales en 28 días y 2133 usuarios, el techo está en el punto 1. Arreglá eso primero, todo lo demás es optimización de segundo orden.",
+  "model": "claude-sonnet-5",
+  "at": "2026-07-09T23:21:16.124Z"
  }
 }
