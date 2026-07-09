@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Git Workflow — Gambeta AI</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/png" href="/favicon-512.png">
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="index.html"><span class="logo-dot"></span><em>Gambeta</em>&nbsp;<span>AI</span></a>
+  <div class="nav-links">
+    <a href="index.html">Inicio</a>
+    <a href="context.html">Contexto</a>
+    <a href="decisions.html">Decisiones</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="glossary.html">Glosario</a>
+    <a href="issues.html">Issues</a>
+    <a href="git-workflow.html" class="active">Git</a>
+    <a href="stack.html">Stack</a>
+    <a href="distribucion.html">Distribución</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <header style="margin-bottom: 40px;">
+    <h1>Git Workflow <span class="subtitle">Commit · Push · Deploy</span></h1>
+    <div class="mt-md">
+      <span class="badge green">Repo</span>
+      <a href="https://github.com/maurounion10-lab/ia-apuestas" target="_blank">github.com/maurounion10-lab/ia-apuestas</a>
+      &nbsp;<span class="badge gold">Branch principal: main</span>
+    </div>
+  </header>
+
+  <section>
+    <h2>Setup <span class="accent">del equipo nuevo</span></h2>
+    <p class="text-dim">Correr <strong>una sola vez</strong> después de la migración a Windows.</p>
+    <pre><code># 1. Ir a la carpeta de código
+cd "C:\Users\IMO Creativo\Documents\Claude\Projects\gambeta-ai\code"
+
+# 2. Autenticar con GitHub CLI (recomendado — evita PAT expuesto)
+gh auth login
+# Elegir: GitHub.com → HTTPS → Login with a web browser
+
+# 3. Clonar el repo
+gh repo clone maurounion10-lab/ia-apuestas .
+
+# 4. Configurar identidad (una vez por máquina)
+git config --global user.name "Mauro"
+git config --global user.email "pronosticosarg@gmail.com"
+
+# 5. Verificar
+git remote -v
+git status</code></pre>
+
+    <p class="mt-md text-dim">Alternativa sin GitHub CLI: usar Git Credential Manager (viene con Git for Windows).</p>
+    <pre><code>git clone https://github.com/maurounion10-lab/ia-apuestas.git .
+# En el primer push te pide login por navegador. Lo guarda en Credential Manager.</code></pre>
+  </section>
+
+  <section>
+    <h2>Flujo <span class="accent-gold">diario</span></h2>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div class="card-title">Ver qué está pasando</div>
+        <div class="card-body">
+          <pre style="margin: 0;"><code>git status
+git diff
+git log --oneline -20</code></pre>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Hacer un cambio y subirlo</div>
+        <div class="card-body">
+          <pre style="margin: 0;"><code>git pull origin main
+# ...editar archivos...
+git add .
+git commit -m "feat: descripción clara"
+git push origin main</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Convención <span class="accent-sky">de commits</span></h2>
+    <p>Usar prefijos <a href="https://www.conventionalcommits.org/" target="_blank">Conventional Commits</a>:</p>
+    <table>
+      <tr><td width="120"><code>feat:</code></td><td>Feature nueva</td></tr>
+      <tr><td><code>fix:</code></td><td>Bug fix</td></tr>
+      <tr><td><code>docs:</code></td><td>Cambios de documentación</td></tr>
+      <tr><td><code>style:</code></td><td>Formato / CSS / no cambio de lógica</td></tr>
+      <tr><td><code>refactor:</code></td><td>Refactor sin cambio de comportamiento</td></tr>
+      <tr><td><code>perf:</code></td><td>Mejora de performance</td></tr>
+      <tr><td><code>test:</code></td><td>Agregar / arreglar tests</td></tr>
+      <tr><td><code>chore:</code></td><td>Mantenimiento (deps, config)</td></tr>
+      <tr><td><code>content:</code></td><td>Post SEO nuevo o edición de copy</td></tr>
+    </table>
+
+    <h3>Ejemplos buenos</h3>
+    <ul>
+      <li><code>feat: sistema de daily reward de A-COIN con cooldown 24h</code></li>
+      <li><code>fix: OAuth Google no persistía sesión en Firefox</code></li>
+      <li><code>content: post "cuotas campeón Mundial 2026" para mercado México</code></li>
+      <li><code>style: nueva paleta oscura + tipografía display en landing</code></li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Deploy <span class="accent">(pendiente confirmar)</span></h2>
+    <p class="text-dim">Hipótesis basada en el material recuperado — validar en próxima sesión.</p>
+    <div class="card">
+      <div class="card-body">
+        <h4>Preguntas abiertas para Mauro</h4>
+        <ol>
+          <li>¿Hay <code>wrangler.toml</code> en el repo?</li>
+          <li>¿Hay <code>.github/workflows/*.yml</code> (CI/CD)?</li>
+          <li>¿A qué domain se deploya (gambeta.ai / preview.gambeta.ai)?</li>
+          <li>¿Existe un environment de staging separado?</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Reglas <span class="accent-gold">duras</span></h2>
+    <div class="card">
+      <div class="card-body">
+        <ol>
+          <li><strong>Nunca pushear <code>.env</code></strong> — está en <code>.gitignore</code> del proyecto. Verificar con <code>git status</code>.</li>
+          <li><strong>Nunca hardcodear secretos nuevos</strong> — usar <code>.env</code> + <code>process.env.X</code>.</li>
+          <li><strong>Pull antes de push</strong> — evita conflictos.</li>
+          <li><strong>Un push = un cambio lógico</strong> — no mezclar features distintas.</li>
+          <li><strong>PATs de GitHub nunca en archivos del repo</strong> — solo en Credential Manager.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Emergencias <span class="accent-sky">de git</span></h2>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div class="card-title">Rollback de deploy</div>
+        <div class="card-body"><code>git revert HEAD</code> + push, o rollback desde Cloudflare dashboard.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Perdí cambios locales</div>
+        <div class="card-body"><code>git reflog</code> — todo commit efímero de los últimos 30 días está ahí.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Repo remoto borrado</div>
+        <div class="card-body">GitHub tiene backups internos las primeras 90 días — abrir ticket con soporte.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Commit rompió producción</div>
+        <div class="card-body"><code>git revert &lt;hash&gt;</code> + push inmediato.</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

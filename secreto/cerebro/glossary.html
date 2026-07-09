@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glosario — Gambeta AI</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/png" href="/favicon-512.png">
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="index.html"><span class="logo-dot"></span><em>Gambeta</em>&nbsp;<span>AI</span></a>
+  <div class="nav-links">
+    <a href="index.html">Inicio</a>
+    <a href="context.html">Contexto</a>
+    <a href="decisions.html">Decisiones</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="glossary.html" class="active">Glosario</a>
+    <a href="issues.html">Issues</a>
+    <a href="git-workflow.html">Git</a>
+    <a href="stack.html">Stack</a>
+    <a href="distribucion.html">Distribución</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <header style="margin-bottom: 40px;">
+    <h1>Glosario <span class="subtitle">Vocabulario del proyecto</span></h1>
+  </header>
+
+  <section>
+    <h2>Personas <span class="accent">clave</span></h2>
+    <table>
+      <tr><td width="180"><strong class="text-green">Mauro</strong></td><td>Owner. Lead técnico y de producto. Argentino. Toma las decisiones.</td></tr>
+      <tr><td><strong class="text-green">Adam Choi</strong></td><td>Tipster de fútbol muy conocido. Una entrada del site sobre él ranquea con ~1.700 impresiones/mes.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Conceptos <span class="accent-gold">del producto</span></h2>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div class="card-title">$A-COIN</div>
+        <div class="card-body">Moneda virtual gamificada. Se acumula con picks acertados + daily reward. Meta: 100.000. Estado en <code>localStorage</code>.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pick</div>
+        <div class="card-body">Predicción del usuario sobre un partido. 1X2, hándicap, doble oportunidad. Compromete A-COIN.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Bust date</div>
+        <div class="card-body">Fecha en que un usuario quedó con 0 A-COIN sin picks pendientes. Se registra para reanimación.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Credited win</div>
+        <div class="card-body">Partido cuyo pick ya fue acreditado en el balance. Evita doble crédito si el sistema recomputa.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Daily reward</div>
+        <div class="card-body">Bonus diario reclamable una vez cada 24hs.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Conceptos <span class="accent-sky">de apuestas</span></h2>
+    <table>
+      <tr><td width="180"><strong class="text-sky">1X2</strong></td><td>Apuesta a resultado final. 1 = local, X = empate, 2 = visitante.</td></tr>
+      <tr><td><strong class="text-sky">Hándicap asiático</strong></td><td>Apuesta con gol de ventaja/desventaja al favorito para nivelar cuotas.</td></tr>
+      <tr><td><strong class="text-sky">Doble oportunidad</strong></td><td>Apuesta a dos de los tres resultados (1X, X2, 12). Cuota baja, menos riesgo.</td></tr>
+      <tr><td><strong class="text-sky">Valor esperado (EV)</strong></td><td>Concepto matemático: si una cuota está "cara" o "barata" vs. la probabilidad real.</td></tr>
+      <tr><td><strong class="text-sky">Cuota / Odds</strong></td><td>Pago por unidad apostada.</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Sitios <span class="accent-gold">y espacios</span></h2>
+    <div class="chip-list">
+      <div class="chip"><strong>gambeta.ai</strong> dominio principal</div>
+      <div class="chip"><strong>@Gambeta_ai</strong> cuenta X</div>
+      <div class="chip"><strong>GitHub</strong> maurounion10-lab/ia-apuestas</div>
+      <div class="chip"><strong>GSC</strong> fuente métricas SEO</div>
+      <div class="chip"><strong>Supabase</strong> proyecto ixfrtjvhnpapyup...</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Casas <span class="accent">de apuestas</span> mencionadas</h2>
+    <p class="text-dim">No promocionamos ninguna — pero cubrimos comparativas y guías porque es lo que la gente busca.</p>
+    <table>
+      <tr><td width="180"><strong>Wplay</strong></td><td><span class="flag">🇨🇴</span> Colombia</td></tr>
+      <tr><td><strong>Yajuego</strong></td><td><span class="flag">🇨🇴</span> Colombia</td></tr>
+      <tr><td><strong>Pinnacle</strong></td><td>Global. Respetada por bettors sharps. AR con restricciones.</td></tr>
+      <tr><td><strong>Bet365</strong></td><td>Global. Popular en <span class="flag">🇪🇸</span> España.</td></tr>
+      <tr><td><strong>Bplay</strong></td><td><span class="flag">🇦🇷</span> Argentina</td></tr>
+      <tr><td><strong>Caliente</strong></td><td><span class="flag">🇲🇽</span> México</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Fuentes <span class="accent-sky">de datos deportivos</span></h2>
+    <div class="chip-list">
+      <div class="chip"><strong>Statarea</strong> stats + predicciones</div>
+      <div class="chip"><strong>Sofascore</strong> live + stats</div>
+      <div class="chip"><strong>Flashscore</strong> live resultados</div>
+      <div class="chip"><strong>Promiedos</strong> tablas AR</div>
+      <div class="chip"><strong>Azteca</strong> TV MX</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Subreddits <span class="accent-gold">relevantes</span></h2>
+    <div class="chip-list">
+      <div class="chip">r/futbolargentina</div>
+      <div class="chip">r/Colombia</div>
+      <div class="chip">r/Mexico</div>
+      <div class="chip">r/argentina</div>
+      <div class="chip">r/SportsBettingArg</div>
+      <div class="chip">r/Mundial2026</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Jerga <span class="accent">y abreviaciones</span></h2>
+    <table>
+      <tr><td width="120"><strong>GSC</strong></td><td>Google Search Console</td></tr>
+      <tr><td><strong>GA4</strong></td><td>Google Analytics 4</td></tr>
+      <tr><td><strong>CTR</strong></td><td>Click-Through Rate</td></tr>
+      <tr><td><strong>SERP</strong></td><td>Search Engine Results Page</td></tr>
+      <tr><td><strong>PAT</strong></td><td>Personal Access Token (GitHub)</td></tr>
+      <tr><td><strong>RLS</strong></td><td>Row Level Security (Supabase)</td></tr>
+      <tr><td><strong>CWV</strong></td><td>Core Web Vitals</td></tr>
+      <tr><td><strong>UTM</strong></td><td>UTM parameters (tracking en analytics)</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Lo que <span class="accent-sky">NO es</span> Gambeta AI</h2>
+    <div class="alert">
+      <strong>NO es una casa de apuestas.</strong> No se apuestan pesos/dólares/euros reales. Solo picks y A-COIN virtual.<br>
+      <strong>NO es una tipster paga.</strong> Los picks son colaborativos, no vienen de un experto vendiendo señales.<br>
+      <strong>NO es Statarea.</strong> No es una app de datos crudos — es un producto con capa de comunidad + gamificación.<br>
+      <strong>NO es solo Argentina.</strong> Es hispanoparlante multi-país; Argentina es la base, no el techo.
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

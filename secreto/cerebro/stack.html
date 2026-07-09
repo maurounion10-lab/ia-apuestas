@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack Técnico — Gambeta AI</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/png" href="/favicon-512.png">
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="index.html"><span class="logo-dot"></span><em>Gambeta</em>&nbsp;<span>AI</span></a>
+  <div class="nav-links">
+    <a href="index.html">Inicio</a>
+    <a href="context.html">Contexto</a>
+    <a href="decisions.html">Decisiones</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="glossary.html">Glosario</a>
+    <a href="issues.html">Issues</a>
+    <a href="git-workflow.html">Git</a>
+    <a href="stack.html" class="active">Stack</a>
+    <a href="distribucion.html">Distribución</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <header style="margin-bottom: 40px;">
+    <h1>Stack Técnico <span class="subtitle">Arquitectura + servicios + decisiones</span></h1>
+  </header>
+
+  <section>
+    <h2>Diagrama <span class="accent">de alto nivel</span></h2>
+    <pre><code>                    ┌───────────────────────┐
+                    │       USUARIO         │
+                    │  (browser mobile/desk)│
+                    │  ES · EN · PT         │
+                    └──────────┬────────────┘
+                               │ HTTPS
+                               ▼
+                 ┌──────────────────────────────┐
+                 │   Cloudflare PAGES           │
+                 │   proyecto: ia-apuestas      │
+                 │   HTML/CSS/JS static +        │
+                 │   Pages Functions (sb, previa)│
+                 └──────────────┬───────────────┘
+                                │
+        ┌───────────────────────┼───────────────────────────┐
+        ▼                       ▼                           ▼
+ ┌──────────────┐    ┌──────────────────┐    ┌──────────────────────┐
+ │   Supabase   │    │   Odds API       │    │  Cloudflare Workers  │
+ │  Auth + DB   │    │  ⚠️ sin créditos │    │  (4, servicios aparte)│
+ │  ixfrtjvhn.. │    │  ESPN+TSDB backup│    │  worker (cron resolver)│
+ └──────────────┘    └──────────────────┘    │  worker-chat / x-bot  │
+                                             │  fixtures-validator   │
+                                             └──────────────────────┘</code></pre>
+    <div class="alert">
+      <strong>El sitio se sirve desde Cloudflare Pages</strong> (no Workers puros). Los 4 Workers son servicios independientes: cron de resolución de picks, chat IA, validador de fixtures y bot de X.
+    </div>
+  </section>
+
+  <section>
+    <h2>Frontend <span class="accent-gold">(vanilla JS)</span></h2>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div class="card-title">Lenguaje</div>
+        <div class="card-body">JavaScript vanilla. Sin framework. Sin build step. Se sirve directo.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">HTML principal (app)</div>
+        <div class="card-body"><code>index.html</code> — ~4.5k líneas, shell de la app. (Ya <strong>no</strong> es <code>client-index.html</code>.)</div>
+      </div>
+      <div class="card" style="border-color: var(--green); box-shadow: var(--shadow-glow);">
+        <div class="card-title">⭐ Estilos — <code>css/main.css</code></div>
+        <div class="card-body"><strong>Un solo archivo (~251 KB) con 333 variables CSS.</strong> Es el corazón del sistema visual: color, tipografía, spacing y componentes salen de tokens en <code>:root</code>. <strong>El rediseño se hace acá.</strong></div>
+      </div>
+      <div class="card">
+        <div class="card-title">JS externalizado (<code>js/</code>)</div>
+        <div class="card-body"><code>app-core.js</code> (~732 KB, monolito — <a href="issues.html">deuda</a>) + bundles: <code>inline</code>, <code>ai-chat</code>, <code>my-picks</code>, <code>footer-panel</code>.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Theming por tokens</div>
+        <div class="card-body">Existe <code>body.wc2026-theme</code> que se <strong>auto-activa 2-jun → 19-jul 2026</strong> y repaletea todo (oro/rojo/verde MX) cambiando variables. Rediseñar = reescribir los tokens de <code>:root</code>.</div>
+      </div>
+      <div class="card">
+        <div class="card-title">📱 App Android nativa</div>
+        <div class="card-body">Proyecto Android completo en <code>android/</code> (Gradle) + workflow <code>build-android.yml</code>. Estilo Capacitor.</div>
+      </div>
+    </div>
+
+    <h3>Estado del cliente (localStorage)</h3>
+    <table>
+      <thead><tr><th>Key</th><th>Contenido</th></tr></thead>
+      <tbody>
+        <tr><td><code>acoin_balance</code></td><td>Balance actual de A-COIN</td></tr>
+        <tr><td><code>acoin_picks</code></td><td>Picks activos</td></tr>
+        <tr><td><code>acoin_history</code></td><td>Historial resuelto</td></tr>
+        <tr><td><code>acoin_last_daily</code></td><td>Timestamp del último daily reward</td></tr>
+        <tr><td><code>acoin_bust_date</code></td><td>Fecha en que el usuario quedó "quebrado"</td></tr>
+        <tr><td><code>acoin_credited_wins</code></td><td>Set de partidos acreditados (evita doble crédito)</td></tr>
+      </tbody>
+    </table>
+    <p class="text-dim">Constante interna: <code>AC_GOAL = 100000</code> (meta simbólica).</p>
+  </section>
+
+  <section>
+    <h2>Backend <span class="accent-sky">Supabase</span></h2>
+    <div class="card">
+      <div class="card-body">
+        <p><strong>Proyecto:</strong> <code>ixfrtjvhnpapyuphqfxp</code></p>
+        <p><strong>URL:</strong> <code>https://ixfrtjvhnpapyuphqfxp.supabase.co</code></p>
+        <p><strong>Auth:</strong></p>
+        <ul>
+          <li>Google OAuth (con <code>detectSessionInUrl: true</code>).</li>
+          <li>Magic links con <strong><code>flowType: 'implicit'</code></strong>.</li>
+        </ul>
+        <p><strong>DB:</strong> Postgres. Schema <span class="badge amber">parcial</span> — hay 2 migraciones en <code>supabase-migrations/</code> (se corren a mano en el Dashboard), falta el dump completo.</p>
+        <p><strong>Tablas conocidas:</strong> <code>acoin_users</code> (con <code>historial_full</code>), <code>shared_cache</code> (<code>global_historial_v1</code>), <code>forum_threads</code>, <code>forum_posts</code>, <code>forum_reactions</code>.</p>
+      </div>
+    </div>
+    <div class="alert">
+      <strong>Sync de historial en 3 capas:</strong> localStorage → <code>acoin_users.historial_full</code> → <code>shared_cache</code> (lo que ven los anónimos vía <code>/api/sb</code>). Un <strong>trigger Postgres</strong> (migración 2026-05-14) replica capa 2 → 3 server-side. Antes dependía del browser del admin y se quedaba "stuck".
+    </div>
+    <div class="alert">
+      <strong>Ojo con el flow de magic links:</strong> el default de Supabase v2 (PKCE) guarda un <code>code_verifier</code> en localStorage del tab que inició el flujo. Si el link se abre en otro navegador o dispositivo, el verifier no existe y la auth falla silenciosamente. Por eso se eligió <code>implicit</code> — pone el token en el hash.
+    </div>
+  </section>
+
+  <section>
+    <h2>Workers <span class="accent">de Cloudflare</span> <span class="subtitle">(4, servicios aparte del sitio)</span></h2>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div class="card-title"><code>worker/</code> — cron resolver</div>
+        <div class="card-body">El más importante. <strong>Cron horario</strong> que resuelve picks pendientes server-side (ESPN → TheSportsDB → manual), sin depender del browser del admin. Escribe a Supabase con <code>service_role</code>. Endpoint: <code>/cron-resolve</code>.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><code>worker-chat/</code></div>
+        <div class="card-body">Backend del chat IA (widget flotante).</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><code>worker-fixtures-validator/</code></div>
+        <div class="card-body">Valida fixtures / partidos.</div>
+      </div>
+      <div class="card">
+        <div class="card-title"><code>worker-x-bot/</code></div>
+        <div class="card-body">Bot de publicación automática en X (@Gambeta_ai).</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Deploy <span class="accent-sky">(Cloudflare Pages + GitHub Actions)</span></h2>
+    <div class="card">
+      <div class="card-body">
+        <p><strong>Hosting:</strong> Cloudflare <strong>Pages</strong> (proyecto <code>ia-apuestas</code>). Config en <code>wrangler.jsonc</code>.</p>
+        <p><strong>Cómo deployar el sitio:</strong> <span class="badge green">push a <code>main</code></span> → <code>deploy-pages.yml</code> despliega solo. Nada de wrangler manual.</p>
+        <p><strong>5 workflows en <code>.github/workflows/</code>:</strong></p>
+        <div class="chip-list">
+          <div class="chip">deploy-pages</div>
+          <div class="chip">deploy-worker</div>
+          <div class="chip">deploy-worker-chat</div>
+          <div class="chip">deploy-x-bot</div>
+          <div class="chip">build-android</div>
+        </div>
+      </div>
+    </div>
+    <div class="alert">
+      <strong>Post-deploy obligatorio:</strong> correr <code>scripts/verify-deploy.sh</code> antes de declarar "listo" (regla del <code>CLAUDE.md</code> del repo). Secrets <code>CLOUDFLARE_API_TOKEN</code> + <code>ACCOUNT_ID</code> viven en GitHub Actions, no en <code>.env</code>.
+    </div>
+  </section>
+
+  <section>
+    <h2>Datos deportivos <span class="accent-gold">(cuotas + scores)</span></h2>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div class="card-title">Odds API <span class="badge amber">sin créditos</span></div>
+        <div class="card-body"><code>the-odds-api.com</code> — fuente principal de cuotas. Créditos agotados, hay que renovar plan (<a href="issues.html">issue abierto</a>).</div>
+      </div>
+      <div class="card">
+        <div class="card-title">ESPN + TheSportsDB</div>
+        <div class="card-body">Backup automático de scores. ESPN primero; TSDB para ligas que ESPN no cubre (Ekstraklasa, Suiza, Bélgica, Austria, nórdicas).</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Escudos de equipos</div>
+        <div class="card-body">~700 crests en <code>escudos/</code>. Mapa único <code>teamLogos</code> + <code>teamShortNames</code> consolidado (no duplicar).</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Resolución de picks</div>
+        <div class="card-body">Doble resolver: client-side (al abrir historial) + <strong>cron horario</strong> en el Worker. Ver <code>SETUP-CRON-RESOLVER.md</code>.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Analytics <span class="accent-sky">y métricas</span></h2>
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="stat-value">✓</div>
+        <div class="stat-label">GSC activo</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value gold">?</div>
+        <div class="stat-label">GA4</div>
+      </div>
+    </div>
+    <p><strong>Métricas clave a trackear:</strong></p>
+    <div class="chip-list">
+      <div class="chip">Impresiones GSC</div>
+      <div class="chip">Clics GSC</div>
+      <div class="chip">Posición media</div>
+      <div class="chip">Registros Supabase</div>
+      <div class="chip">Picks / día</div>
+      <div class="chip">Retention D1/D7/D30</div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Email <span class="accent">y comunicación</span></h2>
+    <div class="card-grid card-grid-2">
+      <div class="card">
+        <div class="card-title">Transaccionales</div>
+        <div class="card-body">Supabase (magic links).</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Marketing (recuperados)</div>
+        <div class="card-body">
+          <ul style="margin: 0;">
+            <li><code>email-copa.html</code> — temático Copa/Mundial</li>
+            <li><code>email-reenganche.html</code> — re-engagement</li>
+          </ul>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Proveedor</div>
+        <div class="card-body"><span class="badge amber">A confirmar</span> — Resend, Postmark, Amazon SES, Klaviyo.</div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>SEO <span class="accent-gold">y contenido</span></h2>
+    <div class="card">
+      <div class="card-body">
+        <p><strong>Volumen:</strong> 85 posts publicados al 2026-07.</p>
+        <p><strong>Idioma:</strong> español neutro con adaptaciones regionales (AR/MX/CO/ES).</p>
+        <p><strong>Rendering:</strong> HTML estático servido por Cloudflare Pages (423 archivos <code>.html</code> en el repo: blog, mundial, herramientas, previas).</p>
+        <p><strong>Meta / Schema:</strong> confirmar meta descriptions y JSON-LD por post.</p>
+        <p><strong>Sitemap:</strong> <span class="badge green">existe</span> — <code>sitemap.xml</code> (~70 KB) en la raíz + <code>feed.xml</code> + <code>functions/sitemap-previas.xml.js</code> (sitemap dinámico de previas).</p>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

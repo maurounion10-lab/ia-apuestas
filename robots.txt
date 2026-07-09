@@ -15,6 +15,8 @@ Disallow: /cup-context
 Disallow: /coupon
 Disallow: /ranking
 Disallow: /nba/500
+Disallow: /secreto/
+Disallow: /secreto
 Allow: /
 
 Sitemap: https://gambeta.ai/sitemap.xml

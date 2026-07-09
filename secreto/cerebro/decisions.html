@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decisiones — Gambeta AI</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" type="image/png" href="/favicon-512.png">
+</head>
+<body>
+
+<nav class="topnav">
+  <a class="brand" href="index.html"><span class="logo-dot"></span><em>Gambeta</em>&nbsp;<span>AI</span></a>
+  <div class="nav-links">
+    <a href="index.html">Inicio</a>
+    <a href="context.html">Contexto</a>
+    <a href="decisions.html" class="active">Decisiones</a>
+    <a href="roadmap.html">Roadmap</a>
+    <a href="glossary.html">Glosario</a>
+    <a href="issues.html">Issues</a>
+    <a href="git-workflow.html">Git</a>
+    <a href="stack.html">Stack</a>
+    <a href="distribucion.html">Distribución</a>
+  </div>
+</nav>
+
+<main class="container">
+
+  <header style="margin-bottom: 40px;">
+    <h1>Decisiones <span class="subtitle">Bitácora de decisiones tomadas</span></h1>
+    <p class="text-dim" style="margin-top: 16px;">Cada decisión tiene su <em>por qué</em> — el rationale es lo que ahorra reabrir debates cerrados.</p>
+  </header>
+
+  <div class="entry decision">
+    <div class="entry-head">
+      <span class="entry-date">2026-07-08</span>
+      <span class="badge gold">actual</span>
+      <span class="entry-title">Rediseño del Foro: estructura de apuestasdeportivas.com + piel Gambeta</span>
+    </div>
+    <div class="entry-section"><strong>Decisión</strong>Rediseñar el Foro BETA tomando la <strong>arquitectura de información</strong> de <a href="https://www.apuestasdeportivas.com/foro/" target="_blank">apuestasdeportivas.com/foro</a> (categorías → subforos → temas, filas escaneables con stats + "último mensaje", ranking de casas integrado, widget de marcadores, CTA de crear pronóstico), pero <strong>conservando el tema oscuro y la gamificación de Gambeta</strong> (ranks 👑💎🥇, rachas 🔥, ranking mensual por profit, Hall of Fame, avatars = escudos). El foro se rediseña <strong>alineado al resto del sitio</strong>.</div>
+    <div class="entry-section"><strong>Por qué</strong>La referencia aporta claridad, densidad escaneable y monetización nativa que el feed plano actual no tiene; pero su tema claro y su falta de gamificación chocarían con la marca y matarían el motor de retención. Se toma la estructura de la referencia + la identidad de Gambeta.</div>
+    <div class="entry-section"><strong>Alternativas rechazadas</strong>
+      <ul>
+        <li><strong>Copiar el look completo (tema claro):</strong> rompe la marca verde-oscura y obliga a repensar la gamificación.</li>
+        <li><strong>Solo reorganizar por categorías:</strong> desaprovecha la oportunidad del rediseño.</li>
+      </ul>
+    </div>
+    <div class="entry-section"><strong>Quién decide</strong>Mauro.</div>
+    <div class="entry-section"><strong>Impacto</strong>El plan visual del foro (Claude Design) parte de: estructura de la referencia + tokens oscuros de <code>css/main.css</code> + gamificación existente en <code>foro.html</code>. Ver <code>docs/referencia-visual-foro.md</code> y <code>docs/brief-rediseno-foro.md</code>.</div>
+  </div>
+
+  <div class="entry decision">
+    <div class="entry-head">
+      <span class="entry-date">2026-07-08</span>
+      <span class="badge gold">actual</span>
+      <span class="entry-title">Estructura unificada del proyecto en <code>Documents/Claude/Projects/gambeta-ai/</code></span>
+    </div>
+    <div class="entry-section"><strong>Decisión</strong>Consolidar en una sola carpeta código, cerebro, dashboard, docs y assets tras la migración Mac → Windows.</div>
+    <div class="entry-section"><strong>Por qué</strong>En el Mac el material estaba disperso en múltiples sesiones y outputs. Con la migración se perdió organización. Una carpeta canónica evita duplicaciones y facilita el trabajo con Claude Code + Claude Design.</div>
+    <div class="entry-section"><strong>Alternativas rechazadas</strong>
+      <ul>
+        <li><strong>Solo brain/ en <code>cerebros/</code>:</strong> como iprocon/resmarket. El proyecto es demasiado grande y activo para eso.</li>
+        <li><strong>Brain dentro del repo de código:</strong> mezcla concerns — el cerebro no debería viajar en cada deploy.</li>
+      </ul>
+    </div>
+    <div class="entry-section"><strong>Quién decide</strong>Mauro.</div>
+    <div class="entry-section"><strong>Impacto</strong>Todo trabajo futuro arranca desde <code>C:\Users\IMO Creativo\Documents\Claude\Projects\gambeta-ai\</code>.</div>
+  </div>
+
+  <div class="entry decision">
+    <div class="entry-head">
+      <span class="entry-date">2026-07-08</span>
+      <span class="badge gold">actual</span>
+      <span class="entry-title">Cerebro + Dashboard con skill <code>cerebro-proyectos-imo</code></span>
+    </div>
+    <div class="entry-section"><strong>Decisión</strong>Adoptar el patrón dual: markdown para Claude + HTML navegable para humanos.</div>
+    <div class="entry-section"><strong>Por qué</strong>Los cerebros anteriores (iprocon, resmarket) eran un solo <code>BRAIN.md</code>. Funciona hasta que crece — después es un muro de texto. El dashboard hace navegable un proyecto grande.</div>
+    <div class="entry-section"><strong>Impacto</strong>El proyecto tiene ahora dos caras: brain (edición) + dashboard (lectura). Cada cambio al brain requiere regenerar la vista HTML afectada.</div>
+  </div>
+
+  <h2>Decisiones técnicas <span class="accent">heredadas</span></h2>
+  <p class="text-dim">Documentadas para no reabrirlas sin motivo.</p>
+
+  <div class="entry">
+    <div class="entry-head">
+      <span class="badge sky">heredada</span>
+      <span class="entry-title">Auth: Supabase + Google OAuth + magic links con flow <code>implicit</code></span>
+    </div>
+    <div class="entry-section"><strong>Por qué</strong>El flow por defecto de Supabase v2 es PKCE, que guarda un <code>code_verifier</code> en localStorage del tab que inició el flujo. Si el magic link se abre en otro navegador o dispositivo, el verifier no existe y la auth falla silenciosamente. <code>implicit</code> pone el token en el hash — funciona cross-device.</div>
+  </div>
+
+  <div class="entry">
+    <div class="entry-head">
+      <span class="badge sky">heredada</span>
+      <span class="entry-title">Frontend: JavaScript vanilla, sin framework</span>
+    </div>
+    <div class="entry-section"><strong>Por qué</strong><code>app-core.js</code> (13k líneas) es un solo archivo servido tal cual desde Cloudflare Workers. Rápido de deployar, sin tooling.</div>
+    <div class="entry-section"><strong>Deuda</strong>Con 13k líneas ya duele mantenerlo. Migración a framework (React/Svelte/Astro) es un debate abierto — ver <a href="issues.html">issues</a>.</div>
+  </div>
+
+  <div class="entry">
+    <div class="entry-head">
+      <span class="badge sky">heredada</span>
+      <span class="entry-title">Storage de estado del cliente: <code>localStorage</code> del navegador</span>
+    </div>
+    <div class="entry-section"><strong>Claves usadas</strong>
+      <div class="chip-list" style="margin-top: 8px;">
+        <div class="chip"><code>acoin_balance</code></div>
+        <div class="chip"><code>acoin_picks</code></div>
+        <div class="chip"><code>acoin_history</code></div>
+        <div class="chip"><code>acoin_last_daily</code></div>
+        <div class="chip"><code>acoin_bust_date</code></div>
+        <div class="chip"><code>acoin_credited_wins</code></div>
+      </div>
+    </div>
+    <div class="entry-section"><strong>Constante</strong><code>AC_GOAL = 100000</code> — meta simbólica de A-COIN.</div>
+  </div>
+
+  <div class="entry">
+    <div class="entry-head">
+      <span class="badge sky">heredada</span>
+      <span class="entry-title">Backend: Supabase (Auth + Postgres)</span>
+    </div>
+    <div class="entry-section"><strong>Por qué</strong>Setup rápido, auth built-in, RLS para seguridad, plan gratuito generoso para arrancar.</div>
+  </div>
+
+  <div class="entry">
+    <div class="entry-head">
+      <span class="badge sky">heredada</span>
+      <span class="entry-title">Deploy: Cloudflare Workers</span>
+    </div>
+    <div class="entry-section"><strong>Por qué</strong>Low-latency global, plan gratuito, sirve el HTML + JS directamente y corre workers para APIs.</div>
+  </div>
+
+  <h2>Decisiones <span class="accent-gold">abiertas</span></h2>
+  <div class="card-grid card-grid-2">
+    <div class="card">
+      <div class="card-title">Nueva paleta y sistema visual</div>
+      <div class="card-body">Transformación visual completa en curso — pendiente de definir.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Migrar frontend a framework</div>
+      <div class="card-body">O mantener vanilla. Decisión pospuesta hasta que el mantenimiento del monolito frene el ritmo del negocio.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">Nombre exacto del dominio</div>
+      <div class="card-body">¿gambeta.ai? ¿gambeta.app? — confirmar en próxima sesión.</div>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
