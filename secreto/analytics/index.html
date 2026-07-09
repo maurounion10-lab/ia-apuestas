@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Centro de Control · Gambeta AI</title>
+<style>
+  :root{
+    --bg:#07090c; --glass:rgba(255,255,255,.045); --glass-hi:rgba(255,255,255,.08);
+    --stroke:rgba(255,255,255,.10); --stroke-hi:rgba(255,255,255,.18);
+    --text:#f2f5f3; --soft:rgba(235,245,238,.62); --dim:rgba(235,245,238,.38);
+    --green:#34e07f; --green-deep:#0f9d58; --gold:#ffd34d; --sky:#5fb2ff; --red:#ff6b6b; --violet:#b78aff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden;
+    font-family:'Inter','Segoe UI',system-ui,-apple-system,sans-serif; line-height:1.5;
+    padding:34px clamp(14px,3vw,44px) 90px;
+  }
+  /* ── blobs líquidos de fondo ── */
+  .blob{position:fixed;border-radius:50%;filter:blur(90px);opacity:.16;pointer-events:none;z-index:0;animation:drift 24s ease-in-out infinite alternate}
+  .blob.g{width:560px;height:560px;background:radial-gradient(circle,#17c964,#0f9d58 60%,transparent);top:-160px;left:-120px}
+  .blob.o{width:460px;height:460px;background:radial-gradient(circle,#ffd34d,#ff9f1a 60%,transparent);bottom:-140px;right:-100px;animation-delay:-8s}
+  .blob.b{width:420px;height:420px;background:radial-gradient(circle,#5fb2ff,#3a6fd8 60%,transparent);top:38%;left:58%;animation-delay:-16s}
+  @keyframes drift{from{transform:translate(0,0) scale(1)}to{transform:translate(60px,40px) scale(1.12)}}
+  .wrap{position:relative;z-index:1;max-width:1240px;margin:0 auto}
+
+  /* ── glass base ── */
+  .card{
+    background:linear-gradient(160deg,var(--glass-hi),var(--glass) 38%);
+    border:1px solid var(--stroke); border-radius:22px;
+    backdrop-filter:blur(22px) saturate(1.4); -webkit-backdrop-filter:blur(22px) saturate(1.4);
+    box-shadow:0 22px 50px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.12);
+    padding:22px 24px; position:relative; overflow:hidden;
+  }
+  .card::before{content:'';position:absolute;top:0;left:8%;right:8%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.35),transparent)}
+
+  /* ── header ── */
+  header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:26px}
+  .brand{display:flex;align-items:center;gap:13px}
+  .brand .dot{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#17c964,#0b7a3e);display:flex;align-items:center;justify-content:center;font-size:1.3rem;box-shadow:0 8px 22px rgba(23,201,100,.35)}
+  h1{font-size:clamp(1.3rem,3vw,1.8rem);font-weight:900;letter-spacing:-.5px;line-height:1.1}
+  h1 span{color:var(--green)}
+  .sub{font-size:.76rem;color:var(--dim);margin-top:3px}
+  .stamp{font-size:.7rem;color:var(--soft);background:var(--glass);border:1px solid var(--stroke);border-radius:999px;padding:6px 14px;backdrop-filter:blur(10px)}
+  .stamp b{color:var(--green)}
+
+  /* ── KPI hero ── */
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(168px,1fr));gap:14px;margin-bottom:14px}
+  .kpi{padding:18px 20px}
+  .kpi .lbl{font-size:.62rem;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+  .kpi .val{font-size:clamp(1.7rem,3.4vw,2.4rem);font-weight:900;letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums}
+  .kpi .sub2{font-size:.68rem;color:var(--dim);margin-top:7px}
+  .kpi .delta{font-size:.66rem;font-weight:800;border-radius:999px;padding:2px 8px;margin-left:6px;vertical-align:middle}
+  .up{color:#8affc0;background:rgba(52,224,127,.14)} .down{color:#ffb3b3;background:rgba(255,107,107,.14)}
+  .accent-g .val{color:var(--green)} .accent-o .val{color:var(--gold)} .accent-b .val{color:var(--sky)} .accent-v .val{color:var(--violet)}
+
+  /* ── insights chips ── */
+  .insights{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 26px}
+  .chip{font-size:.74rem;color:var(--soft);background:var(--glass);border:1px solid var(--stroke);border-radius:999px;padding:7px 15px;backdrop-filter:blur(10px)}
+  .chip b{color:var(--text)}
+  .chip.warn{border-color:rgba(255,211,77,.35);background:rgba(255,211,77,.06)}
+  .chip.warn b{color:var(--gold)}
+
+  /* ── layout ── */
+  .grid{display:grid;gap:14px;margin-bottom:14px}
+  .g2{grid-template-columns:1.35fr 1fr} .g2e{grid-template-columns:1fr 1fr} .g3{grid-template-columns:1fr 1fr 1fr}
+  @media(max-width:900px){.g2,.g2e,.g3{grid-template-columns:1fr}}
+  h2{font-size:.72rem;font-weight:800;letter-spacing:1.8px;text-transform:uppercase;color:var(--soft);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  h2::before{content:'';width:8px;height:8px;border-radius:3px;background:linear-gradient(135deg,var(--green),var(--gold))}
+  h2 .note{margin-left:auto;font-size:.62rem;font-weight:600;letter-spacing:.2px;text-transform:none;color:var(--dim)}
+
+  /* ── funnel ── */
+  .fstep{display:grid;grid-template-columns:150px 1fr 74px;align-items:center;gap:12px;padding:8px 0}
+  .fstep .n{font-size:.78rem;color:var(--soft)}
+  .fbar{height:26px;border-radius:9px;background:rgba(255,255,255,.05);overflow:hidden;position:relative}
+  .fbar i{position:absolute;inset:0 auto 0 0;border-radius:9px;background:linear-gradient(90deg,var(--green-deep),var(--green));box-shadow:0 0 18px rgba(52,224,127,.35);min-width:3px;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+  .fstep:nth-child(3) .fbar i{background:linear-gradient(90deg,#b98f13,var(--gold))}
+  .fstep:nth-child(4) .fbar i{background:linear-gradient(90deg,#2a6fb8,var(--sky))}
+  .fstep:nth-child(5) .fbar i{background:linear-gradient(90deg,#7a4fd8,var(--violet))}
+  .fstep .v{font-size:.92rem;font-weight:900;text-align:right;font-variant-numeric:tabular-nums}
+  .frate{font-size:.64rem;color:var(--dim);text-align:right}
+
+  /* ── barras horizontales genéricas ── */
+  .hrow{display:grid;grid-template-columns:minmax(90px,140px) 1fr 58px;align-items:center;gap:10px;padding:6px 0;font-size:.8rem}
+  .hrow .hn{color:var(--soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .hbar{height:9px;border-radius:99px;background:rgba(255,255,255,.05);overflow:hidden}
+  .hbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--green-deep),var(--green))}
+  .hrow .hv{font-weight:800;text-align:right;font-variant-numeric:tabular-nums;font-size:.78rem}
+
+  table{width:100%;border-collapse:collapse;font-size:.78rem}
+  th{font-size:.6rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);text-align:left;padding:4px 8px 8px}
+  td{padding:7px 8px;border-top:1px solid rgba(255,255,255,.05);color:var(--soft)}
+  td.num{text-align:right;font-weight:800;color:var(--text);font-variant-numeric:tabular-nums}
+  .host{font-size:.6rem;font-weight:800;border-radius:6px;padding:2px 7px;margin-right:7px}
+  .host.a{background:rgba(255,211,77,.14);color:var(--gold)} .host.g{background:rgba(52,224,127,.13);color:var(--green)}
+
+  /* ── clarity cards ── */
+  .cx{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:10px;margin-top:6px}
+  .cxi{background:rgba(0,0,0,.24);border:1px solid var(--stroke);border-radius:14px;padding:11px 13px}
+  .cxi .l{font-size:.56rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
+  .cxi .v{font-size:1.15rem;font-weight:900;margin-top:3px;font-variant-numeric:tabular-nums}
+  .cxi .v.ok{color:var(--green)} .cxi .v.meh{color:var(--gold)} .cxi .v.bad{color:var(--red)}
+
+  /* ── gauge picks ── */
+  .gaugewrap{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+  .gtxt .big{font-size:2rem;font-weight:900;color:var(--green)}
+  .gtxt .row{font-size:.78rem;color:var(--soft);padding:2px 0}
+  .gtxt .row b{color:var(--text)}
+
+  /* ── IA ── */
+  .ia-off{display:flex;align-items:center;gap:14px;background:rgba(183,138,255,.05);border:1px dashed rgba(183,138,255,.3);border-radius:16px;padding:16px 18px;font-size:.82rem;color:var(--soft)}
+  .ia-off .ico{font-size:1.5rem}
+  .ia-body{font-size:.86rem;color:var(--soft);white-space:pre-wrap;line-height:1.65}
+
+  footer{text-align:center;color:var(--dim);font-size:.68rem;margin-top:40px}
+  footer code{background:rgba(0,0,0,.3);border:1px solid var(--stroke);border-radius:6px;padding:2px 8px;font-size:.92em}
+  .loading{text-align:center;padding:80px 0;color:var(--dim)}
+  svg text{font-family:inherit}
+</style>
+</head>
+<body>
+<div class="blob g"></div><div class="blob o"></div><div class="blob b"></div>
+<div class="wrap">
+
+<header>
+  <div class="brand">
+    <div class="dot">⚡</div>
+    <div>
+      <h1>Centro de <span>Control</span></h1>
+      <p class="sub">gambeta.ai + accesoia.app · GA4 · Microsoft Clarity · IA propia</p>
+    </div>
+  </div>
+  <div class="stamp">Actualizado: <b id="stamp">—</b></div>
+</header>
+
+<div id="app" class="loading">Cargando datos…</div>
+
+<footer>
+  Panel privado · los datos se refrescan con <code>node scripts/dashboard-refresh.mjs</code> + push ·
+  ventana GA4: 28 días · ventana Clarity: 3 días (cuota 10/día)
+</footer>
+</div>
+
+<script>
+const $=(h)=>{const t=document.createElement('template');t.innerHTML=h.trim();return t.content.firstChild};
+const fmt=(n)=>n==null?'—':Number(n).toLocaleString('es-AR');
+const pct=(n)=>n==null?'—':(n+'%');
+
+fetch('data.json?cb='+Date.now()).then(r=>r.json()).then(render).catch(e=>{
+  document.getElementById('app').textContent='Error cargando data.json — corré el refresh y volvé a intentar. ('+e.message+')';
+});
+
+function render(d){
+  document.getElementById('stamp').textContent=new Date(d.generatedAt).toLocaleString('es-AR',{dateStyle:'medium',timeStyle:'short'});
+  const app=document.getElementById('app'); app.className=''; app.innerHTML='';
+  const f=d.funnel||{}, t=d.totals||{};
+
+  /* KPIs */
+  const deltaTag=(v)=>v==null?'':`<span class="delta ${v>=0?'up':'down'}">${v>=0?'▲':'▼'} ${Math.abs(v)}%</span>`;
+  app.appendChild($(`<div class="kpis">
+    <div class="card kpi accent-g"><div class="lbl">Usuarios · 28d</div><div class="val">${fmt(t.users)}</div><div class="sub2">hoy: ${fmt(d.today?.users)} ${deltaTag(d.today?.dUsers)}</div></div>
+    <div class="card kpi"><div class="lbl">Sesiones · 28d</div><div class="val">${fmt(t.sessions)}</div><div class="sub2">hoy: ${fmt(d.today?.sessions)} ${deltaTag(d.today?.dSessions)}</div></div>
+    <div class="card kpi accent-o"><div class="lbl">Leads (emails)</div><div class="val">${fmt(f.leads)}</div><div class="sub2">de ${fmt(f.gateOpens)} aperturas del gate</div></div>
+    <div class="card kpi accent-b"><div class="lbl">Conversión</div><div class="val">${pct(f.leadConvRate)}</div><div class="sub2">sesión → lead</div></div>
+    <div class="card kpi accent-v"><div class="lbl">Acierto IA · 30d</div><div class="val">${pct(d.picks?.acc30d)}</div><div class="sub2">${fmt(d.picks?.total)} picks históricos</div></div>
+  </div>`));
+
+  /* Insights automáticos (reglas sobre los datos) */
+  const chips=[];
+  const dev=d.devices||[]; const mob=dev.find(x=>x.device==='mobile');
+  if(mob&&t.sessions) chips.push(`📱 <b>${Math.round(100*mob.sessions/t.sessions)}%</b> del tráfico es mobile — diseñá para el pulgar`);
+  const co=(d.countries||[])[0];
+  if(co&&t.sessions) chips.push(`🌎 <b>${Math.round(100*co.sessions/t.sessions)}%</b> viene de <b>${co.country}</b>`);
+  const sc=d.clarity?.accesoia?.scrollDepth;
+  if(sc!=null&&sc<35) chips.push({w:1,h:`⚠️ Scroll promedio en accesoia: <b>${sc}%</b> — casi nadie ve el contenido bajo el hero`});
+  if(f.gateToLeadRate) chips.push(`🎯 Del gate al email convierte el <b>${f.gateToLeadRate}%</b>`);
+  const paid=(d.sources||[]).filter(s=>s.medium==='paid').reduce((a,s)=>a+s.sessions,0);
+  if(paid&&t.sessions) chips.push(`📣 Ads de Meta: <b>${fmt(paid)}</b> sesiones pagas (${Math.round(100*paid/t.sessions)}%)`);
+  app.appendChild($(`<div class="insights">${chips.map(c=>typeof c==='string'?`<span class="chip">${c}</span>`:`<span class="chip warn">${c.h}</span>`).join('')}</div>`));
+
+  /* Funnel + serie diaria */
+  const steps=[['Sesiones',f.sessions],['Gate abierto',f.gateOpens],['Formulario iniciado',f.formStarts],['Lead capturado',f.leads],['Cruzó a gambeta',f.gotoGambeta]];
+  const max=steps[0][1]||1;
+  const funnelHtml=steps.map(([n,v],i)=>`<div class="fstep"><span class="n">${n}</span><div class="fbar"><i style="width:${Math.max(1.2,100*v/max)}%"></i></div><div><div class="v">${fmt(v)}</div><div class="frate">${i?pct(+(100*v/(steps[i-1][1]||1)).toFixed(1)):'100%'}</div></div></div>`).join('');
+  const days=(d.daily||[]).filter(x=>x.sessions>0||x.users>0);
+  app.appendChild($(`<div class="grid g2">
+    <div class="card"><h2>Embudo de conversión <span class="note">28 días · accesoia → gambeta</span></h2>${funnelHtml}
+      <div style="font-size:.68rem;color:var(--dim);margin-top:10px">+ ${fmt(f.tgClicks)} clics a Telegram · ${fmt(f.eleccion)} eligieron jugada post-gate</div></div>
+    <div class="card"><h2>Sesiones por día <span class="note">${days.length} día${days.length===1?'':'s'} con datos</span></h2><div id="chart"></div></div>
+  </div>`));
+  drawChart(document.getElementById('chart'),days);
+
+  /* Fuentes + páginas */
+  const srcs=(d.sources||[]).filter(s=>s.sessions>0).slice(0,8);
+  const smax=Math.max(...srcs.map(s=>s.sessions),1);
+  const srcName=(s)=>{const k=`${s.source}/${s.medium}`;return {'fb/paid':'📣 Facebook Ads','ig/paid':'📸 Instagram Ads','(direct)/(none)':'🔗 Directo','google/organic':'🔍 Google orgánico'}[k]||( s.source==='(not set)'||s.source==='(data not available)' ? '⏳ Procesando (GA4 nuevo)' : k);};
+  app.appendChild($(`<div class="grid g2e">
+    <div class="card"><h2>Fuentes de tráfico</h2>${srcs.map(s=>`<div class="hrow"><span class="hn">${srcName(s)}</span><div class="hbar"><i style="width:${100*s.sessions/smax}%"></i></div><span class="hv">${fmt(s.sessions)}</span></div>`).join('')}</div>
+    <div class="card"><h2>Páginas más vistas</h2><table><tr><th>Página</th><th style="text-align:right">Vistas</th></tr>${(d.pages||[]).slice(0,8).map(p=>`<tr><td><span class="host ${p.host.includes('accesoia')?'a':'g'}">${p.host.includes('accesoia')?'AIA':'GAM'}</span>${p.path}</td><td class="num">${fmt(p.views)}</td></tr>`).join('')}</table></div>
+  </div>`));
+
+  /* Clarity UX health */
+  const cxCard=(name,c,url)=>{ if(!c)return `<div class="card"><h2>${name}</h2><p style="color:var(--dim);font-size:.8rem">Sin datos aún.</p></div>`;
+    const cls=(p,warnAt,badAt)=>p>=badAt?'bad':p>=warnAt?'meh':'ok';
+    return `<div class="card"><h2>Salud UX · ${name} <span class="note"><a href="${url}" target="_blank" style="color:var(--sky);text-decoration:none">ver grabaciones ↗</a></span></h2>
+    <div class="cx">
+      <div class="cxi"><div class="l">Sesiones 3d</div><div class="v">${fmt(c.totalSessions)}</div></div>
+      <div class="cxi"><div class="l">Usuarios únicos</div><div class="v">${fmt(c.uniqueUsers)}</div></div>
+      <div class="cxi"><div class="l">Scroll prom.</div><div class="v ${c.scrollDepth<25?'bad':c.scrollDepth<45?'meh':'ok'}">${c.scrollDepth??'—'}%</div></div>
+      <div class="cxi"><div class="l">Rage clicks</div><div class="v ${cls(c.rageClicks?.pct||0,1,3)}">${fmt(c.rageClicks?.sessions)}</div></div>
+      <div class="cxi"><div class="l">Dead clicks</div><div class="v ${cls(c.deadClicks?.pct||0,2,6)}">${fmt(c.deadClicks?.sessions)}</div></div>
+      <div class="cxi"><div class="l">Volvió rápido</div><div class="v ${cls(c.quickback?.pct||0,3,8)}">${fmt(c.quickback?.sessions)}</div></div>
+      <div class="cxi"><div class="l">Errores JS</div><div class="v ${cls(c.scriptErrors?.pct||0,1,5)}">${fmt(c.scriptErrors?.sessions)}</div></div>
+    </div></div>`; };
+  app.appendChild($(`<div class="grid g2e">
+    ${cxCard('accesoia.app',d.clarity?.accesoia,'https://clarity.microsoft.com')}
+    ${cxCard('gambeta.ai',d.clarity?.gambeta,'https://clarity.microsoft.com')}
+  </div>`));
+
+  /* Producto + IA */
+  const p=d.picks||{};
+  const ring=(v)=>{const r=40,c=2*Math.PI*r,o=c*(1-(v||0)/100);return `<svg width="112" height="112" viewBox="0 0 100 100"><circle cx="50" cy="50" r="${r}" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="9"/><circle cx="50" cy="50" r="${r}" fill="none" stroke="url(#gr)" stroke-width="9" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${o}" transform="rotate(-90 50 50)"/><defs><linearGradient id="gr"><stop offset="0%" stop-color="#0f9d58"/><stop offset="100%" stop-color="#34e07f"/></linearGradient></defs><text x="50" y="56" text-anchor="middle" fill="#f2f5f3" font-size="20" font-weight="900">${v??'—'}%</text></svg>`};
+  app.appendChild($(`<div class="grid g2e">
+    <div class="card"><h2>Rendimiento del producto <span class="note">fuente: gambeta.ai/api/sb en vivo</span></h2>
+      <div class="gaugewrap">${ring(p.acc30d)}
+        <div class="gtxt">
+          <div class="row"><b>${pct(p.acc30d)}</b> de acierto · últimos 30 días</div>
+          <div class="row">All-time: <b>${pct(p.accAllTime)}</b> (${fmt(p.resueltos)} picks resueltos)</div>
+          <div class="row">Histórico total: <b>${fmt(p.total)}</b> picks · <b>${fmt(p.pendientes)}</b> pendientes</div>
+        </div></div></div>
+    <div class="card"><h2>Análisis con IA</h2>${
+      d.ia ? `<div class="ia-body">${d.ia.text||''}</div><div style="font-size:.62rem;color:var(--dim);margin-top:10px">Generado: ${new Date(d.ia.at).toLocaleString('es-AR')}</div>`
+           : `<div class="ia-off"><span class="ico">🤖</span><span>Este panel se enciende al cargar la <b>ANTHROPIC_API_KEY</b> en el .env (paso 4 de la guía). Con la key, cada refresh incluye un diagnóstico escrito por Claude: qué funciona, qué está frenando la conversión y qué probar.</span></div>`
+    }</div>
+  </div>`));
+}
+
+function drawChart(el,days){
+  if(!days.length){el.innerHTML='<p style="color:var(--dim);font-size:.8rem;padding:30px 0">Todavía no hay serie diaria — la medición arrancó recién. Mañana esta curva empieza a dibujarse.</p>';return;}
+  const W=520,H=210,P=34;
+  const max=Math.max(...days.map(x=>x.sessions),10);
+  const x=(i)=>days.length===1?W/2:P+i*(W-2*P)/(days.length-1);
+  const y=(v)=>H-P-(v/max)*(H-2*P);
+  const pts=days.map((v,i)=>`${x(i)},${y(v.sessions)}`).join(' ');
+  const area=days.length>1?`<polygon points="${x(0)},${y(0)} ${pts} ${x(days.length-1)},${H-P}" fill="url(#ag)" opacity=".28"/><polyline points="${pts}" fill="none" stroke="#34e07f" stroke-width="2.6" stroke-linejoin="round"/>`:'';
+  const dots=days.map((v,i)=>`<circle cx="${x(i)}" cy="${y(v.sessions)}" r="4.4" fill="#34e07f" stroke="#07090c" stroke-width="2"/><text x="${x(i)}" y="${y(v.sessions)-11}" text-anchor="middle" fill="#f2f5f3" font-size="11" font-weight="800">${v.sessions}</text>`).join('');
+  const labels=days.map((v,i)=>(days.length<=9||i%Math.ceil(days.length/8)===0)?`<text x="${x(i)}" y="${H-9}" text-anchor="middle" fill="rgba(235,245,238,.35)" font-size="9">${v.date.slice(6,8)}/${v.date.slice(4,6)}</text>`:'').join('');
+  el.innerHTML=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto"><defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#34e07f"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs>
+    <line x1="${P}" y1="${H-P}" x2="${W-P}" y2="${H-P}" stroke="rgba(255,255,255,.1)"/>${area}${dots}${labels}</svg>`;
+}
+</script>
+</body>
+</html>
