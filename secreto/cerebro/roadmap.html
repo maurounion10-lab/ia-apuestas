@@ -35,23 +35,29 @@
     <div class="kanban">
 
       <div class="kanban-col now">
-        <h3>Ahora <span class="count">7</span></h3>
+        <h3>Ahora <span class="count">9</span></h3>
         <div class="kanban-card done"><strong>Consolidar estructura post-migración</strong>Mac → Windows terminado.</div>
         <div class="kanban-card done"><strong>Crear cerebro + dashboard</strong>Hecho 2026-07-08.</div>
         <div class="kanban-card done"><strong>Clonar repo en <code>code/</code></strong>Hecho 2026-07-08.</div>
         <div class="kanban-card done"><strong>Pulir ficha de pronóstico</strong>Cabecera + recomendación + sello — en producción.</div>
         <div class="kanban-card done"><strong>Botón "Crear pronóstico" + escudos sin marco</strong>En producción 2026-07-08.</div>
         <div class="kanban-card done"><strong>Cerebro online</strong><code>gambeta.ai/secreto/cerebro</code> con clave + noindex.</div>
+        <div class="kanban-card done"><strong>Motor de contenido social</strong>Skill <code>gambeta-content-engine</code>: ingest + research 3 fuentes (picks + WebSearch + Apify), 2 vertientes (Meta anti-baneo / X), render Puppeteer, plantillas.</div>
+        <div class="kanban-card"><strong>Agentes de publicación (dry-run)</strong><code>agent-x-daily</code> + <code>agent-ig-daily</code> con kill-switch. ✅ Claude scheduled agent diario de X. Falta: tokens + hosting PNG para ir a real.</div>
+        <div class="kanban-card done"><strong>Sistema de medición completo</strong>GA4 cross-domain (457 pág.) + Clarity ambos sitios + UTMs. 2026-07-09.</div>
+        <div class="kanban-card done"><strong>Centro de Control</strong><code>gambeta.ai/secreto/analytics</code> — dashboard Liquid Glass con GA4 + Clarity + embudo. Falta API key de Anthropic para el panel IA.</div>
         <div class="kanban-card"><strong>Transformación visual (resto)</strong>Landing marketing + branding — lo arma Mauro en Claude Design.</div>
       </div>
 
       <div class="kanban-col next">
-        <h3>Próximo <span class="count">5</span></h3>
+        <h3>Próximo <span class="count">7</span></h3>
+        <div class="kanban-card"><strong>Publicación auto a real</strong>Cargar tokens X/Meta + hosting de PNG, ≥3 días en dry-run y prender <code>PUBLISH_ENABLED=true</code>.</div>
+        <div class="kanban-card"><strong>Gemelo Meta/IG en producción</strong>Graph API content publishing + carruseles.</div>
         <div class="kanban-card"><strong>Terminar indexación 85 posts</strong>Push a través de plan social.</div>
         <div class="kanban-card"><strong>Ejecutar plan de distribución</strong>X + Reddit + Quora, 2 semanas.</div>
         <div class="kanban-card"><strong>Setup Google Analytics 4</strong>Eventos de conversión.</div>
         <div class="kanban-card"><strong>Copy de la nueva landing</strong>Framework growth marketing.</div>
-        <div class="kanban-card"><strong>Contenido Mundial 2026</strong>Planillas, cuotas, previas.</div>
+        <div class="kanban-card"><strong>Contenido Mundial 2026</strong>Planillas, cuotas, previas — motor listo, falta operar a diario.</div>
       </div>
 
       <div class="kanban-col future">
@@ -71,6 +77,15 @@
   <section>
     <h2>Hitos <span class="accent-gold">completados</span></h2>
     <div class="timeline">
+      <div class="timeline-item done">
+        <div class="ti-head"><span class="ti-date">2026-07-09</span><span class="ti-title">Sistema de medición (GA4 cross-domain 457 pág. + Clarity ambos sitios) + Centro de Control Liquid Glass en <code>/secreto/analytics</code></span></div>
+      </div>
+      <div class="timeline-item done">
+        <div class="ti-head"><span class="ti-date">2026-07-09</span><span class="ti-title">accesoia.app renovada: copy growth + datos reales auto-actualizados desde gambeta (<code>live.js</code>)</span></div>
+      </div>
+      <div class="timeline-item done">
+        <div class="ti-head"><span class="ti-date">2026-07-08</span><span class="ti-title">Motor de contenido social (skill <code>gambeta-content-engine</code>) — piezas reales Meta + X del Mundial, plantilla "probables ganadores", Apify cableado, agentes de publicación en dry-run + Claude scheduled agent diario de X</span></div>
+      </div>
       <div class="timeline-item done">
         <div class="ti-head"><span class="ti-date">2026-07-08</span><span class="ti-title">Botón "Crear pronóstico" en el nav + escudos de la ficha sin marco redondo — en producción</span></div>
       </div>

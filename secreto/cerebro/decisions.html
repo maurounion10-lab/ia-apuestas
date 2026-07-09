@@ -35,6 +35,32 @@
     <div class="entry-head">
       <span class="entry-date">2026-07-08</span>
       <span class="badge gold">actual</span>
+      <span class="entry-title">Motor de contenido social (skill <code>gambeta-content-engine</code>) + agentes de publicación</span>
+    </div>
+    <div class="entry-section"><strong>Decisión</strong>Construir un <strong>motor de contenido social</strong> como skill de Claude Code que: (1) toma data del endpoint público <code>/api/sb</code> (JSON limpio, sin scrapear render); (2) investiga en vivo con <strong>3 fuentes</strong> — picks del endpoint + noticias del Mundial (WebSearch) + tendencias sociales (<strong>Apify</strong>: IG/TikTok/X); (3) escribe copy; (4) arma piezas (post/carrusel) en <strong>DOS vertientes</strong>; (5) renderiza PNG local con Puppeteer sobre el kit de diseño (skins A/B/C).</div>
+    <div class="entry-section"><strong>Dos vertientes</strong>
+      <ul>
+        <li><strong>META (IG/FB Ads):</strong> cero lenguaje de apuestas, <strong>gate anti-baneo</strong> (<code>lint-meta.mjs</code>) que sustituye cuota → <strong>probabilidad %</strong>, neutraliza mercados y bloquea el render si no pasa. CTA a <strong>accesoia.app</strong>.</li>
+        <li><strong>X:</strong> flexible — cuota, stake, apuestas OK. CTA a gambeta.ai, +18.</li>
+      </ul>
+    </div>
+    <div class="entry-section"><strong>Agentes de publicación</strong><code>agent-x-daily</code> y <code>agent-ig-daily</code> con <strong>kill-switch</strong> <code>PUBLISH_ENABLED</code> + outbox auditable. <strong>Claude scheduled agent</strong> diario de X (10:14, dry-run) en <code>.claude/scheduled-tasks/</code>. Escudos: selecciones → banderas, clubes → los ~700 crests del repo.</div>
+    <div class="entry-section"><strong>Por qué</strong>El Mundial 2026 es la ventana de máximo volumen; hay que producir contenido de marca a diario en las dos plataformas sin arriesgar baneos en Meta. Un pipeline determinístico + reproducible permite automatizar la publicación después, apoyándose en la data del propio producto.</div>
+    <div class="entry-section"><strong>Alternativas rechazadas</strong>
+      <ul>
+        <li><strong>Scrapear el render:</strong> frágil; el endpoint JSON es más robusto.</li>
+        <li><strong>Mismo copy en Meta y X:</strong> Meta banea lenguaje de apuestas — necesita encuadre y CTA distintos.</li>
+        <li><strong>Publicación full-auto sin revisión:</strong> riesgo de compliance → <strong>dry-run</strong> obligatorio ≥3 días.</li>
+      </ul>
+    </div>
+    <div class="entry-section"><strong>Quién decide</strong>Mauro.</div>
+    <div class="entry-section"><strong>Impacto</strong>Sistema reproducible para generar y (a futuro) publicar contenido diario. Para ir a real: tokens X/Meta en <code>.env</code>, hostear PNG para IG, <code>PUBLISH_ENABLED=true</code>. Crons: sección <strong>"Scheduled"</strong> de Claude Code (local). Token de Apify en <code>.env</code> (gitignoreado).</div>
+  </div>
+
+  <div class="entry decision">
+    <div class="entry-head">
+      <span class="entry-date">2026-07-08</span>
+      <span class="badge gold">actual</span>
       <span class="entry-title">Rediseño del Foro: estructura de apuestasdeportivas.com + piel Gambeta</span>
     </div>
     <div class="entry-section"><strong>Decisión</strong>Rediseñar el Foro BETA tomando la <strong>arquitectura de información</strong> de <a href="https://www.apuestasdeportivas.com/foro/" target="_blank">apuestasdeportivas.com/foro</a> (categorías → subforos → temas, filas escaneables con stats + "último mensaje", ranking de casas integrado, widget de marcadores, CTA de crear pronóstico), pero <strong>conservando el tema oscuro y la gamificación de Gambeta</strong> (ranks 👑💎🥇, rachas 🔥, ranking mensual por profit, Hall of Fame, avatars = escudos). El foro se rediseña <strong>alineado al resto del sitio</strong>.</div>
