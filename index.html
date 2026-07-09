@@ -226,9 +226,9 @@ main{max-width:1280px;margin:0 auto;padding:32px 20px}
   .hero-cta,.hero-buttons{justify-content:center!important}
 }
 </style>
-<link rel="preload" href="/css/main.css?v=1783558798" as="style">
-<link rel="stylesheet" href="/css/main.css?v=1783558798" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="/css/main.css?v=1783558798"></noscript>
+<link rel="preload" href="/css/main.css?v=1783560400" as="style">
+<link rel="stylesheet" href="/css/main.css?v=1783560400" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="/css/main.css?v=1783560400"></noscript>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script type="application/ld+json">
 {
@@ -369,6 +369,13 @@ setTimeout(function(){
   </div>
 
   <!-- ( widget removido) -->
+
+  <!-- Botón Crear pronóstico — siempre visible (móvil + desktop). Misma acción que el 🎯 lateral (#gbBetBbl) -->
+  <button class="nav-create-btn" id="navCreateBtn" type="button" onclick="openGbBetModal();" title="Crear un pronóstico" aria-label="Crear un pronóstico">
+    <svg class="nav-create-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+    <span class="nav-create-full">Crear pronóstico</span>
+    <span class="nav-create-short">Crear</span>
+  </button>
 
   <!-- Auth button (logged out) -->
   <button class="nav-auth-btn" id="navAuthBtn" onclick="openAuth()">

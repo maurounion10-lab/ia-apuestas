@@ -2748,13 +2748,9 @@
     flex: 1;
     min-width: 0;
   }
-  .pred-emoji {
-    display: inline-flex; align-items: center; justify-content: center;
-    width: 50px; height: 50px; border-radius: 50%;
-    background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12);
-    overflow: hidden; flex-shrink: 0;
-  }
-  .pred-emoji > img, .pred-emoji > span { transform: scale(0.6); transform-origin: center center; }
+  /* Escudos flotando, al mismo tamaño, sin marco redondo (decisión del dueño 8-jul-2026:
+     las selecciones ya vienen redondas; a los escudos de club NO forzarles fondo redondo) */
+  .pred-emoji { font-size: 2rem; }
   .pred-tname {
     font-size: 0.78rem;
     font-weight: 700;
@@ -2776,19 +2772,18 @@
   @media (max-width: 600px) {
     .pred-match { margin-bottom: 12px; gap: 6px; }
     .pred-team { gap: 4px; }
-    .pred-emoji { width: 44px; height: 44px; }
-    /* Escalar wrapper de badges nacionales (span) + club logos (img directo) dentro del marco */
+    .pred-emoji { font-size: 1.6rem; }
+    /* Escalar wrapper de badges nacionales (span) + club logos (img directo) */
     .pred-emoji > span, .pred-emoji > img {
-      transform: scale(0.52);
+      transform: scale(0.82);
       transform-origin: center center;
     }
     .pred-tname { font-size: 0.74rem; line-height: 1.15; }
     .pred-vs { font-size: 0.58rem; padding: 2px 6px; letter-spacing: 0.05em; }
   }
   @media (max-width: 380px) {
-    .pred-emoji { width: 40px; height: 40px; }
     .pred-emoji > span, .pred-emoji > img {
-      transform: scale(0.46);
+      transform: scale(0.68);
     }
     .pred-tname { font-size: 0.7rem; }
   }
@@ -5329,6 +5324,31 @@
   }
   .nav-auth-btn:hover .nav-auth-register {
     box-shadow: 0 0 16px rgba(0,200,83,0.4);
+  }
+
+  /* ── NAV: botón Crear pronóstico (mismo onclick que el 🎯 lateral: openGbBetModal) ── */
+  .nav-create-btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 8px 15px;
+    background: linear-gradient(135deg, #ffe066, #ffb300);
+    color: #1a1200;
+    border: none; border-radius: 10px;
+    font-family: inherit; font-size: 0.82rem; font-weight: 800;
+    letter-spacing: 0.01em; white-space: nowrap; cursor: pointer;
+    flex-shrink: 0; transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 10px rgba(255,190,0,0.32);
+  }
+  .nav-create-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,190,0,0.5); }
+  .nav-create-btn:active { transform: translateY(0); }
+  .nav-create-ico { flex-shrink: 0; }
+  .nav-create-btn .nav-create-short { display: none; }
+  @media (max-width: 600px) {
+    .nav-create-btn { padding: 7px 12px; font-size: 0.78rem; gap: 5px; }
+    .nav-create-btn .nav-create-full { display: none; }
+    .nav-create-btn .nav-create-short { display: inline; }
+  }
+  @media (max-width: 380px) {
+    .nav-create-btn { padding: 7px 10px; }
   }
   @media (max-width: 820px) {
     /* Botón único en mobile: ocultar "Entrar" y dejar solo el verde */
