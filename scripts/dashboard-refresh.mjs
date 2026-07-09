@@ -120,7 +120,7 @@ async function iaAnalysis(summary) {
       headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-5',
-        max_tokens: 900,
+        max_tokens: 2500,   // sonnet-5 piensa antes de responder; hay que dejar lugar para el thinking + la respuesta
         messages: [{
           role: 'user',
           content: `Sos un analista de growth de Gambeta AI. accesoia.app es una landing "Meta-Ads safe" cuyo objetivo es capturar emails y llevar tráfico a gambeta.ai (picks de fútbol con IA). Analizá estos datos de los últimos 28 días y devolvé un diagnóstico BREVE en español rioplatense, accionable, sin relleno. Estructura: (1) 🟢 Qué funciona (1-2 líneas). (2) 🔴 El principal cuello de botella (con el número que lo prueba). (3) 🎯 Las 3 acciones concretas de mayor impacto, ordenadas. Máximo 180 palabras. Datos:\n${JSON.stringify(summary)}`
@@ -129,7 +129,8 @@ async function iaAnalysis(summary) {
     });
     const j = await r.json();
     if (j.error) return { error: j.error.type || 'api_error', text: `El análisis IA no corrió: ${j.error.message}. (Suele ser falta de saldo — cargá crédito en console.anthropic.com y el próximo refresh lo genera.)`, at: new Date().toISOString() };
-    return { text: (j.content?.[0]?.text || '').trim(), model: j.model, at: new Date().toISOString() };
+    const textBlock = (j.content || []).find(c => c.type === 'text');   // saltear bloques de thinking
+    return { text: (textBlock?.text || '').trim(), model: j.model, at: new Date().toISOString() };
   } catch (e) {
     return { error: 'exception', text: 'El análisis IA no corrió: ' + e.message, at: new Date().toISOString() };
   }
@@ -140,27 +141,98 @@ const prev = existsSync(OUT_FILE) ? JSON.parse(readFileSync(OUT_FILE, 'utf8')) :
 TOKEN = await ga4Token();
 console.log('✓ GA4 autenticado');
 
-const [daily, hourly, sources, pages, landing, events, devices, countries, cities, newRet, durations] = await Promise.all([
-  report({ dateRanges: R28, dimensions: [{ name: 'date' }], metrics: [{ name: 'activeUsers' }, { name: 'sessions' }, { name: 'screenPageViews' }, { name: 'averageSessionDuration' }, { name: 'engagementRate' }], orderBys: [{ dimension: { dimensionName: 'date' } }] }),
-  report({ dateRanges: R28, dimensions: [{ name: 'hour' }], metrics: [{ name: 'sessions' }], orderBys: [{ dimension: { dimensionName: 'hour' } }] }),
-  report({ dateRanges: R28, dimensions: [{ name: 'sessionSource' }, { name: 'sessionMedium' }], metrics: [{ name: 'sessions' }, { name: 'activeUsers' }, { name: 'engagementRate' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 12 }),
-  report({ dateRanges: R28, dimensions: [{ name: 'hostName' }, { name: 'pagePath' }], metrics: [{ name: 'screenPageViews' }, { name: 'activeUsers' }, { name: 'averageSessionDuration' }], orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }], limit: 15 }),
-  report({ dateRanges: R28, dimensions: [{ name: 'landingPagePlusQueryString' }], metrics: [{ name: 'sessions' }, { name: 'bounceRate' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 10 }),
-  report({ dateRanges: R28, dimensions: [{ name: 'eventName' }], metrics: [{ name: 'eventCount' }, { name: 'totalUsers' }], orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }], limit: 30 }),
-  report({ dateRanges: R28, dimensions: [{ name: 'deviceCategory' }], metrics: [{ name: 'sessions' }, { name: 'engagementRate' }] }),
-  report({ dateRanges: R28, dimensions: [{ name: 'country' }], metrics: [{ name: 'sessions' }, { name: 'activeUsers' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 10 }),
-  report({ dateRanges: R28, dimensions: [{ name: 'city' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 8 }),
-  report({ dateRanges: R28, dimensions: [{ name: 'newVsReturning' }], metrics: [{ name: 'sessions' }] }),
-  report({ dateRanges: R28, dimensions: [{ name: 'deviceCategory' }], metrics: [{ name: 'sessions' }] }),
-]);
-console.log('✓ GA4 reportes (11)');
+// ── rangos de fecha (el dashboard filtra entre estos) ──
+const RANGES = {
+  today:     { label: 'Hoy',     dr: { startDate: 'today',       endDate: 'today' } },
+  yesterday: { label: 'Ayer',    dr: { startDate: 'yesterday',   endDate: 'yesterday' } },
+  '7d':      { label: '7 días',  dr: { startDate: '6daysAgo',    endDate: 'today' } },
+  '14d':     { label: '14 días', dr: { startDate: '13daysAgo',   endDate: 'today' } },
+  '28d':     { label: '28 días', dr: { startDate: '27daysAgo',   endDate: 'today' } },
+  '90d':     { label: '3 meses', dr: { startDate: '89daysAgo',   endDate: 'today' } },
+  '180d':    { label: '6 meses', dr: { startDate: '179daysAgo',  endDate: 'today' } },
+};
 
-// Clarity (tolerante a fallos / cuota)
+// corre reportes en tandas de 5 (GA4 limita concurrencia ~10 por propiedad)
+async function runChunked(specs, size = 5) {
+  const out = [];
+  for (let i = 0; i < specs.length; i += size) out.push(...await Promise.all(specs.slice(i, i + size).map(s => report(s))));
+  return out;
+}
+
+async function pullRange(dr) {
+  const dateRanges = [dr];
+  const specs = [
+    { dateRanges, dimensions: [{ name: 'date' }], metrics: [{ name: 'activeUsers' }, { name: 'sessions' }, { name: 'screenPageViews' }, { name: 'averageSessionDuration' }, { name: 'engagementRate' }], orderBys: [{ dimension: { dimensionName: 'date' } }] },
+    { dateRanges, dimensions: [{ name: 'hour' }], metrics: [{ name: 'sessions' }], orderBys: [{ dimension: { dimensionName: 'hour' } }] },
+    { dateRanges, dimensions: [{ name: 'sessionSource' }, { name: 'sessionMedium' }], metrics: [{ name: 'sessions' }, { name: 'activeUsers' }, { name: 'engagementRate' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 12 },
+    { dateRanges, dimensions: [{ name: 'hostName' }, { name: 'pagePath' }], metrics: [{ name: 'screenPageViews' }, { name: 'activeUsers' }, { name: 'averageSessionDuration' }], orderBys: [{ metric: { metricName: 'screenPageViews' }, desc: true }], limit: 15 },
+    { dateRanges, dimensions: [{ name: 'landingPagePlusQueryString' }], metrics: [{ name: 'sessions' }, { name: 'bounceRate' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 10 },
+    { dateRanges, dimensions: [{ name: 'eventName' }], metrics: [{ name: 'eventCount' }], orderBys: [{ metric: { metricName: 'eventCount' }, desc: true }], limit: 30 },
+    { dateRanges, dimensions: [{ name: 'deviceCategory' }], metrics: [{ name: 'sessions' }, { name: 'engagementRate' }] },
+    { dateRanges, dimensions: [{ name: 'country' }], metrics: [{ name: 'sessions' }, { name: 'activeUsers' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 8 },
+    { dateRanges, dimensions: [{ name: 'city' }], metrics: [{ name: 'sessions' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 8 },
+    { dateRanges, dimensions: [{ name: 'newVsReturning' }], metrics: [{ name: 'sessions' }] },
+    { dateRanges, dimensions: [{ name: 'hostName' }], metrics: [{ name: 'sessions' }, { name: 'activeUsers' }, { name: 'screenPageViews' }, { name: 'engagementRate' }] },
+    { dateRanges, dimensions: [{ name: 'sessionCampaignName' }, { name: 'sessionManualAdContent' }], metrics: [{ name: 'sessions' }, { name: 'activeUsers' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 15 },
+  ];
+  const [daily, hourly, sources, pages, landing, events, devices, countries, cities, newRet, hostSplit, campaigns] = await runChunked(specs, 5);
+
+  const dailySeries = rows(daily, r => ({ date: dv(r, 0), users: mv(r, 0), sessions: mv(r, 1), pageviews: mv(r, 2), avgDur: Math.round(mv(r, 3)), engagement: +(mv(r, 4) * 100).toFixed(1) }));
+  const hourSeries = Array.from({ length: 24 }, (_, h) => ({ hour: h, sessions: 0 }));
+  rows(hourly, r => { const h = +dv(r, 0); if (hourSeries[h]) hourSeries[h].sessions = mv(r, 0); });
+  const eventMap = Object.fromEntries(rows(events, r => [dv(r, 0), mv(r, 0)]));
+  const totSessions = dailySeries.reduce((a, d) => a + d.sessions, 0);
+  const totUsers = dailySeries.reduce((a, d) => a + d.users, 0);
+  const totPV = dailySeries.reduce((a, d) => a + d.pageviews, 0);
+  const engDays = dailySeries.filter(d => d.sessions);
+  const avgEng = engDays.length ? +(engDays.reduce((a, d) => a + d.engagement, 0) / engDays.length).toFixed(1) : 0;
+
+  const gateOpens = Object.entries(eventMap).filter(([k]) => /open_gate$/.test(k) || k === 'gate_manual_open').reduce((a, [, v]) => a + v, 0);
+  const leads = eventMap.lead_capture || 0;
+  const funnel = {
+    sessions: totSessions, gateShows: eventMap.gate_show || 0, gateOpens, formStarts: eventMap.form_start || 0, leads,
+    tgClicks: eventMap.telegram_click || 0, gotoGambeta: eventMap.goto_gambeta || 0, eleccion: eventMap.eleccion_jugada || 0,
+    gateOpenRate: totSessions ? +(100 * gateOpens / totSessions).toFixed(1) : 0,
+    leadConvRate: totSessions ? +(100 * leads / totSessions).toFixed(2) : 0,
+    gateToLeadRate: gateOpens ? +(100 * leads / gateOpens).toFixed(1) : 0,
+    leadToGambetaRate: leads ? +(100 * (eventMap.goto_gambeta || 0) / leads).toFixed(1) : 0,
+    formToLeadRate: (eventMap.form_start || 0) ? +(100 * leads / eventMap.form_start).toFixed(1) : 0,
+  };
+
+  // desglose por sitio (accesoia vs gambeta) desde el hostName
+  const siteOf = (h) => /accesoia/.test(h) ? 'accesoia' : /gambeta/.test(h) ? 'gambeta' : 'otro';
+  const bySite = { accesoia: { sessions: 0, users: 0, pageviews: 0, engSum: 0, n: 0 }, gambeta: { sessions: 0, users: 0, pageviews: 0, engSum: 0, n: 0 } };
+  rows(hostSplit, r => { const s = siteOf(dv(r, 0)); if (bySite[s]) { bySite[s].sessions += mv(r, 0); bySite[s].users += mv(r, 1); bySite[s].pageviews += mv(r, 2); bySite[s].engSum += mv(r, 3); bySite[s].n++; } });
+  for (const s of ['accesoia', 'gambeta']) { bySite[s].engagement = bySite[s].n ? +(100 * bySite[s].engSum / bySite[s].n).toFixed(1) : 0; delete bySite[s].engSum; delete bySite[s].n; }
+
+  return {
+    totals: { sessions: totSessions, users: totUsers, pageviews: totPV, avgEngagement: avgEng, pagesPerSession: totSessions ? +(totPV / totSessions).toFixed(2) : 0 },
+    daily: dailySeries, hourly: hourSeries,
+    sources: rows(sources, r => ({ source: dv(r, 0), medium: dv(r, 1), sessions: mv(r, 0), users: mv(r, 1), engagement: +(mv(r, 2) * 100).toFixed(1) })),
+    pages: rows(pages, r => ({ host: dv(r, 0), path: dv(r, 1), views: mv(r, 0), users: mv(r, 1), avgDur: Math.round(mv(r, 2)) })),
+    landing: rows(landing, r => ({ path: dv(r, 0), sessions: mv(r, 0), bounce: +(mv(r, 1) * 100).toFixed(1) })),
+    events: eventMap,
+    devices: rows(devices, r => ({ device: dv(r, 0), sessions: mv(r, 0), engagement: +(mv(r, 1) * 100).toFixed(1) })),
+    countries: rows(countries, r => ({ country: dv(r, 0), sessions: mv(r, 0), users: mv(r, 1) })),
+    cities: rows(cities, r => ({ city: dv(r, 0), sessions: mv(r, 0) })),
+    newVsReturning: rows(newRet, r => ({ type: dv(r, 0), sessions: mv(r, 0) })),
+    bySite,
+    campaigns: rows(campaigns, r => ({ campaign: dv(r, 0), content: dv(r, 1), sessions: mv(r, 0), users: mv(r, 1) })),
+    funnel,
+  };
+}
+
+// ── traer los 7 rangos (secuencial para no reventar la cuota de concurrencia) ──
+const ranges = {};
+for (const [k, cfg] of Object.entries(RANGES)) { ranges[k] = await pullRange(cfg.dr); console.log(`✓ rango ${k}`); }
+const delta = (a, b) => (b ? Math.round(100 * (a - b) / b) : null);
+
+// Clarity (global, tolerante a fallos / cuota)
 let cA = prev.clarity?.accesoia || null, cG = prev.clarity?.gambeta || null;
 try { cA = await clarity(E('CLARITY_EXPORT_TOKEN_ACCESOIA')); console.log('✓ Clarity accesoia'); } catch (e) { console.log('⚠ Clarity accesoia: ' + e.message + ' (conservo previo)'); }
 try { cG = await clarity(E('CLARITY_EXPORT_TOKEN_GAMBETA')); console.log('✓ Clarity gambeta'); } catch (e) { console.log('⚠ Clarity gambeta: ' + e.message + ' (conservo previo)'); }
 
-// gambeta /api/sb
+// gambeta /api/sb (global)
 let picks = prev.picks || null;
 try {
   const j = await (await fetch('https://gambeta.ai/api/sb?type=historial')).json();
@@ -173,61 +245,26 @@ try {
   console.log('✓ /api/sb');
 } catch (e) { console.log('⚠ /api/sb: ' + e.message); }
 
-// ── derivadas ──
-const dailySeries = rows(daily, r => ({ date: dv(r, 0), users: mv(r, 0), sessions: mv(r, 1), pageviews: mv(r, 2), avgDur: Math.round(mv(r, 3)), engagement: +(mv(r, 4) * 100).toFixed(1) }));
-const hourSeries = Array.from({ length: 24 }, (_, h) => ({ hour: h, sessions: 0 }));
-rows(hourly, r => hourSeries[+dv(r, 0)] && (hourSeries[+dv(r, 0)].sessions = mv(r, 0)));
-const eventMap = Object.fromEntries(rows(events, r => [dv(r, 0), mv(r, 0)]));
-const totSessions = dailySeries.reduce((a, d) => a + d.sessions, 0);
-const totUsers = dailySeries.reduce((a, d) => a + d.users, 0);
-const totPV = dailySeries.reduce((a, d) => a + d.pageviews, 0);
-const avgEng = dailySeries.length ? +(dailySeries.reduce((a, d) => a + d.engagement, 0) / dailySeries.filter(d => d.sessions).length || 0).toFixed(1) : 0;
-
-const gateOpens = Object.entries(eventMap).filter(([k]) => /open_gate$/.test(k) || k === 'gate_manual_open').reduce((a, [, v]) => a + v, 0);
-const gateShows = eventMap.gate_show || 0, formStarts = eventMap.form_start || 0, leads = eventMap.lead_capture || 0;
-const tgClicks = eventMap.telegram_click || 0, gotoGambeta = eventMap.goto_gambeta || 0, eleccion = eventMap.eleccion_jugada || 0;
-const funnel = {
-  sessions: totSessions, gateShows, gateOpens, formStarts, leads, tgClicks, gotoGambeta, eleccion,
-  gateOpenRate: totSessions ? +(100 * gateOpens / totSessions).toFixed(1) : 0,
-  leadConvRate: totSessions ? +(100 * leads / totSessions).toFixed(2) : 0,
-  gateToLeadRate: gateOpens ? +(100 * leads / gateOpens).toFixed(1) : 0,
-  leadToGambetaRate: leads ? +(100 * gotoGambeta / leads).toFixed(1) : 0,
-  formToLeadRate: formStarts ? +(100 * leads / formStarts).toFixed(1) : 0,
-};
-// conversión por fuente (leads no atribuibles por fuente en GA4 sin config, se usa engagementRate como proxy de calidad)
-const sourcesData = rows(sources, r => ({ source: dv(r, 0), medium: dv(r, 1), sessions: mv(r, 0), users: mv(r, 1), engagement: +(mv(r, 2) * 100).toFixed(1) }));
-
-const last = dailySeries[dailySeries.length - 1] || {}, prevD = dailySeries[dailySeries.length - 2] || {};
-const delta = (a, b) => (b ? Math.round(100 * (a - b) / b) : null);
-
-const summaryForIA = {
-  periodo: '28 dias', usuarios: totUsers, sesiones: totSessions, conversion_pct: funnel.leadConvRate, leads: leads,
-  embudo: funnel, fuentes: sourcesData.slice(0, 5), dispositivos: rows(devices, r => ({ d: dv(r, 0), s: mv(r, 0) })),
-  paises: rows(countries, r => ({ c: dv(r, 0), s: mv(r, 0) })).slice(0, 4),
+// IA sobre la ventana de 28 días
+const R = ranges['28d'];
+const ia = await iaAnalysis({
+  periodo: '28 dias', usuarios: R.totals.users, sesiones: R.totals.sessions, conversion_pct: R.funnel.leadConvRate,
+  embudo: R.funnel, fuentes: R.sources.slice(0, 5), por_sitio: R.bySite, dispositivos: R.devices,
   scroll_accesoia_pct: cA?.scrollDepth, rage_clicks: cA?.rageClicks?.sessions, dead_clicks: cA?.deadClicks?.sessions,
-  paginas_top: rows(pages, r => ({ p: dv(r, 0) + dv(r, 1), v: mv(r, 0) })).slice(0, 5), acierto_producto_30d: picks?.acc30d,
-};
-const ia = await iaAnalysis(summaryForIA);
+  campanias: R.campaigns.slice(0, 6), acierto_producto_30d: picks?.acc30d,
+});
 console.log(ia.error ? `⚠ IA: ${ia.error}` : '✓ IA análisis generado');
 
 const data = {
-  generatedAt: new Date().toISOString(), propertyId: PROP, window: '28d',
-  today: { ...last, dUsers: delta(last.users, prevD.users), dSessions: delta(last.sessions, prevD.sessions), dPageviews: delta(last.pageviews, prevD.pageviews) },
-  totals: { sessions: totSessions, users: totUsers, pageviews: totPV, avgEngagement: avgEng, pagesPerSession: totSessions ? +(totPV / totSessions).toFixed(2) : 0 },
-  daily: dailySeries, hourly: hourSeries,
-  sources: sourcesData,
-  pages: rows(pages, r => ({ host: dv(r, 0), path: dv(r, 1), views: mv(r, 0), users: mv(r, 1), avgDur: Math.round(mv(r, 2)) })),
-  landing: rows(landing, r => ({ path: dv(r, 0), sessions: mv(r, 0), bounce: +(mv(r, 1) * 100).toFixed(1) })),
-  events: eventMap,
-  devices: rows(devices, r => ({ device: dv(r, 0), sessions: mv(r, 0), engagement: +(mv(r, 1) * 100).toFixed(1) })),
-  countries: rows(countries, r => ({ country: dv(r, 0), sessions: mv(r, 0), users: mv(r, 1) })),
-  cities: rows(cities, r => ({ city: dv(r, 0), sessions: mv(r, 0) })),
-  newVsReturning: rows(newRet, r => ({ type: dv(r, 0), sessions: mv(r, 0) })),
-  funnel,
+  generatedAt: new Date().toISOString(), propertyId: PROP,
+  defaultRange: '28d',
+  rangeLabels: Object.fromEntries(Object.entries(RANGES).map(([k, v]) => [k, v.label])),
+  today: { ...ranges.today.totals, dUsers: delta(ranges.today.totals.users, ranges.yesterday.totals.users), dSessions: delta(ranges.today.totals.sessions, ranges.yesterday.totals.sessions) },
+  ranges,
   clarity: { accesoia: cA, gambeta: cG, note: 'ventana 3 días · cuota 10 req/día por proyecto · el heatmap visual está en clarity.microsoft.com' },
   picks, ia,
 };
 
 mkdirSync(OUT_DIR, { recursive: true });
 writeFileSync(OUT_FILE, JSON.stringify(data, null, 1));
-console.log(`\n✅ data.json (${(JSON.stringify(data).length / 1024).toFixed(1)} KB) → ${totUsers} usuarios · ${totSessions} sesiones · ${leads} leads · conv ${funnel.leadConvRate}%`);
+console.log(`\n✅ data.json (${(JSON.stringify(data).length / 1024).toFixed(1)} KB) → 28d: ${R.totals.users} usuarios · ${R.totals.sessions} sesiones · ${R.funnel.leads} leads · conv ${R.funnel.leadConvRate}%`);

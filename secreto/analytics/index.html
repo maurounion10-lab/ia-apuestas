@@ -45,6 +45,24 @@
   #tooltip.show{opacity:1}
   #tooltip b{color:var(--text)}
 
+  /* filtro de fechas */
+  .filterbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:16px;padding:8px 10px;background:var(--glass);border:1px solid var(--stroke);border-radius:14px;backdrop-filter:blur(14px)}
+  .filterbar .flabel{font-size:.6rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-right:4px;padding-left:4px}
+  .fbtn{font-size:.76rem;font-weight:700;color:var(--soft);background:transparent;border:1px solid transparent;border-radius:999px;padding:6px 13px;cursor:pointer;transition:.15s;font-family:inherit;white-space:nowrap}
+  .fbtn:hover{background:rgba(255,255,255,.06);color:var(--text)}
+  .fbtn.active{background:linear-gradient(135deg,var(--green),var(--green-deep));color:#04160c;border-color:transparent}
+  /* comparativa gambeta vs accesoia */
+  .vs2{display:grid;grid-template-columns:1fr auto 1fr;gap:14px;align-items:stretch}
+  @media(max-width:560px){.vs2{grid-template-columns:1fr}}
+  .site{background:rgba(0,0,0,.22);border:1px solid var(--stroke);border-radius:14px;padding:14px 16px}
+  .site.aia{border-color:rgba(255,211,77,.25)} .site.gam{border-color:rgba(52,224,127,.25)}
+  .site .sh{display:flex;align-items:center;gap:8px;font-weight:800;font-size:.8rem;margin-bottom:10px}
+  .site .sm{display:flex;justify-content:space-between;font-size:.76rem;color:var(--soft);padding:3px 0}
+  .site .sm b{color:var(--text);font-variant-numeric:tabular-nums}
+  .vsdot{display:flex;align-items:center;justify-content:center;font-weight:900;color:var(--dim);font-size:.9rem}
+  @media(max-width:560px){.vsdot{display:none}}
+  .adnote{margin-top:12px;font-size:.72rem;line-height:1.5;color:var(--soft);background:rgba(52,224,127,.06);border:1px solid rgba(52,224,127,.18);border-radius:10px;padding:10px 12px}
+  .adnote code{display:inline-block;font-family:ui-monospace,Menlo,monospace;font-size:.68rem;background:rgba(0,0,0,.35);border:1px solid var(--stroke);border-radius:6px;padding:2px 6px;margin-top:5px;color:#ffd34d;word-break:break-all}
   .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-bottom:14px}
   .kpi{padding:16px 18px}
   .kpi .lbl{font-size:.6rem;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);margin-bottom:7px;display:flex;align-items:center}
@@ -167,37 +185,64 @@ fetch('data.json?cb='+Date.now()).then(r=>r.json()).then(render).catch(e=>{
   document.getElementById('app').textContent='Error cargando data.json — corré el refresh. ('+e.message+')';
 });
 
+let DATA=null,RANGE=null;
+const RORDER=['today','yesterday','7d','14d','28d','90d','180d'];
 function render(d){
+  DATA=d;RANGE=d.defaultRange||'28d';
   document.getElementById('stamp').textContent=new Date(d.generatedAt).toLocaleString('es-AR',{dateStyle:'medium',timeStyle:'short'});
+  buildAll();
+}
+function setRange(k){if(!DATA?.ranges?.[k])return;RANGE=k;buildAll();}
+// nombres lindos para campañas/anuncios de Meta (llegan como IDs numéricos)
+function campName(c){if(!c||/^\(not set\)$|^\(direct\)$/.test(c))return '⏳ Sin campaña';if(c==='(cross-network)')return '🔀 Cross-network';if(c==='(organic)')return '🔍 Orgánico';if(/^\d{6,}$/.test(c))return '📣 Meta camp. #'+c.slice(-5);return c;}
+function adName(c){if(!c||/^\(not set\)$/.test(c))return '—';if(/^\d{6,}$/.test(c))return '🎬 Anuncio #'+c.slice(-5);return c;}
+
+function buildAll(){
+  const d=DATA,a=(d.ranges&&d.ranges[RANGE])||{},RL=d.rangeLabels||{},lbl=RL[RANGE]||RANGE;
   const app=document.getElementById('app');app.className='';app.innerHTML='';
-  const f=d.funnel||{},t=d.totals||{},p=d.picks||{};
+  const f=a.funnel||{},t=a.totals||{},p=d.picks||{};
+
+  // ═══ barra de filtro de fechas ═══
+  app.appendChild($(`<div class="filterbar"><span class="flabel">Período</span>${RORDER.filter(k=>d.ranges&&d.ranges[k]).map(k=>`<button class="fbtn ${k===RANGE?'active':''}" data-r="${k}">${RL[k]||k}</button>`).join('')}</div>`));
+  app.querySelectorAll('.fbtn').forEach(b=>b.addEventListener('click',()=>setRange(b.dataset.r)));
 
   // ═══ KPIs ═══
   const dt=(v)=>v==null?'':`<span class="delta ${v>0?'up':v<0?'down':'flat'}">${v>0?'▲':v<0?'▼':'='} ${Math.abs(v)}%</span>`;
   app.appendChild($(`<div class="kpis">
-    <div class="card kpi ag"><div class="lbl">Usuarios${Q('Personas únicas que entraron en los últimos 28 días (GA4 <b>activeUsers</b>). Si uno vuelve, cuenta una vez.')}</div><div class="val">${fmt(t.users)}</div><div class="sub2">hoy: ${fmt(d.today?.users)} ${dt(d.today?.dUsers)}</div></div>
+    <div class="card kpi ag"><div class="lbl">Usuarios${Q('Personas únicas que entraron en el período elegido (GA4 <b>activeUsers</b>). Si uno vuelve, cuenta una vez.')}</div><div class="val">${fmt(t.users)}</div><div class="sub2">hoy: ${fmt(d.today?.users)} ${dt(d.today?.dUsers)}</div></div>
     <div class="card kpi"><div class="lbl">Sesiones${Q('Cada visita al sitio. Una persona puede tener varias sesiones (GA4 <b>sessions</b>).')}</div><div class="val">${fmt(t.sessions)}</div><div class="sub2">hoy: ${fmt(d.today?.sessions)} ${dt(d.today?.dSessions)}</div></div>
     <div class="card kpi"><div class="lbl">Vistas${Q('Total de páginas vistas (<b>pageviews</b>). Dividido las sesiones da las páginas por visita.')}</div><div class="val">${fmt(t.pageviews)}</div><div class="sub2">${t.pagesPerSession} por sesión</div></div>
-    <div class="card kpi av"><div class="lbl">Engagement${Q('% de sesiones "con interés": >10s activas, o con 2+ vistas, o una conversión. Bajo = la gente rebota rápido.')}</div><div class="val">${pct(t.avgEngagement)}</div><div class="sub2">promedio 28d</div></div>
+    <div class="card kpi av"><div class="lbl">Engagement${Q('% de sesiones "con interés": >10s activas, o con 2+ vistas, o una conversión. Bajo = la gente rebota rápido.')}</div><div class="val">${pct(t.avgEngagement)}</div><div class="sub2">promedio ${lbl}</div></div>
     <div class="card kpi ao"><div class="lbl">Leads${Q('Emails capturados por el gate (evento <b>lead_capture</b>). Es la conversión principal de accesoia.')}</div><div class="val">${fmt(f.leads)}</div><div class="sub2">de ${fmt(f.gateOpens)} aperturas del gate</div></div>
     <div class="card kpi ab"><div class="lbl">Conversión${Q('Leads ÷ sesiones × 100. Cuántas visitas terminan dejando el email. Referencia típica de landing con ads: 2-5%.')}</div><div class="val">${pct(f.leadConvRate)}</div><div class="sub2">sesión → email</div></div>
-    <div class="card kpi ag"><div class="lbl">Acierto IA${Q('% de picks ganados por el modelo en los últimos 30 días. Sale en vivo de gambeta.ai/api/sb.')}</div><div class="val">${pct(p.acc30d)}</div><div class="sub2">${fmt(p.total)} picks históricos</div></div>
+    <div class="card kpi ag"><div class="lbl">Acierto IA${Q('% de picks ganados por el modelo en los últimos 30 días. Sale en vivo de gambeta.ai/api/sb. (Global, no depende del período.)')}</div><div class="val">${pct(p.acc30d)}</div><div class="sub2">${fmt(p.total)} picks históricos</div></div>
   </div>`));
 
+  // ═══ gambeta vs accesoia ═══
+  const bs=a.bySite||{},A=bs.accesoia||{},G=bs.gambeta||{};
+  const siteRow=(o)=>`<div class="sm">Sesiones <b>${fmt(o.sessions)}</b></div><div class="sm">Usuarios <b>${fmt(o.users)}</b></div><div class="sm">Vistas <b>${fmt(o.pageviews)}</b></div><div class="sm">Engagement <b>${pct(o.engagement)}</b></div>`;
+  app.appendChild($(`<div class="card" style="margin-bottom:12px"><h2>¿De qué sitio viene el tráfico?${Q('Separa el tráfico entre las dos webs. <b>accesoia.app</b> es la landing satélite (recibe los ads de Meta). <b>gambeta.ai</b> es el producto final (recibe el cruce desde accesoia). Período: '+lbl+'.')}<span class="note">${lbl}</span></h2>
+    <div class="vs2">
+      <div class="site aia"><div class="sh">🛰️ accesoia.app <span style="font-weight:600;color:var(--dim);font-size:.68rem">landing de ads</span></div>${siteRow(A)}</div>
+      <div class="vsdot">vs</div>
+      <div class="site gam"><div class="sh">⚽ gambeta.ai <span style="font-weight:600;color:var(--dim);font-size:.68rem">producto</span></div>${siteRow(G)}</div>
+    </div>
+    <div style="font-size:.68rem;color:var(--dim);margin-top:10px">Cruce accesoia→gambeta: de <b>${fmt(A.sessions)}</b> sesiones en la landing, <b style="color:var(--green)">${fmt(G.sessions)}</b> llegaron al producto${A.sessions?` (<b>${(100*(G.sessions||0)/A.sessions).toFixed(1)}%</b>)`:''}.</div></div>`));
+
   // ═══ insights ═══
-  const chips=[];const dev=d.devices||[];const mob=dev.find(x=>x.device==='mobile');
+  const chips=[];const dev=a.devices||[];const mob=dev.find(x=>x.device==='mobile');
   if(mob&&t.sessions)chips.push(['',`📱 <b>${Math.round(100*mob.sessions/t.sessions)}%</b> del tráfico es mobile`]);
-  const co=(d.countries||[])[0];if(co&&t.sessions)chips.push(['',`🌎 <b>${Math.round(100*co.sessions/t.sessions)}%</b> desde <b>${co.country}</b>`]);
-  const peak=[...(d.hourly||[])].sort((a,b)=>b.sessions-a.sessions)[0];if(peak&&peak.sessions)chips.push(['',`🕐 Pico de tráfico: <b>${peak.hour}:00 hs</b>`]);
+  const co=(a.countries||[])[0];if(co&&t.sessions)chips.push(['',`🌎 <b>${Math.round(100*co.sessions/t.sessions)}%</b> desde <b>${co.country}</b>`]);
+  const peak=[...(a.hourly||[])].sort((x,y)=>y.sessions-x.sessions)[0];if(peak&&peak.sessions)chips.push(['',`🕐 Pico de tráfico: <b>${peak.hour}:00 hs</b>`]);
   const sc=d.clarity?.accesoia?.scrollDepth;if(sc!=null&&sc<35)chips.push(['warn',`⚠️ Scroll accesoia: <b>${sc}%</b> — casi nadie baja del hero`]);
   if(f.gateToLeadRate>10)chips.push(['good',`🎯 El gate convierte bien: <b>${f.gateToLeadRate}%</b> deja el email`]);
   if(f.gateOpenRate&&f.gateOpenRate<12)chips.push(['warn',`🚪 Solo el <b>${f.gateOpenRate}%</b> abre el gate — ahí está el cuello`]);
-  const paid=(d.sources||[]).filter(s=>s.medium==='paid').reduce((a,s)=>a+s.sessions,0);
+  const paid=(a.sources||[]).filter(s=>s.medium==='paid').reduce((x,s)=>x+s.sessions,0);
   if(paid&&t.sessions)chips.push(['',`📣 Ads Meta: <b>${fmt(paid)}</b> sesiones (${Math.round(100*paid/t.sessions)}%)`]);
-  const nr=d.newVsReturning||[];const ret=nr.find(x=>x.type==='returning');if(ret&&t.sessions)chips.push(['',`🔁 <b>${Math.round(100*ret.sessions/t.sessions)}%</b> son visitantes que vuelven`]);
+  const nr=a.newVsReturning||[];const ret=nr.find(x=>x.type==='returning');if(ret&&t.sessions)chips.push(['',`🔁 <b>${Math.round(100*ret.sessions/t.sessions)}%</b> son visitantes que vuelven`]);
   app.appendChild($(`<div class="insights">${chips.map(([c,h])=>`<span class="chip ${c}">${h}</span>`).join('')}</div>`));
 
-  // ═══ IA panel ═══
+  // ═══ IA panel (global) ═══
   const ia=d.ia||{};
   app.appendChild($(`<div class="card ia-panel" style="margin-bottom:12px"><h2>🤖 Análisis de la IA <span class="note">${ia.model||'Claude'} · se regenera cada refresh</span></h2>${
     ia.text&&!ia.error ? `<div class="ia-body">${ia.text.replace(/</g,'&lt;')}</div><div class="ia-meta">Generado: ${ia.at?new Date(ia.at).toLocaleString('es-AR'):'—'}</div>`
@@ -208,42 +253,49 @@ function render(d){
   const steps=[['Sesiones',f.sessions,'Todas las visitas a accesoia.'],['Gate abierto',f.gateOpens,'Abrieron el formulario de email (por cualquier vía: spoiler, botón, sticky).'],['Formulario iniciado',f.formStarts,'Empezaron a escribir el email.'],['Lead capturado',f.leads,'Dejaron el email = conversión.'],['Cruzó a gambeta',f.gotoGambeta,'Desde el pick del día saltaron a gambeta.ai.']];
   const mx=steps[0][1]||1;
   const fh=steps.map(([n,v,tip],i)=>`<div class="fstep"><span class="n">${n}${Q(tip)}</span><div class="fbar"><i style="width:${Math.max(1.2,100*v/mx)}%"></i></div><div><div class="v">${fmt(v)}</div><div class="frate">${i?pct(+(100*v/(steps[i-1][1]||1)).toFixed(1)):'100%'}</div></div></div>`).join('');
-  const days=(d.daily||[]).filter(x=>x.sessions>0||x.users>0);
+  const days=(a.daily||[]).filter(x=>x.sessions>0||x.users>0);
   app.appendChild($(`<div class="grid g2">
-    <div class="card"><h2>Embudo de conversión <span class="note">accesoia → gambeta · 28d</span></h2>${fh}
+    <div class="card"><h2>Embudo de conversión <span class="note">accesoia → gambeta · ${lbl}</span></h2>${fh}
       <div style="font-size:.68rem;color:var(--dim);margin-top:10px">+ ${fmt(f.tgClicks)} clics a Telegram · ${fmt(f.eleccion)} eligieron jugada post-gate · del gate al email: <b style="color:var(--green)">${pct(f.gateToLeadRate)}</b></div></div>
     <div class="card"><h2>Sesiones por día <span class="note">${days.length} día${days.length===1?'':'s'} con datos</span></h2><div id="chart"></div></div>
   </div>`));
   drawLine(document.getElementById('chart'),days);
 
+  // ═══ campañas / anuncios de Meta ═══
+  const camps=(a.campaigns||[]).filter(c=>c.sessions>0).slice(0,10);const cmax=Math.max(...camps.map(c=>c.sessions),1);
+  const anyId=camps.some(c=>/^\d{6,}$/.test(c.campaign)||/^\d{6,}$/.test(c.content));
+  app.appendChild($(`<div class="card" style="margin-bottom:12px"><h2>Campañas y anuncios${Q('De qué campaña y de qué anuncio de Meta viene cada sesión. Se arma con los parámetros <b>utm_campaign</b> y <b>utm_content</b> de la URL del ad. Período: '+lbl+'.')}<span class="note">${lbl}</span></h2>
+    ${camps.length?`<table><tr><th>Campaña</th><th>Anuncio</th><th style="text-align:right">Sesiones</th><th style="text-align:right">Usuarios</th></tr>${camps.map(c=>`<tr><td>${campName(c.campaign)}</td><td style="color:var(--soft)">${adName(c.content)}</td><td class="num"><div class="hbar" style="display:inline-block;width:60px;vertical-align:middle;margin-right:6px"><i style="width:${100*c.sessions/cmax}%"></i></div>${fmt(c.sessions)}</td><td class="num">${fmt(c.users)}</td></tr>`).join('')}</table>`:`<p style="color:var(--dim);font-size:.8rem">Todavía no hay sesiones atribuidas a campañas en este período.</p>`}
+    <div class="adnote">${anyId?'✅ <b>La atribución por anuncio ya funciona</b>: Meta está pasando el ID de campaña y de anuncio. Para verlos con nombre en vez de número, en el ad de Meta poné en el parámetro de URL: <code>utm_source=fb&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}</code>':'💡 Para identificar de qué anuncio viene cada visita, agregá parámetros de URL en cada ad de Meta: <code>utm_source=fb&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}</code>'}</div></div>`));
+
   // ═══ franja horaria (heatmap de tráfico) ═══
-  const hrs=d.hourly||[];const hmax=Math.max(...hrs.map(h=>h.sessions),1);const peakH=hrs.reduce((a,b)=>b.sessions>a.sessions?b:a,{sessions:0}).hour;
-  app.appendChild($(`<div class="card" style="margin-bottom:12px"><h2>¿A qué hora entra la gente?${Q('Sesiones por hora del día (28d, hora de Buenos Aires). Sirve para programar los ads y las publicaciones cuando hay más tráfico.')}<span class="note">pico: ${peakH}:00 hs</span></h2>
+  const hrs=a.hourly||[];const hmax=Math.max(...hrs.map(h=>h.sessions),1);const peakH=hrs.reduce((x,y)=>y.sessions>x.sessions?y:x,{sessions:0}).hour;
+  app.appendChild($(`<div class="card" style="margin-bottom:12px"><h2>¿A qué hora entra la gente?${Q('Sesiones por hora del día (hora de Buenos Aires). Sirve para programar los ads y las publicaciones cuando hay más tráfico.')}<span class="note">pico: ${peakH}:00 hs · ${lbl}</span></h2>
     <div class="hourmap">${hrs.map(h=>`<div class="hb ${h.hour===peakH?'peak':''}" style="height:${Math.max(3,100*h.sessions/hmax)}%" data-tip="${h.hour}:00 — ${h.sessions} sesiones"></div>`).join('')}</div>
     <div class="hourlabels">${hrs.map(h=>h.hour%3===0?`<span>${h.hour}</span>`:'<span></span>').join('')}</div></div>`));
 
   // ═══ fuentes + landing ═══
-  const srcs=(d.sources||[]).filter(s=>s.sessions>0).slice(0,8);const smax=Math.max(...srcs.map(s=>s.sessions),1);
+  const srcs=(a.sources||[]).filter(s=>s.sessions>0).slice(0,8);const smax=Math.max(...srcs.map(s=>s.sessions),1);
   const sName=(s)=>({'fb/paid':'📣 Facebook Ads','ig/paid':'📸 Instagram Ads','(direct)/(none)':'🔗 Directo','google/organic':'🔍 Google orgánico'}[`${s.source}/${s.medium}`]||(/(not set|not available)/.test(s.source)?'⏳ Sin atribuir (GA4 nuevo)':`${s.source} / ${s.medium}`));
   app.appendChild($(`<div class="grid g2e">
     <div class="card"><h2>Fuentes de tráfico${Q('De dónde vienen las sesiones. "paid" = ads de Meta. La barra clara al lado es el <b>engagement</b> de esa fuente (su calidad).')}</h2>${srcs.map(s=>`<div class="hrow"><span class="hn">${sName(s)}</span><div class="hbar"><i style="width:${100*s.sessions/smax}%"></i></div><span class="hv">${fmt(s.sessions)}</span></div>`).join('')}
-      <div style="font-size:.64rem;color:var(--dim);margin-top:8px">Mejor calidad (engagement): ${(()=>{const b=[...srcs].sort((a,b)=>b.engagement-a.engagement)[0];return b?`<b style="color:var(--green)">${sName(b)}</b> (${b.engagement}%)`:'—'})()}</div></div>
-    <div class="card"><h2>Páginas de entrada${Q('Por dónde ATERRIZA la gente (landing). "Rebote 100%" en páginas nuevas es normal hasta que GA4 acumula datos.')}</h2><table><tr><th>Landing</th><th style="text-align:right">Sesiones</th><th style="text-align:right">Rebote</th></tr>${(d.landing||[]).filter(l=>l.sessions>0).slice(0,7).map(l=>`<tr><td>${l.path||'/ (raíz)'}</td><td class="num">${fmt(l.sessions)}</td><td class="num" style="color:${l.bounce>80?'var(--red)':l.bounce>55?'var(--gold)':'var(--green)'}">${l.bounce}%</td></tr>`).join('')}</table></div>
+      <div style="font-size:.64rem;color:var(--dim);margin-top:8px">Mejor calidad (engagement): ${(()=>{const b=[...srcs].sort((x,y)=>y.engagement-x.engagement)[0];return b?`<b style="color:var(--green)">${sName(b)}</b> (${b.engagement}%)`:'—'})()}</div></div>
+    <div class="card"><h2>Páginas de entrada${Q('Por dónde ATERRIZA la gente (landing). "Rebote 100%" en páginas nuevas es normal hasta que GA4 acumula datos.')}</h2><table><tr><th>Landing</th><th style="text-align:right">Sesiones</th><th style="text-align:right">Rebote</th></tr>${(a.landing||[]).filter(l=>l.sessions>0).slice(0,7).map(l=>`<tr><td>${l.path||'/ (raíz)'}</td><td class="num">${fmt(l.sessions)}</td><td class="num" style="color:${l.bounce>80?'var(--red)':l.bounce>55?'var(--gold)':'var(--green)'}">${l.bounce}%</td></tr>`).join('')}</table></div>
   </div>`));
 
   // ═══ páginas top + dispositivos/países ═══
   app.appendChild($(`<div class="grid g2">
-    <div class="card"><h2>Páginas más vistas${Q('Ranking de páginas por vistas. AIA = accesoia.app · GAM = gambeta.ai. Muestra dónde pasa el tiempo la gente en ambos sitios.')}</h2><table><tr><th>Página</th><th style="text-align:right">Vistas</th><th style="text-align:right">Perm.</th></tr>${(d.pages||[]).slice(0,9).map(pg=>`<tr><td><span class="host ${pg.host.includes('accesoia')?'a':'g'}">${pg.host.includes('accesoia')?'AIA':'GAM'}</span>${pg.path}</td><td class="num">${fmt(pg.views)}</td><td class="num" style="font-weight:600;color:var(--dim)">${dur(pg.avgDur)}</td></tr>`).join('')}</table></div>
+    <div class="card"><h2>Páginas más vistas${Q('Ranking de páginas por vistas. AIA = accesoia.app · GAM = gambeta.ai. Muestra dónde pasa el tiempo la gente en ambos sitios.')}</h2><table><tr><th>Página</th><th style="text-align:right">Vistas</th><th style="text-align:right">Perm.</th></tr>${(a.pages||[]).slice(0,9).map(pg=>`<tr><td><span class="host ${pg.host.includes('accesoia')?'a':'g'}">${pg.host.includes('accesoia')?'AIA':'GAM'}</span>${pg.path}</td><td class="num">${fmt(pg.views)}</td><td class="num" style="font-weight:600;color:var(--dim)">${dur(pg.avgDur)}</td></tr>`).join('')}</table></div>
     <div class="card"><h2>Dispositivos y visitantes</h2>
       <div class="split"><div>${donut(dev.map((x,i)=>({label:x.device==='mobile'?'📱 Mobile':x.device==='desktop'?'💻 Desktop':'📟 Tablet',value:x.sessions,color:['#34e07f','#5fb2ff','#ffd34d'][i]})),'sesiones')}</div>
-      <div>${donut((d.newVsReturning||[]).filter(x=>x.type).map((x,i)=>({label:x.type==='new'?'✨ Nuevos':'🔁 Recurrentes',value:x.sessions,color:['#b78aff','#34e07f'][i]})),'visitantes')}</div></div>
-      <div style="margin-top:14px"><div style="font-size:.6rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-bottom:8px">Top ciudades</div>${(d.cities||[]).filter(c=>c.city&&c.sessions).slice(0,5).map(c=>{const cm=Math.max(...d.cities.map(x=>x.sessions),1);return `<div class="hrow"><span class="hn">${c.city}</span><div class="hbar b"><i style="width:${100*c.sessions/cm}%"></i></div><span class="hv">${fmt(c.sessions)}</span></div>`}).join('')}</div></div>
+      <div>${donut((a.newVsReturning||[]).filter(x=>x.type).map((x,i)=>({label:x.type==='new'?'✨ Nuevos':'🔁 Recurrentes',value:x.sessions,color:['#b78aff','#34e07f'][i]})),'visitantes')}</div></div>
+      <div style="margin-top:14px"><div style="font-size:.6rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-bottom:8px">Top ciudades</div>${(a.cities||[]).filter(c=>c.city&&c.sessions).slice(0,5).map(c=>{const cm=Math.max(...a.cities.map(x=>x.sessions),1);return `<div class="hrow"><span class="hn">${c.city}</span><div class="hbar b"><i style="width:${100*c.sessions/cm}%"></i></div><span class="hv">${fmt(c.sessions)}</span></div>`}).join('')}</div></div>
   </div>`));
 
-  // ═══ Clarity / heatmap ═══
+  // ═══ Clarity / heatmap (global) ═══
   app.appendChild($(`<div class="grid g2e">${cxCard('accesoia.app',d.clarity?.accesoia)}${cxCard('gambeta.ai',d.clarity?.gambeta)}</div>`));
 
-  // ═══ producto ═══
+  // ═══ producto (global) ═══
   app.appendChild($(`<div class="card" style="margin-bottom:12px"><h2>Rendimiento del producto${Q('Track record del modelo de picks — es la prueba de credibilidad que usan las landings. Fuente: gambeta.ai/api/sb en vivo.')}<span class="note">gambeta.ai/api/sb</span></h2>
     <div class="gaugewrap">${ring(p.acc30d)}
       <div class="gtxt">
