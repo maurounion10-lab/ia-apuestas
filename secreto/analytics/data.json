@@ -1,5 +1,5 @@
 {
- "generatedAt": "2026-07-09T23:30:02.828Z",
+ "generatedAt": "2026-07-10T17:44:58.218Z",
  "propertyId": "544952014",
  "defaultRange": "28d",
  "rangeLabels": {
@@ -12,89 +12,89 @@
   "180d": "6 meses"
  },
  "today": {
-  "sessions": 2327,
-  "users": 2298,
-  "pageviews": 2507,
+  "sessions": 5943,
+  "users": 5840,
+  "pageviews": 6791,
   "avgEngagement": 0.2,
-  "pagesPerSession": 1.08,
-  "dUsers": null,
-  "dSessions": null
+  "pagesPerSession": 1.14,
+  "dUsers": -11,
+  "dSessions": -11
  },
  "ranges": {
   "today": {
    "totals": {
-    "sessions": 2327,
-    "users": 2298,
-    "pageviews": 2507,
+    "sessions": 5943,
+    "users": 5840,
+    "pageviews": 6791,
     "avgEngagement": 0.2,
-    "pagesPerSession": 1.08
+    "pagesPerSession": 1.14
    },
    "daily": [
     {
-     "date": "20260709",
-     "users": 2298,
-     "sessions": 2327,
-     "pageviews": 2507,
-     "avgDur": 13,
+     "date": "20260710",
+     "users": 5840,
+     "sessions": 5943,
+     "pageviews": 6791,
+     "avgDur": 11,
      "engagement": 0.2
     }
    ],
    "hourly": [
     {
      "hour": 0,
-     "sessions": 0
+     "sessions": 879
     },
     {
      "hour": 1,
-     "sessions": 0
+     "sessions": 1466
     },
     {
      "hour": 2,
-     "sessions": 0
+     "sessions": 441
     },
     {
      "hour": 3,
-     "sessions": 0
+     "sessions": 193
     },
     {
      "hour": 4,
-     "sessions": 0
+     "sessions": 161
     },
     {
      "hour": 5,
-     "sessions": 0
+     "sessions": 155
     },
     {
      "hour": 6,
-     "sessions": 0
+     "sessions": 249
     },
     {
      "hour": 7,
-     "sessions": 0
+     "sessions": 383
     },
     {
      "hour": 8,
-     "sessions": 0
+     "sessions": 531
     },
     {
      "hour": 9,
-     "sessions": 0
+     "sessions": 413
     },
     {
      "hour": 10,
-     "sessions": 0
+     "sessions": 353
     },
     {
      "hour": 11,
-     "sessions": 0
+     "sessions": 283
     },
     {
      "hour": 12,
-     "sessions": 0
+     "sessions": 277
     },
     {
      "hour": 13,
-     "sessions": 0
+     "sessions": 207
     },
     {
      "hour": 14,
@@ -102,23 +102,23 @@
     },
     {
      "hour": 15,
-     "sessions": 555
+     "sessions": 0
     },
     {
      "hour": 16,
-     "sessions": 410
+     "sessions": 0
     },
     {
      "hour": 17,
-     "sessions": 351
+     "sessions": 0
     },
     {
      "hour": 18,
-     "sessions": 465
+     "sessions": 0
     },
     {
      "hour": 19,
-     "sessions": 543
+     "sessions": 0
     },
     {
      "hour": 20,
@@ -141,57 +141,57 @@
     {
      "source": "fb",
      "medium": "paid",
-     "sessions": 835,
-     "users": 827,
-     "engagement": 0.5
-    },
-    {
-     "source": "(data not available)",
-     "medium": "(data not available)",
-     "sessions": 604,
-     "users": 604,
-     "engagement": 0
+     "sessions": 2944,
+     "users": 2861,
+     "engagement": 0.2
     },
     {
      "source": "ig",
      "medium": "paid",
-     "sessions": 530,
-     "users": 528,
-     "engagement": 0
+     "sessions": 1739,
+     "users": 1711,
+     "engagement": 0.1
+    },
+    {
+     "source": "(data not available)",
+     "medium": "(data not available)",
+     "sessions": 1159,
+     "users": 1161,
+     "engagement": 0.2
     },
     {
      "source": "(not set)",
      "medium": "(not set)",
-     "sessions": 429,
-     "users": 393,
-     "engagement": 0.2
+     "sessions": 394,
+     "users": 369,
+     "engagement": 0
     },
     {
      "source": "(direct)",
      "medium": "(none)",
-     "sessions": 37,
-     "users": 36,
+     "sessions": 66,
+     "users": 56,
      "engagement": 0
     },
     {
      "source": "google",
      "medium": "organic",
-     "sessions": 8,
-     "users": 8,
-     "engagement": 0
-    },
-    {
-     "source": "tiktok.com",
-     "medium": "referral",
-     "sessions": 6,
-     "users": 6,
+     "sessions": 25,
+     "users": 24,
      "engagement": 0
     },
     {
      "source": "t.co",
      "medium": "referral",
-     "sessions": 4,
-     "users": 4,
+     "sessions": 9,
+     "users": 9,
+     "engagement": 0
+    },
+    {
+     "source": "accounts.google.com",
+     "medium": "referral",
+     "sessions": 3,
+     "users": 1,
      "engagement": 0
     },
     {
@@ -202,21 +202,21 @@
      "engagement": 0
     },
     {
-     "source": "l.threads.com",
+     "source": "pe.search.yahoo.com",
+     "medium": "referral",
+     "sessions": 2,
+     "users": 2,
+     "engagement": 0
+    },
+    {
+     "source": "es.search.yahoo.com",
      "medium": "referral",
      "sessions": 1,
      "users": 1,
      "engagement": 0
     },
     {
-     "source": "lm.facebook.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
-     "engagement": 0
-    },
-    {
-     "source": "ntp.msn.com",
+     "source": "facebook.com",
      "medium": "referral",
      "sessions": 1,
      "users": 1,
@@ -227,377 +227,421 @@
     {
      "host": "accesoia.app",
      "path": "/predicciones-ia",
-     "views": 2368,
-     "users": 2229,
+     "views": 6540,
+     "users": 5723,
      "avgDur": 6
     },
     {
      "host": "gambeta.ai",
      "path": "/",
-     "views": 95,
-     "users": 65,
-     "avgDur": 190
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/",
-     "views": 8,
-     "users": 9,
-     "avgDur": 28
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/eleccion",
-     "views": 7,
-     "users": 4,
-     "avgDur": 63
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/mundial-2026",
-     "views": 7,
-     "users": 6,
-     "avgDur": 29
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/calendario-ia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 6
+     "views": 133,
+     "users": 99,
+     "avgDur": 112
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/ia-para-apostar",
-     "views": 3,
+     "views": 36,
+     "users": 27,
+     "avgDur": 57
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/",
+     "views": 17,
+     "users": 18,
+     "avgDur": 1
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/estadisticas-ia",
+     "views": 14,
+     "users": 6,
+     "avgDur": 676
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/calendario-ia",
+     "views": 13,
+     "users": 3,
+     "avgDur": 2226
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/eleccion",
+     "views": 4,
      "users": 4,
-     "avgDur": 13
+     "avgDur": 54
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/mejor-tipster-argentino-2026",
+     "views": 4,
+     "users": 2,
+     "avgDur": 250
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/",
+     "views": 3,
+     "users": 2,
+     "avgDur": 296
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "views": 3,
+     "users": 3,
+     "avgDur": 0
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
      "views": 3,
-     "users": 3,
-     "avgDur": 0
+     "users": 2,
+     "avgDur": 87
     },
     {
-     "host": "accesoia.app",
-     "path": "/estadisticas-ia",
-     "views": 2,
+     "host": "gambeta.ai",
+     "path": "/herramientas/",
+     "views": 3,
      "users": 3,
-     "avgDur": 303
+     "avgDur": 267
     },
     {
-     "host": "accesoia.app",
-     "path": "/pick-del-dia",
+     "host": "gambeta.ai",
+     "path": "/mundial-2026",
+     "views": 3,
+     "users": 3,
+     "avgDur": 223
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/el-ruso-de-latam",
      "views": 2,
      "users": 2,
-     "avgDur": 75
+     "avgDur": 160
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/linemate-mas-ia-futbol",
+     "path": "/blog/footystats-premium-vale-la-pena",
      "views": 2,
      "users": 1,
-     "avgDur": 448
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/blog/apuestas-deportivas-errores",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-el-salvador",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-venezuela",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/blog/dbbet-bono-100-freebet-argentina-mundial-2026",
-     "views": 1,
-     "users": 1,
-     "avgDur": 960
+     "avgDur": 77
     }
    ],
    "landing": [
     {
      "path": "",
-     "sessions": 145,
+     "sessions": 219,
      "bounce": 100
     },
     {
      "path": "/",
-     "sessions": 54,
-     "bounce": 100
-    },
-    {
-     "path": "/?ref=blog-promo-picks",
-     "sessions": 4,
-     "bounce": 100
-    },
-    {
-     "path": "/mundial-2026",
-     "sessions": 4,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia",
-     "sessions": 4,
-     "bounce": 100
-    },
-    {
-     "path": "/?gtm_latency=1",
-     "sessions": 2,
+     "sessions": 93,
      "bounce": 100
     },
     {
      "path": "/blog/ia-para-apostar",
+     "sessions": 18,
+     "bounce": 94.4
+    },
+    {
+     "path": "/predicciones-ia",
+     "sessions": 8,
+     "bounce": 100
+    },
+    {
+     "path": "/estadisticas-ia",
+     "sessions": 4,
+     "bounce": 100
+    },
+    {
+     "path": "/?ref=blog-promo-picks",
+     "sessions": 3,
+     "bounce": 100
+    },
+    {
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "sessions": 3,
+     "bounce": 100
+    },
+    {
+     "path": "/predicciones-ia?fbclid=IwcGRvZgFmZGlkFlCkJdNIOBmFA7qXg2Wor-sAjFG39A5leHRuA2FlbQEwAGFkaWQBqzQvG2CQMnNydGMGYXBwX2lkCjY2Mjg1NjgzNzkAAR7jM2YhizaWRhTyvS-CnDajoZKeGiwFAzkJZoLYk_sgSG7vmpPSzLEMtnStXw_aem_L00bHgUVQmpM-vKe2sX3Rw",
+     "sessions": 3,
+     "bounce": 100
+    },
+    {
+     "path": "/blog/linemate-mas-ia-futbol",
      "sessions": 2,
      "bounce": 100
     },
     {
-     "path": "/eleccion",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwZXh0bgNhZW0BMABhZGlkAas0LxtzowJzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7bV2J_O9kHKAKau7F6OkDWao5a9ggpaCN7PMAvna8rLHuVsz_pvZH8rEpMDA_aem_r-ep1hipTBK54142YgVjMQ",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwcGRvZgFmZGlkFlCjiVuAF6Pcn5YBpMVGv6glxWBV_iFleHRuA2FlbQEwAGFkaWQBqzQvG2CQMnNydGMGYXBwX2lkCjY2Mjg1NjgzNzkAAR6jW8Cc_QiYhHOz9QXEevYX6PADUBKGeIjTVeFTA8VbB1H-PMcUAmdukguyBw_aem_PxWQGp7IGabUSOQz8OMIMg",
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
      "sessions": 2,
      "bounce": 100
     }
    ],
    "events": {
-    "page_view": 2507,
-    "session_start": 2327,
-    "first_visit": 2315,
-    "spoiler_click_open_gate": 136,
-    "user_engagement": 135,
-    "gate_show": 70,
-    "scroll": 48,
-    "gate_manual_open": 16,
-    "inline_cta_open_gate": 11,
-    "click": 8,
-    "lead_capture": 8,
-    "form_start": 6,
-    "sticky_open_gate": 6,
-    "eleccion_jugada": 4,
-    "telegram_click": 3,
-    "goto_gambeta": 2
+    "page_view": 6791,
+    "session_start": 6197,
+    "first_visit": 6043,
+    "user_engagement": 341,
+    "spoiler_click_open_gate": 247,
+    "gate_show": 90,
+    "scroll": 86,
+    "gate_close": 26,
+    "gate_manual_open": 26,
+    "inline_cta_open_gate": 17,
+    "form_start": 11,
+    "click": 6,
+    "lead_capture": 6,
+    "sticky_open_gate": 4,
+    "telegram_click": 3
    },
    "devices": [
     {
      "device": "mobile",
-     "sessions": 2302,
+     "sessions": 5902,
      "engagement": 0.2
     },
     {
      "device": "desktop",
-     "sessions": 21,
+     "sessions": 38,
      "engagement": 0
     },
     {
      "device": "tablet",
-     "sessions": 3,
+     "sessions": 6,
      "engagement": 0
     }
    ],
    "countries": [
     {
      "country": "Argentina",
-     "sessions": 2245,
-     "users": 2218
-    },
-    {
-     "country": "Mexico",
-     "sessions": 13,
-     "users": 13
-    },
-    {
-     "country": "Brazil",
-     "sessions": 9,
-     "users": 9
+     "sessions": 5724,
+     "users": 5644
     },
     {
      "country": "Spain",
+     "sessions": 36,
+     "users": 31
+    },
+    {
+     "country": "United States",
+     "sessions": 27,
+     "users": 27
+    },
+    {
+     "country": "Mexico",
+     "sessions": 22,
+     "users": 21
+    },
+    {
+     "country": "Brazil",
+     "sessions": 20,
+     "users": 20
+    },
+    {
+     "country": "Paraguay",
+     "sessions": 10,
+     "users": 10
+    },
+    {
+     "country": "Peru",
      "sessions": 9,
-     "users": 9
-    },
-    {
-     "country": "Chile",
-     "sessions": 5,
-     "users": 5
-    },
-    {
-     "country": "Colombia",
-     "sessions": 5,
-     "users": 5
+     "users": 8
     },
     {
      "country": "Bolivia",
-     "sessions": 4,
-     "users": 4
-    },
-    {
-     "country": "France",
-     "sessions": 4,
-     "users": 4
+     "sessions": 8,
+     "users": 8
     }
    ],
    "cities": [
     {
      "city": "Buenos Aires",
-     "sessions": 285
+     "sessions": 815
     },
     {
      "city": "",
-     "sessions": 200
+     "sessions": 664
     },
     {
      "city": "Cordoba",
-     "sessions": 88
-    },
-    {
-     "city": "Rosario",
-     "sessions": 54
-    },
-    {
-     "city": "Mar del Plata",
-     "sessions": 53
-    },
-    {
-     "city": "Salta",
-     "sessions": 41
-    },
-    {
-     "city": "Santa Fe",
-     "sessions": 34
+     "sessions": 240
     },
     {
      "city": "San Miguel de Tucuman",
-     "sessions": 31
+     "sessions": 133
+    },
+    {
+     "city": "Rosario",
+     "sessions": 122
+    },
+    {
+     "city": "Mar del Plata",
+     "sessions": 91
+    },
+    {
+     "city": "Salta",
+     "sessions": 87
+    },
+    {
+     "city": "Santa Fe",
+     "sessions": 82
     }
    ],
    "newVsReturning": [
     {
      "type": "new",
-     "sessions": 2283
+     "sessions": 5873
     },
     {
      "type": "",
-     "sessions": 188
+     "sessions": 389
     }
    ],
    "bySite": {
     "accesoia": {
-     "sessions": 2257,
-     "users": 2230,
-     "pageviews": 2390,
-     "engagement": 0.2
+     "sessions": 5808,
+     "users": 5724,
+     "pageviews": 6588,
+     "engagement": 0.1
     },
     "gambeta": {
-     "sessions": 71,
-     "users": 70,
-     "pageviews": 117,
-     "engagement": 0
+     "sessions": 130,
+     "users": 115,
+     "pageviews": 203,
+     "engagement": 0.8
     }
    },
    "campaigns": [
     {
      "campaign": "120245888814470578",
+     "content": "120247191856340578",
+     "sessions": 2486,
+     "users": 2460
+    },
+    {
+     "campaign": "120245888814470578",
      "content": "120247191945600578",
-     "sessions": 830,
-     "users": 821
+     "sessions": 2165,
+     "users": 2070
     },
     {
      "campaign": "(cross-network)",
      "content": "",
-     "sessions": 604,
-     "users": 604
-    },
-    {
-     "campaign": "120245888814470578",
-     "content": "120247191856340578",
-     "sessions": 519,
-     "users": 517
+     "sessions": 1159,
+     "users": 1161
     },
     {
      "campaign": "(not set)",
      "content": "",
-     "sessions": 429,
-     "users": 393
+     "sessions": 394,
+     "users": 369
     },
     {
      "campaign": "(direct)",
      "content": "",
-     "sessions": 37,
-     "users": 36
-    },
-    {
-     "campaign": "120245888814470578",
-     "content": "120247191856330578",
-     "sessions": 17,
-     "users": 17
-    },
-    {
-     "campaign": "(referral)",
-     "content": "",
-     "sessions": 14,
-     "users": 14
+     "sessions": 66,
+     "users": 56
     },
     {
      "campaign": "(organic)",
      "content": "",
-     "sessions": 10,
-     "users": 10
+     "sessions": 27,
+     "users": 26
     },
     {
-     "campaign": "(ai-assistant)",
+     "campaign": "120245888814470578",
+     "content": "120247191856330578",
+     "sessions": 27,
+     "users": 25
+    },
+    {
+     "campaign": "(referral)",
+     "content": "",
+     "sessions": 18,
+     "users": 15
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191735000578",
+     "sessions": 11,
+     "users": 11
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191856310578",
+     "sessions": 3,
+     "users": 3
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191951700578",
+     "sessions": 3,
+     "users": 3
+    },
+    {
+     "campaign": "",
      "content": "",
      "sessions": 1,
      "users": 1
+    },
+    {
+     "campaign": "(referral)",
+     "content": "link_in_bio",
+     "sessions": 1,
+     "users": 0
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120245889119400578",
+     "sessions": 1,
+     "users": 1
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191825720578",
+     "sessions": 1,
+     "users": 0
     }
    ],
    "funnel": {
-    "sessions": 2327,
-    "gateShows": 70,
-    "gateOpens": 169,
-    "formStarts": 6,
-    "leads": 8,
+    "sessions": 5943,
+    "gateShows": 90,
+    "gateOpens": 294,
+    "formStarts": 11,
+    "leads": 6,
     "tgClicks": 3,
-    "gotoGambeta": 2,
-    "eleccion": 4,
-    "gateOpenRate": 7.3,
-    "leadConvRate": 0.34,
-    "gateToLeadRate": 4.7,
-    "leadToGambetaRate": 25,
-    "formToLeadRate": 133.3
+    "gotoGambeta": 0,
+    "eleccion": 0,
+    "gateOpenRate": 4.9,
+    "leadConvRate": 0.1,
+    "gateToLeadRate": 2,
+    "leadToGambetaRate": 0,
+    "formToLeadRate": 54.5
    }
   },
   "yesterday": {
    "totals": {
-    "sessions": 0,
-    "users": 0,
-    "pageviews": 0,
-    "avgEngagement": 0,
-    "pagesPerSession": 0
+    "sessions": 6674,
+    "users": 6578,
+    "pageviews": 7251,
+    "avgEngagement": 11.8,
+    "pagesPerSession": 1.09
    },
-   "daily": [],
+   "daily": [
+    {
+     "date": "20260709",
+     "users": 6578,
+     "sessions": 6674,
+     "pageviews": 7251,
+     "avgDur": 10,
+     "engagement": 11.8
+    }
+   ],
    "hourly": [
     {
      "hour": 0,
@@ -661,154 +705,599 @@
     },
     {
      "hour": 15,
-     "sessions": 0
+     "sessions": 657
     },
     {
      "hour": 16,
-     "sessions": 0
+     "sessions": 444
     },
     {
      "hour": 17,
-     "sessions": 0
+     "sessions": 381
     },
     {
      "hour": 18,
-     "sessions": 0
+     "sessions": 527
     },
     {
      "hour": 19,
-     "sessions": 0
+     "sessions": 925
     },
     {
      "hour": 20,
-     "sessions": 0
+     "sessions": 748
     },
     {
      "hour": 21,
-     "sessions": 0
+     "sessions": 842
     },
     {
      "hour": 22,
-     "sessions": 0
+     "sessions": 1029
     },
     {
      "hour": 23,
-     "sessions": 0
+     "sessions": 1050
     }
    ],
-   "sources": [],
-   "pages": [],
-   "landing": [],
-   "events": {},
-   "devices": [],
-   "countries": [],
-   "cities": [],
-   "newVsReturning": [],
-   "bySite": {
-    "accesoia": {
-     "sessions": 0,
-     "users": 0,
-     "pageviews": 0,
+   "sources": [
+    {
+     "source": "fb",
+     "medium": "paid",
+     "sessions": 4020,
+     "users": 3922,
+     "engagement": 13.1
+    },
+    {
+     "source": "ig",
+     "medium": "paid",
+     "sessions": 2452,
+     "users": 2438,
+     "engagement": 7.5
+    },
+    {
+     "source": "(direct)",
+     "medium": "(none)",
+     "sessions": 68,
+     "users": 63,
+     "engagement": 45.6
+    },
+    {
+     "source": "google",
+     "medium": "organic",
+     "sessions": 35,
+     "users": 35,
+     "engagement": 85.7
+    },
+    {
+     "source": "t.co",
+     "medium": "referral",
+     "sessions": 14,
+     "users": 14,
+     "engagement": 35.7
+    },
+    {
+     "source": "tiktok.com",
+     "medium": "referral",
+     "sessions": 7,
+     "users": 7,
      "engagement": 0
     },
-    "gambeta": {
-     "sessions": 0,
-     "users": 0,
-     "pageviews": 0,
+    {
+     "source": "ig",
+     "medium": "social",
+     "sessions": 4,
+     "users": 4,
      "engagement": 0
+    },
+    {
+     "source": "bing",
+     "medium": "organic",
+     "sessions": 3,
+     "users": 3,
+     "engagement": 100
+    },
+    {
+     "source": "accounts.google.com",
+     "medium": "referral",
+     "sessions": 2,
+     "users": 2,
+     "engagement": 0
+    },
+    {
+     "source": "ntp.msn.com",
+     "medium": "referral",
+     "sessions": 2,
+     "users": 1,
+     "engagement": 0
+    },
+    {
+     "source": "chatgpt.com",
+     "medium": "ai-assistant",
+     "sessions": 1,
+     "users": 1,
+     "engagement": 100
+    },
+    {
+     "source": "facebook.com",
+     "medium": "referral",
+     "sessions": 1,
+     "users": 1,
+     "engagement": 100
+    }
+   ],
+   "pages": [
+    {
+     "host": "accesoia.app",
+     "path": "/predicciones-ia",
+     "views": 6946,
+     "users": 6464,
+     "avgDur": 7
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/",
+     "views": 189,
+     "users": 114,
+     "avgDur": 129
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/ia-para-apostar",
+     "views": 32,
+     "users": 21,
+     "avgDur": 74
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/",
+     "views": 16,
+     "users": 15,
+     "avgDur": 16
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/calendario-ia",
+     "views": 9,
+     "users": 5,
+     "avgDur": 17
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/eleccion",
+     "views": 9,
+     "users": 6,
+     "avgDur": 15
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/mundial-2026",
+     "views": 9,
+     "users": 8,
+     "avgDur": 15
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/estadisticas-ia",
+     "views": 8,
+     "users": 6,
+     "avgDur": 157
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/dbbet-bono-100-freebet-argentina-mundial-2026",
+     "views": 4,
+     "users": 4,
+     "avgDur": 40
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "views": 4,
+     "users": 4,
+     "avgDur": 15
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/pick-del-dia",
+     "views": 3,
+     "users": 3,
+     "avgDur": 32
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/apuestas-deportivas-psicologia",
+     "views": 2,
+     "users": 1,
+     "avgDur": 76
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/linemate-mas-ia-futbol",
+     "views": 2,
+     "users": 1,
+     "avgDur": 448
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/predictz-espanol",
+     "views": 2,
+     "users": 1,
+     "avgDur": 318
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/que-es-footystats",
+     "views": 2,
+     "users": 2,
+     "avgDur": 8
+    }
+   ],
+   "landing": [
+    {
+     "path": "/",
+     "sessions": 79,
+     "bounce": 60.8
+    },
+    {
+     "path": "/blog/ia-para-apostar",
+     "sessions": 21,
+     "bounce": 4.8
+    },
+    {
+     "path": "/?ref=blog-promo-picks",
+     "sessions": 4,
+     "bounce": 50
+    },
+    {
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "sessions": 4,
+     "bounce": 0
+    },
+    {
+     "path": "/?gtm_latency=1",
+     "sessions": 3,
+     "bounce": 0
+    },
+    {
+     "path": "/mundial-2026",
+     "sessions": 3,
+     "bounce": 0
+    },
+    {
+     "path": "(not set)",
+     "sessions": 2,
+     "bounce": 100
+    },
+    {
+     "path": "/blog/que-es-footystats",
+     "sessions": 2,
+     "bounce": 50
+    },
+    {
+     "path": "/predicciones-ia",
+     "sessions": 2,
+     "bounce": 50
+    },
+    {
+     "path": "/predicciones-ia?fbclid=IwZXh0bgNhZW0BMABhZGlkAas0LxtgkDJzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR6t-qyag8EULONmuNTAN2y2U7uI6nduuPCWTdksCy8sPIPFjqrl1CBhO3vbvw_aem_uLp7GoOh-gmEd90EvQe9iA",
+     "sessions": 2,
+     "bounce": 100
+    }
+   ],
+   "events": {
+    "page_view": 7251,
+    "session_start": 6747,
+    "first_visit": 6663,
+    "spoiler_click_open_gate": 350,
+    "user_engagement": 335,
+    "gate_show": 177,
+    "scroll": 104,
+    "gate_manual_open": 35,
+    "inline_cta_open_gate": 24,
+    "click": 22,
+    "form_start": 13,
+    "lead_capture": 12,
+    "sticky_open_gate": 12,
+    "eleccion_jugada": 6,
+    "telegram_click": 5,
+    "goto_gambeta": 3
+   },
+   "devices": [
+    {
+     "device": "mobile",
+     "sessions": 6641,
+     "engagement": 11.4
+    },
+    {
+     "device": "desktop",
+     "sessions": 34,
+     "engagement": 70.6
+    },
+    {
+     "device": "tablet",
+     "sessions": 8,
+     "engagement": 37.5
+    }
+   ],
+   "countries": [
+    {
+     "country": "Argentina",
+     "sessions": 6502,
+     "users": 6421
+    },
+    {
+     "country": "Brazil",
+     "sessions": 30,
+     "users": 30
+    },
+    {
+     "country": "Mexico",
+     "sessions": 21,
+     "users": 19
+    },
+    {
+     "country": "Spain",
+     "sessions": 18,
+     "users": 18
+    },
+    {
+     "country": "Colombia",
+     "sessions": 12,
+     "users": 10
+    },
+    {
+     "country": "Chile",
+     "sessions": 11,
+     "users": 11
+    },
+    {
+     "country": "United States",
+     "sessions": 11,
+     "users": 11
+    },
+    {
+     "country": "France",
+     "sessions": 9,
+     "users": 9
+    }
+   ],
+   "cities": [
+    {
+     "city": "Buenos Aires",
+     "sessions": 834
+    },
+    {
+     "city": "(not set)",
+     "sessions": 626
+    },
+    {
+     "city": "Cordoba",
+     "sessions": 265
+    },
+    {
+     "city": "Mar del Plata",
+     "sessions": 136
+    },
+    {
+     "city": "Rosario",
+     "sessions": 136
+    },
+    {
+     "city": "San Miguel de Tucuman",
+     "sessions": 126
+    },
+    {
+     "city": "Salta",
+     "sessions": 108
+    },
+    {
+     "city": "Santa Fe",
+     "sessions": 100
+    }
+   ],
+   "newVsReturning": [
+    {
+     "type": "new",
+     "sessions": 6589
+    },
+    {
+     "type": "returning",
+     "sessions": 83
+    }
+   ],
+   "bySite": {
+    "accesoia": {
+     "sessions": 6559,
+     "users": 6464,
+     "pageviews": 6991,
+     "engagement": 10.9
+    },
+    "gambeta": {
+     "sessions": 133,
+     "users": 126,
+     "pageviews": 260,
+     "engagement": 54.9
     }
    },
-   "campaigns": [],
+   "campaigns": [
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191945600578",
+     "sessions": 3684,
+     "users": 3539
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191856340578",
+     "sessions": 2811,
+     "users": 2802
+    },
+    {
+     "campaign": "(direct)",
+     "content": "(not set)",
+     "sessions": 68,
+     "users": 63
+    },
+    {
+     "campaign": "(organic)",
+     "content": "(not set)",
+     "sessions": 38,
+     "users": 38
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191856330578",
+     "sessions": 32,
+     "users": 32
+    },
+    {
+     "campaign": "(referral)",
+     "content": "(not set)",
+     "sessions": 30,
+     "users": 29
+    },
+    {
+     "campaign": "(referral)",
+     "content": "link_in_bio",
+     "sessions": 4,
+     "users": 4
+    },
+    {
+     "campaign": "(ai-assistant)",
+     "content": "(not set)",
+     "sessions": 2,
+     "users": 2
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191951700578",
+     "sessions": 2,
+     "users": 2
+    },
+    {
+     "campaign": "(not set)",
+     "content": "(not set)",
+     "sessions": 1,
+     "users": 1
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191856310578",
+     "sessions": 1,
+     "users": 1
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191856450578",
+     "sessions": 1,
+     "users": 1
+    },
+    {
+     "campaign": "novedades_julio2026",
+     "content": "(not set)",
+     "sessions": 1,
+     "users": 1
+    }
+   ],
    "funnel": {
-    "sessions": 0,
-    "gateShows": 0,
-    "gateOpens": 0,
-    "formStarts": 0,
-    "leads": 0,
-    "tgClicks": 0,
-    "gotoGambeta": 0,
-    "eleccion": 0,
-    "gateOpenRate": 0,
-    "leadConvRate": 0,
-    "gateToLeadRate": 0,
-    "leadToGambetaRate": 0,
-    "formToLeadRate": 0
+    "sessions": 6674,
+    "gateShows": 177,
+    "gateOpens": 421,
+    "formStarts": 13,
+    "leads": 12,
+    "tgClicks": 5,
+    "gotoGambeta": 3,
+    "eleccion": 6,
+    "gateOpenRate": 6.3,
+    "leadConvRate": 0.18,
+    "gateToLeadRate": 2.9,
+    "leadToGambetaRate": 25,
+    "formToLeadRate": 92.3
    }
   },
   "7d": {
    "totals": {
-    "sessions": 2327,
-    "users": 2298,
-    "pageviews": 2507,
-    "avgEngagement": 0.2,
-    "pagesPerSession": 1.08
+    "sessions": 12617,
+    "users": 12418,
+    "pageviews": 14042,
+    "avgEngagement": 6,
+    "pagesPerSession": 1.11
    },
    "daily": [
     {
      "date": "20260709",
-     "users": 2298,
-     "sessions": 2327,
-     "pageviews": 2507,
-     "avgDur": 13,
+     "users": 6578,
+     "sessions": 6674,
+     "pageviews": 7251,
+     "avgDur": 10,
+     "engagement": 11.8
+    },
+    {
+     "date": "20260710",
+     "users": 5840,
+     "sessions": 5943,
+     "pageviews": 6791,
+     "avgDur": 11,
      "engagement": 0.2
     }
    ],
    "hourly": [
     {
      "hour": 0,
-     "sessions": 0
+     "sessions": 879
     },
     {
      "hour": 1,
-     "sessions": 0
+     "sessions": 1466
     },
     {
      "hour": 2,
-     "sessions": 0
+     "sessions": 441
     },
     {
      "hour": 3,
-     "sessions": 0
+     "sessions": 193
     },
     {
      "hour": 4,
-     "sessions": 0
+     "sessions": 161
     },
     {
      "hour": 5,
-     "sessions": 0
+     "sessions": 155
     },
     {
      "hour": 6,
-     "sessions": 0
+     "sessions": 249
     },
     {
      "hour": 7,
-     "sessions": 0
+     "sessions": 383
     },
     {
      "hour": 8,
-     "sessions": 0
+     "sessions": 531
     },
     {
      "hour": 9,
-     "sessions": 0
+     "sessions": 413
     },
     {
      "hour": 10,
-     "sessions": 0
+     "sessions": 353
     },
     {
      "hour": 11,
-     "sessions": 0
+     "sessions": 283
     },
     {
      "hour": 12,
-     "sessions": 0
+     "sessions": 277
     },
     {
      "hour": 13,
-     "sessions": 0
+     "sessions": 207
     },
     {
      "hour": 14,
@@ -816,123 +1305,123 @@
     },
     {
      "hour": 15,
-     "sessions": 555
+     "sessions": 657
     },
     {
      "hour": 16,
-     "sessions": 410
+     "sessions": 444
     },
     {
      "hour": 17,
-     "sessions": 351
+     "sessions": 381
     },
     {
      "hour": 18,
-     "sessions": 465
+     "sessions": 527
     },
     {
      "hour": 19,
-     "sessions": 543
+     "sessions": 925
     },
     {
      "hour": 20,
-     "sessions": 0
+     "sessions": 748
     },
     {
      "hour": 21,
-     "sessions": 0
+     "sessions": 842
     },
     {
      "hour": 22,
-     "sessions": 0
+     "sessions": 1029
     },
     {
      "hour": 23,
-     "sessions": 0
+     "sessions": 1050
     }
    ],
    "sources": [
     {
      "source": "fb",
      "medium": "paid",
-     "sessions": 835,
-     "users": 827,
-     "engagement": 0.5
-    },
-    {
-     "source": "(data not available)",
-     "medium": "(data not available)",
-     "sessions": 604,
-     "users": 604,
-     "engagement": 0
+     "sessions": 6965,
+     "users": 6846,
+     "engagement": 7.7
     },
     {
      "source": "ig",
      "medium": "paid",
-     "sessions": 530,
-     "users": 528,
-     "engagement": 0
+     "sessions": 4210,
+     "users": 4146,
+     "engagement": 4.4
+    },
+    {
+     "source": "(data not available)",
+     "medium": "(data not available)",
+     "sessions": 1159,
+     "users": 1161,
+     "engagement": 0.2
     },
     {
      "source": "(not set)",
      "medium": "(not set)",
-     "sessions": 429,
-     "users": 393,
-     "engagement": 0.2
+     "sessions": 394,
+     "users": 369,
+     "engagement": 0
     },
     {
      "source": "(direct)",
      "medium": "(none)",
-     "sessions": 37,
-     "users": 36,
-     "engagement": 0
+     "sessions": 134,
+     "users": 118,
+     "engagement": 23.1
     },
     {
      "source": "google",
      "medium": "organic",
-     "sessions": 8,
-     "users": 8,
-     "engagement": 0
-    },
-    {
-     "source": "tiktok.com",
-     "medium": "referral",
-     "sessions": 6,
-     "users": 6,
-     "engagement": 0
+     "sessions": 60,
+     "users": 59,
+     "engagement": 50
     },
     {
      "source": "t.co",
      "medium": "referral",
-     "sessions": 4,
-     "users": 4,
+     "sessions": 23,
+     "users": 23,
+     "engagement": 21.7
+    },
+    {
+     "source": "tiktok.com",
+     "medium": "referral",
+     "sessions": 7,
+     "users": 7,
+     "engagement": 0
+    },
+    {
+     "source": "accounts.google.com",
+     "medium": "referral",
+     "sessions": 5,
+     "users": 3,
      "engagement": 0
     },
     {
      "source": "bing",
      "medium": "organic",
-     "sessions": 2,
-     "users": 2,
-     "engagement": 0
+     "sessions": 5,
+     "users": 5,
+     "engagement": 60
     },
     {
-     "source": "l.threads.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
-     "engagement": 0
-    },
-    {
-     "source": "lm.facebook.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
+     "source": "ig",
+     "medium": "social",
+     "sessions": 5,
+     "users": 4,
      "engagement": 0
     },
     {
      "source": "ntp.msn.com",
      "medium": "referral",
-     "sessions": 1,
+     "sessions": 3,
      "users": 1,
      "engagement": 0
     }
@@ -941,442 +1430,491 @@
     {
      "host": "accesoia.app",
      "path": "/predicciones-ia",
-     "views": 2368,
-     "users": 2229,
+     "views": 13486,
+     "users": 12152,
      "avgDur": 6
     },
     {
      "host": "gambeta.ai",
      "path": "/",
-     "views": 95,
-     "users": 65,
-     "avgDur": 190
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/",
-     "views": 8,
-     "users": 9,
-     "avgDur": 28
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/eleccion",
-     "views": 7,
-     "users": 4,
-     "avgDur": 63
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/mundial-2026",
-     "views": 7,
-     "users": 6,
-     "avgDur": 29
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/calendario-ia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 6
+     "views": 322,
+     "users": 210,
+     "avgDur": 121
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/ia-para-apostar",
-     "views": 3,
-     "users": 4,
-     "avgDur": 13
+     "views": 68,
+     "users": 48,
+     "avgDur": 65
     },
     {
-     "host": "gambeta.ai",
-     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 0
+     "host": "accesoia.app",
+     "path": "/",
+     "views": 33,
+     "users": 33,
+     "avgDur": 7
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/calendario-ia",
+     "views": 22,
+     "users": 8,
+     "avgDur": 845
     },
     {
      "host": "accesoia.app",
      "path": "/estadisticas-ia",
-     "views": 2,
-     "users": 3,
-     "avgDur": 303
+     "views": 22,
+     "users": 12,
+     "avgDur": 417
     },
     {
      "host": "accesoia.app",
-     "path": "/pick-del-dia",
-     "views": 2,
-     "users": 2,
-     "avgDur": 75
+     "path": "/eleccion",
+     "views": 13,
+     "users": 10,
+     "avgDur": 31
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/linemate-mas-ia-futbol",
-     "views": 2,
-     "users": 1,
-     "avgDur": 448
+     "path": "/mundial-2026",
+     "views": 12,
+     "users": 11,
+     "avgDur": 72
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/apuestas-deportivas-errores",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "views": 7,
+     "users": 6,
+     "avgDur": 39
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-el-salvador",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-venezuela",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
+     "path": "/herramientas/",
+     "views": 5,
+     "users": 5,
+     "avgDur": 162
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/dbbet-bono-100-freebet-argentina-mundial-2026",
-     "views": 1,
-     "users": 1,
-     "avgDur": 960
+     "views": 4,
+     "users": 4,
+     "avgDur": 40
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "views": 4,
+     "users": 4,
+     "avgDur": 1
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/linemate-mas-ia-futbol",
+     "views": 4,
+     "users": 3,
+     "avgDur": 149
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/mejor-tipster-argentino-2026",
+     "views": 4,
+     "users": 2,
+     "avgDur": 250
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/pick-del-dia",
+     "views": 3,
+     "users": 3,
+     "avgDur": 32
     }
    ],
    "landing": [
     {
      "path": "",
-     "sessions": 145,
+     "sessions": 219,
      "bounce": 100
     },
     {
      "path": "/",
-     "sessions": 54,
-     "bounce": 100
+     "sessions": 171,
+     "bounce": 81.9
     },
     {
-     "path": "/?ref=blog-promo-picks",
-     "sessions": 4,
-     "bounce": 100
-    },
-    {
-     "path": "/mundial-2026",
-     "sessions": 4,
-     "bounce": 100
+     "path": "/blog/ia-para-apostar",
+     "sessions": 39,
+     "bounce": 46.2
     },
     {
      "path": "/predicciones-ia",
+     "sessions": 10,
+     "bounce": 90
+    },
+    {
+     "path": "/?ref=blog-promo-picks",
+     "sessions": 7,
+     "bounce": 71.4
+    },
+    {
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "sessions": 6,
+     "bounce": 33.3
+    },
+    {
+     "path": "/mundial-2026",
+     "sessions": 5,
+     "bounce": 40
+    },
+    {
+     "path": "/estadisticas-ia",
      "sessions": 4,
      "bounce": 100
     },
     {
      "path": "/?gtm_latency=1",
-     "sessions": 2,
-     "bounce": 100
+     "sessions": 3,
+     "bounce": 0
     },
     {
-     "path": "/blog/ia-para-apostar",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/eleccion",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwZXh0bgNhZW0BMABhZGlkAas0LxtzowJzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7bV2J_O9kHKAKau7F6OkDWao5a9ggpaCN7PMAvna8rLHuVsz_pvZH8rEpMDA_aem_r-ep1hipTBK54142YgVjMQ",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwcGRvZgFmZGlkFlCjiVuAF6Pcn5YBpMVGv6glxWBV_iFleHRuA2FlbQEwAGFkaWQBqzQvG2CQMnNydGMGYXBwX2lkCjY2Mjg1NjgzNzkAAR6jW8Cc_QiYhHOz9QXEevYX6PADUBKGeIjTVeFTA8VbB1H-PMcUAmdukguyBw_aem_PxWQGp7IGabUSOQz8OMIMg",
-     "sessions": 2,
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "sessions": 3,
      "bounce": 100
     }
    ],
    "events": {
-    "page_view": 2507,
-    "session_start": 2327,
-    "first_visit": 2315,
-    "spoiler_click_open_gate": 136,
-    "user_engagement": 135,
-    "gate_show": 70,
-    "scroll": 48,
-    "gate_manual_open": 16,
-    "inline_cta_open_gate": 11,
-    "click": 8,
-    "lead_capture": 8,
-    "form_start": 6,
-    "sticky_open_gate": 6,
-    "eleccion_jugada": 4,
-    "telegram_click": 3,
-    "goto_gambeta": 2
+    "page_view": 14042,
+    "session_start": 12944,
+    "first_visit": 12706,
+    "user_engagement": 676,
+    "spoiler_click_open_gate": 597,
+    "gate_show": 267,
+    "scroll": 190,
+    "gate_manual_open": 61,
+    "inline_cta_open_gate": 41,
+    "click": 28,
+    "gate_close": 26,
+    "form_start": 24,
+    "lead_capture": 18,
+    "sticky_open_gate": 16,
+    "telegram_click": 8,
+    "eleccion_jugada": 6,
+    "goto_gambeta": 3
    },
    "devices": [
     {
      "device": "mobile",
-     "sessions": 2302,
-     "engagement": 0.2
+     "sessions": 12617,
+     "engagement": 6.1
     },
     {
      "device": "desktop",
-     "sessions": 21,
-     "engagement": 0
+     "sessions": 72,
+     "engagement": 33.3
     },
     {
      "device": "tablet",
-     "sessions": 3,
-     "engagement": 0
+     "sessions": 14,
+     "engagement": 21.4
     }
    ],
    "countries": [
     {
      "country": "Argentina",
-     "sessions": 2245,
-     "users": 2218
-    },
-    {
-     "country": "Mexico",
-     "sessions": 13,
-     "users": 13
-    },
-    {
-     "country": "Brazil",
-     "sessions": 9,
-     "users": 9
+     "sessions": 12312,
+     "users": 11992
     },
     {
      "country": "Spain",
-     "sessions": 9,
-     "users": 9
+     "sessions": 54,
+     "users": 47
+    },
+    {
+     "country": "Brazil",
+     "sessions": 50,
+     "users": 50
+    },
+    {
+     "country": "Mexico",
+     "sessions": 43,
+     "users": 39
+    },
+    {
+     "country": "United States",
+     "sessions": 38,
+     "users": 38
     },
     {
      "country": "Chile",
-     "sessions": 5,
-     "users": 5
+     "sessions": 18,
+     "users": 17
     },
     {
      "country": "Colombia",
-     "sessions": 5,
-     "users": 5
+     "sessions": 18,
+     "users": 16
     },
     {
-     "country": "Bolivia",
-     "sessions": 4,
-     "users": 4
-    },
-    {
-     "country": "France",
-     "sessions": 4,
-     "users": 4
+     "country": "Peru",
+     "sessions": 18,
+     "users": 17
     }
    ],
    "cities": [
     {
      "city": "Buenos Aires",
-     "sessions": 285
+     "sessions": 1645
     },
     {
      "city": "",
-     "sessions": 200
+     "sessions": 664
+    },
+    {
+     "city": "(not set)",
+     "sessions": 626
     },
     {
      "city": "Cordoba",
-     "sessions": 88
-    },
-    {
-     "city": "Rosario",
-     "sessions": 54
-    },
-    {
-     "city": "Mar del Plata",
-     "sessions": 53
-    },
-    {
-     "city": "Salta",
-     "sessions": 41
-    },
-    {
-     "city": "Santa Fe",
-     "sessions": 34
+     "sessions": 505
     },
     {
      "city": "San Miguel de Tucuman",
-     "sessions": 31
+     "sessions": 259
+    },
+    {
+     "city": "Rosario",
+     "sessions": 258
+    },
+    {
+     "city": "Mar del Plata",
+     "sessions": 227
+    },
+    {
+     "city": "Salta",
+     "sessions": 195
     }
    ],
    "newVsReturning": [
     {
      "type": "new",
-     "sessions": 2283
+     "sessions": 12534
     },
     {
      "type": "",
-     "sessions": 188
+     "sessions": 389
+    },
+    {
+     "type": "returning",
+     "sessions": 83
     }
    ],
    "bySite": {
     "accesoia": {
-     "sessions": 2257,
-     "users": 2230,
-     "pageviews": 2390,
-     "engagement": 0.2
+     "sessions": 12433,
+     "users": 12152,
+     "pageviews": 13579,
+     "engagement": 5.8
     },
     "gambeta": {
-     "sessions": 71,
-     "users": 70,
-     "pageviews": 117,
-     "engagement": 0
+     "sessions": 262,
+     "users": 238,
+     "pageviews": 463,
+     "engagement": 28.2
     }
    },
    "campaigns": [
     {
      "campaign": "120245888814470578",
      "content": "120247191945600578",
-     "sessions": 830,
-     "users": 821
-    },
-    {
-     "campaign": "(cross-network)",
-     "content": "",
-     "sessions": 604,
-     "users": 604
+     "sessions": 5848,
+     "users": 5602
     },
     {
      "campaign": "120245888814470578",
      "content": "120247191856340578",
-     "sessions": 519,
-     "users": 517
+     "sessions": 5238,
+     "users": 5261
+    },
+    {
+     "campaign": "(cross-network)",
+     "content": "",
+     "sessions": 1159,
+     "users": 1161
     },
     {
      "campaign": "(not set)",
      "content": "",
-     "sessions": 429,
-     "users": 393
+     "sessions": 394,
+     "users": 369
+    },
+    {
+     "campaign": "(direct)",
+     "content": "(not set)",
+     "sessions": 68,
+     "users": 63
     },
     {
      "campaign": "(direct)",
      "content": "",
-     "sessions": 37,
-     "users": 36
+     "sessions": 66,
+     "users": 56
     },
     {
      "campaign": "120245888814470578",
      "content": "120247191856330578",
-     "sessions": 17,
-     "users": 17
+     "sessions": 59,
+     "users": 57
+    },
+    {
+     "campaign": "(organic)",
+     "content": "(not set)",
+     "sessions": 38,
+     "users": 38
     },
     {
      "campaign": "(referral)",
-     "content": "",
-     "sessions": 14,
-     "users": 14
+     "content": "(not set)",
+     "sessions": 30,
+     "users": 29
     },
     {
      "campaign": "(organic)",
      "content": "",
-     "sessions": 10,
-     "users": 10
+     "sessions": 27,
+     "users": 26
     },
     {
-     "campaign": "(ai-assistant)",
+     "campaign": "(referral)",
      "content": "",
-     "sessions": 1,
-     "users": 1
+     "sessions": 18,
+     "users": 15
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191735000578",
+     "sessions": 11,
+     "users": 11
+    },
+    {
+     "campaign": "(referral)",
+     "content": "link_in_bio",
+     "sessions": 5,
+     "users": 4
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191951700578",
+     "sessions": 5,
+     "users": 5
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191856310578",
+     "sessions": 4,
+     "users": 4
     }
    ],
    "funnel": {
-    "sessions": 2327,
-    "gateShows": 70,
-    "gateOpens": 169,
-    "formStarts": 6,
-    "leads": 8,
-    "tgClicks": 3,
-    "gotoGambeta": 2,
-    "eleccion": 4,
-    "gateOpenRate": 7.3,
-    "leadConvRate": 0.34,
-    "gateToLeadRate": 4.7,
-    "leadToGambetaRate": 25,
-    "formToLeadRate": 133.3
+    "sessions": 12617,
+    "gateShows": 267,
+    "gateOpens": 715,
+    "formStarts": 24,
+    "leads": 18,
+    "tgClicks": 8,
+    "gotoGambeta": 3,
+    "eleccion": 6,
+    "gateOpenRate": 5.7,
+    "leadConvRate": 0.14,
+    "gateToLeadRate": 2.5,
+    "leadToGambetaRate": 16.7,
+    "formToLeadRate": 75
    }
   },
   "14d": {
    "totals": {
-    "sessions": 2327,
-    "users": 2298,
-    "pageviews": 2507,
-    "avgEngagement": 0.2,
-    "pagesPerSession": 1.08
+    "sessions": 12633,
+    "users": 12427,
+    "pageviews": 14052,
+    "avgEngagement": 6,
+    "pagesPerSession": 1.11
    },
    "daily": [
     {
      "date": "20260709",
-     "users": 2298,
-     "sessions": 2327,
-     "pageviews": 2507,
-     "avgDur": 13,
+     "users": 6578,
+     "sessions": 6674,
+     "pageviews": 7251,
+     "avgDur": 10,
+     "engagement": 11.8
+    },
+    {
+     "date": "20260710",
+     "users": 5849,
+     "sessions": 5959,
+     "pageviews": 6801,
+     "avgDur": 11,
      "engagement": 0.2
     }
    ],
    "hourly": [
     {
      "hour": 0,
-     "sessions": 0
+     "sessions": 879
     },
     {
      "hour": 1,
-     "sessions": 0
+     "sessions": 1466
     },
     {
      "hour": 2,
-     "sessions": 0
+     "sessions": 441
     },
     {
      "hour": 3,
-     "sessions": 0
+     "sessions": 193
     },
     {
      "hour": 4,
-     "sessions": 0
+     "sessions": 161
     },
     {
      "hour": 5,
-     "sessions": 0
+     "sessions": 156
     },
     {
      "hour": 6,
-     "sessions": 0
+     "sessions": 249
     },
     {
      "hour": 7,
-     "sessions": 0
+     "sessions": 383
     },
     {
      "hour": 8,
-     "sessions": 0
+     "sessions": 531
     },
     {
      "hour": 9,
-     "sessions": 0
+     "sessions": 414
     },
     {
      "hour": 10,
-     "sessions": 0
+     "sessions": 353
     },
     {
      "hour": 11,
-     "sessions": 0
+     "sessions": 283
     },
     {
      "hour": 12,
-     "sessions": 0
+     "sessions": 277
     },
     {
      "hour": 13,
-     "sessions": 0
+     "sessions": 214
     },
     {
      "hour": 14,
@@ -1384,123 +1922,123 @@
     },
     {
      "hour": 15,
-     "sessions": 555
+     "sessions": 657
     },
     {
      "hour": 16,
-     "sessions": 410
+     "sessions": 444
     },
     {
      "hour": 17,
-     "sessions": 351
+     "sessions": 381
     },
     {
      "hour": 18,
-     "sessions": 465
+     "sessions": 527
     },
     {
      "hour": 19,
-     "sessions": 543
+     "sessions": 925
     },
     {
      "hour": 20,
-     "sessions": 0
+     "sessions": 748
     },
     {
      "hour": 21,
-     "sessions": 0
+     "sessions": 842
     },
     {
      "hour": 22,
-     "sessions": 0
+     "sessions": 1029
     },
     {
      "hour": 23,
-     "sessions": 0
+     "sessions": 1050
     }
    ],
    "sources": [
     {
      "source": "fb",
      "medium": "paid",
-     "sessions": 835,
-     "users": 827,
-     "engagement": 0.5
-    },
-    {
-     "source": "(data not available)",
-     "medium": "(data not available)",
-     "sessions": 604,
-     "users": 604,
-     "engagement": 0
+     "sessions": 6968,
+     "users": 6846,
+     "engagement": 7.7
     },
     {
      "source": "ig",
      "medium": "paid",
-     "sessions": 530,
-     "users": 528,
-     "engagement": 0
+     "sessions": 4211,
+     "users": 4147,
+     "engagement": 4.4
+    },
+    {
+     "source": "(data not available)",
+     "medium": "(data not available)",
+     "sessions": 1166,
+     "users": 1168,
+     "engagement": 0.2
     },
     {
      "source": "(not set)",
      "medium": "(not set)",
-     "sessions": 429,
-     "users": 393,
-     "engagement": 0.2
+     "sessions": 395,
+     "users": 370,
+     "engagement": 0
     },
     {
      "source": "(direct)",
      "medium": "(none)",
-     "sessions": 37,
-     "users": 36,
-     "engagement": 0
+     "sessions": 134,
+     "users": 118,
+     "engagement": 23.1
     },
     {
      "source": "google",
      "medium": "organic",
-     "sessions": 8,
-     "users": 8,
-     "engagement": 0
-    },
-    {
-     "source": "tiktok.com",
-     "medium": "referral",
-     "sessions": 6,
-     "users": 6,
-     "engagement": 0
+     "sessions": 60,
+     "users": 59,
+     "engagement": 50
     },
     {
      "source": "t.co",
      "medium": "referral",
-     "sessions": 4,
-     "users": 4,
+     "sessions": 23,
+     "users": 23,
+     "engagement": 21.7
+    },
+    {
+     "source": "tiktok.com",
+     "medium": "referral",
+     "sessions": 7,
+     "users": 7,
+     "engagement": 0
+    },
+    {
+     "source": "accounts.google.com",
+     "medium": "referral",
+     "sessions": 5,
+     "users": 3,
      "engagement": 0
     },
     {
      "source": "bing",
      "medium": "organic",
-     "sessions": 2,
-     "users": 2,
-     "engagement": 0
+     "sessions": 5,
+     "users": 5,
+     "engagement": 60
     },
     {
-     "source": "l.threads.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
-     "engagement": 0
-    },
-    {
-     "source": "lm.facebook.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
+     "source": "ig",
+     "medium": "social",
+     "sessions": 5,
+     "users": 4,
      "engagement": 0
     },
     {
      "source": "ntp.msn.com",
      "medium": "referral",
-     "sessions": 1,
+     "sessions": 3,
      "users": 1,
      "engagement": 0
     }
@@ -1509,442 +2047,491 @@
     {
      "host": "accesoia.app",
      "path": "/predicciones-ia",
-     "views": 2368,
-     "users": 2229,
+     "views": 13495,
+     "users": 12161,
      "avgDur": 6
     },
     {
      "host": "gambeta.ai",
      "path": "/",
-     "views": 95,
-     "users": 65,
-     "avgDur": 190
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/",
-     "views": 8,
-     "users": 9,
-     "avgDur": 28
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/eleccion",
-     "views": 7,
-     "users": 4,
-     "avgDur": 63
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/mundial-2026",
-     "views": 7,
-     "users": 6,
-     "avgDur": 29
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/calendario-ia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 6
+     "views": 323,
+     "users": 211,
+     "avgDur": 121
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/ia-para-apostar",
-     "views": 3,
-     "users": 4,
-     "avgDur": 13
+     "views": 68,
+     "users": 48,
+     "avgDur": 65
     },
     {
-     "host": "gambeta.ai",
-     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 0
+     "host": "accesoia.app",
+     "path": "/",
+     "views": 33,
+     "users": 33,
+     "avgDur": 7
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/calendario-ia",
+     "views": 22,
+     "users": 8,
+     "avgDur": 845
     },
     {
      "host": "accesoia.app",
      "path": "/estadisticas-ia",
-     "views": 2,
-     "users": 3,
-     "avgDur": 303
+     "views": 22,
+     "users": 12,
+     "avgDur": 417
     },
     {
      "host": "accesoia.app",
-     "path": "/pick-del-dia",
-     "views": 2,
-     "users": 2,
-     "avgDur": 75
+     "path": "/eleccion",
+     "views": 13,
+     "users": 10,
+     "avgDur": 31
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/linemate-mas-ia-futbol",
-     "views": 2,
-     "users": 1,
-     "avgDur": 448
+     "path": "/mundial-2026",
+     "views": 12,
+     "users": 11,
+     "avgDur": 72
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/apuestas-deportivas-errores",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "views": 7,
+     "users": 6,
+     "avgDur": 39
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-el-salvador",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-venezuela",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
+     "path": "/herramientas/",
+     "views": 5,
+     "users": 5,
+     "avgDur": 162
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/dbbet-bono-100-freebet-argentina-mundial-2026",
-     "views": 1,
-     "users": 1,
-     "avgDur": 960
+     "views": 4,
+     "users": 4,
+     "avgDur": 40
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "views": 4,
+     "users": 4,
+     "avgDur": 1
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/linemate-mas-ia-futbol",
+     "views": 4,
+     "users": 3,
+     "avgDur": 149
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/mejor-tipster-argentino-2026",
+     "views": 4,
+     "users": 2,
+     "avgDur": 250
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/pick-del-dia",
+     "views": 3,
+     "users": 3,
+     "avgDur": 32
     }
    ],
    "landing": [
     {
      "path": "",
-     "sessions": 145,
+     "sessions": 220,
      "bounce": 100
     },
     {
      "path": "/",
-     "sessions": 54,
-     "bounce": 100
+     "sessions": 172,
+     "bounce": 82
     },
     {
-     "path": "/?ref=blog-promo-picks",
-     "sessions": 4,
-     "bounce": 100
-    },
-    {
-     "path": "/mundial-2026",
-     "sessions": 4,
-     "bounce": 100
+     "path": "/blog/ia-para-apostar",
+     "sessions": 39,
+     "bounce": 46.2
     },
     {
      "path": "/predicciones-ia",
+     "sessions": 10,
+     "bounce": 90
+    },
+    {
+     "path": "/?ref=blog-promo-picks",
+     "sessions": 7,
+     "bounce": 71.4
+    },
+    {
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "sessions": 6,
+     "bounce": 33.3
+    },
+    {
+     "path": "/mundial-2026",
+     "sessions": 5,
+     "bounce": 40
+    },
+    {
+     "path": "/estadisticas-ia",
      "sessions": 4,
      "bounce": 100
     },
     {
      "path": "/?gtm_latency=1",
-     "sessions": 2,
-     "bounce": 100
+     "sessions": 3,
+     "bounce": 0
     },
     {
-     "path": "/blog/ia-para-apostar",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/eleccion",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwZXh0bgNhZW0BMABhZGlkAas0LxtzowJzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7bV2J_O9kHKAKau7F6OkDWao5a9ggpaCN7PMAvna8rLHuVsz_pvZH8rEpMDA_aem_r-ep1hipTBK54142YgVjMQ",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwcGRvZgFmZGlkFlCjiVuAF6Pcn5YBpMVGv6glxWBV_iFleHRuA2FlbQEwAGFkaWQBqzQvG2CQMnNydGMGYXBwX2lkCjY2Mjg1NjgzNzkAAR6jW8Cc_QiYhHOz9QXEevYX6PADUBKGeIjTVeFTA8VbB1H-PMcUAmdukguyBw_aem_PxWQGp7IGabUSOQz8OMIMg",
-     "sessions": 2,
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "sessions": 3,
      "bounce": 100
     }
    ],
    "events": {
-    "page_view": 2507,
-    "session_start": 2327,
-    "first_visit": 2315,
-    "spoiler_click_open_gate": 136,
-    "user_engagement": 135,
-    "gate_show": 70,
-    "scroll": 48,
-    "gate_manual_open": 16,
-    "inline_cta_open_gate": 11,
-    "click": 8,
-    "lead_capture": 8,
-    "form_start": 6,
-    "sticky_open_gate": 6,
-    "eleccion_jugada": 4,
-    "telegram_click": 3,
-    "goto_gambeta": 2
+    "page_view": 14052,
+    "session_start": 12954,
+    "first_visit": 12716,
+    "user_engagement": 677,
+    "spoiler_click_open_gate": 597,
+    "gate_show": 267,
+    "scroll": 190,
+    "gate_manual_open": 61,
+    "inline_cta_open_gate": 41,
+    "click": 28,
+    "gate_close": 26,
+    "form_start": 24,
+    "lead_capture": 18,
+    "sticky_open_gate": 16,
+    "telegram_click": 8,
+    "eleccion_jugada": 6,
+    "goto_gambeta": 3
    },
    "devices": [
     {
      "device": "mobile",
-     "sessions": 2302,
-     "engagement": 0.2
+     "sessions": 12631,
+     "engagement": 6.1
     },
     {
      "device": "desktop",
-     "sessions": 21,
-     "engagement": 0
+     "sessions": 73,
+     "engagement": 32.9
     },
     {
      "device": "tablet",
-     "sessions": 3,
-     "engagement": 0
+     "sessions": 14,
+     "engagement": 21.4
     }
    ],
    "countries": [
     {
      "country": "Argentina",
-     "sessions": 2269,
-     "users": 2240
-    },
-    {
-     "country": "Mexico",
-     "sessions": 13,
-     "users": 13
-    },
-    {
-     "country": "Brazil",
-     "sessions": 10,
-     "users": 10
+     "sessions": 12329,
+     "users": 12003
     },
     {
      "country": "Spain",
-     "sessions": 10,
-     "users": 10
+     "sessions": 54,
+     "users": 47
+    },
+    {
+     "country": "Brazil",
+     "sessions": 50,
+     "users": 50
+    },
+    {
+     "country": "Mexico",
+     "sessions": 43,
+     "users": 39
+    },
+    {
+     "country": "United States",
+     "sessions": 38,
+     "users": 38
     },
     {
      "country": "Chile",
-     "sessions": 5,
-     "users": 5
+     "sessions": 18,
+     "users": 17
     },
     {
      "country": "Colombia",
-     "sessions": 5,
-     "users": 5
+     "sessions": 18,
+     "users": 16
     },
     {
-     "country": "Bolivia",
-     "sessions": 4,
-     "users": 4
-    },
-    {
-     "country": "France",
-     "sessions": 4,
-     "users": 4
+     "country": "Peru",
+     "sessions": 18,
+     "users": 17
     }
    ],
    "cities": [
     {
      "city": "Buenos Aires",
-     "sessions": 285
+     "sessions": 1646
     },
     {
      "city": "",
-     "sessions": 200
+     "sessions": 665
+    },
+    {
+     "city": "(not set)",
+     "sessions": 626
     },
     {
      "city": "Cordoba",
-     "sessions": 88
-    },
-    {
-     "city": "Rosario",
-     "sessions": 54
-    },
-    {
-     "city": "Mar del Plata",
-     "sessions": 53
-    },
-    {
-     "city": "Salta",
-     "sessions": 41
-    },
-    {
-     "city": "Santa Fe",
-     "sessions": 34
+     "sessions": 506
     },
     {
      "city": "San Miguel de Tucuman",
-     "sessions": 31
+     "sessions": 259
+    },
+    {
+     "city": "Rosario",
+     "sessions": 258
+    },
+    {
+     "city": "Mar del Plata",
+     "sessions": 227
+    },
+    {
+     "city": "Salta",
+     "sessions": 195
     }
    ],
    "newVsReturning": [
     {
      "type": "new",
-     "sessions": 2283
+     "sessions": 12552
     },
     {
      "type": "",
-     "sessions": 188
+     "sessions": 390
+    },
+    {
+     "type": "returning",
+     "sessions": 83
     }
    ],
    "bySite": {
     "accesoia": {
-     "sessions": 2257,
-     "users": 2230,
-     "pageviews": 2390,
-     "engagement": 0.2
+     "sessions": 12446,
+     "users": 12161,
+     "pageviews": 13588,
+     "engagement": 5.8
     },
     "gambeta": {
-     "sessions": 71,
-     "users": 70,
-     "pageviews": 117,
-     "engagement": 0
+     "sessions": 263,
+     "users": 239,
+     "pageviews": 464,
+     "engagement": 28.1
     }
    },
    "campaigns": [
     {
      "campaign": "120245888814470578",
      "content": "120247191945600578",
-     "sessions": 830,
-     "users": 821
-    },
-    {
-     "campaign": "(cross-network)",
-     "content": "",
-     "sessions": 604,
-     "users": 604
+     "sessions": 5852,
+     "users": 5604
     },
     {
      "campaign": "120245888814470578",
      "content": "120247191856340578",
-     "sessions": 519,
-     "users": 517
+     "sessions": 5238,
+     "users": 5261
+    },
+    {
+     "campaign": "(cross-network)",
+     "content": "",
+     "sessions": 1166,
+     "users": 1168
     },
     {
      "campaign": "(not set)",
      "content": "",
-     "sessions": 429,
-     "users": 393
+     "sessions": 395,
+     "users": 370
+    },
+    {
+     "campaign": "(direct)",
+     "content": "(not set)",
+     "sessions": 68,
+     "users": 63
     },
     {
      "campaign": "(direct)",
      "content": "",
-     "sessions": 37,
-     "users": 36
+     "sessions": 66,
+     "users": 56
     },
     {
      "campaign": "120245888814470578",
      "content": "120247191856330578",
-     "sessions": 17,
-     "users": 17
+     "sessions": 59,
+     "users": 57
+    },
+    {
+     "campaign": "(organic)",
+     "content": "(not set)",
+     "sessions": 38,
+     "users": 38
     },
     {
      "campaign": "(referral)",
-     "content": "",
-     "sessions": 14,
-     "users": 14
+     "content": "(not set)",
+     "sessions": 30,
+     "users": 29
     },
     {
      "campaign": "(organic)",
      "content": "",
-     "sessions": 10,
-     "users": 10
+     "sessions": 27,
+     "users": 26
     },
     {
-     "campaign": "(ai-assistant)",
+     "campaign": "(referral)",
      "content": "",
-     "sessions": 1,
-     "users": 1
+     "sessions": 18,
+     "users": 15
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191735000578",
+     "sessions": 11,
+     "users": 11
+    },
+    {
+     "campaign": "(referral)",
+     "content": "link_in_bio",
+     "sessions": 5,
+     "users": 4
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191951700578",
+     "sessions": 5,
+     "users": 5
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191856310578",
+     "sessions": 4,
+     "users": 4
     }
    ],
    "funnel": {
-    "sessions": 2327,
-    "gateShows": 70,
-    "gateOpens": 169,
-    "formStarts": 6,
-    "leads": 8,
-    "tgClicks": 3,
-    "gotoGambeta": 2,
-    "eleccion": 4,
-    "gateOpenRate": 7.3,
-    "leadConvRate": 0.34,
-    "gateToLeadRate": 4.7,
-    "leadToGambetaRate": 25,
-    "formToLeadRate": 133.3
+    "sessions": 12633,
+    "gateShows": 267,
+    "gateOpens": 715,
+    "formStarts": 24,
+    "leads": 18,
+    "tgClicks": 8,
+    "gotoGambeta": 3,
+    "eleccion": 6,
+    "gateOpenRate": 5.7,
+    "leadConvRate": 0.14,
+    "gateToLeadRate": 2.5,
+    "leadToGambetaRate": 16.7,
+    "formToLeadRate": 75
    }
   },
   "28d": {
    "totals": {
-    "sessions": 2327,
-    "users": 2298,
-    "pageviews": 2507,
-    "avgEngagement": 0.2,
-    "pagesPerSession": 1.08
+    "sessions": 12633,
+    "users": 12427,
+    "pageviews": 14052,
+    "avgEngagement": 6,
+    "pagesPerSession": 1.11
    },
    "daily": [
     {
      "date": "20260709",
-     "users": 2298,
-     "sessions": 2327,
-     "pageviews": 2507,
-     "avgDur": 13,
+     "users": 6578,
+     "sessions": 6674,
+     "pageviews": 7251,
+     "avgDur": 10,
+     "engagement": 11.8
+    },
+    {
+     "date": "20260710",
+     "users": 5849,
+     "sessions": 5959,
+     "pageviews": 6801,
+     "avgDur": 11,
      "engagement": 0.2
     }
    ],
    "hourly": [
     {
      "hour": 0,
-     "sessions": 0
+     "sessions": 879
     },
     {
      "hour": 1,
-     "sessions": 0
+     "sessions": 1466
     },
     {
      "hour": 2,
-     "sessions": 0
+     "sessions": 441
     },
     {
      "hour": 3,
-     "sessions": 0
+     "sessions": 193
     },
     {
      "hour": 4,
-     "sessions": 0
+     "sessions": 161
     },
     {
      "hour": 5,
-     "sessions": 0
+     "sessions": 156
     },
     {
      "hour": 6,
-     "sessions": 0
+     "sessions": 249
     },
     {
      "hour": 7,
-     "sessions": 0
+     "sessions": 383
     },
     {
      "hour": 8,
-     "sessions": 0
+     "sessions": 531
     },
     {
      "hour": 9,
-     "sessions": 0
+     "sessions": 414
     },
     {
      "hour": 10,
-     "sessions": 0
+     "sessions": 353
     },
     {
      "hour": 11,
-     "sessions": 0
+     "sessions": 283
     },
     {
      "hour": 12,
-     "sessions": 0
+     "sessions": 277
     },
     {
      "hour": 13,
-     "sessions": 0
+     "sessions": 214
     },
     {
      "hour": 14,
@@ -1952,123 +2539,123 @@
     },
     {
      "hour": 15,
-     "sessions": 555
+     "sessions": 657
     },
     {
      "hour": 16,
-     "sessions": 410
+     "sessions": 444
     },
     {
      "hour": 17,
-     "sessions": 351
+     "sessions": 381
     },
     {
      "hour": 18,
-     "sessions": 465
+     "sessions": 527
     },
     {
      "hour": 19,
-     "sessions": 543
+     "sessions": 925
     },
     {
      "hour": 20,
-     "sessions": 0
+     "sessions": 748
     },
     {
      "hour": 21,
-     "sessions": 0
+     "sessions": 842
     },
     {
      "hour": 22,
-     "sessions": 0
+     "sessions": 1029
     },
     {
      "hour": 23,
-     "sessions": 0
+     "sessions": 1050
     }
    ],
    "sources": [
     {
      "source": "fb",
      "medium": "paid",
-     "sessions": 835,
-     "users": 827,
-     "engagement": 0.5
-    },
-    {
-     "source": "(data not available)",
-     "medium": "(data not available)",
-     "sessions": 604,
-     "users": 604,
-     "engagement": 0
+     "sessions": 6968,
+     "users": 6846,
+     "engagement": 7.7
     },
     {
      "source": "ig",
      "medium": "paid",
-     "sessions": 530,
-     "users": 528,
-     "engagement": 0
+     "sessions": 4211,
+     "users": 4147,
+     "engagement": 4.4
+    },
+    {
+     "source": "(data not available)",
+     "medium": "(data not available)",
+     "sessions": 1166,
+     "users": 1168,
+     "engagement": 0.2
     },
     {
      "source": "(not set)",
      "medium": "(not set)",
-     "sessions": 429,
-     "users": 393,
-     "engagement": 0.2
+     "sessions": 395,
+     "users": 370,
+     "engagement": 0
     },
     {
      "source": "(direct)",
      "medium": "(none)",
-     "sessions": 37,
-     "users": 36,
-     "engagement": 0
+     "sessions": 134,
+     "users": 118,
+     "engagement": 23.1
     },
     {
      "source": "google",
      "medium": "organic",
-     "sessions": 8,
-     "users": 8,
-     "engagement": 0
-    },
-    {
-     "source": "tiktok.com",
-     "medium": "referral",
-     "sessions": 6,
-     "users": 6,
-     "engagement": 0
+     "sessions": 60,
+     "users": 59,
+     "engagement": 50
     },
     {
      "source": "t.co",
      "medium": "referral",
-     "sessions": 4,
-     "users": 4,
+     "sessions": 23,
+     "users": 23,
+     "engagement": 21.7
+    },
+    {
+     "source": "tiktok.com",
+     "medium": "referral",
+     "sessions": 7,
+     "users": 7,
+     "engagement": 0
+    },
+    {
+     "source": "accounts.google.com",
+     "medium": "referral",
+     "sessions": 5,
+     "users": 3,
      "engagement": 0
     },
     {
      "source": "bing",
      "medium": "organic",
-     "sessions": 2,
-     "users": 2,
-     "engagement": 0
+     "sessions": 5,
+     "users": 5,
+     "engagement": 60
     },
     {
-     "source": "l.threads.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
-     "engagement": 0
-    },
-    {
-     "source": "lm.facebook.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
+     "source": "ig",
+     "medium": "social",
+     "sessions": 5,
+     "users": 4,
      "engagement": 0
     },
     {
      "source": "ntp.msn.com",
      "medium": "referral",
-     "sessions": 1,
+     "sessions": 3,
      "users": 1,
      "engagement": 0
     }
@@ -2077,442 +2664,491 @@
     {
      "host": "accesoia.app",
      "path": "/predicciones-ia",
-     "views": 2368,
-     "users": 2229,
+     "views": 13495,
+     "users": 12161,
      "avgDur": 6
     },
     {
      "host": "gambeta.ai",
      "path": "/",
-     "views": 95,
-     "users": 65,
-     "avgDur": 190
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/",
-     "views": 8,
-     "users": 9,
-     "avgDur": 28
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/eleccion",
-     "views": 7,
-     "users": 4,
-     "avgDur": 63
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/mundial-2026",
-     "views": 7,
-     "users": 6,
-     "avgDur": 29
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/calendario-ia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 6
+     "views": 323,
+     "users": 211,
+     "avgDur": 121
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/ia-para-apostar",
-     "views": 3,
-     "users": 4,
-     "avgDur": 13
+     "views": 68,
+     "users": 48,
+     "avgDur": 65
     },
     {
-     "host": "gambeta.ai",
-     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 0
+     "host": "accesoia.app",
+     "path": "/",
+     "views": 33,
+     "users": 33,
+     "avgDur": 7
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/calendario-ia",
+     "views": 22,
+     "users": 8,
+     "avgDur": 845
     },
     {
      "host": "accesoia.app",
      "path": "/estadisticas-ia",
-     "views": 2,
-     "users": 3,
-     "avgDur": 303
+     "views": 22,
+     "users": 12,
+     "avgDur": 417
     },
     {
      "host": "accesoia.app",
-     "path": "/pick-del-dia",
-     "views": 2,
-     "users": 2,
-     "avgDur": 75
+     "path": "/eleccion",
+     "views": 13,
+     "users": 10,
+     "avgDur": 31
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/linemate-mas-ia-futbol",
-     "views": 2,
-     "users": 1,
-     "avgDur": 448
+     "path": "/mundial-2026",
+     "views": 12,
+     "users": 11,
+     "avgDur": 72
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/apuestas-deportivas-errores",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "views": 7,
+     "users": 6,
+     "avgDur": 39
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-el-salvador",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-venezuela",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
+     "path": "/herramientas/",
+     "views": 5,
+     "users": 5,
+     "avgDur": 162
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/dbbet-bono-100-freebet-argentina-mundial-2026",
-     "views": 1,
-     "users": 1,
-     "avgDur": 960
+     "views": 4,
+     "users": 4,
+     "avgDur": 40
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "views": 4,
+     "users": 4,
+     "avgDur": 1
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/linemate-mas-ia-futbol",
+     "views": 4,
+     "users": 3,
+     "avgDur": 149
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/mejor-tipster-argentino-2026",
+     "views": 4,
+     "users": 2,
+     "avgDur": 250
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/pick-del-dia",
+     "views": 3,
+     "users": 3,
+     "avgDur": 32
     }
    ],
    "landing": [
     {
      "path": "",
-     "sessions": 145,
+     "sessions": 220,
      "bounce": 100
     },
     {
      "path": "/",
-     "sessions": 54,
-     "bounce": 100
+     "sessions": 172,
+     "bounce": 82
     },
     {
-     "path": "/?ref=blog-promo-picks",
-     "sessions": 4,
-     "bounce": 100
-    },
-    {
-     "path": "/mundial-2026",
-     "sessions": 4,
-     "bounce": 100
+     "path": "/blog/ia-para-apostar",
+     "sessions": 39,
+     "bounce": 46.2
     },
     {
      "path": "/predicciones-ia",
+     "sessions": 10,
+     "bounce": 90
+    },
+    {
+     "path": "/?ref=blog-promo-picks",
+     "sessions": 7,
+     "bounce": 71.4
+    },
+    {
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "sessions": 6,
+     "bounce": 33.3
+    },
+    {
+     "path": "/mundial-2026",
+     "sessions": 5,
+     "bounce": 40
+    },
+    {
+     "path": "/estadisticas-ia",
      "sessions": 4,
      "bounce": 100
     },
     {
      "path": "/?gtm_latency=1",
-     "sessions": 2,
-     "bounce": 100
+     "sessions": 3,
+     "bounce": 0
     },
     {
-     "path": "/blog/ia-para-apostar",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/eleccion",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwZXh0bgNhZW0BMABhZGlkAas0LxtzowJzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7bV2J_O9kHKAKau7F6OkDWao5a9ggpaCN7PMAvna8rLHuVsz_pvZH8rEpMDA_aem_r-ep1hipTBK54142YgVjMQ",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwcGRvZgFmZGlkFlCjiVuAF6Pcn5YBpMVGv6glxWBV_iFleHRuA2FlbQEwAGFkaWQBqzQvG2CQMnNydGMGYXBwX2lkCjY2Mjg1NjgzNzkAAR6jW8Cc_QiYhHOz9QXEevYX6PADUBKGeIjTVeFTA8VbB1H-PMcUAmdukguyBw_aem_PxWQGp7IGabUSOQz8OMIMg",
-     "sessions": 2,
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "sessions": 3,
      "bounce": 100
     }
    ],
    "events": {
-    "page_view": 2535,
-    "session_start": 2354,
-    "first_visit": 2341,
-    "user_engagement": 137,
-    "spoiler_click_open_gate": 136,
-    "gate_show": 71,
-    "scroll": 49,
-    "gate_manual_open": 16,
-    "inline_cta_open_gate": 11,
-    "click": 8,
-    "lead_capture": 8,
-    "form_start": 6,
-    "sticky_open_gate": 6,
-    "eleccion_jugada": 4,
-    "telegram_click": 3,
-    "goto_gambeta": 2
+    "page_view": 14052,
+    "session_start": 12954,
+    "first_visit": 12716,
+    "user_engagement": 677,
+    "spoiler_click_open_gate": 597,
+    "gate_show": 267,
+    "scroll": 190,
+    "gate_manual_open": 61,
+    "inline_cta_open_gate": 41,
+    "click": 28,
+    "gate_close": 26,
+    "form_start": 24,
+    "lead_capture": 18,
+    "sticky_open_gate": 16,
+    "telegram_click": 8,
+    "eleccion_jugada": 6,
+    "goto_gambeta": 3
    },
    "devices": [
     {
      "device": "mobile",
-     "sessions": 2329,
-     "engagement": 0.2
+     "sessions": 12631,
+     "engagement": 6.1
     },
     {
      "device": "desktop",
-     "sessions": 21,
-     "engagement": 0
+     "sessions": 73,
+     "engagement": 32.9
     },
     {
      "device": "tablet",
-     "sessions": 3,
-     "engagement": 0
+     "sessions": 14,
+     "engagement": 21.4
     }
    ],
    "countries": [
     {
      "country": "Argentina",
-     "sessions": 2245,
-     "users": 2218
-    },
-    {
-     "country": "Mexico",
-     "sessions": 13,
-     "users": 13
-    },
-    {
-     "country": "Brazil",
-     "sessions": 9,
-     "users": 9
+     "sessions": 12329,
+     "users": 12003
     },
     {
      "country": "Spain",
-     "sessions": 9,
-     "users": 9
+     "sessions": 54,
+     "users": 47
+    },
+    {
+     "country": "Brazil",
+     "sessions": 50,
+     "users": 50
+    },
+    {
+     "country": "Mexico",
+     "sessions": 43,
+     "users": 39
+    },
+    {
+     "country": "United States",
+     "sessions": 38,
+     "users": 38
     },
     {
      "country": "Chile",
-     "sessions": 5,
-     "users": 5
+     "sessions": 18,
+     "users": 17
     },
     {
      "country": "Colombia",
-     "sessions": 5,
-     "users": 5
+     "sessions": 18,
+     "users": 16
     },
     {
-     "country": "Bolivia",
-     "sessions": 4,
-     "users": 4
-    },
-    {
-     "country": "France",
-     "sessions": 4,
-     "users": 4
+     "country": "Peru",
+     "sessions": 18,
+     "users": 17
     }
    ],
    "cities": [
     {
      "city": "Buenos Aires",
-     "sessions": 287
+     "sessions": 1646
     },
     {
      "city": "",
-     "sessions": 205
+     "sessions": 665
+    },
+    {
+     "city": "(not set)",
+     "sessions": 626
     },
     {
      "city": "Cordoba",
-     "sessions": 88
-    },
-    {
-     "city": "Mar del Plata",
-     "sessions": 54
-    },
-    {
-     "city": "Rosario",
-     "sessions": 54
-    },
-    {
-     "city": "Salta",
-     "sessions": 41
-    },
-    {
-     "city": "Santa Fe",
-     "sessions": 34
+     "sessions": 506
     },
     {
      "city": "San Miguel de Tucuman",
-     "sessions": 32
+     "sessions": 259
+    },
+    {
+     "city": "Rosario",
+     "sessions": 258
+    },
+    {
+     "city": "Mar del Plata",
+     "sessions": 227
+    },
+    {
+     "city": "Salta",
+     "sessions": 195
     }
    ],
    "newVsReturning": [
     {
      "type": "new",
-     "sessions": 2283
+     "sessions": 12552
     },
     {
      "type": "",
-     "sessions": 188
+     "sessions": 390
+    },
+    {
+     "type": "returning",
+     "sessions": 83
     }
    ],
    "bySite": {
     "accesoia": {
-     "sessions": 2283,
-     "users": 2254,
-     "pageviews": 2417,
-     "engagement": 0.2
+     "sessions": 12446,
+     "users": 12161,
+     "pageviews": 13588,
+     "engagement": 5.8
     },
     "gambeta": {
-     "sessions": 72,
-     "users": 71,
-     "pageviews": 118,
-     "engagement": 0
+     "sessions": 263,
+     "users": 239,
+     "pageviews": 464,
+     "engagement": 28.1
     }
    },
    "campaigns": [
     {
      "campaign": "120245888814470578",
      "content": "120247191945600578",
-     "sessions": 844,
-     "users": 834
-    },
-    {
-     "campaign": "(cross-network)",
-     "content": "",
-     "sessions": 606,
-     "users": 606
+     "sessions": 5852,
+     "users": 5604
     },
     {
      "campaign": "120245888814470578",
      "content": "120247191856340578",
-     "sessions": 529,
-     "users": 527
+     "sessions": 5238,
+     "users": 5261
+    },
+    {
+     "campaign": "(cross-network)",
+     "content": "",
+     "sessions": 1166,
+     "users": 1168
     },
     {
      "campaign": "(not set)",
      "content": "",
-     "sessions": 430,
-     "users": 394
+     "sessions": 395,
+     "users": 370
+    },
+    {
+     "campaign": "(direct)",
+     "content": "(not set)",
+     "sessions": 68,
+     "users": 63
     },
     {
      "campaign": "(direct)",
      "content": "",
-     "sessions": 37,
-     "users": 36
+     "sessions": 66,
+     "users": 56
     },
     {
      "campaign": "120245888814470578",
      "content": "120247191856330578",
-     "sessions": 17,
-     "users": 17
+     "sessions": 59,
+     "users": 57
+    },
+    {
+     "campaign": "(organic)",
+     "content": "(not set)",
+     "sessions": 38,
+     "users": 38
     },
     {
      "campaign": "(referral)",
-     "content": "",
-     "sessions": 14,
-     "users": 14
+     "content": "(not set)",
+     "sessions": 30,
+     "users": 29
     },
     {
      "campaign": "(organic)",
      "content": "",
-     "sessions": 10,
-     "users": 10
+     "sessions": 27,
+     "users": 26
     },
     {
-     "campaign": "(ai-assistant)",
+     "campaign": "(referral)",
      "content": "",
-     "sessions": 1,
-     "users": 1
+     "sessions": 18,
+     "users": 15
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191735000578",
+     "sessions": 11,
+     "users": 11
+    },
+    {
+     "campaign": "(referral)",
+     "content": "link_in_bio",
+     "sessions": 5,
+     "users": 4
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191951700578",
+     "sessions": 5,
+     "users": 5
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191856310578",
+     "sessions": 4,
+     "users": 4
     }
    ],
    "funnel": {
-    "sessions": 2327,
-    "gateShows": 71,
-    "gateOpens": 169,
-    "formStarts": 6,
-    "leads": 8,
-    "tgClicks": 3,
-    "gotoGambeta": 2,
-    "eleccion": 4,
-    "gateOpenRate": 7.3,
-    "leadConvRate": 0.34,
-    "gateToLeadRate": 4.7,
-    "leadToGambetaRate": 25,
-    "formToLeadRate": 133.3
+    "sessions": 12633,
+    "gateShows": 267,
+    "gateOpens": 715,
+    "formStarts": 24,
+    "leads": 18,
+    "tgClicks": 8,
+    "gotoGambeta": 3,
+    "eleccion": 6,
+    "gateOpenRate": 5.7,
+    "leadConvRate": 0.14,
+    "gateToLeadRate": 2.5,
+    "leadToGambetaRate": 16.7,
+    "formToLeadRate": 75
    }
   },
   "90d": {
    "totals": {
-    "sessions": 2353,
-    "users": 2323,
-    "pageviews": 2535,
-    "avgEngagement": 0.2,
-    "pagesPerSession": 1.08
+    "sessions": 12633,
+    "users": 12427,
+    "pageviews": 14052,
+    "avgEngagement": 6,
+    "pagesPerSession": 1.11
    },
    "daily": [
     {
      "date": "20260709",
-     "users": 2323,
-     "sessions": 2353,
-     "pageviews": 2535,
-     "avgDur": 12,
+     "users": 6578,
+     "sessions": 6674,
+     "pageviews": 7251,
+     "avgDur": 10,
+     "engagement": 11.8
+    },
+    {
+     "date": "20260710",
+     "users": 5849,
+     "sessions": 5959,
+     "pageviews": 6801,
+     "avgDur": 11,
      "engagement": 0.2
     }
    ],
    "hourly": [
     {
      "hour": 0,
-     "sessions": 0
+     "sessions": 879
     },
     {
      "hour": 1,
-     "sessions": 0
+     "sessions": 1466
     },
     {
      "hour": 2,
-     "sessions": 0
+     "sessions": 441
     },
     {
      "hour": 3,
-     "sessions": 0
+     "sessions": 193
     },
     {
      "hour": 4,
-     "sessions": 0
+     "sessions": 161
     },
     {
      "hour": 5,
-     "sessions": 0
+     "sessions": 156
     },
     {
      "hour": 6,
-     "sessions": 0
+     "sessions": 249
     },
     {
      "hour": 7,
-     "sessions": 0
+     "sessions": 383
     },
     {
      "hour": 8,
-     "sessions": 0
+     "sessions": 531
     },
     {
      "hour": 9,
-     "sessions": 0
+     "sessions": 414
     },
     {
      "hour": 10,
-     "sessions": 0
+     "sessions": 353
     },
     {
      "hour": 11,
-     "sessions": 0
+     "sessions": 283
     },
     {
      "hour": 12,
-     "sessions": 0
+     "sessions": 277
     },
     {
      "hour": 13,
-     "sessions": 0
+     "sessions": 214
     },
     {
      "hour": 14,
@@ -2520,123 +3156,123 @@
     },
     {
      "hour": 15,
-     "sessions": 555
+     "sessions": 657
     },
     {
      "hour": 16,
-     "sessions": 410
+     "sessions": 444
     },
     {
      "hour": 17,
-     "sessions": 351
+     "sessions": 381
     },
     {
      "hour": 18,
-     "sessions": 466
+     "sessions": 527
     },
     {
      "hour": 19,
-     "sessions": 568
+     "sessions": 925
     },
     {
      "hour": 20,
-     "sessions": 0
+     "sessions": 748
     },
     {
      "hour": 21,
-     "sessions": 0
+     "sessions": 842
     },
     {
      "hour": 22,
-     "sessions": 0
+     "sessions": 1029
     },
     {
      "hour": 23,
-     "sessions": 0
+     "sessions": 1050
     }
    ],
    "sources": [
     {
      "source": "fb",
      "medium": "paid",
-     "sessions": 849,
-     "users": 840,
-     "engagement": 0.5
-    },
-    {
-     "source": "(data not available)",
-     "medium": "(data not available)",
-     "sessions": 606,
-     "users": 606,
-     "engagement": 0
+     "sessions": 6968,
+     "users": 6846,
+     "engagement": 7.7
     },
     {
      "source": "ig",
      "medium": "paid",
-     "sessions": 540,
-     "users": 538,
-     "engagement": 0
+     "sessions": 4211,
+     "users": 4147,
+     "engagement": 4.4
+    },
+    {
+     "source": "(data not available)",
+     "medium": "(data not available)",
+     "sessions": 1166,
+     "users": 1168,
+     "engagement": 0.2
     },
     {
      "source": "(not set)",
      "medium": "(not set)",
-     "sessions": 430,
-     "users": 394,
-     "engagement": 0.2
+     "sessions": 395,
+     "users": 370,
+     "engagement": 0
     },
     {
      "source": "(direct)",
      "medium": "(none)",
-     "sessions": 37,
-     "users": 36,
-     "engagement": 0
+     "sessions": 134,
+     "users": 118,
+     "engagement": 23.1
     },
     {
      "source": "google",
      "medium": "organic",
-     "sessions": 8,
-     "users": 8,
-     "engagement": 0
-    },
-    {
-     "source": "tiktok.com",
-     "medium": "referral",
-     "sessions": 6,
-     "users": 6,
-     "engagement": 0
+     "sessions": 60,
+     "users": 59,
+     "engagement": 50
     },
     {
      "source": "t.co",
      "medium": "referral",
-     "sessions": 4,
-     "users": 4,
+     "sessions": 23,
+     "users": 23,
+     "engagement": 21.7
+    },
+    {
+     "source": "tiktok.com",
+     "medium": "referral",
+     "sessions": 7,
+     "users": 7,
+     "engagement": 0
+    },
+    {
+     "source": "accounts.google.com",
+     "medium": "referral",
+     "sessions": 5,
+     "users": 3,
      "engagement": 0
     },
     {
      "source": "bing",
      "medium": "organic",
-     "sessions": 2,
-     "users": 2,
-     "engagement": 0
+     "sessions": 5,
+     "users": 5,
+     "engagement": 60
     },
     {
-     "source": "l.threads.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
-     "engagement": 0
-    },
-    {
-     "source": "lm.facebook.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
+     "source": "ig",
+     "medium": "social",
+     "sessions": 5,
+     "users": 4,
      "engagement": 0
     },
     {
      "source": "ntp.msn.com",
      "medium": "referral",
-     "sessions": 1,
+     "sessions": 3,
      "users": 1,
      "engagement": 0
     }
@@ -2645,442 +3281,491 @@
     {
      "host": "accesoia.app",
      "path": "/predicciones-ia",
-     "views": 2395,
-     "users": 2253,
+     "views": 13495,
+     "users": 12161,
      "avgDur": 6
     },
     {
      "host": "gambeta.ai",
      "path": "/",
-     "views": 96,
-     "users": 66,
-     "avgDur": 187
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/",
-     "views": 8,
-     "users": 9,
-     "avgDur": 28
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/eleccion",
-     "views": 7,
-     "users": 4,
-     "avgDur": 63
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/mundial-2026",
-     "views": 7,
-     "users": 6,
-     "avgDur": 29
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/calendario-ia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 6
+     "views": 323,
+     "users": 211,
+     "avgDur": 121
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/ia-para-apostar",
-     "views": 3,
-     "users": 4,
-     "avgDur": 13
+     "views": 68,
+     "users": 48,
+     "avgDur": 65
     },
     {
-     "host": "gambeta.ai",
-     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 0
+     "host": "accesoia.app",
+     "path": "/",
+     "views": 33,
+     "users": 33,
+     "avgDur": 7
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/calendario-ia",
+     "views": 22,
+     "users": 8,
+     "avgDur": 845
     },
     {
      "host": "accesoia.app",
      "path": "/estadisticas-ia",
-     "views": 2,
-     "users": 3,
-     "avgDur": 303
+     "views": 22,
+     "users": 12,
+     "avgDur": 417
     },
     {
      "host": "accesoia.app",
-     "path": "/pick-del-dia",
-     "views": 2,
-     "users": 2,
-     "avgDur": 75
+     "path": "/eleccion",
+     "views": 13,
+     "users": 10,
+     "avgDur": 31
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/linemate-mas-ia-futbol",
-     "views": 2,
-     "users": 1,
-     "avgDur": 448
+     "path": "/mundial-2026",
+     "views": 12,
+     "users": 11,
+     "avgDur": 72
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/apuestas-deportivas-errores",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "views": 7,
+     "users": 6,
+     "avgDur": 39
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-el-salvador",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-venezuela",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
+     "path": "/herramientas/",
+     "views": 5,
+     "users": 5,
+     "avgDur": 162
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/dbbet-bono-100-freebet-argentina-mundial-2026",
-     "views": 1,
-     "users": 1,
-     "avgDur": 960
+     "views": 4,
+     "users": 4,
+     "avgDur": 40
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "views": 4,
+     "users": 4,
+     "avgDur": 1
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/linemate-mas-ia-futbol",
+     "views": 4,
+     "users": 3,
+     "avgDur": 149
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/mejor-tipster-argentino-2026",
+     "views": 4,
+     "users": 2,
+     "avgDur": 250
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/pick-del-dia",
+     "views": 3,
+     "users": 3,
+     "avgDur": 32
     }
    ],
    "landing": [
     {
      "path": "",
-     "sessions": 145,
+     "sessions": 220,
      "bounce": 100
     },
     {
      "path": "/",
-     "sessions": 54,
-     "bounce": 100
+     "sessions": 172,
+     "bounce": 82
     },
     {
-     "path": "/?ref=blog-promo-picks",
-     "sessions": 5,
-     "bounce": 100
-    },
-    {
-     "path": "/mundial-2026",
-     "sessions": 4,
-     "bounce": 100
+     "path": "/blog/ia-para-apostar",
+     "sessions": 39,
+     "bounce": 46.2
     },
     {
      "path": "/predicciones-ia",
+     "sessions": 10,
+     "bounce": 90
+    },
+    {
+     "path": "/?ref=blog-promo-picks",
+     "sessions": 7,
+     "bounce": 71.4
+    },
+    {
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "sessions": 6,
+     "bounce": 33.3
+    },
+    {
+     "path": "/mundial-2026",
+     "sessions": 5,
+     "bounce": 40
+    },
+    {
+     "path": "/estadisticas-ia",
      "sessions": 4,
      "bounce": 100
     },
     {
      "path": "/?gtm_latency=1",
-     "sessions": 2,
-     "bounce": 100
+     "sessions": 3,
+     "bounce": 0
     },
     {
-     "path": "/blog/ia-para-apostar",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/eleccion",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwZXh0bgNhZW0BMABhZGlkAas0LxtzowJzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7bV2J_O9kHKAKau7F6OkDWao5a9ggpaCN7PMAvna8rLHuVsz_pvZH8rEpMDA_aem_r-ep1hipTBK54142YgVjMQ",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwcGRvZgFmZGlkFlCjiVuAF6Pcn5YBpMVGv6glxWBV_iFleHRuA2FlbQEwAGFkaWQBqzQvG2CQMnNydGMGYXBwX2lkCjY2Mjg1NjgzNzkAAR6jW8Cc_QiYhHOz9QXEevYX6PADUBKGeIjTVeFTA8VbB1H-PMcUAmdukguyBw_aem_PxWQGp7IGabUSOQz8OMIMg",
-     "sessions": 2,
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "sessions": 3,
      "bounce": 100
     }
    ],
    "events": {
-    "page_view": 2535,
-    "session_start": 2354,
-    "first_visit": 2341,
-    "user_engagement": 137,
-    "spoiler_click_open_gate": 136,
-    "gate_show": 71,
-    "scroll": 49,
-    "gate_manual_open": 16,
-    "inline_cta_open_gate": 11,
-    "click": 8,
-    "lead_capture": 8,
-    "form_start": 6,
-    "sticky_open_gate": 6,
-    "eleccion_jugada": 4,
-    "telegram_click": 3,
-    "goto_gambeta": 2
+    "page_view": 14052,
+    "session_start": 12954,
+    "first_visit": 12716,
+    "user_engagement": 677,
+    "spoiler_click_open_gate": 597,
+    "gate_show": 267,
+    "scroll": 190,
+    "gate_manual_open": 61,
+    "inline_cta_open_gate": 41,
+    "click": 28,
+    "gate_close": 26,
+    "form_start": 24,
+    "lead_capture": 18,
+    "sticky_open_gate": 16,
+    "telegram_click": 8,
+    "eleccion_jugada": 6,
+    "goto_gambeta": 3
    },
    "devices": [
     {
      "device": "mobile",
-     "sessions": 2329,
-     "engagement": 0.2
+     "sessions": 12631,
+     "engagement": 6.1
     },
     {
      "device": "desktop",
-     "sessions": 21,
-     "engagement": 0
+     "sessions": 73,
+     "engagement": 32.9
     },
     {
      "device": "tablet",
-     "sessions": 3,
-     "engagement": 0
+     "sessions": 14,
+     "engagement": 21.4
     }
    ],
    "countries": [
     {
      "country": "Argentina",
-     "sessions": 2269,
-     "users": 2240
-    },
-    {
-     "country": "Mexico",
-     "sessions": 13,
-     "users": 13
-    },
-    {
-     "country": "Brazil",
-     "sessions": 10,
-     "users": 10
+     "sessions": 12329,
+     "users": 12003
     },
     {
      "country": "Spain",
-     "sessions": 10,
-     "users": 10
+     "sessions": 54,
+     "users": 47
+    },
+    {
+     "country": "Brazil",
+     "sessions": 50,
+     "users": 50
+    },
+    {
+     "country": "Mexico",
+     "sessions": 43,
+     "users": 39
+    },
+    {
+     "country": "United States",
+     "sessions": 38,
+     "users": 38
     },
     {
      "country": "Chile",
-     "sessions": 5,
-     "users": 5
+     "sessions": 18,
+     "users": 17
     },
     {
      "country": "Colombia",
-     "sessions": 5,
-     "users": 5
+     "sessions": 18,
+     "users": 16
     },
     {
-     "country": "Bolivia",
-     "sessions": 4,
-     "users": 4
-    },
-    {
-     "country": "France",
-     "sessions": 4,
-     "users": 4
+     "country": "Peru",
+     "sessions": 18,
+     "users": 17
     }
    ],
    "cities": [
     {
      "city": "Buenos Aires",
-     "sessions": 287
+     "sessions": 1646
     },
     {
      "city": "",
-     "sessions": 205
+     "sessions": 665
+    },
+    {
+     "city": "(not set)",
+     "sessions": 626
     },
     {
      "city": "Cordoba",
-     "sessions": 88
-    },
-    {
-     "city": "Mar del Plata",
-     "sessions": 54
-    },
-    {
-     "city": "Rosario",
-     "sessions": 54
-    },
-    {
-     "city": "Salta",
-     "sessions": 41
-    },
-    {
-     "city": "Santa Fe",
-     "sessions": 34
+     "sessions": 506
     },
     {
      "city": "San Miguel de Tucuman",
-     "sessions": 32
+     "sessions": 259
+    },
+    {
+     "city": "Rosario",
+     "sessions": 258
+    },
+    {
+     "city": "Mar del Plata",
+     "sessions": 227
+    },
+    {
+     "city": "Salta",
+     "sessions": 195
     }
    ],
    "newVsReturning": [
     {
      "type": "new",
-     "sessions": 2309
+     "sessions": 12552
     },
     {
      "type": "",
-     "sessions": 189
+     "sessions": 390
+    },
+    {
+     "type": "returning",
+     "sessions": 83
     }
    ],
    "bySite": {
     "accesoia": {
-     "sessions": 2283,
-     "users": 2254,
-     "pageviews": 2417,
-     "engagement": 0.2
+     "sessions": 12446,
+     "users": 12161,
+     "pageviews": 13588,
+     "engagement": 5.8
     },
     "gambeta": {
-     "sessions": 72,
-     "users": 71,
-     "pageviews": 118,
-     "engagement": 0
+     "sessions": 263,
+     "users": 239,
+     "pageviews": 464,
+     "engagement": 28.1
     }
    },
    "campaigns": [
     {
      "campaign": "120245888814470578",
      "content": "120247191945600578",
-     "sessions": 844,
-     "users": 834
-    },
-    {
-     "campaign": "(cross-network)",
-     "content": "",
-     "sessions": 606,
-     "users": 606
+     "sessions": 5852,
+     "users": 5604
     },
     {
      "campaign": "120245888814470578",
      "content": "120247191856340578",
-     "sessions": 529,
-     "users": 527
+     "sessions": 5238,
+     "users": 5261
+    },
+    {
+     "campaign": "(cross-network)",
+     "content": "",
+     "sessions": 1166,
+     "users": 1168
     },
     {
      "campaign": "(not set)",
      "content": "",
-     "sessions": 430,
-     "users": 394
+     "sessions": 395,
+     "users": 370
+    },
+    {
+     "campaign": "(direct)",
+     "content": "(not set)",
+     "sessions": 68,
+     "users": 63
     },
     {
      "campaign": "(direct)",
      "content": "",
-     "sessions": 37,
-     "users": 36
+     "sessions": 66,
+     "users": 56
     },
     {
      "campaign": "120245888814470578",
      "content": "120247191856330578",
-     "sessions": 17,
-     "users": 17
+     "sessions": 59,
+     "users": 57
+    },
+    {
+     "campaign": "(organic)",
+     "content": "(not set)",
+     "sessions": 38,
+     "users": 38
     },
     {
      "campaign": "(referral)",
-     "content": "",
-     "sessions": 14,
-     "users": 14
+     "content": "(not set)",
+     "sessions": 30,
+     "users": 29
     },
     {
      "campaign": "(organic)",
      "content": "",
-     "sessions": 10,
-     "users": 10
+     "sessions": 27,
+     "users": 26
     },
     {
-     "campaign": "(ai-assistant)",
+     "campaign": "(referral)",
      "content": "",
-     "sessions": 1,
-     "users": 1
+     "sessions": 18,
+     "users": 15
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191735000578",
+     "sessions": 11,
+     "users": 11
+    },
+    {
+     "campaign": "(referral)",
+     "content": "link_in_bio",
+     "sessions": 5,
+     "users": 4
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191951700578",
+     "sessions": 5,
+     "users": 5
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191856310578",
+     "sessions": 4,
+     "users": 4
     }
    ],
    "funnel": {
-    "sessions": 2353,
-    "gateShows": 71,
-    "gateOpens": 169,
-    "formStarts": 6,
-    "leads": 8,
-    "tgClicks": 3,
-    "gotoGambeta": 2,
-    "eleccion": 4,
-    "gateOpenRate": 7.2,
-    "leadConvRate": 0.34,
-    "gateToLeadRate": 4.7,
-    "leadToGambetaRate": 25,
-    "formToLeadRate": 133.3
+    "sessions": 12633,
+    "gateShows": 267,
+    "gateOpens": 715,
+    "formStarts": 24,
+    "leads": 18,
+    "tgClicks": 8,
+    "gotoGambeta": 3,
+    "eleccion": 6,
+    "gateOpenRate": 5.7,
+    "leadConvRate": 0.14,
+    "gateToLeadRate": 2.5,
+    "leadToGambetaRate": 16.7,
+    "formToLeadRate": 75
    }
   },
   "180d": {
    "totals": {
-    "sessions": 2353,
-    "users": 2323,
-    "pageviews": 2535,
-    "avgEngagement": 0.2,
-    "pagesPerSession": 1.08
+    "sessions": 12633,
+    "users": 12427,
+    "pageviews": 14052,
+    "avgEngagement": 6,
+    "pagesPerSession": 1.11
    },
    "daily": [
     {
      "date": "20260709",
-     "users": 2323,
-     "sessions": 2353,
-     "pageviews": 2535,
-     "avgDur": 12,
+     "users": 6578,
+     "sessions": 6674,
+     "pageviews": 7251,
+     "avgDur": 10,
+     "engagement": 11.8
+    },
+    {
+     "date": "20260710",
+     "users": 5849,
+     "sessions": 5959,
+     "pageviews": 6801,
+     "avgDur": 11,
      "engagement": 0.2
     }
    ],
    "hourly": [
     {
      "hour": 0,
-     "sessions": 0
+     "sessions": 879
     },
     {
      "hour": 1,
-     "sessions": 0
+     "sessions": 1466
     },
     {
      "hour": 2,
-     "sessions": 0
+     "sessions": 441
     },
     {
      "hour": 3,
-     "sessions": 0
+     "sessions": 193
     },
     {
      "hour": 4,
-     "sessions": 0
+     "sessions": 161
     },
     {
      "hour": 5,
-     "sessions": 0
+     "sessions": 156
     },
     {
      "hour": 6,
-     "sessions": 0
+     "sessions": 249
     },
     {
      "hour": 7,
-     "sessions": 0
+     "sessions": 383
     },
     {
      "hour": 8,
-     "sessions": 0
+     "sessions": 531
     },
     {
      "hour": 9,
-     "sessions": 0
+     "sessions": 414
     },
     {
      "hour": 10,
-     "sessions": 0
+     "sessions": 353
     },
     {
      "hour": 11,
-     "sessions": 0
+     "sessions": 283
     },
     {
      "hour": 12,
-     "sessions": 0
+     "sessions": 277
     },
     {
      "hour": 13,
-     "sessions": 0
+     "sessions": 214
     },
     {
      "hour": 14,
@@ -3088,123 +3773,123 @@
     },
     {
      "hour": 15,
-     "sessions": 555
+     "sessions": 657
     },
     {
      "hour": 16,
-     "sessions": 410
+     "sessions": 444
     },
     {
      "hour": 17,
-     "sessions": 351
+     "sessions": 381
     },
     {
      "hour": 18,
-     "sessions": 466
+     "sessions": 527
     },
     {
      "hour": 19,
-     "sessions": 568
+     "sessions": 925
     },
     {
      "hour": 20,
-     "sessions": 0
+     "sessions": 748
     },
     {
      "hour": 21,
-     "sessions": 0
+     "sessions": 842
     },
     {
      "hour": 22,
-     "sessions": 0
+     "sessions": 1029
     },
     {
      "hour": 23,
-     "sessions": 0
+     "sessions": 1050
     }
    ],
    "sources": [
     {
      "source": "fb",
      "medium": "paid",
-     "sessions": 849,
-     "users": 840,
-     "engagement": 0.5
-    },
-    {
-     "source": "(data not available)",
-     "medium": "(data not available)",
-     "sessions": 606,
-     "users": 606,
-     "engagement": 0
+     "sessions": 6968,
+     "users": 6846,
+     "engagement": 7.7
     },
     {
      "source": "ig",
      "medium": "paid",
-     "sessions": 540,
-     "users": 538,
-     "engagement": 0
+     "sessions": 4211,
+     "users": 4147,
+     "engagement": 4.4
+    },
+    {
+     "source": "(data not available)",
+     "medium": "(data not available)",
+     "sessions": 1166,
+     "users": 1168,
+     "engagement": 0.2
     },
     {
      "source": "(not set)",
      "medium": "(not set)",
-     "sessions": 430,
-     "users": 394,
-     "engagement": 0.2
+     "sessions": 395,
+     "users": 370,
+     "engagement": 0
     },
     {
      "source": "(direct)",
      "medium": "(none)",
-     "sessions": 37,
-     "users": 36,
-     "engagement": 0
+     "sessions": 134,
+     "users": 118,
+     "engagement": 23.1
     },
     {
      "source": "google",
      "medium": "organic",
-     "sessions": 8,
-     "users": 8,
-     "engagement": 0
-    },
-    {
-     "source": "tiktok.com",
-     "medium": "referral",
-     "sessions": 6,
-     "users": 6,
-     "engagement": 0
+     "sessions": 60,
+     "users": 59,
+     "engagement": 50
     },
     {
      "source": "t.co",
      "medium": "referral",
-     "sessions": 4,
-     "users": 4,
+     "sessions": 23,
+     "users": 23,
+     "engagement": 21.7
+    },
+    {
+     "source": "tiktok.com",
+     "medium": "referral",
+     "sessions": 7,
+     "users": 7,
+     "engagement": 0
+    },
+    {
+     "source": "accounts.google.com",
+     "medium": "referral",
+     "sessions": 5,
+     "users": 3,
      "engagement": 0
     },
     {
      "source": "bing",
      "medium": "organic",
-     "sessions": 2,
-     "users": 2,
-     "engagement": 0
+     "sessions": 5,
+     "users": 5,
+     "engagement": 60
     },
     {
-     "source": "l.threads.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
-     "engagement": 0
-    },
-    {
-     "source": "lm.facebook.com",
-     "medium": "referral",
-     "sessions": 1,
-     "users": 1,
+     "source": "ig",
+     "medium": "social",
+     "sessions": 5,
+     "users": 4,
      "engagement": 0
     },
     {
      "source": "ntp.msn.com",
      "medium": "referral",
-     "sessions": 1,
+     "sessions": 3,
      "users": 1,
      "engagement": 0
     }
@@ -3213,366 +3898,407 @@
     {
      "host": "accesoia.app",
      "path": "/predicciones-ia",
-     "views": 2395,
-     "users": 2253,
+     "views": 13495,
+     "users": 12161,
      "avgDur": 6
     },
     {
      "host": "gambeta.ai",
      "path": "/",
-     "views": 96,
-     "users": 66,
-     "avgDur": 187
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/",
-     "views": 8,
-     "users": 9,
-     "avgDur": 28
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/eleccion",
-     "views": 7,
-     "users": 4,
-     "avgDur": 63
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/mundial-2026",
-     "views": 7,
-     "users": 6,
-     "avgDur": 29
-    },
-    {
-     "host": "accesoia.app",
-     "path": "/calendario-ia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 6
+     "views": 323,
+     "users": 211,
+     "avgDur": 121
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/ia-para-apostar",
-     "views": 3,
-     "users": 4,
-     "avgDur": 13
+     "views": 68,
+     "users": 48,
+     "avgDur": 65
     },
     {
-     "host": "gambeta.ai",
-     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
-     "views": 3,
-     "users": 3,
-     "avgDur": 0
+     "host": "accesoia.app",
+     "path": "/",
+     "views": 33,
+     "users": 33,
+     "avgDur": 7
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/calendario-ia",
+     "views": 22,
+     "users": 8,
+     "avgDur": 845
     },
     {
      "host": "accesoia.app",
      "path": "/estadisticas-ia",
-     "views": 2,
-     "users": 3,
-     "avgDur": 303
+     "views": 22,
+     "users": 12,
+     "avgDur": 417
     },
     {
      "host": "accesoia.app",
-     "path": "/pick-del-dia",
-     "views": 2,
-     "users": 2,
-     "avgDur": 75
+     "path": "/eleccion",
+     "views": 13,
+     "users": 10,
+     "avgDur": 31
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/linemate-mas-ia-futbol",
-     "views": 2,
-     "users": 1,
-     "avgDur": 448
+     "path": "/mundial-2026",
+     "views": 12,
+     "users": 11,
+     "avgDur": 72
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/apuestas-deportivas-errores",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "views": 7,
+     "users": 6,
+     "avgDur": 39
     },
     {
      "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-el-salvador",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
-    },
-    {
-     "host": "gambeta.ai",
-     "path": "/blog/como-ver-mundial-2026-venezuela",
-     "views": 1,
-     "users": 1,
-     "avgDur": 0
+     "path": "/herramientas/",
+     "views": 5,
+     "users": 5,
+     "avgDur": 162
     },
     {
      "host": "gambeta.ai",
      "path": "/blog/dbbet-bono-100-freebet-argentina-mundial-2026",
-     "views": 1,
-     "users": 1,
-     "avgDur": 960
+     "views": 4,
+     "users": 4,
+     "avgDur": 40
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "views": 4,
+     "users": 4,
+     "avgDur": 1
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/linemate-mas-ia-futbol",
+     "views": 4,
+     "users": 3,
+     "avgDur": 149
+    },
+    {
+     "host": "gambeta.ai",
+     "path": "/blog/mejor-tipster-argentino-2026",
+     "views": 4,
+     "users": 2,
+     "avgDur": 250
+    },
+    {
+     "host": "accesoia.app",
+     "path": "/pick-del-dia",
+     "views": 3,
+     "users": 3,
+     "avgDur": 32
     }
    ],
    "landing": [
     {
      "path": "",
-     "sessions": 145,
+     "sessions": 220,
      "bounce": 100
     },
     {
      "path": "/",
-     "sessions": 54,
-     "bounce": 100
+     "sessions": 172,
+     "bounce": 82
     },
     {
-     "path": "/?ref=blog-promo-picks",
-     "sessions": 5,
-     "bounce": 100
-    },
-    {
-     "path": "/mundial-2026",
-     "sessions": 4,
-     "bounce": 100
+     "path": "/blog/ia-para-apostar",
+     "sessions": 39,
+     "bounce": 46.2
     },
     {
      "path": "/predicciones-ia",
+     "sessions": 10,
+     "bounce": 90
+    },
+    {
+     "path": "/?ref=blog-promo-picks",
+     "sessions": 7,
+     "bounce": 71.4
+    },
+    {
+     "path": "/blog/mejor-casa-apuestas-mundial-2026-bolivia",
+     "sessions": 6,
+     "bounce": 33.3
+    },
+    {
+     "path": "/mundial-2026",
+     "sessions": 5,
+     "bounce": 40
+    },
+    {
+     "path": "/estadisticas-ia",
      "sessions": 4,
      "bounce": 100
     },
     {
      "path": "/?gtm_latency=1",
-     "sessions": 2,
-     "bounce": 100
+     "sessions": 3,
+     "bounce": 0
     },
     {
-     "path": "/blog/ia-para-apostar",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/eleccion",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwZXh0bgNhZW0BMABhZGlkAas0LxtzowJzcnRjBmFwcF9pZAwzNTA2ODU1MzE3MjgAAR7bV2J_O9kHKAKau7F6OkDWao5a9ggpaCN7PMAvna8rLHuVsz_pvZH8rEpMDA_aem_r-ep1hipTBK54142YgVjMQ",
-     "sessions": 2,
-     "bounce": 100
-    },
-    {
-     "path": "/predicciones-ia?fbclid=IwcGRvZgFmZGlkFlCjiVuAF6Pcn5YBpMVGv6glxWBV_iFleHRuA2FlbQEwAGFkaWQBqzQvG2CQMnNydGMGYXBwX2lkCjY2Mjg1NjgzNzkAAR6jW8Cc_QiYhHOz9QXEevYX6PADUBKGeIjTVeFTA8VbB1H-PMcUAmdukguyBw_aem_PxWQGp7IGabUSOQz8OMIMg",
-     "sessions": 2,
+     "path": "/blog/ia-predicciones-deportivas-gratis-top-5",
+     "sessions": 3,
      "bounce": 100
     }
    ],
    "events": {
-    "page_view": 2535,
-    "session_start": 2354,
-    "first_visit": 2341,
-    "user_engagement": 137,
-    "spoiler_click_open_gate": 136,
-    "gate_show": 71,
-    "scroll": 49,
-    "gate_manual_open": 16,
-    "inline_cta_open_gate": 11,
-    "click": 8,
-    "lead_capture": 8,
-    "form_start": 6,
-    "sticky_open_gate": 6,
-    "eleccion_jugada": 4,
-    "telegram_click": 3,
-    "goto_gambeta": 2
+    "page_view": 14052,
+    "session_start": 12954,
+    "first_visit": 12716,
+    "user_engagement": 677,
+    "spoiler_click_open_gate": 597,
+    "gate_show": 267,
+    "scroll": 190,
+    "gate_manual_open": 61,
+    "inline_cta_open_gate": 41,
+    "click": 28,
+    "gate_close": 26,
+    "form_start": 24,
+    "lead_capture": 18,
+    "sticky_open_gate": 16,
+    "telegram_click": 8,
+    "eleccion_jugada": 6,
+    "goto_gambeta": 3
    },
    "devices": [
     {
      "device": "mobile",
-     "sessions": 2329,
-     "engagement": 0.2
+     "sessions": 12631,
+     "engagement": 6.1
     },
     {
      "device": "desktop",
-     "sessions": 21,
-     "engagement": 0
+     "sessions": 73,
+     "engagement": 32.9
     },
     {
      "device": "tablet",
-     "sessions": 3,
-     "engagement": 0
+     "sessions": 14,
+     "engagement": 21.4
     }
    ],
    "countries": [
     {
      "country": "Argentina",
-     "sessions": 2269,
-     "users": 2240
-    },
-    {
-     "country": "Mexico",
-     "sessions": 13,
-     "users": 13
-    },
-    {
-     "country": "Brazil",
-     "sessions": 10,
-     "users": 10
+     "sessions": 12329,
+     "users": 12003
     },
     {
      "country": "Spain",
-     "sessions": 10,
-     "users": 10
+     "sessions": 54,
+     "users": 47
+    },
+    {
+     "country": "Brazil",
+     "sessions": 50,
+     "users": 50
+    },
+    {
+     "country": "Mexico",
+     "sessions": 43,
+     "users": 39
+    },
+    {
+     "country": "United States",
+     "sessions": 38,
+     "users": 38
     },
     {
      "country": "Chile",
-     "sessions": 5,
-     "users": 5
+     "sessions": 18,
+     "users": 17
     },
     {
      "country": "Colombia",
-     "sessions": 5,
-     "users": 5
+     "sessions": 18,
+     "users": 16
     },
     {
-     "country": "Bolivia",
-     "sessions": 4,
-     "users": 4
-    },
-    {
-     "country": "France",
-     "sessions": 4,
-     "users": 4
+     "country": "Peru",
+     "sessions": 18,
+     "users": 17
     }
    ],
    "cities": [
     {
      "city": "Buenos Aires",
-     "sessions": 287
+     "sessions": 1646
     },
     {
      "city": "",
-     "sessions": 205
+     "sessions": 665
+    },
+    {
+     "city": "(not set)",
+     "sessions": 626
     },
     {
      "city": "Cordoba",
-     "sessions": 88
-    },
-    {
-     "city": "Mar del Plata",
-     "sessions": 54
-    },
-    {
-     "city": "Rosario",
-     "sessions": 54
-    },
-    {
-     "city": "Salta",
-     "sessions": 41
-    },
-    {
-     "city": "Santa Fe",
-     "sessions": 34
+     "sessions": 506
     },
     {
      "city": "San Miguel de Tucuman",
-     "sessions": 32
+     "sessions": 259
+    },
+    {
+     "city": "Rosario",
+     "sessions": 258
+    },
+    {
+     "city": "Mar del Plata",
+     "sessions": 227
+    },
+    {
+     "city": "Salta",
+     "sessions": 195
     }
    ],
    "newVsReturning": [
     {
      "type": "new",
-     "sessions": 2309
+     "sessions": 12552
     },
     {
      "type": "",
-     "sessions": 189
+     "sessions": 390
+    },
+    {
+     "type": "returning",
+     "sessions": 83
     }
    ],
    "bySite": {
     "accesoia": {
-     "sessions": 2283,
-     "users": 2254,
-     "pageviews": 2417,
-     "engagement": 0.2
+     "sessions": 12446,
+     "users": 12161,
+     "pageviews": 13588,
+     "engagement": 5.8
     },
     "gambeta": {
-     "sessions": 72,
-     "users": 71,
-     "pageviews": 118,
-     "engagement": 0
+     "sessions": 263,
+     "users": 239,
+     "pageviews": 464,
+     "engagement": 28.1
     }
    },
    "campaigns": [
     {
      "campaign": "120245888814470578",
      "content": "120247191945600578",
-     "sessions": 844,
-     "users": 834
-    },
-    {
-     "campaign": "(cross-network)",
-     "content": "",
-     "sessions": 606,
-     "users": 606
+     "sessions": 5852,
+     "users": 5604
     },
     {
      "campaign": "120245888814470578",
      "content": "120247191856340578",
-     "sessions": 529,
-     "users": 527
+     "sessions": 5238,
+     "users": 5261
+    },
+    {
+     "campaign": "(cross-network)",
+     "content": "",
+     "sessions": 1166,
+     "users": 1168
     },
     {
      "campaign": "(not set)",
      "content": "",
-     "sessions": 430,
-     "users": 394
+     "sessions": 395,
+     "users": 370
+    },
+    {
+     "campaign": "(direct)",
+     "content": "(not set)",
+     "sessions": 68,
+     "users": 63
     },
     {
      "campaign": "(direct)",
      "content": "",
-     "sessions": 37,
-     "users": 36
+     "sessions": 66,
+     "users": 56
     },
     {
      "campaign": "120245888814470578",
      "content": "120247191856330578",
-     "sessions": 17,
-     "users": 17
+     "sessions": 59,
+     "users": 57
+    },
+    {
+     "campaign": "(organic)",
+     "content": "(not set)",
+     "sessions": 38,
+     "users": 38
     },
     {
      "campaign": "(referral)",
-     "content": "",
-     "sessions": 14,
-     "users": 14
+     "content": "(not set)",
+     "sessions": 30,
+     "users": 29
     },
     {
      "campaign": "(organic)",
      "content": "",
-     "sessions": 10,
-     "users": 10
+     "sessions": 27,
+     "users": 26
     },
     {
-     "campaign": "(ai-assistant)",
+     "campaign": "(referral)",
      "content": "",
-     "sessions": 1,
-     "users": 1
+     "sessions": 18,
+     "users": 15
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191735000578",
+     "sessions": 11,
+     "users": 11
+    },
+    {
+     "campaign": "(referral)",
+     "content": "link_in_bio",
+     "sessions": 5,
+     "users": 4
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191951700578",
+     "sessions": 5,
+     "users": 5
+    },
+    {
+     "campaign": "120245888814470578",
+     "content": "120247191856310578",
+     "sessions": 4,
+     "users": 4
     }
    ],
    "funnel": {
-    "sessions": 2353,
-    "gateShows": 71,
-    "gateOpens": 169,
-    "formStarts": 6,
-    "leads": 8,
-    "tgClicks": 3,
-    "gotoGambeta": 2,
-    "eleccion": 4,
-    "gateOpenRate": 7.2,
-    "leadConvRate": 0.34,
-    "gateToLeadRate": 4.7,
-    "leadToGambetaRate": 25,
-    "formToLeadRate": 133.3
+    "sessions": 12633,
+    "gateShows": 267,
+    "gateOpens": 715,
+    "formStarts": 24,
+    "leads": 18,
+    "tgClicks": 8,
+    "gotoGambeta": 3,
+    "eleccion": 6,
+    "gateOpenRate": 5.7,
+    "leadConvRate": 0.14,
+    "gateToLeadRate": 2.5,
+    "leadToGambetaRate": 16.7,
+    "formToLeadRate": 75
    }
   }
  },
@@ -3893,8 +4619,8 @@
   "pendientes": 4
  },
  "ia": {
-  "text": "# 📊 Diagnóstico Gambeta AI / accesoia.app\n\n**🟢 Qué funciona:**\nEl tráfico paga entra bien (fb+ig = 1365 sesiones, 58% del total) y es 100% mobile, coherente con el canal. La campaña 945600578 rinde mejor que su hermana (844 vs 529 sesiones).\n\n**🔴 Cuello de botella:**\nEl gate casi no se muestra. Solo **71 de 2327 sesiones (3%) ven el gate**, y el scroll promedio es de apenas **16.3%**. La gente entra y se va antes de que el sitio le pida algo. No es problema de conversión del form, es que el form nunca aparece.\n\n**🎯 Acciones (por impacto):**\n\n1. **Bajá el trigger del gate.** Si depende de scroll/tiempo, activalo mucho antes (ej: 5seg o 10% scroll). Con 16.3% de scroll promedio, estás perdiendo el 97% del tráfico antes de mostrar la oferta.\n2. **Poné el gate arriba (above the fold)** o con un sticky CTA, no esperes que bajen.\n3. **Pausá la campaña \"(not set)\"** (430 sesiones sin data, 0% engagement) — está quemando budget sin trackear nada. Redirigí ese spend a 945600578.",
+  "text": "# 📊 Diagnóstico Accesoia.app — 28 días\n\n**🟢 Qué funciona:**\nEl tráfico paid entra bien (12.4k usuarios, FB con engagement 7.7% > IG 4.4%) y tenés un gancho de producto fuerte: 77% de acierto en los picks. Los que llegan a Gambeta se re-enganchan fuerte (28.1% engagement ahí).\n\n**🔴 El cuello de botella:**\nLa landing no engancha en el fold. Scroll depth de solo **16.3%** y gate open rate de **5.7%** (715 de 12,633 sesiones). El 94% del tráfico se va sin ver siquiera la propuesta de valor. Es 100% mobile (99.9% de sesiones) y el engagement general de accesoia es 5.8%, paupérrimo.\n\n**🎯 Las 3 acciones:**\n\n1. **Poné el 77% de acierto como headline arriba del fold**, sin necesidad de scroll. Si la gente no scrollea, el mensaje tiene que pegar en los primeros 3 segundos.\n2. **Rediseñá el trigger del gate**: que no dependa de scroll manual, sino de tiempo en página o exit-intent. Estás perdiendo el 94% antes de que abran el formulario.\n3. **Pausá o iterá creativos de IG** (4.4% engagement vs 7.7% de FB) y reasigná presupuesto a FB mientras testeás nuevo copy en IG.",
   "model": "claude-sonnet-5",
-  "at": "2026-07-09T23:30:02.826Z"
+  "at": "2026-07-10T17:44:58.216Z"
  }
 }
