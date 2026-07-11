@@ -754,7 +754,7 @@ window.toggleHeroBubble = function(n) {
         var wcPending = picks.filter(function(p) {
           return p && p._sportKey === 'soccer_fifa_world_cup'
               && (!p.result || p.result === 'pending')
-              && p.commenceTs && p.commenceTs >= nowMs && p.commenceTs <= in24h
+              && p.commenceTs && p.commenceTs >= nowMs - 2.5 * 3600 * 1000 && p.commenceTs <= in24h  // 🆕 incluye EN VIVO (hasta 2h30 post-kickoff)
               && p.home && p.away && ISO_MAP[p.home] && ISO_MAP[p.away];
         });
         // Ordenar por confianza (Máxima > Alta > Media) + hora más cercana
@@ -813,7 +813,8 @@ window.toggleHeroBubble = function(n) {
                  tz.indexOf('america/los_angeles')>=0) tzLabel = 'US';
         else tzLabel = 'tu hora';
       }
-      if (tag) tag.innerHTML = todayMatch ? ('⚡ PICK IA DEL DÍA · ' + (hhmm ? hhmm + ' ' + tzLabel : 'Mundial 2026')) : '✨ Picks IA en gambeta.ai';
+      var _heroLive = todayMatch && todayMatch.commenceTs && todayMatch.commenceTs <= Date.now();  // 🆕 partido en curso
+      if (tag) tag.innerHTML = todayMatch ? (_heroLive ? '🔴 PICK IA · EN VIVO AHORA' : ('⚡ PICK IA DEL DÍA · ' + (hhmm ? hhmm + ' ' + tzLabel : 'Mundial 2026'))) : '✨ Picks IA en gambeta.ai';
       if (sub) {
         if (todayMatch) {
           var _vfHome = (todayMatch.home || '').replace(/'/g, "\\'");
