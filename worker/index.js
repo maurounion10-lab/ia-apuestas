@@ -1227,14 +1227,14 @@ function calcResult(pick, score) {
   if (rec === 'Más de 1.5')      return total >= 2 ? 'win' : 'loss';
   if (rec === 'Más de 2.5')      return total >= 3 ? 'win' : 'loss';
   if (rec === 'Más de 3.5')      return total >= 4 ? 'win' : 'loss';
-  const mO = rec.match(/^Más de (\d+\.?\d*)$/);
+  const mO = rec.match(/^Más de (\d+[.,]?\d*)(?:\s*goles)?$/i);
   if (mO) {
-    const line = parseFloat(mO[1]);
+    const line = parseFloat(mO[1].replace(',','.'));
     return total > line ? 'win' : 'loss';
   }
-  const mU = rec.match(/^Menos de (\d+\.?\d*)$/);
+  const mU = rec.match(/^Menos de (\d+[.,]?\d*)(?:\s*goles)?$/i);
   if (mU) {
-    const line = parseFloat(mU[1]);
+    const line = parseFloat(mU[1].replace(',','.'));
     return total < line ? 'win' : 'loss';
   }
   const mG = rec.match(/^Gana\s+(.+)$/i);
