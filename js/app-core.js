@@ -4463,7 +4463,7 @@ function renderPreds() {
       p &&
       (p._sportKey === 'soccer_fifa_world_cup' || (p.league||'').includes('Mundial')) &&
       (!p.result || p.result === 'pending') &&
-      p.commenceTs && p.commenceTs > Date.now() - 4*60*60*1000  // que no haya terminado hace más de 4h
+      p.commenceTs && p.commenceTs > Date.now() - 16*60*60*1000  // 🆕 16h: pending en vivo/recién terminado sigue visible hasta que el cron lo resuelva
     );
     if (_wcPendings.length) {
       // Mergear evitando duplicados por id o por (home+away+date)
@@ -5024,7 +5024,7 @@ function renderPreds() {
         else if (rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
         else if (rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
         else if (rec === 'Más de 3.5')     result = totalGoals >= 4 ? 'win' : 'loss';
-        else if (/^Más de (\d+\.?\d*)$/.test(rec)) {
+        else if (/^Más de (\d+[.,]?\d*)(?:\s*goles)?$/i.test(rec)) {
           const line = parseFloat(rec.replace('Más de ',''));
           result = totalGoals > line ? 'win' : 'loss';
         }
@@ -8290,12 +8290,12 @@ function resolveCompletedGames(scores, skipRender) {
       else if (p.rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
       else if (p.rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
       else if (p.rec === 'Más de 3.5')     result = totalGoals >= 4 ? 'win' : 'loss';
-      else if (/^Más de (\d+\.?\d*)$/.test(p.rec)) {
+      else if (/^Más de (\d+[.,]?\d*)(?:\s*goles)?$/i.test(p.rec)) {
         // Over basket (ej: "Más de 215.5")
         const line = parseFloat(p.rec.replace('Más de ',''));
         result = totalGoals > line ? 'win' : 'loss';
       }
-      else if (/^Menos de (\d+\.?\d*)$/.test(p.rec)) {
+      else if (/^Menos de (\d+[.,]?\d*)(?:\s*goles)?$/i.test(p.rec)) {
         // Under basket (ej: "Menos de 215.5")
         const line = parseFloat(p.rec.replace('Menos de ',''));
         result = totalGoals < line ? 'win' : 'loss';
@@ -8782,11 +8782,11 @@ function resolveAllGames(scores) {
       else if (p.rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
       else if (p.rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
       else if (p.rec === 'Más de 3.5')     result = totalGoals >= 4 ? 'win' : 'loss';
-      else if (/^Más de (\d+\.?\d*)$/.test(p.rec)) {
+      else if (/^Más de (\d+[.,]?\d*)(?:\s*goles)?$/i.test(p.rec)) {
         const line = parseFloat(p.rec.replace('Más de ',''));
         result = totalGoals > line ? 'win' : 'loss';
       }
-      else if (/^Menos de (\d+\.?\d*)$/.test(p.rec)) {
+      else if (/^Menos de (\d+[.,]?\d*)(?:\s*goles)?$/i.test(p.rec)) {
         const line = parseFloat(p.rec.replace('Menos de ',''));
         result = totalGoals < line ? 'win' : 'loss';
       }
