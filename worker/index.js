@@ -1720,6 +1720,73 @@ async function fetchPickIntel(q, env) {
   };
 }
 
+// ── 🆕 (13-jul) PICK INTEL vía TheSportsDB — fallback gratis cuando APF no tiene la temporada.
+// Da H2H + forma reales. Lesiones: solo con APF pago.
+async function fetchPickIntelTsdb(q, env) {
+  const slug = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
+  async function tsdbJson(path) {
+    const r = await fetch(`${TSDB_BASE}/${path}`);
+    if (!r.ok) throw new Error('TSDB ' + r.status);
+    return r.json();
+  }
+  // 1) H2H: searchevents devuelve el historial completo del cruce
+  const evs = [];
+  for (const qq of [`${slug(q.home)}_vs_${slug(q.away)}`, `${slug(q.away)}_vs_${slug(q.home)}`]) {
+    try {
+      const j = await cached(env, `tsx_h2h_${qq}`, 24 * 3600, () => tsdbJson(`searchevents.php?e=${qq}`));
+      const list = (j && (j.event || j.events)) || [];
+      for (const e of list) if (e && e.intHomeScore != null && e.intAwayScore != null) evs.push(e);
+    } catch(_) {}
+  }
+  evs.sort((a, b) => String(b.dateEvent || '').localeCompare(String(a.dateEvent || '')));
+  const h2h = { n: 0, homeW: 0, draw: 0, awayW: 0, homeAtHome: { n: 0, w: 0, d: 0, l: 0 }, last: [] };
+  const _isHomeTeam = nm => teamsMatch(nm, q.home);
+  for (const e of evs.slice(0, 10)) {
+    const gh = Number(e.intHomeScore), ga = Number(e.intAwayScore);
+    const homeWasLocal = _isHomeTeam(e.strHomeTeam || '');
+    h2h.n++;
+    const localWin = gh > ga, visitWin = ga > gh;
+    if ((homeWasLocal && localWin) || (!homeWasLocal && visitWin)) h2h.homeW++;
+    else if (gh === ga) h2h.draw++;
+    else h2h.awayW++;
+    if (homeWasLocal) {
+      h2h.homeAtHome.n++;
+      if (localWin) h2h.homeAtHome.w++; else if (gh === ga) h2h.homeAtHome.d++; else h2h.homeAtHome.l++;
+    }
+    if (h2h.last.length < 5) h2h.last.push({ date: e.dateEvent || '', home: e.strHomeTeam, away: e.strAwayTeam, score: gh + '-' + ga });
+  }
+  // 2) Forma: searchteams → idTeam → eventslast (últimos 5)
+  async function formOf(name) {
+    try {
+      const t = await cached(env, `tsx_team_${slug(name)}`, 7 * 24 * 3600, () => tsdbJson(`searchteams.php?t=${slug(name).replace(/_/g, '%20')}`));
+      const team = ((t && t.teams) || []).find(x => x && x.strSport === 'Soccer' && teamsMatch(x.strTeam, name));
+      if (!team) return '';
+      const le = await cached(env, `tsx_last_${team.idTeam}`, 6 * 3600, () => tsdbJson(`eventslast.php?id=${team.idTeam}`));
+      const out = [];
+      for (const e of ((le && le.results) || [])) {
+        if (e.intHomeScore == null || e.intAwayScore == null) continue;
+        const isHome = teamsMatch(e.strHomeTeam || '', name);
+        const gf = Number(isHome ? e.intHomeScore : e.intAwayScore);
+        const gc = Number(isHome ? e.intAwayScore : e.intHomeScore);
+        out.push(gf > gc ? 'W' : gf === gc ? 'D' : 'L');
+      }
+      return out.slice(0, 5).join('');
+    } catch(_) { return ''; }
+  }
+  const formHome = await formOf(q.home);
+  const formAway = await formOf(q.away);
+  if (!h2h.n && !formHome && !formAway) return { error: 'no-data-tsdb' };
+  return {
+    teams: { home: q.home, away: q.away },
+    injuries: { home: { count: 0, players: [] }, away: { count: 0, players: [] } },
+    injuriesUnavailable: true, // APF free: sin data de lesiones
+    h2h,
+    form: { home: formHome, away: formAway },
+    _src: 'tsdb',
+  };
+}
+
 async function fetchApfScore(pick, env) {
   if (!pick._sportKey || !pick.commenceTs) return null;
   const leagueId = _getApfLeagueIdForSportKey(pick._sportKey);
@@ -3530,11 +3597,17 @@ export default {
       if (!q.home || !q.away || !q.sportKey) {
         return new Response(JSON.stringify({ error: 'missing params (home, away, sportKey)' }), { status: 400, headers: CORS });
       }
-      const cacheKey = `pickintel_v3_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
-      const data = q.debug
-        ? await fetchPickIntel(q, env).catch(e => ({ error: String(e && e.message || e) }))
-        : await cached(env, cacheKey, 6 * 3600,
-            () => fetchPickIntel(q, env).catch(e => ({ error: String(e && e.message || e) })));
+      const cacheKey = `pickintel_v4_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
+      const _getIntel = async () => {
+        let d = await fetchPickIntel(q, env).catch(e => ({ error: String(e && e.message || e) }));
+        if (d && d.error) {
+          // APF sin acceso (plan free / rate limit / sin fixture) → fallback TSDB
+          const t = await fetchPickIntelTsdb(q, env).catch(e => ({ error: String(e && e.message || e) }));
+          if (t && !t.error) { t._apfError = d.error; d = t; }
+        }
+        return d;
+      };
+      const data = q.debug ? await _getIntel() : await cached(env, cacheKey, 6 * 3600, _getIntel);
       return new Response(JSON.stringify(data || { error: 'no-data' }), { headers: CORS });
     }
 
