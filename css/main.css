@@ -3566,7 +3566,15 @@
     font-size: 0.9rem;
   }
   .pred-action-btn.btn-icon > span { line-height: 1; font-size: 0.95rem; }
-  /* .btn-like sigue con contador visible, ocupa flex normal */
+  /* 🆕 (13-jul) Like compacto alineado a la derecha — antes flex:1 lo estiraba
+     como un rectángulo vacío gigante y la botonera quedaba desbalanceada */
+  .pred-action-btn.btn-like {
+    flex: 0 0 auto;
+    margin-left: auto;
+    min-width: 56px;
+    padding: 7px 12px;
+    font-size: 0.72rem;
+  }
   .pred-action-arrow { font-size: 0.55rem; margin-left: 2px; transition: transform .2s; }
   .pred-action-arrow.open { transform: rotate(180deg); }
   /* mantener .share-pick-btn como alias por si se usa en otro lado */
