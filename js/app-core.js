@@ -6221,7 +6221,7 @@ function renderPreds() {
       <div class="pred-ia-strip" id="iastrip-${_cardId}" style="display:none"></div>
       <div class="pred-match">
         <div class="pred-team">
-          <div class="pred-emoji">${logoHtml((p._sportKey?.includes('conmebol') && (p.homeRaw||p.home)==='Barcelona') ? 'Barcelona SC' : (p.homeRaw||p.home), 64)}</div>
+          <div class="pred-emoji">${logoHtml((p._sportKey?.includes('conmebol') && (p.homeRaw||p.home)==='Barcelona') ? 'Barcelona SC' : (p.homeRaw||p.home), 96)}</div>
           <div class="pred-tname">${shortName(p.home)}</div>
         </div>
         ${isGameLive
@@ -6245,7 +6245,7 @@ function renderPreds() {
           : `<div class="pred-vs">VS</div>`
         }
         <div class="pred-team">
-          <div class="pred-emoji">${logoHtml((p._sportKey?.includes('conmebol') && (p.awayRaw||p.away)==='Barcelona') ? 'Barcelona SC' : (p.awayRaw||p.away), 64)}</div>
+          <div class="pred-emoji">${logoHtml((p._sportKey?.includes('conmebol') && (p.awayRaw||p.away)==='Barcelona') ? 'Barcelona SC' : (p.awayRaw||p.away), 96)}</div>
           <div class="pred-tname">${shortName(p.away)}</div>
         </div>
       </div>
