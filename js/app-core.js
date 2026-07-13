@@ -4022,6 +4022,25 @@ function _updateHeroProStats() {
 //   1) scoresData con flag='live' (autoritativo del API)
 //   2) Fallback temporal estricto: kickoff <= now AND kickoff > now - 2.5h
 // Excluye picks ya resueltos (win/loss/void) o "stale" (kickoff pasó hace mucho).
+// 🆕 (13-jul) Winrate últimos 30 días para el sello FALLADO (cache 60s)
+function _winRate30() {
+  try {
+    if (window._wr30Cache && Date.now() - window._wr30Cache.ts < 60000) return window._wr30Cache.v;
+    const h = (typeof loadHistorial === 'function') ? loadHistorial() : [];
+    const cut = Date.now() - 30 * 24 * 3600 * 1000;
+    let w = 0, t = 0;
+    (h || []).forEach(x => {
+      if (!x || (x.result !== 'win' && x.result !== 'loss')) return;
+      const ts = x.commenceTs || (x.date ? new Date(x.date).getTime() : 0);
+      if (!ts || ts < cut) return;
+      t++; if (x.result === 'win') w++;
+    });
+    const v = t >= 10 ? Math.round(w / t * 100) : null;
+    window._wr30Cache = { ts: Date.now(), v };
+    return v;
+  } catch(e) { return null; }
+}
+
 function _isPickLive(p) {
   try {
     if (!p) return null;
@@ -6320,12 +6339,22 @@ function renderPreds() {
         const _title = _win ? '¡Acertado!' : isFinishedLoss ? 'Fallado' : 'Pendiente';
         const _sub = isHighConfWin ? 'Máxima confianza · ganado' : isFinishedWin ? 'La IA ganó este pick' : isFinishedLoss ? 'Este pick no entró' : 'Esperando resultado';
         const _scoreFmt = finalScore ? (/^\d+\s*-\s*\d+$/.test(finalScore) ? finalScore.replace(/\s*-\s*/, ' – ') : _translateMatchState(finalScore)) : '';
+        // 🆕 (13-jul) Aprovechar el espacio central del sello: pago en ganados, winrate 30d en fallados
+        let _mid = '';
+        const _roStamp = parseFloat(p._bestOdds || p.odds || 0);
+        if (_win && !isHighConfWin && _roStamp > 1) {
+          _mid = `<div class="pred-result-stamp-mid">💰 $100 → $${Math.round(_roStamp * 100)}</div>`;
+        } else if (isFinishedLoss) {
+          const _wr30 = _winRate30();
+          if (_wr30 != null && _wr30 >= 55) _mid = `<div class="pred-result-stamp-mid">📊 30 días: ${_wr30}% acierto</div>`;
+        }
         return `<div class="pred-result-stamp ${_cls}">
         <span class="pred-result-stamp-icon">${_ico}</span>
         <div class="pred-result-stamp-body">
           <span class="pred-result-stamp-text">${_title}${isHighConfWin ? ' <span class="stamp-max-tag">★ MÁXIMA</span>' : ''}</span>
           <span class="pred-result-stamp-sub">${_sub}</span>
         </div>
+        ${_mid}
         ${_scoreFmt ? `<div class="pred-result-stamp-score"><span class="stamp-score-num">${_scoreFmt}</span><span class="stamp-score-lbl">FINAL</span></div>` : ''}
       </div>`;
       })() : ''}
