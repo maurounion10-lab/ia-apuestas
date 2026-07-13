@@ -4022,12 +4022,12 @@ function _updateHeroProStats() {
 //   1) scoresData con flag='live' (autoritativo del API)
 //   2) Fallback temporal estricto: kickoff <= now AND kickoff > now - 2.5h
 // Excluye picks ya resueltos (win/loss/void) o "stale" (kickoff pasó hace mucho).
-// 🆕 (13-jul) Winrate últimos 30 días para el sello FALLADO (cache 60s)
+// 🆕 (13-jul) Winrate últimos 7 días para el sello FALLADO (cache 60s)
 function _winRate30() {
   try {
     if (window._wr30Cache && Date.now() - window._wr30Cache.ts < 60000) return window._wr30Cache.v;
     const h = (typeof loadHistorial === 'function') ? loadHistorial() : [];
-    const cut = Date.now() - 30 * 24 * 3600 * 1000;
+    const cut = Date.now() - 7 * 24 * 3600 * 1000;
     let w = 0, t = 0;
     (h || []).forEach(x => {
       if (!x || (x.result !== 'win' && x.result !== 'loss')) return;
@@ -4035,7 +4035,7 @@ function _winRate30() {
       if (!ts || ts < cut) return;
       t++; if (x.result === 'win') w++;
     });
-    const v = t >= 10 ? Math.round(w / t * 100) : null;
+    const v = t >= 5 ? { w: w, l: t - w, pct: Math.round(w / t * 100) } : null;
     window._wr30Cache = { ts: Date.now(), v };
     return v;
   } catch(e) { return null; }
@@ -6346,7 +6346,7 @@ function renderPreds() {
           _mid = `<div class="pred-result-stamp-mid">💰 $100 → $${Math.round(_roStamp * 100)}</div>`;
         } else if (isFinishedLoss) {
           const _wr30 = _winRate30();
-          if (_wr30 != null && _wr30 >= 55) _mid = `<div class="pred-result-stamp-mid">📊 30 días: ${_wr30}% acierto</div>`;
+          if (_wr30 && _wr30.pct >= 55) _mid = `<div class="pred-result-stamp-mid">📊 7 días: ${_wr30.w}W-${_wr30.l}L · ${_wr30.pct}%</div>`;
         }
         return `<div class="pred-result-stamp ${_cls}">
         <span class="pred-result-stamp-icon">${_ico}</span>
