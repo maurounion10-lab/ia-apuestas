@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Análisis completo del pick · gambeta.ai</title>
+<meta name="description" content="Análisis completo de la predicción de la IA: probabilidades, bajas, historial H2H y forma reciente.">
+<meta name="robots" content="noindex, follow">
+<link rel="icon" href="/favicon.png">
+<style>
+  :root { --verde:#00c853; --amarillo:#ffd600; --bg:#0a0f0a; --card:#121a12; --borde:rgba(255,255,255,0.09); --texto:#e8f5e9; --texto-sec:#9ab09c; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:var(--bg); color:var(--texto); font-family:'Inter',-apple-system,system-ui,sans-serif; min-height:100vh; }
+  .wrap { max-width:640px; margin:0 auto; padding:18px 16px 60px; }
+  .top { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+  .logo { font-weight:900; font-size:1.1rem; color:#fff; text-decoration:none; }
+  .logo span { color:var(--verde); }
+  .back { color:var(--texto-sec); text-decoration:none; font-size:0.8rem; font-weight:700; }
+  .card { background:var(--card); border:1px solid var(--borde); border-radius:16px; padding:18px 16px; margin-bottom:14px; }
+  .match { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:6px 0 14px; }
+  .team { flex:1; text-align:center; }
+  .team img { width:72px; height:72px; object-fit:contain; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
+  .tname { font-weight:800; margin-top:6px; font-size:0.95rem; }
+  .vs { color:var(--texto-sec); font-weight:800; font-size:0.7rem; background:rgba(0,0,0,0.3); border:1px solid var(--borde); border-radius:6px; padding:4px 9px; }
+  .meta { text-align:center; color:var(--texto-sec); font-size:0.78rem; margin-bottom:4px; }
+  .pickbox { display:flex; align-items:stretch; justify-content:space-between; gap:10px; background:linear-gradient(135deg,rgba(255,215,0,0.10),rgba(255,170,0,0.05)); border:1px solid rgba(255,215,0,0.3); border-radius:12px; padding:12px 13px; }
+  .picklbl { font-size:0.58rem; letter-spacing:0.1em; text-transform:uppercase; color:#f6cf6b; font-weight:800; margin-bottom:6px; }
+  .pickval { display:inline-flex; align-items:center; gap:6px; background:rgba(0,200,83,0.14); border:1px solid rgba(0,200,83,0.4); border-radius:8px; padding:6px 12px; font-weight:800; font-size:1rem; }
+  .cuota { display:flex; flex-direction:column; align-items:center; justify-content:center; background:rgba(0,0,0,0.3); border:1px solid var(--borde); border-radius:10px; padding:6px 16px; min-width:82px; }
+  .cuota small { font-size:0.52rem; letter-spacing:0.12em; color:var(--texto-sec); font-weight:800; }
+  .cuota b { font-size:1.6rem; font-family:monospace; }
+  h2 { font-size:0.72rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--texto-sec); margin-bottom:12px; }
+  .bars { display:flex; gap:12px; }
+  .bar { flex:1; text-align:center; }
+  .bar .lbl { font-size:0.72rem; color:var(--texto-sec); margin-bottom:5px; }
+  .bar .bg { height:7px; background:rgba(255,255,255,0.08); border-radius:99px; overflow:hidden; }
+  .bar .fill { height:100%; border-radius:99px; background:var(--verde); }
+  .bar.draw .fill { background:#9e9e9e; } .bar.away .fill { background:#42a5f5; }
+  .bar .pct { font-weight:800; margin-top:5px; font-size:0.9rem; }
+  .bullet { padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:0.88rem; line-height:1.45; }
+  .bullet:last-child { border-bottom:none; }
+  .inj-team { margin-bottom:12px; }
+  .inj-team h3 { font-size:0.85rem; margin-bottom:6px; }
+  .inj { display:flex; justify-content:space-between; font-size:0.82rem; color:var(--texto-sec); padding:4px 0; }
+  .inj b { color:#ff8a80; font-weight:700; }
+  .ok { color:var(--verde); font-size:0.84rem; }
+  table { width:100%; border-collapse:collapse; font-size:0.8rem; }
+  td { padding:7px 4px; border-bottom:1px solid rgba(255,255,255,0.05); }
+  td.score { text-align:center; font-weight:800; font-family:monospace; white-space:nowrap; }
+  td.fecha { color:var(--texto-sec); white-space:nowrap; }
+  .form-row { display:flex; justify-content:space-between; align-items:center; padding:8px 0; }
+  .dots span { display:inline-block; width:22px; height:22px; border-radius:6px; text-align:center; line-height:22px; font-size:0.68rem; font-weight:900; margin-left:4px; }
+  .dot-W { background:rgba(0,200,83,0.2); color:var(--verde); border:1px solid rgba(0,200,83,0.4); }
+  .dot-D { background:rgba(158,158,158,0.15); color:#bdbdbd; border:1px solid rgba(158,158,158,0.3); }
+  .dot-L { background:rgba(255,82,82,0.12); color:#ff8a80; border:1px solid rgba(255,82,82,0.3); }
+  .cta { display:flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,#d32f2f,#b71c1c); border:2px solid var(--amarillo); color:#fff; font-weight:900; border-radius:12px; padding:14px; text-decoration:none; font-size:1rem; margin-top:6px; }
+  .loading { text-align:center; padding:60px 0; color:var(--texto-sec); }
+  .err { text-align:center; padding:40px 12px; color:var(--texto-sec); font-size:0.9rem; }
+  .badge-conf { display:inline-block; font-size:0.62rem; font-weight:800; letter-spacing:0.06em; text-transform:uppercase; border-radius:99px; padding:3px 10px; background:rgba(255,214,0,0.1); border:1px solid rgba(255,214,0,0.35); color:var(--amarillo); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="logo" href="/">⚡ gambeta<span>.ai</span></a>
+    <a class="back" href="/#predicciones">← Volver a los picks</a>
+  </div>
+  <div id="app"><div class="loading">Cargando análisis…</div></div>
+</div>
+<script src="/team-logos.js"></script>
+<script>
+(async function() {
+  const $app = document.getElementById('app');
+  const P = new URLSearchParams(location.search);
+  const qId = P.get('id') || '', qH = P.get('h') || '', qA = P.get('a') || '', qTs = P.get('ts') || '';
+  const WORKER = 'https://apuestas-api.mauro-union10.workers.dev';
+
+  function esc(x) { return String(x == null ? '' : x).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
+  function logo(name) {
+    try {
+      const url = (typeof teamLogos !== 'undefined') && (teamLogos[name] || null);
+      if (url) return '<img src="' + url + '" alt="' + esc(name) + '" onerror="this.style.display=\'none\'">';
+    } catch(e) {}
+    const ini = String(name || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    return '<div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.07);display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:1.4rem">' + esc(ini) + '</div>';
+  }
+  function dots(f) {
+    return '<span class="dots">' + String(f || '').split('').map(c => {
+      const k = c === 'W' || c === 'G' ? 'W' : c === 'D' || c === 'E' ? 'D' : 'L';
+      const es = k === 'W' ? 'G' : k === 'D' ? 'E' : 'P';
+      return '<span class="dot-' + k + '">' + es + '</span>';
+    }).join('') + '</span>';
+  }
+
+  try {
+    // 1) Buscar el pick en el historial global
+    const hist = await fetch('/api/sb?type=historial').then(r => r.json());
+    const items = (hist && hist[0] && hist[0].historial_full) || [];
+    let p = null;
+    if (qId) p = items.find(x => x && x.id === qId);
+    if (!p && qH && qA) {
+      const cands = items.filter(x => x && x.home === qH && x.away === qA);
+      cands.sort((a, b) => (b.commenceTs || 0) - (a.commenceTs || 0));
+      p = cands[0] || null;
+    }
+    if (!p && qH && qA) p = { home: qH, away: qA, commenceTs: Number(qTs) || null, rec: '', result: 'pending' };
+    if (!p) { $app.innerHTML = '<div class="err">No encontramos esta predicción. <a href="/#predicciones" style="color:#ffd600">Ver los picks de hoy →</a></div>'; return; }
+
+    // 2) Intel real (bajas + H2H + forma)
+    let intel = null;
+    if (p._sportKey && p._sportKey !== 'soccer_fifa_world_cup') {
+      try {
+        intel = await fetch(WORKER + '/pick-intel?home=' + encodeURIComponent(p.home) + '&away=' + encodeURIComponent(p.away)
+          + '&sportKey=' + encodeURIComponent(p._sportKey) + '&ts=' + (p.commenceTs || '')).then(r => r.json());
+        if (intel && intel.error) intel = null;
+      } catch(e) {}
+    }
+
+    document.title = p.home + ' vs ' + p.away + ' · Análisis IA · gambeta.ai';
+
+    const fecha = p.commenceTs ? new Date(p.commenceTs).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '';
+    const odds = p._bestOdds || p.odds || null;
+    const resuelto = p.result === 'win' || p.result === 'loss';
+
+    let html = '';
+    html += '<div class="card">';
+    html += '<div class="meta">' + esc(p.league || '') + (fecha ? ' · ' + fecha + ' hs' : '') + (p.bvrText ? ' · <span class="badge-conf">Confianza ' + esc(p.bvrText) + '</span>' : '') + '</div>';
+    html += '<div class="match"><div class="team">' + logo(p.home) + '<div class="tname">' + esc(p.home) + '</div></div>';
+    html += '<div class="vs">' + (resuelto && p.finalScore ? esc(p.finalScore) : 'VS') + '</div>';
+    html += '<div class="team">' + logo(p.away) + '<div class="tname">' + esc(p.away) + '</div></div></div>';
+    html += '<div class="pickbox"><div><div class="picklbl">🤖 Recomendación de la IA' + (resuelto ? (p.result === 'win' ? ' · ✅ ACERTADO' : ' · ❌ FALLADO') : '') + '</div>';
+    html += '<span class="pickval">🎯 ' + esc(p.rec || '—') + '</span></div>';
+    if (odds) html += '<div class="cuota"><small>CUOTA</small><b>' + Number(odds).toFixed(2) + '</b></div>';
+    html += '</div></div>';
+
+    if (p.probH || p.probA) {
+      html += '<div class="card"><h2>Probabilidades del modelo</h2><div class="bars">';
+      html += '<div class="bar"><div class="lbl">Local</div><div class="bg"><div class="fill" style="width:' + (p.probH || 0) + '%"></div></div><div class="pct">' + (p.probH || 0) + '%</div></div>';
+      if (p.probD) html += '<div class="bar draw"><div class="lbl">Empate</div><div class="bg"><div class="fill" style="width:' + p.probD + '%"></div></div><div class="pct">' + p.probD + '%</div></div>';
+      html += '<div class="bar away"><div class="lbl">Visitante</div><div class="bg"><div class="fill" style="width:' + (p.probA || 0) + '%"></div></div><div class="pct">' + (p.probA || 0) + '%</div></div>';
+      html += '</div></div>';
+    }
+
+    if (p.insight) html += '<div class="card"><h2>Análisis</h2><div class="bullet">💡 ' + esc(p.insight) + '</div></div>';
+
+    if (intel) {
+      const iH = (intel.injuries && intel.injuries.home) || { count: 0, players: [] };
+      const iA = (intel.injuries && intel.injuries.away) || { count: 0, players: [] };
+      html += '<div class="card"><h2>🚑 Bajas confirmadas</h2>';
+      [[p.home, iH], [p.away, iA]].forEach(([nm, inj]) => {
+        html += '<div class="inj-team"><h3>' + esc(nm) + (inj.count ? ' · <b style="color:#ff8a80">' + inj.count + ' baja' + (inj.count > 1 ? 's' : '') + '</b>' : '') + '</h3>';
+        if (!inj.count) html += '<div class="ok">✓ Sin bajas reportadas.</div>';
+        else inj.players.forEach(x => { html += '<div class="inj"><span>' + esc(x.name) + '</span><b>' + esc(x.reason || 'Baja') + '</b></div>'; });
+        html += '</div>';
+      });
+      html += '</div>';
+
+      const hh = intel.h2h || {};
+      if (hh.n) {
+        html += '<div class="card"><h2>⚔️ Historial entre sí (últimos ' + hh.n + ')</h2>';
+        html += '<div class="bullet">' + esc(p.home) + ' ganó <b>' + hh.homeW + '</b> · Empates <b>' + hh.draw + '</b> · ' + esc(p.away) + ' ganó <b>' + hh.awayW + '</b>.</div>';
+        if (hh.homeAtHome && hh.homeAtHome.n) {
+          html += '<div class="bullet">De local, ' + esc(p.home) + ' va <b>' + hh.homeAtHome.w + 'G-' + hh.homeAtHome.d + 'E-' + hh.homeAtHome.l + 'P</b> en este cruce.</div>';
+        }
+        if (hh.last && hh.last.length) {
+          html += '<table>' + hh.last.map(f => '<tr><td class="fecha">' + esc(f.date) + '</td><td>' + esc(f.home) + ' vs ' + esc(f.away) + '</td><td class="score">' + esc(f.score) + '</td></tr>').join('') + '</table>';
+        }
+        html += '</div>';
+      }
+
+      if (intel.form && (intel.form.home || intel.form.away)) {
+        html += '<div class="card"><h2>📊 Forma reciente (últimos 5)</h2>';
+        html += '<div class="form-row"><span>' + esc(p.home) + '</span>' + dots(intel.form.home) + '</div>';
+        html += '<div class="form-row"><span>' + esc(p.away) + '</span>' + dots(intel.form.away) + '</div>';
+        html += '</div>';
+      }
+    }
+
+    html += '<a class="cta" href="/#predicciones">⚡ Ver todos los picks de hoy</a>';
+    $app.innerHTML = html;
+  } catch(e) {
+    $app.innerHTML = '<div class="err">Error cargando el análisis. <a href="/#predicciones" style="color:#ffd600">Volver →</a></div>';
+  }
+})();
+</script>
+</body>
+</html>
