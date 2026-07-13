@@ -4192,25 +4192,21 @@ function _buildIAReasoning(p) {
     // 🆕 #579 — Bullets con VARIANTES rotativas (no repetir entre picks)
     const _seed = (p.id || (p.home + '|' + p.away + '|' + (p.commenceTs || '')));
 
-    // 1) CUOTA GENEROSA vs mercado
+    // 1) CUOTA/VALOR vs mercado — 🆕 (13-jul) bullets reescritos: 1 oración, concreta, con punto final.
     const _odds = parseFloat(p._bestOdds || p.odds || 0);
     if (_odds && _odds > 1 && modelProb) {
       const impliedProb = Math.round(100 / _odds);
       const diff = modelProb - impliedProb;
       if (diff >= 8) {
         bullets.push(_gbPickVariant(_seed + 'cuota', [
-          '💰 <b>Cuota generosa</b> para lo probable que es',
-          '💰 <b>La casa paga más</b> de lo que el modelo estima',
-          '💰 <b>Cuota inflada</b>: el mercado se quedó corto',
-          '💰 <b>Buena oportunidad de cuota</b> en esta jugada',
-          '💰 <b>Cuota por encima</b> de lo que merece este partido'
+          '💰 <b>El mercado paga de más</b>: la cuota supera en ' + diff + ' puntos la probabilidad real del modelo.',
+          '💰 <b>Cuota inflada</b>: la casa subestima este resultado en ' + diff + ' puntos.',
+          '💰 <b>Valor detectado</b>: el modelo ve este pick ' + diff + ' puntos más probable de lo que paga la cuota.'
         ]));
       } else if (diff >= 4) {
         bullets.push(_gbPickVariant(_seed + 'cuotaedge', [
-          '📈 <b>Cuota a favor</b> según el modelo',
-          '📈 <b>Ligero plus</b> en la cuota vs el mercado',
-          '📈 <b>Cuota correcta con margen extra</b>',
-          '📈 <b>La línea favorece</b> ligeramente al modelo'
+          '📈 <b>Margen a favor</b>: la cuota paga por encima de la probabilidad que calcula el modelo.',
+          '📈 <b>Cuota con premio</b>: pequeña ventaja matemática sobre el precio del mercado.'
         ]));
       }
     }
@@ -4221,147 +4217,109 @@ function _buildIAReasoning(p) {
       const wins = (_formStr.match(/W/gi) || []).length;
       const total = _formStr.length;
       if (wins >= 4 && total >= 5) {
-        const _prefix = _gbPickVariant(_seed + 'racha', [
-          '🔥 <b>En racha</b>',
-          '🔥 <b>Llegan calientes</b>',
-          '🔥 <b>Buen tramo</b>',
-          '🔥 <b>Vienen finos</b>',
-          '🔥 <b>Forma TOP</b>'
-        ]);
-        bullets.push(_prefix + ': ' + wins + ' victorias en los últimos ' + total);
+        bullets.push(_gbPickVariant(_seed + 'racha', [
+          '🔥 <b>Racha viva</b>: ganó ' + wins + ' de sus últimos ' + total + ' partidos.',
+          '🔥 <b>Momento demoledor</b>: ' + wins + ' victorias en los últimos ' + total + '.'
+        ]));
       } else if (wins >= 3 && total >= 5) {
-        const _prefix = _gbPickVariant(_seed + 'buenmom', [
-          '📊 <b>Buen momento</b>',
-          '📊 <b>Andan sólidos</b>',
-          '📊 <b>Resultados a favor</b>',
-          '📊 <b>Pasan por una buena</b>'
-        ]);
-        bullets.push(_prefix + ': ' + wins + ' triunfos recientes');
+        bullets.push(_gbPickVariant(_seed + 'buenmom', [
+          '📊 <b>Forma sólida</b>: ' + wins + ' triunfos en sus últimos ' + total + ' partidos.',
+          '📊 <b>Llega bien</b>: ganó ' + wins + ' de los últimos ' + total + '.'
+        ]));
       }
     }
 
     // 3) FAVORITISMO
     if (modelProb && modelProb >= 65) {
       bullets.push(_gbPickVariant(_seed + 'fav', [
-        '✅ <b>Favorito claro</b> según el modelo',
-        '✅ <b>Lo ven amplio favorito</b>',
-        '✅ <b>El más probable por amplitud</b>',
-        '✅ <b>Sale como favorito firme</b>',
-        '✅ <b>Bien arriba en las probabilidades</b>'
+        '✅ <b>Favorito neto</b>: el modelo le da ' + modelProb + '% de probabilidad, muy lejos del rival.',
+        '✅ <b>Dominio esperado</b>: ' + modelProb + '% de probabilidad según las cuotas de todo el mercado.'
       ]));
     } else if (modelProb && modelProb >= 55 && _odds && _odds >= 1.6) {
       bullets.push(_gbPickVariant(_seed + 'prob', [
-        '🎯 <b>El escenario más probable</b> y la cuota lo paga',
-        '🎯 <b>Bien posicionado</b> con una cuota interesante',
-        '🎯 <b>Favorito moderado</b>, pero la cuota lo justifica',
-        '🎯 <b>Mejor opción del partido</b> según el modelo'
+        '🎯 <b>El escenario más probable</b> del partido y con una cuota que lo paga bien.',
+        '🎯 <b>Mejor relación probabilidad-cuota</b> de los mercados de este partido.'
       ]));
     }
 
-    // 4) CONTEXTO LIGA / TORNEO — variantes
-    const liga = String(p.league || '');
-    if (/mundial|world cup|fifa/i.test(liga)) {
-      bullets.push(_gbPickVariant(_seed + 'wc', [
-        '🏆 <b>Mundial 2026</b>: máximo nivel de exigencia',
-        '🏆 <b>Mundial 2026</b>: cada partido es una final',
-        '🏆 <b>Mundial</b>: todos quieren mostrarse en la vidriera',
-        '🏆 <b>Mundial 2026</b>: presión histórica para los equipos',
-        '🏆 <b>Mundial</b>: el escenario más prestigioso del fútbol',
-        '🏆 <b>Mundial 2026</b>: nadie se guarda nada en este torneo'
-      ]));
-    } else if (/libertadores|sudamericana/i.test(liga)) {
-      bullets.push(_gbPickVariant(_seed + 'cop', [
-        '🌎 <b>Copa internacional</b>: partido de alto interés',
-        '🌎 <b>Copa</b>: nadie quiere quedarse afuera',
-        '🌎 <b>Copa</b>: las cuotas suelen tener valor por la presión',
-        '🌎 <b>Copa internacional</b>: contexto que cambia el partido',
-        '🌎 <b>Cruces internacionales</b>: alta intensidad asegurada'
-      ]));
-    } else if (/champions|europa.league|conference/i.test(liga)) {
-      bullets.push(_gbPickVariant(_seed + 'euu', [
-        '⭐ <b>Europa</b>: torneo de nivel top',
-        '⭐ <b>Competencia europea</b>: lo mejor del continente',
-        '⭐ <b>Europa</b>: equipos en su mejor versión',
-        '⭐ <b>Cruce europeo</b>: data muy profunda del modelo'
-      ]));
-    } else if (/premier|liga.*españ|serie a|bundesliga|ligue.*1/i.test(liga)) {
-      bullets.push(_gbPickVariant(_seed + 'top5', [
-        '📺 <b>Liga top de Europa</b>: data sólida del modelo',
-        '📺 <b>Una de las grandes ligas</b>: cobertura completa',
-        '📺 <b>Liga de elite</b>: estadísticas profundas y estables',
-        '📺 <b>Liga top mundial</b>: ritmo y nivel parejo'
-      ]));
-    } else if (/argentina|brasil|méxic|colomb|chile|perú|ecuador|uruguay/i.test(liga)) {
-      bullets.push(_gbPickVariant(_seed + 'sa', [
-        '🇦🇷 <b>Liga sudamericana</b>: cobertura completa del modelo',
-        '🇦🇷 <b>Fútbol sudamericano</b>: contexto que conocemos a fondo',
-        '🇦🇷 <b>Liga local</b>: data abundante para el modelo',
-        '🇦🇷 <b>Sudamérica</b>: especialidad de la casa'
-      ]));
-    }
-
-    // 5) MERCADO/TIPO — variantes por mercado
+    // 4) MERCADO/TIPO — el motivo del pick va antes que el contexto de liga
     if (/over 2\.5|m[aá]s de 2\.5/i.test(_rec)) {
       bullets.push(_gbPickVariant(_seed + 'ov25', [
-        '⚽ <b>Suelen jugar partidos abiertos</b>: tendencia goleadora',
-        '⚽ <b>Partido con goles</b> según el patrón reciente',
-        '⚽ <b>Promedio alto de goles</b> en partidos de estos rivales',
-        '⚽ <b>Ataques sueltos</b>: pinta para que caigan varios'
+        '⚽ <b>Tendencia goleadora</b>: los partidos recientes de ambos vienen terminando con 3 o más goles.',
+        '⚽ <b>Estilos abiertos</b>: los dos priorizan atacar antes que cuidar el cero.',
+        '⚽ <b>Defensas permeables</b>: ambos reciben goles con frecuencia y eso empuja la línea.'
       ]));
     } else if (/over 1\.5|m[aá]s de 1\.5/i.test(_rec)) {
       bullets.push(_gbPickVariant(_seed + 'ov15', [
-        '⚽ <b>Casi siempre cae más de 1 gol</b> en este tipo de partido',
-        '⚽ <b>Línea cómoda</b>: 2 o más goles es lo habitual aquí',
-        '⚽ <b>Mercado conservador</b>: el over 1.5 se suele cumplir'
+        '⚽ <b>Línea conservadora</b>: en estos cruces casi siempre caen 2 goles o más.',
+        '⚽ <b>Piso bajo</b>: alcanza con 2 goles y es lo habitual entre estos equipos.'
       ]));
     } else if (/under|menos de/i.test(_rec)) {
       bullets.push(_gbPickVariant(_seed + 'un', [
-        '🛡️ <b>Suelen ser partidos cerrados</b>: defensas firmes',
-        '🛡️ <b>Poco gol esperado</b>: ambos defienden bien',
-        '🛡️ <b>Trámite trabado</b>: el promedio de goles es bajo',
-        '🛡️ <b>Defensas sobre los ataques</b>: tendencia clara'
+        '🛡️ <b>Partido cerrado en puerta</b>: los dos defienden bien y arriesgan poco.',
+        '🛡️ <b>Promedio de goles bajo</b> en los últimos partidos de ambos.'
       ]));
     } else if (/btts|ambos.*marcan/i.test(_rec)) {
       bullets.push(_gbPickVariant(_seed + 'btts', [
-        '🎯 <b>Los dos llegan al arco</b>: ambos suelen marcar',
-        '🎯 <b>Defensas vulnerables</b>: pinta para que ambos conviertan',
-        '🎯 <b>Patrón ofensivo</b> en los dos equipos',
-        '🎯 <b>Ambos marcan habitualmente</b> en sus últimos partidos'
+        '🎯 <b>Los dos convierten seguido</b>: ambos vienen marcando en sus últimos partidos.',
+        '🎯 <b>Ataques efectivos, defensas frágiles</b>: el combo ideal para que marquen los dos.'
       ]));
     } else if (/doble oportunidad|^1x|x2/i.test(_rec)) {
       bullets.push(_gbPickVariant(_seed + 'do', [
-        '⚖️ <b>Dos escenarios a favor</b> con la misma cuota',
-        '⚖️ <b>Doble cobertura</b>: ganar o empatar, ambos pagan',
-        '⚖️ <b>Apuesta más segura</b> con dos posibles ganancias',
-        '⚖️ <b>Cobertura doble</b>: solo perdés en un escenario'
+        '⚖️ <b>Doble cobertura</b>: cobrás con la victoria y también con el empate.',
+        '⚖️ <b>Solo pierde en un escenario</b> de los tres posibles.'
       ]));
     } else if (/^empate/i.test(_rec)) {
       bullets.push(_gbPickVariant(_seed + 'x', [
-        '⚖️ <b>Fuerzas parejas</b>: la cuota del empate paga bien',
-        '⚖️ <b>Cuota interesante</b> en un partido sin favorito claro',
-        '⚖️ <b>Partido cerrado esperado</b>: empate con buen pago'
+        '⚖️ <b>Fuerzas parejas</b>: ningún favorito claro y la cuota del empate paga de más.',
+        '⚖️ <b>Partido trabado en puerta</b>: el empate es el resultado que el mercado menos valora.'
       ]));
     }
 
-    // 6) CONVICCIÓN DEL MODELO — variantes
+    // 5) CONTEXTO LIGA / TORNEO — pasa a ser relleno de menor prioridad
+    const liga = String(p.league || '');
+    if (/mundial|world cup|fifa/i.test(liga)) {
+      bullets.push(_gbPickVariant(_seed + 'wc', [
+        '🏆 <b>Instancia decisiva del Mundial</b>: sin margen de especulación para los dos.',
+        '🏆 <b>Eliminación directa</b>: los equipos salen a definirlo desde el arranque.'
+      ]));
+    } else if (/libertadores|sudamericana/i.test(liga)) {
+      bullets.push(_gbPickVariant(_seed + 'cop', [
+        '🌎 <b>Copa internacional</b>: la localía pesa el doble en Sudamérica.',
+        '🌎 <b>Instancia de copa</b>: la presión del cruce favorece este escenario.'
+      ]));
+    } else if (/champions|europa.league|conference/i.test(liga)) {
+      bullets.push(_gbPickVariant(_seed + 'euu', [
+        '⭐ <b>Cruce europeo</b>: el modelo procesa el historial completo de ambos en el torneo.',
+        '⭐ <b>Torneo de elite</b>: diferencias de plantel que las cuotas no siempre reflejan.'
+      ]));
+    } else if (/premier|liga.*españ|serie a|bundesliga|ligue.*1/i.test(liga)) {
+      bullets.push(_gbPickVariant(_seed + 'top5', [
+        '📺 <b>Liga top con data profunda</b>: el modelo cruza años de estadísticas de ambos.',
+        '📺 <b>Torneo de máxima regularidad</b>: los patrones se cumplen más que en ligas chicas.'
+      ]));
+    } else if (/argentina|brasil|méxic|colomb|chile|perú|ecuador|uruguay/i.test(liga)) {
+      bullets.push(_gbPickVariant(_seed + 'sa', [
+        '🇦🇷 <b>Liga que el modelo sigue fecha a fecha</b>: cada plantel está mapeado al detalle.',
+        '🇦🇷 <b>Localía fuerte en Sudamérica</b>: el factor cancha acá pesa más que en Europa.'
+      ]));
+    }
+
+    // 6) CONVICCIÓN DEL MODELO
     if (_bvr >= 6) {
       bullets.push(_gbPickVariant(_seed + 'top', [
-        '💎 <b>Pick destacado del día</b>',
-        '💎 <b>El mejor pick que ve la IA hoy</b>',
-        '💎 <b>Top del día</b> según el modelo',
-        '💎 <b>Pick estrella</b> del análisis'
+        '💎 <b>El pick más fuerte del día</b>: máxima convicción del modelo.',
+        '💎 <b>Número uno del ranking de hoy</b> entre todos los partidos analizados.'
       ]));
     } else if (_bvr >= 5 || _conf === 'high') {
       bullets.push(_gbPickVariant(_seed + 'fav2', [
-        '💎 <b>Uno de los favoritos del día</b>',
-        '💎 <b>Bien posicionado en el ranking</b> del modelo',
-        '💎 <b>Pick recomendado</b> en el análisis',
-        '💎 <b>De los más sólidos</b> entre los picks de hoy'
+        '💎 <b>Entre los picks más sólidos de hoy</b> según el ranking del modelo.',
+        '💎 <b>Confianza alta del modelo</b>: pasó todos los filtros de calidad.'
       ]));
     }
 
     if (bullets.length < 3) return '';
-    const top5 = bullets.slice(0, 5);
+    const top5 = bullets.slice(0, 3); // 🆕 3 motivos concretos, no 5
 
     // Barra de confianza (modelo o derivado del conf/bvr)
     const confVal = modelProb || (_conf === 'high' ? 75 : _conf === 'med' ? 62 : 50);
