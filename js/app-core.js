@@ -4046,7 +4046,11 @@ async function _enrichPicksWithIntel(preds) {
       && p._sportKey !== 'soccer_fifa_world_cup').slice(0, 14);
     if (!_cands.length) return;
     const _lsKey = p => 'gb_intel_v1_' + (p.id || (p.home + '_' + p.away)).replace(/[^a-z0-9_]/gi, '');
-    await Promise.all(_cands.map(async function(p) {
+    // 🆕 Secuencial con pausa: APF limita requests por minuto — nada de bursts.
+    const _sleep = ms => new Promise(res => setTimeout(res, ms));
+    for (const p of _cands.slice(0, 10)) {
+      await _sleep(400);
+      await (async function(p) {
       p._intelDone = true;
       try {
         let intel = null;
@@ -4097,7 +4101,8 @@ async function _enrichPicksWithIntel(preds) {
           p._intelBoosted = true;
         }
       } catch(_) {}
-    }));
+      })(p);
+    }
   } catch(_) {}
 }
 
