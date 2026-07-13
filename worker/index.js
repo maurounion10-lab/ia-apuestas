@@ -328,6 +328,11 @@ async function apf(path, env) {
   const json = await r.json();
   // Check for rate limit errors
   if (json.errors?.requests) throw new Error(`APF rate limit: ${json.errors.requests}`);
+  // 🆕 (13-jul) throw ante cualquier error de APF (rateLimit por minuto, plan, etc)
+  // para que cached() NUNCA almacene respuestas vacías por error.
+  if (json.errors && !Array.isArray(json.errors) && Object.keys(json.errors).length) {
+    throw new Error('APF error: ' + JSON.stringify(json.errors));
+  }
   return json;
 }
 
@@ -1606,7 +1611,7 @@ async function fetchPickIntel(q, env) {
   const dateStr = dt.toISOString().slice(0, 10);
 
   // 1) Fixture del día (cacheado 3h por liga+fecha — compartido entre picks de la misma liga)
-  const fxData = await cached(env, `apx2_fx_${leagueId}_${dateStr}`, 3 * 3600,
+  const fxData = await cached(env, `apx3_fx_${leagueId}_${dateStr}`, 3 * 3600,
     () => apf(`/fixtures?league=${leagueId}&season=${season}&date=${dateStr}`, env));
   const fixtures = fxData?.response || [];
   let fx = null;
@@ -1617,7 +1622,7 @@ async function fetchPickIntel(q, env) {
   }
   // Fallback: buscar en los próximos fixtures de la liga (kickoff en otra fecha UTC)
   if (!fx) {
-    const fxNext = await cached(env, `apx2_fxnext_${leagueId}`, 3 * 3600,
+    const fxNext = await cached(env, `apx3_fxnext_${leagueId}`, 3 * 3600,
       () => apf(`/fixtures?league=${leagueId}&season=${season}&next=30`, env));
     for (const f of (fxNext?.response || [])) {
       const fh = f.teams?.home?.name || '', fa = f.teams?.away?.name || '';
@@ -1627,7 +1632,7 @@ async function fetchPickIntel(q, env) {
   }
   if (!fx) {
     if (q.debug) {
-      const fxNext2 = await cached(env, `apx2_fxnext_${leagueId}`, 3 * 3600,
+      const fxNext2 = await cached(env, `apx3_fxnext_${leagueId}`, 3 * 3600,
         () => apf(`/fixtures?league=${leagueId}&season=${season}&next=30`, env)).catch(e => ({ _err: String(e) }));
       // raw APF sin wrapper para ver errors/results
       let raw = null;
@@ -1652,13 +1657,12 @@ async function fetchPickIntel(q, env) {
   if (!homeId || !awayId) return { error: 'teams-not-found' };
 
   // 2) En paralelo: lesiones del fixture + H2H últimos 10 + forma últimos 5 de cada uno
-  const [injData, h2hData, formHData, formAData] = await Promise.all([
-    cached(env, `apx2_inj_${fxId}`, 3 * 3600, () => apf(`/injuries?fixture=${fxId}`, env)).catch(() => null),
-    cached(env, `apx2_h2h_${Math.min(homeId,awayId)}_${Math.max(homeId,awayId)}`, 24 * 3600,
-      () => apf(`/fixtures/headtohead?h2h=${homeId}-${awayId}&last=10&status=FT`, env)).catch(() => null),
-    cached(env, `apx2_form_${homeId}`, 6 * 3600, () => apf(`/fixtures?team=${homeId}&last=5&status=FT`, env)).catch(() => null),
-    cached(env, `apx2_form_${awayId}`, 6 * 3600, () => apf(`/fixtures?team=${awayId}&last=5&status=FT`, env)).catch(() => null),
-  ]);
+  // 🆕 Secuencial (no Promise.all): el plan de APF limita requests POR MINUTO.
+  const injData = await cached(env, `apx3_inj_${fxId}`, 3 * 3600, () => apf(`/injuries?fixture=${fxId}`, env)).catch(() => null);
+  const h2hData = await cached(env, `apx3_h2h_${Math.min(homeId,awayId)}_${Math.max(homeId,awayId)}`, 24 * 3600,
+    () => apf(`/fixtures/headtohead?h2h=${homeId}-${awayId}&last=10&status=FT`, env)).catch(() => null);
+  const formHData = await cached(env, `apx3_form_${homeId}`, 6 * 3600, () => apf(`/fixtures?team=${homeId}&last=5&status=FT`, env)).catch(() => null);
+  const formAData = await cached(env, `apx3_form_${awayId}`, 6 * 3600, () => apf(`/fixtures?team=${awayId}&last=5&status=FT`, env)).catch(() => null);
 
   // Lesiones: agrupar por equipo, solo tipos que restan (Missing Fixture / Questionable)
   const injuries = { home: { count: 0, players: [] }, away: { count: 0, players: [] } };
@@ -3526,7 +3530,7 @@ export default {
       if (!q.home || !q.away || !q.sportKey) {
         return new Response(JSON.stringify({ error: 'missing params (home, away, sportKey)' }), { status: 400, headers: CORS });
       }
-      const cacheKey = `pickintel_v2_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
+      const cacheKey = `pickintel_v3_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
       const data = q.debug
         ? await fetchPickIntel(q, env).catch(e => ({ error: String(e && e.message || e) }))
         : await cached(env, cacheKey, 6 * 3600,
