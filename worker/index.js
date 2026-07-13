@@ -1588,6 +1588,115 @@ function _getApfLeagueIdForSportKey(sportKey) {
   return entry ? entry[1] : null;
 }
 
+// ── 🆕 (13-jul-2026) PICK INTEL: bajas + H2H + forma REALES desde API-Football ──
+// Alimenta la decisión del motor y el "Razonamiento de la IA" del frontend.
+// Cacheado agresivamente en KV para cuidar el cupo diario de APF.
+function _apfSeasonFor(leagueId, dt) {
+  const year = dt.getUTCFullYear();
+  const month = dt.getUTCMonth();
+  const euroIds = new Set([39,40,140,141,135,136,78,79,61,62,88,94,203,2,3,848,235,144,207,218,106,345,197]);
+  return euroIds.has(leagueId) ? (month >= 7 ? year : year - 1) : year;
+}
+
+async function fetchPickIntel(q, env) {
+  const leagueId = _getApfLeagueIdForSportKey(q.sportKey);
+  if (!leagueId) return { error: 'league-not-mapped' };
+  const dt = q.ts ? new Date(Number(q.ts)) : new Date();
+  const season = _apfSeasonFor(leagueId, dt);
+  const dateStr = dt.toISOString().slice(0, 10);
+
+  // 1) Fixture del día (cacheado 3h por liga+fecha — compartido entre picks de la misma liga)
+  const fxData = await cached(env, `apx_fx_${leagueId}_${dateStr}`, 3 * 3600,
+    () => apf(`/fixtures?league=${leagueId}&season=${season}&date=${dateStr}`, env));
+  const fixtures = fxData?.response || [];
+  let fx = null;
+  for (const f of fixtures) {
+    const fh = f.teams?.home?.name || '', fa = f.teams?.away?.name || '';
+    if ((teamsMatch(fh, q.home) && teamsMatch(fa, q.away)) ||
+        (teamsMatch(fh, q.away) && teamsMatch(fa, q.home))) { fx = f; break; }
+  }
+  // Fallback: buscar en los próximos fixtures de la liga (kickoff en otra fecha UTC)
+  if (!fx) {
+    const fxNext = await cached(env, `apx_fxnext_${leagueId}`, 3 * 3600,
+      () => apf(`/fixtures?league=${leagueId}&season=${season}&next=30`, env));
+    for (const f of (fxNext?.response || [])) {
+      const fh = f.teams?.home?.name || '', fa = f.teams?.away?.name || '';
+      if ((teamsMatch(fh, q.home) && teamsMatch(fa, q.away)) ||
+          (teamsMatch(fh, q.away) && teamsMatch(fa, q.home))) { fx = f; break; }
+    }
+  }
+  if (!fx) return { error: 'fixture-not-found' };
+
+  const fxId    = fx.fixture?.id;
+  const homeId  = fx.teams?.home?.id, awayId = fx.teams?.away?.id;
+  const homeNm  = fx.teams?.home?.name, awayNm = fx.teams?.away?.name;
+  if (!homeId || !awayId) return { error: 'teams-not-found' };
+
+  // 2) En paralelo: lesiones del fixture + H2H últimos 10 + forma últimos 5 de cada uno
+  const [injData, h2hData, formHData, formAData] = await Promise.all([
+    cached(env, `apx_inj_${fxId}`, 3 * 3600, () => apf(`/injuries?fixture=${fxId}`, env)).catch(() => null),
+    cached(env, `apx_h2h_${Math.min(homeId,awayId)}_${Math.max(homeId,awayId)}`, 24 * 3600,
+      () => apf(`/fixtures/headtohead?h2h=${homeId}-${awayId}&last=10&status=FT`, env)).catch(() => null),
+    cached(env, `apx_form_${homeId}`, 6 * 3600, () => apf(`/fixtures?team=${homeId}&last=5&status=FT`, env)).catch(() => null),
+    cached(env, `apx_form_${awayId}`, 6 * 3600, () => apf(`/fixtures?team=${awayId}&last=5&status=FT`, env)).catch(() => null),
+  ]);
+
+  // Lesiones: agrupar por equipo, solo tipos que restan (Missing Fixture / Questionable)
+  const injuries = { home: { count: 0, players: [] }, away: { count: 0, players: [] } };
+  for (const it of (injData?.response || [])) {
+    const side = it.team?.id === homeId ? 'home' : it.team?.id === awayId ? 'away' : null;
+    if (!side) continue;
+    injuries[side].count++;
+    if (injuries[side].players.length < 5) {
+      injuries[side].players.push({ name: it.player?.name || '?', reason: it.player?.reason || '' });
+    }
+  }
+
+  // H2H desde la perspectiva del local ACTUAL: total y "el local jugando en casa"
+  const h2h = { n: 0, homeW: 0, draw: 0, awayW: 0, homeAtHome: { n: 0, w: 0, d: 0, l: 0 }, last: [] };
+  for (const f of (h2hData?.response || [])) {
+    const gh = f.goals?.home, ga = f.goals?.away;
+    if (gh == null || ga == null) continue;
+    const fHomeId = f.teams?.home?.id;
+    const homeWasLocal = fHomeId === homeId;
+    h2h.n++;
+    const localWin = gh > ga, visitWin = ga > gh;
+    if ((homeWasLocal && localWin) || (!homeWasLocal && visitWin)) h2h.homeW++;
+    else if (gh === ga) h2h.draw++;
+    else h2h.awayW++;
+    if (homeWasLocal) {
+      h2h.homeAtHome.n++;
+      if (localWin) h2h.homeAtHome.w++; else if (gh === ga) h2h.homeAtHome.d++; else h2h.homeAtHome.l++;
+    }
+    if (h2h.last.length < 5) {
+      h2h.last.push({ date: (f.fixture?.date || '').slice(0, 10), home: f.teams?.home?.name, away: f.teams?.away?.name, score: gh + '-' + ga });
+    }
+  }
+
+  // Forma: string tipo "WDLWW" (más reciente primero) desde la perspectiva de cada equipo
+  function formOf(data, teamId) {
+    const out = [];
+    for (const f of (data?.response || [])) {
+      const gh = f.goals?.home, ga = f.goals?.away;
+      if (gh == null || ga == null) continue;
+      const isHome = f.teams?.home?.id === teamId;
+      const gf = isHome ? gh : ga, gc = isHome ? ga : gh;
+      out.push(gf > gc ? 'W' : gf === gc ? 'D' : 'L');
+    }
+    return out.slice(0, 5).join('');
+  }
+
+  return {
+    fixtureId: fxId,
+    teams: { home: homeNm, away: awayNm },
+    kickoff: fx.fixture?.date || null,
+    injuries,
+    h2h,
+    form: { home: formOf(formHData, homeId), away: formOf(formAData, awayId) },
+    _src: 'apf',
+  };
+}
+
 async function fetchApfScore(pick, env) {
   if (!pick._sportKey || !pick.commenceTs) return null;
   const leagueId = _getApfLeagueIdForSportKey(pick._sportKey);
@@ -3383,6 +3492,24 @@ export default {
     if (path === '/available') {
       const keys = [...LEAGUES_MAIN, ...LEAGUES_EUROPE, ...LEAGUES_SECONDARY].map(([k]) => k);
       return new Response(JSON.stringify({ keys }), { headers: CORS });
+    }
+
+    // ── 🆕 (13-jul-2026) GET /pick-intel?home=&away=&sportKey=&ts= ──
+    // Bajas + H2H + forma reales (API-Football) para el motor de picks y el razonamiento.
+    if (path === '/pick-intel') {
+      const q = {
+        home:     url.searchParams.get('home') || '',
+        away:     url.searchParams.get('away') || '',
+        sportKey: url.searchParams.get('sportKey') || '',
+        ts:       url.searchParams.get('ts') || '',
+      };
+      if (!q.home || !q.away || !q.sportKey) {
+        return new Response(JSON.stringify({ error: 'missing params (home, away, sportKey)' }), { status: 400, headers: CORS });
+      }
+      const cacheKey = `pickintel_v1_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
+      const data = await cached(env, cacheKey, 6 * 3600,
+        () => fetchPickIntel(q, env).catch(e => ({ error: String(e && e.message || e) })));
+      return new Response(JSON.stringify(data || { error: 'no-data' }), { headers: CORS });
     }
 
     // ── 🆕 (25-jun-2026) GET /wc-pick?id=X ──
