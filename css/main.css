@@ -6589,6 +6589,18 @@ img, video, iframe, svg { max-width: 100%; height: auto }
   .pred-card .pred-header { flex-wrap: wrap; gap: 6px }
   .pred-card .team-block { flex: 1 1 45%; min-width: 0 }
   .pred-card img { max-height: 40px; width: auto }
+  /* 🆕 (13-jul) Escudos 50% más grandes: la regla de arriba los capeaba a 40px.
+     !important necesario porque los badges de selecciones traen width/height inline. */
+  .pred-card .pred-emoji img {
+    max-height: 60px !important;
+    max-width: 60px !important;
+    width: 60px !important;
+    height: 60px !important;
+  }
+  .pred-card .pred-emoji > span {
+    width: 60px !important;
+    height: 60px !important;
+  }
 }
 
 /* ── LEGIBILIDAD: line-height más generoso ───────────────────────────── */
