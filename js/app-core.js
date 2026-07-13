@@ -4041,6 +4041,19 @@ function _winRate30() {
   } catch(e) { return null; }
 }
 
+// 🆕 (13-jul) Racha de los últimos 5 picks resueltos (G=ganado, P=perdido), más reciente primero
+function _last5Streak() {
+  try {
+    const h = (typeof loadHistorial === 'function') ? loadHistorial() : [];
+    const res = (h || [])
+      .filter(x => x && (x.result === 'win' || x.result === 'loss'))
+      .sort((a, b) => (b.commenceTs || 0) - (a.commenceTs || 0))
+      .slice(0, 5);
+    if (res.length < 5) return null;
+    return res.map(x => x.result === 'win' ? 'G' : 'P');
+  } catch(e) { return null; }
+}
+
 function _isPickLive(p) {
   try {
     if (!p) return null;
@@ -6346,7 +6359,15 @@ function renderPreds() {
           _mid = `<div class="pred-result-stamp-mid">💰 $100 → $${Math.round(_roStamp * 100)}</div>`;
         } else if (isFinishedLoss) {
           const _wr30 = _winRate30();
-          if (_wr30 && _wr30.pct >= 55) _mid = `<div class="pred-result-stamp-mid">📊 7 días: ${_wr30.w}W-${_wr30.l}L · ${_wr30.pct}%</div>`;
+          const _st5 = _last5Streak();
+          const _st5Ok = _st5 && _st5.filter(x => x === 'G').length >= 3; // solo si la racha es mostrable
+          if (_wr30 && _wr30.pct >= 55 && _st5Ok) {
+            _mid = `<div class="pred-result-stamp-mid">📊 7d: ${_wr30.w}G-${_wr30.l}P · ${_st5.join('-')}</div>`;
+          } else if (_wr30 && _wr30.pct >= 55) {
+            _mid = `<div class="pred-result-stamp-mid">📊 7 días: ${_wr30.w}G-${_wr30.l}P</div>`;
+          } else if (_st5Ok) {
+            _mid = `<div class="pred-result-stamp-mid">📊 Últimos 5: ${_st5.join('-')}</div>`;
+          }
         }
         return `<div class="pred-result-stamp ${_cls}">
         <span class="pred-result-stamp-icon">${_ico}</span>
