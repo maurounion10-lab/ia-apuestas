@@ -1244,6 +1244,20 @@
     border-radius: 9px; padding: 5px 11px; flex-shrink: 0;
   }
   .stamp-score-num { font-size: 0.95rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+  /* 🆕 (13-jul) Chip central del sello: pago (win) / winrate 30d (loss) */
+  .pred-result-stamp-mid {
+    flex: 0 1 auto;
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 5px 10px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.18);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+  .stamp-win  .pred-result-stamp-mid { color: #eafff1; }
+  .stamp-loss .pred-result-stamp-mid { color: #ffe3e0; }
+  @media (max-width: 390px) { .pred-result-stamp-mid { display: none } }
   .stamp-score-lbl { font-size: 0.44rem; font-weight: 800; letter-spacing: 0.14em; }
   /* Ganado máxima — dorado sólido */
   .stamp-highconf { background: linear-gradient(135deg,#ffe680,#ffcf1a); box-shadow: 0 6px 22px rgba(255,214,0,0.45), inset 0 1px 0 rgba(255,255,255,0.4); }
