@@ -3568,6 +3568,19 @@ function buildPredsFromOdds() {
     if (!candidates2.length) return null;
     let best     = candidates2[0];
 
+    // 🆕 (13-jul-2026) FRANJA DE CUOTA OBJETIVO 1.70-2.10 — datos del historial propio:
+    //    cuota 1.35-1.75 → ROI -4% (405 picks) | cuota 1.75-2.00 → ROI +14.8% (152 picks).
+    //    Si el pick natural cae fuera de banda, se prefiere una alternativa dentro de la
+    //    banda con valor esperado (prob × cuota) comparable o superior.
+    try {
+      const _inBand = c => { const o = parseFloat(c.odds || 0); return o >= 1.70 && o <= 2.10; };
+      const _ev = c => (Number(c.prob) / 100) * parseFloat(c.odds || 0);
+      if (!_inBand(best)) {
+        const _alt = candidates2.find(c => c !== best && _inBand(c) && Number(c.prob) >= 52 && _ev(c) >= Math.max(_ev(best) * 0.97, 0.98));
+        if (_alt) { console.log('[odds-band] ' + g.home_team + ' vs ' + g.away_team + ': ' + best.rec + '@' + best.odds + ' → ' + _alt.rec + '@' + _alt.odds); best = _alt; }
+      }
+    } catch(e) {}
+
     // 🆕 (27-may-2026) CUP CONTEXT OVERRIDE — para Conmebol cups en fase de grupos
     //    El worker /cup-context computa "qué equipo clasifica con empate" usando standings.
     //    Si hay match, forzamos Doble Oportunidad o Empate sobre el pick natural.
@@ -3694,6 +3707,8 @@ function buildPredsFromOdds() {
     const _isTopTier = isTopTierLeague(g.sport_key);
     let bvr = (_isTopTier || rawBvr < 6) ? rawBvr : 5; // solo bloquea 6 → 5 si no es Top-Tier
     if (bvr < 4) return null; // descartar Media y Baja
+    // 🆕 (13-jul-2026) Franja muerta: cuota < 1.50 rindió -4.6% histórico. Solo pasa bvr 6.
+    { const _bo = parseFloat(best.odds || 0); if (_bo && _bo < 1.50 && bvr < 6) return null; }
     const bvrText = bvr === 6 ? 'Máxima' : bvr === 5 ? 'Alta' : bvr === 4 ? 'Media-Alta' : 'Media';
     // Re-derivar conf y confLabel para que UI/insights reflejen el bvr final post-handicap
     if      (bvr === 6 || bvr === 5) conf = 'high';
@@ -4022,6 +4037,78 @@ function _updateHeroProStats() {
 //   1) scoresData con flag='live' (autoritativo del API)
 //   2) Fallback temporal estricto: kickoff <= now AND kickoff > now - 2.5h
 // Excluye picks ya resueltos (win/loss/void) o "stale" (kickoff pasó hace mucho).
+// 🆕 (13-jul-2026) INTEL REAL: bajas + H2H + forma desde el worker (API-Football).
+// Se aplica a los picks pendientes del día: ajusta confianza y alimenta el razonamiento.
+async function _enrichPicksWithIntel(preds) {
+  try {
+    const _cands = (preds || []).filter(p => p && !p._intelDone && !p._started
+      && (!p.result || p.result === 'pending') && p._sportKey && p.home && p.away
+      && p._sportKey !== 'soccer_fifa_world_cup').slice(0, 14);
+    if (!_cands.length) return;
+    const _lsKey = p => 'gb_intel_v1_' + (p.id || (p.home + '_' + p.away)).replace(/[^a-z0-9_]/gi, '');
+    await Promise.all(_cands.map(async function(p) {
+      p._intelDone = true;
+      try {
+        let intel = null;
+        try { const c = JSON.parse(localStorage.getItem(_lsKey(p)) || 'null'); if (c && Date.now() - c.ts < 6 * 3600 * 1000) intel = c.v; } catch(_) {}
+        if (!intel) {
+          const u = WORKER_URL + '/pick-intel?home=' + encodeURIComponent(p.home) + '&away=' + encodeURIComponent(p.away)
+                  + '&sportKey=' + encodeURIComponent(p._sportKey) + '&ts=' + (p.commenceTs || '');
+          const r = await fetch(u);
+          if (!r.ok) return;
+          intel = await r.json();
+          try { localStorage.setItem(_lsKey(p), JSON.stringify({ ts: Date.now(), v: intel })); } catch(_) {}
+        }
+        if (!intel || intel.error) return;
+        p._intel = intel;
+        // Forma real reemplaza la decorativa
+        if (intel.form && intel.form.home) p.formH = intel.form.home;
+        if (intel.form && intel.form.away) p.formA = intel.form.away;
+        window._intelChanged = true;
+        // ── Influencia en la decisión (solo si el pick aún no está lockeado global) ──
+        if (p._confLocked) return;
+        const _side = (typeof _recSideOf === 'function') ? _recSideOf(p) : null;
+        let score = 0;
+        const injH = (intel.injuries && intel.injuries.home && intel.injuries.home.count) || 0;
+        const injA = (intel.injuries && intel.injuries.away && intel.injuries.away.count) || 0;
+        if (_side === 'home') score += (injA - injH) * 0.5;
+        if (_side === 'away') score += (injH - injA) * 0.5;
+        const hh = intel.h2h || {};
+        if (hh.n >= 4) {
+          const wr = _side === 'home' ? hh.homeW / hh.n : _side === 'away' ? hh.awayW / hh.n : hh.draw / hh.n;
+          if (wr >= 0.6) score += 1; else if (wr <= 0.2) score -= 1;
+          if (_side === 'home' && hh.homeAtHome && hh.homeAtHome.n >= 3) {
+            const wrl = hh.homeAtHome.w / hh.homeAtHome.n;
+            if (wrl >= 0.65) score += 1; else if (wrl <= 0.2) score -= 1;
+          }
+        }
+        const _formPts = f => (String(f || '').match(/W/g) || []).length;
+        if (_side === 'home' || _side === 'away') {
+          const own = _formPts(_side === 'home' ? intel.form.home : intel.form.away);
+          const riv = _formPts(_side === 'home' ? intel.form.away : intel.form.home);
+          if (own - riv >= 3) score += 1; else if (riv - own >= 3) score -= 1;
+        }
+        p._intelScore = Math.round(score * 10) / 10;
+        if (score <= -2 && p.bvr > 3) {
+          p.bvr = p.bvr - 1;
+          p.bvrText = p.bvr >= 6 ? 'Máxima' : p.bvr === 5 ? 'Alta' : p.bvr === 4 ? 'Media-Alta' : 'Media';
+          p._intelDemoted = true;
+        } else if (score >= 2) {
+          p._intelBoosted = true;
+        }
+      } catch(_) {}
+    }));
+  } catch(_) {}
+}
+
+// URL de la página individual de cada predicción
+function _predPageUrl(p) {
+  if (!p || !p.home || !p.away) return null;
+  return '/prediccion/?id=' + encodeURIComponent(p.id || '')
+       + '&h=' + encodeURIComponent(p.home) + '&a=' + encodeURIComponent(p.away)
+       + '&ts=' + (p.commenceTs || '');
+}
+
 // 🆕 (13-jul) Winrate últimos 7 días para el sello FALLADO (cache 60s)
 function _winRate30() {
   try {
@@ -4192,6 +4279,40 @@ function _buildIAReasoning(p) {
     // 🆕 #579 — Bullets con VARIANTES rotativas (no repetir entre picks)
     const _seed = (p.id || (p.home + '|' + p.away + '|' + (p.commenceTs || '')));
 
+    // 0) 🆕 INTEL REAL (API-Football): bajas y H2H verificados — máxima prioridad
+    const _it = p._intel || null;
+    if (_it) {
+      const injH = (_it.injuries && _it.injuries.home && _it.injuries.home.count) || 0;
+      const injA = (_it.injuries && _it.injuries.away && _it.injuries.away.count) || 0;
+      const _rivalSide = _side === 'home' ? 'away' : _side === 'away' ? 'home' : null;
+      if (_rivalSide) {
+        const rivalInj = _rivalSide === 'away' ? injA : injH;
+        const ownInj   = _rivalSide === 'away' ? injH : injA;
+        const rivalName = _rivalSide === 'away' ? p.away : p.home;
+        if (rivalInj >= 2 && rivalInj > ownInj) {
+          const _nm = ((_it.injuries[_rivalSide] || {}).players || []).slice(0, 2).map(x => x.name).join(', ');
+          bullets.push('🚑 <b>' + rivalInj + ' bajas confirmadas en ' + rivalName + '</b>' + (_nm ? ': ' + _nm + '.' : '.'));
+        } else if (ownInj === 0 && rivalInj === 1) {
+          bullets.push('🚑 <b>Plantel completo</b> frente a un rival con una baja confirmada.');
+        }
+      }
+      const hh = _it.h2h || {};
+      if (hh.n >= 4) {
+        if (_side === 'home' && hh.homeAtHome && hh.homeAtHome.n >= 3 && hh.homeAtHome.w / hh.homeAtHome.n >= 0.6) {
+          bullets.push('⚔️ <b>Manda de local</b>: ganó ' + hh.homeAtHome.w + ' de los últimos ' + hh.homeAtHome.n + ' cruces en su cancha.');
+        } else if (_side === 'home' && hh.homeW / hh.n >= 0.6) {
+          bullets.push('⚔️ <b>Domina el historial</b>: ' + hh.homeW + ' triunfos en los últimos ' + hh.n + ' cruces.');
+        } else if (_side === 'away' && hh.awayW / hh.n >= 0.6) {
+          bullets.push('⚔️ <b>Domina el historial</b>: ganó ' + hh.awayW + ' de los últimos ' + hh.n + ' cruces.');
+        } else if (_side === 'draw' && hh.draw / hh.n >= 0.4) {
+          bullets.push('⚔️ <b>Cruce de empates</b>: ' + hh.draw + ' de los últimos ' + hh.n + ' terminaron igualados.');
+        }
+      }
+      if (p._intelDemoted) {
+        bullets.push('⚠️ <b>Confianza ajustada a la baja</b> por bajas y señales del historial.');
+      }
+    }
+
     // 1) CUOTA/VALOR vs mercado — 🆕 (13-jul) bullets reescritos: 1 oración, concreta, con punto final.
     const _odds = parseFloat(p._bestOdds || p.odds || 0);
     if (_odds && _odds > 1 && modelProb) {
@@ -4337,6 +4458,7 @@ function _buildIAReasoning(p) {
       +     '<div class="ia-conf-bar"><div class="ia-conf-fill" style="width:' + confVal + '%"></div></div>'
       +     '<div class="ia-conf-val">' + confVal + '%</div>'
       +   '</div>'
+      +   (function() { const _u = _predPageUrl(p); return _u ? '<a class="ia-vermas" href="' + _u + '">Ver análisis completo →</a>' : ''; })()
       + '</div>';
   } catch (e) {
     console.warn('[_buildIAReasoning]', e);
@@ -4732,9 +4854,15 @@ function renderPreds() {
         }
       }
       if (realPreds && realPreds.length) {
-        saveDailyPredsCache(realPreds);
-        // Escribir a Supabase si aún no hay picks globales (solo el primer usuario del día)
-        sbSaveLockedPicks(realPreds);
+        // 🆕 (13-jul-2026) Enriquecer con intel real (bajas/H2H/forma de API-Football)
+        // ANTES de lockear: el intel puede bajar la confianza de un pick contradicho.
+        const _toSave = realPreds;
+        _enrichPicksWithIntel(_toSave).finally(function() {
+          saveDailyPredsCache(_toSave);
+          // Escribir a Supabase si aún no hay picks globales (solo el primer usuario del día)
+          sbSaveLockedPicks(_toSave);
+          try { if (window._intelChanged) { window._intelChanged = false; renderPreds(); } } catch(_) {}
+        });
       }
     } catch(e) {
       console.error('[renderPreds] buildPredsFromOdds crash:', e.stack || e.message);
