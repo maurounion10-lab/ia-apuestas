@@ -1629,11 +1629,19 @@ async function fetchPickIntel(q, env) {
     if (q.debug) {
       const fxNext2 = await cached(env, `apx2_fxnext_${leagueId}`, 3 * 3600,
         () => apf(`/fixtures?league=${leagueId}&season=${season}&next=30`, env)).catch(e => ({ _err: String(e) }));
+      // raw APF sin wrapper para ver errors/results
+      let raw = null;
+      try {
+        const key = env.API_FOOTBALL_KEY;
+        const rr = await fetch(`${API_FOOTBALL_BASE}/fixtures?league=${leagueId}&season=${season}&next=5`, { headers: { 'x-apisports-key': key } });
+        const jj = await rr.json();
+        raw = { status: rr.status, errors: jj.errors || null, results: jj.results, paging: jj.paging || null, sample: (jj.response || []).slice(0,3).map(f => (f.teams?.home?.name||'?') + ' vs ' + (f.teams?.away?.name||'?')) };
+      } catch(e) { raw = { fetchErr: String(e) }; }
       return { error: 'fixture-not-found', debug: { leagueId, season, dateStr,
         dayCount: fixtures.length,
         nextCount: (fxNext2 && fxNext2.response || []).length,
         nextErr: fxNext2 && fxNext2._err || null,
-        sample: (fxNext2 && fxNext2.response || []).slice(0, 5).map(f => (f.teams?.home?.name || '?') + ' vs ' + (f.teams?.away?.name || '?')) } };
+        raw } };
     }
     return { error: 'fixture-not-found' };
   }
