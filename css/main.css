@@ -1271,6 +1271,10 @@
     z-index: 5;
     box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
   }
+  /* 🆕 (14-jul) En mobile la franja centrada tapaba el pick y la cuota — sube a la zona de escudos */
+  @media (max-width: 480px) {
+    .pred-legacy-ribbon { top: 27%; font-size: 0.62rem; padding: 7px 0; }
+  }
 
   /* 🆕 (13-jul) Chip central del sello: pago (win) / winrate 30d (loss) */
   .pred-result-stamp-mid {
