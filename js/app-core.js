@@ -4518,6 +4518,8 @@ function renderPreds() {
   const isLimitedLeague = k => LIMITED_LEAGUES.has(k || '');
 
   function formDots(arr) {
+  // 🛡️ (13-jul) Acepta string "WWLWW" o array ['W','W',...] — el intel y el caché pueden traer cualquiera
+  if (typeof arr === 'string') arr = arr.split('');
     return (arr||[]).map(r => {
       const cls = r==='G'||r==='W' ? 'g' : r==='E'||r==='D' ? 'e' : 'p';
       const lbl = r==='G'||r==='W' ? 'G' : r==='E'||r==='D' ? 'E' : 'P';
