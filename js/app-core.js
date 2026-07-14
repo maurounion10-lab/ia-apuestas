@@ -4065,9 +4065,9 @@ async function _enrichPicksWithIntel(preds) {
         }
         if (!intel || intel.error) return;
         p._intel = intel;
-        // Forma real reemplaza la decorativa
-        if (intel.form && intel.form.home) p.formH = intel.form.home;
-        if (intel.form && intel.form.away) p.formA = intel.form.away;
+        // Forma real reemplaza la decorativa — como ARRAY: formDots() espera array, no string
+        if (intel.form && intel.form.home) p.formH = String(intel.form.home).split('');
+        if (intel.form && intel.form.away) p.formA = String(intel.form.away).split('');
         window._intelChanged = true;
         // ── Influencia en la decisión (solo si el pick aún no está lockeado global) ──
         if (p._confLocked) return;
@@ -4104,6 +4104,18 @@ async function _enrichPicksWithIntel(preds) {
       })(p);
     }
   } catch(_) {}
+}
+
+// 🆕 (13-jul) Picks lockeados con el MOTOR ANTERIOR (pre banda de cuota + intel).
+// Se muestran con una franja diagonal de advertencia. No agregar nuevos acá:
+// los picks generados desde el 13-jul ya salen del motor nuevo.
+const _LEGACY_ENGINE_PICKS = new Set([
+  'bahia_chapecoense_2026-07-13',
+  'chicagofire_vancouver_2026-07-13',
+  'vitoria_vascodagama_2026-07-13',
+]);
+function _isLegacyPick(p) {
+  return !!(p && p.id && _LEGACY_ENGINE_PICKS.has(p.id) && (!p.result || p.result === 'pending'));
 }
 
 // URL de la página individual de cada predicción
@@ -6280,13 +6292,14 @@ function renderPreds() {
 
     const _cardId = 'predcard-' + (p.home+'-'+p.away).toLowerCase().replace(/[^a-z0-9]+/g,'-');
     return `
-    <div id="${_cardId}" class="pred-card ${cardClass}${_stageCardClass}" style="${
+    <div id="${_cardId}" class="pred-card ${cardClass}${_stageCardClass}${_isLegacyPick(p) ? ' pred-card-legacy' : ''}" style="${
       isGameLive
         ? 'border-color:rgba(229,57,53,0.4)'
         : (!isStarted && !isMaxConf && p.conf==='high')
           ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)'
           : ''
     }">
+      ${_isLegacyPick(p) ? '<div class="pred-legacy-ribbon" aria-hidden="true">PICK DEL FORMATO ANTERIOR</div>' : ''}
       ${_stageBadgeHtml}
       ${(!isGameLive && isStarted && finalScore && (histResult === 'win' || histResult === 'loss')) ? (() => {
         const _isWin = histResult === 'win';
@@ -7270,6 +7283,8 @@ function _recLabel(rec, home, away) {
     const sn = shortName(teamPart);
     return 'Gana ' + sn;
   }
+  // 🆕 (13-jul) Consistencia: "Más de 2.5" → "Más de 2.5 goles" (idem Menos)
+  { const mOU = r.match(/^(Más|Menos) de (\d+[.,]?\d*)$/i); if (mOU) return mOU[1] + ' de ' + mOU[2] + ' goles'; }
   return r;
 }
 function loadHistorial()   {
