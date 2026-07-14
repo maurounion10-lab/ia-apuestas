@@ -4114,8 +4114,12 @@ const _LEGACY_ENGINE_PICKS = new Set([
   'chicagofire_vancouver_2026-07-13',
   'vitoria_vascodagama_2026-07-13',
 ]);
+const _LEGACY_ENGINE_KEYS = new Set(['bahia|chapecoense', 'chicagofire|vancouver', 'vitoria|vascodagama']);
 function _isLegacyPick(p) {
-  return !!(p && p.id && _LEGACY_ENGINE_PICKS.has(p.id) && (!p.result || p.result === 'pending'));
+  if (!p || (p.result && p.result !== 'pending')) return false;
+  if (p.id && _LEGACY_ENGINE_PICKS.has(p.id)) return true;
+  const k = (String(p.home || '') + '|' + String(p.away || '')).toLowerCase().replace(/[^a-z0-9|]/g, '');
+  return _LEGACY_ENGINE_KEYS.has(k);
 }
 
 // URL de la página individual de cada predicción
