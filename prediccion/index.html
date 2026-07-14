@@ -20,6 +20,12 @@
   .match { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:6px 0 14px; }
   .team { flex:1; text-align:center; }
   .team img { width:72px; height:72px; object-fit:contain; filter:drop-shadow(0 2px 6px rgba(0,0,0,0.5)); }
+  .match { flex-wrap: nowrap; }
+  .team { min-width: 0; }
+  @media (max-width: 400px) {
+    .team img, .ini-badge { width:56px !important; height:56px !important; }
+    .tname { font-size: 0.84rem; }
+  }
   .tname { font-weight:800; margin-top:6px; font-size:0.95rem; }
   .vs { color:var(--texto-sec); font-weight:800; font-size:0.7rem; background:rgba(0,0,0,0.3); border:1px solid var(--borde); border-radius:6px; padding:4px 9px; }
   .meta { text-align:center; color:var(--texto-sec); font-size:0.78rem; margin-bottom:4px; }
@@ -77,12 +83,14 @@
 
   function esc(x) { return String(x == null ? '' : x).replace(/[<>&"]/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])); }
   function logo(name) {
+    const ini = String(name || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
+    // 🆕 (14-jul) Si el logo falla se muestran iniciales (antes desaparecía y rompía el layout)
+    const fb = '<div class="ini-badge" style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.07);display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:1.4rem">' + esc(ini) + '</div>';
     try {
       const url = (typeof teamLogos !== 'undefined') && (teamLogos[name] || null);
-      if (url) return '<img src="' + url + '" alt="' + esc(name) + '" onerror="this.style.display=\'none\'">';
+      if (url) return '<span class="logo-wrap">' + fb.replace('class="ini-badge"','class="ini-badge" hidden') + '<img src="' + url + '" alt="' + esc(name) + '" onerror="this.previousElementSibling.hidden=false;this.remove()"></span>';
     } catch(e) {}
-    const ini = String(name || '?').split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase();
-    return '<div style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.07);display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:1.4rem">' + esc(ini) + '</div>';
+    return fb;
   }
   function dots(f) {
     return '<span class="dots">' + String(f || '').split('').map(c => {
