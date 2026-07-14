@@ -1244,27 +1244,32 @@
     border-radius: 9px; padding: 5px 11px; flex-shrink: 0;
   }
   .stamp-score-num { font-size: 0.95rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
-  /* 🆕 (13-jul) Franja diagonal para picks del motor anterior */
+  /* 🆕 (13-jul) Franja para picks del motor anterior — banda sólida, legible */
   .pred-card-legacy { overflow: hidden; position: relative; }
   .pred-legacy-ribbon {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(-24deg);
-    width: 150%;
-    text-align: center;
-    padding: 7px 0;
-    background: repeating-linear-gradient(135deg, rgba(255,170,0,0.16) 0 14px, rgba(0,0,0,0.28) 14px 28px);
-    border-top: 1px dashed rgba(255,190,60,0.55);
-    border-bottom: 1px dashed rgba(255,190,60,0.55);
+    transform: translate(-50%, -50%) rotate(-8deg);
+    width: 120%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 9px 0;
+    background: rgba(8, 8, 8, 0.93);
+    border-top: 2px solid #ffca4d;
+    border-bottom: 2px solid #ffca4d;
     color: #ffca4d;
-    font-size: 0.66rem;
+    font-size: 0.7rem;
     font-weight: 900;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    line-height: 1;
+    white-space: nowrap;
     pointer-events: none;
     z-index: 5;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.55);
   }
 
   /* 🆕 (13-jul) Chip central del sello: pago (win) / winrate 30d (loss) */
