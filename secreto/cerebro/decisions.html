@@ -33,8 +33,40 @@
 
   <div class="entry decision">
     <div class="entry-head">
-      <span class="entry-date">2026-07-08</span>
+      <span class="entry-date">2026-07-14</span>
       <span class="badge gold">actual</span>
+      <span class="entry-title">Gate de accesoia: value-first → captura agresiva</span>
+    </div>
+    <div class="entry-section"><strong>Decisión</strong>Rediseñar el gate de captura de email de <strong>accesoia.app</strong> (<code>img/gate-v2.js</code>, las 3 landings del Mundial) desde un "hard-gate" que trababa el scroll hacia <strong>captura agresiva pero honesta</strong>.</div>
+    <div class="entry-section"><strong>Cambios clave</strong>
+      <ul>
+        <li><strong>Cerrar = cerrar de verdad</strong>: se eliminó la trampa que trababa el scroll al 75% y reabría el modal solo. X + backdrop + Escape cierran; el scroll queda libre.</li>
+        <li><strong>Triggers</strong> (el que ocurra primero): <strong>4 s</strong> en página (99.9% del tráfico es mobile), <strong>scroll 10%</strong>, <strong>exit-intent</strong> (desktop) y <strong>click</strong> en contenido tapado/CTAs.</li>
+        <li><strong>Si lo cierra, vuelve</strong> al re-dispararse, con <strong>cooldown de 12 s</strong> (no persiste entre visitas). Si ya es lead, no reaparece.</li>
+        <li><strong>Mensaje concreto</strong> (antes "2 IAs" abstracto): ranking de las 8 + combinada del día + pick de mañana, con prueba social (15.000 en Telegram · 77% de acierto).</li>
+        <li><strong>Hero value-first</strong>: muestra el <strong>18% del favorito</strong> pero <strong>tapa el nombre</strong> (bloque sólido, que no se deduzca que es España); fondo → <code>trofeo.jpg</code>. El dato tapado es el incentivo del mail.</li>
+      </ul>
+    </div>
+    <div class="entry-section"><strong>Por qué</strong>Los ads de Meta traían buen tráfico pero la conversión era <strong>0,14%</strong>. El diagnóstico (GA4 + Clarity + IA) mostró el cuello: <strong>scroll 16%, 7 s activos, 1,08 páginas/sesión</strong> — el 94% rebotaba antes del pedido de mail (que salía al 75% de scroll). El gate-trampa mataba la confianza.</div>
+    <div class="entry-section"><strong>Quién decide</strong>Mauro (eligió "value-first" y después el ajuste agresivo: 4 s, 10%, y que vuelva tras cerrar).</div>
+    <div class="entry-section"><strong>Impacto</strong>En observación 2-3 días. Métricas a vigilar en el panel: <strong>gate open rate</strong> (baseline 5,7%) y <strong>conversión/leads</strong> (baseline 0,14%). Si suben aperturas pero no leads → aflojar (subir timer o cooldown).</div>
+  </div>
+
+  <div class="entry decision">
+    <div class="entry-head">
+      <span class="entry-date">2026-07-14</span>
+      <span class="entry-title">Centro de Control (dashboard de analytics + heatmap + IA)</span>
+    </div>
+    <div class="entry-section"><strong>Decisión</strong>Dashboard interno <strong>Liquid Glass</strong> en <code>gambeta.ai/secreto/analytics</code> (misma clave <code>Mauro123</code>) que agrega toda la medición: <strong>GA4 Data API</strong> (property 544952014, JWT server-side), <strong>Microsoft Clarity</strong> (scroll/rage/dead clicks), filtros de fecha (hoy→6m), <strong>split gambeta vs accesoia</strong>, <strong>campañas/anuncios de Meta</strong> (UTM), y <strong>análisis IA</strong> con Claude (<code>claude-sonnet-5</code>). Refresh <strong>4×/día</strong> por <strong>Windows Task Scheduler</strong> local.</div>
+    <div class="entry-section"><strong>Por qué</strong>Los ads corrían pero <strong>GA4 no estaba instalado</strong> en accesoia (se corrigió: <code>G-19YJJNDPSN</code> + Clarity en las 7 páginas). Sin medición no se podía optimizar. El panel da la foto ad → accesoia → gambeta; la IA llegó sola al mismo diagnóstico (16% scroll, cuello en el hero).</div>
+    <div class="entry-section"><strong>Alternativas rechazadas</strong>GitHub Actions para el cron (PAT vencido → Task Scheduler, usa credenciales cacheadas de Windows sin exponer secretos); heatmap propio (Clarity no expone imagen por API → se enlaza su dashboard + métricas numéricas).</div>
+    <div class="entry-section"><strong>Quién decide</strong>Mauro.</div>
+    <div class="entry-section"><strong>Impacto</strong>Medición end-to-end operativa. Key de Anthropic operativa (tenía saldo). Para pushear a <code>ia-apuestas</code>/<code>accesoia-app</code>: <code>origin</code> con identidad <code>maurounion10-lab@</code> + <code>GCM_INTERACTIVE=never</code> (el PAT del <code>.env</code> da 401). Pendiente: regenerar el PAT como respaldo.</div>
+  </div>
+
+  <div class="entry decision">
+    <div class="entry-head">
+      <span class="entry-date">2026-07-08</span>
       <span class="entry-title">Motor de contenido social (skill <code>gambeta-content-engine</code>) + agentes de publicación</span>
     </div>
     <div class="entry-section"><strong>Decisión</strong>Construir un <strong>motor de contenido social</strong> como skill de Claude Code que: (1) toma data del endpoint público <code>/api/sb</code> (JSON limpio, sin scrapear render); (2) investiga en vivo con <strong>3 fuentes</strong> — picks del endpoint + noticias del Mundial (WebSearch) + tendencias sociales (<strong>Apify</strong>: IG/TikTok/X); (3) escribe copy; (4) arma piezas (post/carrusel) en <strong>DOS vertientes</strong>; (5) renderiza PNG local con Puppeteer sobre el kit de diseño (skins A/B/C).</div>
