@@ -3508,6 +3508,13 @@ function buildPredsFromOdds() {
       const yes = (bttsMkt.outcomes || []).find(o => /yes|si|sí/i.test(o.name));
       if (yes) bttsOddsReal = yes.price;
     }
+    // 🆕 (14-jul) Ambos NO Marcan — cuota real del outcome "No"
+    let bttsNoOddsReal = null;
+    if (bttsMkt) {
+      const noOut = (bttsMkt.outcomes || []).find(o => /^no$/i.test(String(o.name || '').trim()));
+      if (noOut) bttsNoOddsReal = noOut.price;
+    }
+    const bttsNoEst = bttsNoOddsReal ? Math.round(100 / bttsNoOddsReal) : null;
     // Solo cuota real — sin estimaciones
     const bttsEst = bttsOddsReal ? Math.round(100 / bttsOddsReal) : null;
     const bttsOddsEst = bttsOddsReal;
@@ -3549,6 +3556,7 @@ function buildPredsFromOdds() {
           && (pt !== '2.5' || (probOver[pt] || 0) >= 62))
           .map(pt => ({ rec: `Más de ${pt}`, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
       ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsEst, isBtts: true }] : []),
+      ...(bttsNoEst ? [{ rec: 'Ambos No Marcan', prob: bttsNoEst, odds: bttsNoOddsReal, isBtts: true, isBttsNo: true }] : []),
     ]
     .filter(c => c.prob > 0)
     .filter(c => c._isDoubleChance || !c.odds || parseFloat(c.odds) >= MIN_ODDS);
@@ -4408,6 +4416,11 @@ function _buildIAReasoning(p) {
         '🛡️ <b>Partido cerrado en puerta</b>: los dos defienden bien y arriesgan poco.',
         '🛡️ <b>Promedio de goles bajo</b> en los últimos partidos de ambos.'
       ]));
+    } else if (/ambos\s*no\s*marcan/i.test(_rec)) {
+      bullets.push(_gbPickVariant(_seed + 'bttsno', [
+        '🛡️ <b>Al menos uno no convierte</b>: defensas firmes o ataque desdentado enfrente.',
+        '🛡️ <b>Cerrojo probable</b>: uno de los dos suele terminar sin marcar este tipo de partidos.'
+      ]));
     } else if (/btts|ambos.*marcan/i.test(_rec)) {
       bullets.push(_gbPickVariant(_seed + 'btts', [
         '🎯 <b>Los dos convierten seguido</b>: ambos vienen marcando en sus últimos partidos.',
@@ -5175,6 +5188,7 @@ function renderPreds() {
         if      (_side === 'home')         result = homeWin  ? 'win' : 'loss';
         else if (_side === 'away')         result = awayWin  ? 'win' : 'loss';
         else if (_side === 'draw')         result = draw     ? 'win' : 'loss';
+        else if (rec === 'Ambos No Marcan') result = !bttsMet ? 'win' : 'loss';
         else if (rec === 'Ambos Marcan')   result = bttsMet  ? 'win' : 'loss';
         else if (rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
         else if (rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
@@ -8466,6 +8480,7 @@ function resolveCompletedGames(scores, skipRender) {
       else if (p.rec === 'Empate')         result = draw       ? 'win' : 'loss';
       else if (p.rec === 'Doble 1X')       result = (homeWin || draw) ? 'win' : 'loss';   // 🆕
       else if (p.rec === 'Doble X2')       result = (awayWin || draw) ? 'win' : 'loss';   // 🆕
+      else if (p.rec === 'Ambos No Marcan') result = !bttsMet  ? 'win' : 'loss';
       else if (p.rec === 'Ambos Marcan')   result = bttsMet    ? 'win' : 'loss';
       else if (p.rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
       else if (p.rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
@@ -8958,6 +8973,7 @@ function resolveAllGames(scores) {
       else if (p.rec === 'Empate')         result = draw          ? 'win' : 'loss';
       else if (p.rec === 'Doble 1X')       result = (homeWin || draw) ? 'win' : 'loss';   // 🆕
       else if (p.rec === 'Doble X2')       result = (awayWin || draw) ? 'win' : 'loss';   // 🆕
+      else if (p.rec === 'Ambos No Marcan') result = !bttsMet     ? 'win' : 'loss';
       else if (p.rec === 'Ambos Marcan')   result = bttsMet       ? 'win' : 'loss';
       else if (p.rec === 'Más de 1.5')     result = totalGoals >= 2 ? 'win' : 'loss';
       else if (p.rec === 'Más de 2.5')     result = totalGoals >= 3 ? 'win' : 'loss';
