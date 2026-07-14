@@ -268,6 +268,20 @@ function buildAll(){
     ${camps.length?`<table><tr><th>Campaña</th><th>Anuncio</th><th style="text-align:right">Sesiones</th><th style="text-align:right">Usuarios</th></tr>${camps.map(c=>`<tr><td>${campName(c.campaign)}</td><td style="color:var(--soft)">${adName(c.content)}</td><td class="num"><div class="hbar" style="display:inline-block;width:60px;vertical-align:middle;margin-right:6px"><i style="width:${100*c.sessions/cmax}%"></i></div>${fmt(c.sessions)}</td><td class="num">${fmt(c.users)}</td></tr>`).join('')}</table>`:`<p style="color:var(--dim);font-size:.8rem">Todavía no hay sesiones atribuidas a campañas en este período.</p>`}
     <div class="adnote">${anyId?'✅ <b>La atribución por anuncio ya funciona</b>: Meta está pasando el ID de campaña y de anuncio. Para verlos con nombre en vez de número, en el ad de Meta poné en el parámetro de URL: <code>utm_source=fb&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}</code>':'💡 Para identificar de qué anuncio viene cada visita, agregá parámetros de URL en cada ad de Meta: <code>utm_source=fb&utm_medium=paid&utm_campaign={{campaign.name}}&utm_content={{ad.name}}</code>'}</div></div>`));
 
+  // ═══ Canal de Telegram (landings /canal*) ═══
+  const canal=(a.canal||[]).filter(c=>c.sessions>0||c.joins>0);const ct=a.canalTotals||{sessions:0,joins:0,leads:0};
+  const cName=(p)=>({'/canal':'🔗 Genérica','/canal-form':'📧 Formulario','/canal-pick':'🎯 Pick del día','/canal-social':'🔥 Prueba social','/canal-acierto':'📊 77% acierto','/canal-mundial':'🏆 Urgencia Mundial'}[p]||p);
+  const cmx=Math.max(...canal.map(c=>c.sessions),1);
+  app.appendChild($(`<div class="card" style="margin-bottom:12px"><h2>Canal de Telegram${Q('Tráfico y conversión de las landings que llevan al canal de Telegram (/canal, /canal-pick, etc.). "Al canal" = clics en "Unirse al canal" (eventos <b>telegram_join_click</b> + <b>goto_telegram</b>). Así ves qué variante manda más gente al canal. Período: '+lbl+'.')}<span class="note">${lbl}</span></h2>
+    ${canal.length?`<div style="display:flex;gap:8px 16px;flex-wrap:wrap;margin-bottom:12px;font-size:.72rem;color:var(--dim)">
+      <span>Sesiones: <b style="color:var(--soft)">${fmt(ct.sessions)}</b></span>
+      <span>Al canal: <b style="color:var(--green)">${fmt(ct.joins)}</b></span>
+      <span>% al canal: <b style="color:var(--green)">${pct(ct.sessions?+(100*ct.joins/ct.sessions).toFixed(1):0)}</b></span>
+      <span>Leads del form: <b style="color:var(--gold)">${fmt(ct.leads)}</b></span></div>
+      <table><tr><th>Variante</th><th style="text-align:right">Sesiones</th><th style="text-align:right">Al canal</th><th style="text-align:right">%</th><th style="text-align:right">Leads</th></tr>${canal.map(c=>`<tr><td>${cName(c.path)}</td><td class="num"><div class="hbar" style="display:inline-block;width:44px;vertical-align:middle;margin-right:6px"><i style="width:${100*c.sessions/cmx}%"></i></div>${fmt(c.sessions)}</td><td class="num" style="color:var(--green);font-weight:700">${fmt(c.joins)}</td><td class="num" style="color:${c.joinRate>=15?'var(--green)':c.joinRate>=6?'var(--gold)':'var(--dim)'}">${pct(c.joinRate)}</td><td class="num">${fmt(c.leads)}</td></tr>`).join('')}</table>
+      <div style="font-size:.66rem;color:var(--dim);margin-top:8px">"Al canal" = clics en "Unirse al canal". La variante con mayor <b>%</b> es la que más conviene escalar.</div>`
+    :`<p style="color:var(--dim);font-size:.82rem">Todavía sin tráfico en las landings del canal. Cuando corran los ads a <b style="color:#ffd34d">accesoia.app/canal*</b> vas a ver acá, por variante, cuántos entran al canal y cuál convierte mejor.</p>`}</div>`));
+
   // ═══ franja horaria (heatmap de tráfico) ═══
   const hrs=a.hourly||[];const hmax=Math.max(...hrs.map(h=>h.sessions),1);const peakH=hrs.reduce((x,y)=>y.sessions>x.sessions?y:x,{sessions:0}).hour;
   app.appendChild($(`<div class="card" style="margin-bottom:12px"><h2>¿A qué hora entra la gente?${Q('Sesiones por hora del día (hora de Buenos Aires). Sirve para programar los ads y las publicaciones cuando hay más tráfico.')}<span class="note">pico: ${peakH}:00 hs · ${lbl}</span></h2>

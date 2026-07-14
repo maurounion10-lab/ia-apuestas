@@ -174,8 +174,11 @@ async function pullRange(dr) {
     { dateRanges, dimensions: [{ name: 'newVsReturning' }], metrics: [{ name: 'sessions' }] },
     { dateRanges, dimensions: [{ name: 'hostName' }], metrics: [{ name: 'sessions' }, { name: 'activeUsers' }, { name: 'screenPageViews' }, { name: 'engagementRate' }] },
     { dateRanges, dimensions: [{ name: 'sessionCampaignName' }, { name: 'sessionManualAdContent' }], metrics: [{ name: 'sessions' }, { name: 'activeUsers' }], orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 15 },
+    // canal Telegram: sesiones y eventos por variante de landing (/canal, /canal-pick, ...)
+    { dateRanges, dimensions: [{ name: 'pagePath' }], metrics: [{ name: 'sessions' }, { name: 'screenPageViews' }], dimensionFilter: { filter: { fieldName: 'pagePath', stringFilter: { matchType: 'CONTAINS', value: 'canal' } } }, orderBys: [{ metric: { metricName: 'sessions' }, desc: true }], limit: 20 },
+    { dateRanges, dimensions: [{ name: 'pagePath' }, { name: 'eventName' }], metrics: [{ name: 'eventCount' }], dimensionFilter: { andGroup: { expressions: [{ filter: { fieldName: 'pagePath', stringFilter: { matchType: 'CONTAINS', value: 'canal' } } }, { filter: { fieldName: 'eventName', inListFilter: { values: ['telegram_join_click', 'goto_telegram', 'lead_capture'] } } }] } }, limit: 60 },
   ];
-  const [daily, hourly, sources, pages, landing, events, devices, countries, cities, newRet, hostSplit, campaigns] = await runChunked(specs, 5);
+  const [daily, hourly, sources, pages, landing, events, devices, countries, cities, newRet, hostSplit, campaigns, canalSess, canalEv] = await runChunked(specs, 5);
 
   const dailySeries = rows(daily, r => ({ date: dv(r, 0), users: mv(r, 0), sessions: mv(r, 1), pageviews: mv(r, 2), avgDur: Math.round(mv(r, 3)), engagement: +(mv(r, 4) * 100).toFixed(1) }));
   const hourSeries = Array.from({ length: 24 }, (_, h) => ({ hour: h, sessions: 0 }));
@@ -187,8 +190,21 @@ async function pullRange(dr) {
   const engDays = dailySeries.filter(d => d.sessions);
   const avgEng = engDays.length ? +(engDays.reduce((a, d) => a + d.engagement, 0) / engDays.length).toFixed(1) : 0;
 
+  // ── Canal Telegram: sesiones + clics al canal por variante de landing ──
+  const canalSessMap = {};
+  rows(canalSess, r => { canalSessMap[dv(r, 0)] = { sessions: mv(r, 0), views: mv(r, 1) }; });
+  const canalEvMap = {};
+  rows(canalEv, r => { const p = dv(r, 0), e = dv(r, 1); (canalEvMap[p] = canalEvMap[p] || {})[e] = mv(r, 0); });
+  const canalPaths = new Set([...Object.keys(canalSessMap), ...Object.keys(canalEvMap)]);
+  const canal = [...canalPaths].map(p => {
+    const s = canalSessMap[p] || { sessions: 0, views: 0 }, ev = canalEvMap[p] || {};
+    const joins = (ev.telegram_join_click || 0) + (ev.goto_telegram || 0), lead = ev.lead_capture || 0;
+    return { path: p, sessions: s.sessions, views: s.views, joins, leads: lead, joinRate: s.sessions ? +(100 * joins / s.sessions).toFixed(1) : 0 };
+  }).filter(c => c.sessions > 0 || c.joins > 0 || c.leads > 0).sort((a, b) => b.joins - a.joins);
+  const canalLeads = canal.reduce((a, c) => a + c.leads, 0);
+
   const gateOpens = Object.entries(eventMap).filter(([k]) => /open_gate$/.test(k) || k === 'gate_manual_open').reduce((a, [, v]) => a + v, 0);
-  const leads = eventMap.lead_capture || 0;
+  const leads = Math.max(0, (eventMap.lead_capture || 0) - canalLeads);   // leads de accesoia puros (sin los del canal-form)
   const funnel = {
     sessions: totSessions, gateShows: eventMap.gate_show || 0, gateOpens, formStarts: eventMap.form_start || 0, leads,
     tgClicks: eventMap.telegram_click || 0, gotoGambeta: eventMap.goto_gambeta || 0, eleccion: eventMap.eleccion_jugada || 0,
@@ -218,6 +234,7 @@ async function pullRange(dr) {
     newVsReturning: rows(newRet, r => ({ type: dv(r, 0), sessions: mv(r, 0) })),
     bySite,
     campaigns: rows(campaigns, r => ({ campaign: dv(r, 0), content: dv(r, 1), sessions: mv(r, 0), users: mv(r, 1) })),
+    canal, canalTotals: { sessions: canal.reduce((a, c) => a + c.sessions, 0), joins: canal.reduce((a, c) => a + c.joins, 0), leads: canalLeads },
     funnel,
   };
 }
