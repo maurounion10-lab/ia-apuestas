@@ -341,7 +341,7 @@ async function fetchOddsAPI(sportKey, env) {
   const key = env.ODDS_API_KEY;
   if (!key) return [];
   try {
-    const url = `https://api.the-odds-api.com/v4/sports/${sportKey}/odds/?apiKey=${key}&regions=eu,uk&markets=h2h,totals&oddsFormat=decimal&dateFormat=iso`;
+    const url = `https://api.the-odds-api.com/v4/sports/${sportKey}/odds/?apiKey=${key}&regions=eu,uk&markets=h2h,totals,btts&oddsFormat=decimal&dateFormat=iso`;
     const r = await fetch(url);
     if (!r.ok) return [];
     return await r.json();
@@ -1229,6 +1229,7 @@ function calcResult(pick, score) {
   if (rec === 'Doble 1X')        return (homeWin || draw) ? 'win' : 'loss';   // 🆕 (27-may-2026) DO local o empate
   if (rec === 'Doble X2')        return (awayWin || draw) ? 'win' : 'loss';   // 🆕 (27-may-2026) DO visitante o empate
   if (rec === 'Ambos Marcan')    return btts    ? 'win' : 'loss';
+  if (rec === 'Ambos No Marcan') return !btts   ? 'win' : 'loss';   // 🆕 (14-jul) BTTS No
   if (rec === 'Más de 1.5')      return total >= 2 ? 'win' : 'loss';
   if (rec === 'Más de 2.5')      return total >= 3 ? 'win' : 'loss';
   if (rec === 'Más de 3.5')      return total >= 4 ? 'win' : 'loss';
