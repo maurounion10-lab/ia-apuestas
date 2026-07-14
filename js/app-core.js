@@ -4114,6 +4114,21 @@ async function _enrichPicksWithIntel(preds) {
   } catch(_) {}
 }
 
+// 🆕 (13-jul) Picks lockeados con el MOTOR ANTERIOR (pre banda de cuota + intel).
+// Se muestran con una franja de advertencia. No agregar nuevos acá.
+const _LEGACY_ENGINE_PICKS = new Set([
+  'bahia_chapecoense_2026-07-13',
+  'chicagofire_vancouver_2026-07-13',
+  'vitoria_vascodagama_2026-07-13',
+]);
+const _LEGACY_ENGINE_KEYS = new Set(['bahia|chapecoense', 'chicagofire|vancouver', 'vitoria|vascodagama']);
+function _isLegacyPick(p) {
+  if (!p || (p.result && p.result !== 'pending')) return false;
+  if (p.id && _LEGACY_ENGINE_PICKS.has(p.id)) return true;
+  const k = (String(p.home || '') + '|' + String(p.away || '')).toLowerCase().replace(/[^a-z0-9|]/g, '');
+  return _LEGACY_ENGINE_KEYS.has(k);
+}
+
 // URL de la página individual de cada predicción
 function _predPageUrl(p) {
   if (!p || !p.home || !p.away) return null;
