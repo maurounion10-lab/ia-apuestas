@@ -6305,7 +6305,7 @@ function renderPreds() {
           ? 'border-color:rgba(255,214,0,0.55);box-shadow:0 0 28px rgba(255,214,0,0.18),0 4px 16px rgba(0,0,0,0.4);background:linear-gradient(180deg,rgba(255,214,0,0.06) 0%,var(--gris-card) 60%)'
           : ''
     }">
-      ${_isLegacyPick(p) ? '<div class="pred-legacy-ribbon" aria-hidden="true">PICK DEL FORMATO ANTERIOR</div>' : ''}
+      ${_isLegacyPick(p) ? '<div class="pred-legacy-ribbon" aria-hidden="true">⚠️ Pick del formato anterior</div>' : ''}
       ${_stageBadgeHtml}
       ${(!isGameLive && isStarted && finalScore && (histResult === 'win' || histResult === 'loss')) ? (() => {
         const _isWin = histResult === 'win';
