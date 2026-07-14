@@ -3881,15 +3881,20 @@ html body #aiChatBox {
 html body #aiChatBox.open { transform: translateY(calc(-50% + 55px)) scale(1) !important; }
 html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale(0.05) !important; }
 
-/* Mobile: mismo layout pero bubbles más chicos y popup fullwidth abajo */
-@media (max-width: 480px) {
+/* 🆕 (14-jul) Mobile: bubbles al RINCÓN inferior derecho (patrón FAB) — centrados
+   verticalmente tapaban el botón APOSTAR de DBbet y los likes de todas las fichas */
+@media (max-width: 600px) {
   html body #gbBetBbl, html body .forum-bbl, html body #aiChatBtn {
-    width: 37px !important;
-    height: 37px !important;
-    right: 12px !important;
+    width: 38px !important;
+    height: 38px !important;
+    right: 10px !important;
+    top: auto !important;
+    transform: none !important;
+    opacity: 0.93;
   }
-  html body #gbBetBbl  { top: calc(50% - 48px) !important; }
-  html body #aiChatBtn { top: calc(50% + 48px) !important; }
+  html body #aiChatBtn { bottom: 60px !important; }
+  html body .forum-bbl { bottom: 106px !important; }
+  html body #gbBetBbl  { bottom: 152px !important; }
   #gbBetBbl .gbb-emoji { font-size: 18px; }
   html body #aiChatBox {
     top: auto !important;
