@@ -4041,85 +4041,77 @@ function _updateHeroProStats() {
 // Se aplica a los picks pendientes del día: ajusta confianza y alimenta el razonamiento.
 async function _enrichPicksWithIntel(preds) {
   try {
-    const _cands = (preds || []).filter(p => p && !p._intelDone && !p._started
-      && (!p.result || p.result === 'pending') && p._sportKey && p.home && p.away
-      && p._sportKey !== 'soccer_fifa_world_cup').slice(0, 14);
-    if (!_cands.length) return;
+    window._intelSeen = window._intelSeen || new Set();
     const _lsKey = p => 'gb_intel_v1_' + (p.id || (p.home + '_' + p.away)).replace(/[^a-z0-9_]/gi, '');
-    // 🆕 Secuencial con pausa: APF limita requests por minuto — nada de bursts.
     const _sleep = ms => new Promise(res => setTimeout(res, ms));
-    for (const p of _cands.slice(0, 10)) {
-      await _sleep(400);
-      await (async function(p) {
-      p._intelDone = true;
+    const _attach = (p, intel) => {
+      p._intel = intel;
+      if (intel.form && intel.form.home) p.formH = String(intel.form.home).split('');
+      if (intel.form && intel.form.away) p.formA = String(intel.form.away).split('');
+    };
+    const _adjust = (p, intel) => {
+      if (p._confLocked) return;
+      const _side = (typeof _recSideOf === 'function') ? _recSideOf(p) : null;
+      let score = 0;
+      const injH = (intel.injuries && intel.injuries.home && intel.injuries.home.count) || 0;
+      const injA = (intel.injuries && intel.injuries.away && intel.injuries.away.count) || 0;
+      if (_side === 'home') score += (injA - injH) * 0.5;
+      if (_side === 'away') score += (injH - injA) * 0.5;
+      const hh = intel.h2h || {};
+      if (hh.n >= 4) {
+        const wr = _side === 'home' ? hh.homeW / hh.n : _side === 'away' ? hh.awayW / hh.n : hh.draw / hh.n;
+        if (wr >= 0.6) score += 1; else if (wr <= 0.2) score -= 1;
+        if (_side === 'home' && hh.homeAtHome && hh.homeAtHome.n >= 3) {
+          const wrl = hh.homeAtHome.w / hh.homeAtHome.n;
+          if (wrl >= 0.65) score += 1; else if (wrl <= 0.2) score -= 1;
+        }
+      }
+      const _formPts = f => (String(f || '').match(/W/g) || []).length;
+      if ((_side === 'home' || _side === 'away') && intel.form) {
+        const own = _formPts(_side === 'home' ? intel.form.home : intel.form.away);
+        const riv = _formPts(_side === 'home' ? intel.form.away : intel.form.home);
+        if (own - riv >= 3) score += 1; else if (riv - own >= 3) score -= 1;
+      }
+      p._intelScore = Math.round(score * 10) / 10;
+      if (score <= -2 && p.bvr > 3) {
+        p.bvr = p.bvr - 1;
+        p.bvrText = p.bvr >= 6 ? 'Máxima' : p.bvr === 5 ? 'Alta' : p.bvr === 4 ? 'Media-Alta' : 'Media';
+        p._intelDemoted = true;
+      } else if (score >= 2) {
+        p._intelBoosted = true;
+      }
+    };
+
+    const _cands = (preds || []).filter(p => p && !p._started
+      && (!p.result || p.result === 'pending') && p._sportKey && p.home && p.away
+      && p._sportKey !== 'soccer_fifa_world_cup');
+    let _fetched = 0;
+    for (const p of _cands) {
       try {
+        const key = _lsKey(p);
+        // 1) Attach silencioso desde caché local (no dispara re-render)
         let intel = null;
-        try { const c = JSON.parse(localStorage.getItem(_lsKey(p)) || 'null'); if (c && Date.now() - c.ts < 6 * 3600 * 1000) intel = c.v; } catch(_) {}
-        if (!intel) {
-          const u = WORKER_URL + '/pick-intel?home=' + encodeURIComponent(p.home) + '&away=' + encodeURIComponent(p.away)
-                  + '&sportKey=' + encodeURIComponent(p._sportKey) + '&ts=' + (p.commenceTs || '');
-          const r = await fetch(u);
-          if (!r.ok) return;
-          intel = await r.json();
-          try { localStorage.setItem(_lsKey(p), JSON.stringify({ ts: Date.now(), v: intel })); } catch(_) {}
-        }
-        if (!intel || intel.error) return;
-        p._intel = intel;
-        // Forma real reemplaza la decorativa — como ARRAY: formDots() espera array, no string
-        if (intel.form && intel.form.home) p.formH = String(intel.form.home).split('');
-        if (intel.form && intel.form.away) p.formA = String(intel.form.away).split('');
-        window._intelChanged = true;
-        // ── Influencia en la decisión (solo si el pick aún no está lockeado global) ──
-        if (p._confLocked) return;
-        const _side = (typeof _recSideOf === 'function') ? _recSideOf(p) : null;
-        let score = 0;
-        const injH = (intel.injuries && intel.injuries.home && intel.injuries.home.count) || 0;
-        const injA = (intel.injuries && intel.injuries.away && intel.injuries.away.count) || 0;
-        if (_side === 'home') score += (injA - injH) * 0.5;
-        if (_side === 'away') score += (injH - injA) * 0.5;
-        const hh = intel.h2h || {};
-        if (hh.n >= 4) {
-          const wr = _side === 'home' ? hh.homeW / hh.n : _side === 'away' ? hh.awayW / hh.n : hh.draw / hh.n;
-          if (wr >= 0.6) score += 1; else if (wr <= 0.2) score -= 1;
-          if (_side === 'home' && hh.homeAtHome && hh.homeAtHome.n >= 3) {
-            const wrl = hh.homeAtHome.w / hh.homeAtHome.n;
-            if (wrl >= 0.65) score += 1; else if (wrl <= 0.2) score -= 1;
-          }
-        }
-        const _formPts = f => (String(f || '').match(/W/g) || []).length;
-        if (_side === 'home' || _side === 'away') {
-          const own = _formPts(_side === 'home' ? intel.form.home : intel.form.away);
-          const riv = _formPts(_side === 'home' ? intel.form.away : intel.form.home);
-          if (own - riv >= 3) score += 1; else if (riv - own >= 3) score -= 1;
-        }
-        p._intelScore = Math.round(score * 10) / 10;
-        if (score <= -2 && p.bvr > 3) {
-          p.bvr = p.bvr - 1;
-          p.bvrText = p.bvr >= 6 ? 'Máxima' : p.bvr === 5 ? 'Alta' : p.bvr === 4 ? 'Media-Alta' : 'Media';
-          p._intelDemoted = true;
-        } else if (score >= 2) {
-          p._intelBoosted = true;
-        }
+        try { const c = JSON.parse(localStorage.getItem(key) || 'null'); if (c && Date.now() - c.ts < 6 * 3600 * 1000) intel = c.v; } catch(_) {}
+        if (intel && !intel.error) _attach(p, intel);
+        // 2) Fetch solo la primera vez por sesión y con tope (rate limit APF)
+        if (window._intelSeen.has(key)) continue;
+        window._intelSeen.add(key);
+        if (intel || _fetched >= 10) { if (intel && !intel.error) _adjust(p, intel); continue; }
+        _fetched++;
+        await _sleep(400);
+        const u = WORKER_URL + '/pick-intel?home=' + encodeURIComponent(p.home) + '&away=' + encodeURIComponent(p.away)
+                + '&sportKey=' + encodeURIComponent(p._sportKey) + '&ts=' + (p.commenceTs || '');
+        const r = await fetch(u);
+        if (!r.ok) continue;
+        intel = await r.json();
+        try { localStorage.setItem(key, JSON.stringify({ ts: Date.now(), v: intel })); } catch(_) {}
+        if (!intel || intel.error) continue;
+        _attach(p, intel);
+        _adjust(p, intel);
+        window._intelChanged = true; // solo cuando llegó data NUEVA
       } catch(_) {}
-      })(p);
     }
   } catch(_) {}
-}
-
-// 🆕 (13-jul) Picks lockeados con el MOTOR ANTERIOR (pre banda de cuota + intel).
-// Se muestran con una franja diagonal de advertencia. No agregar nuevos acá:
-// los picks generados desde el 13-jul ya salen del motor nuevo.
-const _LEGACY_ENGINE_PICKS = new Set([
-  'bahia_chapecoense_2026-07-13',
-  'chicagofire_vancouver_2026-07-13',
-  'vitoria_vascodagama_2026-07-13',
-]);
-const _LEGACY_ENGINE_KEYS = new Set(['bahia|chapecoense', 'chicagofire|vancouver', 'vitoria|vascodagama']);
-function _isLegacyPick(p) {
-  if (!p || (p.result && p.result !== 'pending')) return false;
-  if (p.id && _LEGACY_ENGINE_PICKS.has(p.id)) return true;
-  const k = (String(p.home || '') + '|' + String(p.away || '')).toLowerCase().replace(/[^a-z0-9|]/g, '');
-  return _LEGACY_ENGINE_KEYS.has(k);
 }
 
 // URL de la página individual de cada predicción
@@ -4884,7 +4876,14 @@ function renderPreds() {
           saveDailyPredsCache(_toSave);
           // Escribir a Supabase si aún no hay picks globales (solo el primer usuario del día)
           sbSaveLockedPicks(_toSave);
-          try { if (window._intelChanged) { window._intelChanged = false; renderPreds(); } } catch(_) {}
+          // 🛡️ (13-jul) UN solo re-render por carga — sin guard esto loopeaba y parpadeaba el grid
+          try {
+            if (window._intelChanged && !window._intelRerendered) {
+              window._intelRerendered = true;
+              window._intelChanged = false;
+              renderPreds();
+            }
+          } catch(_) {}
         });
       }
     } catch(e) {
