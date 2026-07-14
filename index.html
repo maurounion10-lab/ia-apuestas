@@ -12,7 +12,7 @@
 <meta charset="UTF-8"><!-- v3 -->
 <link rel="preconnect" href="https://api.accesoia.app">
 <!-- 🆕 #578 Gambeta 1.1 — Tipografía premium Inter + Geist Mono -->
-<link rel="preload" href="/js/app-core.js?v=1783985278" as="script">
+<link rel="preload" href="/js/app-core.js?v=1783988891" as="script">
 <link rel="preload" href="/js/inline-bundle.js?v=1783382200" as="script">
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -234,9 +234,9 @@ main{max-width:1280px;margin:0 auto;padding:32px 20px}
   .hero-cta,.hero-buttons{justify-content:center!important}
 }
 </style>
-<link rel="preload" href="/css/main.css?v=1783984252" as="style">
-<link rel="stylesheet" href="/css/main.css?v=1783984252" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="/css/main.css?v=1783984252"></noscript>
+<link rel="preload" href="/css/main.css?v=1783988891" as="style">
+<link rel="stylesheet" href="/css/main.css?v=1783988891" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="/css/main.css?v=1783988891"></noscript>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
 <script type="application/ld+json">
 {
@@ -2440,7 +2440,7 @@ window.toggleHeroBubble = function(n) {
   <div class="fp-emoji-grid" id="fpEmojiGrid"></div>
 </div>
 
-<script src="/js/app-core.js?v=1783985278" defer></script>
+<script src="/js/app-core.js?v=1783988891" defer></script>
 
 <!-- AUTH MODAL -->
 <!-- ── MODAL BIENVENIDA (nuevo usuario) ── -->
@@ -3453,6 +3453,8 @@ window.toggleHeroBubble = function(n) {
 
   /* ── Texto ── */
   #gbVipSticky .gb-vip-txt {
+    flex: 1;
+    text-align: center; /* 🆕 (13-jul) balancea el espacio entre regalo y botón */
     flex: 1 1 auto; min-width: 0; color: #fff;
     font-size: 0.88rem; line-height: 1.3; font-weight: 700;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -3519,7 +3521,7 @@ window.toggleHeroBubble = function(n) {
 <div id="gbVipSticky" class="gb-hidden" role="complementary" aria-label="Promo DBbet">
   <span class="gb-vip-trophy">🎁</span>
   <div class="gb-vip-txt">
-    <span class="gb-vip-hl">🎁 DBbet: Bono +100% bienvenida</span> · <span class="gb-vip-sub">Duplicá tu primer depósito hasta $130 USD</span>
+    <span class="gb-vip-hl">DBbet: Bono +100% bienvenida</span><span class="gb-vip-sub"> · Duplicá tu primer depósito hasta $130 USD</span>
   </div>
   <a href="https://gambeta.ai/blog/dbbet-bono-100-freebet-argentina-mundial-2026?utm_source=home_sticky&utm_medium=banner" class="gb-vip-cta" onclick="try{localStorage.setItem('gb_vip_clicked','1')}catch(e){}">Activar <span class="gb-vip-cta-arrow">→</span></a>
 </div>
