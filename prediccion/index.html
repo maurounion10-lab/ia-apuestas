@@ -88,7 +88,7 @@
     const fb = '<div class="ini-badge" style="width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,0.07);display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:1.4rem">' + esc(ini) + '</div>';
     try {
       const url = (typeof teamLogos !== 'undefined') && (teamLogos[name] || null);
-      if (url) return '<span class="logo-wrap">' + fb.replace('class="ini-badge"','class="ini-badge" hidden') + '<img src="' + url + '" alt="' + esc(name) + '" onerror="this.previousElementSibling.hidden=false;this.remove()"></span>';
+      if (url) return '<span class="logo-wrap">' + fb.replace('display:inline-flex','display:none') + '<img src="' + url + '" alt="' + esc(name) + '" onerror="this.previousElementSibling.style.display=\'inline-flex\';this.remove()"></span>';
     } catch(e) {}
     return fb;
   }
