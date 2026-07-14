@@ -1244,6 +1244,29 @@
     border-radius: 9px; padding: 5px 11px; flex-shrink: 0;
   }
   .stamp-score-num { font-size: 0.95rem; font-weight: 900; line-height: 1; font-variant-numeric: tabular-nums; }
+  /* 🆕 (13-jul) Franja diagonal para picks del motor anterior */
+  .pred-card-legacy { overflow: hidden; position: relative; }
+  .pred-legacy-ribbon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-24deg);
+    width: 150%;
+    text-align: center;
+    padding: 7px 0;
+    background: repeating-linear-gradient(135deg, rgba(255,170,0,0.16) 0 14px, rgba(0,0,0,0.28) 14px 28px);
+    border-top: 1px dashed rgba(255,190,60,0.55);
+    border-bottom: 1px dashed rgba(255,190,60,0.55);
+    color: #ffca4d;
+    font-size: 0.66rem;
+    font-weight: 900;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    pointer-events: none;
+    z-index: 5;
+  }
+
   /* 🆕 (13-jul) Chip central del sello: pago (win) / winrate 30d (loss) */
   .pred-result-stamp-mid {
     flex: 0 1 auto;
