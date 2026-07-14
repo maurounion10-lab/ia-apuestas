@@ -1661,8 +1661,8 @@ async function fetchPickIntel(q, env) {
   const injData = await cached(env, `apx3_inj_${fxId}`, 3 * 3600, () => apf(`/injuries?fixture=${fxId}`, env)).catch(() => null);
   const h2hData = await cached(env, `apx3_h2h_${Math.min(homeId,awayId)}_${Math.max(homeId,awayId)}`, 24 * 3600,
     () => apf(`/fixtures/headtohead?h2h=${homeId}-${awayId}&last=10&status=FT`, env)).catch(() => null);
-  const formHData = await cached(env, `apx3_form_${homeId}`, 6 * 3600, () => apf(`/fixtures?team=${homeId}&last=5&status=FT`, env)).catch(() => null);
-  const formAData = await cached(env, `apx3_form_${awayId}`, 6 * 3600, () => apf(`/fixtures?team=${awayId}&last=5&status=FT`, env)).catch(() => null);
+  const formHData = await cached(env, `apx4_form_${homeId}`, 6 * 3600, () => apf(`/fixtures?team=${homeId}&last=7`, env)).catch(() => null);
+  const formAData = await cached(env, `apx4_form_${awayId}`, 6 * 3600, () => apf(`/fixtures?team=${awayId}&last=7`, env)).catch(() => null);
 
   // Lesiones: agrupar por equipo, solo tipos que restan (Missing Fixture / Questionable)
   const injuries = { home: { count: 0, players: [] }, away: { count: 0, players: [] } };
@@ -3597,7 +3597,7 @@ export default {
       if (!q.home || !q.away || !q.sportKey) {
         return new Response(JSON.stringify({ error: 'missing params (home, away, sportKey)' }), { status: 400, headers: CORS });
       }
-      const cacheKey = `pickintel_v4_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
+      const cacheKey = `pickintel_v5_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
       const _getIntel = async () => {
         let d = await fetchPickIntel(q, env).catch(e => ({ error: String(e && e.message || e) }));
         if (d && d.error) {
