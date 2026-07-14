@@ -6471,12 +6471,16 @@ function renderPreds() {
           const _wr30 = _winRate30();
           const _st5 = _last5Streak();
           const _st5Ok = _st5 && _st5.filter(x => x === 'G').length >= 3; // solo si la racha es mostrable
+          // 🆕 (13-jul) G en verde, P en rojo — que se note cuando venimos acertando
+          const _cG = x => '<span class="st5-g">' + x + '</span>';
+          const _cP = x => '<span class="st5-p">' + x + '</span>';
+          const _st5Html = _st5 ? _st5.map(x => x === 'G' ? _cG('G') : _cP('P')).join('-') : '';
           if (_wr30 && _wr30.pct >= 55 && _st5Ok) {
-            _mid = `<div class="pred-result-stamp-mid">📊 7d: ${_wr30.w}G-${_wr30.l}P · ${_st5.join('-')}</div>`;
+            _mid = `<div class="pred-result-stamp-mid">📊 7d: ${_cG(_wr30.w + 'G')}-${_cP(_wr30.l + 'P')} · ${_st5Html}</div>`;
           } else if (_wr30 && _wr30.pct >= 55) {
-            _mid = `<div class="pred-result-stamp-mid">📊 7 días: ${_wr30.w}G-${_wr30.l}P</div>`;
+            _mid = `<div class="pred-result-stamp-mid">📊 7 días: ${_cG(_wr30.w + 'G')}-${_cP(_wr30.l + 'P')}</div>`;
           } else if (_st5Ok) {
-            _mid = `<div class="pred-result-stamp-mid">📊 Últimos 5: ${_st5.join('-')}</div>`;
+            _mid = `<div class="pred-result-stamp-mid">📊 Últimos 5: ${_st5Html}</div>`;
           }
         }
         return `<div class="pred-result-stamp ${_cls}">
