@@ -1,5 +1,5 @@
 // gambeta.ai — Service Worker v1.8
-const CACHE_NAME = 'gambeta2-v11';
+const CACHE_NAME = 'gambeta2-v12'; // 🆕 (13-jul) bump: fuerza limpieza tras el incidente de fichas
 // NO cacheamos HTML — siempre se pide a la red para que los deploys sean inmediatos
 const STATIC_ASSETS = [
   '/manifest.json',
