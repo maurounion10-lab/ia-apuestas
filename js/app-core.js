@@ -6518,7 +6518,6 @@ function renderPreds() {
           <span class="pred-result-stamp-sub">${_sub}</span>
         </div>
         ${_mid}
-        ${_scoreFmt ? `<div class="pred-result-stamp-score"><span class="stamp-score-num">${_scoreFmt}</span><span class="stamp-score-lbl">FINAL</span></div>` : ''}
       </div>`;
       })() : ''}
 
