@@ -1615,13 +1615,27 @@ const TM_HEADERS = {
 };
 
 function _tmParseVal(s) {
-  // "€41.85m" | "€1.05bn" | "€850k" → millones de EUR (Number) o null
-  const m = String(s || '').replace(/\s/g, '').match(/€([\d.,]+)(bn|m|k)/i);
+  // "€41.85m" | "€1.05bn" | "€850k" | "€850th." → millones de EUR (Number) o null
+  const m = String(s || '').replace(/\s/g, '').match(/€([\d.,]+)(bn|m|k|th\.?)/i);
   if (!m) return null;
   const n = parseFloat(m[1].replace(',', '.'));
   if (isNaN(n)) return null;
   const u = m[2].toLowerCase();
-  return u === 'bn' ? n * 1000 : u === 'k' ? n / 1000 : n;
+  return u === 'bn' ? n * 1000 : (u === 'k' || u.startsWith('th')) ? n / 1000 : n;
+}
+
+// Elegir el club correcto entre los resultados de búsqueda: el slug tiene que
+// parecerse al nombre buscado (evita agarrar el primer verein random de la página).
+function _tmPickClub(sh, name) {
+  const nn = normTeam(name);
+  const re = /href="\/([a-z0-9\-]+)\/startseite\/verein\/(\d+)/gi;
+  let m, first = null, best = null;
+  while ((m = re.exec(sh))) {
+    if (!first) first = m;
+    const slug = m[1].replace(/-/g, '');
+    if (!best && nn && (slug.includes(nn) || nn.includes(slug))) best = m;
+  }
+  return best || first;
 }
 
 async function _tmTeamValue(name, env) {
@@ -1631,16 +1645,16 @@ async function _tmTeamValue(name, env) {
       const sr = await fetch(TM_BASE + '/schnellsuche/ergebnis/schnellsuche?query=' + encodeURIComponent(name), { headers: TM_HEADERS });
       if (!sr.ok) return null;
       const sh = await sr.text();
-      const m = sh.match(/href="\/([a-z0-9\-]+)\/startseite\/verein\/(\d+)/i);
+      const m = _tmPickClub(sh, name);
       if (!m) return null;
       const cr = await fetch(TM_BASE + '/' + m[1] + '/startseite/verein/' + m[2], { headers: TM_HEADERS });
       if (!cr.ok) return null;
       const ch = await cr.text();
       let val = null;
-      const vm = ch.match(/data-header__market-value-wrapper[^>]*>([\s\S]{0,80}?)</);
-      if (vm) val = _tmParseVal(vm[1]);
+      const vm = ch.match(/data-header__market-value-wrapper[\s\S]{0,200}?€\s*[\d.,]+\s*(?:bn|m|k|th\.?)/i);
+      if (vm) val = _tmParseVal(vm[0]);
       if (val == null) {
-        const tm2 = ch.match(/otal market value[\s\S]{0,300}?€\s*([\d.,]+)\s*(bn|m|k)/i);
+        const tm2 = ch.match(/otal market value[\s\S]{0,300}?€\s*([\d.,]+)\s*(bn|m|k|th\.?)/i);
         if (tm2) val = _tmParseVal('€' + tm2[1] + tm2[2]);
       }
       if (val == null) return null;
@@ -3655,18 +3669,18 @@ export default {
         dbg.steps.push({ step: 'search', status: sr.status });
         const sh = await sr.text();
         dbg.searchLen = sh.length;
-        const m = sh.match(/href="\/([a-z0-9\-]+)\/startseite\/verein\/(\d+)/i);
+        const m = _tmPickClub(sh, team);
         dbg.clubMatch = m ? m[1] + '/' + m[2] : null;
         if (m) {
           const cr = await fetch(TM_BASE + '/' + m[1] + '/startseite/verein/' + m[2], { headers: TM_HEADERS });
           dbg.steps.push({ step: 'club', status: cr.status });
           const ch = await cr.text();
           dbg.clubLen = ch.length;
-          const vm = ch.match(/data-header__market-value-wrapper[^>]*>([\s\S]{0,80}?)</);
-          dbg.rawVal = vm ? vm[1].trim().slice(0, 40) : null;
+          const vm = ch.match(/data-header__market-value-wrapper[\s\S]{0,200}?€\s*[\d.,]+\s*(?:bn|m|k|th\.?)/i);
+          dbg.rawVal = vm ? vm[0].slice(-25) : null;
           dbg.hasWrapper = /data-header__market-value-wrapper/.test(ch);
           dbg.hasTotalMv = /otal market value/.test(ch);
-          const tm2 = ch.match(/otal market value[\s\S]{0,300}?€\s*([\d.,]+)\s*(bn|m|k)/i);
+          const tm2 = ch.match(/otal market value[\s\S]{0,300}?€\s*([\d.,]+)\s*(bn|m|k|th\.?)/i);
           dbg.rawVal2 = tm2 ? '€' + tm2[1] + tm2[2] : null;
           dbg.parsed = _tmParseVal(dbg.rawVal) ?? _tmParseVal(dbg.rawVal2);
         }
