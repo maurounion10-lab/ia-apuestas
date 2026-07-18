@@ -4947,12 +4947,16 @@ function renderPreds() {
     //        O si terminó hace menos de 16h (ventana de display)
     const _16H_REC = 16 * 60 * 60 * 1000;
     const _48H_REC = 48 * 60 * 60 * 1000;
+    // 🆕 (18-jul) Día sin picks pendientes (parón, vísperas de final, slate flojo):
+    // extender la vidriera de resueltos a 48h para que el grid nunca quede vacío.
+    const _sinPendientes = !realPreds.some(p => p && !p._started && (!p.result || p.result === 'pending'));
+    const _recWin = _sinPendientes ? _48H_REC : _16H_REC;
     hist
       .filter(h => {
         if (realPreds.find(p => teamsMatch(p.home, h.home) && teamsMatch(p.away, h.away))) return false;
         const ts = h.commenceTs;
         if (!ts) return h.date === todayStr;
-        return ts > (_nowMs - _16H_REC);
+        return ts > (_nowMs - _recWin);
       })
       .forEach(h => {
         realPreds.push({
