@@ -6363,8 +6363,9 @@ function renderPreds() {
         }).join('');
     }
 
-    // Forma reciente (solo si hay datos)
-    const hasForm = p.formH?.length || p.formA?.length;
+    // Forma reciente (solo si AMBOS equipos tienen datos suficientes — 18-jul-2026:
+    // con un solo lado (o 1-2 letras sueltas) la fila queda desbalanceada y fea)
+    const hasForm = (p.formH?.length >= 3) && (p.formA?.length >= 3);
     const formRow = hasForm ? `
       <div class="pred-form-row">
         <div class="pred-form-side">
