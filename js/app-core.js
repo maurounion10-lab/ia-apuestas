@@ -5150,8 +5150,10 @@ function renderPreds() {
 
     // TTL post-resolución: WIN visible 16h, LOSS visible 10h después de marcado.
     // Si el pick fue resuelto y pasó su ventana, se quita del bloque de pronósticos.
-    const _TTL_WIN_MS  = 16 * 60 * 60 * 1000;
-    const _TTL_LOSS_MS = 10 * 60 * 60 * 1000;
+    // 🆕 (18-jul) Día sin pendientes: los resueltos se exhiben 48h para no dejar el grid vacío
+    const _noPend = !realPreds.some(p => p && !p._started && (!p.result || p.result === 'pending'));
+    const _TTL_WIN_MS  = (_noPend ? 48 : 16) * 60 * 60 * 1000;
+    const _TTL_LOSS_MS = (_noPend ? 48 : 10) * 60 * 60 * 1000;
     realPreds = realPreds.map(p => {
       const started = p.commenceTs && p.commenceTs <= nowMs;
       if (!started) return p; // partido futuro — sin cambios
@@ -5450,7 +5452,8 @@ function renderPreds() {
     });
 
     // ── Regla 16 horas: no mostrar terminados después de 16h del inicio del partido ──
-    const _16H_MS = 16 * 60 * 60 * 1000;
+    const _noPend2 = !(realPreds || []).some(p => p && !p._started && (!p.result || p.result === 'pending'));
+    const _16H_MS = (_noPend2 ? 48 : 16) * 60 * 60 * 1000; // 🆕 (18-jul) 48h si no hay pendientes
     const _nowFilter = Date.now();
     finished = finished.filter(p => !p.commenceTs || (_nowFilter - p.commenceTs) < _16H_MS);
 
