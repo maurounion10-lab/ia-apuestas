@@ -1651,11 +1651,12 @@ async function _tmTeamValue(name, env) {
       if (!cr.ok) return null;
       const ch = await cr.text();
       let val = null;
-      const vm = ch.match(/data-header__market-value-wrapper[\s\S]{0,200}?€\s*[\d.,]+\s*(?:bn|m|k|th\.?)/i);
-      if (vm) val = _tmParseVal(vm[0]);
+      // El valor viene partido por tags: <span>€</span>36.20<span>m</span> → strip tags y parsear
+      const vm = ch.match(/data-header__market-value-wrapper[\s\S]{0,500}?<\/a>/i);
+      if (vm) val = _tmParseVal(vm[0].replace(/<[^>]*>/g, ''));
       if (val == null) {
-        const tm2 = ch.match(/otal market value[\s\S]{0,300}?€\s*([\d.,]+)\s*(bn|m|k|th\.?)/i);
-        if (tm2) val = _tmParseVal('€' + tm2[1] + tm2[2]);
+        const ti = ch.search(/otal market value/i);
+        if (ti > 0) val = _tmParseVal(ch.slice(Math.max(0, ti - 400), ti + 100).replace(/<[^>]*>/g, ''));
       }
       if (val == null) return null;
       return { name, tmId: m[2], valM: Math.round(val * 100) / 100 };
@@ -3676,13 +3677,15 @@ export default {
           dbg.steps.push({ step: 'club', status: cr.status });
           const ch = await cr.text();
           dbg.clubLen = ch.length;
-          const vm = ch.match(/data-header__market-value-wrapper[\s\S]{0,200}?€\s*[\d.,]+\s*(?:bn|m|k|th\.?)/i);
-          dbg.rawVal = vm ? vm[0].slice(-25) : null;
+          const vm = ch.match(/data-header__market-value-wrapper[\s\S]{0,500}?<\/a>/i);
+          dbg.rawVal = vm ? vm[0].replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 50) : null;
           dbg.hasWrapper = /data-header__market-value-wrapper/.test(ch);
           dbg.hasTotalMv = /otal market value/.test(ch);
-          const tm2 = ch.match(/otal market value[\s\S]{0,300}?€\s*([\d.,]+)\s*(bn|m|k|th\.?)/i);
-          dbg.rawVal2 = tm2 ? '€' + tm2[1] + tm2[2] : null;
-          dbg.parsed = _tmParseVal(dbg.rawVal) ?? _tmParseVal(dbg.rawVal2);
+          dbg.parsed = _tmParseVal(dbg.rawVal);
+          if (dbg.parsed == null) {
+            const ti = ch.search(/otal market value/i);
+            if (ti > 0) dbg.parsed = _tmParseVal(ch.slice(Math.max(0, ti - 400), ti + 100).replace(/<[^>]*>/g, ''));
+          }
         }
       } catch (e) { dbg.err = String(e && e.message || e); }
       return new Response(JSON.stringify(dbg), { headers: CORS });
