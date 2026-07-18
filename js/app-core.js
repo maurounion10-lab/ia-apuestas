@@ -4069,7 +4069,7 @@ function _updateHeroProStats() {
 async function _enrichPicksWithIntel(preds) {
   try {
     window._intelSeen = window._intelSeen || new Set();
-    const _lsKey = p => 'gb_intel_v2_' + (p.id || (p.home + '_' + p.away)).replace(/[^a-z0-9_]/gi, '');
+    const _lsKey = p => 'gb_intel_v3_' + (p.id || (p.home + '_' + p.away)).replace(/[^a-z0-9_]/gi, '');
     const _sleep = ms => new Promise(res => setTimeout(res, ms));
     const _attach = (p, intel) => {
       p._intel = intel;
