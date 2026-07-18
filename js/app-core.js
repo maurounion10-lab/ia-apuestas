@@ -4065,7 +4065,7 @@ function _updateHeroProStats() {
 async function _enrichPicksWithIntel(preds) {
   try {
     window._intelSeen = window._intelSeen || new Set();
-    const _lsKey = p => 'gb_intel_v1_' + (p.id || (p.home + '_' + p.away)).replace(/[^a-z0-9_]/gi, '');
+    const _lsKey = p => 'gb_intel_v2_' + (p.id || (p.home + '_' + p.away)).replace(/[^a-z0-9_]/gi, '');
     const _sleep = ms => new Promise(res => setTimeout(res, ms));
     const _attach = (p, intel) => {
       p._intel = intel;
@@ -4094,6 +4094,12 @@ async function _enrichPicksWithIntel(preds) {
         const own = _formPts(_side === 'home' ? intel.form.home : intel.form.away);
         const riv = _formPts(_side === 'home' ? intel.form.away : intel.form.home);
         if (own - riv >= 3) score += 1; else if (riv - own >= 3) score -= 1;
+      }
+      // 🆕 (18-jul) Valor de plantel (Transfermarkt): plantel mucho más caro = señal a favor
+      const _sv = intel.squadValue || null;
+      if (_sv && _sv.home && _sv.away && (_side === 'home' || _side === 'away')) {
+        const _rOwn = _side === 'home' ? (_sv.home / _sv.away) : (_sv.away / _sv.home);
+        if (_rOwn >= 1.8) score += 1; else if (_rOwn <= 0.55) score -= 1;
       }
       p._intelScore = Math.round(score * 10) / 10;
       if (score <= -2 && p.bvr > 3) {
@@ -4357,6 +4363,18 @@ function _buildIAReasoning(p) {
           bullets.push('⚔️ <b>Domina el historial</b>: ganó ' + hh.awayW + ' de los últimos ' + hh.n + ' cruces.');
         } else if (_side === 'draw' && hh.draw / hh.n >= 0.4) {
           bullets.push('⚔️ <b>Cruce de empates</b>: ' + hh.draw + ' de los últimos ' + hh.n + ' terminaron igualados.');
+        }
+      }
+      // 🆕 (18-jul) Valor de plantel (Transfermarkt): la "neuronita" del poder económico
+      const _sv = _it.squadValue || null;
+      if (_sv && _sv.home && _sv.away && (_side === 'home' || _side === 'away')) {
+        const _own = _side === 'home' ? _sv.home : _sv.away;
+        const _riv = _side === 'home' ? _sv.away : _sv.home;
+        const _ownName = _side === 'home' ? p.home : p.away;
+        const _fmtM = v => v >= 1000 ? (Math.round(v / 100) / 10) + ' mil M€' : (v >= 10 ? Math.round(v) : Math.round(v * 10) / 10) + ' M€';
+        if (_own / _riv >= 1.5) {
+          const _x = Math.round((_own / _riv) * 10) / 10;
+          bullets.push('💶 <b>Plantel ' + _x + '× más caro</b>: ' + _ownName + ' está tasado en ' + _fmtM(_own) + ' contra ' + _fmtM(_riv) + ' del rival.');
         }
       }
       if (p._intelDemoted) {
