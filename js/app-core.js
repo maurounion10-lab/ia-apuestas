@@ -3415,7 +3415,7 @@ function buildPredsFromOdds() {
   } catch(e) {}
   // ──────────────────────────────────────────────────────────────────────────
 
-  return candidates.map(g => {
+  const _outPreds = candidates.map(g => {
     try {
     // ── Bookmakers en orden de prioridad por cobertura real (h2h + totals) ──
     // Primario: onexbet (máxima cobertura), Secundario: betrivers, etc.
@@ -3695,10 +3695,10 @@ function buildPredsFromOdds() {
     //    Razón: conf=med rinde -25% ROI a 14 días. Subir el floor para reducir volumen y mejorar calidad.
     //    Strict leagues: solo Alta (62+). Por debajo se descarta.
     if      (maxProb >= 62)        { conf = 'high'; confLabel = 'Alta'; }
-    else if (_isStrictLeague)      { return null; } // strict: solo Alta — no se publica Media-Alta en ligas menores
+    else if (_isStrictLeague)      { console.log('[Preds] reject liga-estricta:', g.home_team, 'vs', g.away_team, '| prob', maxProb); return null; }
     else if (maxProb >= 58)        { conf = 'med';  confLabel = 'Media-Alta'; } // ↑ era 55 (flex), volvió a 58
     else if (maxProb >= _minProb)  { conf = 'low';  confLabel = 'Media'; }
-    else                           { return null; } // Debajo del piso mínimo de la liga
+    else                           { console.log('[Preds] reject piso-prob:', g.home_team, 'vs', g.away_team, '| ' + best.rec + ' prob', maxProb, 'piso', _minProb); return null; }
 
     // Bet Value Rating 3–6
     // Máxima (≥75%) → 6  |  Alta (62-74%) → 5  |  Media-Alta (56-61%) → 4  |  Media (50-55% o 56% strict) → 3
@@ -3714,9 +3714,14 @@ function buildPredsFromOdds() {
     else                                                  rawBvr = 3;
     const _isTopTier = isTopTierLeague(g.sport_key);
     let bvr = (_isTopTier || rawBvr < 6) ? rawBvr : 5; // solo bloquea 6 → 5 si no es Top-Tier
-    if (bvr < 4) return null; // descartar Media y Baja
+    if (bvr < 4) { console.log('[Preds] reject bvr<4:', g.home_team, 'vs', g.away_team, '| ' + best.rec, 'prob', maxProb); return null; }
     // 🆕 (13-jul-2026) Franja muerta: cuota < 1.50 rindió -4.6% histórico. Solo pasa bvr 6.
-    { const _bo = parseFloat(best.odds || 0); if (_bo && _bo < 1.50 && bvr < 6) return null; }
+    // 🆕 (18-jul) En modo relajado (día sin picks) la franja muerta no aplica.
+    { const _bo = parseFloat(best.odds || 0);
+      if (_bo && _bo < 1.50 && bvr < 6 && !window._gbRelaxedPass) {
+        console.log('[Preds] reject franja-muerta:', g.home_team, 'vs', g.away_team, '| ' + best.rec + ' @' + _bo);
+        return null;
+      } }
     const bvrText = bvr === 6 ? 'Máxima' : bvr === 5 ? 'Alta' : bvr === 4 ? 'Media-Alta' : 'Media';
     // Re-derivar conf y confLabel para que UI/insights reflejen el bvr final post-handicap
     if      (bvr === 6 || bvr === 5) conf = 'high';
@@ -3865,6 +3870,16 @@ function buildPredsFromOdds() {
       return null;
     }
   }).filter(Boolean);
+
+  // 🆕 (18-jul) VÁLVULA ANTI-DÍA-VACÍO: si el pase estricto no publicó nada,
+  // re-correr UNA vez en modo relajado (sin franja muerta de cuota).
+  // Mejor publicar el mejor pick disponible que dejar el grid vacío.
+  if (!_outPreds.length && !window._gbRelaxedPass && candidates.length) {
+    window._gbRelaxedPass = true;
+    console.warn('[Preds] 0 picks en modo estricto — reintento en modo relajado');
+    try { return buildPredsFromOdds(); } finally { window._gbRelaxedPass = false; }
+  }
+  return _outPreds;
 }
 
 // ── Traductor de estados de match (ESPN/TSDB devuelven en inglés) ──
