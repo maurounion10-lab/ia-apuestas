@@ -341,7 +341,10 @@ async function fetchOddsAPI(sportKey, env) {
   const key = env.ODDS_API_KEY;
   if (!key) return [];
   try {
-    const url = `https://api.the-odds-api.com/v4/sports/${sportKey}/odds/?apiKey=${key}&regions=eu,uk&markets=h2h,totals,btts&oddsFormat=decimal&dateFormat=iso`;
+    // ⚠️ (18-jul) NO agregar btts acá: el endpoint masivo /odds NO lo soporta (422
+    // INVALID_MARKET) y el error silencioso dejó el feed VACÍO todo un finde.
+    // BTTS solo existe en el endpoint por-evento /events/{id}/odds.
+    const url = `https://api.the-odds-api.com/v4/sports/${sportKey}/odds/?apiKey=${key}&regions=eu,uk&markets=h2h,totals&oddsFormat=decimal&dateFormat=iso`;
     const r = await fetch(url);
     if (!r.ok) return [];
     return await r.json();
@@ -4465,7 +4468,7 @@ export default {
       const sk = url.searchParams.get('sport') || 'soccer_sweden_allsvenskan';
       const key = env.ODDS_API_KEY;
       if (!key) return new Response(JSON.stringify({ error: 'no key' }), { headers: CORS });
-      const r = await fetch(`https://api.the-odds-api.com/v4/sports/${sk}/odds/?apiKey=${key}&regions=eu,uk&markets=h2h,totals,btts&oddsFormat=decimal&dateFormat=iso`);
+      const r = await fetch(`https://api.the-odds-api.com/v4/sports/${sk}/odds/?apiKey=${key}&regions=eu,uk&markets=h2h,totals&oddsFormat=decimal&dateFormat=iso`);
       const body = await r.text();
       let games = null; try { const j = JSON.parse(body); games = Array.isArray(j) ? j.length : null; } catch {}
       return new Response(JSON.stringify({
