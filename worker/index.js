@@ -4439,12 +4439,40 @@ export default {
                     : category === 'secondary' ? LEAGUES_SECONDARY
                     : LEAGUES_MAIN;
 
-      const result = await cached(env, cacheKey, 3600, () => getLeagueData(env, leagues));
+      let result = await cached(env, cacheKey, 3600, () => getLeagueData(env, leagues));
+
+      // 🆕 (18-jul) NUNCA confiar en un vacío cacheado: si una pasada falló y quedó
+      // [] en KV, reintentar en vivo y sobreescribir el caché si ahora hay data.
+      if (!result || !result.data || !result.data.length) {
+        try {
+          const fresh = await getLeagueData(env, leagues);
+          if (fresh && fresh.data && fresh.data.length) {
+            result = fresh;
+            try { await env.CACHE_KV?.put(cacheKey, JSON.stringify(fresh), { expirationTtl: 3600 }); } catch {}
+          }
+        } catch {}
+      }
 
       return new Response(JSON.stringify({
         data:    result.data,
         meta:    { total: result.data.length, source: result.source, category },
         _source: result.source
+      }), { headers: CORS });
+    }
+
+    // ── 🆕 (18-jul) GET /odds-debug — estado real de The Odds API (cuota) ──
+    if (path === '/odds-debug') {
+      const sk = url.searchParams.get('sport') || 'soccer_sweden_allsvenskan';
+      const key = env.ODDS_API_KEY;
+      if (!key) return new Response(JSON.stringify({ error: 'no key' }), { headers: CORS });
+      const r = await fetch(`https://api.the-odds-api.com/v4/sports/${sk}/odds/?apiKey=${key}&regions=eu,uk&markets=h2h,totals,btts&oddsFormat=decimal&dateFormat=iso`);
+      const body = await r.text();
+      let games = null; try { const j = JSON.parse(body); games = Array.isArray(j) ? j.length : null; } catch {}
+      return new Response(JSON.stringify({
+        sport: sk, status: r.status,
+        remaining: r.headers.get('x-requests-remaining'),
+        used: r.headers.get('x-requests-used'),
+        games, sample: games === null ? body.slice(0, 200) : undefined,
       }), { headers: CORS });
     }
 
