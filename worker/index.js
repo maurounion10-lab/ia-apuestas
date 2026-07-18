@@ -3645,6 +3645,35 @@ export default {
       return new Response(JSON.stringify({ keys }), { headers: CORS });
     }
 
+    // ── 🆕 (18-jul) GET /tm-value?team=X — debug del fetch de valor de plantel TM ──
+    if (path === '/tm-value') {
+      const team = url.searchParams.get('team') || '';
+      if (!team) return new Response(JSON.stringify({ error: 'missing team' }), { status: 400, headers: CORS });
+      const dbg = { team, steps: [] };
+      try {
+        const sr = await fetch(TM_BASE + '/schnellsuche/ergebnis/schnellsuche?query=' + encodeURIComponent(team), { headers: TM_HEADERS });
+        dbg.steps.push({ step: 'search', status: sr.status });
+        const sh = await sr.text();
+        dbg.searchLen = sh.length;
+        const m = sh.match(/href="\/([a-z0-9\-]+)\/startseite\/verein\/(\d+)/i);
+        dbg.clubMatch = m ? m[1] + '/' + m[2] : null;
+        if (m) {
+          const cr = await fetch(TM_BASE + '/' + m[1] + '/startseite/verein/' + m[2], { headers: TM_HEADERS });
+          dbg.steps.push({ step: 'club', status: cr.status });
+          const ch = await cr.text();
+          dbg.clubLen = ch.length;
+          const vm = ch.match(/data-header__market-value-wrapper[^>]*>([\s\S]{0,80}?)</);
+          dbg.rawVal = vm ? vm[1].trim().slice(0, 40) : null;
+          dbg.hasWrapper = /data-header__market-value-wrapper/.test(ch);
+          dbg.hasTotalMv = /otal market value/.test(ch);
+          const tm2 = ch.match(/otal market value[\s\S]{0,300}?€\s*([\d.,]+)\s*(bn|m|k)/i);
+          dbg.rawVal2 = tm2 ? '€' + tm2[1] + tm2[2] : null;
+          dbg.parsed = _tmParseVal(dbg.rawVal) ?? _tmParseVal(dbg.rawVal2);
+        }
+      } catch (e) { dbg.err = String(e && e.message || e); }
+      return new Response(JSON.stringify(dbg), { headers: CORS });
+    }
+
     // ── 🆕 (13-jul-2026) GET /pick-intel?home=&away=&sportKey=&ts= ──
     // Bajas + H2H + forma reales (API-Football) para el motor de picks y el razonamiento.
     if (path === '/pick-intel') {
