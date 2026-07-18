@@ -1627,6 +1627,22 @@ function _tmParseVal(s) {
   return u === 'bn' ? n * 1000 : (u === 'k' || u.startsWith('th')) ? n / 1000 : n;
 }
 
+// Variantes de búsqueda para nombres abreviados/con tilde que TM no encuentra:
+// "Ind. Medellín" → ["Ind. Medellín", "Ind. Medellin", "Independiente Medellin", "Medellin"]
+function _tmQueryVariants(name) {
+  const base = String(name || '').trim();
+  const noDia = base.normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const expanded = noDia
+    .replace(/\bInd\.?\s+/i, 'Independiente ')
+    .replace(/\bAtl\.?\s+/i, 'Atletico ')
+    .replace(/\bDep\.?\s+/i, 'Deportivo ')
+    .replace(/\bUniv\.?\s+/i, 'Universidad ')
+    .replace(/\./g, ' ').replace(/\s+/g, ' ').trim();
+  const words = expanded.split(' ').filter(w => w.length >= 4 && !/^(club|city|united|town)$/i.test(w));
+  const longest = words.sort((a, b) => b.length - a.length)[0] || expanded;
+  return [...new Set([base, noDia, expanded, longest])].slice(0, 3);
+}
+
 // Elegir el club correcto entre los resultados de búsqueda: el slug tiene que
 // parecerse al nombre buscado (evita agarrar el primer verein random de la página).
 function _tmPickClub(sh, name) {
@@ -1643,12 +1659,17 @@ function _tmPickClub(sh, name) {
 
 async function _tmTeamValue(name, env) {
   // caché KV 7 días (los valores cambian poco); errores devuelven null y NO se cachean
-  return cached(env, 'tmval_v1_' + normTeam(name), 7 * 24 * 3600, async () => {
+  return cached(env, 'tmval_v2_' + normTeam(name), 7 * 24 * 3600, async () => {
     try {
-      const sr = await fetch(TM_BASE + '/schnellsuche/ergebnis/schnellsuche?query=' + encodeURIComponent(name), { headers: TM_HEADERS });
-      if (!sr.ok) return null;
-      const sh = await sr.text();
-      const m = _tmPickClub(sh, name);
+      // 🆕 (18-jul) Probar variantes: nombre tal cual, sin tildes, abreviaturas expandidas
+      let m = null, qUsed = null;
+      for (const qv of _tmQueryVariants(name)) {
+        const sr = await fetch(TM_BASE + '/schnellsuche/ergebnis/schnellsuche?query=' + encodeURIComponent(qv), { headers: TM_HEADERS });
+        if (!sr.ok) continue;
+        const sh = await sr.text();
+        m = _tmPickClub(sh, qv);
+        if (m) { qUsed = qv; break; }
+      }
       if (!m) return null;
       const cr = await fetch(TM_BASE + '/' + m[1] + '/startseite/verein/' + m[2], { headers: TM_HEADERS });
       if (!cr.ok) return null;
@@ -1662,7 +1683,7 @@ async function _tmTeamValue(name, env) {
         if (ti > 0) val = _tmParseVal(ch.slice(Math.max(0, ti - 400), ti + 100).replace(/<[^>]*>/g, ''));
       }
       if (val == null) return null;
-      return { name, tmId: m[2], valM: Math.round(val * 100) / 100 };
+      return { name, tmId: m[2], valM: Math.round(val * 100) / 100, _q: qUsed };
     } catch (_) { return null; }
   });
 }
@@ -3667,30 +3688,10 @@ export default {
     if (path === '/tm-value') {
       const team = url.searchParams.get('team') || '';
       if (!team) return new Response(JSON.stringify({ error: 'missing team' }), { status: 400, headers: CORS });
-      const dbg = { team, steps: [] };
-      try {
-        const sr = await fetch(TM_BASE + '/schnellsuche/ergebnis/schnellsuche?query=' + encodeURIComponent(team), { headers: TM_HEADERS });
-        dbg.steps.push({ step: 'search', status: sr.status });
-        const sh = await sr.text();
-        dbg.searchLen = sh.length;
-        const m = _tmPickClub(sh, team);
-        dbg.clubMatch = m ? m[1] + '/' + m[2] : null;
-        if (m) {
-          const cr = await fetch(TM_BASE + '/' + m[1] + '/startseite/verein/' + m[2], { headers: TM_HEADERS });
-          dbg.steps.push({ step: 'club', status: cr.status });
-          const ch = await cr.text();
-          dbg.clubLen = ch.length;
-          const vm = ch.match(/data-header__market-value-wrapper[\s\S]{0,500}?<\/a>/i);
-          dbg.rawVal = vm ? vm[0].replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim().slice(0, 50) : null;
-          dbg.hasWrapper = /data-header__market-value-wrapper/.test(ch);
-          dbg.hasTotalMv = /otal market value/.test(ch);
-          dbg.parsed = _tmParseVal(dbg.rawVal);
-          if (dbg.parsed == null) {
-            const ti = ch.search(/otal market value/i);
-            if (ti > 0) dbg.parsed = _tmParseVal(ch.slice(Math.max(0, ti - 400), ti + 100).replace(/<[^>]*>/g, ''));
-          }
-        }
-      } catch (e) { dbg.err = String(e && e.message || e); }
+      const dbg = { team, variants: _tmQueryVariants(team) };
+      dbg.result = await _tmTeamValue(team, env).catch(e => ({ err: String(e && e.message || e) }));
+      dbg.parsed = dbg.result && dbg.result.valM || null;
+      dbg.clubMatch = dbg.result && dbg.result.tmId || null;
       return new Response(JSON.stringify(dbg), { headers: CORS });
     }
 
@@ -3707,7 +3708,7 @@ export default {
       if (!q.home || !q.away || !q.sportKey) {
         return new Response(JSON.stringify({ error: 'missing params (home, away, sportKey)' }), { status: 400, headers: CORS });
       }
-      const cacheKey = `pickintel_v6_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
+      const cacheKey = `pickintel_v7_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
       const _getIntel = async () => {
         let d = await fetchPickIntel(q, env).catch(e => ({ error: String(e && e.message || e) }));
         if (d && d.error) {
