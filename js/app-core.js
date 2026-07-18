@@ -4100,9 +4100,11 @@ async function _enrichPicksWithIntel(preds) {
         if (own - riv >= 3) score += 1; else if (riv - own >= 3) score -= 1;
       }
       // 🆕 (18-jul) Valor de plantel (Transfermarkt): plantel mucho más caro = señal a favor
+      // Cubre también dobles oportunidades: 1X inclina al local, X2 al visitante.
       const _sv = intel.squadValue || null;
-      if (_sv && _sv.home && _sv.away && (_side === 'home' || _side === 'away')) {
-        const _rOwn = _side === 'home' ? (_sv.home / _sv.away) : (_sv.away / _sv.home);
+      const _vSide = (_side === 'home' || _side === '1x') ? 'home' : (_side === 'away' || _side === 'x2') ? 'away' : null;
+      if (_sv && _sv.home && _sv.away && _vSide) {
+        const _rOwn = _vSide === 'home' ? (_sv.home / _sv.away) : (_sv.away / _sv.home);
         if (_rOwn >= 1.8) score += 1; else if (_rOwn <= 0.55) score -= 1;
       }
       p._intelScore = Math.round(score * 10) / 10;
@@ -4370,11 +4372,13 @@ function _buildIAReasoning(p) {
         }
       }
       // 🆕 (18-jul) Valor de plantel (Transfermarkt): la "neuronita" del poder económico
+      // Cubre también dobles oportunidades: 1X inclina al local, X2 al visitante.
       const _sv = _it.squadValue || null;
-      if (_sv && _sv.home && _sv.away && (_side === 'home' || _side === 'away')) {
-        const _own = _side === 'home' ? _sv.home : _sv.away;
-        const _riv = _side === 'home' ? _sv.away : _sv.home;
-        const _ownName = _side === 'home' ? p.home : p.away;
+      const _svSide = (_side === 'home' || _side === '1x') ? 'home' : (_side === 'away' || _side === 'x2') ? 'away' : null;
+      if (_sv && _sv.home && _sv.away && _svSide) {
+        const _own = _svSide === 'home' ? _sv.home : _sv.away;
+        const _riv = _svSide === 'home' ? _sv.away : _sv.home;
+        const _ownName = _svSide === 'home' ? p.home : p.away;
         const _fmtM = v => v >= 1000 ? (Math.round(v / 100) / 10) + ' mil M€' : (v >= 10 ? Math.round(v) : Math.round(v * 10) / 10) + ' M€';
         if (_own / _riv >= 1.5) {
           const _x = Math.round((_own / _riv) * 10) / 10;
