@@ -1604,6 +1604,59 @@ function _apfSeasonFor(leagueId, dt) {
   return euroIds.has(leagueId) ? (month >= 7 ? year : year - 1) : year;
 }
 
+// ── 🆕 (18-jul-2026) VALOR DE PLANTEL vía Transfermarkt (best-effort) ──
+// "Neuronita" de poder económico: cuánto vale cada plantel según TM.
+// Si TM no responde o cambia el HTML devuelve null y el intel sigue sin este dato.
+const TM_BASE = 'https://www.transfermarkt.com';
+const TM_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+  'Accept-Language': 'en-US,en;q=0.8',
+  'Accept': 'text/html,application/xhtml+xml',
+};
+
+function _tmParseVal(s) {
+  // "€41.85m" | "€1.05bn" | "€850k" → millones de EUR (Number) o null
+  const m = String(s || '').replace(/\s/g, '').match(/€([\d.,]+)(bn|m|k)/i);
+  if (!m) return null;
+  const n = parseFloat(m[1].replace(',', '.'));
+  if (isNaN(n)) return null;
+  const u = m[2].toLowerCase();
+  return u === 'bn' ? n * 1000 : u === 'k' ? n / 1000 : n;
+}
+
+async function _tmTeamValue(name, env) {
+  // caché KV 7 días (los valores cambian poco); errores devuelven null y NO se cachean
+  return cached(env, 'tmval_v1_' + normTeam(name), 7 * 24 * 3600, async () => {
+    try {
+      const sr = await fetch(TM_BASE + '/schnellsuche/ergebnis/schnellsuche?query=' + encodeURIComponent(name), { headers: TM_HEADERS });
+      if (!sr.ok) return null;
+      const sh = await sr.text();
+      const m = sh.match(/href="\/([a-z0-9\-]+)\/startseite\/verein\/(\d+)/i);
+      if (!m) return null;
+      const cr = await fetch(TM_BASE + '/' + m[1] + '/startseite/verein/' + m[2], { headers: TM_HEADERS });
+      if (!cr.ok) return null;
+      const ch = await cr.text();
+      let val = null;
+      const vm = ch.match(/data-header__market-value-wrapper[^>]*>([\s\S]{0,80}?)</);
+      if (vm) val = _tmParseVal(vm[1]);
+      if (val == null) {
+        const tm2 = ch.match(/otal market value[\s\S]{0,300}?€\s*([\d.,]+)\s*(bn|m|k)/i);
+        if (tm2) val = _tmParseVal('€' + tm2[1] + tm2[2]);
+      }
+      if (val == null) return null;
+      return { name, tmId: m[2], valM: Math.round(val * 100) / 100 };
+    } catch (_) { return null; }
+  });
+}
+
+async function fetchSquadValues(homeNm, awayNm, env) {
+  // Secuencial a propósito (2 requests suaves a TM, no en paralelo)
+  const svH = await _tmTeamValue(homeNm, env).catch(() => null);
+  const svA = await _tmTeamValue(awayNm, env).catch(() => null);
+  if (!svH || !svH.valM || !svA || !svA.valM) return null;
+  return { home: svH.valM, away: svA.valM, ratio: Math.round((svH.valM / svA.valM) * 100) / 100, _src: 'tm' };
+}
+
 async function fetchPickIntel(q, env) {
   const leagueId = _getApfLeagueIdForSportKey(q.sportKey);
   if (!leagueId) return { error: 'league-not-mapped' };
@@ -1710,6 +1763,9 @@ async function fetchPickIntel(q, env) {
     return out.slice(0, 5).join('');
   }
 
+  // 🆕 (18-jul) Valor de plantel (Transfermarkt, best-effort — nunca bloquea el intel)
+  const squadValue = await fetchSquadValues(homeNm, awayNm, env).catch(() => null);
+
   return {
     fixtureId: fxId,
     teams: { home: homeNm, away: awayNm },
@@ -1717,6 +1773,7 @@ async function fetchPickIntel(q, env) {
     injuries,
     h2h,
     form: { home: formOf(formHData, homeId), away: formOf(formAData, awayId) },
+    squadValue,
     _src: 'apf',
   };
 }
@@ -1778,12 +1835,15 @@ async function fetchPickIntelTsdb(q, env) {
   const formHome = await formOf(q.home);
   const formAway = await formOf(q.away);
   if (!h2h.n && !formHome && !formAway) return { error: 'no-data-tsdb' };
+  // 🆕 (18-jul) Valor de plantel también en el fallback TSDB
+  const squadValue = await fetchSquadValues(q.home, q.away, env).catch(() => null);
   return {
     teams: { home: q.home, away: q.away },
     injuries: { home: { count: 0, players: [] }, away: { count: 0, players: [] } },
     injuriesUnavailable: true, // APF free: sin data de lesiones
     h2h,
     form: { home: formHome, away: formAway },
+    squadValue,
     _src: 'tsdb',
   };
 }
@@ -3598,7 +3658,7 @@ export default {
       if (!q.home || !q.away || !q.sportKey) {
         return new Response(JSON.stringify({ error: 'missing params (home, away, sportKey)' }), { status: 400, headers: CORS });
       }
-      const cacheKey = `pickintel_v5_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
+      const cacheKey = `pickintel_v6_${normTeam(q.home)}_${normTeam(q.away)}_${(q.ts || '').slice(0, 8)}`;
       const _getIntel = async () => {
         let d = await fetchPickIntel(q, env).catch(e => ({ error: String(e && e.message || e) }));
         if (d && d.error) {
