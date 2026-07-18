@@ -3341,8 +3341,12 @@ function buildPredsFromOdds() {
     candidates = [...topTier, ...eurTier, ...rest];
     // Cortar solo si: hay 2+ candidatos Y ya cubrimos 48h (para no perder Champions/Libertadores de mañana)
     // O si el mejor candidato ya es Champions/Libertadores en 24h
+    // 🆕 (18-jul) En modo relajado (día flaco: los de 48h no pasaron los filtros de
+    // calidad) exigir 12+ candidatos → expande la ventana hasta 168h buscando
+    // partidos analizables más adelante en la semana, SIN bajar el piso de calidad.
     const bestPrio = candidates.length ? getEffectivePrio(candidates[0]) : 0;
-    if (candidates.length >= 2 && (hours >= 48 || bestPrio >= TOP_PRIO_THRESHOLD)) break;
+    const _minCands = window._gbRelaxedPass ? 12 : 2;
+    if (candidates.length >= _minCands && (hours >= 48 || bestPrio >= TOP_PRIO_THRESHOLD)) break;
   }
 
   // Nota: el API solo devuelve partidos futuros. Los partidos ya iniciados con pick bloqueado
