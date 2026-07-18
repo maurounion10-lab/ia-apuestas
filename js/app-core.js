@@ -6245,6 +6245,18 @@ function renderPreds() {
     xCircle: '<svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-linecap="round" style="vertical-align:-0.16em"><circle cx="12" cy="12" r="9.5" stroke-width="2"/><path d="M9 9l6 6M15 9l-6 6" stroke-width="2.4"/></svg>'
   };
 
+  // 🆕 (18-jul) Dedupe final: el rescate del historial y el pad de relleno pueden
+  // aportar el mismo pick por caminos distintos → una sola ficha por id/partido.
+  {
+    const _seen = new Set();
+    source = source.filter(p => {
+      if (!p) return false;
+      const k = p.id || ((p.home || '') + '|' + (p.away || '') + '|' + (p.commenceTs || ''));
+      if (_seen.has(k)) return false;
+      _seen.add(k);
+      return true;
+    });
+  }
   document.getElementById('predGrid').innerHTML = source.map((p, idx) => {
     // BVR: usar valor guardado en p, o derivar de p.conf para datos estáticos
     const _bvr     = p.bvr     || (p.conf==='high' ? 5 : 3);
