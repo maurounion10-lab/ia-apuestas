@@ -3424,6 +3424,498 @@ async function runForumBetResolver(env) {
   return stats;
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 🆕 (18-jul-2026) PICK GENERATOR CRON — genera y lockea los picks del día
+// server-side (08:00 ART) sin depender de ningún navegador.
+// Réplica FIEL del motor del cliente (buildPredsFromOdds en js/app-core.js).
+// ⚠️ Si se cambia la lógica del motor en el cliente, replicar acá (y viceversa).
+// Regla de lock: "el primero gana" — solo agrega keys nuevas y sube bvr.
+// ═══════════════════════════════════════════════════════════════════════════
+
+const GEN_SPORT_CAT_PRIO = { soccer: 40, tennis: 20, rugby: 10, mma: 10 };
+const GEN_LEAGUE_PRIO = {
+  soccer_uefa_champs_league: 100, soccer_conmebol_copa_libertadores: 99,
+  soccer_argentina_primera_division: 98, soccer_epl: 97, soccer_england_premier_league: 97,
+  soccer_brazil_campeonato: 96, soccer_conmebol_copa_sudamericana: 90,
+  soccer_spain_la_liga: 88, soccer_italy_serie_a: 86, soccer_germany_bundesliga: 85,
+  soccer_france_ligue_one: 78, soccer_uefa_europa_league: 76, soccer_uefa_europa_conference_league: 70,
+  soccer_portugal_primeira_liga: 74, soccer_netherlands_eredivisie: 72, soccer_england_championship: 68,
+  soccer_belgium_first_div_a: 66, soccer_belgium_first_div: 66, soccer_argentina_primera_nacional: 65,
+  soccer_germany_bundesliga2: 64, soccer_colombia_primera_a: 63, soccer_scotland_premiership: 62,
+  soccer_mexico_ligamx: 62, soccer_spain_segunda_division: 60, soccer_italy_serie_b: 58,
+  soccer_turkey_super_league: 58, soccer_greece_super_league: 56,
+  soccer_austria_football_bundesliga: 55, soccer_austria_bundesliga: 55, soccer_usa_mls: 55,
+  soccer_ecuador_liga_pro: 54, soccer_ecuador_primera_a: 54, soccer_switzerland_superleague: 32,
+  soccer_peru_primera_division: 52, soccer_denmark_superliga: 33, soccer_france_ligue_two: 51,
+  soccer_chile_campeonato: 50, soccer_uruguay_primera_division: 50, soccer_poland_ekstraklasa: 33,
+  soccer_sweden_allsvenskan: 31, soccer_norway_eliteserien: 30, soccer_paraguay_primera_division: 31,
+  soccer_saudi_professional_league: 27, soccer_australia_aleague: 28, soccer_australia_a_league: 28,
+  soccer_south_korea_kleague1: 29, soccer_czech_republic_first_league: 30, soccer_czech_liga: 30,
+  soccer_japan_j_league: 29, soccer_venezuela_primera_division: 26, soccer_venezuela_primera: 26,
+  soccer_bolivia_primera_division: 26, soccer_romania_liga1: 29, soccer_russia_premier_league: 28,
+  tennis_atp_french_open: 85, tennis_wta_french_open: 85, tennis_atp_wimbledon: 85,
+};
+const GEN_TOP_TIER = new Set([
+  'soccer_uefa_champs_league', 'soccer_epl', 'soccer_england_premier_league', 'soccer_spain_la_liga',
+  'soccer_italy_serie_a', 'soccer_germany_bundesliga', 'soccer_france_ligue_one', 'soccer_uefa_europa_league',
+  'soccer_conmebol_copa_libertadores', 'soccer_conmebol_copa_sudamericana', 'soccer_argentina_primera_division',
+  'soccer_brazil_campeonato', 'soccer_uefa_europa_conference_league', 'soccer_mexico_ligamx',
+  'soccer_netherlands_eredivisie', 'soccer_portugal_primeira_liga', 'soccer_turkey_super_league',
+  'soccer_england_championship', 'soccer_argentina_primera_nacional',
+]);
+const GEN_LEAGUE_CAPS = {
+  soccer_argentina_primera_nacional: 5, soccer_argentina_primera_division: 6,
+  soccer_england_championship: 3, soccer_germany_bundesliga2: 3, soccer_spain_segunda_division: 3,
+  soccer_italy_serie_b: 2, soccer_france_ligue_two: 2, soccer_belgium_first_div_a: 3, soccer_belgium_first_div: 3,
+  soccer_portugal_primeira_liga: 2, soccer_netherlands_eredivisie: 3, soccer_scotland_premiership: 2,
+  soccer_turkey_super_league: 2, soccer_greece_super_league: 2,
+  soccer_austria_football_bundesliga: 2, soccer_austria_bundesliga: 2, soccer_switzerland_superleague: 2,
+  soccer_denmark_superliga: 2, soccer_sweden_allsvenskan: 2, soccer_norway_eliteserien: 2,
+  soccer_poland_ekstraklasa: 2, soccer_czech_republic_first_league: 2, soccer_czech_liga: 2,
+  soccer_romania_liga1: 2, soccer_russia_premier_league: 2,
+  soccer_saudi_professional_league: 2, soccer_japan_j_league: 2, soccer_south_korea_kleague1: 2,
+  soccer_australia_aleague: 2, soccer_australia_a_league: 2,
+};
+const GEN_STRICT_CONF = new Set([
+  'soccer_colombia_primera_a', 'soccer_ecuador_liga_pro', 'soccer_ecuador_primera_a',
+  'soccer_peru_primera_division', 'soccer_venezuela_primera_division', 'soccer_venezuela_primera',
+  'soccer_bolivia_primera_division', 'soccer_paraguay_primera_division',
+  'soccer_south_korea_kleague1', 'soccer_australia_aleague', 'soccer_australia_a_league', 'soccer_romania_liga1',
+]);
+const GEN_RELAXED_FLOOR = new Set(['soccer_conmebol_copa_libertadores', 'soccer_conmebol_copa_sudamericana']);
+const GEN_SEASON_END_EU = new Set([
+  'soccer_italy_serie_a', 'soccer_italy_serie_b', 'soccer_spain_la_liga', 'soccer_spain_segunda_division',
+  'soccer_germany_bundesliga', 'soccer_germany_bundesliga2', 'soccer_epl', 'soccer_england_efl_championship',
+  'soccer_england_league1', 'soccer_france_ligue_one', 'soccer_france_ligue_two', 'soccer_netherlands_eredivisie',
+  'soccer_belgium_first_div_a', 'soccer_belgium_first_div', 'soccer_scotland_premiership',
+  'soccer_austria_bundesliga', 'soccer_austria_football_bundesliga', 'soccer_switzerland_superleague',
+  'soccer_denmark_superliga', 'soccer_poland_ekstraklasa', 'soccer_czech_liga', 'soccer_czech_republic_first_league',
+  'soccer_romania_liga1', 'soccer_greece_super_league', 'soccer_turkey_super_league', 'soccer_portugal_primeira_liga',
+]);
+const GEN_SEASON_END_SPRING = new Set([
+  'soccer_sweden_allsvenskan', 'soccer_norway_eliteserien', 'soccer_russia_premier_league',
+  'soccer_usa_mls', 'soccer_south_korea_kleague1', 'soccer_australia_aleague', 'soccer_australia_a_league',
+]);
+const GEN_SEASON_END_SUD = new Set(['soccer_argentina_primera_division', 'soccer_brazil_campeonato', 'soccer_brazil_serie_b']);
+
+const genGamePrio = k => {
+  if (!k) return 0;
+  if (GEN_LEAGUE_PRIO[k]) return GEN_LEAGUE_PRIO[k];
+  if (k.includes('soccer')) return GEN_SPORT_CAT_PRIO.soccer;
+  if (k.includes('basketball')) return 0;
+  if (k.includes('tennis')) return GEN_SPORT_CAT_PRIO.tennis;
+  if (k.includes('rugby')) return GEN_SPORT_CAT_PRIO.rugby;
+  return 5;
+};
+const GEN_STAGE_BOOST = { final: 60, semi: 35, quarter: 15, r16: 5 };
+const genEffPrio = g => genGamePrio(g.sport_key) + (GEN_STAGE_BOOST[g._stage] || 0);
+
+// ── shortNames: UNA sola fuente de verdad (el mapa del cliente), fetcheado y cacheado ──
+// Regla CLAUDE.md: nunca duplicar maps de equipos. Se parsea desde el app-core deployado.
+async function genShortNamesMap(env) {
+  return cached(env, 'gen_shortnames_v2', 24 * 3600, async () => {
+    try {
+      const html = await (await fetch('https://gambeta.ai/?nc=' + Date.now())).text();
+      const mv = html.match(/js\/app-core\.js\?v=\d+/);
+      const js = await (await fetch('https://gambeta.ai/' + (mv ? mv[0] : 'js/app-core.js'))).text();
+      const mm = js.match(/const teamShortNames = \{([\s\S]*?)\n\};/);
+      if (!mm) return {};
+      const map = {};
+      const re = /'((?:[^'\\]|\\.)*)'\s*:\s*'((?:[^'\\]|\\.)*)'/g;
+      let e;
+      while ((e = re.exec(mm[1]))) map[e[1].replace(/\\'/g, "'")] = e[2].replace(/\\'/g, "'");
+      return Object.keys(map).length > 50 ? map : {};
+    } catch (_) { return {}; }
+  });
+}
+function genShortName(map, name) {
+  if (!name) return '';
+  if (map && map[name]) return map[name];
+  let s = String(name)
+    .replace(/\s+(FC|CF|SC|AC|AFC|SFC|RFC|IF|IFK|FK|SK|BK|NK|GNK|BSC|SV|AG|JK|BC)\s*$/i, '')
+    .replace(/\s+Calcio\s*(\d{4})?\s*$/i, '').trim();
+  s = s.replace(/^(FC|CF|SC|AC|AFC|SFC|RFC|FK|SK|NK|GNK|RB|RC|RCD|AS|CD|SD|UD|CA|CE|SL|US|SS|CS|RS|SK)\s+/i, '').trim();
+  const r = s || String(name);
+  return r.length > 18 ? r.slice(0, 16) + '…' : r;
+}
+
+// Cooldown: equipos con pérdida en los últimos 10 días (ventana 30) — desde historial admin
+async function genCooldownTeams(env) {
+  const out = new Set();
+  try {
+    const hist = await fetchAdminHistorial(env);
+    const nowMs = Date.now();
+    hist.filter(h => h.result === 'loss' && h.commenceTs && (nowMs - h.commenceTs) <= 30 * 86400000)
+      .forEach(h => {
+        if ((nowMs - h.commenceTs) > 10 * 86400000) return;
+        const rec = (h.rec || '').toLowerCase().trim();
+        const hN = (h.home || '').toLowerCase().trim();
+        const aN = (h.away || '').toLowerCase().trim();
+        if (rec === 'gana local' && hN) out.add(hN);
+        else if (rec === 'gana visitante' && aN) out.add(aN);
+        else if (rec.startsWith('gana ')) {
+          const t = rec.replace(/^gana\s+/, '').trim();
+          if (hN && (hN === t || hN.includes(t) || t.includes(hN))) out.add(hN);
+          else if (aN && (aN === t || aN.includes(t) || t.includes(aN))) out.add(aN);
+        }
+      });
+  } catch (_) {}
+  return out;
+}
+
+function genLockedKey() {
+  const art = new Date(Date.now() - 3 * 3600e3); // hora Argentina
+  const d = art.getUTCHours() < 6 ? new Date(art.getTime() - 86400e3) : art;
+  return 'locked_picks_v1_' + d.toISOString().slice(0, 10);
+}
+const genMatchKey = (h, a) => (normTeam(h || '') + '_vs_' + normTeam(a || '')).toLowerCase().replace(/\s+/g, '');
+
+// ── Núcleo del motor (réplica de buildPredsFromOdds) ──
+function genEvaluateGame(g, ctx) {
+  const { cooldown, cupCtx, lgCtx, relaxed, shortMap, log } = ctx;
+  try {
+    if ((g.sport_key || '') === 'soccer_fifa_world_cup') return null; // WC: lo maneja wc-matches
+    const PRIMARY = ['onexbet', 'betrivers', 'unibet_nl', 'betsson', 'williamhill', 'pinnacle'];
+    const FALLBACK = ['nordicbet', 'pmu_fr', 'betonlineag', 'lowvig', 'betanysports', 'betmgm'];
+    const ALL_P = [...PRIMARY, ...FALLBACK];
+    const hasH2H = b => b.markets && b.markets.some(m => m.key === 'h2h');
+    let bmMain = null;
+    for (const k of ALL_P) { const f = (g.bookmakers || []).find(b => b.key === k && hasH2H(b)); if (f) { bmMain = f; break; } }
+    if (!bmMain) bmMain = (g.bookmakers || []).find(hasH2H);
+    const mkt = bmMain && bmMain.markets.find(m => m.key === 'h2h');
+    const outs = (mkt && mkt.outcomes) || [];
+    const hO = (outs.find(o => o.name === g.home_team) || {}).price || null;
+    const aO = (outs.find(o => o.name === g.away_team) || {}).price || null;
+    const dO = (outs.find(o => o.name === 'Draw') || {}).price || null;
+    const findMkt = key => {
+      const mm = bmMain && bmMain.markets.find(m => m.key === key);
+      if (mm) return mm;
+      for (const k of ALL_P) { const bk = (g.bookmakers || []).find(b => b.key === k); const m2 = bk && bk.markets && bk.markets.find(m => m.key === key); if (m2) return m2; }
+      for (const bk of (g.bookmakers || [])) { const m2 = bk.markets && bk.markets.find(m => m.key === key); if (m2) return m2; }
+      return null;
+    };
+    const totalsMkt = findMkt('totals');
+    const overOdds = {};
+    ((totalsMkt && totalsMkt.outcomes) || []).forEach(o => { if (o.name === 'Over') overOdds[String(o.point)] = o.price; });
+    const rawH = hO ? 1 / hO : 0, rawD = dO ? 1 / dO : 0, rawA = aO ? 1 / aO : 0;
+    const tot = rawH + rawD + rawA || 1;
+    const probH = Math.round(rawH / tot * 100);
+    const probD = dO ? Math.round(rawD / tot * 100) : 0;
+    const probA = Math.round(rawA / tot * 100);
+    const probOver = {};
+    ['1.5', '2.5', '3.5'].forEach(pt => { if (overOdds[pt]) probOver[pt] = Math.round(100 / overOdds[pt]); });
+    const bttsMkt = findMkt('btts') || findMkt('both_teams_to_score');
+    let bttsOddsReal = null, bttsNoOddsReal = null;
+    if (bttsMkt) {
+      const yes = (bttsMkt.outcomes || []).find(o => /yes|si|sí/i.test(o.name));
+      if (yes) bttsOddsReal = yes.price;
+      const noO = (bttsMkt.outcomes || []).find(o => /^no$/i.test(String(o.name || '').trim()));
+      if (noO) bttsNoOddsReal = noO.price;
+    }
+    const bttsEst = bttsOddsReal ? Math.round(100 / bttsOddsReal) : null;
+    const bttsNoEst = bttsNoOddsReal ? Math.round(100 / bttsNoOddsReal) : null;
+    const hN = genShortName(shortMap, g.home_team), aN = genShortName(shortMap, g.away_team);
+    const MIN_ODDS = 1.60;
+    const isArg = (g.sport_key || '').includes('argentina');
+    const isCup = GEN_RELAXED_FLOOR.has(g.sport_key || '');
+    const hasFav = (probH >= 62 || probA >= 62);
+    const doMin = isCup ? 22 : 25;
+    const doInc = (!hasFav || (isCup && probH < 70 && probA < 70)) && (probD >= doMin);
+    const prob1X = probH + probD, probX2 = probA + probD;
+    const odds1X = (hO > 0 && dO > 0) ? +((hO * dO) / (hO + dO)).toFixed(2) : null;
+    const oddsX2 = (aO > 0 && dO > 0) ? +((aO * dO) / (aO + dO)).toFixed(2) : null;
+    const cands = [
+      { rec: 'Gana ' + hN, prob: probH, odds: hO, _recSide: 'home' },
+      { rec: 'Gana ' + aN, prob: probA, odds: aO, _recSide: 'away' },
+      ...(dO ? [{ rec: 'Empate', prob: probD, odds: dO, _recSide: 'draw' }] : []),
+      ...((doInc && odds1X && odds1X >= 1.60) ? [{ rec: 'Doble 1X', prob: prob1X, odds: odds1X, _recSide: '1x', _isDoubleChance: true }] : []),
+      ...((doInc && oddsX2 && oddsX2 >= 1.60) ? [{ rec: 'Doble X2', prob: probX2, odds: oddsX2, _recSide: 'x2', _isDoubleChance: true }] : []),
+      ...(isArg ? [] : ['1.5', '2.5'].filter(pt => overOdds[pt] && overOdds[pt] >= MIN_ODDS && (pt !== '2.5' || (probOver[pt] || 0) >= 62))
+        .map(pt => ({ rec: 'Más de ' + pt, prob: probOver[pt], odds: overOdds[pt], isTotals: true, line: parseFloat(pt) }))),
+      ...(bttsEst ? [{ rec: 'Ambos Marcan', prob: bttsEst, odds: bttsOddsReal, isBtts: true }] : []),
+      ...(bttsNoEst ? [{ rec: 'Ambos No Marcan', prob: bttsNoEst, odds: bttsNoOddsReal, isBtts: true, isBttsNo: true }] : []),
+    ].filter(c => c.prob > 0).filter(c => c._isDoubleChance || !c.odds || parseFloat(c.odds) >= MIN_ODDS);
+    cands.sort((a, b) => {
+      if (b.prob !== a.prob) return b.prob - a.prob;
+      if (a.isTotals && !b.isTotals) return 1;
+      if (!a.isTotals && b.isTotals) return -1;
+      if (a.isBtts && !b.isBtts) return 1;
+      if (!a.isBtts && b.isBtts) return -1;
+      if (a._isDoubleChance && !b._isDoubleChance) return 1;
+      if (!a._isDoubleChance && b._isDoubleChance) return -1;
+      return 0;
+    });
+    if (!cands.length) return null;
+    let best = cands[0];
+    // Franja de cuota 1.70-2.10
+    try {
+      const inBand = c => { const o = parseFloat(c.odds || 0); return o >= 1.70 && o <= 2.10; };
+      const ev = c => (Number(c.prob) / 100) * parseFloat(c.odds || 0);
+      if (!inBand(best)) {
+        const alt = cands.find(c => c !== best && inBand(c) && Number(c.prob) >= 52 && ev(c) >= Math.max(ev(best) * 0.97, 0.98));
+        if (alt) best = alt;
+      }
+    } catch (_) {}
+    // Cup context override
+    try {
+      const ov = (cupCtx || {})[g.home_team + '|' + g.away_team] || (cupCtx || {})[hN + '|' + aN];
+      if (ov && ov.prefer) {
+        if (ov.prefer === '1x' && odds1X && odds1X >= 1.35) best = { rec: 'Doble 1X', prob: prob1X, odds: odds1X, _recSide: '1x', _isDoubleChance: true, _cupOverride: true };
+        else if (ov.prefer === 'x2' && oddsX2 && oddsX2 >= 1.35) best = { rec: 'Doble X2', prob: probX2, odds: oddsX2, _recSide: 'x2', _isDoubleChance: true, _cupOverride: true };
+        else if (ov.prefer === 'empate' && dO) best = { rec: 'Empate', prob: probD, odds: dO, _recSide: 'draw', _cupOverride: true };
+      }
+    } catch (_) {}
+    // League context (motivación asimétrica)
+    try {
+      const lg = (lgCtx || {})[g.home_team + '|' + g.away_team] || (lgCtx || {})[hN + '|' + aN];
+      if (lg && lg.prefer) {
+        const s = best._recSide;
+        if (lg.prefer === 'avoid_home' && (s === 'home' || s === '1x')) {
+          const alt = cands.find(c => c._recSide !== 'home' && c._recSide !== '1x' && c !== best);
+          if (alt) best = alt; else return null;
+        } else if (lg.prefer === 'avoid_away' && (s === 'away' || s === 'x2')) {
+          const alt = cands.find(c => c._recSide !== 'away' && c._recSide !== 'x2' && c !== best);
+          if (alt) best = alt; else return null;
+        }
+      }
+    } catch (_) {}
+    // Empate como pick de valor
+    if (best._recSide !== 'draw' && !best._cupOverride && dO && probD >= 28 && probH < 48 && probA < 48 && dO >= 3.00) {
+      if ((probD / 100) * dO >= 1.02) best = { rec: 'Empate', prob: probD, odds: dO, _recSide: 'draw', _evOverride: true };
+    }
+    const maxProb = best.prob || probH;
+    const isStrict = GEN_STRICT_CONF.has(g.sport_key || '');
+    const minProb = isStrict ? 62 : (isCup ? 50 : 55);
+    let conf;
+    if (maxProb >= 62) conf = 'high';
+    else if (isStrict) { log.push('reject liga-estricta: ' + g.home_team + ' vs ' + g.away_team + ' prob ' + maxProb); return null; }
+    else if (maxProb >= 58) conf = 'med';
+    else if (maxProb >= minProb) conf = 'low';
+    else { log.push('reject piso-prob: ' + g.home_team + ' vs ' + g.away_team + ' | ' + best.rec + ' prob ' + maxProb + ' piso ' + minProb); return null; }
+    let rawBvr;
+    if (best._isDoubleChance && conf === 'high') rawBvr = 5;
+    else if (best._isDoubleChance && conf === 'med') rawBvr = 4;
+    else if (conf === 'high' && maxProb >= 75) rawBvr = 6;
+    else if (conf === 'high') rawBvr = 5;
+    else if (conf === 'med') rawBvr = 4;
+    else rawBvr = 3;
+    let bvr = (GEN_TOP_TIER.has(g.sport_key || '') || rawBvr < 6) ? rawBvr : 5;
+    if (bvr < 4) { log.push('reject bvr<4: ' + g.home_team + ' vs ' + g.away_team); return null; }
+    { const bo = parseFloat(best.odds || 0);
+      if (bo && bo < 1.50 && bvr < 6 && !relaxed) { log.push('reject franja-muerta: ' + g.home_team + ' vs ' + g.away_team + ' @' + bo); return null; } }
+    const bvrText = bvr === 6 ? 'Máxima' : bvr === 5 ? 'Alta' : bvr === 4 ? 'Media-Alta' : 'Media';
+    if (bvr === 6 || bvr === 5) conf = 'high'; else if (bvr === 4) conf = 'med';
+    if (best._recSide === 'home' && bvr < 5) return null;
+    if (best._recSide === 'home' && parseFloat(best.odds) < 1.60 && bvr < 6) return null;
+    // Fin de temporada (asimetría de motivación)
+    const m = new Date(g.commence_time).getUTCMonth();
+    const sk = g.sport_key || '';
+    const isEOS = (GEN_SEASON_END_EU.has(sk) && (m === 4 || m === 5)) ||
+                  (GEN_SEASON_END_SPRING.has(sk) && (m === 9 || m === 10)) ||
+                  (GEN_SEASON_END_SUD.has(sk) && (m === 10 || m === 11));
+    if (isEOS) {
+      if (best._isDoubleChance) return null;
+      if ((best._recSide === 'home' || best._recSide === 'away') && bvr < 6) return null;
+    }
+    // Cooldown
+    if (cooldown.has(hN.toLowerCase().trim()) || cooldown.has(aN.toLowerCase().trim())) {
+      log.push('cooldown: ' + hN + ' vs ' + aN); return null;
+    }
+    return {
+      home: hN, away: aN, homeRaw: g.home_team, awayRaw: g.away_team,
+      rec: best.rec, _recSide: best._recSide || null, conf, bvr, bvrText,
+      probH, probD, probA, _hO: hO, _dO: dO, _aO: aO, _bestOdds: best.odds,
+      commenceTs: new Date(g.commence_time).getTime(), _sportKey: sk,
+    };
+  } catch (e) { ctx.log.push('error ' + (g && g.home_team) + ': ' + e.message); return null; }
+}
+
+function genSelectCandidates(games, relaxed) {
+  const now = Date.now();
+  const hasH2HData = g => g.bookmakers && g.bookmakers.some(b => b.markets && b.markets.some(m => m.key === 'h2h'));
+  const sortP = (a, b) => { const pa = genEffPrio(a), pb = genEffPrio(b); if (pa !== pb) return pb - pa; return new Date(a.commence_time) - new Date(b.commence_time); };
+  const applyCaps = gs => { const c = {}; return gs.filter(g => { const sk = g.sport_key || ''; if (!(sk in GEN_LEAGUE_CAPS)) return true; c[sk] = (c[sk] || 0) + 1; return c[sk] <= GEN_LEAGUE_CAPS[sk]; }); };
+  const TOP_PRIO = GEN_LEAGUE_PRIO.soccer_conmebol_copa_libertadores;
+  let candidates = [];
+  for (const hours of [24, 48, 72, 120, 168]) {
+    const end = now + hours * 3600000;
+    const base = g => { const t = new Date(g.commence_time).getTime(); return t > now && t <= end && !(g.sport_key || '').includes('basketball') && hasH2HData(g); };
+    const top = games.filter(base).filter(g => genEffPrio(g) >= 90).sort(sortP).slice(0, 20);
+    const eur = applyCaps(games.filter(base).filter(g => { const p = genEffPrio(g); return p >= 60 && p < 90; }).sort(sortP)).slice(0, 25);
+    const rest = applyCaps(games.filter(base).filter(g => genEffPrio(g) < 60).sort(sortP)).slice(0, 20);
+    candidates = [...top, ...eur, ...rest];
+    const bestPrio = candidates.length ? genEffPrio(candidates[0]) : 0;
+    const minC = relaxed ? 12 : 2;
+    if (candidates.length >= minC && (hours >= 48 || bestPrio >= TOP_PRIO)) break;
+  }
+  if (!candidates.length) {
+    candidates = games.filter(g => new Date(g.commence_time).getTime() > now).filter(hasH2HData)
+      .filter(g => !(g.sport_key || '').includes('basketball')).sort(sortP).slice(0, 18);
+  }
+  return candidates;
+}
+
+// Intel + ajuste de confianza (réplica de _adjust del cliente, con valor de plantel)
+async function genApplyIntel(p, env) {
+  const q = { home: p.homeRaw, away: p.awayRaw, sportKey: p._sportKey, ts: String(p.commenceTs || '') };
+  const leagueOk = _getApfLeagueIdForSportKey(q.sportKey);
+  if (!leagueOk) return;
+  const cacheKey = `pickintel_v7_${normTeam(q.home)}_${normTeam(q.away)}_${String(p.commenceTs || '').slice(0, 8)}`;
+  const intel = await cached(env, cacheKey, 6 * 3600, async () => {
+    let d = await fetchPickIntel(q, env).catch(e => ({ error: String(e && e.message || e) }));
+    if (d && d.error) { const t = await fetchPickIntelTsdb(q, env).catch(() => null); if (t && !t.error) d = t; }
+    return d;
+  }).catch(() => null);
+  if (!intel || intel.error) return;
+  const side = p._recSide;
+  let score = 0;
+  const injH = (intel.injuries && intel.injuries.home && intel.injuries.home.count) || 0;
+  const injA = (intel.injuries && intel.injuries.away && intel.injuries.away.count) || 0;
+  if (side === 'home') score += (injA - injH) * 0.5;
+  if (side === 'away') score += (injH - injA) * 0.5;
+  const hh = intel.h2h || {};
+  if (hh.n >= 4) {
+    const wr = side === 'home' ? hh.homeW / hh.n : side === 'away' ? hh.awayW / hh.n : hh.draw / hh.n;
+    if (wr >= 0.6) score += 1; else if (wr <= 0.2) score -= 1;
+    if (side === 'home' && hh.homeAtHome && hh.homeAtHome.n >= 3) {
+      const wrl = hh.homeAtHome.w / hh.homeAtHome.n;
+      if (wrl >= 0.65) score += 1; else if (wrl <= 0.2) score -= 1;
+    }
+  }
+  const fp = f => (String(f || '').match(/W/g) || []).length;
+  if ((side === 'home' || side === 'away') && intel.form) {
+    const own = fp(side === 'home' ? intel.form.home : intel.form.away);
+    const riv = fp(side === 'home' ? intel.form.away : intel.form.home);
+    if (own - riv >= 3) score += 1; else if (riv - own >= 3) score -= 1;
+  }
+  const sv = intel.squadValue || null;
+  const vSide = (side === 'home' || side === '1x') ? 'home' : (side === 'away' || side === 'x2') ? 'away' : null;
+  if (sv && sv.home && sv.away && vSide) {
+    const rOwn = vSide === 'home' ? (sv.home / sv.away) : (sv.away / sv.home);
+    if (rOwn >= 1.8) score += 1; else if (rOwn <= 0.55) score -= 1;
+  }
+  if (score <= -2 && p.bvr > 3) {
+    p.bvr = p.bvr - 1;
+    p.bvrText = p.bvr >= 6 ? 'Máxima' : p.bvr === 5 ? 'Alta' : p.bvr === 4 ? 'Media-Alta' : 'Media';
+    p.conf = (p.bvr >= 5) ? 'high' : (p.bvr === 4) ? 'med' : 'low';
+  }
+}
+
+async function genSaveLockedPicks(env, picks) {
+  const skey = env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!skey) throw new Error('sin SUPABASE_SERVICE_ROLE_KEY');
+  const key = genLockedKey();
+  const H = { apikey: skey, Authorization: 'Bearer ' + skey, 'Content-Type': 'application/json' };
+  const getR = await fetch(SUPABASE_URL + '/rest/v1/shared_cache?key=eq.' + encodeURIComponent(key) + '&select=data', { headers: H });
+  const rows = await getR.json().catch(() => []);
+  const existing = (Array.isArray(rows) && rows[0] && rows[0].data) || {};
+  const merged = { ...existing };
+  let added = 0, upgraded = 0;
+  for (const p of picks) {
+    if (p._sportKey === 'soccer_fifa_world_cup') continue;
+    const mk = genMatchKey(p.home, p.away);
+    const entry = {
+      conf: p.conf, bvr: p.bvr, bvrText: p.bvrText, rec: p.rec,
+      bestOdds: p._bestOdds, hO: p._hO, aO: p._aO, dO: p._dO,
+      probH: p.probH, probD: p.probD, probA: p.probA,
+      home: p.home || null, away: p.away || null,
+      commenceTs: p.commenceTs || null, sportKey: p._sportKey || null,
+    };
+    if (!merged[mk]) { merged[mk] = entry; added++; }
+    else if ((p.bvr || 0) > (merged[mk].bvr || 0)) { merged[mk] = { ...merged[mk], ...entry }; upgraded++; }
+  }
+  if (!added && !upgraded) return { key, added, upgraded, total: Object.keys(merged).length };
+  if (Array.isArray(rows) && rows.length > 0) {
+    const pr = await fetch(SUPABASE_URL + '/rest/v1/shared_cache?key=eq.' + encodeURIComponent(key), {
+      method: 'PATCH', headers: H, body: JSON.stringify({ data: merged, fetched_at: new Date().toISOString() }),
+    });
+    if (!pr.ok) throw new Error('PATCH shared_cache ' + pr.status);
+  } else {
+    const po = await fetch(SUPABASE_URL + '/rest/v1/shared_cache', {
+      method: 'POST', headers: { ...H, Prefer: 'resolution=merge-duplicates' },
+      body: JSON.stringify({ key, data: merged, fetched_at: new Date().toISOString() }),
+    });
+    if (!po.ok) throw new Error('POST shared_cache ' + po.status);
+  }
+  return { key, added, upgraded, total: Object.keys(merged).length };
+}
+
+async function genAlertEmail(env, stats, severity) {
+  if (!env.RESEND_API_KEY) return false;
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        from: 'Gambeta Motor <no-reply@gambeta.ai>',
+        to: ['pronosticosarg@gmail.com'],
+        subject: severity === 'error' ? '🔴 Generador de picks: FALLÓ' : '🟡 Generador de picks: aviso',
+        html: '<div style="font-family:sans-serif;max-width:560px"><h2>Generador de picks (cron 08:00 ART)</h2>' +
+          '<pre style="background:#f5f5f5;padding:12px;border-radius:8px;font-size:12px">' +
+          JSON.stringify(stats, null, 2).replace(/</g, '&lt;') + '</pre>' +
+          '<p style="font-size:12px;color:#999">Auto-generado. Solo recibís mail si algo requiere tu atención.</p></div>',
+      }),
+    });
+    return r.ok;
+  } catch (_) { return false; }
+}
+
+async function runScheduledPickGenerator(env) {
+  const stats = { ts: new Date().toISOString(), lockKey: genLockedKey(), odds: 0, candidates: 0, generated: 0, relaxed: false, saved: null, rejects: [], errors: [] };
+  try {
+    // 1) Cuotas (misma caché horaria que /odds, sin confiar en vacíos)
+    const hourKey = new Date().toISOString().slice(0, 13);
+    const cats = [['main', LEAGUES_MAIN], ['europe', LEAGUES_EUROPE], ['secondary', LEAGUES_SECONDARY]];
+    let games = [];
+    for (const [cat, leagues] of cats) {
+      let res = await cached(env, `odds10_${cat}_${hourKey}`, 3600, () => getLeagueData(env, leagues)).catch(() => null);
+      if (!res || !res.data || !res.data.length) {
+        try { const fresh = await getLeagueData(env, leagues); if (fresh && fresh.data && fresh.data.length) res = fresh; } catch (_) {}
+      }
+      if (res && res.data) games = games.concat(res.data);
+    }
+    // dedupe partidos por equipos+kickoff
+    { const seen = new Set(); games = games.filter(g => { const k = (g.home_team || '') + '|' + (g.away_team || '') + '|' + (g.commence_time || ''); if (seen.has(k)) return false; seen.add(k); return true; }); }
+    stats.odds = games.length;
+    if (!games.length) { stats.errors.push('feed de cuotas VACÍO (las 3 categorías)'); throw new Error('odds vacías'); }
+
+    // 2) Contexto
+    const shortMap = await genShortNamesMap(env);
+    const cooldown = await genCooldownTeams(env);
+    const dayKey = new Date().toISOString().slice(0, 10);
+    const cupCtx = await cached(env, `cup_context_v2_${dayKey}`, 21600, () => computeCupContext(env)).catch(() => ({}));
+    const lgCtx = await cached(env, `league_context_v2_${dayKey}`, 43200, () => computeLeagueContext(env)).catch(() => ({}));
+
+    // 3) Motor: pase estricto → relajado si 0
+    const runPass = relaxed => {
+      const cList = genSelectCandidates(games, relaxed);
+      if (relaxed === false) stats.candidates = cList.length;
+      const ctx = { cooldown, cupCtx, lgCtx, relaxed, shortMap, log: stats.rejects };
+      return cList.map(g => genEvaluateGame(g, ctx)).filter(Boolean);
+    };
+    let picks = runPass(false);
+    if (!picks.length) { stats.relaxed = true; picks = runPass(true); }
+    stats.generated = picks.length;
+
+    // 4) Intel: ajusta confianza (secuencial, máx 8 por el rate de APF)
+    for (const p of picks.slice(0, 8)) { try { await genApplyIntel(p, env); } catch (_) {} }
+
+    // 5) Lock en Supabase ("el primero gana")
+    if (picks.length) stats.saved = await genSaveLockedPicks(env, picks);
+
+    // 6) Registro para inspección posterior
+    try { await env.CACHE_KV?.put('gen_last_run', JSON.stringify(stats), { expirationTtl: 7 * 86400 }); } catch (_) {}
+  } catch (e) {
+    stats.errors.push(String(e && e.message || e));
+  }
+  stats.rejects = stats.rejects.slice(0, 25);
+  // Alerta: error duro siempre; aviso si con 5+ candidatos no salió ningún pick
+  if (stats.errors.length) await genAlertEmail(env, stats, 'error');
+  else if (!stats.generated && stats.candidates >= 5) await genAlertEmail(env, stats, 'warn');
+  return stats;
+}
+
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
@@ -3455,6 +3947,14 @@ export default {
         medium: stats.findings_by_severity.medium,
         new_bugs: stats.new_count,
         alert: stats.alert,
+      }));
+    } else if (cronExpr === '0 11 * * *') {
+      // ── 🆕 (18-jul) Diario 11:00 UTC (08:00 ART): GENERADOR DE PICKS server-side ──
+      // Genera y lockea los picks del día sin depender de ningún navegador.
+      const stats = await runScheduledPickGenerator(env);
+      console.log('[cron-pick-generator]', JSON.stringify({
+        ts: stats.ts, odds: stats.odds, candidates: stats.candidates,
+        generated: stats.generated, relaxed: stats.relaxed, saved: stats.saved, errors: stats.errors,
       }));
     } else if (cronExpr === '0 */6 * * *') {
       // Every 6h: update odds for pending picks
@@ -4824,6 +5324,18 @@ export default {
     if (path === '/cron-resolve') {
       const stats = await runScheduledResolver(env);
       return new Response(JSON.stringify(stats, null, 2), { headers: CORS });
+    }
+
+    // ── 🆕 (18-jul) /cron-generate — generador de picks server-side (trigger manual) ──
+    if (path === '/cron-generate') {
+      const stats = await runScheduledPickGenerator(env);
+      return new Response(JSON.stringify(stats, null, 2), { headers: CORS });
+    }
+
+    // ── 🆕 (18-jul) /cron-generate-status — última corrida del generador ──
+    if (path === '/cron-generate-status') {
+      const last = await env.CACHE_KV?.get('gen_last_run');
+      return new Response(last || '{"error":"sin corridas registradas"}', { headers: CORS });
     }
 
     // ── 🆕 (25-jun-2026) /wc-teams — devuelve team_ids + logos de TODAS las selecciones del WC 2026
