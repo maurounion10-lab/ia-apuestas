@@ -3607,6 +3607,43 @@
   .pred-action-btn.btn-like  { border-color: rgba(255,100,100,0.2); color: rgba(255,130,130,0.85); }
   .pred-action-btn.btn-like:hover  { background: rgba(255,80,80,0.08); border-color: rgba(255,80,80,0.4); color: #ff8a80; }
   .pred-action-btn.btn-like.liked  { background: rgba(255,80,80,0.1); border-color: rgba(255,80,80,0.45); color: #ff5252; }
+  /* 🆕 (18-jul) Corazón animado estilo Pinterest/Twitter — reemplaza al 👍.
+     Estado: outline → fill vía .liked. Animación pop+burst SOLO con .just-liked
+     (clase efímera que agrega togglePickLike en el click del usuario). */
+  .btn-like .like-wrap { position: relative; display: inline-flex; align-items: center; }
+  .btn-like .like-heart { display: block; overflow: visible; }
+  .btn-like .like-heart path {
+    fill: transparent; stroke: currentColor; stroke-width: 2;
+    transition: fill .25s ease, stroke .25s ease;
+    transform-origin: center; }
+  .btn-like.liked .like-heart path { fill: #ff5252; stroke: #ff5252; }
+  .btn-like.just-liked .like-heart { animation: gbHeartPop .5s cubic-bezier(.2,1.7,.45,1); }
+  @keyframes gbHeartPop {
+    0%   { transform: scale(.4); }
+    45%  { transform: scale(1.35); }
+    70%  { transform: scale(.92); }
+    100% { transform: scale(1); }
+  }
+  /* Burst de partículas: un solo span, 8 puntitos vía box-shadow radial */
+  .btn-like .like-burst {
+    position: absolute; left: 50%; top: 50%;
+    width: 4px; height: 4px; border-radius: 50%;
+    background: transparent; pointer-events: none;
+    transform: translate(-50%,-50%) scale(0); opacity: 0; }
+  .btn-like.just-liked .like-burst { animation: gbHeartBurst .55s ease-out forwards; }
+  @keyframes gbHeartBurst {
+    0% {
+      transform: translate(-50%,-50%) scale(.3); opacity: 1;
+      box-shadow: 0 -8px 0 0 #ff5252, 6px -6px 0 0 #ffd600, 8px 0 0 0 #ff5252, 6px 6px 0 0 #ff8a80,
+                  0 8px 0 0 #ffd600, -6px 6px 0 0 #ff5252, -8px 0 0 0 #ff8a80, -6px -6px 0 0 #ffd600; }
+    100% {
+      transform: translate(-50%,-50%) scale(1.6); opacity: 0;
+      box-shadow: 0 -14px 0 -2px #ff5252, 10px -10px 0 -2px #ffd600, 14px 0 0 -2px #ff5252, 10px 10px 0 -2px #ff8a80,
+                  0 14px 0 -2px #ffd600, -10px 10px 0 -2px #ff5252, -14px 0 0 -2px #ff8a80, -10px -10px 0 -2px #ffd600; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn-like .like-heart, .btn-like .like-burst { animation: none !important; }
+  }
   .pred-action-btn.btn-twitter { border-color: rgba(29,161,242,0.2); color: rgba(29,161,242,0.85); }
   .pred-action-btn.btn-twitter:hover { background: rgba(29,161,242,0.08); border-color: rgba(29,161,242,0.4); color: #1da1f2; }
   /* Publicar tu apuesta (dardo) — CTA principal, un poco más marcado */
