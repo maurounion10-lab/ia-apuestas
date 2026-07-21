@@ -6614,7 +6614,7 @@ ${(() => {
         </button>`;
         })()}
         <button class="pred-action-btn btn-like${_isPickLiked(idx) ? ' liked' : ''}" id="plbtn-${idx}" onclick="togglePickLike(${idx}, ${source.length})" title="Me gusta este pick" aria-label="Me gusta">
-          👍 <span id="plikes-${idx}">${_getFakeLikes(idx, source.length) + (_isPickLiked(idx) ? 1 : 0)}</span>
+          <span class="like-wrap" aria-hidden="true"><svg class="like-heart" viewBox="0 0 24 24" width="15" height="15"><path d="M12 21C5.4 15 2 11.3 2 7.7 2 4.9 4.3 2.6 7.1 2.6c1.7 0 3.3.8 4.9 2.4 1.6-1.6 3.2-2.4 4.9-2.4 2.8 0 5.1 2.3 5.1 5.1 0 3.6-3.4 7.3-10 13.3z"/></svg><span class="like-burst"></span></span> <span id="plikes-${idx}">${_getFakeLikes(idx, source.length) + (_isPickLiked(idx) ? 1 : 0)}</span>
         </button>
       </div>
       <!-- Cuerpo expandible del análisis -->
@@ -10223,6 +10223,14 @@ function togglePickLike(idx, total) {
   const base = _getFakeLikes(idx, total);
   const nowLiked = !wasLiked;
   if (btn) btn.classList.toggle('liked', nowLiked);
+  // 🆕 (18-jul) Animación del corazón: SOLO en el click del usuario (clase efímera
+  // .just-liked). Si animáramos con .liked, cada re-render de la grilla la repetiría.
+  if (btn && nowLiked) {
+    btn.classList.remove('just-liked');
+    void btn.offsetWidth; // reflow: permite re-disparar la animación en likes seguidos
+    btn.classList.add('just-liked');
+    setTimeout(() => btn.classList.remove('just-liked'), 700);
+  }
   if (cnt) cnt.textContent = String(base + (nowLiked ? 1 : 0));
 }
 
