@@ -3612,11 +3612,15 @@
      (clase efímera que agrega togglePickLike en el click del usuario). */
   .btn-like .like-wrap { position: relative; display: inline-flex; align-items: center; }
   .btn-like .like-heart { display: block; overflow: visible; }
+  /* 🆕 Corazón "silueta": sin borde, relleno con el color de fondo del tema.
+     --like-heart-fill apunta a --negro → si el tema cambia (ej: violeta),
+     basta cambiar esa variable y el corazón acompaña solo. */
+  .pred-action-btn.btn-like { --like-heart-fill: var(--negro, #0a0f0a); }
   .btn-like .like-heart path {
-    fill: transparent; stroke: currentColor; stroke-width: 2;
-    transition: fill .25s ease, stroke .25s ease;
+    fill: var(--like-heart-fill); stroke: none;
+    transition: fill .25s ease;
     transform-origin: center; }
-  .btn-like.liked .like-heart path { fill: #ff5252; stroke: #ff5252; }
+  .btn-like.liked .like-heart path { fill: #ff5252; stroke: none; }
   .btn-like.just-liked .like-heart { animation: gbHeartPop .5s cubic-bezier(.2,1.7,.45,1); }
   @keyframes gbHeartPop {
     0%   { transform: scale(.4); }
