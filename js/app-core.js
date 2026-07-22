@@ -4059,6 +4059,25 @@ function _updateHeroProStats() {
   };
 })();
 
+// 🆕 (22-jul-2026) Minuto de partido estimado desde el kickoff, CON entretiempo.
+// Antes se mostraba el reloj crudo (70 min de reloj = "70'") pero el partido real
+// va ~15 min atrás por el descanso. Aproximación por tramos:
+//   0-45 min reloj  → minuto real = reloj (1er tiempo)
+//   45-50           → "45+'" (descuento 1er tiempo)
+//   50-65           → "ET" (entretiempo)
+//   65-110          → reloj - 20 (2do tiempo, capped 90)
+//   110+            → "90+'"
+function _gbMinuteFromKickoff(commenceTs) {
+  if (!commenceTs) return '';
+  var m = Math.floor((Date.now() - commenceTs) / 60000);
+  if (m < 0) return '';
+  if (m <= 45)  return m + "'";
+  if (m <= 50)  return "45+'";
+  if (m <= 65)  return 'ET';
+  if (m <= 110) return Math.min(m - 20, 90) + "'";
+  return "90+'";
+}
+
 // ─── Gambeta 1.1 (29-jun-2026 #570): Helper EN VIVO ───
 // Resuelve si un pick está EN VIVO usando 2 fuentes:
 //   1) scoresData con flag='live' (autoritativo del API)
@@ -4237,8 +4256,7 @@ function _isPickLive(p) {
           if (minute) minute = minute + "'";
         }
         if (!minute && p.commenceTs) {
-          var m = Math.floor((Date.now() - p.commenceTs) / 60000);
-          if (m >= 0 && m <= 120) minute = m + "'";
+          minute = _gbMinuteFromKickoff(p.commenceTs);
         }
         return {
           live: true,
@@ -4261,12 +4279,11 @@ function _isPickLive(p) {
       //   130-180 min: aún live si no hay marcador final guardado (cubre prórroga + penales)
       //   > 180 min: definitivamente terminado, trigger self-heal
       if (elapsed >= 0 && elapsed <= 130 * 60 * 1000) {
-        var mins = Math.min(Math.floor(elapsed / 60000), 95);
         return {
           live: true,
           scoreH: null,
           scoreA: null,
-          minute: mins + "'",
+          minute: _gbMinuteFromKickoff(p.commenceTs) || 'LIVE',
           source: 'fallback'
         };
       }
