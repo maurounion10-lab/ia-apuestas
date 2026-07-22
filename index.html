@@ -206,8 +206,6 @@ main{max-width:1280px;margin:0 auto;padding:32px 20px}
 .gb-pstat-num{font-size:1.5rem;font-weight:800;color:#fff;line-height:1.05;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
 .gb-pstat-lbl{font-size:.62rem;color:#9e9e9e;text-transform:uppercase;letter-spacing:1px;margin-top:4px;font-weight:600}
 .hero-cta,.hero-buttons{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
-/* Banner Mundial — reservar altura estable para evitar shift */
-#gbMundialBanner{min-height:92px;box-sizing:border-box}
 /* Ticker + secciones dinamicas — reservar espacio con contain-intrinsic-size */
 #gbTicker,.ticker{min-height:56px;overflow:hidden}
 #predictions,#predsWrap,.predictions-grid{min-height:320px}
@@ -230,7 +228,6 @@ main{max-width:1280px;margin:0 auto;padding:32px 20px}
   .gb-pstat{padding:2px 4px}
   .gb-pstat-num{font-size:1.15rem;letter-spacing:-.4px}
   .gb-pstat-lbl{font-size:.52rem;letter-spacing:.4px}
-  #gbMundialBanner{min-height:76px}
   .hero-cta,.hero-buttons{justify-content:center!important}
 }
 </style>
@@ -359,7 +356,6 @@ setTimeout(function(){
   <!-- Nav visitante (sin login) -->
   <div class="nav-links" id="navLinksGuest">
     <a onclick="navTo('predictions')">🔮 <span class="nav-text">Picks</span></a>
-    <a href="/mundial-2026" class="nav-wc"><span class="nav-text-wc">🏆 Mundial 2026</span><span class="nav-wc-pulse"></span></a>
     <a onclick="navTo('historial')">📋 <span class="nav-text">Resultados</span></a>
     <a href="/herramientas">🧮 <span class="nav-text">Herramientas</span></a>
     <a href="/foro">💬 <span class="nav-text">Foro</span><sup style="font-size:0.55rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</sup></a>
@@ -370,7 +366,6 @@ setTimeout(function(){
   <!-- Nav usuario registrado -->
   <div class="nav-links" id="navLinksUser" style="display:none">
     <a onclick="navTo('predictions')">🔮 <span class="nav-text">Picks</span></a>
-    <a href="/mundial-2026" class="nav-wc"><span class="nav-text-wc">🏆 Mundial 2026</span><span class="nav-wc-pulse"></span></a>
     <a onclick="navTo('historial')">📋 <span class="nav-text">Resultados</span></a>
     <a href="/herramientas">🧮 <span class="nav-text">Herramientas</span></a>
     <a href="/foro">💬 <span class="nav-text">Foro</span><sup style="font-size:0.55rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</sup></a>
@@ -555,7 +550,6 @@ window.toggleHeroBubble = function(n) {
   <!-- Links visitante -->
   <div id="drawerLinksGuest">
     <a onclick="navTo('predictions');closeMobileNav()">🔮 Picks de la IA</a>
-    <a href="/mundial-2026" style="background:linear-gradient(90deg,rgba(255,214,0,0.10),transparent);border-left:3px solid #FFD700">🏆 Mundial 2026</a>
     <a onclick="navTo('historial');closeMobileNav()">📋 Resultados</a>
     <a href="/foro">💬 Foro <sup style="font-size:0.5rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</sup></a>
     <a href="/herramientas">🧮 Herramientas</a>
@@ -579,7 +573,6 @@ window.toggleHeroBubble = function(n) {
     </div>
     <!-- Links principales -->
     <a onclick="navTo('predictions');closeMobileNav()">🔮 Picks de la IA</a>
-    <a href="/mundial-2026" style="background:linear-gradient(90deg,rgba(255,214,0,0.10),transparent);border-left:3px solid #FFD700">🏆 Mundial 2026</a>
     <a onclick="navTo('historial');closeMobileNav()">📋 Resultados</a>
     <a href="/foro">💬 Foro <sup style="font-size:0.5rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</sup></a>
     <!-- Herramientas -->
@@ -612,393 +605,7 @@ window.toggleHeroBubble = function(n) {
   <span class="gb-page-label" id="gbPageLabel">gambeta.ai</span>
 </div>
 
-<!-- BANNER MUNDIAL 2026 — countdown dinámico, full-width arriba del hero -->
-<section id="gbMundialBanner" style="background:linear-gradient(135deg,#5c0816 0%,#a30f1d 35%,#dc1e2e 65%,#a30f1d 100%);border-bottom:2px solid rgba(255,255,255,0.18);padding:22px 20px;text-align:center;position:relative;overflow:hidden" class="gb-above-fold">
-  <!-- Shine sweeping animation -->
-  <div class="gbMundialShine" aria-hidden="true"></div>
-  <!-- Top highlight line -->
-  <div style="position:absolute;top:0;left:0;right:0;height:1.5px;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.65) 50%,transparent 100%);opacity:0.6"></div>
-  <!-- Radial vignette -->
-  <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(255,255,255,0.10) 0%,transparent 65%);pointer-events:none"></div>
-  <div style="max-width:1000px;margin:0 auto;position:relative;display:flex;align-items:center;justify-content:center;gap:22px;flex-wrap:nowrap;z-index:2">
-    <div style="font-size:2.8rem;filter:drop-shadow(0 2px 10px rgba(0,0,0,0.45));flex-shrink:0" class="gbMundialTrophy">🏆</div>
-    <div style="text-align:left;min-width:0;flex:0 1 auto" class="gbMundialText">
-      <div style="font-size:0.78rem;font-weight:800;letter-spacing:2.5px;color:rgba(255,255,255,0.85);text-transform:uppercase;line-height:1;margin-bottom:3px" class="gbMundialPulse"><span id="gbMundialTag">⚡ Próximamente</span></div>
-      <div id="gbMundialHeadline" style="font-size:1.35rem;font-weight:900;color:#fff;letter-spacing:-0.3px;line-height:1.2;text-shadow:0 2px 6px rgba(0,0,0,0.4)">Mundial 2026 · <span id="gbMundialDays">14</span> <span>días</span></div>
-      <div style="font-size:0.85rem;color:rgba(255,255,255,0.7);margin-top:4px;line-height:1.4" class="gbMundialSub" id="gbMundialSub">USA 🇺🇸 · Canadá 🇨🇦 · México 🇲🇽 — la IA se está preparando con picks especiales</div>
-      <div style="font-size:0.82rem;font-weight:700;margin-top:6px;line-height:1.35" id="gbMundialPicksTeaser"></div>
-    </div>
-  </div>
-</section>
-<style>
-  .gbMundialPulse { opacity: 0.85; }
-  @keyframes gbMundialFloat { 0%,100% { transform:translateY(0) rotate(-3deg) } 50% { transform:translateY(-3px) rotate(3deg) } }
-  .gbMundialTrophy { display:inline-block; animation: gbMundialFloat 3.5s ease-in-out infinite; }
-  /* Shine: barra blanca diagonal que cruza el banner cada 5s */
-  .gbMundialShine {
-    position: absolute; top: 0; left: -40%; width: 30%; height: 100%;
-    background: linear-gradient(105deg, transparent 0%, transparent 35%, rgba(255,255,255,0.06) 45%, rgba(255,255,255,0.28) 50%, rgba(255,255,255,0.06) 55%, transparent 65%, transparent 100%);
-    transform: skewX(-20deg); pointer-events: none; z-index: 1;
-    animation: gbMundialShineLoop 5s ease-in-out infinite;
-  }
-  @keyframes gbMundialShineLoop {
-    0%   { left: -40%; }
-    40%  { left: 130%; }
-    100% { left: 130%; }
-  }
-  /* TODAY MODE — HOY COMIENZA EL MUNDIAL */
-  #gbMundialBanner.gbMundialToday {
-    background: linear-gradient(135deg, #3a0510 0%, #6e0a1a 25%, #b50d22 50%, #6e0a1a 75%, #3a0510 100%);
-    background-size: 200% 200%;
-    animation: gbMundialTodayBg 4s ease-in-out infinite;
-    border-bottom: 2px solid rgba(255,255,255,0.35);
-    box-shadow: 0 6px 30px rgba(180,13,34,0.45) inset, 0 4px 22px rgba(180,13,34,0.45);
-  }
-  @keyframes gbMundialTodayBg {
-    0%,100% { background-position: 0% 0%; }
-    50%     { background-position: 100% 100%; }
-  }
-  #gbMundialBanner.gbMundialToday .gbMundialTrophy { animation: gbMundialTodayTrophy 1.2s ease-in-out infinite; }
-  @keyframes gbMundialTodayTrophy {
-    0%,100% { transform: scale(1) rotate(-6deg); filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5)); }
-    50%     { transform: scale(1.18) rotate(6deg); filter: drop-shadow(0 6px 16px rgba(255,200,200,0.6)); }
-  }
-  #gbMundialBanner.gbMundialToday #gbMundialHeadline {
-    font-size: clamp(1.5rem, 4.5vw, 2.4rem);
-    font-weight: 900;
-    letter-spacing: -0.5px;
-    text-shadow: 0 2px 8px rgba(0,0,0,0.55), 0 0 24px rgba(255,255,255,0.18);
-  }
-  /* Responsive */
-  @media (max-width:760px) {
-    #gbMundialBanner.gbMundialToday #gbMundialHeadline { font-size: clamp(1.2rem, 5vw, 1.7rem); line-height: 1.15; }
-  }
-  @media (max-width:560px) {
-    #gbMundialBanner { padding:10px 12px; }
-    #gbMundialBanner .gbMundialTrophy { font-size:1.8rem !important; }
-    #gbMundialBanner .gbMundialSub { display:none; }
-    .gbMundialShine { width: 50%; }
-    #gbMundialBanner.gbMundialToday .gbMundialTrophy { font-size: 2.4rem !important; }
-  }
-  @media (max-width:380px) {
-    #gbMundialBanner .gbMundialPulse { font-size: 0.65rem !important; }
-    #gbMundialBanner.gbMundialToday #gbMundialHeadline { font-size: 1.05rem; }
-  }
-</style>
-<script>
-(function(){
-  // Fecha objetivo: partido inaugural Mundial 2026 (11-jun-2026 en Estadio Azteca).
-  // Para el contador de DÍAS solo importa la fecha calendario, no la hora exacta del kickoff.
-  var TARGET_Y = 2026, TARGET_M = 5 /* junio (0-indexed) */, TARGET_D = 11;
-  var el = document.getElementById('gbMundialDays');
-  if (!el) return;
-  function daysUntilMundial() {
-    var now = new Date();
-    // HORA LOCAL del visitante: el contador baja 1 a su 00:00 real, no a las 00:00 UTC.
-    var today  = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    var target = new Date(TARGET_Y, TARGET_M, TARGET_D).getTime();
-    return Math.max(0, Math.round((target - today) / 86400000));
-  }
-  // 5 días antes del Mundial salen los 10 picks de futures (locked-in 6-jun-2026)
-  var PICKS_PUBLISH_Y = 2026, PICKS_PUBLISH_M = 5, PICKS_PUBLISH_D = 6;
-  function daysUntilPicks() {
-    var now = new Date();
-    var today  = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
-    var target = new Date(PICKS_PUBLISH_Y, PICKS_PUBLISH_M, PICKS_PUBLISH_D).getTime();
-    return Math.max(0, Math.round((target - today) / 86400000));
-  }
-  function update() {
-    var d = daysUntilMundial();
-    el.textContent = d;
-    var teaser = document.getElementById('gbMundialPicksTeaser');
-    var dPicks = daysUntilPicks();
-    if (teaser) {
-      if (dPicks > 0) {
-        teaser.innerHTML = '🎯 <span style="color:#FFD700">' + dPicks + ' día' + (dPicks===1?'':'s') + '</span> para que la IA publique sus <span style="color:#FFD700">10 predicciones del Mundial</span>';
-        teaser.style.color = 'rgba(255,255,255,0.78)';
-      } else if (d > 0) {
-        teaser.innerHTML = '🔥 <a href="#predicciones" style="color:#FFD700;text-decoration:none;border-bottom:1px dotted #FFD700">10 predicciones del Mundial — disponibles ahora</a>';
-        teaser.style.color = '#fff';
-      } else {
-        teaser.innerHTML = '';
-      }
-    }
-    if (d <= 0) {
-      // 🏆 Mundial en curso: leer pick REAL del día desde window._aiPreds (sin inventar nada)
-      var head = document.getElementById('gbMundialHeadline');
-      var tag  = document.getElementById('gbMundialTag');
-      var sub  = document.getElementById('gbMundialSub');
-      var ban  = document.getElementById('gbMundialBanner');
-      
-      // Map ISO (para banderas) — solo selecciones del Mundial 2026
-      var ISO_MAP = {
-        'Alemania':'de','Curaçao':'cw','Curacao':'cw','Países Bajos':'nl','Paises Bajos':'nl',
-        'Japón':'jp','Japon':'jp','Bélgica':'be','Belgica':'be','Egipto':'eg',
-        'España':'es','Espana':'es','Cabo Verde':'cv','Argentina':'ar','Argelia':'dz',
-        'Estados Unidos':'us','USA':'us','Paraguay':'py','Canadá':'ca','Canada':'ca',
-        'Bosnia':'ba','Bosnia y Herzegovina':'ba','México':'mx','Mexico':'mx','Sudáfrica':'za','Sudafrica':'za',
-        'Brasil':'br','Marruecos':'ma','Suiza':'ch','Catar':'qa','Qatar':'qa','Haití':'ht','Haiti':'ht','Escocia':'gb-sct',
-        'Inglaterra':'gb-eng','Croacia':'hr','Uruguay':'uy','Túnez':'tn','Tunez':'tn',
-        'Francia':'fr','Italia':'it','Portugal':'pt','Polonia':'pl','Colombia':'co','Ecuador':'ec',
-        'Corea del Sur':'kr','Iraq':'iq','Bolivia':'bo','Jordania':'jo','RD Congo':'cd','Senegal':'sn',
-        'Costa de Marfil':'ci','Camerún':'cm','Camerun':'cm','Nigeria':'ng','Marruecos':'ma',
-        'Austria':'at','Noruega':'no','Dinamarca':'dk','Suecia':'se','Túnez':'tn',
-        'Australia':'au','Nueva Zelanda':'nz','Arabia Saudita':'sa','Irán':'ir','Iran':'ir',
-        'Costa Rica':'cr','Panamá':'pa','Panama':'pa','Honduras':'hn','Jamaica':'jm','Cuba':'cu'
-      };
-      
-      // Buscar el pick Mundial pendiente de mayor confianza
-      var picks = Array.isArray(window._aiPreds) ? window._aiPreds : [];
-      var todayMatch = null;
-      try {
-        var nowMs = Date.now();
-        var in24h = nowMs + 24 * 3600 * 1000;
-        var wcPending = picks.filter(function(p) {
-          return p && p._sportKey === 'soccer_fifa_world_cup'
-              && (!p.result || p.result === 'pending')
-              && p.commenceTs && p.commenceTs >= nowMs - 2.5 * 3600 * 1000 && p.commenceTs <= in24h  // 🆕 incluye EN VIVO (hasta 2h30 post-kickoff)
-              && p.home && p.away && ISO_MAP[p.home] && ISO_MAP[p.away];
-        });
-        // Ordenar por confianza (Máxima > Alta > Media) + hora más cercana
-        var confRank = { 'Máxima':3, 'Alta':2, 'Media':1 };
-        wcPending.sort(function(a,b) {
-          var ra = confRank[a.confLabel] || 0, rb = confRank[b.confLabel] || 0;
-          if (rb !== ra) return rb - ra;
-          return a.commenceTs - b.commenceTs;
-        });
-        todayMatch = wcPending[0] || null;
-      } catch(e) {}
-      
-      if (head) {
-        if (todayMatch) {
-          var hIso = ISO_MAP[todayMatch.home], aIso = ISO_MAP[todayMatch.away];
-          head.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center">'
-            + '<img loading="lazy" decoding="async" src="https://flagcdn.com/h60/' + hIso + '.png" alt="' + todayMatch.home + '" style="width:38px;height:26px;border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4);object-fit:cover">'
-            + '<span style="font-weight:900">' + todayMatch.home + '</span>'
-            + '<span style="color:#FFD700;font-weight:800;font-size:0.85em;padding:0 4px">VS</span>'
-            + '<span style="font-weight:900">' + todayMatch.away + '</span>'
-            + '<img loading="lazy" decoding="async" src="https://flagcdn.com/h60/' + aIso + '.png" alt="' + todayMatch.away + '" style="width:38px;height:26px;border-radius:3px;box-shadow:0 2px 6px rgba(0,0,0,0.4);object-fit:cover">'
-            + '</span>';
-        } else {
-          head.innerHTML = 'MUNDIAL 2026 EN VIVO';
-        }
-      }
-      // 🆕 (2-jul-2026) Hora detectada del timezone del usuario — no más ART hardcodeado
-      var hhmm = '', tzLabel = 'local';
-      if (todayMatch && todayMatch.commenceTs) {
-        var userTz = 'America/Argentina/Buenos_Aires';
-        try { userTz = Intl.DateTimeFormat().resolvedOptions().timeZone; } catch(e) {}
-        try {
-          // Format hora en la zona del usuario (Intl.DateTimeFormat es el estándar moderno)
-          hhmm = new Intl.DateTimeFormat('es-AR', {
-            hour: '2-digit', minute: '2-digit', hour12: false, timeZone: userTz
-          }).format(new Date(todayMatch.commenceTs));
-        } catch(e) {
-          var dt = new Date(todayMatch.commenceTs);
-          hhmm = String(dt.getHours()).padStart(2,'0') + ':' + String(dt.getMinutes()).padStart(2,'0');
-        }
-        // Etiqueta amigable según zona
-        var tz = (userTz || '').toLowerCase();
-        if      (tz.indexOf('argentina')>=0 || tz.indexOf('buenos_aires')>=0) tzLabel = 'ART';
-        else if (tz.indexOf('mexico')>=0)      tzLabel = 'CDMX';
-        else if (tz.indexOf('bogota')>=0)      tzLabel = 'COL';
-        else if (tz.indexOf('santiago')>=0)    tzLabel = 'CL';
-        else if (tz.indexOf('lima')>=0)        tzLabel = 'PET';
-        else if (tz.indexOf('caracas')>=0)     tzLabel = 'VET';
-        else if (tz.indexOf('montevideo')>=0)  tzLabel = 'UY';
-        else if (tz.indexOf('asuncion')>=0)    tzLabel = 'PY';
-        else if (tz.indexOf('la_paz')>=0)      tzLabel = 'BO';
-        else if (tz.indexOf('guayaquil')>=0)   tzLabel = 'EC';
-        else if (tz.indexOf('madrid')>=0)      tzLabel = 'ES';
-        else if (tz.indexOf('europe')>=0)      tzLabel = 'local';
-        else if (tz.indexOf('america/new_york')>=0 || tz.indexOf('america/chicago')>=0 ||
-                 tz.indexOf('america/los_angeles')>=0) tzLabel = 'US';
-        else tzLabel = 'tu hora';
-      }
-      var _heroLive = todayMatch && todayMatch.commenceTs && todayMatch.commenceTs <= Date.now();  // 🆕 partido en curso
-      if (tag) tag.innerHTML = todayMatch ? (_heroLive ? '🔴 PICK IA · EN VIVO AHORA' : ('⚡ PICK IA DEL DÍA · ' + (hhmm ? hhmm + ' ' + tzLabel : 'Mundial 2026'))) : '✨ Picks IA en gambeta.ai';
-      if (sub) {
-        if (todayMatch) {
-          var _vfHome = (todayMatch.home || '').replace(/'/g, "\\'");
-          var _vfAway = (todayMatch.away || '').replace(/'/g, "\\'");
-          sub.innerHTML = '🤖 <b>IA Gambeta:</b> <span style="color:#FFD700">' + (todayMatch.rec || '') + '</span> · Confianza <b>' + (todayMatch.confLabel || 'Alta') + '</b> · <a href="#predicciones" onclick="event.preventDefault();scrollToPickCard(\''+_vfHome+'\',\''+_vfAway+'\')" style="color:#fff;text-decoration:underline;cursor:pointer">Ver ficha →</a>';
-        } else {
-          sub.innerHTML = 'Ver todos los picks IA del Mundial →';
-        }
-      }
-      if (ban) ban.classList.add('gbMundialToday');
-    }
-  }
-  update();
-  // Cada minuto: cuando cruza la medianoche UTC el contador se refresca solo.
-  setInterval(update, 60 * 1000);
-})();
-</script>
-
-
-<!-- ─── 🎯 TICKER PRÓXIMOS PARTIDOS MUNDIAL 2026 ─── -->
-<section id="gbWcTicker" aria-label="Próximos partidos Mundial 2026" style="background:linear-gradient(180deg,#0d0a05 0%,#14110a 100%);border-bottom:1px solid rgba(255,215,0,0.28);overflow:hidden;position:relative" class="gb-above-fold">
-  <div style="display:flex;align-items:center;gap:14px;padding:10px 18px;position:relative">
-    <span style="background:#FFD700;color:#14110a;font-weight:900;font-size:.72rem;letter-spacing:1.2px;padding:5px 11px;border-radius:6px;flex-shrink:0;text-transform:uppercase;box-shadow:0 2px 8px rgba(255,215,0,0.35)">🏆 Próximos</span>
-    <div class="gb-ticker-wrap" style="flex:1;overflow:hidden;mask-image:linear-gradient(90deg,transparent 0%,#000 6%,#000 94%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 6%,#000 94%,transparent 100%)">
-      <div class="gb-ticker-track" id="gbWcTickerTrack"></div>
-    </div>
-  </div>
-</section>
-<style>
-  #gbWcTicker .gb-ticker-track {
-    display:inline-flex;
-    gap:38px;
-    white-space:nowrap;
-    animation: gbWcTickerScroll 70s linear infinite;
-    will-change: transform;
-  }
-  #gbWcTicker:hover .gb-ticker-track { animation-play-state: paused; }
-  #gbWcTicker .gb-ticker-item {
-    display:inline-flex;
-    align-items:center;
-    gap:9px;
-    font-size:.86rem;
-    color:rgba(255,255,255,0.92);
-    font-weight:600;
-    flex-shrink:0;
-  }
-  #gbWcTicker .gb-ticker-item .gb-tk-flag {
-    width:22px; height:16px; border-radius:2.5px;
-    object-fit:cover;
-    box-shadow:0 1px 3px rgba(0,0,0,0.55);
-    flex-shrink:0;
-  }
-  #gbWcTicker .gb-ticker-item .gb-tk-vs {
-    color:rgba(255,215,0,0.85);
-    font-weight:800;
-    font-size:.78rem;
-    padding:0 3px;
-    letter-spacing:0.5px;
-  }
-  #gbWcTicker .gb-ticker-item .gb-tk-team {
-    font-weight:700;
-    color:rgba(255,255,255,0.96);
-  }
-  #gbWcTicker .gb-ticker-item .gb-tk-meta {
-    color:rgba(255,215,0,0.78);
-    font-weight:700;
-    font-size:.78rem;
-    margin-left:10px;
-    padding:2px 9px;
-    border-radius:5px;
-    background:rgba(255,215,0,0.10);
-    border:1px solid rgba(255,215,0,0.22);
-    letter-spacing:0.2px;
-  }
-  @keyframes gbWcTickerScroll {
-    from { transform: translateX(0); }
-    to   { transform: translateX(-50%); }
-  }
-  @media (max-width:560px) {
-    #gbWcTicker .gb-ticker-item { font-size:.78rem; gap:7px; }
-    #gbWcTicker .gb-ticker-item .gb-tk-meta { font-size:.7rem; margin-left:6px; padding:1px 7px; }
-  }
-</style>
-<script>
-(function(){
-  // Fixtures Mundial 2026 — todos los partidos restantes (fase grupos final + octavos + cuartos+).
-  // ts = Date.UTC del kickoff. El ticker filtra los pasados automáticamente.
-  // Hora ART (UTC-3) → para Date.UTC sumamos 3.
-  var _U = function(y,mo,d,hART){ return Date.UTC(y, mo-1, d, hART+3, 0, 0); };
-  var _DOW = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
-  var _MES = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  var _fmtWhen = function(ts){
-    var dt = new Date(ts);
-    // Convertir a ART (UTC-3)
-    var artMs = ts - (3*60*60*1000);
-    var d = new Date(artMs);
-    var hhmm = String(d.getUTCHours()).padStart(2,'0')+':'+String(d.getUTCMinutes()).padStart(2,'0');
-    return _DOW[d.getUTCDay()]+' '+d.getUTCDate()+'-'+_MES[d.getUTCMonth()]+' · '+hhmm;
-  };
-  var FIXTURES_ALL = [
-    // Fase de grupos final
-    { h:'mx',     H:'México',         a:'za',     A:'Sudáfrica',        ts: _U(2026,6,11,19) },
-    { h:'ca',     H:'Canadá',         a:'ba',     A:'Bosnia',           ts: _U(2026,6,12,16) },
-    { h:'us',     H:'Estados Unidos', a:'py',     A:'Paraguay',         ts: _U(2026,6,12,20) },
-    { h:'ch',     H:'Suiza',          a:'qa',     A:'Catar',            ts: _U(2026,6,13,13) },
-    { h:'br',     H:'Brasil',         a:'ma',     A:'Marruecos',        ts: _U(2026,6,13,16) },
-    { h:'ht',     H:'Haití',          a:'gb-sct', A:'Escocia',          ts: _U(2026,6,13,19) },
-    { h:'de',     H:'Alemania',       a:'cw',     A:'Curaçao',          ts: _U(2026,6,14,13) },
-    { h:'co',     H:'Colombia',       a:'uz',     A:'Uzbekistán',       ts: _U(2026,6,14,16) },
-    { h:'nl',     H:'Países Bajos',   a:'jp',     A:'Japón',            ts: _U(2026,6,14,19) },
-    { h:'be',     H:'Bélgica',        a:'eg',     A:'Egipto',           ts: _U(2026,6,15,13) },
-    { h:'ec',     H:'Ecuador',        a:'ci',     A:'Costa Marfil',     ts: _U(2026,6,15,16) },
-    { h:'es',     H:'España',         a:'cv',     A:'Cabo Verde',       ts: _U(2026,6,15,19) },
-    { h:'fr',     H:'Francia',        a:'sn',     A:'Senegal',          ts: _U(2026,6,16,13) },
-    { h:'at',     H:'Austria',        a:'jo',     A:'Jordania',         ts: _U(2026,6,16,16) },
-    { h:'ar',     H:'Argentina',      a:'dz',     A:'Argelia',          ts: _U(2026,6,16,19) },
-    { h:'pt',     H:'Portugal',       a:'cd',     A:'RD Congo',         ts: _U(2026,6,17,13) },
-    { h:'tr',     H:'Turquía',        a:'no',     A:'Noruega',          ts: _U(2026,6,17,16) },
-    { h:'gb-eng', H:'Inglaterra',     a:'hr',     A:'Croacia',          ts: _U(2026,6,17,19) },
-    { h:'uy',     H:'Uruguay',        a:'tn',     A:'Túnez',            ts: _U(2026,6,18,13) },
-    { h:'kr',     H:'Corea del Sur',  a:'iq',     A:'Iraq',             ts: _U(2026,6,18,19) },
-    // 2da fecha grupos
-    { h:'tn',     H:'Túnez',          a:'jp',     A:'Japón',            ts: _U(2026,6,21,1) },
-    { h:'es',     H:'España',         a:'sa',     A:'Arabia Saudita',   ts: _U(2026,6,21,13) },
-    { h:'be',     H:'Bélgica',        a:'ir',     A:'Irán',             ts: _U(2026,6,21,16) },
-    { h:'uy',     H:'Uruguay',        a:'cv',     A:'Cabo Verde',       ts: _U(2026,6,21,19) },
-    { h:'nz',     H:'Nueva Zelanda',  a:'eg',     A:'Egipto',           ts: _U(2026,6,21,22) },
-    { h:'ar',     H:'Argentina',      a:'at',     A:'Austria',          ts: _U(2026,6,22,14) },
-    { h:'fr',     H:'Francia',        a:'iq',     A:'Irak',             ts: _U(2026,6,22,17) },
-    { h:'no',     H:'Noruega',        a:'sn',     A:'Senegal',          ts: _U(2026,6,22,20) },
-    // 3ra fecha grupos D (24-jun pasada)
-    { h:'mx',     H:'México',         a:'cz',     A:'Rep. Checa',       ts: _U(2026,6,24,13) },
-    { h:'za',     H:'Sudáfrica',      a:'kr',     A:'Corea del Sur',    ts: _U(2026,6,24,13) },
-    { h:'ca',     H:'Canadá',         a:'au',     A:'Australia',        ts: _U(2026,6,24,16) },
-    // 3ra fecha Grupo E (25-jun, simultáneos)
-    { h:'ec',     H:'Ecuador',        a:'de',     A:'Alemania',         ts: _U(2026,6,25,17) },
-    { h:'cw',     H:'Curaçao',        a:'ci',     A:'Costa Marfil',     ts: _U(2026,6,25,17) },
-    // 3ra fecha Grupo F (25-jun noche, simultáneos)
-    { h:'tn',     H:'Túnez',          a:'nl',     A:'Países Bajos',     ts: _U(2026,6,25,20) },
-    { h:'jp',     H:'Japón',          a:'se',     A:'Suecia',           ts: _U(2026,6,25,20) },
-    // 3ra fecha Grupo H (26-jun 21h ART, simultáneos)
-    { h:'cv',     H:'Cabo Verde',     a:'sa',     A:'Arabia Saudita',   ts: _U(2026,6,26,21) },
-    { h:'uy',     H:'Uruguay',        a:'es',     A:'España',           ts: _U(2026,6,26,21) },
-    // 3ra fecha Grupo G (26-jun 24h ART = 00h del 27 ART, simultáneos)
-    { h:'eg',     H:'Egipto',         a:'ir',     A:'Irán',             ts: _U(2026,6,27,0) },
-    { h:'nz',     H:'Nueva Zelanda',  a:'be',     A:'Bélgica',          ts: _U(2026,6,27,0) },
-    // Octavos (28 jun - 3 jul, partidos TBD por clasificados)
-    // Cuartos, semis, final placeholders se mostrarán cuando se aproximen
-  ];
-  // Filtrar partidos pasados — solo mostrar los que aún no empezaron
-  var nowTs = Date.now();
-  var FIXTURES = FIXTURES_ALL.filter(function(f){ return f.ts > nowTs; });
-  // Si no hay futuros (post-Mundial), mostrar los próximos 7 días o vacío
-  if (FIXTURES.length === 0) {
-    // Fallback: si todo pasó, no mostrar el ticker
-    var _t = document.getElementById('gbWcTicker');
-    if (_t) _t.style.display = 'none';
-    return;
-  }
-  // Asignar string 'when' calculado en runtime
-  FIXTURES.forEach(function(f){ f.when = _fmtWhen(f.ts); });
-  // Limitar a 10 próximos para que no sea infinito
-  FIXTURES = FIXTURES.slice(0, 10);
-
-  function buildItem(f) {
-    return '<span class="gb-ticker-item">'
-      + '<img loading="lazy" decoding="async" class="gb-tk-flag" src="https://flagcdn.com/w40/'+f.h+'.png" alt="'+f.H+'">'
-      + '<span class="gb-tk-team">'+f.H+'</span>'
-      + '<span class="gb-tk-vs">VS</span>'
-      + '<img loading="lazy" decoding="async" class="gb-tk-flag" src="https://flagcdn.com/w40/'+f.a+'.png" alt="'+f.A+'">'
-      + '<span class="gb-tk-team">'+f.A+'</span>'
-      + '<span class="gb-tk-meta">'+f.when+'</span>'
-      + '</span>';
-  }
-
-  var track = document.getElementById('gbWcTickerTrack');
-  if (!track) return;
-  // Duplicar la secuencia para que el loop sea seamless (-50% al final)
-  var html = FIXTURES.map(buildItem).join('');
-  track.innerHTML = html + html;
-})();
-</script>
+<!-- (21-jul-2026) Banner + ticker Mundial 2026 removidos: el torneo terminó. -->
 
 <!-- HERO -->
 <div class="hero" id="gbHero">
@@ -1512,7 +1119,7 @@ window.toggleHeroBubble = function(n) {
       3: { d:'Mié', nameLong:'Miércoles', name:'Melbet',       bono:'100% hasta $130 USD + 30 giros gratis',      logo:'/img/casas/melbet.svg',   href:'https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213' },
       4: { d:'Jue', nameLong:'Jueves',    name:'BetWinner',    bono:'100% hasta $100 USD en tu primer depósito',  logo:'/img/casas/betwinner.svg', href:'https://bwredir.com/2J04?p=%2Fregistration%2F&s1=PronosticosLATAM' },
       5: { d:'Vie', nameLong:'Viernes',   name:'DBbet',        bono:'🎁 DBbet: Duplicá hasta $130 USD tu primer depósito',                              logo:'/img/casas/dbbet.svg', href:'https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213' },
-      6: { d:'Sáb', nameLong:'Sábado',    name:'DBbet',        bono:'⭐ Sponsor del Mundial 2026: cashback 25%',   logo:'/img/casas/dbbet.svg', href:'https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213' },
+      6: { d:'Sáb', nameLong:'Sábado',    name:'DBbet',        bono:'⭐ Cashback 25% en DBbet',   logo:'/img/casas/dbbet.svg', href:'https://refpa96317.com/L?tag=d_5208568m_11213c_&site=5208568&ad=11213' },
       7: { d:'Dom', nameLong:'Domingo',   name:'Megapari',     bono:'Domingo de fútbol: 100% hasta $300 USD',     logo:'/img/casas/megapari.svg', href:'https://proarg.megapari-003572.in/' }
     };
 
