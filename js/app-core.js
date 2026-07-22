@@ -5974,6 +5974,16 @@ function renderPreds() {
   // Separar upcoming (no iniciados, no resueltos) vs finalizados
   let _upcoming = realPreds.filter(p => !p._started && p.result !== 'win' && p.result !== 'loss');
 
+  // 🆕 (22-jul-2026) EN JUEGO: picks ya iniciados pero SIN resultado (partido en curso).
+  // Bug: la reconstrucción del home (_upcoming + _homeShowcase) los tiraba porque no
+  // son upcoming (ya arrancaron) ni showcase (no están resueltos) → la ficha
+  // desaparecía justo cuando el partido estaba EN VIVO. Ahora van al FRENTE del grid.
+  const _liveNowPicks = realPreds.filter(p =>
+    p && p._started &&
+    (p._histResult === 'pending' || (!p._histResult && (!p.result || p.result === 'pending'))) &&
+    !p._showcase && !p._padded
+  );
+
   // Aplicar orden custom solo a UPCOMING
   if (_upcoming.length > 1) {
     const _origLen = _upcoming.length;
@@ -6060,14 +6070,15 @@ function renderPreds() {
   }
 
   // Reconstruir realPreds según vista
+  // 🆕 (22-jul) Los picks EN JUEGO (_liveNowPicks) van SIEMPRE primero — nunca se caen.
   if (_isPicksSubPage) {
-    realPreds = _upcoming; // subpágina: solo upcoming, sin finalizados
+    realPreds = [..._liveNowPicks, ..._upcoming]; // subpágina: live + upcoming, sin finalizados
   } else {
     // 🏆 WC Largo Plazo necesita mostrar los 10 picks futures completos,
     // no los 6 que caben en el home normal. Detectar y subir el cap.
     const _isWcFutures = window._predSportFilter === 'wcfutures';
     const _homeUpLimit = _isWcFutures ? 20 : 6;
-    realPreds = [..._upcoming.slice(0, _homeUpLimit), ..._homeShowcase];
+    realPreds = [..._liveNowPicks, ..._upcoming.slice(0, _homeUpLimit), ..._homeShowcase];
   }
 
   // 🆕 (2-jul-2026 #686) GARANTIZAR MIN 10 FICHAS — rellenar con aciertos del historial (max 2 fallos)
