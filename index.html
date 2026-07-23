@@ -3642,9 +3642,9 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
           <label class="gbm-lbl">Cuota DBbet</label>
           <div class="gbm-dbbet-chip" id="gbmOddsChip">
             <svg class="gbm-db-logo" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="#fff"/><text x="12" y="16" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="900" fill="#dc1e2e">DB</text></svg>
-            <span class="gbm-db-cuota" id="gbmOddsDisplay">1.85</span>
+            <span class="gbm-db-cuota" id="gbmOddsDisplay">—</span>
             <span class="gbm-db-badge">AUTO</span>
-            <input type="hidden" id="gbmOdds" value="1.85">
+            <input type="hidden" id="gbmOdds" value="">
           </div>
         </div>
         <div>
@@ -3859,7 +3859,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     var p = _matches[idx];
     var disp = document.getElementById('gbmOddsDisplay');
     var hid  = document.getElementById('gbmOdds');
-    if (!p || !p._ods) { hid.value = '1.85'; if (disp) disp.textContent = '—'; return; }
+    if (!p || !p._ods) { hid.value = ''; if (disp) disp.textContent = '—'; return; }
     var mSel = document.getElementById('gbmMercado');
     var mkt = (mSel.options[mSel.selectedIndex] ? mSel.options[mSel.selectedIndex].textContent : '').trim();
     var O = p._ods;
@@ -3875,13 +3875,14 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     else if (mkt.indexOf('Más de 2.5') === 0)    val = O.o25;
     else if (mkt.indexOf('Más de 3.5') === 0)    val = O.o35;
     else if (mkt.indexOf('Menos de 2.5') === 0)  val = O.u25;
-    // Ambos Marcan / Local Sin Recibir: sin cuota real en el feed → sin AUTO
+    // 🆕 (23-jul) SIN DEFAULTS: cuota real o no se publica. Si el mercado no
+    // tiene cuota en el feed, se vacía y submitGbBet() lo bloquea.
     if (val && val > 1) {
       hid.value = val.toFixed(2);
       if (disp) disp.textContent = val.toFixed(2);
     } else {
-      hid.value = '1.85';
-      if (disp) disp.textContent = '—';
+      hid.value = '';
+      if (disp) disp.textContent = 'sin cuota';
     }
   }
 
@@ -3893,7 +3894,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       if (!p) {
         document.getElementById('gbmMatchDisplay').value = '';
         document.getElementById('gbmLeagueDisplay').value = '';
-        document.getElementById('gbmOdds').value = '1.85';
+        document.getElementById('gbmOdds').value = '';
         var _od = document.getElementById('gbmOddsDisplay'); if (_od) _od.textContent = '—';
         return;
       }
@@ -3962,6 +3963,8 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     if (justif.split(/\s+/).filter(function(w){return w.length>0;}).length < 20) {
       msg.className='gbm-msg err'; msg.textContent='Mínimo 20 palabras en la justificación'; return;
     }
+    // 🆕 (23-jul) Sin cuota real → no se publica (nada de defaults inventados)
+    if (!odds) { msg.className='gbm-msg err'; msg.textContent='Este mercado no tiene cuota disponible para este partido — elegí otro mercado'; return; }
     if (odds < 1.30) { msg.className='gbm-msg err'; msg.textContent='Cuota mínima 1.30'; return; }
 
     var betData = {
@@ -4004,7 +4007,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       document.getElementById('gbmPartido').value = '';
       document.getElementById('gbmMatchDisplay').value = '';
       document.getElementById('gbmLeagueDisplay').value = '';
-      document.getElementById('gbmOdds').value = '1.85';
+      document.getElementById('gbmOdds').value = '';
         var _od = document.getElementById('gbmOddsDisplay'); if (_od) _od.textContent = '—';
       document.getElementById('gbmJustif').value = '';
       updateWordCount();
@@ -4130,7 +4133,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
         var _v = Number(pick.odds).toFixed(2);
         if (oddsInp) oddsInp.value = _v;
         if (oddsDsp) oddsDsp.textContent = _v;
-      } else if (oddsDsp) { oddsDsp.textContent = '1.85'; if (oddsInp) oddsInp.value = '1.85'; }
+      } else if (oddsDsp) { oddsDsp.textContent = 'sin cuota'; if (oddsInp) oddsInp.value = ''; }
       // Sugerir justificación mínima
       var just = document.getElementById('gbmJustif');
       if (just && !just.value) {
