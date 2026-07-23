@@ -6588,10 +6588,17 @@ html { -webkit-tap-highlight-color: rgba(0,200,83,0.15); }
     overflow-y: auto;
   }
 
-  /* 6) Bubbles sticky - reposicionar si están tapadas por banner inferior */
+  /* 6) Bubbles sticky - reposicionar si están tapadas por banner inferior.
+     🆕 (23-jul) FIX: antes las 3 recibían el MISMO bottom (selectores por ID le
+     ganan a la tríada de index.html) → quedaban apiladas una sobre otra.
+     Ahora mantienen el escalonado FAB: chat abajo, foro al medio, 🎯 arriba. */
   #forumBubble, #aiChatBtn, #gbBetBbl, .forum-bbl {
-    bottom: calc(var(--gb-bottom-banner) + var(--gb-safe-bottom) + 12px) !important;
+    top: auto !important;
+    transform: none !important;
   }
+  #aiChatBtn { bottom: calc(var(--gb-bottom-banner) + var(--gb-safe-bottom) + 12px) !important; }
+  #forumBubble, .forum-bbl { bottom: calc(var(--gb-bottom-banner) + var(--gb-safe-bottom) + 58px) !important; }
+  #gbBetBbl { bottom: calc(var(--gb-bottom-banner) + var(--gb-safe-bottom) + 104px) !important; }
 }
 
 /* Pantallas muy chicas: banner inferior más chico */
