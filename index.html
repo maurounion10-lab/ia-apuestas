@@ -3788,23 +3788,40 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       var events = (raw.data || raw || []);
       // Transformar shape /odds → shape que espera el modal
       var picks = events.filter(function(e) { return e.home_team && e.away_team; }).map(function(e) {
-        // Best odds: promedio h2h de los bookmakers
-        var h2h_odds = null;
+        // 🆕 (23-jul) Cuotas POR MERCADO (antes: una sola cuota de "gana local"
+        // para todos los mercados → el chip AUTO nunca cambiaba al elegir mercado)
+        var ods = { home:[], draw:[], away:[], o15:[], o25:[], o35:[], u25:[] };
         try {
-          var books = (e.bookmakers || []).slice(0, 5);
-          var homeOdds = books.map(function(b) {
-            var m = (b.markets || []).find(function(x){return x.key==='h2h';});
-            var o = m ? m.outcomes.find(function(x){return x.name===e.home_team;}) : null;
-            return o ? o.price : null;
-          }).filter(Boolean);
-          if (homeOdds.length) h2h_odds = homeOdds.reduce(function(a,b){return a+b;},0) / homeOdds.length;
+          (e.bookmakers || []).slice(0, 5).forEach(function(b) {
+            (b.markets || []).forEach(function(m) {
+              if (m.key === 'h2h') {
+                (m.outcomes || []).forEach(function(o) {
+                  if (o.name === e.home_team) ods.home.push(o.price);
+                  else if (o.name === e.away_team) ods.away.push(o.price);
+                  else if (o.name === 'Draw') ods.draw.push(o.price);
+                });
+              } else if (m.key === 'totals') {
+                (m.outcomes || []).forEach(function(o) {
+                  var pt = String(o.point);
+                  if (o.name === 'Over') {
+                    if (pt === '1.5') ods.o15.push(o.price);
+                    else if (pt === '2.5') ods.o25.push(o.price);
+                    else if (pt === '3.5') ods.o35.push(o.price);
+                  } else if (o.name === 'Under' && pt === '2.5') ods.u25.push(o.price);
+                });
+              }
+            });
+          });
         } catch(err) {}
+        var avg = function(arr) { return arr.length ? arr.reduce(function(a,b){return a+b;},0) / arr.length : null; };
+        var O = { home:avg(ods.home), draw:avg(ods.draw), away:avg(ods.away), o15:avg(ods.o15), o25:avg(ods.o25), o35:avg(ods.o35), u25:avg(ods.u25) };
         return {
           home: e.home_team,
           away: e.away_team,
           league: e.sport_title || 'Fútbol',
           date: e.commence_time,
-          odds: h2h_odds ? h2h_odds.toFixed(2) : null,
+          odds: O.home ? O.home.toFixed(2) : null,
+          _ods: O,
           rec: 'Gana Local'
         };
       });
@@ -3833,7 +3850,43 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
     }
   }
 
+  // 🆕 (23-jul) Cuota AUTO según partido + mercado seleccionados.
+  // Antes: una sola cuota (gana local) fija para todos los mercados y sin
+  // listener en gbmMercado → "las cuotas no funcionan". Ahora cada mercado
+  // calcula la suya (dobles derivadas de las individuales: h·d/(h+d), etc.).
+  function gbmRecalcOdds() {
+    var idx = parseInt(document.getElementById('gbmPartido').value, 10);
+    var p = _matches[idx];
+    var disp = document.getElementById('gbmOddsDisplay');
+    var hid  = document.getElementById('gbmOdds');
+    if (!p || !p._ods) { hid.value = '1.85'; if (disp) disp.textContent = '—'; return; }
+    var mSel = document.getElementById('gbmMercado');
+    var mkt = (mSel.options[mSel.selectedIndex] ? mSel.options[mSel.selectedIndex].textContent : '').trim();
+    var O = p._ods;
+    var dc = function(a, b) { return (a && b) ? (a * b) / (a + b) : null; };
+    var val = null;
+    if (mkt.indexOf('Ganador Local') === 0)      val = O.home;
+    else if (mkt === 'Empate')                   val = O.draw;
+    else if (mkt.indexOf('Ganador Visitante') === 0) val = O.away;
+    else if (mkt.indexOf('Doble 1X') === 0)      val = dc(O.home, O.draw);
+    else if (mkt.indexOf('Doble X2') === 0)      val = dc(O.away, O.draw);
+    else if (mkt.indexOf('Doble 12') === 0)      val = dc(O.home, O.away);
+    else if (mkt.indexOf('Más de 1.5') === 0)    val = O.o15;
+    else if (mkt.indexOf('Más de 2.5') === 0)    val = O.o25;
+    else if (mkt.indexOf('Más de 3.5') === 0)    val = O.o35;
+    else if (mkt.indexOf('Menos de 2.5') === 0)  val = O.u25;
+    // Ambos Marcan / Local Sin Recibir: sin cuota real en el feed → sin AUTO
+    if (val && val > 1) {
+      hid.value = val.toFixed(2);
+      if (disp) disp.textContent = val.toFixed(2);
+    } else {
+      hid.value = '1.85';
+      if (disp) disp.textContent = '—';
+    }
+  }
+
   document.addEventListener('change', function(e) {
+    if (e.target && e.target.id === 'gbmMercado') gbmRecalcOdds();
     if (e.target && e.target.id === 'gbmPartido') {
       var idx = parseInt(e.target.value, 10);
       var p = _matches[idx];
@@ -3846,10 +3899,6 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
       }
       document.getElementById('gbmMatchDisplay').value = p.home + ' vs ' + p.away;
       document.getElementById('gbmLeagueDisplay').value = (p.league || '').replace(/^[\W]+/, '');
-      var _oddsVal = p.odds ? parseFloat(p.odds).toFixed(2) : '1.85';
-      document.getElementById('gbmOdds').value = _oddsVal;
-      var _oddsDisp = document.getElementById('gbmOddsDisplay');
-      if (_oddsDisp) _oddsDisp.textContent = _oddsVal;
       // Sugerir mercado según IA
       if (p.rec) {
         var m = document.getElementById('gbmMercado');
@@ -3861,6 +3910,7 @@ html body #aiChatBox:not(.open) { transform: translateY(calc(-50% + 55px)) scale
           }
         }
       }
+      gbmRecalcOdds();
     }
   });
 
