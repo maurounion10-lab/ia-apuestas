@@ -3916,6 +3916,85 @@ async function runScheduledPickGenerator(env) {
 }
 
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 🆕 (22-jul-2026) MAIL DIARIO DE RESULTADOS DE LA IA
+// Resumen de las últimas 24h: aciertos/fallos, balance stake $100, winrate 7d
+// y picks pendientes. Corre en el cron de 12:00 UTC (09:00 ART) junto al billing.
+// Solo manda mail si hubo al menos 1 resultado (no spamea días muertos).
+// Test manual: GET /email-results (preview JSON) · /email-results?send=1 (envía)
+// ═══════════════════════════════════════════════════════════════════════════
+async function buildResultsEmailData(env) {
+  const hist = await fetchAdminHistorial(env);
+  const now = Date.now();
+  const resolvedRecent = hist.filter(h => {
+    if (!h || !['win', 'loss', 'void'].includes(h.result)) return false;
+    const rAt = h.resolvedAt || (h.commenceTs ? h.commenceTs + 2 * 3600e3 : 0);
+    return rAt && (now - rAt) <= 24 * 3600e3;
+  });
+  const pendingSoon = hist.filter(h => h && (!h.result || h.result === 'pending')
+    && h.commenceTs && h.commenceTs > now - 6 * 3600e3 && h.commenceTs < now + 36 * 3600e3);
+  const _odds = h => parseFloat(h._bestOdds || h.bestOdds || (typeof h.odds === 'number' ? h.odds : 0)) || null;
+  let profit = 0, w = 0, l = 0, v = 0;
+  const rows = resolvedRecent.map(h => {
+    const o = _odds(h);
+    let p = 0;
+    if (h.result === 'win') { w++; p = o ? Math.round((o - 1) * 100) : 0; }
+    else if (h.result === 'loss') { l++; p = -100; }
+    else v++;
+    profit += p;
+    return {
+      emoji: h.result === 'win' ? '✅' : h.result === 'loss' ? '❌' : '⚪',
+      match: (h.home || '?') + (h.finalScore ? ' ' + h.finalScore + ' ' : ' vs ') + (h.away || '?'),
+      rec: h.rec || '', odds: o, delta: p,
+    };
+  });
+  const res7 = hist.filter(h => h && ['win', 'loss'].includes(h.result) && h.commenceTs && (now - h.commenceTs) <= 7 * 86400e3);
+  const w7 = res7.filter(h => h.result === 'win').length;
+  return {
+    rows, w, l, v, profit, w7, n7: res7.length,
+    pct7: res7.length ? Math.round(w7 / res7.length * 100) : null,
+    pending: pendingSoon.map(h => ({ match: (h.home || '?') + ' vs ' + (h.away || '?'), rec: h.rec || '', ts: h.commenceTs || null })),
+  };
+}
+
+async function runResultsEmail(env, force) {
+  const d = await buildResultsEmailData(env);
+  if (!d.rows.length && !force) return { sent: false, reason: 'sin resultados en 24h' };
+  if (!env.RESEND_API_KEY) return { sent: false, reason: 'sin RESEND_API_KEY' };
+  const fmtART = ts => { const dt = new Date(ts - 3 * 3600e3); return dt.toISOString().slice(11, 16); };
+  const rowsHtml = d.rows.map(r =>
+    '<tr><td style="padding:7px 8px;font-size:16px">' + r.emoji + '</td>' +
+    '<td style="padding:7px 8px"><b>' + r.match + '</b><br><span style="color:#777;font-size:12px">' + r.rec + (r.odds ? ' @' + r.odds : '') + '</span></td>' +
+    '<td style="padding:7px 8px;text-align:right;font-weight:700;color:' + (r.delta >= 0 ? '#0a8f3c' : '#c62828') + '">' + (r.delta >= 0 ? '+' : '') + '$' + r.delta + '</td></tr>'
+  ).join('');
+  const pendHtml = d.pending.length
+    ? '<p style="margin:18px 0 6px;font-weight:700">⏳ Picks en juego / próximos</p>' +
+      d.pending.map(p => '<div style="font-size:13px;color:#444;padding:2px 0">• ' + p.match + ' — ' + p.rec + (p.ts ? ' (' + fmtART(p.ts) + ' ART)' : '') + '</div>').join('')
+    : '';
+  const html = '<div style="font-family:sans-serif;max-width:560px;margin:auto">' +
+    '<h2 style="margin-bottom:4px">⚽ Resultados de la IA</h2>' +
+    '<p style="color:#666;margin-top:0">Últimas 24 horas · gambeta.ai</p>' +
+    '<div style="background:#f6f8f6;border-radius:10px;padding:12px 16px;margin:12px 0;font-size:14px">' +
+    '<b>' + d.w + '</b> acierto' + (d.w === 1 ? '' : 's') + ' · <b>' + d.l + '</b> fallo' + (d.l === 1 ? '' : 's') + (d.v ? ' · ' + d.v + ' anulado' + (d.v === 1 ? '' : 's') : '') +
+    ' — balance <b style="color:' + (d.profit >= 0 ? '#0a8f3c' : '#c62828') + '">' + (d.profit >= 0 ? '+' : '') + '$' + d.profit + '</b> <span style="color:#888">(stake $100)</span>' +
+    (d.pct7 != null ? '<br>Últimos 7 días: <b>' + d.pct7 + '%</b> de acierto (' + d.w7 + '/' + d.n7 + ')' : '') +
+    '</div>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:14px">' + rowsHtml + '</table>' +
+    pendHtml +
+    '<p style="font-size:12px;color:#999;border-top:1px solid #eee;padding-top:12px;margin-top:20px">Auto-generado 09:00 ART · <a href="https://gambeta.ai/#resultados" style="color:#0a8f3c">Ver historial completo</a></p>' +
+    '</div>';
+  const subject = '⚽ IA: ' + d.w + '✅ ' + d.l + '❌ · ' + (d.profit >= 0 ? '+' : '') + '$' + d.profit;
+  try {
+    const r = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + env.RESEND_API_KEY, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ from: 'Gambeta IA <no-reply@gambeta.ai>', to: ['pronosticosarg@gmail.com'], subject, html }),
+    });
+    return { sent: r.ok, status: r.status, w: d.w, l: d.l, profit: d.profit };
+  } catch (e) { return { sent: false, reason: String(e && e.message || e) }; }
+}
+
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
@@ -3931,6 +4010,11 @@ export default {
       }));
     } else if (cronExpr === '0 12 * * *') {
       // ── Diario 12:00 UTC (09:00 ART): Billing Monitor pre-vencimiento ──
+      // 🆕 (22-jul) + Mail de resultados de la IA (últimas 24h)
+      try {
+        const mail = await runResultsEmail(env);
+        console.log('[cron-results-email]', JSON.stringify(mail));
+      } catch (e) { console.error('[cron-results-email] error', e.message); }
       const stats = await runBillingMonitor(env);
       console.log('[cron-billing-monitor]', JSON.stringify({
         ts: stats.ts,
@@ -5333,6 +5417,13 @@ export default {
     }
 
     // ── 🆕 (18-jul) /cron-generate-status — última corrida del generador ──
+    // ── 🆕 (22-jul) /email-results — mail de resultados (preview / ?send=1) ──
+    if (path === '/email-results') {
+      const doSend = url.searchParams.get('send') === '1';
+      const out = doSend ? await runResultsEmail(env, true) : await buildResultsEmailData(env);
+      return new Response(JSON.stringify(out, null, 2), { headers: CORS });
+    }
+
     if (path === '/cron-generate-status') {
       const last = await env.CACHE_KV?.get('gen_last_run');
       return new Response(last || '{"error":"sin corridas registradas"}', { headers: CORS });
