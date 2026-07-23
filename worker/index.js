@@ -4004,18 +4004,24 @@ const INDEXNOW_KEY = 'a52025ab97119fc4c1b14c981d7a2c28';
 
 async function runIndexNow(env, urls) {
   if (!urls || !urls.length) return { submitted: 0 };
+  // Nota: api.indexnow.org devuelve 429 a las IPs compartidas de Cloudflare Workers.
+  // Usamos bing.com/indexnow como endpoint primario (propaga a todos los partners
+  // IndexNow: Bing, Yandex, Seznam, Naver) con api.indexnow.org de fallback.
+  const body = JSON.stringify({
+    host: 'gambeta.ai',
+    key: INDEXNOW_KEY,
+    keyLocation: 'https://gambeta.ai/' + INDEXNOW_KEY + '.txt',
+    urlList: urls.slice(0, 100),
+  });
+  const headers = { 'Content-Type': 'application/json; charset=utf-8' };
   try {
-    const r = await fetch('https://api.indexnow.org/indexnow', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-      body: JSON.stringify({
-        host: 'gambeta.ai',
-        key: INDEXNOW_KEY,
-        keyLocation: 'https://gambeta.ai/' + INDEXNOW_KEY + '.txt',
-        urlList: urls.slice(0, 100),
-      }),
-    });
-    const out = { submitted: urls.length, status: r.status, ok: r.status === 200 || r.status === 202 };
+    let endpoint = 'https://www.bing.com/indexnow';
+    let r = await fetch(endpoint, { method: 'POST', headers, body });
+    if (r.status !== 200 && r.status !== 202) {
+      endpoint = 'https://api.indexnow.org/indexnow';
+      r = await fetch(endpoint, { method: 'POST', headers, body });
+    }
+    const out = { submitted: urls.length, status: r.status, endpoint, ok: r.status === 200 || r.status === 202 };
     try { await env.CACHE_KV?.put('indexnow_last', JSON.stringify({ ts: new Date().toISOString(), ...out, urls }), { expirationTtl: 7 * 86400 }); } catch (_) {}
     return out;
   } catch (e) { return { submitted: 0, error: String(e && e.message || e) }; }
