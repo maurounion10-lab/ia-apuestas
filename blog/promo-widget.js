@@ -10,7 +10,8 @@
     if (location.pathname.indexOf('/blog/img/') === 0) return;  // no en imágenes
     if (window.__gbPromo) return; window.__gbPromo = true;
 
-    var GAP = 120000;            // respaldo: 2 min tras minimizar (si no navega)
+    var GAP = 15000;             // 🆕 (23-jul) secuencia por tiempo: 15s entre tarjetas
+                                 // (2da = +15s de la 1ra, 3ra = +30s de la 1ra)
     var FIRST_DELAY = 4000;      // 4s antes del primero
     var NAV_DELAY = 1200;        // al cambiar de página, casi inmediato
     var KEY = 'gbPromoV2';
@@ -128,11 +129,12 @@
       if (!key) return;
       openCard(key);
       st.stage++; write(st);
+      // 🆕 (23-jul) encadenar la próxima por tiempo (15s), sin requerir minimizar
+      if (st.stage < ORDER.length) setTimer(showNext, GAP);
     }
     // click del usuario en "—" : colapsa y arma el respaldo de 2 min para la siguiente
     function minimize(k) {
       st.state[k] = 'min'; st.minAt[k] = Date.now(); write(st); render();
-      if (st.stage < ORDER.length) setTimer(showNext, GAP);
     }
     // reabrir desde un pill
     function reopen(k) { openCard(k); }
@@ -146,11 +148,8 @@
       if (changedPage) {
         setTimer(showNext, NAV_DELAY);                 // cambió de página -> dispara ya
       } else {
-        // misma página (recarga): reconstruye el respaldo si la previa está minimizada
-        var prev = ORDER[st.stage - 1];
-        if (st.state[prev] === 'min' && st.minAt[prev]) {
-          setTimer(showNext, Math.max(0, st.minAt[prev] + GAP - Date.now()));
-        }
+        // misma página (recarga a mitad de secuencia): continuar por tiempo
+        setTimer(showNext, GAP);
       }
     }
   } catch (e) { /* silencioso */ }
