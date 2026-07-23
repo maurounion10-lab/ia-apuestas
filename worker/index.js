@@ -5424,6 +5424,23 @@ export default {
       return new Response(JSON.stringify(out, null, 2), { headers: CORS });
     }
 
+    // ── 🆕 (23-jul) /dbbet-test — explorador de la Marketing API de DBbet ──
+    // Requiere el secret DBBET_API_TOKEN (Cloudflare → Settings → Variables).
+    // Uso: /dbbet-test                     → lista de deportes (directorio)
+    //      /dbbet-test?path=<ruta-y-query> → passthrough a cualquier endpoint del datafeed
+    if (path === '/dbbet-test') {
+      const tok = env.DBBET_API_TOKEN;
+      if (!tok) return new Response(JSON.stringify({ error: 'DBBET_API_TOKEN no configurado. Cloudflare dashboard → Workers → apuestas-api → Settings → Variables → Add secret.' }), { status: 503, headers: CORS });
+      const sub = url.searchParams.get('path') || 'datafeed/directories/api/v2/sports';
+      try {
+        const r = await fetch('https://cpservm.com/gateway/marketing/' + sub, { headers: { Authorization: 'Bearer ' + tok } });
+        const body = await r.text();
+        return new Response(JSON.stringify({ status: r.status, len: body.length, body: body.slice(0, 4000) }), { headers: CORS });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: String(e && e.message || e) }), { status: 502, headers: CORS });
+      }
+    }
+
     if (path === '/cron-generate-status') {
       const last = await env.CACHE_KV?.get('gen_last_run');
       return new Response(last || '{"error":"sin corridas registradas"}', { headers: CORS });
