@@ -1128,6 +1128,7 @@ const teamLogos = {
   'ABB': '/escudos/abb.png',
   'ADT': '/escudos/adt.png',
   'AGF': '/escudos/agf.png',
+  'AGF Aarhus': '/escudos/agf.png', // 🆕 (22-jul) alias: la Odds API manda el nombre completo
   'AIK': '/escudos/aik.png',
   'AVS':             '/escudos/avs.png',
   'AVS Futebol SAD': '/escudos/avs.png',
@@ -10360,6 +10361,7 @@ const WORKER_URL = 'https://apuestas-api.mauro-union10.workers.dev';
 
 
 const teamShortNames = {
+  'AGF Aarhus': 'AGF', // 🆕 (22-jul)
   'Brighton and Hove Albion': 'Brighton',
   'Brighton & Hove Albion':   'Brighton',
   'Wolverhampton Wanderers':  'Wolverhampton',
