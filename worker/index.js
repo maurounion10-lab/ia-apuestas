@@ -3995,6 +3995,32 @@ async function runResultsEmail(env, force) {
 }
 
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 🆕 (24-jul-2026) INDEXNOW — indexación automática instantánea (Bing/Yandex y
+// buscadores asociados). Google NO usa IndexNow: para Google el canal es el
+// sitemap actualizado + GSC. La key es pública por diseño (se hostea en /<key>.txt).
+// ═══════════════════════════════════════════════════════════════════════════
+const INDEXNOW_KEY = 'a52025ab97119fc4c1b14c981d7a2c28';
+
+async function runIndexNow(env, urls) {
+  if (!urls || !urls.length) return { submitted: 0 };
+  try {
+    const r = await fetch('https://api.indexnow.org/indexnow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+      body: JSON.stringify({
+        host: 'gambeta.ai',
+        key: INDEXNOW_KEY,
+        keyLocation: 'https://gambeta.ai/' + INDEXNOW_KEY + '.txt',
+        urlList: urls.slice(0, 100),
+      }),
+    });
+    const out = { submitted: urls.length, status: r.status, ok: r.status === 200 || r.status === 202 };
+    try { await env.CACHE_KV?.put('indexnow_last', JSON.stringify({ ts: new Date().toISOString(), ...out, urls }), { expirationTtl: 7 * 86400 }); } catch (_) {}
+    return out;
+  } catch (e) { return { submitted: 0, error: String(e && e.message || e) }; }
+}
+
 export default {
   async scheduled(controller, env, ctx) {
     // Cron handler — multiple crons distinguished by controller.cron string
@@ -4040,6 +4066,11 @@ export default {
         ts: stats.ts, odds: stats.odds, candidates: stats.candidates,
         generated: stats.generated, relaxed: stats.relaxed, saved: stats.saved, errors: stats.errors,
       }));
+      // 🆕 (24-jul) IndexNow diario: las homes cambian todos los días con los picks nuevos
+      try {
+        const inx = await runIndexNow(env, ['https://gambeta.ai/', 'https://gambeta.ai/pt/', 'https://gambeta.ai/en/']);
+        console.log('[cron-indexnow]', JSON.stringify(inx));
+      } catch (e) { console.error('[cron-indexnow] error', e.message); }
     } else if (cronExpr === '0 */6 * * *') {
       // Every 6h: update odds for pending picks
       const stats = await runOddsUpdater(env);
@@ -5439,6 +5470,19 @@ export default {
       } catch (e) {
         return new Response(JSON.stringify({ error: String(e && e.message || e) }), { status: 502, headers: CORS });
       }
+    }
+
+    // ── 🆕 (24-jul) /submit-indexing — IndexNow manual (?urls=a,b o set prioritario) ──
+    if (path === '/submit-indexing') {
+      const raw = url.searchParams.get('urls');
+      const urls = raw
+        ? raw.split(',').map(u => u.trim()).filter(Boolean)
+        : ['https://gambeta.ai/', 'https://gambeta.ai/pt/', 'https://gambeta.ai/en/',
+           'https://gambeta.ai/blog/ia-para-apostar',
+           'https://gambeta.ai/pt/blog/ia-para-apostas',
+           'https://gambeta.ai/en/blog/ai-for-sports-betting'];
+      const out = await runIndexNow(env, urls);
+      return new Response(JSON.stringify(out, null, 2), { headers: CORS });
     }
 
     if (path === '/cron-generate-status') {
