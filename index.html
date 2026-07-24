@@ -12,7 +12,7 @@
 <meta charset="UTF-8"><!-- v3 -->
 <link rel="preconnect" href="https://api.accesoia.app">
 <!-- 🆕 #578 Gambeta 1.1 — Tipografía premium Inter + Geist Mono -->
-<link rel="preload" href="/js/app-core.js?v=1784941000" as="script">
+<link rel="preload" href="/js/app-core.js?v=1784950002" as="script">
 <link rel="preload" href="/js/inline-bundle.js?v=1783382200" as="script">
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -447,10 +447,10 @@ setTimeout(function(){
   <span class="dbbet-bar-wordmark" style="color:#fff">★ DB<span style="color:#dc1e2e;font-weight:900">BET</span></span>
   <div class="dbbet-bar-sep"></div>
   <div class="dbbet-bar-msg">
-    <span>Somos <strong>GRATIS</strong> gracias a DBbet 🏆</span>
+    <span data-i18n-html="sponsor.msg">Somos <strong>GRATIS</strong> gracias a DBbet 🏆</span>
   </div>
   <div class="dbbet-bar-sep"></div>
-  <span class="dbbet-bar-cta">Recibir Bono 🎁</span>
+  <span class="dbbet-bar-cta" data-i18n="sponsor.cta">Recibir Bono 🎁</span>
 </a>
 
 <script>
@@ -618,32 +618,32 @@ window.toggleHeroBubble = function(n) {
     <div class="gb-profile-row">
       <div class="gb-online gb-online--top">
         <span class="gb-online-dot"></span>
-        <span class="gb-online-text">En línea · IA activa 24/7</span>
+        <span class="gb-online-text" data-i18n="hero.badge">En línea · IA activa 24/7</span>
       </div>
     </div>
 
     <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)"><span data-i18n="hero.sub">Inteligencia Artificial para Apuestas de Fútbol</span> <span class="hero-emoji-btn" id="heroEmoji1" onclick="toggleHeroBubble(1)" title="Más info">🌎<sup class="hero-emoji-hint">✦</sup></span></span></h1>
-    <p>Soy una IA que pronostica Fútbol automáticamente, configurada por un experto y gratis para todo mundo <span class="hero-emoji-btn" id="heroEmoji2" onclick="toggleHeroBubble(2)" title="Más info">💚<sup class="hero-emoji-hint">✦</sup></span></p>
+    <p><span data-i18n="hero.desc">Soy una IA que pronostica Fútbol automáticamente, configurada por un experto y gratis para todo mundo</span> <span class="hero-emoji-btn" id="heroEmoji2" onclick="toggleHeroBubble(2)" title="Más info">💚<sup class="hero-emoji-hint">✦</sup></span></p>
 
     <!-- 🆕 Stat row tipo perfil app: 4 contadores horizontales con dividers verticales -->
     <div class="gb-profile-stats" id="gbProfileStats">
       <div class="gb-pstat" data-stat="hoy">
         <div class="gb-pstat-num" id="gbStatHoy">–</div>
-        <div class="gb-pstat-lbl">Picks hoy</div>
+        <div class="gb-pstat-lbl" data-i18n="stats.today">Picks hoy</div>
       </div>
       <div class="gb-pstat" data-stat="acierto">
         <div class="gb-pstat-num gb-pstat-success" id="gbStatAcierto">–</div>
-        <div class="gb-pstat-lbl">Acierto 30d</div>
+        <div class="gb-pstat-lbl" data-i18n="stats.hit">Acierto 30d</div>
       </div>
       <div class="gb-pstat" data-stat="live" id="gbStatLiveCard">
         <div class="gb-pstat-num" id="gbStatLive">
           <span class="gb-live-pulse"></span><span id="gbStatLiveNum">0</span>
         </div>
-        <div class="gb-pstat-lbl">En vivo</div>
+        <div class="gb-pstat-lbl" data-i18n="stats.live">En vivo</div>
       </div>
       <div class="gb-pstat" data-stat="total">
         <div class="gb-pstat-num gb-pstat-mono" id="heroStatPicks">–</div>
-        <div class="gb-pstat-lbl">Total picks</div>
+        <div class="gb-pstat-lbl" data-i18n="stats.total">Total picks</div>
       </div>
     </div>
 
@@ -651,7 +651,7 @@ window.toggleHeroBubble = function(n) {
     <div class="gb-cta-row">
       <a class="gb-pill gb-pill-primary" href="#predictions" onclick="document.getElementById('predictions')?.scrollIntoView({behavior:'smooth'});return false;">
         <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-        Ver picks del día
+        <span data-i18n="hero.cta">Ver picks del día</span>
       </a>
       <a class="gb-x-follow" href="https://x.com/Gambeta_ai" target="_blank" rel="noopener" title="Seguinos en X" id="gbXFollowBtn">
         <span class="gb-x-icon">
@@ -662,7 +662,7 @@ window.toggleHeroBubble = function(n) {
       </a>
       <a class="gb-pill gb-pill-ghost" href="https://t.me/GrupoLatam" target="_blank" rel="noopener" title="Telegram">
         <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.464.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.231-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
-        Canal
+        <span data-i18n="hero.channel">Canal</span>
       </a>
     </div>
 
@@ -2037,7 +2037,7 @@ window.toggleHeroBubble = function(n) {
         <strong>+$179.000 GRATIS</strong> de bono en tu primer depósito
         <br><em>Son 100 euros o dólares · Apoyan este proyecto 💎</em>
       </div>
-      <span class="fp-dbbet-footer-btn">Recibir Bono 🎁</span>
+      <span class="fp-dbbet-footer-btn" data-i18n="sponsor.cta">Recibir Bono 🎁</span>
     </a>
   </div>
 
@@ -2053,7 +2053,7 @@ window.toggleHeroBubble = function(n) {
   <div class="fp-emoji-grid" id="fpEmojiGrid"></div>
 </div>
 
-<script src="/js/app-core.js?v=1784941000" defer></script>
+<script src="/js/app-core.js?v=1784950002" defer></script>
 
 <!-- AUTH MODAL -->
 <!-- ── MODAL BIENVENIDA (nuevo usuario) ── -->
