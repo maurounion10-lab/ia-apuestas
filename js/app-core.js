@@ -10819,6 +10819,18 @@ function setLang(lang) {
   renderScores(currentScoreFilter);
 }
 
+// Cambio EXPLÍCITO de idioma desde el menú: EN/PT llevan a las homes
+// traducidas (/en/ y /pt/); ES se queda en la app. La detección automática
+// (detectLang) sigue usando setLang sin redirigir.
+function goLang(lang) {
+  if (lang === 'en' || lang === 'pt') {
+    try { localStorage.setItem('aa_lang', lang); } catch (_) {}
+    window.location.href = '/' + lang + '/';
+    return;
+  }
+  setLang('es');
+}
+
 function toggleLangMenu(e) {
   e && e.stopPropagation();
   const dd = document.getElementById('langDropdown');
