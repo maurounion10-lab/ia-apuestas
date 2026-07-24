@@ -12,7 +12,7 @@
 <meta charset="UTF-8"><!-- v3 -->
 <link rel="preconnect" href="https://api.accesoia.app">
 <!-- 🆕 #578 Gambeta 1.1 — Tipografía premium Inter + Geist Mono -->
-<link rel="preload" href="/js/app-core.js?v=1784830918" as="script">
+<link rel="preload" href="/js/app-core.js?v=1784930001" as="script">
 <link rel="preload" href="/js/inline-bundle.js?v=1783382200" as="script">
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -435,8 +435,8 @@ setTimeout(function(){
     <button id="langBtn" onclick="toggleLangMenu(event)" aria-label="Idioma" style="background-image:url('https://flagcdn.com/w40/es.png')"></button>
     <div class="lang-dropdown" id="langDropdown">
       <button onclick="setLang('es')" id="langOpt_es">🇪🇸 Español</button>
-      <button onclick="setLang('en')" id="langOpt_en">🇺🇸 English</button>
-      <button onclick="setLang('pt')" id="langOpt_pt">🇧🇷 Português</button>
+      <button onclick="goLang('en')" id="langOpt_en">🇺🇸 English</button>
+      <button onclick="goLang('pt')" id="langOpt_pt">🇧🇷 Português</button>
     </div>
   </div>
 </nav>
@@ -596,8 +596,8 @@ window.toggleHeroBubble = function(n) {
     <div style="display:flex;gap:8px;align-items:center">
       <span style="font-size:0.72rem;color:var(--texto-sec);letter-spacing:.3px">Idioma</span>
       <button onclick="setLang('es');closeMobileNav()" id="drawerLangEs" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:5px 10px;font-size:0.82rem;cursor:pointer;color:#fff;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(0,200,83,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">🇪🇸 ES</button>
-      <button onclick="setLang('en');closeMobileNav()" id="drawerLangEn" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:5px 10px;font-size:0.82rem;cursor:pointer;color:#fff;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(0,200,83,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">🇺🇸 EN</button>
-      <button onclick="setLang('pt');closeMobileNav()" id="drawerLangPt" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:5px 10px;font-size:0.82rem;cursor:pointer;color:#fff;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(0,200,83,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">🇧🇷 PT</button>
+      <button onclick="goLang('en');closeMobileNav()" id="drawerLangEn" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:5px 10px;font-size:0.82rem;cursor:pointer;color:#fff;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(0,200,83,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">🇺🇸 EN</button>
+      <button onclick="goLang('pt');closeMobileNav()" id="drawerLangPt" style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:8px;padding:5px 10px;font-size:0.82rem;cursor:pointer;color:#fff;font-family:inherit;transition:all .15s" onmouseover="this.style.background='rgba(0,200,83,0.15)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'">🇧🇷 PT</button>
     </div>
   </div>
 </nav>
@@ -2053,7 +2053,7 @@ window.toggleHeroBubble = function(n) {
   <div class="fp-emoji-grid" id="fpEmojiGrid"></div>
 </div>
 
-<script src="/js/app-core.js?v=1784830918" defer></script>
+<script src="/js/app-core.js?v=1784930001" defer></script>
 
 <!-- AUTH MODAL -->
 <!-- ── MODAL BIENVENIDA (nuevo usuario) ── -->
