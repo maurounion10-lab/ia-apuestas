@@ -10723,6 +10723,11 @@ const LANGS = {
     'cta.pickspage':'🔮 Página completa de Picks →','cta.resultspage':'📋 Página completa de Resultados →',
     'dd.picks':'🔮 Picks IA','dd.results':'📋 Resultados','dd.logout':'↩ Cerrar sesión',
     'label.odds':'Cuota',
+    'sponsor.msg':'Somos <strong>GRATIS</strong> gracias a DBbet 🏆','sponsor.cta':'Recibir Bono 🎁',
+    'hero.badge':'En línea · IA activa 24/7',
+    'hero.desc':'Soy una IA que pronostica Fútbol automáticamente, configurada por un experto y gratis para todo mundo',
+    'stats.today':'Picks hoy','stats.hit':'Acierto 30d','stats.live':'En vivo','stats.total':'Total picks',
+    'hero.cta':'Ver picks del día','hero.channel':'Canal',
     'tab.all':'Todos','tab.futbol':'Fútbol',
     'tab.tenis':'Tenis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● EN VIVO','status.soon':'⚡ COMIENZA PRONTO','status.upcoming':'PRÓXIMO','status.final':'FINALIZADO',
@@ -10754,6 +10759,11 @@ const LANGS = {
     'cta.pickspage':'🔮 Full Picks page →','cta.resultspage':'📋 Full Results page →',
     'dd.picks':'🔮 AI Picks','dd.results':'📋 Results','dd.logout':'↩ Log out',
     'label.odds':'Odds',
+    'sponsor.msg':'We are <strong>FREE</strong> thanks to DBbet 🏆','sponsor.cta':'Get Bonus 🎁',
+    'hero.badge':'Online · AI active 24/7',
+    'hero.desc':'I am an AI that predicts football automatically, configured by an expert and free for everyone',
+    'stats.today':'Picks today','stats.hit':'30d win rate','stats.live':'Live','stats.total':'Total picks',
+    'hero.cta':"See today's picks",'hero.channel':'Channel',
     'tab.all':'All','tab.futbol':'Football',
     'tab.tenis':'Tennis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● LIVE','status.soon':'⚡ STARTING SOON','status.upcoming':'UPCOMING','status.final':'FINISHED',
@@ -10785,6 +10795,11 @@ const LANGS = {
     'cta.pickspage':'🔮 Página completa de Picks →','cta.resultspage':'📋 Página completa de Resultados →',
     'dd.picks':'🔮 Picks IA','dd.results':'📋 Resultados','dd.logout':'↩ Sair',
     'label.odds':'Odd',
+    'sponsor.msg':'Somos <strong>GRÁTIS</strong> graças à DBbet 🏆','sponsor.cta':'Receber Bônus 🎁',
+    'hero.badge':'Online · IA ativa 24/7',
+    'hero.desc':'Sou uma IA que faz palpites de futebol automaticamente, configurada por um especialista e grátis para todo mundo',
+    'stats.today':'Picks hoje','stats.hit':'Acerto 30d','stats.live':'Ao vivo','stats.total':'Total de picks',
+    'hero.cta':'Ver os picks de hoje','hero.channel':'Canal',
     'tab.all':'Todos','tab.futbol':'Futebol',
     'tab.tenis':'Tênis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● AO VIVO','status.soon':'⚡ COMEÇA EM BREVE','status.upcoming':'PRÓXIMO','status.final':'FINALIZADO',
@@ -10829,6 +10844,11 @@ function setLang(lang) {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const key = el.getAttribute('data-i18n');
     el.textContent = T(key);
+  });
+  // Elementos con HTML embebido (ej: <strong> en el banner del sponsor)
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const key = el.getAttribute('data-i18n-html');
+    el.innerHTML = T(key);
   });
   // Update lang button with flag image
   const flagImgs = { es:'https://flagcdn.com/w40/es.png', en:'https://flagcdn.com/w40/us.png', pt:'https://flagcdn.com/w40/br.png' };
