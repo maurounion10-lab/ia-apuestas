@@ -870,6 +870,8 @@ const MANUAL_SCORES = {
   'rakow|arkagdynia':  { h: 3, a: 0 },  // Ekstraklasa 23-may-2026
   'volendam|willemii': { h: 1, a: 2 },  // Playoff Eredivisie 23-may-2026 (vuelta)
   'bodoglimt|brann':   { h: 3, a: 1 },  // Eliteserien 24-may-2026
+  // Entradas { void: 'razón' } → el pick se marca void (stake devuelta)
+  'chicagofire|vancouver': { void: 'Pospuesto — reprogramado al 07-oct-2026' },  // MLS 16-jul-2026
 };
 
 // Match fuzzy entre dos nombres de equipo (mismo equipo, distintas variantes)
@@ -1172,6 +1174,42 @@ async function fetchTsdbEvent(homeName, awayName) {
         commenceTs: ts,
         src: 'tsdb',
       };
+    }
+    return null;
+  } catch { return null; }
+}
+
+// 🆕 (23-jul-2026) Detección de partidos reprogramados: si TSDB muestra el mismo
+// fixture SIN score con fecha futura (3-180 días después del kickoff original),
+// el partido fue pospuesto → el pick se puede marcar void en vez de quedar colgado.
+// Devuelve la nueva fecha (string) o null.
+async function fetchTsdbReschedule(homeName, awayName, commenceTs) {
+  if (!commenceTs) return null;
+  try {
+    const slug = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '')
+      .replace(/[^a-zA-Z0-9\s]/g, '').trim().replace(/\s+/g, '_');
+    const homeVariants = [homeName, TEAM_ALIAS_READABLE[homeName]].filter(Boolean);
+    const awayVariants = [awayName, TEAM_ALIAS_READABLE[awayName]].filter(Boolean);
+    const queries = [];
+    for (const h of homeVariants) for (const a of awayVariants) {
+      const q = `${slug(h)}_vs_${slug(a)}`;
+      if (q && q !== '_vs_' && !queries.includes(q)) queries.push(q);
+    }
+    for (const q of queries) {
+      const r = await fetch(`${TSDB_BASE}/searchevents.php?e=${q}`);
+      if (!r.ok) continue;
+      const j = await r.json();
+      const evs = j.event || j.events || [];
+      for (const e of evs) {
+        const hasScore = e.intHomeScore != null && e.intHomeScore !== '';
+        if (hasScore) continue;
+        const ts = e.dateEvent ? new Date(e.dateEvent + 'T12:00:00Z').getTime() : null;
+        if (!ts) continue;
+        const delta = ts - commenceTs;
+        // Reprogramado: entre 3 y 180 días después del kickoff original
+        // (>180 días sería el fixture de la temporada siguiente → no aplica)
+        if (delta > 3 * 86400000 && delta < 180 * 86400000) return e.dateEvent;
+      }
     }
     return null;
   } catch { return null; }
@@ -2088,8 +2126,10 @@ async function runScheduledResolver(env) {
         const _mk = normTeam(pick.home) + '|' + normTeam(pick.away);
         if (MANUAL_SCORES[_mk]) {
           const ms = MANUAL_SCORES[_mk];
-          matched = { home: pick.home, away: pick.away,
-                      scoreH: ms.h, scoreA: ms.a, src: 'manual' };
+          matched = ms.void
+            ? { home: pick.home, away: pick.away, voidReason: ms.void, src: 'manual' }
+            : { home: pick.home, away: pick.away,
+                scoreH: ms.h, scoreA: ms.a, src: 'manual' };
         }
 
         // Si la liga es ESPN-supported, intentar ESPN
@@ -2135,6 +2175,18 @@ async function runScheduledResolver(env) {
           if (apfMatch) {
             matched = apfMatch;
             stats.apf = (stats.apf || 0) + 1;
+          }
+        }
+
+        // 🆕 (23-jul-2026) Pospuestos: si ninguna fuente tiene score y el pick
+        // lleva >7 días pending, chequear si TSDB muestra el fixture
+        // reprogramado a futuro → void automático (stake devuelta).
+        if (!matched && pick.commenceTs && (now - pick.commenceTs) > 7 * 24 * 3600 * 1000) {
+          const newDate = await fetchTsdbReschedule(pick.home, pick.away, pick.commenceTs);
+          if (newDate) {
+            matched = { home: pick.home, away: pick.away,
+                        voidReason: 'Pospuesto — reprogramado al ' + newDate, src: 'tsdb-resch' };
+            stats.log.push(`${pick.home} vs ${pick.away}: pospuesto, reprogramado ${newDate}`);
           }
         }
 
