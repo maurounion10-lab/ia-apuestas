@@ -181,6 +181,32 @@
 
 
 <main class="container">
+<!-- 🆕 Picks IA de hoy — se actualiza solo (24-jul-2026) -->
+<div id="gbTodayPicks" style="margin:0 0 28px;border:1px solid rgba(0,200,83,0.3);border-radius:14px;overflow:hidden">
+<div style="background:rgba(0,200,83,0.1);padding:12px 18px;font-weight:800;color:#00c853;font-size:0.85rem;letter-spacing:0.5px">⚡ PICKS DE LA IA PARA HOY · <span id="gbTpFecha"></span></div>
+<div id="gbTpBody" style="padding:14px 18px;font-size:0.92rem;color:rgba(255,255,255,0.7)">Cargando picks del día…</div>
+</div>
+<script>
+(function(){
+  var LEAGUE='soccer_uefa_champs_league';
+  document.getElementById('gbTpFecha').textContent=new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+  fetch('https://apuestas-api.mauro-union10.workers.dev/today-picks?league='+LEAGUE)
+    .then(function(r){return r.json()})
+    .then(function(d){
+      var b=document.getElementById('gbTpBody');
+      if(!d.picks||!d.picks.length){
+        b.innerHTML='Hoy la IA no encontró valor en la Champions League — no publica por publicar. <a href="https://gambeta.ai/#predictions" style="color:#00c853;text-decoration:underline">Ver todos los picks de hoy →</a>';
+        return;
+      }
+      b.innerHTML=d.picks.map(function(p){
+        var t=new Date(p.commenceTs).toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+        var bolts='⚡'.repeat(Math.max(1,Math.min(p.bvr||1,6)));
+        return '<div style="padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06)"><strong style="color:#fff">'+p.home+' vs '+p.away+'</strong> · '+t+' hs<br><span style="color:#00c853">'+(p.rec||'Pick de la IA')+'</span>'+(p.odds?' · cuota '+p.odds:'')+' · '+bolts+'</div>';
+      }).join('')+'<div style="padding-top:10px"><a href="https://gambeta.ai/#predictions" style="color:#00c853;text-decoration:underline">Ver el análisis completo en la app →</a></div>';
+    })
+    .catch(function(){document.getElementById('gbTpBody').innerHTML='<a href="https://gambeta.ai" style="color:#00c853">Mirá los picks de hoy en gambeta.ai →</a>';});
+})();
+</script>
   <article class="article">
 <p>La Champions League es la competencia de clubes más vista del planeta y también la más vigilada por las casas de apuestas. Sus cuotas son muy eficientes, pero "eficiente" no es lo mismo que "perfecto": hay situaciones —rotaciones, contexto de calendario, partidos de ida y vuelta— donde la IA de gambeta.ai detecta valor que los modelos genéricos pasan por alto. Acá te contamos cómo trabaja el sistema sobre la Champions.</p>
 <h2>Cómo la IA de gambeta.ai analiza la Champions League</h2>
