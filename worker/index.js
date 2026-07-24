@@ -3892,6 +3892,71 @@ async function genSaveLockedPicks(env, picks) {
   return { key, added, upgraded, total: Object.keys(merged).length };
 }
 
+// ═══════════════════════════════════════════════════════════════════════════
+// 🆕 (23-jul-2026) CLV TRACKER — Closing Line Value
+// Cada 30 min (cron */30): para los picks bloqueados cuyo partido arranca en
+// las próximas 6 horas, actualiza las cuotas "de cierre" (cHO/cDO/cAO) con el
+// feed actual de The Odds API. La última actualización antes del kickoff queda
+// como closing line. CLV = cuota tomada / cuota de cierre - 1 (positivo = le
+// ganamos al mercado). Reporte en GET /clv-report.
+// Ventana de 6h para cuidar la cuota de The Odds API.
+// ═══════════════════════════════════════════════════════════════════════════
+async function runClvTracker(env) {
+  const skey = env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!skey) return { skipped: 'no service key' };
+  const H = { apikey: skey, Authorization: 'Bearer ' + skey, 'Content-Type': 'application/json' };
+  const today = new Date(); const prev = new Date(); prev.setDate(prev.getDate() - 1);
+  const keys = ['locked_picks_v1_' + today.toISOString().slice(0, 10),
+                'locked_picks_v1_' + prev.toISOString().slice(0, 10)];
+  const now = Date.now();
+  const stats = { updated: 0, sports: 0, pending: 0 };
+  for (const ck of keys) {
+    try {
+      const r = await fetch(SUPABASE_URL + '/rest/v1/shared_cache?key=eq.' + encodeURIComponent(ck) + '&select=data', { headers: H });
+      const rows = await r.json().catch(() => []);
+      const data = Array.isArray(rows) && rows[0] && rows[0].data;
+      if (!data) continue;
+      // Picks que arrancan dentro de las próximas 6 horas
+      const pend = Object.entries(data).filter(([, v]) =>
+        v && v.commenceTs && v.commenceTs > now && v.commenceTs < now + 6 * 3600e3 && v.sportKey);
+      stats.pending += pend.length;
+      if (!pend.length) continue;
+      const bySport = {};
+      for (const [mk, v] of pend) (bySport[v.sportKey] = bySport[v.sportKey] || []).push([mk, v]);
+      let changed = false;
+      for (const [sk, entries] of Object.entries(bySport)) {
+        const games = await fetchOddsAPI(sk, env).catch(() => null);
+        if (!games || !games.length) continue;
+        stats.sports++;
+        for (const [mk, v] of entries) {
+          const g = games.find(x => genMatchKey(x.home_team, x.away_team) === mk);
+          if (!g) continue;
+          let hO = null, aO = null, dO = null;
+          for (const bm of g.bookmakers || []) {
+            const m = (bm.markets || []).find(mm => mm.key === 'h2h');
+            if (!m) continue;
+            for (const o of m.outcomes || []) {
+              if (o.name === g.home_team) hO = Math.max(hO || 0, o.price);
+              else if (o.name === g.away_team) aO = Math.max(aO || 0, o.price);
+              else dO = Math.max(dO || 0, o.price);
+            }
+          }
+          if (!hO && !aO) continue;
+          v.cHO = hO; v.cDO = dO; v.cAO = aO; v.cTs = now;
+          changed = true; stats.updated++;
+        }
+      }
+      if (changed) {
+        await fetch(SUPABASE_URL + '/rest/v1/shared_cache?key=eq.' + encodeURIComponent(ck), {
+          method: 'PATCH', headers: H,
+          body: JSON.stringify({ data, fetched_at: new Date().toISOString() }),
+        });
+      }
+    } catch (e) { stats.err = String(e && e.message || e); }
+  }
+  return stats;
+}
+
 async function genAlertEmail(env, stats, severity) {
   if (!env.RESEND_API_KEY) return false;
   try {
@@ -4151,6 +4216,9 @@ export default {
       // 🆕 (30-jun-2026 #437) Forum bet resolver
       const fbStats = await runForumBetResolver(env);
       console.log('[cron-forum-bets]', JSON.stringify(fbStats));
+      // 🆕 (23-jul-2026) CLV tracker: closing odds de picks por arrancar
+      const clvStats = await runClvTracker(env);
+      console.log('[cron-clv]', JSON.stringify(clvStats));
     }
   },
   async fetch(request, env) {
@@ -4487,6 +4555,37 @@ export default {
       } catch (e) {
         return new Response(JSON.stringify({ error: e.message }), { status: 500, headers: CORS });
       }
+    }
+
+    // ── 🆕 (23-jul-2026) /clv-report — CLV de picks con closing line capturada ──
+    if (path === '/clv-report') {
+      const skey = env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!skey) return new Response(JSON.stringify({ error: 'no service key' }), { status: 500, headers: CORS });
+      const H2 = { apikey: skey, Authorization: 'Bearer ' + skey };
+      const t2 = new Date(); const p2 = new Date(); p2.setDate(p2.getDate() - 1);
+      const ks = ['locked_picks_v1_' + t2.toISOString().slice(0, 10),
+                  'locked_picks_v1_' + p2.toISOString().slice(0, 10)];
+      const out = [];
+      for (const ck of ks) {
+        try {
+          const r = await fetch(SUPABASE_URL + '/rest/v1/shared_cache?key=eq.' + encodeURIComponent(ck) + '&select=data', { headers: H2 });
+          const rows = await r.json().catch(() => []);
+          const data = Array.isArray(rows) && rows[0] && rows[0].data;
+          if (!data) continue;
+          for (const [mk, v] of Object.entries(data)) {
+            if (!v || !v.cTs) continue;
+            const clv = (open, close) => (open && close) ? +(((open / close) - 1) * 100).toFixed(2) : null;
+            out.push({
+              match: (v.home || '') + ' vs ' + (v.away || ''), key: mk, rec: v.rec || null, bvr: v.bvr || null,
+              open: { h: v.hO || null, d: v.dO || null, a: v.aO || null },
+              close: { h: v.cHO || null, d: v.cDO || null, a: v.cAO || null },
+              clvPct: { h: clv(v.hO, v.cHO), d: clv(v.dO, v.cDO), a: clv(v.aO, v.cAO) },
+              closeAt: new Date(v.cTs).toISOString(), kickoff: v.commenceTs ? new Date(v.commenceTs).toISOString() : null,
+            });
+          }
+        } catch (_) {}
+      }
+      return new Response(JSON.stringify({ picks: out.length, clv: out }, null, 2), { headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
 
     // ── 🆕 (25-jun-2026 FIX RAÍZ #3) /admin/clear-wc-locks ──
