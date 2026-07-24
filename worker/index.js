@@ -4557,6 +4557,46 @@ export default {
       }
     }
 
+    // ── 🆕 (24-jul-2026) /today-picks — picks bloqueados de hoy (público) ──
+    // Alimenta las cajas "Picks IA de hoy" de las páginas de liga del blog.
+    // Filtro opcional: ?league=<sportKey>. Cacheado 10 min en KV.
+    if (path === '/today-picks') {
+      const skey = env.SUPABASE_SERVICE_ROLE_KEY;
+      if (!skey) return new Response(JSON.stringify({ error: 'no service key' }), { status: 500, headers: CORS });
+      const leagueFilter = url.searchParams.get('league');
+      const fetchAll = async () => {
+        const H3 = { apikey: skey, Authorization: 'Bearer ' + skey };
+        const t3 = new Date(); const p3 = new Date(); p3.setDate(p3.getDate() - 1);
+        const ks3 = ['locked_picks_v1_' + t3.toISOString().slice(0, 10),
+                     'locked_picks_v1_' + p3.toISOString().slice(0, 10)];
+        const nowMs = Date.now();
+        const out = [];
+        for (const ck of ks3) {
+          try {
+            const r = await fetch(SUPABASE_URL + '/rest/v1/shared_cache?key=eq.' + encodeURIComponent(ck) + '&select=data', { headers: H3 });
+            const rows = await r.json().catch(() => []);
+            const data = Array.isArray(rows) && rows[0] && rows[0].data;
+            if (!data) continue;
+            for (const v of Object.values(data)) {
+              if (!v || !v.commenceTs) continue;
+              // Solo partidos que no terminaron (kickoff hasta 3h atrás = puede estar en juego)
+              if (v.commenceTs < nowMs - 3 * 3600e3) continue;
+              out.push({ home: v.home, away: v.away, commenceTs: v.commenceTs,
+                         sportKey: v.sportKey || null, rec: v.rec || null,
+                         bvr: v.bvr || null, odds: v.bestOdds || null });
+            }
+          } catch (_) {}
+        }
+        out.sort((a, b) => a.commenceTs - b.commenceTs);
+        return out;
+      };
+      let picks = await cached(env, 'todaypicks_v1', 600, fetchAll).catch(() => null);
+      if (!Array.isArray(picks)) picks = [];
+      if (leagueFilter) picks = picks.filter(p => p.sportKey === leagueFilter);
+      return new Response(JSON.stringify({ ts: new Date().toISOString(), count: picks.length, picks }),
+        { headers: { ...CORS, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300' } });
+    }
+
     // ── 🆕 (23-jul-2026) /clv-report — CLV de picks con closing line capturada ──
     if (path === '/clv-report') {
       const skey = env.SUPABASE_SERVICE_ROLE_KEY;
