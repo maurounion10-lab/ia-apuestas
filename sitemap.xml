@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://gambeta.ai/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/"/>
     <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/como-funciona</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/como-funciona"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/how-it-works"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/como-funciona"/>
     <lastmod>2026-06-30</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/blog/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/"/>
     <lastmod>2026-05-20</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
@@ -152,6 +163,10 @@
   </url>
   <url>
     <loc>https://gambeta.ai/blog/ia-champions-league</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/ia-champions-league"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/ia-champions-league"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/ai-champions-league"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/ia-champions-league"/>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -164,6 +179,10 @@
   </url>
   <url>
     <loc>https://gambeta.ai/blog/ia-para-apostar</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/ia-para-apostar"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/ia-para-apostas"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/ai-for-sports-betting"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/ia-para-apostar"/>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -212,12 +231,20 @@
   </url>
   <url>
     <loc>https://gambeta.ai/blog/que-es-adamchoi</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/que-es-adamchoi"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/o-que-e-adamchoi"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/what-is-adamchoi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/que-es-adamchoi"/>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/blog/que-es-footystats</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/que-es-footystats"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/o-que-e-footystats"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/what-is-footystats"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/que-es-footystats"/>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -272,6 +299,10 @@
   </url>
   <url>
     <loc>https://gambeta.ai/blog/flashscore-vs-sofascore</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/flashscore-vs-sofascore"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/flashscore-vs-sofascore"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/flashscore-vs-sofascore"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/flashscore-vs-sofascore"/>
     <lastmod>2026-05-20</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
@@ -368,6 +399,10 @@
   </url>
   <url>
     <loc>https://gambeta.ai/blog/pronosticos-futbol-ia</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/pronosticos-futbol-ia"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/palpites-futebol-ia"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/ai-football-predictions"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/pronosticos-futbol-ia"/>
     <lastmod>2026-05-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
@@ -2210,92 +2245,171 @@
   </url>
   <url>
     <loc>https://gambeta.ai/pt/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/"/>
     <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/en/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/"/>
     <lastmod>2026-07-24</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/pt/blog/ia-para-apostas</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/ia-para-apostar"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/ia-para-apostas"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/ai-for-sports-betting"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/ia-para-apostar"/>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/en/blog/ai-for-sports-betting</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/ia-para-apostar"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/ia-para-apostas"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/ai-for-sports-betting"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/ia-para-apostar"/>
     <lastmod>2026-07-24</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/pt/blog/palpites-futebol-ia</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/pronosticos-futbol-ia"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/palpites-futebol-ia"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/ai-football-predictions"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/pronosticos-futbol-ia"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/pt/blog/ia-champions-league</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/ia-champions-league"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/ia-champions-league"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/ai-champions-league"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/ia-champions-league"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/pt/blog/o-que-e-adamchoi</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/que-es-adamchoi"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/o-que-e-adamchoi"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/what-is-adamchoi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/que-es-adamchoi"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/en/blog/ai-football-predictions</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/pronosticos-futbol-ia"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/palpites-futebol-ia"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/ai-football-predictions"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/pronosticos-futbol-ia"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/en/blog/ai-champions-league</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/ia-champions-league"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/ia-champions-league"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/ai-champions-league"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/ia-champions-league"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/en/blog/what-is-adamchoi</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/que-es-adamchoi"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/o-que-e-adamchoi"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/what-is-adamchoi"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/que-es-adamchoi"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/pt/blog/o-que-e-footystats</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/que-es-footystats"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/o-que-e-footystats"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/what-is-footystats"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/que-es-footystats"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/pt/blog/flashscore-vs-sofascore</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/flashscore-vs-sofascore"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/flashscore-vs-sofascore"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/flashscore-vs-sofascore"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/flashscore-vs-sofascore"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/en/blog/what-is-footystats</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/que-es-footystats"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/o-que-e-footystats"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/what-is-footystats"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/que-es-footystats"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/en/blog/flashscore-vs-sofascore</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/flashscore-vs-sofascore"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/flashscore-vs-sofascore"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/flashscore-vs-sofascore"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/flashscore-vs-sofascore"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://gambeta.ai/en/how-it-works</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/como-funciona"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/how-it-works"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/como-funciona"/>
     <lastmod>2026-07-23</lastmod>
     <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gambeta.ai/pt/blog/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/"/>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://gambeta.ai/en/blog/</loc>
+    <xhtml:link rel="alternate" hreflang="es" href="https://gambeta.ai/blog/"/>
+    <xhtml:link rel="alternate" hreflang="pt-BR" href="https://gambeta.ai/pt/blog/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://gambeta.ai/en/blog/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://gambeta.ai/blog/"/>
+    <lastmod>2026-07-24</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 </urlset>
