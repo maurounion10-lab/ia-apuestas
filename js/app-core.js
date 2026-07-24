@@ -6520,7 +6520,7 @@ function renderPreds() {
           } ${_recLabel(p.rec, p.home, p.away)}</div>
           ${(()=>{ const _u = buildPickBlogUrl(p); return _u ? `<a href="${_u}" class="pred-saber-mas" title="Leer análisis completo del pick"><span class="sm-ico">📖</span> Análisis completo <span class="sm-arrow">→</span></a>` : ''; })()}
         </div>
-        ${(()=>{ const _s=_recSideOf(p); const _roRaw = _s==='home' ? (p._hO ? parseFloat(p._hO) : null) : _s==='away' ? (p._aO ? parseFloat(p._aO) : null) : _s==='draw' ? (p._dO ? parseFloat(p._dO) : null) : (p._bestOdds ? parseFloat(p._bestOdds) : null); if (!_roRaw) return ''; const _roShown = isMaxConf ? (_roRaw * 0.95).toFixed(2) : _roRaw.toFixed(2); return `<div class="pred-rec-right"><span class="pred-rec-odds-label">Cuota</span><div class="pred-rec-odds">${_roShown}</div></div>`; })()}
+        ${(()=>{ const _s=_recSideOf(p); const _roRaw = _s==='home' ? (p._hO ? parseFloat(p._hO) : null) : _s==='away' ? (p._aO ? parseFloat(p._aO) : null) : _s==='draw' ? (p._dO ? parseFloat(p._dO) : null) : (p._bestOdds ? parseFloat(p._bestOdds) : null); if (!_roRaw) return ''; const _roShown = isMaxConf ? (_roRaw * 0.95).toFixed(2) : _roRaw.toFixed(2); return `<div class="pred-rec-right"><span class="pred-rec-odds-label">${T('label.odds')}</span><div class="pred-rec-odds">${_roShown}</div></div>`; })()}
       </div>
       ${(p.probH > 0 || p.probA > 0) ? `
       <div class="pred-bars">
@@ -10714,6 +10714,15 @@ const LANGS = {
     'nav.scores':'Marcadores','nav.pred':'Pronósticos','nav.calc':'Calculadora',
     'nav.stats':'Stats','nav.hist':'Resultados','nav.cuotas':'Cuotas',
     'nav.bankroll':'Bankroll','auth.enter':'Entrar','auth.register':'Registro Gratis',
+    'nav.picks':'Picks','nav.tools':'Herramientas','nav.forum':'Foro','nav.blog':'Blog','nav.bonus':'Bonos',
+    'nav.create':'Crear pronóstico','nav.createShort':'Crear',
+    'hero.sub':'Inteligencia Artificial para Apuestas de Fútbol',
+    'sec.preds':'Pronósticos de la IA','sec.results':'Resultados de Pronósticos',
+    'sec.mypicks':'Mis Picks · Rendimiento Personal','sec.bankroll':'Bankroll Manager',
+    'sec.toppick':'El pick que la IA Gambeta más banca hoy',
+    'cta.pickspage':'🔮 Página completa de Picks →','cta.resultspage':'📋 Página completa de Resultados →',
+    'dd.picks':'🔮 Picks IA','dd.results':'📋 Resultados','dd.logout':'↩ Cerrar sesión',
+    'label.odds':'Cuota',
     'tab.all':'Todos','tab.futbol':'Fútbol',
     'tab.tenis':'Tenis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● EN VIVO','status.soon':'⚡ COMIENZA PRONTO','status.upcoming':'PRÓXIMO','status.final':'FINALIZADO',
@@ -10736,6 +10745,15 @@ const LANGS = {
     'nav.scores':'Scores','nav.pred':'Forecasts','nav.calc':'Calculator',
     'nav.stats':'Stats','nav.hist':'Results','nav.cuotas':'Odds',
     'nav.bankroll':'Bankroll','auth.enter':'Login','auth.register':'Free Sign Up',
+    'nav.picks':'Picks','nav.tools':'Tools','nav.forum':'Forum','nav.blog':'Blog','nav.bonus':'Bonuses',
+    'nav.create':'Create prediction','nav.createShort':'Create',
+    'hero.sub':'Artificial Intelligence for Football Betting',
+    'sec.preds':'AI Predictions','sec.results':'Prediction Results',
+    'sec.mypicks':'My Picks · Personal Performance','sec.bankroll':'Bankroll Manager',
+    'sec.toppick':"Today's highest-conviction AI pick",
+    'cta.pickspage':'🔮 Full Picks page →','cta.resultspage':'📋 Full Results page →',
+    'dd.picks':'🔮 AI Picks','dd.results':'📋 Results','dd.logout':'↩ Log out',
+    'label.odds':'Odds',
     'tab.all':'All','tab.futbol':'Football',
     'tab.tenis':'Tennis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● LIVE','status.soon':'⚡ STARTING SOON','status.upcoming':'UPCOMING','status.final':'FINISHED',
@@ -10758,6 +10776,15 @@ const LANGS = {
     'nav.scores':'Placar','nav.pred':'Prognósticos','nav.calc':'Calculadora',
     'nav.stats':'Stats','nav.hist':'Resultados','nav.cuotas':'Odds',
     'nav.bankroll':'Bankroll','auth.enter':'Entrar','auth.register':'Registro Grátis',
+    'nav.picks':'Picks','nav.tools':'Ferramentas','nav.forum':'Fórum','nav.blog':'Blog','nav.bonus':'Bônus',
+    'nav.create':'Criar palpite','nav.createShort':'Criar',
+    'hero.sub':'Inteligência Artificial para Apostas de Futebol',
+    'sec.preds':'Prognósticos da IA','sec.results':'Resultados dos Prognósticos',
+    'sec.mypicks':'Meus Picks · Desempenho Pessoal','sec.bankroll':'Bankroll Manager',
+    'sec.toppick':'O pick que a IA Gambeta mais confia hoje',
+    'cta.pickspage':'🔮 Página completa de Picks →','cta.resultspage':'📋 Página completa de Resultados →',
+    'dd.picks':'🔮 Picks IA','dd.results':'📋 Resultados','dd.logout':'↩ Sair',
+    'label.odds':'Odd',
     'tab.all':'Todos','tab.futbol':'Futebol',
     'tab.tenis':'Tênis','tab.rugby':'Rugby','tab.ufc':'UFC',
     'status.live':'● AO VIVO','status.soon':'⚡ COMEÇA EM BREVE','status.upcoming':'PRÓXIMO','status.final':'FINALIZADO',
