@@ -12,7 +12,7 @@
 <meta charset="UTF-8"><!-- v3 -->
 <link rel="preconnect" href="https://api.accesoia.app">
 <!-- 🆕 #578 Gambeta 1.1 — Tipografía premium Inter + Geist Mono -->
-<link rel="preload" href="/js/app-core.js?v=1784930001" as="script">
+<link rel="preload" href="/js/app-core.js?v=1784941000" as="script">
 <link rel="preload" href="/js/inline-bundle.js?v=1783382200" as="script">
 <link rel="preload" href="/fonts/inter-latin.woff2" as="font" type="font/woff2" crossorigin>
 <style>
@@ -359,22 +359,22 @@ setTimeout(function(){
   </div>
   <!-- Nav visitante (sin login) -->
   <div class="nav-links" id="navLinksGuest">
-    <a onclick="navTo('predictions')">🔮 <span class="nav-text">Picks</span></a>
-    <a onclick="navTo('historial')">📋 <span class="nav-text">Resultados</span></a>
-    <a href="/herramientas">🧮 <span class="nav-text">Herramientas</span></a>
-    <a href="/foro">💬 <span class="nav-text">Foro</span><sup style="font-size:0.55rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</sup></a>
-    <a href="/blog/">📰 <span class="nav-text">Blog</span></a>
-    <a href="/bonos">💰 <span class="nav-text">Bonos</span></a>
+    <a onclick="navTo('predictions')">🔮 <span class="nav-text" data-i18n="nav.picks">Picks</span></a>
+    <a onclick="navTo('historial')">📋 <span class="nav-text" data-i18n="nav.hist">Resultados</span></a>
+    <a href="/herramientas">🧮 <span class="nav-text" data-i18n="nav.tools">Herramientas</span></a>
+    <a href="/foro">💬 <span class="nav-text" data-i18n="nav.forum">Foro</span><sup style="font-size:0.55rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</sup></a>
+    <a href="/blog/">📰 <span class="nav-text" data-i18n="nav.blog">Blog</span></a>
+    <a href="/bonos">💰 <span class="nav-text" data-i18n="nav.bonus">Bonos</span></a>
   </div>
 
   <!-- Nav usuario registrado -->
   <div class="nav-links" id="navLinksUser" style="display:none">
-    <a onclick="navTo('predictions')">🔮 <span class="nav-text">Picks</span></a>
-    <a onclick="navTo('historial')">📋 <span class="nav-text">Resultados</span></a>
-    <a href="/herramientas">🧮 <span class="nav-text">Herramientas</span></a>
-    <a href="/foro">💬 <span class="nav-text">Foro</span><sup style="font-size:0.55rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</sup></a>
-    <a href="/blog/">📰 <span class="nav-text">Blog</span></a>
-    <a href="/bonos">💰 <span class="nav-text">Bonos</span></a>
+    <a onclick="navTo('predictions')">🔮 <span class="nav-text" data-i18n="nav.picks">Picks</span></a>
+    <a onclick="navTo('historial')">📋 <span class="nav-text" data-i18n="nav.hist">Resultados</span></a>
+    <a href="/herramientas">🧮 <span class="nav-text" data-i18n="nav.tools">Herramientas</span></a>
+    <a href="/foro">💬 <span class="nav-text" data-i18n="nav.forum">Foro</span><sup style="font-size:0.55rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</sup></a>
+    <a href="/blog/">📰 <span class="nav-text" data-i18n="nav.blog">Blog</span></a>
+    <a href="/bonos">💰 <span class="nav-text" data-i18n="nav.bonus">Bonos</span></a>
   </div>
 
   <!-- ( widget removido) -->
@@ -382,8 +382,8 @@ setTimeout(function(){
   <!-- Botón Crear pronóstico — siempre visible (móvil + desktop). Misma acción que el 🎯 lateral (#gbBetBbl) -->
   <button class="nav-create-btn" id="navCreateBtn" type="button" onclick="openGbBetModal();" title="Crear un pronóstico" aria-label="Crear un pronóstico">
     <svg class="nav-create-ico" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
-    <span class="nav-create-full">Crear pronóstico</span>
-    <span class="nav-create-short">Crear</span>
+    <span class="nav-create-full" data-i18n="nav.create">Crear pronóstico</span>
+    <span class="nav-create-short" data-i18n="nav.createShort">Crear</span>
   </button>
 
   <!-- Auth button (logged out) -->
@@ -415,12 +415,12 @@ setTimeout(function(){
           </div>
         </div>
       </div>
-      <button class="user-dd-item" onclick="navTo('predictions');closeUserMenu()">🔮 Picks IA</button>
-      <button class="user-dd-item" onclick="navTo('historial');closeUserMenu()">📋 Resultados</button>
+      <button class="user-dd-item" onclick="navTo('predictions');closeUserMenu()" data-i18n="dd.picks">🔮 Picks IA</button>
+      <button class="user-dd-item" onclick="navTo('historial');closeUserMenu()" data-i18n="dd.results">📋 Resultados</button>
       <a class="user-dd-item" href="/foro" style="text-decoration:none;display:block">💬 Foro <span style="font-size:0.55rem;font-weight:800;color:#ffd600;background:rgba(255,214,0,0.15);border:1px solid rgba(255,214,0,0.4);border-radius:4px;padding:1px 4px;margin-left:4px;letter-spacing:0.06em">BETA</span></a>
       <button class="user-dd-item" onclick="navTo('bankroll');closeUserMenu()">💰 Bankroll</button>
       <div class="user-dd-sep"></div>
-      <button class="user-dd-item danger" onclick="logoutUser()">↩ Cerrar sesión</button>
+      <button class="user-dd-item danger" onclick="logoutUser()" data-i18n="dd.logout">↩ Cerrar sesión</button>
     </div>
   </div>
 
@@ -622,7 +622,7 @@ window.toggleHeroBubble = function(n) {
       </div>
     </div>
 
-    <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)">Inteligencia Artificial para Apuestas de Fútbol <span class="hero-emoji-btn" id="heroEmoji1" onclick="toggleHeroBubble(1)" title="Más info">🌎<sup class="hero-emoji-hint">✦</sup></span></span></h1>
+    <h1><span style="color:#fff;font-weight:900">gambeta</span><span style="color:var(--verde);font-weight:900">.ai</span><br><span style="font-size:0.75em;font-weight:700;color:var(--texto-sec)"><span data-i18n="hero.sub">Inteligencia Artificial para Apuestas de Fútbol</span> <span class="hero-emoji-btn" id="heroEmoji1" onclick="toggleHeroBubble(1)" title="Más info">🌎<sup class="hero-emoji-hint">✦</sup></span></span></h1>
     <p>Soy una IA que pronostica Fútbol automáticamente, configurada por un experto y gratis para todo mundo <span class="hero-emoji-btn" id="heroEmoji2" onclick="toggleHeroBubble(2)" title="Más info">💚<sup class="hero-emoji-hint">✦</sup></span></p>
 
     <!-- 🆕 Stat row tipo perfil app: 4 contadores horizontales con dividers verticales -->
@@ -686,7 +686,7 @@ window.toggleHeroBubble = function(n) {
   <section id="predictions">
     <div class="section-title">
       <div class="icon">🔮</div>
-      Pronósticos de la IA
+      <span data-i18n="sec.preds">Pronósticos de la IA</span>
     </div>
     <!-- Filtros pronósticos IA: pills destacados + dropdown agrupado (28-jun-2026 simplificación) -->
     <div style="display:flex;gap:6px;margin:0 0 8px;flex-wrap:wrap;align-items:center" id="predSportTabs">
@@ -795,7 +795,7 @@ window.toggleHeroBubble = function(n) {
 
     <!-- CTA página completa de Picks — solo en home -->
     <div class="section-page-cta">
-      <a class="section-page-cta-btn" href="#picks">🔮 Página completa de Picks →</a>
+      <a class="section-page-cta-btn" href="#picks" data-i18n="cta.pickspage">🔮 Página completa de Picks →</a>
     </div>
 
     <!-- Cross-navigation -->
@@ -827,7 +827,7 @@ window.toggleHeroBubble = function(n) {
   <section id="gbMpPickDelDia" style="padding:48px 20px 64px;background:radial-gradient(ellipse at center top,rgba(255,214,0,0.07),transparent 60%)">
   <div style="max-width:920px;margin:0 auto">
     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,214,0,0.12);border:1px solid rgba(255,214,0,0.38);border-radius:30px;padding:5px 18px;font-size:0.72rem;font-weight:700;color:#ffd600;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:14px">⭐ Máxima Confianza · IA Gambeta</div>
-    <h2 style="font-size:clamp(1.4rem,4.2vw,1.85rem);font-weight:900;color:#fff;margin:0 0 8px;letter-spacing:-0.4px;text-align:left">El pick que la IA Gambeta más banca hoy</h2>
+    <h2 style="font-size:clamp(1.4rem,4.2vw,1.85rem);font-weight:900;color:#fff;margin:0 0 8px;letter-spacing:-0.4px;text-align:left"><span data-i18n="sec.toppick">El pick que la IA Gambeta más banca hoy</span></h2>
     <p style="color:rgba(255,255,255,0.55);font-size:0.92rem;margin:0 0 22px;text-align:left">Es el de mayor confianza del modelo (BVR 6/6). Si querés <strong style="color:#d4a520">combinadas con cuotas altas</strong> sobre este mismo partido, las arma MasterProps.</p>
 
     <div id="mpPickCard" style="background:linear-gradient(135deg,#111118 0%,#16161f 100%);border:1px solid rgba(255,214,0,0.32);border-radius:18px;padding:22px;box-shadow:0 12px 32px rgba(0,0,0,0.35);min-height:200px;display:flex;align-items:center;justify-content:center">
@@ -957,7 +957,7 @@ window.toggleHeroBubble = function(n) {
 </section>
 <section id="historial" class="gb-lazy-render">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px">
-      <div class="section-title" style="margin:0"><div class="icon">📋</div>Resultados de Pronósticos</div>
+      <div class="section-title" style="margin:0"><div class="icon">📋</div><span data-i18n="sec.results">Resultados de Pronósticos</span></div>
       <button id="btnResolveManual" onclick="manualResolveResults()" style="display:none;align-items:center;gap:7px;background:rgba(0,200,83,0.08);border:1px solid rgba(0,200,83,0.3);color:var(--verde);padding:8px 14px;border-radius:10px;cursor:pointer;font-size:0.8rem;font-weight:700;transition:background .2s;white-space:nowrap">
         🔄 Actualizar resultados
       </button>
@@ -1034,7 +1034,7 @@ window.toggleHeroBubble = function(n) {
 
     <!-- CTA página dedicada de Historial -->
     <div class="section-page-cta">
-      <a class="section-page-cta-btn" href="#historial">📋 Página completa de Resultados →</a>
+      <a class="section-page-cta-btn" href="#historial" data-i18n="cta.resultspage">📋 Página completa de Resultados →</a>
     </div>
 
     <!-- Cross-navigation -->
@@ -1429,7 +1429,7 @@ window.toggleHeroBubble = function(n) {
 
   <!-- MIS PICKS: PANEL PERSONAL DE STATS  -->
   <section id="myPicksPanel" style="display:none" class="gb-lazy-render">
-    <div class="section-title"><div class="icon">📊</div>Mis Picks · Rendimiento Personal</div>
+    <div class="section-title"><div class="icon">📊</div><span data-i18n="sec.mypicks">Mis Picks · Rendimiento Personal</span></div>
     <div class="mypicks-stats" id="myPicksStats"></div>
     <div class="mypicks-list" id="myPicksList"></div>
     <div id="myPicksEmpty" style="display:none;text-align:center;padding:24px 16px;color:var(--texto-sec);font-size:0.88rem">
@@ -1832,7 +1832,7 @@ window.toggleHeroBubble = function(n) {
 </section>
 
 <section id="bankroll" class="gb-lazy-render">
-    <div class="section-title"><div class="icon">💰</div>Bankroll Manager</div>
+    <div class="section-title"><div class="icon">💰</div><span data-i18n="sec.bankroll">Bankroll Manager</span></div>
 
     <!-- Lock CTA (guests only) -->
     <div class="bk-lock-overlay" id="bkLockOverlay">
@@ -2053,7 +2053,7 @@ window.toggleHeroBubble = function(n) {
   <div class="fp-emoji-grid" id="fpEmojiGrid"></div>
 </div>
 
-<script src="/js/app-core.js?v=1784930001" defer></script>
+<script src="/js/app-core.js?v=1784941000" defer></script>
 
 <!-- AUTH MODAL -->
 <!-- ── MODAL BIENVENIDA (nuevo usuario) ── -->

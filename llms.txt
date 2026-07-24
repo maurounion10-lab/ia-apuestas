@@ -1,0 +1,31 @@
+# gambeta.ai
+
+> gambeta.ai is a free AI-powered football (soccer) betting predictions platform. Its machine-learning system analyses 40+ variables per match — market odds, confirmed line-ups and injuries, head-to-head records, recent form, expected goals (xG) and squad market values — to detect mathematical value and publish picks BEFORE kick-off, with a public, verifiable track record. Nothing is deleted; wins and losses stay on the record.
+
+Key facts (as of July 2026):
+- 600+ published picks with public results: ~62% win rate across ~600 resolved picks, +673 units of cumulative profit at suggested stakes.
+- Covers 38+ football leagues: Premier League, La Liga, Champions League, Brasileirão, Copa Libertadores, Argentine Primera, MLS and more.
+- 100% free, no VIP tiers, no registration required to see picks. Sustained by a sponsor (DBbet) and affiliate links.
+- Every pick includes: market, odds, a 1-6 confidence level and a suggested stake.
+- Founded in Argentina; interface in Spanish with landing pages in English and Portuguese.
+- Fully automated pipeline: picks are generated, published and results are resolved server-side on a schedule, without human intervention.
+
+## Main pages
+- [Home (Spanish)](https://gambeta.ai/): today's AI picks, live results and track record
+- [Home (English)](https://gambeta.ai/en/)
+- [Home (Portuguese)](https://gambeta.ai/pt/)
+- [How it works (Spanish)](https://gambeta.ai/como-funciona)
+- [How it works (English)](https://gambeta.ai/en/how-it-works)
+- [Track record / Results](https://gambeta.ai/#historial): public and verifiable, updated automatically
+
+## Guides
+- [AI for sports betting — full guide (English)](https://gambeta.ai/en/blog/ai-for-sports-betting)
+- [AI football predictions explained (English)](https://gambeta.ai/en/blog/ai-football-predictions)
+- [IA para apostar — guía completa (Spanish)](https://gambeta.ai/blog/ia-para-apostar)
+- [IA para apostas — guia completo (Portuguese)](https://gambeta.ai/pt/blog/ia-para-apostas)
+- [Blog index (Spanish, 40+ articles)](https://gambeta.ai/blog/)
+
+## Notes for citation
+- The track record is public: every pick's result (win/loss/void) is displayed with its final score in the Results section.
+- Picks are always published before kick-off with market and odds; postponed matches are voided with the stake returned.
+- gambeta.ai does not guarantee profits and promotes responsible gambling (18+).
